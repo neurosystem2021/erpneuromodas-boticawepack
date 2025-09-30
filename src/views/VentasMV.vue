@@ -373,6 +373,7 @@
               :items="venta.productos"
               :id="`TablaCarrito${index}`"
               :ref="`TablaCarrito${index}`"
+              class="tblCarrrito"
             >
               <template slot="Series" slot-scope="data">
                 <b-select 
@@ -913,7 +914,7 @@
                 style="background: #FFEA00; color:#000000"
                 size="lg"
                 class="btnAction"
-                >Añadir nueva ventana</b-button
+                >nueva ventana</b-button
                 >
               <b-button
                 @click="eliminarVentana"
@@ -3253,6 +3254,14 @@ export default {
 };
 </script>
 <style scoped>
+.tblCarrrito {
+  min-height: 380px !important ;
+  max-height: 380px !important ;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #bdbdbd !important;
+  background: #ffffff !important;
+}
 .text-red {
   color: red !important;
   margin: 50px 0px 50px 0 !important;

@@ -125,362 +125,363 @@
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
         </b-row>
       </b-modal>
-
-      <b-table
-        small
-        responsive
-        striped
-        hover
-        :items="productos"
-        :fields="fields"
-        ref="tablaCarrito"
-        style="margin-top: -12px"
-        v-if="mostrarTablaProductos"
-        class="tblCarrrito"
-      >
-        <template slot="eventPres" slot-scope="data">
-          <b-button
-            size="sm"
-            v-if="productos[data.index].estadoPxP == false"
-            :disabled="bloquearInput ? true : false"
-            variant="info"
-            @click="showPresentacion(productos[data.index],data.index)"
-            >
-            <i class="fas fa-list"></i>
-            </b-button>
-          <b-button
-            @click="
-              abrirImagen(
-                productos[data.index].Producto,
-                productos[data.index].Imagen == null ||
-                  productos[data.index].Imagen == ''
-                  ? 'static/no-photo.png'
-                  : '/resources/images/productos/' +
-                      productos[data.index].Imagen
-              )
-            "
-            style="margin-top: 2px"
-            :id="'popover-imagen' + productos[data.index].IdProducto"
-            variant="success"
-            size="sm"
-            ><i class="fas fa-image"></i
-          ></b-button>
-          <b-popover
-            placement="right"
-            :target="'popover-imagen' + productos[data.index].IdProducto"
-            :title="productos[data.index].Producto"
-            triggers="hover"
-          >
-            <div style="text-align: center">
-              <b-img
-                style="border-radius: 10px; width: 200px"
-                fluid
-                :src="
+      <div class="">
+        <b-table
+          small
+          responsive
+          striped
+          hover
+          :items="productos"
+          :fields="fields"
+          ref="tablaCarrito"
+          style="margin-top: -12px"
+          v-if="mostrarTablaProductos"
+          class="tblCarrrito"
+        >
+          <template slot="eventPres" slot-scope="data">
+            <b-button
+              size="sm"
+              v-if="productos[data.index].estadoPxP == false"
+              :disabled="bloquearInput ? true : false"
+              variant="info"
+              @click="showPresentacion(productos[data.index],data.index)"
+              >
+              <i class="fas fa-list"></i>
+              </b-button>
+            <b-button
+              @click="
+                abrirImagen(
+                  productos[data.index].Producto,
                   productos[data.index].Imagen == null ||
-                  productos[data.index].Imagen == ''
+                    productos[data.index].Imagen == ''
                     ? 'static/no-photo.png'
                     : '/resources/images/productos/' +
-                      productos[data.index].Imagen
-                "
-                alt=""
-                @error="setAltImg"
-              ></b-img>
-            </div>
-          </b-popover>
-        </template>
+                        productos[data.index].Imagen
+                )
+              "
+              style="margin-top: 2px"
+              :id="'popover-imagen' + productos[data.index].IdProducto"
+              variant="success"
+              size="sm"
+              ><i class="fas fa-image"></i
+            ></b-button>
+            <b-popover
+              placement="right"
+              :target="'popover-imagen' + productos[data.index].IdProducto"
+              :title="productos[data.index].Producto"
+              triggers="hover"
+            >
+              <div style="text-align: center">
+                <b-img
+                  style="border-radius: 10px; width: 200px"
+                  fluid
+                  :src="
+                    productos[data.index].Imagen == null ||
+                    productos[data.index].Imagen == ''
+                      ? 'static/no-photo.png'
+                      : '/resources/images/productos/' +
+                        productos[data.index].Imagen
+                  "
+                  alt=""
+                  @error="setAltImg"
+                ></b-img>
+              </div>
+            </b-popover>
+          </template>
 
-        <template slot="obsequio" slot-scope="data">
-          <div class="obsequio" v-if="tipoMov == 0">
+          <template slot="obsequio" slot-scope="data">
+            <div class="obsequio" v-if="tipoMov == 0">
+              <b-form-checkbox
+                button-variant="primary"
+                v-model="productos[data.index].EsObsequio"
+                :value="1"
+                @input="setObsequio(data.index)"
+                :unchecked-value="0"
+              >
+              </b-form-checkbox>
+            </div>
+          </template>
+
+          <template
+            slot="cantxPrecio"
+            slot-scope="data"
+            v-if="productos[data.index].tipo == 'PRESENTACION'"
+          >
+            <input
+              v-model="productos[data.index].cantxPrecio"
+              type="number"
+              style="width: 80px"
+              step="0.001"
+              min="0"
+              :disabled="bloquearInput ? true : false"
+              @input="
+                (val) => changeCant(val.target.value, productos[data.index])
+              "
+              placeholder="Cantidad"
+              class="form-control"
+            />
+            <span>x{{ productos[data.index].cantidadPres }}</span>
+          </template>
+
+          <template slot="Serie" slot-scope="data">
+            <ul>
+              <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
+                {{ serie.Serie }}
+              </li>
+            </ul>
+          </template>
+
+          <template slot="Series" slot-scope="data">
+            <b-select 
+                v-if="generarSerie(data.item.productoSerie).length>0"
+                :options="generarSerie(data.item.productoSerie)" 
+                v-model="data.item.IdProductoSerie"
+                text-field="Serie"
+                value-field="IdProductoSerie"
+            />
+            
+          </template>
+
+          <template slot="AddSeries" slot-scope="data">
+            <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
+              <i class="fa fa-barcode" aria-hidden="true"></i>
+            </b-button>
+          </template>
+          
+          <template slot="cantidad" slot-scope="data">
+            <input
+              v-model="productos[data.index].cantidad"
+              :disabled="productos[data.index].tipo == 'PRESENTACION'"
+              type="number"
+              style="width: 95px"
+              class="form-control"
+              step="0.001"            
+              min="0"
+              @input="
+                (val) => {
+                  $emit('onInputCantidad', val.target.value);
+                recalcularTotalPorItem(productos[data.index],data.index);
+                  if (productos[data.index].EsObsequio == 1) {
+                    productos[data.index].precio = 0;
+                    productos[data.index].nuevoPrecioContado = 0;
+                  }
+                }
+              "
+              placeholder="Cantidad"
+            />
+          </template>
+
+          <template slot="precio" slot-scope="data">
+            <!-- disabled -->
+            <input
+              v-model="productos[data.index].precio"
+              type="number"
+              style="width: 95px"
+              min="0"
+              step="0.00001"
+              class="form-control"
+              placeholder="Precio"
+              @input="setNuevoPrecioContado(data.index)"
+            />
+          </template>
+
+          <template slot="subtotal" slot-scope="data">
+            {{ getSubtotal(data.index) }}
+          </template>
+
+          <template slot="subtotalE" slot-scope="data">
+            <b-input v-model="productos[data.index].subtotal"
+            type="number"
+            @blur="recalcularPUxSubTotal(data.index)"
+            @input="recalcularPUxSubTotal(data.index)"
+            />
+            <!-- {{data.item.subtotal}} -->
+            
+            {{ getSubtotal(data.index) }}
+          </template>
+
+          <template slot="igv" slot-scope="data">
             <b-form-checkbox
-              button-variant="primary"
-              v-model="productos[data.index].EsObsequio"
+              v-model="productos[data.index].TieneIgv"
               :value="1"
-              @input="setObsequio(data.index)"
+              :disabled="
+                bloquearInput
+                  ? true
+                  : false ||
+                    (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                      ? true
+                      : false)
+              "
+              @input="setNuevoPrecioContado(data.index)"
               :unchecked-value="0"
             >
+              <div>{{ getIgv(data.index) }}</div>
             </b-form-checkbox>
-          </div>
-        </template>
-
-        <template
-          slot="cantxPrecio"
-          slot-scope="data"
-          v-if="productos[data.index].tipo == 'PRESENTACION'"
-        >
-          <input
-            v-model="productos[data.index].cantxPrecio"
-            type="number"
-            style="width: 80px"
-            step="0.001"
-            min="0"
-            :disabled="bloquearInput ? true : false"
-            @input="
-              (val) => changeCant(val.target.value, productos[data.index])
-            "
-            placeholder="Cantidad"
-            class="form-control"
-          />
-          <span>x{{ productos[data.index].cantidadPres }}</span>
-        </template>
-
-        <template slot="Serie" slot-scope="data">
-          <ul>
-            <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
-              {{ serie.Serie }}
-            </li>
-          </ul>
-        </template>
-
-        <template slot="Series" slot-scope="data">
-          <b-select 
-              v-if="generarSerie(data.item.productoSerie).length>0"
-              :options="generarSerie(data.item.productoSerie)" 
-              v-model="data.item.IdProductoSerie"
-              text-field="Serie"
-              value-field="IdProductoSerie"
-          />
+          </template>
           
-        </template>
-
-        <template slot="AddSeries" slot-scope="data">
-          <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
-            <i class="fa fa-barcode" aria-hidden="true"></i>
-          </b-button>
-        </template>
-        
-        <template slot="cantidad" slot-scope="data">
-          <input
-            v-model="productos[data.index].cantidad"
-            :disabled="productos[data.index].tipo == 'PRESENTACION'"
-            type="number"
-            style="width: 95px"
-            class="form-control"
-            step="0.001"            
-            min="0"
-            @input="
-              (val) => {
-                $emit('onInputCantidad', val.target.value);
-               recalcularTotalPorItem(productos[data.index],data.index);
-                if (productos[data.index].EsObsequio == 1) {
-                  productos[data.index].precio = 0;
-                  productos[data.index].nuevoPrecioContado = 0;
-                }
-              }
-            "
-            placeholder="Cantidad"
-          />
-        </template>
-
-        <template slot="precio" slot-scope="data">
-          <!-- disabled -->
-          <input
-            v-model="productos[data.index].precio"
-            type="number"
-            style="width: 95px"
-            min="0"
-            step="0.00001"
-            class="form-control"
-            placeholder="Precio"
-            @input="setNuevoPrecioContado(data.index)"
-          />
-        </template>
-
-        <template slot="subtotal" slot-scope="data">
-          {{ getSubtotal(data.index) }}
-        </template>
-
-        <template slot="subtotalE" slot-scope="data">
-          <b-input v-model="productos[data.index].subtotal"
-          type="number"
-           @blur="recalcularPUxSubTotal(data.index)"
-           @input="recalcularPUxSubTotal(data.index)"
-           />
-          <!-- {{data.item.subtotal}} -->
-          
-          {{ getSubtotal(data.index) }}
-        </template>
-
-        <template slot="igv" slot-scope="data">
-          <b-form-checkbox
-            v-model="productos[data.index].TieneIgv"
-            :value="1"
-            :disabled="
-              bloquearInput
-                ? true
-                : false ||
-                  (productos[data.index].EsObsequio == 1 && tipoMov == 0
-                    ? true
-                    : false)
-            "
-            @input="setNuevoPrecioContado(data.index)"
-            :unchecked-value="0"
-          >
-            <div>{{ getIgv(data.index) }}</div>
-          </b-form-checkbox>
-        </template>
-        
-        <template slot="manoobra" slot-scope="data">
-          <input
-            @change="(e) => addManoDeObra(data.index, e)"
-            v-if="productos[data.index].CodigoBarra != 'MANODEOBRA'"
-            :disabled="bloquearInput ? true : false"
-            v-model="productos[data.index].EsManoDeObra"
-            class="form-check-input"
-            type="checkbox"
-          />
-        </template>
-
-        <template slot="precioVenta" slot-scope="data">
-          <input
-            :disabled="bloquearInput ? true : false"
-            style="width: 95px"
-            v-model="productos[data.index].nuevoPrecioContado"
-            type="number"
-            min="0"
-            step="0.01"
-            class="form-control"
-            placeholder="Precio Venta"
-          />
-          <b-form-text>
-            <strike> {{ productos[data.index].normalPrecioContado }} </strike>
-          </b-form-text>
-        </template>
-
-        <template slot="utilidad" slot-scope="data">
-          <input
-            :disabled="
-              bloquearInput
-                ? true
-                : false || idPerfil == 1
-                ? false
-                : true || esDelivery
-            "
-            class="form-control"
-            v-model="productos[data.index].PorcentajeUtilidad"
-            style="width: 80px"
-            type="number"
-            step="0.01"
-            @input="cambiarPrecio(data.index, productos[data.index])"
-            @mouseup="cambiarPrecio(data.index, productos[data.index])"
-          />
-          <small
-            >ganancia:
-            {{
-              (productos[data.index].precio - productos[data.index].PrecioCosto)
-                | redondear
-            }}</small
-          >
-        </template>
-
-        <template slot="descuento" slot-scope="data">
-          <input
-            :disabled="bloquearInput ? true : false || esDelivery"
-            v-model="productos[data.index].descuento"
-            style="width: 90px"
-            type="number"
-            min="0"
-            step="0.01"
-            class="form-control"
-            value="0"
-            @input="actualizarDescu(data.index)"
-          />
-          <b-form-text> </b-form-text>
-        </template>
-
-        <template slot="FechaAlquiler" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FechaAlquiler"
-            type="date"
-            placeholder="Fecha Fin"
-            :value="formatFecha(data.item.FechaAlquiler)"
-          ></b-form-input>
-        </template>
-
-        <template slot="FechaAlquilerFin" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FechaAlquilerFin"
-            type="date"
-            placeholder="Fecha Fin"
-            :value="formatFecha(data.item.FechaAlquilerFin)"
-          ></b-form-input>
-        </template>
-
-        <template slot="Descripcion" slot-scope="data">
-          <textarea
-            :disabled="bloquearInput ? true : false"
-            class="form-control"
-            placeholder="Descripción"
-            cols="9"
-            rows="1"
-            style="width: 150px"
-            v-model="productos[data.index].Descripcion"
-          ></textarea>
-          <!--<b-form-input
-            v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>-->
-        </template>
-
-        <template slot="total" slot-scope="data">
-          {{ getTotal(data.index) }}
-          <br />
-          <h6><i>Prof.</i></h6>
-          <input
-            class="form-check-input"
-            type="checkbox"
-            :disabled="bloquearInput ? true : false"
-            @change="
-              (e) => {
-                $emit('onCheckProf', e);
-                asignarDisabledProf(data.index, e);
-              }
-            "
-          />
-        </template>
-
-        <template slot="acciones" slot-scope="data">
-          <b-button
-            :disabled="bloquearInput ? true : false"
-            variant="danger"
-            size="sm"
-            @click="quitarProducto(data.index)"
-            ><i class="fas fa-times fa-lg"></i
-          ></b-button>
-          <!-- <b-button
-            style="margin-top: 5px"
-            :disabled="bloquearInput ? true : false"
-            v-if="idPerfil == 1 ? true : false"
-            variant="primary"
-            size="sm"
-            @click="editarProducto(productos[data.index])"
-            ><i class="fas fa-pencil-alt fa-sm"></i
-          ></b-button> -->
-        </template>
-
-        <template slot="show_details" slot-scope="row">
-          <b-button
-            :disabled="bloquearInput ? true : false"
-            size="sm"
-            variant="info"
-            @click.stop="row.toggleDetails"
-            >></b-button
-          >
-        </template>     
-
-        <template slot="stock" slot-scope="data">
-          <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
-            <img src="static/moto-delivery.png" style="width: 24px" />
-          </div>
-          <div v-else>
-            <div>{{ data.item.stock }}</div>
-            <img
-              v-if="data.item.EsPadre"
-              src="static/box.png"
-              style="width: 24px"
+          <template slot="manoobra" slot-scope="data">
+            <input
+              @change="(e) => addManoDeObra(data.index, e)"
+              v-if="productos[data.index].CodigoBarra != 'MANODEOBRA'"
+              :disabled="bloquearInput ? true : false"
+              v-model="productos[data.index].EsManoDeObra"
+              class="form-check-input"
+              type="checkbox"
             />
-          </div>
-        </template>
-      </b-table>
+          </template>
+
+          <template slot="precioVenta" slot-scope="data">
+            <input
+              :disabled="bloquearInput ? true : false"
+              style="width: 95px"
+              v-model="productos[data.index].nuevoPrecioContado"
+              type="number"
+              min="0"
+              step="0.01"
+              class="form-control"
+              placeholder="Precio Venta"
+            />
+            <b-form-text>
+              <strike> {{ productos[data.index].normalPrecioContado }} </strike>
+            </b-form-text>
+          </template>
+
+          <template slot="utilidad" slot-scope="data">
+            <input
+              :disabled="
+                bloquearInput
+                  ? true
+                  : false || idPerfil == 1
+                  ? false
+                  : true || esDelivery
+              "
+              class="form-control"
+              v-model="productos[data.index].PorcentajeUtilidad"
+              style="width: 80px"
+              type="number"
+              step="0.01"
+              @input="cambiarPrecio(data.index, productos[data.index])"
+              @mouseup="cambiarPrecio(data.index, productos[data.index])"
+            />
+            <small
+              >ganancia:
+              {{
+                (productos[data.index].precio - productos[data.index].PrecioCosto)
+                  | redondear
+              }}</small
+            >
+          </template>
+
+          <template slot="descuento" slot-scope="data">
+            <input
+              :disabled="bloquearInput ? true : false || esDelivery"
+              v-model="productos[data.index].descuento"
+              style="width: 90px"
+              type="number"
+              min="0"
+              step="0.01"
+              class="form-control"
+              value="0"
+              @input="actualizarDescu(data.index)"
+            />
+            <b-form-text> </b-form-text>
+          </template>
+
+          <template slot="FechaAlquiler" slot-scope="data">
+            <b-form-input
+              v-model="productos[data.index].FechaAlquiler"
+              type="date"
+              placeholder="Fecha Fin"
+              :value="formatFecha(data.item.FechaAlquiler)"
+            ></b-form-input>
+          </template>
+
+          <template slot="FechaAlquilerFin" slot-scope="data">
+            <b-form-input
+              v-model="productos[data.index].FechaAlquilerFin"
+              type="date"
+              placeholder="Fecha Fin"
+              :value="formatFecha(data.item.FechaAlquilerFin)"
+            ></b-form-input>
+          </template>
+
+          <template slot="Descripcion" slot-scope="data">
+            <textarea
+              :disabled="bloquearInput ? true : false"
+              class="form-control"
+              placeholder="Descripción"
+              cols="9"
+              rows="1"
+              style="width: 150px"
+              v-model="productos[data.index].Descripcion"
+            ></textarea>
+            <!--<b-form-input
+              v-model="productos[data.index].Descripcion"
+              type="text"
+              placeholder="Descripción"></b-form-input>-->
+          </template>
+
+          <template slot="total" slot-scope="data">
+            {{ getTotal(data.index) }}
+            <br />
+            <h6><i>Prof.</i></h6>
+            <input
+              class="form-check-input"
+              type="checkbox"
+              :disabled="bloquearInput ? true : false"
+              @change="
+                (e) => {
+                  $emit('onCheckProf', e);
+                  asignarDisabledProf(data.index, e);
+                }
+              "
+            />
+          </template>
+
+          <template slot="acciones" slot-scope="data">
+            <b-button
+              :disabled="bloquearInput ? true : false"
+              variant="danger"
+              size="sm"
+              @click="quitarProducto(data.index)"
+              ><i class="fas fa-times fa-lg"></i
+            ></b-button>
+            <!-- <b-button
+              style="margin-top: 5px"
+              :disabled="bloquearInput ? true : false"
+              v-if="idPerfil == 1 ? true : false"
+              variant="primary"
+              size="sm"
+              @click="editarProducto(productos[data.index])"
+              ><i class="fas fa-pencil-alt fa-sm"></i
+            ></b-button> -->
+          </template>
+
+          <template slot="show_details" slot-scope="row">
+            <b-button
+              :disabled="bloquearInput ? true : false"
+              size="sm"
+              variant="info"
+              @click.stop="row.toggleDetails"
+              >></b-button
+            >
+          </template>     
+
+          <template slot="stock" slot-scope="data">
+            <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
+              <img src="static/moto-delivery.png" style="width: 24px" />
+            </div>
+            <div v-else>
+              <div>{{ data.item.stock }}</div>
+              <img
+                v-if="data.item.EsPadre"
+                src="static/box.png"
+                style="width: 24px"
+              />
+            </div>
+          </template>
+        </b-table>
+      </div>
     </b-col>
     <b-col md="3">
       <!-- <slot name="operaciones"></slot> -->
@@ -2225,16 +2226,15 @@ export default {
   color: #dc3545;
   border-right: 2px solid #dc3545;
 }
-.tblCarrrito {
-  min-height: 380px !important ;
-  max-height: 380px !important ;
-  overflow-y: auto;
-  overflow-x: auto;
-  border: 1px solid #bdbdbd !important;
-  background: #ffffff !important;
-}
 </style>
 <style>
+.tblCarrrito {
+  min-height: 380px;
+  max-height: 380px;
+  border: 1px solid #bdbdbd;
+  background: #ffffff;
+  overflow-y: auto; /* opcional, si quieres scroll */
+}
 .popover {
   max-width: 420px !important;
 }

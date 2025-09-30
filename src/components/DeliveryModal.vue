@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button  @click="show=true" style="background: #ff441f; color: #ffffff;"  class="btnAction"  size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+    <b-button  @click="show=true" style="background: #01579b; color: #ffffff;"  class="btnAction"  size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         
     <b-modal
       id="modalPedidos"
