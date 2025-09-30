@@ -655,22 +655,22 @@
           <b-col cols="4" style="text-align: center;">
             <b-button
               type="button"
-              @click="anularPagoDelivery"
-              variant="danger"
-              v-if="this.$route.query.idPedido"
-              >Anular Pago Delivery</b-button
-            >
-            <b-button
-              type="button"
               v-if="!this.$route.query.idPedido"
               :disabled="inProgress"
               variant="primary"
               size="lg"
               @click="guardarProforma"
               class="btnAction"
-              >Crear Proforma</b-button
               >
-              <!-- style="background: #004D40;" -->
+                Crear Proforma
+              </b-button>
+
+              <proformas
+                :idAlmacen="venta.almacen.IdAlmacen"
+                :empresa="empresa"
+                @onSelectProforma="setCliente"
+              />
+
             <b-button
               type="submit"
               :disabled="inProgress"
@@ -681,6 +681,16 @@
               > 
                 <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
               </b-button>
+            <b-button
+              type="button"
+              @click="anularPagoDelivery"
+              variant="danger"
+              v-if="this.$route.query.idPedido"
+              >Anular Pago Delivery</b-button
+            >
+            
+              <!-- style="background: #004D40;" -->
+            
               <!-- -->
               <b-button
               class="btnAction"
@@ -707,11 +717,7 @@
             
               <pago-deuda />
             
-              <proformas
-                :idAlmacen="venta.almacen.IdAlmacen"
-                :empresa="empresa"
-                @onSelectProforma="setCliente"
-              />
+          
           
             <!-- <b-button-group class="ocularMovil" v-if="false">
               <pre-orden-lista

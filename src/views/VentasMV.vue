@@ -906,6 +906,13 @@
                 class="btnAction"
                 >Crear Proforma</b-button
               >
+
+               <proformas
+                  :idAlmacen="ventas[tab].almacen.IdAlmacen"
+                  :empresa="empresa"
+                  @onSelectProforma="anadirProforma"
+                />
+                
               <b-button
                 @click="guardarVenta"
                 :disabled="inProgress"
@@ -958,11 +965,7 @@
             
               
                 <pago-deuda />
-                <proformas
-                  :idAlmacen="ventas[tab].almacen.IdAlmacen"
-                  :empresa="empresa"
-                  @onSelectProforma="anadirProforma"
-                />
+               
             
               <!-- <b-button-group class="ocularMovil" v-if="false">
                 <pre-orden-lista

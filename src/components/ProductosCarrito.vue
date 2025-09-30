@@ -454,15 +454,15 @@
             @click="quitarProducto(data.index)"
             ><i class="fas fa-times fa-lg"></i
           ></b-button>
-          <!-- <b-button
+          <b-button
             style="margin-top: 5px"
             :disabled="bloquearInput ? true : false"
-            v-if="idPerfil == 1 ? true : false"
+            v-if="idPerfil == 1 ? !isVentas : false"
             variant="primary"
             size="sm"
             @click="editarProducto(productos[data.index])"
             ><i class="fas fa-pencil-alt fa-sm"></i
-          ></b-button> -->
+          ></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
