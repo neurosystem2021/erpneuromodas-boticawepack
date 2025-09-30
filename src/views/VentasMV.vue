@@ -323,24 +323,31 @@
                 <b-input-group>
                   <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0">Agregar Productos
                   </b-button>
-                  <autocomplete
-                    :ref="`autocompleteProducto${index}`"
-                    :url="APIProductos"
-                    :customParams="{
-                      sortBy: 'stock',
-                      sortDesc: 1,
-                      limit: '25',
-                      id_empresa: empresa 
-                    }"
-                    :onShouldRenderChild="renderChild"
-                    anchor="Producto"
-                    label="writer"
-                    placeholder="Agregar Producto"
-                    :on-select="anadirarProductosSeleccionado"
-                    :onFocus="focusAutocomplete.bind(null,`autocompleteProducto${index}`)"
-                    :classes="{ input: 'form-control' }"
-                  >
-                  </autocomplete>
+                   
+                      <autocomplete
+                        :ref="`autocompleteProducto${index}`"
+                        :id="`autocompleteProducto${index}`"
+                        :url="APIProductos"
+                        :customParams="{
+                          sortBy: 'stock',
+                          sortDesc: 1,
+                          limit: '25',
+                          id_empresa: empresa 
+                        }"
+                        :onShouldRenderChild="renderChild"
+                        anchor="Producto"
+                        label="writer"
+                        placeholder="Agregar Producto"
+                        :on-select="anadirarProductosSeleccionado"
+                        :onFocus="focusAutocomplete.bind(null,`autocompleteProducto${index}`)"
+                        :classes="{ input: 'form-control' , text : 'text-producto' }"
+                        style="width: 250px;"
+                      >
+                      </autocomplete>
+                   
+                    <b-button variant="primary" @click="startRecognition">
+                      <i class="fas fa-microphone"></i>
+                    </b-button>
                   <input
                     v-model="loadCode"
                     @keydown.enter.prevent="loadBarcode"
@@ -1159,7 +1166,7 @@
                 </td>
               <td class="table-info"><b>TOTAL</b></td>
               <td class="table-info">
-                {{ sumatoriaTotal }}
+                {{ sumatoriaTotal() }}
               </td>
             </tr>
             <tr>
@@ -1275,6 +1282,7 @@ export default {
   },
   data() {
     return {
+      query: "",
       totalCart: 0,
       monto: 0,
       primerMonto: true,
@@ -1407,6 +1415,79 @@ export default {
   },
 
   methods: {
+    sumatoriaTotal() {
+      let sumatoria = this.ventas[this.tab].productos.reduce(
+        (sum, producto) => {
+          return (
+            sum +
+            parseFloat(
+              producto.subtotal - (producto.descuento ? producto.descuento : 0)
+            )
+          );
+        },
+        0
+      );
+      // this.actualizarTotal(sumatoria);
+      console.log("ssss", sumatoria);
+
+      this.metodoPagoCambio(1);
+      return this.$options.filters.redondear(sumatoria);
+    },
+    search() {
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true
+      });
+
+      let inputElement = `autocompleteProducto${this.tab}`;
+      let autocompleteInput = document.getElementById(inputElement);
+
+      setTimeout(() => {
+        document.getElementById(inputElement).value = this.query;
+        autocompleteInput.dispatchEvent(inputEvent);
+      }, 200);
+    },
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+
     // PRODUCTO CARRITO
 
     quitarProducto(index) {
@@ -3200,24 +3281,7 @@ export default {
 
       return precio;
     },
-    sumatoriaTotal() {
-      let sumatoria = this.ventas[this.tab].productos.reduce(
-        (sum, producto) => {
-          return (
-            sum +
-            parseFloat(
-              producto.subtotal - (producto.descuento ? producto.descuento : 0)
-            )
-          );
-        },
-        0
-      );
-      // this.actualizarTotal(sumatoria);
-      console.log("ssss", sumatoria);
-      this.totalCart = sumatoria;
-      this.metodoPagoCambio(1);
-      return this.$options.filters.redondear(sumatoria);
-    },
+
     subTotalG() {
       let sumatoria = this.ventas[this.tab].productos.reduce(
         (sum, producto) => {
