@@ -2139,6 +2139,18 @@ export default {
         return;
       }
 
+      let listaProductos = this.ventas[this.ventaActiva].productos;
+
+      // revisar si hay productos sin stock
+      let sinStock = listaProductos.find(p => Number(p.stock) <= 0);
+
+      if (sinStock) {
+        this.$toasted.show(
+          `El producto "${sinStock.Producto}" no tiene stock disponible`
+        );
+        return;
+      }
+
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
