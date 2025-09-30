@@ -387,7 +387,7 @@ export default {
       if (item.TieneIgv == 1) {
         igv = item.Cantidad * item.Precio * 0.18;
       }
-      monto = item.Cantidad * item.Precio + igv;
+      monto = item.Cantidad * item.Precio ;
       return parseFloat(monto).toFixed(2);
     }
   },
