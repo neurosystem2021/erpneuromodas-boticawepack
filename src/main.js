@@ -26,6 +26,10 @@ import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
 import 'leaflet/dist/leaflet.css';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import * as echarts from 'echarts';
+
+Vue.prototype.$echarts = echarts;
+
 
 Vue.prototype.$browser = detect()
 
