@@ -564,8 +564,9 @@
               placeholder="Buscar..."
               class="form-control inputResponsive"
             ></b-form-input>
+            <b-button  @click="searchProducto=''" variant="warning"> X </b-button>
             <b-input-group-append>
-              <b-button @click="startRecognition()">
+              <b-button @click="startRecognition()" variant="info">
                 <i class="fas fa-microphone"></i>
               </b-button>
             </b-input-group-append>
