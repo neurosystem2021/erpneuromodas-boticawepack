@@ -123,7 +123,7 @@
                   <th>Flete</th>
                   <th>Precio</th>
                   <th>IGV</th>
-                  <th>Total</th>
+                  <th>TOTAL</th>
                 </tr>
               </thead>
               <tbody>
@@ -314,9 +314,9 @@ export default {
               TotalPEN += element.TOTAL;
             }
             if (element.Moneda == "USD") {
-              SubTotalUSD = element.SUBTOTAL;
-              IgvlUSD = element.IGV;
-              TotalUSD = element.TOTAL;
+              SubTotalUSD += element.SUBTOTAL;
+              IgvlUSD += element.IGV;
+              TotalUSD += element.TOTAL;
             }
           });
           this.SubTotalPEN = parseFloat(SubTotalPEN).toFixed(2);
@@ -387,7 +387,8 @@ export default {
       if (item.TieneIgv == 1) {
         igv = item.Cantidad * item.Precio * 0.18;
       }
-      monto = item.Cantidad * item.Precio + igv;
+      console.log("item");
+      monto = item.Cantidad * item.Precio + parseFloat(igv);
       return parseFloat(monto).toFixed(2);
     }
   },
