@@ -236,7 +236,6 @@ export default {
         });
     },
     ObtenerDatosDellate(productos) {
-      console.log(productos);
       productos.forEach(producto => {
         this.axios(`${this.API}ver_productos`, {
           params: {
@@ -248,6 +247,7 @@ export default {
           this.productos.unshift(producto);
         });
       });
+      console.log(productos);
     },
     calcularFechaHasta(actual, dias) {
       var date = new Date(actual);

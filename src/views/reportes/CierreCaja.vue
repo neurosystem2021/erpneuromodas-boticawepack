@@ -798,7 +798,9 @@ export default {
         this.$swal.showLoading();
       }
     });
-
+    if (sessionStorage.getItem("empresa")) {
+      this.empresa = sessionStorage.getItem("empresa");
+    }
     await this.getListadoVendedor();
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id);
@@ -811,14 +813,10 @@ export default {
       await this.getVendedor();
       this.$swal.close();
     }
-
-    if (sessionStorage.getItem("empresa")) {
-      this.empresa = sessionStorage.getItem("empresa");
-    }
   },
   data() {
     return {
-      empresa:'modasm',
+      empresa: "modasm",
       IdVendedor: "",
       API: config.API,
       lstVendedor: [],
@@ -1091,7 +1089,8 @@ export default {
             salidas: this.totalSalidas,
             total: this.granTotal,
             totalVentas: this.totalVentas,
-            granTotal: this.granTotal
+            granTotal: this.granTotal,
+            id_empresa: this.empresa
           })
           .then(res => {
             this.loadData();
@@ -1115,7 +1114,8 @@ export default {
       await this.axios
         .get(this.API + "ventas/detalle", {
           params: {
-            idDocVentas: this.ventas.map(item => item.idDocVenta)
+            idDocVentas: this.ventas.map(item => item.idDocVenta),
+            id_empresa: this.empresa
           }
         })
         .then(response => {
@@ -1131,7 +1131,8 @@ export default {
     },
     async getVentas() {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        id_empresa: this.empresa
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
@@ -1155,7 +1156,8 @@ export default {
     },
     async getIngresos() {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        id_empresa: this.empresa
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
@@ -1174,7 +1176,8 @@ export default {
     },
     async getSalidas() {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        id_empresa: this.empresa
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
@@ -1200,7 +1203,8 @@ export default {
     },
     async getAdelantos() {
       let params = {
-        idDocVentas: this.ventas.map(v => v.idDocVenta)
+        idDocVentas: this.ventas.map(v => v.idDocVenta),
+        id_empresa: this.empresa
       };
       await this.axios
         .get(this.API + "cierrecaja/ingresos/adelantos", {
@@ -1217,7 +1221,8 @@ export default {
       await this.axios
         .get(this.API + "cierrecaja", {
           params: {
-            idCierre: id
+            idCierre: id,
+            id_empresa: this.empresa
           }
         })
         .then(res => {

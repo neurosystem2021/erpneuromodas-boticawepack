@@ -559,12 +559,13 @@
       <b-row>
         <b-col cols="12">
           <b-input-group>
-            <b-form-input
+            <input
               v-model="searchProducto"
               placeholder="Buscar..."
               class="form-control inputResponsive"
-            ></b-form-input>
-            <b-button  @click="searchProducto=''" variant="warning"> X </b-button>
+              id="searchProducto"
+            >
+            <b-button  @click="limpiarBuscar" variant="warning"> X </b-button>
             <b-input-group-append>
               <b-button @click="startRecognition()" variant="info">
                 <i class="fas fa-microphone"></i>
@@ -614,24 +615,38 @@
               <thead>
                 <tr>
                   <th>Empresa</th>
-                  <th>Categoria</th>
-                  <th>Marca</th>
+                  
+                  <th>CodigoBarra</th>
                   <th>Producto</th>
+                  <th>ProductoModelo</th>
+                  <th>ProductoMarca</th>
+                  <th>ProductoDesc3</th>
+                  <th>ProductoCategoria</th>
+                  <th>ProductoMedicion</th>
                   <th>Stock</th>
-                  <th>Stock</th>
+                  <th>Stock Minimo</th>
                   <th>Precio</th>
                   <th>Imagen</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(prod,index) in listadoProductos()" :key="index"  @dblclick="anadirarProductosSeleccionado(prod,true)">
+                <tr v-for="(prod,index) in listadoProductos()" :key="index" 
+                :class="prod.Empresa"
+                
+                @dblclick="anadirarProductosSeleccionado(prod,true)">
+
                   <td>{{ prod.NombreEmpresa }}</td>
-                  <td>{{ prod.ProductoCategoria }}</td>
-                  <td>{{ prod.ProductoMarca }}</td>
+                  <td>{{ prod.CodigoBarra }}</td>
                   <td>{{ prod.Producto }}</td>
-                  <td>{{ prod.stock }}</td>
-                  <td>{{ prod.StockMinimo }}</td>
-                  <td>{{ prod.PrecioContado }}</td>
+                  <td>{{prod.ProductoModelo }} </td>
+                  <td>{{prod.ProductoMarca }} </td>
+                  <td>{{prod.ProductoDesc3 }} </td>
+                  <td>{{prod.ProductoCategoria }} </td>
+                  <td>{{prod.ProductoMedicion }} </td>
+                  
+                  <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
+                  <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
                   <td>
                     <img
                     :src="
@@ -1245,6 +1260,10 @@ export default {
     }
   },
   methods: {
+    limpiarBuscar() {
+      this.searchProducto = "";
+      document.getElementById("searchProducto").focus();
+    },
     anadirSerie() {
       if (!this.Serie) {
         return;
@@ -1499,7 +1518,6 @@ export default {
       }
     },
     async setProducto(obj) {
-      console.log(setProducto);
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1509,7 +1527,7 @@ export default {
       this.preciosProd = [];
       this.objProd = {};
       obj.EsObsequio = 0;
-      console.log(obj);
+
       // let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto,);
       prod.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
@@ -1540,7 +1558,6 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log("setProductoUni");
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1582,8 +1599,6 @@ export default {
       this.actualizarProd(obj);
     },
     setProductoCant(prod) {
-      console.log("setProductoCant");
-
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1671,6 +1686,7 @@ export default {
                 <td>Marca</td>
                 <td>Procedencia</td>
                 <td>Categoria</td>
+                <td>U.M.</td>
                 <td>Precio</td>
               </tr>
             </thead>
@@ -1682,7 +1698,7 @@ export default {
             : data.stock
               ? Number.isInteger(parseFloat(data.stock))
                 ? parseInt(data.stock)
-                : parseFloat(data.stock).toFixed(2)
+                : parseFloat(data.stock).toFixed(0)
               : data.stock
         }</b></td>
                 <td style="width: 30px"><b> ${data.CodigoBarra}</b></td>
@@ -1693,6 +1709,7 @@ export default {
                   data.ProductoDesc3 ? data.ProductoDesc3 : ""
                 }</td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoMedicion}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado ? data.PrecioContado : ""
                 }</b></td>
@@ -1722,7 +1739,6 @@ export default {
     },
 
     setNuevoPrecioContado(index) {
-      console.log("setNuevoPrecioContado");
       let precio = parseFloat(this.productos[index].precio);
       if (this.productos[index].TieneIgv) {
         precio += precio * 0.18;
@@ -1878,7 +1894,6 @@ export default {
       return lst.slice(start, end);
     },
     async obtenerSeriePorProducto(id) {
-      console.log("obtenerSeriePorProducto", id);
       let productoSerie = [];
       await this.axios
         .get(this.API + "productos/serie", {
@@ -1892,7 +1907,6 @@ export default {
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
-      console.log(item);
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
           v => v.IdProducto == item.IdProducto
@@ -1924,8 +1938,10 @@ export default {
         item.IdProducto,
         item.Empresa
       );
+      this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
+      // this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
       item.productoSerie = productoSerie;
-      console.log(productoSerie);
+
       this.itemProducto = { ...item };
       this.itemProducto.tipo = "PRESENTACION";
       this.itemProducto.PreciosPorProducto = PreciosPorProducto;
@@ -1953,7 +1969,7 @@ export default {
         this.itemProducto.cantxPrecio = 0;
         this.itemProducto.cantidad = 1;
         this.itemProducto.descuento = 0;
-        delete this.itemProducto._rowVariant;
+
         this.$store.state.cart.productos.unshift(this.itemProducto);
         setTimeout(() => {
           this.modalNuevoProductos = abrirModal;
@@ -2220,6 +2236,9 @@ export default {
     buscarProductosCodigoBarrasModal(e) {
       e.preventDefault();
       // this.IdProducto = this.IdProducto;
+    },
+    variantPorEmpresa(empresa) {
+      return null;
     }
   },
   components: {
@@ -2229,6 +2248,21 @@ export default {
 </script>
 
 <style scoped>
+.modasm {
+  background: #eff9ff !important;
+}
+.modasgio {
+  background: #c1e7ff !important;
+}
+.modasjes {
+  background: #cdcdcd !important;
+}
+.modasjun {
+  background: #c2ffc0 !important;
+}
+.modaspau {
+  background: #ffdaf0 !important;
+}
 .contentCard {
   cursor: pointer;
 }
@@ -2311,7 +2345,7 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 60%;
+  max-width: 90%;
 }
 
 .optionSelect {

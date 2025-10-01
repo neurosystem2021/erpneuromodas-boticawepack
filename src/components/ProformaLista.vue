@@ -178,10 +178,29 @@ export default {
               const encontrado = stock.find(
                 s => s.IdProducto === det.IdProducto
               );
+              console.log(det,'det')
               return {
                 ...det,
-                Producto: encontrado.Producto,
-                stock: encontrado ? encontrado.stock : 0
+                Producto: encontrado ? encontrado.Producto : det.Producto,
+                stock: encontrado ? encontrado.stock : 0,
+                Series: encontrado
+                  ? encontrado["Series"]
+                  : null,
+                ProductoModelo: encontrado
+                  ? encontrado["ProductoModelo"]
+                  : null,
+                ProductoDesc3: encontrado
+                  ? encontrado["ProductoDesc3"]
+                  : null,
+                ProductoCategoria: encontrado
+                  ? encontrado["ProductoCategoria"]
+                  : null,
+                ProductoMarca: encontrado
+                  ? encontrado["ProductoMarca"]
+                  : null,
+                ProductoMedicion: encontrado
+                  ? encontrado["ProductoMedicion"]
+                  : null
               };
             });
 
@@ -190,7 +209,7 @@ export default {
               const empresaInfo = this.$store.state.empresas.find(
                 e => e.value == item.Empresa
               );
-
+              console.log("item", item);
               const normalizado = {
                 ...item,
                 Empresa: empresaInfo.value,
@@ -282,6 +301,8 @@ export default {
           this.empresaselec +
           "&limit=" +
           ctx.perPage +
+          "&IdAlmacen=" +
+          this.idAlmacen +
           "&page=" +
           ctx.currentPage +
           "&filter=" +

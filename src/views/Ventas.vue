@@ -969,6 +969,7 @@ import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
+import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
 export default {
   beforeMount() {
@@ -1006,7 +1007,7 @@ export default {
   },
   created() {},
   async mounted() {
-    console.log("empresa", this.empresa);
+
     this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
 
@@ -1073,6 +1074,7 @@ export default {
             variant: "info",
             class: "text-center"
           },
+          { key: "CodigoBarra", label: "Cpodigo" },
           { key: "Producto" },
           { key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMarca", label: "Marca" },
@@ -1083,6 +1085,7 @@ export default {
           // { key: "AddSeries" },
           { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoCategoria", label: "Categoria" },
+          { key: "ProductoMedicion", label: "U.M" },
           { key: "NombreEmpresa", label: "Empresa" },
           { key: "ProductoPresentacion", label: "Anaquel" },
           { key: "Descripcion", label: "Descripción" },
@@ -1611,12 +1614,14 @@ export default {
       }
     },
     setCliente(obj, dni = false) {
+   
       let params = {};
       if (dni) {
         params = {
           dni: dni
         };
       } else {
+        this.venta.cliente = obj;
         params = {
           idCliente: obj.IdCliente || obj
         };
@@ -1851,8 +1856,6 @@ export default {
           let productosLength = this.productos.filter(v => v.Empresa == Empresa)
             .length;
 
-          console.log("lstProductosLength", lstProductosLength);
-          console.log("productosLength", productosLength);
 
           if (productosLength > 0 && lstProductosLength != productosLength) {
             return false;
@@ -2102,13 +2105,18 @@ export default {
         data.Numero = serie.numero;
         data.Serie = serie.serie;
         this.inProgress = true;
+        let IdProformaDets = [];
+        IdProformaDets = this.productos.map(v => {
+          return v.IdProformaDet;
+        });
+        let dataProfs = {
+          IdProformaDets: IdProformaDets
+        };
+        this.axios.post(
+          `${this.API}/proformas/cambiarPagado?id_empresa=` + this.empresa,
+          dataProfs
+        );
         if (data.productos.some(v => v.Empresa == element.value)) {
-          let IdProformaDets = [];
-          if (element.value == this.empresa) {
-            IdProformaDets = this.productos.map(v => {
-              return v.IdProformaDet;
-            });
-          }
           let productos = data.productos.filter(
             v => v.Empresa == element.value
           );
@@ -2367,7 +2375,8 @@ export default {
     PagoDeuda,
     PreOrdenLista,
     Proformas,
-    DeliveryModal
+    DeliveryModal,
+    Movimiento
   }
 };
 </script>
