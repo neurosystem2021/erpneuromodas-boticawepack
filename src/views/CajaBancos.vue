@@ -1005,12 +1005,12 @@ export default {
         return false;
       }
 
-      if (
+      /*if (
         Object.keys(this.Cliente).length === 0 &&
         Object.keys(this.Proveedor).length === 0
       ) {
         return false;
-      }
+      }*/
 
       return true;
     }
