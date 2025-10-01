@@ -1001,7 +1001,7 @@ export default {
     },
     loadBarcode(e) {
       if (e) {
-        e.preventDefault()
+        e.preventDefault();
       }
       let idProducto = this.loadCode;
       let id_empresa = this.empresa;
@@ -1018,7 +1018,7 @@ export default {
             }
           });
       }
-    },    
+    },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
 
@@ -1080,11 +1080,9 @@ export default {
       }
     },
     setProducto(obj) {
-      let val = this.productos.some(prod =>
-        prod.IdProducto === obj.IdProducto
-      )
+      let val = this.productos.some(prod => prod.IdProducto === obj.IdProducto);
       if (val) {
-        this.$toasted.show('Producto ya se encuentra en el listado')
+        this.$toasted.show("Producto ya se encuentra en el listado");
         return;
       }
       this.precioCont = obj.PrecioContado;
@@ -1134,6 +1132,7 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
+      obj.Presentacion = null;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj);
       this.add([
@@ -1152,6 +1151,7 @@ export default {
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
+      console.log("prod", prod);
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1165,6 +1165,7 @@ export default {
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0;
+      obj.Presentacion = JSON.stringify(prod);
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
       this.add([
