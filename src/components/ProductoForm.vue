@@ -227,8 +227,22 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
-            <b-select :options="colorTipo" v-model="producto.TipoColor"></b-select>
+            <label>Tipo color:</label>
+            <autocomplete
+              required="required"
+              :url="API + 'descuentos'"
+              ref="inputDescuento"
+              anchor="Color"
+              label="writer"
+              :placeholder.sync="producto.descuento.Color"
+              :on-select="setDescuento"
+              :onFocus="focusAutocomplete.bind(null, 'inputDescuento')" 
+              :classes="{input: 'form-control'}">
+            </autocomplete>
           </b-form-group>
+          <!-- <b-form-group>
+            <b-select :options="colorTipo" v-model="producto.TipoColor"></b-select>
+          </b-form-group> -->
           <b-form-group>
             Porcentaje Máximo
             <input type="number" step="0.01" class="form-control" v-model="producto.MaxPorcentaje">
@@ -518,6 +532,11 @@ export default {
               ProductoMedicion: newVal.ProductoMedicion
             };
 
+             this.producto.descuento = {
+              IdDescuento: newVal.IdDescuento,
+              Color: newVal.Color
+            };
+
             // this.$refs.inputCategoria.setValue('')
             this.$refs.inputCategoria.setValue(newVal.ProductoCategoria);
 
@@ -526,6 +545,8 @@ export default {
 
             // this.$refs.inputMedicion.setValue('')
             this.$refs.inputMedicion.setValue(newVal.ProductoMedicion);
+
+            this.$refs.inputDescuento.setValue(newVal.Color);
 
             // this.$refs.inputModelo.setValue('')
             this.$refs.inputModelo.setValue(newVal.ProductoModelo);
@@ -702,6 +723,10 @@ export default {
     setMedicion(obj) {
       this.producto.medicion = obj;
     },
+    setDescuento(obj) {
+      this.producto.descuento = obj;
+      this.$refs.inputDescuento.setValue(obj.Color);
+    },
     setMarca(obj) {
       this.producto.marca = obj;
       this.$refs.inputMarca.setValue(obj.ProductoMarca);
@@ -718,6 +743,7 @@ export default {
       this.$refs.inputCategoria.setValue("");
       this.$refs.inputMarca.setValue("");
       this.$refs.inputMedicion.setValue("UNIDAD");
+      this.$refs.inputDescuento.setValue("");
       // this.$refs.inputTalla.setValue('')
       this.$refs.inputModelo.setValue("");
       this.$refs.inputPresentacion.setValue("");
@@ -734,6 +760,7 @@ export default {
         Piso: 1,
         IdProductoMarca: null,
         IdProductoMedicion: null,
+        IdDescuento: null,
         IdProductoCategoria: null,
         ProductoModelo: "",
         // IdProductoModelo: null,
@@ -772,6 +799,7 @@ export default {
           IdProductoMedicion: 6,
           ProductoMedicion: "UNIDAD"
         },
+        descuento: {},
         Imagen: null,
         precios: [
           { nombre: "PRECIO 1", cantidad: 0, precio: 0 },

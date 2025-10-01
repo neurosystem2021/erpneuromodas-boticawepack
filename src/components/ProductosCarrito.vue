@@ -108,9 +108,7 @@
 
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
         <template slot="Producto" slot-scope="data">
-          <span v-if="data.item.TipoColor==-1"> 🔴 </span>
-          <span v-if="data.item.TipoColor==0">🟡 </span>
-          <span v-if="data.item.TipoColor==1">🟢 </span>
+          <span>{{ getColor(data.item) }}</span>
           {{ data.item.Producto }}
         </template>
         <template slot="eventPres" slot-scope="data">
@@ -268,19 +266,19 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput || esDelivery || idPerfil != 1"
+            :disabled="bloquearInput || esDelivery"
             v-model="productos[data.index].PorcentajeDesc"
             type="number"
             min="0"
             step="0.01"
             class="form-control"
             value="0"
-            :max="tipoVenta==2?productos[data.index].MaxPorcentaje:(tipoVenta==1?descCorporativoProp:(tipoVenta==3?descInstitucionalProp:0))"
-            @input="val =>{productos[data.index].descuento = Math.round(getSubtotal(data.index) * val.target.value/100*10)/10; actualizarDescu(data.index); } "/>
+            :max="tipoVenta==2?productos[data.index].DescPublico:(tipoVenta==1?productos[data.index].DescCoporativo:(tipoVenta==3?productos[data.index].DescIntitucional:0))"
+            @input="val =>{productos[data.index].descuento = parseFloat(val.target.value).toFixed(1); actualizarDescu(data.index); } "/>
             <b-form-text class="text-center">
-                <b style="color:#dc3545">% Max: {{tipoVenta==2?productos[data.index].MaxPorcentaje:(tipoVenta==1?descCorporativoProp:(tipoVenta==3?descInstitucionalProp:0))}}</b>
+                <b style="color:#dc3545">% Max: {{tipoVenta==2?productos[data.index].DescPublico:(tipoVenta==1?productos[data.index].DescCoporativo:(tipoVenta==3?productos[data.index].DescIntitucional:0))}}</b>
                 <br>
-                <b>Desc: S/{{productos[data.index].descuento}}</b>      
+                <b>Desc: S/{{parseFloat(productos[data.index].descuento).toFixed(2)}}</b>      
             </b-form-text>
         </template>
 
@@ -571,6 +569,9 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    getColor(item) {
+      return item.Color ? item.Color.split(' ')[0] : '';
+    },
     abrirCalcularM2(obj) {
       this.setProducto(obj);
       if (!this.isVentas) {

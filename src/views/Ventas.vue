@@ -44,12 +44,12 @@
                     <b-col md="7">
                         <b-row>
                             <b-col md="12">
-                                <b-form-group>
+                                <b-form-group >
                                 <b-input-group prepend="Tipo" class="mt-2">
                                     <b-form-radio-group style="margin-left: 12px; margin-top: 7px;"
                                         id="radio-group-1"
                                         v-model="selectedtv"
-                                        :options="optionstv"
+                                        :options="filteredOptions"
                                         v-on:change="cambioTipoVenta($event)"
                                         name="radio-options"
                                     ></b-form-radio-group>
@@ -574,17 +574,24 @@ export default {
                     { key: 'acciones', label: ''}
                 ]
             },
-            selectedtv: 2, // Must be an array reference!
+            selectedtv: 0, // Must be an array reference!
+            tipoAnterior: 0,
             optionstv: [
-            { text: 'TV 1 (Corporativos)', value: 1 },
-            { text: 'TV 2 (Sala)', value: 2 },
-            { text: 'TV 3 (Institucional)', value: 3 },
+                { text: 'TV 1 (Corporativos)', value: 1, key: 'AccesoCorporativo' },
+                { text: 'TV 2 (Público)', value: 2, key: 'AccesoPublico' },
+                { text: 'TV 3 (Institucional)', value: 3, key: 'AccesoInstitucional' }
             ],
             descCorporativoProp:0,
             descInstitucionalProp:0,
             almacenRaiz: (sessionStorage.getItem('IdAlmacen') || 0),
             soloVendedor: sessionStorage.getItem('IdPerfil') == 1 ? 0 : 1,
             idPerfil: sessionStorage.getItem('IdPerfil'),
+
+            accesos: {
+            AccesoCorporativo: 0,
+            AccesoPublico: 0,
+            AccesoInstitucional: 0
+            }
         }
     },
     watch: {
@@ -597,6 +604,9 @@ export default {
             productos: state => state.cart.productos,
             totalCart: state => state.cart.totalCart
         }),
+        filteredOptions() {
+            return this.optionstv.filter(opt => this.accesos[opt.key] == 1);
+        },
         manoDeObraBruta () {
             let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
             let precio = pManoObra ? pManoObra.precioBruta : 0;
@@ -764,7 +774,7 @@ export default {
             this.infoDelivery = {}
             this.descuentoGeneral = 0
             this.puntosAplicados = 0
-            this.selectedtv = 2 
+            this.selectedtv = 0 
         },
         metodoPagoCambio(opc){
             switch (opc) {
@@ -927,8 +937,35 @@ export default {
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
-        cambioTipoVenta(val){
-            this.obtenerDescuentoVenta()
+        async cambioTipoVenta(val) {
+        const opt = this.optionstv.find(o => o.value === val);
+
+        // volver a consultar accesos al backend
+        const resp = await this.axios.get(this.API + "usuarios/" + sessionStorage.getItem("User"));
+        this.accesos.AccesoCorporativo   = Number(resp.data.AccesoCorporativo);
+        this.accesos.AccesoPublico       = Number(resp.data.AccesoPublico);
+        this.accesos.AccesoInstitucional = Number(resp.data.AccesoInstitucional);
+
+        if (opt && this.accesos[opt.key] == 0) {
+            this.$swal({
+            icon: 'error',
+            title: 'Acceso denegado',
+            text: `No tienes permiso para el tipo de venta: ${opt.text}.`,
+            target: document.getElementById('conten'),
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#3880ff',
+            });
+
+            this.$nextTick(() => {
+            this.selectedtv = this.tipoAnterior;
+            });
+
+            return;
+        }
+
+        this.tipoAnterior = val;
+        this.obtenerDescuentoVenta();
         },
         getVendedor (user) {
             let usuario = sessionStorage.getItem('User')
@@ -947,6 +984,12 @@ export default {
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
                 //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
+
+                //columnas de acceso de descuentos en el punto de venta
+                this.accesos.AccesoCorporativo   = Number(response.data.AccesoCorporativo)
+                this.accesos.AccesoPublico       = Number(response.data.AccesoPublico)
+                this.accesos.AccesoInstitucional = Number(response.data.AccesoInstitucional)
+
             })
             .catch((error) => {
                 console.log(error)
@@ -1131,7 +1174,7 @@ export default {
                 this.inProgress = false
             })
         },
-        guardarVenta (evt) {
+        async guardarVenta (evt) {
             evt.preventDefault();
 
             this.inProgress = true
@@ -1268,6 +1311,53 @@ export default {
                 })
                 this.inProgress = false            
                 return 
+            }
+
+           try {
+                // 1. Verificar si existe usuario
+                const userId = sessionStorage.getItem("User");
+                if (!userId) {
+                this.$swal({
+                    icon: "error",
+                    title: "Error",
+                    text: "El usuario no está cargado. Por favor, vuelve a iniciar sesión."
+                });
+                this.inProgress = false;
+                return;
+                }
+
+                // 2. Traer accesos actualizados desde el backend
+                const res = await this.axios.get(this.API + "usuarios/" + userId);
+                this.accesos = res.data; // refresca accesos
+
+                // 3. Validar accesos en base a datos recién traídos
+                const opcionSeleccionada = this.optionstv.find(
+                opt => opt.value === this.selectedtv
+                );
+
+                if (
+                opcionSeleccionada &&
+                parseInt(this.accesos[opcionSeleccionada.key]) === 0
+                ) {
+                this.$swal({
+                    icon: "error",
+                    title: "Acceso denegado",
+                    text: "Ya no tienes permiso para usar este tipo de venta. Elige otro.",
+                    confirmButtonColor: "#3880ff"
+                });
+                this.inProgress = false;
+                this.selectedtv = 0;
+                return;
+                }
+            } catch (err) {
+                console.error(err);
+                this.$swal({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo verificar accesos. Intenta de nuevo."
+                });
+                this.inProgress = false;
+                return; // evitar que siga guardando la venta
             }
 
             this.venta.productos = this.productos
