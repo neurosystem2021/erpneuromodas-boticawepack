@@ -1233,7 +1233,7 @@ export default {
 
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "modasm"
+        sessionStorage.getItem("empresa") || "modasgio"
       );
 
       url = newUrl.toString();

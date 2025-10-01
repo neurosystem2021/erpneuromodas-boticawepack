@@ -45,7 +45,7 @@
                       ref="inputTipoVenta"
                       :url="API + 'ventas/tipos'"
                       anchor="TipoDoc"
-                      initValue="NOTA DE VENTA"
+                      :initValue="TipoDocumento"
                       label="writer"
                       placeholder=""
                       :on-select="setTipoVenta"
@@ -993,7 +993,7 @@ export default {
 
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "modasm"
+        sessionStorage.getItem("empresa") || "modasgio"
       );
 
       url = newUrl.toString();
@@ -1004,22 +1004,33 @@ export default {
     this.initForm();
     this.setScreen();
   },
+  created() {},
   async mounted() {
+    console.log("empresa", this.empresa);
     this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
+
     if (sessionStorage.getItem("empresa")) {
       this.empresa = sessionStorage.getItem("empresa");
+      this.TipoDocumento =
+        this.empresa === "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR";
     }
-    //setInterval(this.updateTime, 1000)
+
+    // setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
     this.escucharPedidos();
     this.configStock();
+
     setTimeout(() => {
       this.recalcularTotalesPorEmpresa();
     }, 100);
   },
+
   data() {
     return {
+      // TipoDocumento:
+      //   this.empresa == "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR",
+      TipoDocumento: "NOTA DE VENTA",
       pagocon: 0,
       isNota: false,
       dni: "",
@@ -1098,7 +1109,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      empresa: "modasm",
+      empresa: sessionStorage.getItem("empresa"),
       ventaSinStock: 0,
       idPerfil: sessionStorage.getItem("IdPerfil") || 0,
       EsCredito: 0,
@@ -1790,6 +1801,9 @@ export default {
 
       this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
+      this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
+        .trim()
+        .toUpperCase();
       this.axios
         .post(this.API + "proformas?id_empresa=" + this.empresa, this.venta)
         .then(async response => {
@@ -2382,10 +2396,10 @@ export default {
 }
 
 .modasm {
-  background: #c1e7ff;
+  background: #eff9ff;
 }
 .modasgio {
-  background: #eff9ff;
+  background: #c1e7ff;
 }
 .modasjes {
   background: #cdcdcd;

@@ -173,7 +173,7 @@ export default {
             ? url
             : location.protocol + "//" + location.host + url;
         newUrl = new URL(newUrl);
-        newUrl.searchParams.append("empresa", "modasm");
+        newUrl.searchParams.append("empresa", "modasgio");
         url = newUrl.toString();
         arguments[1] = url;
         return oldXHROpen.apply(this, arguments);
@@ -236,6 +236,7 @@ export default {
         });
     },
     ObtenerDatosDellate(productos) {
+      console.log(productos);
       productos.forEach(producto => {
         this.axios(`${this.API}ver_productos`, {
           params: {
