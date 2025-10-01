@@ -1662,6 +1662,18 @@ export default {
         </style>
         <div>
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+            <thead>
+              <tr>
+                <td>Stock</td>
+                <td>Código</td>
+                <td>Producto</td>
+                <td>Modelo</td>
+                <td>Marca</td>
+                <td>Procedencia</td>
+                <td>Categoria</td>
+                <td>Precio</td>
+              </tr>
+            </thead>
             <tbody>
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1673,13 +1685,16 @@ export default {
                 : parseFloat(data.stock).toFixed(2)
               : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
-          data.CodigoBarra
-        }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 30px"><b> ${data.CodigoBarra}</b></td>
+                <td style="width: 200px"><b>${data.Producto}</b></td>
+                <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 100px">${
+                  data.ProductoDesc3 ? data.ProductoDesc3 : ""
+                }</td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
+                  data.PrecioContado ? data.PrecioContado : ""
                 }</b></td>
                 <td style="width: 5%">
                   <img src="${
@@ -2333,7 +2348,6 @@ export default {
   margin: 50px 0px 50px 0 !important;
 }
 .inputResponsive {
-
   border: 1px solid #6a1b9a !important;
 }
 @media only screen and (max-width: 700px) {

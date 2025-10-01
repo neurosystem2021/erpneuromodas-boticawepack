@@ -1063,6 +1063,11 @@ export default {
             class: "text-center"
           },
           { key: "Producto" },
+          { key: "ProductoModelo", label: "Modelo" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoDesc3", label: "Procedencia" },
+          { key: "ProductoCategoria", label: "Categoria" },
+          // { key: "Producto" },
           { key: "Series" },
           // { key: "AddSeries" },
           { key: "ProductoMarca", label: "Marca" },

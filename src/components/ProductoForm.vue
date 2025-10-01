@@ -141,16 +141,18 @@
               rows="2"
               v-model="producto._ProductoDesc"
               @input="(val) => producto.ProductoDesc = val"
+              style="field-sizing: content;"
               />
           </b-form-group>
 
-          <b-form-group v-if="false">
-            <label>3ra Descripción:</label>
+          <b-form-group>
+            <label>Procedencia:</label>
             <b-form-textarea 
               ref="inputProductoDesc3"
               rows="6"
               v-model="producto._ProductoDesc3"
               @input="(val) => producto.ProductoDesc3 = val"
+              style="field-sizing: content;"
               />
           </b-form-group>
 
@@ -537,7 +539,7 @@ export default {
 
             this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc;
             //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
-            //this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
+            this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
 
             // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
             // this.$refs.inputProducto.$el.disabled = true
