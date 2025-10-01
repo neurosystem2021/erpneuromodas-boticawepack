@@ -124,44 +124,80 @@ export default {
     generarReporte(listado) {
       this.reporteAgrupado = [];
       let nombresUnicos = [...new Set(listado.map(v => v.Nombre))];
-      let reporteAgrupado = [];
+
       nombresUnicos.forEach(nombre => {
-        let Cantidad = listado
-          .filter(v => v.Nombre == nombre)
-          .reduce((sum, prod) => {
-            return sum + parseFloat(prod.Cantidad ? prod.Cantidad : 0);
-          }, 0);
-        let PrecioCosto = listado.reduce((sum, prod) => {
-          return sum + parseFloat(prod.PrecioCosto ? prod.PrecioCosto : 0);
+        let productos = listado.filter(v => v.Nombre == nombre);
+
+        // Totales
+        let Cantidad = productos.reduce(
+          (sum, prod) => sum + parseFloat(prod.Cantidad || 0),
+          0
+        );
+
+        let TotalCosto = productos.reduce((sum, prod) => {
+          let cant = parseFloat(prod.Cantidad || 0);
+          let pc = parseFloat(prod.PrecioCosto || 0); // 👈 si viene null → 0
+          return sum + cant * pc;
         }, 0);
-        let PrecioVenta = listado.reduce((sum, prod) => {
-          return sum + parseFloat(prod.PrecioVenta ? prod.PrecioVenta : 0);
+
+        let TotalVenta = productos.reduce((sum, prod) => {
+          let cant = parseFloat(prod.Cantidad || 0);
+          let pv = parseFloat(prod.PrecioVenta || 0); // 👈 si viene null → 0
+          return sum + cant * pv;
         }, 0);
-        // let PrecioVenta = listado.reduce((sum, prod) => {
-        //   return sum + parseFloat(prod.PrecioVenta ? prod.PrecioVenta : 0);
-        // }, 0);
+
+        // Precios unitarios (promedio ponderado)
+        let PrecioCosto = Cantidad > 0 ? TotalCosto / Cantidad : 0;
+        let PrecioVenta = Cantidad > 0 ? TotalVenta / Cantidad : 0;
+
+        // Utilidad
+        let UtilidadBruta = TotalVenta - TotalCosto;
+        let UtilidadBrutaPorcentaje =
+          TotalVenta > 0 ? (UtilidadBruta / TotalVenta) * 100 : 0;
+
         this.reporteAgrupado.push({
           Nombre: nombre,
-          Cantidad: parseFloat(Cantidad).toFixed(2),
-          PrecioCosto: parseFloat(PrecioCosto).toFixed(2),
-          TotalCosto: parseFloat(PrecioCosto * Cantidad).toFixed(2),
-          PrecioVenta: parseFloat(PrecioVenta).toFixed(2),
-          TotalVenta: parseFloat(PrecioVenta * Cantidad).toFixed(2),
-          UtilidadBruta: this.getUtilidadBruta({
-            Cantidad: Cantidad,
-            PrecioCosto: PrecioCosto,
-            TotalCosto: PrecioCosto * Cantidad,
-            PrecioVenta: PrecioVenta,
-            TotalVenta: PrecioVenta * Cantidad
-          }),
-          UtilidadBrutaPorcentaje: this.getUtilidadBrutaPorcentaje({
-            Cantidad: Cantidad,
-            PrecioCosto: PrecioCosto,
-            TotalCosto: PrecioCosto * Cantidad,
-            PrecioVenta: PrecioVenta,
-            TotalVenta: PrecioVenta * Cantidad
-          })
+          Cantidad: Cantidad.toFixed(2),
+          PrecioCosto: PrecioCosto.toFixed(2),
+          TotalCosto: TotalCosto.toFixed(2),
+          PrecioVenta: PrecioVenta.toFixed(2),
+          TotalVenta: TotalVenta.toFixed(2),
+          UtilidadBruta: UtilidadBruta.toFixed(2),
+          UtilidadBrutaPorcentaje: UtilidadBrutaPorcentaje.toFixed(2)
         });
+      });
+
+      // Totales generales
+      let totales = this.reporteAgrupado.reduce(
+        (acc, item) => {
+          acc.Cantidad += parseFloat(item.Cantidad);
+          acc.TotalCosto += parseFloat(item.TotalCosto);
+          acc.TotalVenta += parseFloat(item.TotalVenta);
+          return acc;
+        },
+        { Cantidad: 0, TotalCosto: 0, TotalVenta: 0 }
+      );
+
+      let PrecioCostoTotal =
+        totales.Cantidad > 0 ? totales.TotalCosto / totales.Cantidad : 0;
+      let PrecioVentaTotal =
+        totales.Cantidad > 0 ? totales.TotalVenta / totales.Cantidad : 0;
+      let UtilidadBrutaTotal = totales.TotalVenta - totales.TotalCosto;
+      let UtilidadBrutaPctTotal =
+        totales.TotalVenta > 0
+          ? (UtilidadBrutaTotal / totales.TotalVenta) * 100
+          : 0;
+
+      this.reporteAgrupado.push({
+        _rowVariant: "info",
+        Nombre: "TOTALES",
+        Cantidad: totales.Cantidad.toFixed(2),
+        PrecioCosto: PrecioCostoTotal.toFixed(2),
+        TotalCosto: totales.TotalCosto.toFixed(2),
+        PrecioVenta: PrecioVentaTotal.toFixed(2),
+        TotalVenta: totales.TotalVenta.toFixed(2),
+        UtilidadBruta: UtilidadBrutaTotal.toFixed(2),
+        UtilidadBrutaPorcentaje: UtilidadBrutaPctTotal.toFixed(2)
       });
     },
     exportarReporte() {
