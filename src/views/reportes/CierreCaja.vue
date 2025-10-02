@@ -994,9 +994,8 @@ export default {
         (this.totalVentasVisa ? this.totalVentasVisa : 0) +
         (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
         (this.totalVentasDeposito ? this.totalVentasDeposito : 0) +
-        // (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0) 
-        -
-        (this.totalSalidas ? this.totalSalidas : 0) -
+        // (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0)
+        -(this.totalSalidas ? this.totalSalidas : 0) -
         (this.totalAdelantos ? this.totalAdelantos : 0)
       );
     },
@@ -1247,7 +1246,7 @@ export default {
       let r = confirm("¿Está seguro de cerrar la caja?");
       if (r) {
         await this.axios
-          .post(this.API + "cierrecaja", {
+          .post(this.API + "cierrecaja?id_empresa=" + this.empresa, {
             idTurno: this.turno,
             user: sessionStorage.getItem("User"),
             // user:         this.vendedor.Usuario,
@@ -1256,7 +1255,8 @@ export default {
             total: this.granTotal,
             totalVentas: this.totalVentas,
             granTotal: this.granTotal,
-            id_empresa: this.empresa
+            id_empresa: this.empresa,
+            empresa: this.empresa
           })
           .then(res => {
             this.loadData();

@@ -990,7 +990,7 @@
               ></b-form-input
               ><br />
               <label>Vuelto:</label>
-              <b>S/ </b>
+             <input type="text" class="form-control" v-model="vuelto" readonly>
             </td>
           </tr>
         </tbody>
@@ -1179,6 +1179,7 @@ export default {
             parseFloat(this.venta.pago.deposito.monto) +
             parseFloat(this.venta.pago.transferencia.monto))
       ).toFixed(2);
+      this.asignarVuelto()
     },
     productos() {
       this.recalcularTotalesPorEmpresa();
