@@ -595,7 +595,6 @@
               ></b-button>
             </b-input-group-append>
           </b-input-group>
-          <p>Búsqueda Avanzanda (Producto,Categoría,Marca)</p>
         </b-col>
         <!-- <b-col cols="12" slot="modal-footer">
           <div class="w-100 px-2 my-2 derecha">
@@ -1879,14 +1878,21 @@ export default {
           const marca = (p.ProductoMarca || "").toLowerCase();
           const empresa = (p.Empresa || "").toLowerCase();
 
-          // si aparece en cualquiera, entra
+          // ahora como ILIKE 'term%'
           return (
-            prod.includes(term) ||
-            cat.includes(term) ||
-            marca.includes(term) ||
-            empresa.includes(term)
+            prod.startsWith(term) ||
+            cat.startsWith(term) ||
+            marca.startsWith(term) ||
+            empresa.startsWith(term)
           );
         });
+
+        // y ordenar alfabeticamente por nombre de producto
+        lst.sort((a, b) =>
+          (a.Producto || "").localeCompare(b.Producto || "", "es", {
+            sensitivity: "base"
+          })
+        );
       } else {
         lst = productosFiltrados;
       }
@@ -1898,6 +1904,7 @@ export default {
       const perPage = parseInt(this.perPageModal) || lst.length;
       const start = (this.currentPage - 1) * perPage;
       const end = start + perPage;
+
       return lst.slice(start, end);
     },
     async obtenerSeriePorProducto(id) {

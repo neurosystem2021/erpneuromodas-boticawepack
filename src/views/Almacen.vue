@@ -372,7 +372,7 @@
             <h5>Exportar stock hasta la fecha actual:</h5>
           </b-col>
           <b-col md="4" class="centrarClase">
-            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen +'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + filter" target="_blank">Exportar Actual</b-button>
+            <b-button block variant="success" size="md" :href="'/api/index.php/reporte/stock?id_empresa='+empresa+'&controlaStock=1&idAlmacen=' + almacen.IdAlmacen +'&sortBy='+this.sortBy+'&sortDesc='+(this.sortDesc ? 1 : 0 ) + filter" target="_blank">Exportar Actual</b-button>
           </b-col>
         </b-row>
         <hr>
@@ -539,6 +539,8 @@ export default {
       return (
         "/api/index.php/reporte/stock?controlaStock=1&idAlmacen=" +
         this.almacen.IdAlmacen +
+        "&id_empresa=" +
+        this.empresa +
         "&fechaDesde=" +
         this.exportar.fechaDesde +
         "&fechaHasta=" +
