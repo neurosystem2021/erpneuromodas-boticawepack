@@ -223,6 +223,11 @@
           <span>x{{ productos[data.index].cantidadPres }}</span>
         </template>
 
+        <template slot="NombreEmpresa" slot-scope="data">
+          <div :class="`${data.item.Empresa} vChip`">
+            {{ data.item.NombreEmpresa }}
+          </div> 
+          </template>
         <template slot="Serie" slot-scope="data">
           <ul>
             <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
@@ -555,6 +560,8 @@
       v-model="modalNuevoProductos"
       title="Selección Productos"
       class="modalSelectProduct modal-xl"
+      ref="modalSelectProduct"
+      id="modalSelectProduct"
     >
       <b-row>
         <b-col cols="12">
@@ -1938,7 +1945,8 @@ export default {
         item.IdProducto,
         item.Empresa
       );
-      this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
+      delete item._rowVariant;
+      // itemProducto.backgroundColor =
       // this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
       item.productoSerie = productoSerie;
 
@@ -2290,6 +2298,28 @@ export default {
 }
 </style>
 <style>
+.modasm {
+  background: #eff9ff;
+}
+.modasgio {
+  background: #c1e7ff;
+}
+.modasjes {
+  background: #cdcdcd;
+}
+.modasjun {
+  background: #c2ffc0;
+}
+.modaspau {
+  background: #ffdaf0;
+}
+.vChip {
+  font-weight: bold;
+  padding: 10px 5px;
+  /* border-radius: 100% !important; */
+  /* height: 20px;
+  width: 20px; */
+}
 .popover {
   max-width: 420px !important;
 }
@@ -2345,6 +2375,9 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
+  max-width: 90%;
+}
+#modalSelectProduct .modal-dialog {
   max-width: 90%;
 }
 

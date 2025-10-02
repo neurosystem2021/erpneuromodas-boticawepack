@@ -595,7 +595,46 @@
                             venta.pago.efectivo.monto =
                               $options.filters.redondear(
                                 totalCart -
-                                  venta.pago.mastercard.monto -
+                                  venta.pago.transferencia.monto -
+                                  $event.target.value
+                              )
+                          "
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Depósito</td>
+                      <td>
+                        <b-button
+                          variant="info"
+                          size="sm"
+                          class="mt-1"
+                          @click="metodoPagoCambio(5)"
+                          ><i class="fas fa-check"></i
+                        ></b-button>
+                      </td>
+                      <td>
+                        <b-form-input
+                          v-model="venta.pago.deposito.descripcion"
+                          :disabled="bloquearInput ? true : false"
+                          type="text"
+                          placeholder="Descripcion"
+                        ></b-form-input>
+                      </td>
+                      <td>
+                        <input
+                          class="form-control"
+                          v-model="venta.pago.deposito.monto"
+                          :disabled="bloquearInput ? true : false"
+                          min="0"
+                          step="0.01"
+                          type="number"
+                          placeholder="S/."
+                          @input="
+                            venta.pago.efectivo.monto =
+                              $options.filters.redondear(
+                                totalCart -
+                                  venta.pago.deposito.monto -
                                   $event.target.value
                               )
                           "
@@ -777,7 +816,7 @@
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                              @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"
+                              @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
                             />
                         </td>
                       </tr>
@@ -789,7 +828,7 @@
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                            @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" 
+                            @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)" 
                           />
                          
                         </td>
@@ -798,12 +837,25 @@
                         <td>Transferencia</td>
                         <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                         <td>
-                          <b-form-input v-model="venta.pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                          <b-form-input v-model="venta.pago.transferencia.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                         </td>
                         <td>
                           <input
-                            class="form-control" v-model="venta.pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                             @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)" 
+                            class="form-control" v-model="venta.pago.transferencia.monto" min="0" step="0.01" type="number" placeholder="S/."
+                             @input="venta.pago.transferencia.monto = $options.filters.redondear(totalCart - venta.transferencia.visa.monto - $event.target.value)" 
+                            />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Depósito</td>
+                        <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(5)"><i class="fas fa-check"></i></b-button></td>
+                        <td>
+                          <b-form-input v-model="venta.pago.deposito.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                        </td>
+                        <td>
+                          <input
+                            class="form-control" v-model="venta.pago.deposito.monto" min="0" step="0.01" type="number" placeholder="S/."
+                             @input="venta.pago.deposito.monto = $options.filters.redondear(totalCart - venta.deposito.visa.monto - $event.target.value)" 
                             />
                         </td>
                       </tr>
@@ -1007,7 +1059,6 @@ export default {
   },
   created() {},
   async mounted() {
-
     this.$store.state.MostrarBotonMultipleEmpresa = true;
     await this.getVendedor();
 
@@ -1074,7 +1125,7 @@ export default {
             variant: "info",
             class: "text-center"
           },
-          { key: "CodigoBarra", label: "Cpodigo" },
+          { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
           { key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMarca", label: "Marca" },
@@ -1125,6 +1176,7 @@ export default {
         newVal -
           (parseFloat(this.venta.pago.visa.monto) +
             parseFloat(this.venta.pago.mastercard.monto) +
+            parseFloat(this.venta.pago.deposito.monto) +
             parseFloat(this.venta.pago.transferencia.monto))
       ).toFixed(2);
     },
@@ -1258,32 +1310,42 @@ export default {
     },
 
     metodoPagoCambio(opc) {
+      console.log(opc);
       switch (opc) {
         case 1:
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
           this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.deposito.monto = 0;
           this.venta.pago.efectivo.monto = this.totalCart;
           break;
         case 2:
           this.venta.pago.mastercard.monto = 0;
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.deposito.monto = 0;
           this.venta.pago.visa.monto = this.totalCart;
           break;
         case 3:
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.deposito.monto = 0;
           this.venta.pago.mastercard.monto = this.totalCart;
           break;
         case 4:
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.mastercard.monto = 0;
+          this.venta.pago.deposito.monto = 0;
           this.venta.pago.transferencia.monto = this.totalCart;
           break;
-
+        case 5:
+          this.venta.pago.efectivo.monto = 0;
+          this.venta.pago.visa.monto = 0;
+          this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.deposito.monto = this.totalCart;
+          break;
         default:
           break;
       }
@@ -1402,7 +1464,8 @@ export default {
           visa: { descripcion: "", IdMetodoPago: 2, monto: 0 },
           mastercard: { descripcion: "", IdMetodoPago: 3, monto: 0 },
           transferencia: { descripcion: "", IdMetodoPago: 4, monto: 0 },
-          delivery: { descripcion: "", IdMetodoPago: 4, monto: 0 }
+          delivery: { descripcion: "", IdMetodoPago: 4, monto: 0 },
+          deposito: { descripcion: "", IdMetodoPago: 5, monto: 0 }
         },
         IdPreOrden: [],
         CampoDireccion: "Direccion",
@@ -1614,7 +1677,6 @@ export default {
       }
     },
     setCliente(obj, dni = false) {
-   
       let params = {};
       if (dni) {
         params = {
@@ -1706,6 +1768,7 @@ export default {
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
       this.venta.pago.transferencia.monto = 0;
+      this.venta.pago.deposito.monto = 0;
       this.actualizarDescuento();
       this.obtenerStok({
         IdAlmacen: this.venta.almacen.IdAlmacen
@@ -1715,6 +1778,7 @@ export default {
       this.venta.pago.visa.monto = 0;
       this.venta.pago.mastercard.monto = 0;
       this.venta.pago.transferencia.monto = 0;
+      this.venta.pago.deposito.monto = 0;
       if (this.puntosAplicados > 0) {
         this.aplicarPuntos(this.puntosAplicados);
       }
@@ -1824,6 +1888,13 @@ export default {
           this.$refs.inputCliente.setValue("");
           this.$refs.inputVendedor.setValue("");
           this.getVendedor();
+          // window.open(
+          //   "/imprimir/proforma.php?IdProforma=" +
+          //     response.data.insertId +
+          //     "&empresa=" +
+          //     this.empresa,
+          //   "_blank"
+          // );
           window.open(
             "/nuevo/index.html#/reportes/proforma/" +
               response.data.insertId +
@@ -1856,7 +1927,6 @@ export default {
           let productosLength = this.productos.filter(v => v.Empresa == Empresa)
             .length;
 
-
           if (productosLength > 0 && lstProductosLength != productosLength) {
             return false;
           }
@@ -1881,6 +1951,9 @@ export default {
       totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
         ? 0
         : parseFloat(this.venta.pago.transferencia.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.deposito.monto))
+        ? 0
+        : parseFloat(this.venta.pago.deposito.monto);
       if (
         (isNaN(parseFloat(this.venta.pago.efectivo.monto))
           ? 0
