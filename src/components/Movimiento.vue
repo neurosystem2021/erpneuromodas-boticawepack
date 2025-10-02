@@ -169,6 +169,7 @@ export default {
   mounted() {
     // this.getVendedor();
   },
+  props: ['empresa'],
   data() {
     return {
       API: config.API,
@@ -223,23 +224,26 @@ export default {
             // Aquí puedes manejar los datos ingresados
           }
         }); */
-      await this.$swal.fire({
-        icon: "info",
-        title: "Escriba la contraseña del administrador",
-        html:
-          '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
-          '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
-        focusConfirm: false,
-        showCloseButton: true,
-        preConfirm: () => {
-          const input1 = document.getElementById("swal-input1").value;
-          const input2 = document.getElementById("swal-input2").value;
-          if (!input1 || !input2) {
-            this.$swal.showValidationMessage("Por favor, complete ambos campos");
+      await this.$swal
+        .fire({
+          icon: "info",
+          title: "Escriba la contraseña del administrador",
+          html:
+            '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
+            '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
+          focusConfirm: false,
+          showCloseButton: true,
+          preConfirm: () => {
+            const input1 = document.getElementById("swal-input1").value;
+            const input2 = document.getElementById("swal-input2").value;
+            if (!input1 || !input2) {
+              this.$swal.showValidationMessage(
+                "Por favor, complete ambos campos"
+              );
+            }
+            return { usuario: input1, clave: input2 };
           }
-          return { usuario: input1, clave: input2 };
-        }
-      })
+        })
         .then(async result => {
           try {
             const response = await this.axios.post(this.API + "login", {
@@ -283,8 +287,8 @@ export default {
           console.log(e);
         });
     },
-    focusAutocomplete (ref) {
-                this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].handleDoubleClick();
     },
     insertarGasto() {
       let usuario = sessionStorage.getItem("User");
@@ -296,17 +300,17 @@ export default {
         this.axios
           .post(this.API + "cajaybanco/gasto", {
             producto: this.selectProducto,
-            concepto:
-              "Gasto " + " - " + this.selectProducto.GastoDesc,
+            concepto: "Gasto " + " - " + this.selectProducto.GastoDesc,
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
             Gasto: this.selectProducto.Gasto,
-            Usuario: usuario
+            Usuario: usuario,
+            id_empresa: this.empresa
           })
           .then(res => {
             // this.adelantos.push(res.data)
-            this.$refs.inputCaja.setValue('');
+            this.$refs.inputCaja.setValue("");
             this.cargarGastos();
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Gasto = "";
@@ -315,8 +319,8 @@ export default {
           });
       }
     },
-    setCuenta (obj) {
-        this.Cuenta = obj
+    setCuenta(obj) {
+      this.Cuenta = obj;
     },
     insertarIngreso() {
       let usuario = sessionStorage.getItem("User");
@@ -334,12 +338,13 @@ export default {
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
             Ingreso: this.selectProducto.Ingreso,
-            Usuario: usuario
+            Usuario: usuario,
+            id_empresa: this.empresa
           })
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja2.setValue('');
+            this.$refs.inputCaja2.setValue("");
             this.selectProducto.Ingreso = "";
             this.selectProducto.Gasto = "";
             this.selectProducto.Producto = "";
@@ -363,12 +368,13 @@ export default {
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
             Salida: this.selectProducto.Salida,
-            Usuario: usuario
+            Usuario: usuario,
+            id_empresa: this.empresa
           })
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja3.setValue('');
+            this.$refs.inputCaja3.setValue("");
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Salida = "";
             this.selectProducto.Producto = "";
@@ -391,12 +397,13 @@ export default {
             IdCuenta: this.Cuenta.IdCuenta,
             IdHabitacion: this.selectProducto.IdProducto,
             Deposito: this.selectProducto.Deposito,
-            Usuario: usuario
+            Usuario: usuario,
+            id_empresa: this.empresa
           })
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja4.setValue('');
+            this.$refs.inputCaja4.setValue("");
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Deposito = "";
             this.selectProducto.Producto = "";
