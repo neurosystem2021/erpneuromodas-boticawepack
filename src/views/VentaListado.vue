@@ -470,13 +470,13 @@
                       <tbody>
                         <tr>
                           <td>
-                            <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                            <b-button class="p-1 ml-1 mt-1" :id="`popover-metodopago${index}`"  variant="success" @click="togglePopoverMetodo(index)"><i class="fas fa-credit-card"></i></b-button>
                             <br>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus" :style="{ minWidth: '600px' }">
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual" placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
                             <slot name="metodopago" style="width: 1200px;" >
                               <table class="table b-table border table-footer table-sm">
                                 <tbody>
@@ -497,7 +497,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -507,7 +507,7 @@
                                         <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -518,7 +518,7 @@
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -601,7 +601,7 @@
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.DescripcionProforma5"
                                                     min="0"
-                                                    value="0"
+                                                    value="7"
                                                     type="number"
                                                 ></b-form-input>
                                             </b-input-group>
@@ -945,6 +945,7 @@ export default {
   },
   data() {
     return {
+      mostrarMetodo: [],
       mostrarNav: true,
       isNota: [],
       itemsMotivoNota: [
@@ -1147,6 +1148,16 @@ export default {
         this.$set(this.mostrarOp, index, true);
         this.$nextTick(() => {
           this.$root.$emit("bv::show::popover", `popover-opciones${index}`);
+        });
+      }
+    },
+    togglePopoverMetodo(index) {
+    if (this.mostrarMetodo[index]) {
+      this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+    } else {
+      this.$set(this.mostrarMetodo, index, true);
+      this.$nextTick(() => {
+        this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
         });
       }
     },
@@ -1877,7 +1888,7 @@ export default {
           } else {
             return parseFloat(
               total + parseFloat(prod.cantidad * prod.precio)
-            ).toFixed(2);
+            );
           }
           // return (
           //   total +
