@@ -2142,7 +2142,7 @@ export default {
       let listaProductos = this.ventas[this.ventaActiva].productos;
 
       // revisar si hay productos sin stock
-      let sinStock = listaProductos.find(p => Number(p.stock) <= 0);
+      let sinStock = listaProductos.find(p => Number(p.cantidad) > Number(p.stock));
 
       if (sinStock) {
         this.$toasted.show(

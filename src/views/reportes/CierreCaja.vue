@@ -1222,10 +1222,10 @@ export default {
         this.totalVentasMastercard +
         this.totalVentasTransferencia +
         this.totalVentasEfectivo +
-        this.totalIngresosTarjeta +
+        //this.totalIngresosTarjeta +
         this.totalIngresos -
         this.totalSalidas -
-        this.totalSalidasTarjeta -
+        //this.totalSalidasTarjeta -
         this.totalAdelantosActivos
       );
     },

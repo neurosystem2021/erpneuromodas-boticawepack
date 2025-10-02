@@ -410,7 +410,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button variant="success" @click="GuardarMovimiento()">Guardar</b-button>
                     <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
@@ -670,7 +670,7 @@ export default {
       });
     },
     aplicarPago(deuda) {
-      if (this.Importe < deuda.Total - deuda.Aplicado) {
+      if (this.Importe <= deuda.Total - deuda.Aplicado) {
         deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,
