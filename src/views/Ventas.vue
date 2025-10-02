@@ -727,7 +727,7 @@
               v-if="this.$route.query.idPedido"
               >Anular Pago Delivery</b-button
             >
-            
+            <Movimiento :empresa="empresa" v-if="idPerfil == 1 || idPerfil == 14"/>
               <!-- style="background: #004D40;" -->
             
               <!-- -->
@@ -915,14 +915,14 @@
                       <tr>
                         <td>
                           <b-form-checkbox
-                            v-model="EsCredito"
+                            v-model="venta.EsCredito"
                             :value="1"
                             :unchecked-value="0">
                             Venta a credito
                           </b-form-checkbox>
                           <b-form-input 
-                            v-if="EsCredito"
-                            v-model="FechaCredito"
+                            v-if="venta.EsCredito"
+                            v-model="venta.FechaCredito"
                             type="date">
                           </b-form-input>
                                                 <!-- <b-form-checkbox v-if="false"
@@ -2216,7 +2216,7 @@ export default {
           // });
           let comandaJson = JSON.stringify(dataImprimir);
           // console.log(comandaJson);
-
+          console.log('dataCredito',data.EsCredito)
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {
