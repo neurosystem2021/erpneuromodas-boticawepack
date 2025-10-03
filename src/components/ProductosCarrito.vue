@@ -262,6 +262,7 @@
             min="0"
             @input="
               (val) => {
+                cambiarPrecioConvenioBloque(data.index,data.item)
                 $emit('onInputCantidad', val.target.value);
                recalcularTotalPorItem(productos[data.index],data.index);
                 if (productos[data.index].EsObsequio == 1) {
@@ -1395,7 +1396,21 @@ export default {
         //   this.actualizarProd(prod);
       });
     },
-
+    cambiarPrecioConvenioBloque(index, item) {
+      if (item.precioBloque > 0 && item.cantidad >= item.PrecioPorBloque) {
+        this.productos[index].precio = item.precioBloque;
+        console.log("c");
+      } else if (
+        item.PrecioPorMayor > 0 &&
+        item.cantidad >= item.PrecioPorMayor
+      ) {
+        this.productos[index].precio = item.precioConvenio;
+        console.log("b");
+      } else {
+        this.productos[index].precio = item.PrecioContado;
+        console.log("a");
+      }
+    },
     cambiarPrecio(index, prod) {
       var utilidad =
         this.productos[index].PrecioCosto *

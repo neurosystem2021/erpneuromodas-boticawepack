@@ -1311,7 +1311,6 @@ export default {
     },
 
     metodoPagoCambio(opc) {
-      console.log(opc);
       switch (opc) {
         case 1:
           this.venta.pago.visa.monto = 0;

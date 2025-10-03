@@ -185,9 +185,19 @@
               />
           </b-form-group>
           <b-form-group>
-            <label>Precio X Mayor:</label>
+            <label>Cantidad X Mayor:</label>
             <input 
               v-model="producto.PrecioPorMayor"
+              type="number"
+              min="0"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+          <b-form-group>
+            <label>Cantidad X Bloque:</label>
+            <input 
+              v-model="producto.PrecioPorBloque"
               type="number"
               min="0"
               step="0.0001"
@@ -302,8 +312,18 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio Convenio:</label>
+            <label>Precio Por Mayor:</label>
             <input v-model="producto.precioConvenio"
+              type="number"
+              step="0.0001"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Por Bloque:</label>
+            <input v-model="producto.precioBloque"
               type="number"
               step="0.0001"
               class="form-control"
@@ -583,6 +603,8 @@ export default {
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
+            this.producto.PrecioPorBloque = newVal.PrecioPorBloque;
+            this.producto.precioBloque = newVal.precioBloque;
             this.producto.PrecioContado = newVal.PrecioContado;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.EsHabitacion = newVal.EsHabitacion;
