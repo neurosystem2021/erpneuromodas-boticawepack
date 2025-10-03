@@ -631,7 +631,7 @@
                   <th>U.M.</th>
                   <th>Empresa</th>
                   <th>Stock</th>
-                  <!-- <th>Stock Minimo</th> -->
+                  <th>Stock Minimo</th>
                   <th>Precio</th>
                   <th>Imagen</th>
                   
@@ -652,7 +652,7 @@
                   <td>{{prod.ProductoMedicion }} </td>
                   <td>{{ prod.NombreEmpresa }}</td>
                   <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
-                  <!-- <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
+                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
                   <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
                   <td>
                     <img
@@ -1712,7 +1712,9 @@ export default {
               : data.stock
         }</b></td>
                 <td style="width: 30px"><b> ${data.CodigoBarra}</b></td>
-                <td style="text-align:left; pading: 0 0 0 5px ;width: 400px"><b>${data.Producto}</b></td>
+                <td style="text-align:left; pading: 0 0 0 5px ;width: 400px"><b>${
+                  data.Producto
+                }</b></td>
                 <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 100px">${
@@ -1952,10 +1954,11 @@ export default {
       this.abrirModal = abrirModal;
       this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
-      let productoSerie = await this.obtenerSeriePorProducto(
-        item.IdProducto,
-        item.Empresa
-      );
+      // let productoSerie = await this.obtenerSeriePorProducto(
+      //   item.IdProducto,
+      //   item.Empresa
+      // );
+      let productoSerie = [];
       delete item._rowVariant;
       // itemProducto.backgroundColor =
       // this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
@@ -2386,10 +2389,10 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width:100%;
+  max-width: 100%;
 }
 #modalSelectProduct .modal-dialog {
-  max-width:100%;
+  max-width: 100%;
 }
 
 .optionSelect {

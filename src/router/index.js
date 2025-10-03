@@ -250,7 +250,7 @@ export default new Router({
       component: Usuario
     },
     {
-      path: "/ProformaTicket/:id",
+      path: "/reportes/proformaticket/:id",
       name: "ProformaTicket",
       component: ProformaTicket
     },
