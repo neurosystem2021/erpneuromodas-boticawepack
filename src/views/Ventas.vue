@@ -1080,6 +1080,7 @@ export default {
 
   data() {
     return {
+      vuelto: 0,
       // TipoDocumento:
       //   this.empresa == "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR",
       TipoDocumento: "NOTA DE VENTA",
@@ -1179,7 +1180,7 @@ export default {
             parseFloat(this.venta.pago.deposito.monto) +
             parseFloat(this.venta.pago.transferencia.monto))
       ).toFixed(2);
-      this.asignarVuelto()
+      this.asignarVuelto();
     },
     productos() {
       this.recalcularTotalesPorEmpresa();
@@ -2216,7 +2217,7 @@ export default {
           // });
           let comandaJson = JSON.stringify(dataImprimir);
           // console.log(comandaJson);
-          console.log('dataCredito',data.EsCredito)
+          console.log("dataCredito", data.EsCredito);
           await this.axios
             .post(this.API + "ventas?id_empresa=" + element.value, data)
             .then(async response => {

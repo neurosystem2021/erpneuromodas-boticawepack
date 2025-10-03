@@ -597,26 +597,14 @@
             </b-input-group-append>
           </b-input-group>
         </b-col>
-        <!-- <b-col cols="12" slot="modal-footer">
-          <div class="w-100 px-2 my-2 derecha">
-              <b-button
-                variant="primary"
-                size="sm"
-                class="float-right mx-1"
-                @click="anadirarProductos()"
-              >
-                Aceptar
-              </b-button>
-              <b-button
-                variant="danger"
-                size="sm"
-                class="float-right mx-1"
-                @click="modalNuevoProductos = false"
-              >
-                Cancelar
-              </b-button>
-          </div>
-        </b-col> -->
+        <b-form-group class="ml-3">
+          <b-form-radio-group
+            id="radio-group-1"
+            v-model="selected"
+            :options="options"
+            name="radio-options"
+          ></b-form-radio-group>
+        </b-form-group>
         <b-col cols="12" class="mt-3">
           <table class="table table-hover" width="100%">
               <thead>
@@ -1033,6 +1021,13 @@ export default {
       searchProducto: "",
       errorMontoPresentacion: "",
       monto: 0,
+      selected: 1,
+      options: [
+        { text: "Producto", value: 1 },
+        { text: "Marca", value: 3 },
+        { text: "Categoría", value: 2 }
+        // { text: "This is the 4th radio", value: { fourth: 4 } }
+      ],
       fieldsNuevoProductos: [
         { key: "Selected", label: "" },
         { key: "NombreEmpresa", label: "Empresa" },
@@ -1861,6 +1856,8 @@ export default {
     async abrirModaProductos() {
       let vm = this;
       vm.searchProducto = "";
+      this.selected = 1;
+      this.currentPage = 1;
       vm.modalNuevoProductos = !vm.modalNuevoProductos;
       vm.$store.state.consideraAppendEmpresa = false;
     },
@@ -1882,18 +1879,26 @@ export default {
           const prod = (p.Producto || "").toLowerCase();
           const cat = (p.ProductoCategoria || "").toLowerCase();
           const marca = (p.ProductoMarca || "").toLowerCase();
-          const empresa = (p.Empresa || "").toLowerCase();
 
-          // ahora como ILIKE 'term%'
-          return (
-            prod.startsWith(term) ||
-            cat.startsWith(term) ||
-            marca.startsWith(term) ||
-            empresa.startsWith(term)
-          );
+          // depende del radio seleccionado
+          switch (this.selected) {
+            case 1: // Producto
+              return prod.startsWith(term);
+            case 2: // Categoría
+              return cat.startsWith(term);
+            case 3: // Marca
+              return marca.startsWith(term);
+            default:
+              // si no hay selección, que busque en todos
+              return (
+                prod.startsWith(term) ||
+                cat.startsWith(term) ||
+                marca.startsWith(term)
+              );
+          }
         });
 
-        // y ordenar alfabeticamente por nombre de producto
+        // ordenar SIEMPRE por nombre de producto
         lst.sort((a, b) =>
           (a.Producto || "").localeCompare(b.Producto || "", "es", {
             sensitivity: "base"
