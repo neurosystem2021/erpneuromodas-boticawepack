@@ -621,19 +621,20 @@
           <table class="table table-hover" width="100%">
               <thead>
                 <tr>
-                  <th>Empresa</th>
-                  
-                  <th>CodigoBarra</th>
+                  <th></th>
+                  <th>Cód</th>
                   <th>Producto</th>
-                  <th>ProductoModelo</th>
-                  <th>ProductoMarca</th>
-                  <th>ProductoDesc3</th>
-                  <th>ProductoCategoria</th>
-                  <th>ProductoMedicion</th>
+                  <th>Modelo</th>
+                  <th>Marca</th>
+                  <th>Procedencia</th>
+                  <th>Categoria</th>
+                  <th>U.M.</th>
+                  <th>Empresa</th>
                   <th>Stock</th>
-                  <th>Stock Minimo</th>
+                  <!-- <th>Stock Minimo</th> -->
                   <th>Precio</th>
                   <th>Imagen</th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -641,8 +642,7 @@
                 :class="prod.Empresa"
                 
                 @dblclick="anadirarProductosSeleccionado(prod,true)">
-
-                  <td>{{ prod.NombreEmpresa }}</td>
+                  <td><b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
                   <td>{{ prod.CodigoBarra }}</td>
                   <td>{{ prod.Producto }}</td>
                   <td>{{prod.ProductoModelo }} </td>
@@ -650,9 +650,9 @@
                   <td>{{prod.ProductoDesc3 }} </td>
                   <td>{{prod.ProductoCategoria }} </td>
                   <td>{{prod.ProductoMedicion }} </td>
-                  
+                  <td>{{ prod.NombreEmpresa }}</td>
                   <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
-                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
+                  <!-- <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
                   <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
                   <td>
                     <img
@@ -664,6 +664,8 @@
                     class="imagen"
                   />
                   </td>
+                  
+                 
                 </tr>
               </tbody>
           </table>
@@ -998,7 +1000,7 @@ export default {
           ...element,
           Empresa: empresa.value,
           Selected: false,
-          NombreEmpresa: empresa.text.substring(0, 20) + "...",
+          NombreEmpresa: empresa.desc.substring(0, 15),
           _rowVariant:
             element.stock <= 0
               ? "danger"
@@ -1557,7 +1559,7 @@ export default {
           v => v.value == empresa
         );
         obj.Empresa = datoEmpresa[0].value;
-        obj.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
+        obj.NombreEmpresa = datoEmpresa[0].desc.substring(0, 20) + "...";
       }
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
@@ -1697,20 +1699,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
-            <thead>
-              <tr>
-                <td>Stock</td>
-                <td>Código</td>
-                <td>Producto</td>
-                <td>Modelo</td>
-                <td>Marca</td>
-                <td>Procedencia</td>
-                <td>Categoria</td>
-                <td>U.M.</td>
-                <td>Precio</td>
-              </tr>
-            </thead>
+          <table id="table-render" style="width: 1200px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1723,7 +1712,7 @@ export default {
               : data.stock
         }</b></td>
                 <td style="width: 30px"><b> ${data.CodigoBarra}</b></td>
-                <td style="width: 200px"><b>${data.Producto}</b></td>
+                <td style="text-align:left; pading: 0 0 0 5px ;width: 400px"><b>${data.Producto}</b></td>
                 <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 100px">${
@@ -2397,10 +2386,10 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 90%;
+  max-width:100%;
 }
 #modalSelectProduct .modal-dialog {
-  max-width: 90%;
+  max-width:100%;
 }
 
 .optionSelect {

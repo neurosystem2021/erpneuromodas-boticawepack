@@ -35,6 +35,7 @@ import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ArticulosResumen from "@/views/reportes/ArticulosResumen.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ProformaTicket from "@/views/reportes/ProformaTicket.vue";
 // import Usuario from "@/views/Usuario.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
@@ -247,6 +248,11 @@ export default new Router({
       path: "/usuario",
       name: "Usuario",
       component: Usuario
+    },
+    {
+      path: "/ProformaTicket/:id",
+      name: "ProformaTicket",
+      component: ProformaTicket
     },
   ]
 });
