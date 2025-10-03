@@ -390,7 +390,7 @@
                     :disabled="(idPerfil == 1 || idPerfil == 23 || idPerfil == 31) ? false : true"
                     step="0.0001"
                     type="number"
-                    @input="actualizarPorcentajeUtilidad"
+                     @input="actualizarPrecioDolar(1)"
                     class="form-control"
                     />
               </b-form-group>
@@ -398,10 +398,9 @@
                   <label>Tipo Cambio:</label>
                   <input
                     v-model="producto.TipoCambio"
-                    :disabled="true"
                     step="0.0001"
                     type="number"
-                    @input="actualizarPorcentajeUtilidad"
+                    @input="actualizarPrecioDolar(2)"
                     class="form-control"
                     />
               </b-form-group>
@@ -409,10 +408,9 @@
                   <label>Precio de Costo Dolar:</label>
                   <input
                     v-model="producto.PrecioCostoDolar"
-                    :disabled="true"
                     step="0.0001"
                     type="number"
-                    @input="actualizarPorcentajeUtilidad"
+                    @input="actualizarPrecioDolar(3)"
 
                     class="form-control"
                     />
@@ -423,7 +421,7 @@
                 <input v-model="producto.PrecioContado"
                 type="number"
                 step="0.00001"
-                @input="actualizarPorcentajeUtilidad"
+                @input="actualizarPrecioDolar(4)"
                 class="form-control"
                 />
                 <b-form-text v-if="producto.precioContadoNormal">
@@ -436,8 +434,7 @@
                 <input v-model="producto.PrecioContadoDolar"
                 type="number"
                 step="0.00001"
-                @input="actualizarPorcentajeUtilidad"
-                disabled
+                @input="actualizarPrecioDolar(5)"
                 class="form-control"
                 />
                 <b-form-text v-if="producto.precioContadoNormal">
@@ -711,9 +708,7 @@ export default {
             this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
             this.producto.TipoCambio = newVal.TipoCambio;
             this.producto.PrecioContado = newVal.PrecioContado;
-            this.producto.PrecioContadoDolar = parseFloat(
-              newVal.PrecioContado / newVal.TipoCambio
-            ).toFixed(2);
+            this.producto.PrecioContadoDolar = newVal.PrecioContadoDolar;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
             this.producto.EsHabitacion = newVal.EsHabitacion;
@@ -773,6 +768,40 @@ export default {
         
       })
     },*/
+    actualizarPrecioDolar(tipo = 1) {
+      switch (tipo) {
+        case 1:
+          this.producto.PrecioCostoDolar = parseFloat(
+            this.producto.PrecioCosto * this.producto.TipoCambio
+          ).toFixed(2);
+          break;
+        case 2:
+          this.producto.PrecioCostoDolar = parseFloat(
+            this.producto.PrecioCosto * this.producto.TipoCambio
+          ).toFixed(2);
+          this.producto.PrecioContadoDolar = parseFloat(
+            this.producto.PrecioContado * this.producto.TipoCambio
+          ).toFixed(2);
+          this.$forceUpdate();
+          break;
+        case 3:
+          this.producto.PrecioCosto = parseFloat(
+            this.producto.PrecioCostoDolar / this.producto.TipoCambio
+          ).toFixed(2);
+          break;
+        case 4:
+          this.producto.PrecioContadoDolar = parseFloat(
+            this.producto.PrecioContado * this.producto.TipoCambio
+          ).toFixed(2);
+          break;
+        case 5:
+          this.producto.PrecioContado = parseFloat(
+            this.producto.PrecioContadoDolar / this.producto.TipoCambio
+          ).toFixed(2);
+          break;
+      }
+      this.actualizarPorcentajeUtilidad();
+    },
     cargarAlmacenes() {
       this.axios
         .get(this.API + "almacenes")
@@ -869,7 +898,7 @@ export default {
       this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
     setAnaquel(obj) {
-      const valor = obj && obj.Anaquel ? obj.Anaquel : (obj || "");
+      const valor = obj && obj.Anaquel ? obj.Anaquel : obj || "";
       this.producto.Anaquel = valor.trim().toUpperCase();
       this.$refs.inputAnaquel.setValue(valor);
       this.$forceUpdate();
@@ -889,7 +918,7 @@ export default {
         this.$refs.inputMedicion.setValue("UNIDAD");
         this.$refs.inputTipos.setValue("");
         this.$refs.inputProductoDesc.setValue("");
-        this.$refs.inputAnaquel.setValue(""); 
+        this.$refs.inputAnaquel.setValue("");
         this.producto.Anaquel = "";
         // this.$refs.inputTalla.setValue('')
         // this.$refs.inputModelo.setValue("");
@@ -963,7 +992,7 @@ export default {
           { id: null, nombre: "" },
           { id: null, nombre: "" }
         ],
-         Anaquel: ""
+        Anaquel: ""
       };
     },
     keyDownInput(e) {
@@ -1017,8 +1046,8 @@ export default {
 
       // Si no hay un Anaquel seleccionado, tomar el texto manual del input
       if (!this.producto.Anaquel && this.$refs.inputAnaquel) {
-        const valor = this.$refs.inputAnaquel.getValue 
-          ? this.$refs.inputAnaquel.getValue() 
+        const valor = this.$refs.inputAnaquel.getValue
+          ? this.$refs.inputAnaquel.getValue()
           : this.$refs.inputAnaquel.type || "";
 
         this.producto.Anaquel = valor.trim().toUpperCase();
@@ -1030,8 +1059,8 @@ export default {
         .post(this.API + "productos", {
           ...this.producto,
           PreciosPorProducto: this.producto.precios,
-         // Anaqueles: this.producto.anaqueles,
-          Anaquel: this.producto.Anaquel, 
+          // Anaqueles: this.producto.anaqueles,
+          Anaquel: this.producto.Anaquel,
           ProductoReempleazo: this.ProductoReempleazo
         })
         .then(response => {
