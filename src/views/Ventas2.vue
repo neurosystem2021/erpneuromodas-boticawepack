@@ -9,8 +9,8 @@
                 <div class="float-left">
                     <b-button-group size="sm">
                         <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
-                            <option value="imperiop1">EMP. FERRETERIA VENTURO</option>
-                            <option value="imperiop2">EMP. FERRETERIA VENTURO</option>
+                            <option value="imperiop1">SERVICIOS GENERALES EVOLUTION BIKER S.A.C</option>
+                            <option value="imperiop2">SERVICIOS GENERALES EVOLUTION BIKER S.A.C</option>
                         </select>
                     </b-button-group>
                 </div>
