@@ -1,8 +1,29 @@
 <template>
   <b-row>
-    <b-container>
+    <b-container class="ticket">
       <img src="/resources/images/logo-ticket.png" style="max-width:100%; width: 40mm" alt="img-logo-ticket-empresa">
-      {{ proforma }}
+     
+        <h1>COMERCIALIZADORA MIGUELITO S.A.C.</h1>
+        <h1>RUC: 20486408422</h1>
+      
+        <p>PROFORMA NRO: - {{ proforma }}</p>
+       00000000
+      FECHA:
+      VALIDEZ POR: DIAS
+      SR(ES) :
+      RUC/DNI :
+      DIR :
+
+      CANT	PRODUCTO	P/U	TOT
+      SUBTOTAL	S/.0.00
+      TOTAL	S/.0.00
+
+      SON: CON 00/100 SOLES
+
+      JR. MIGUEL GRAU NRO. SN (FRENTE AL HOTEL PARAISO) PASCO - OXAPAMPA - CONSTITUCION
+      PASCO - OXAPAMPA - CONSTITUCION
+
+      GRACIAS POR SU PREFERENCIA
       <b-col></b-col>
     </b-container>
   </b-row>
@@ -49,6 +70,9 @@ export default {
 
     this.getProforma();
     this.getEmpresa();
+    this.$nextTick(() => {
+      // window.print();
+    });
   },
   data() {
     return {
@@ -130,14 +154,19 @@ export default {
 
 <style scoped>
 @import "../../assets/css/invoice.css";
-.celda {
-  text-align: left;
-  border: none !important;
-  background: white !important;
+.ticket {
+  width: 380px; /* o 40mm */
+  font-size: 0.9em;
+  margin: 0 auto; /* centrado */
+  text-align: center;
+  padding: 5px 15px;
 }
 @media print {
-  #printBtn {
-    display: none;
+  * {
+    width: 380px; /* o 40mm */
+    font-size: 0.9em;
+    text-align: center;
+    padding: 5px 15px;
   }
 }
 </style>
