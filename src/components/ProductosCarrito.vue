@@ -2,7 +2,7 @@
   <b-row>
     <b-col md="12">
       <b-form-group>
-        <label>Agregar Productos:</label>
+        <label>Agregar Productos2:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
@@ -22,6 +22,13 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+                 <b-button
+                  size="sm"
+                  variant="primary"
+                  @click="loadBarcode"
+                  title="Buscar por código">
+                  <i class="fas fa-search"></i>
+                </b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
