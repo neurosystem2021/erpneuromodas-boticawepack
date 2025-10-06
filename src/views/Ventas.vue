@@ -1001,9 +1001,12 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
+        { key: "ProductoMarca", label: "Marca" },
         { key: "ProductoTalla", label: "Talla" },
-        { key: "Botapie", label: "Botapie/Manga" },
         { key: "Color" },
+        { key: "Genero" },
+        { key: "Botapie", label: "Botapie/Manga" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
@@ -1157,6 +1160,7 @@ export default {
     };
   },
   mounted() {
+    console.log('componente montado')
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1577,7 +1581,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+          <table id="table-render" style="width: 1300px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1589,11 +1593,17 @@ export default {
                 : parseFloat(data.stock).toFixed(2)
               : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
+                <td style="width: 300px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 80px">${data.ProductoCategoria?data.ProductoCategoria:''}</td>
+                <td style="width: 80px">${data.ProductoModelo?data.ProductoModelo:''}</td>
+                <td style="width: 120px">${data.ProductoMarca?data.ProductoMarca:''}</td>
+                <td style="width: 80px">${data.ProductoTalla?data.ProductoTalla:''}</td>
+                <td style="width: 80px">${data.Color?data.Color:''}</td>
+                <td style="width: 80px">${data.Genero?data.Genero:''}</td>
+                <td style="width: 80px">${data.Botapie?data.Botapie:''}</td>
+                <td style="width: 80px">${data.Anaquel?data.Anaquel:''}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>

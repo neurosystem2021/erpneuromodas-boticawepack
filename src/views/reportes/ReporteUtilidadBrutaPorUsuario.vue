@@ -27,6 +27,12 @@
             <thead>
                 <th>Id Producto</th>
                 <th>Producto</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Talla</th>
+                <th>Color</th>
+                <th>Genero</th>
+                <th>Botapie</th>
                 <th>Cantidad</th>
                 <th>Prom. Precio Costo</th>
                 <th>Prom. Precio Venta</th>
@@ -38,6 +44,12 @@
                 <tr v-for="(reporte,index) in lstReporte" :key="index"> 
                     <td>{{ reporte.IdProducto }}</td>
                     <td>{{ reporte.Producto }}</td>
+                    <td>{{ reporte.ProductoModelo }}</td>
+                    <td>{{ reporte.ProductoMarca }}</td>
+                    <td>{{ reporte.ProductoTalla }}</td>
+                    <td>{{ reporte.Color }}</td>
+                    <td>{{ reporte.Genero }}</td>
+                    <td>{{ reporte.Botapie }}</td>
                     <td>{{ reporte.Cantidad }}</td>
                     <td>{{ reporte.PrecioCosto }}</td>
                     <td>{{ reporte.PrecioVenta }}</td>
@@ -49,7 +61,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                <td colspan="5"> Sumatoria
+                <td colspan="11"> Sumatoria
                 </td>
                 <td><strong class="sumTotalVenta">
                     {{ lstReporte.reduce((sum,reporte)=>{
@@ -88,7 +100,14 @@ export default {
     };
   },
   mounted() {
+    this.fechaInicio = this.$moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    this.fechaFin = this.$moment()
+      .endOf("month")
+      .format("YYYY-MM-DD");
     this.cargarUsuarios();
+    this.getReporteUtilidadPorUsuario();
   },
   methods: {
     async cargarUsuarios() {
