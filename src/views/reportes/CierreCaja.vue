@@ -1192,12 +1192,14 @@ import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
   mounted() {
-    if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id);
-      this.loadData();
-    } else {
-      this.getVendedor();
-    }
+    this.$nextTick(() => {
+      if (this.$route.params.id) {
+        this.getCierre(this.$route.params.id);
+        this.loadData();
+      } else {
+        this.getVendedor();
+      }
+    });
   },
   data() {
     return {
@@ -1453,7 +1455,7 @@ export default {
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
             // user: sessionStorage.getItem("User"),
-            user:         this.vendedor.Usuario,
+            user: this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,

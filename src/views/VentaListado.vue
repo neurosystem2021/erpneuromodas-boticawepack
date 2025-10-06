@@ -83,6 +83,7 @@
                         <autocomplete
                             required="required"
                             :id="`inputAlmacen${index}`"
+                            :ref="`inputAlmacen${index}`"
                             :url="API + 'almacenes'"
                             anchor="Almacen"
                             class="font-weight-bold"
@@ -102,6 +103,7 @@
                             <autocomplete
                             required="required"
                             :id="`inputPuntoVenta${index}`"
+                            :ref="`inputPuntoVenta${index}`"
                             :url="API + 'ventas/puntos'"
                             anchor="PuntoVenta"
                             class="font-weight-bold"
@@ -1530,6 +1532,7 @@ export default {
 
           let e = `inputAlmacen${this.ventaActiva}`;
           document.getElementById(e).disabled = true;
+
           let p = `inputPuntoVenta${this.ventaActiva}`;
           document.getElementById(p).disabled = true;
 
@@ -1561,6 +1564,9 @@ export default {
       this.ventas[this.ventaActiva].vendedor = obj;
     },
     setAlmacen(obj) {
+      let refs = `inputAlmacen${this.ventaActiva}`;
+      this.$refs[refs][0].setValue(obj.Almacen);
+
       this.ventas[this.ventaActiva].almacen = obj;
 
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
@@ -1668,6 +1674,8 @@ export default {
       this.loadCode = "";
     },
     setPuntoVenta(obj) {
+      let refs = `inputPuntoVenta${this.ventaActiva}`;
+      this.$refs[refs][0].setValue(obj.PuntoVenta);
       this.ventas[this.ventaActiva].puntoVenta = obj;
       this.getNumeroVenta();
     },

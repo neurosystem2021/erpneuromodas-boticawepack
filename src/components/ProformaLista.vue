@@ -181,8 +181,8 @@ export default {
         "update",
         "ver",
         "verTicket",
-        ,
         // "Anular"
+        ,
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -247,6 +247,7 @@ export default {
         });
     },
     myProvider(ctx) {
+      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let promise = this.axios.get(
@@ -255,6 +256,8 @@ export default {
           ctx.perPage +
           "&page=" +
           ctx.currentPage +
+          "&IdAlmacen=" +
+          IdAlmacen +
           "&filter=" +
           ctx.filter
       );
