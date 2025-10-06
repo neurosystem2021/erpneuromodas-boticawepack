@@ -91,7 +91,7 @@
               <th>Talla</th>
               <th>Color</th>
               <th>Genero</th>
-              <th>Botapie</th>
+              <th>Botapie/ Manga</th>
               <th>Cantidad</th>
               <th>Precio</th>
               <th>Descuento</th>

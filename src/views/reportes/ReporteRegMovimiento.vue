@@ -96,7 +96,7 @@
             </b-row>
         </b-col>
     </b-row>
-    <b-modal v-model="detalleMovimiento" no-close-on-backdrop no-close-on-esc hide-footer>
+    <b-modal v-model="detalleMovimiento" size="lg" no-close-on-backdrop no-close-on-esc hide-footer>
         <b-row>
           <b-col cols="6">
             <b-input-group>
@@ -119,7 +119,13 @@
                   <th>Marca</th>
                   <th>Producto</th>
                   <th>Descripcion</th>
-                  <th>Medida</th>
+                  <th>Modelo</th>
+                  <th>Marca</th>
+                  <th>Talla</th>
+                  <th>Color</th>
+                  <th>Genero</th>
+                  <th>Botapie/ Manga</th>
+                  <th>Medición</th>
                   <th>Cantidad</th>
                   <th>Precio</th>
                   <th>IGV</th>
@@ -133,6 +139,12 @@
                   <td>{{ detalle.ProductoMarca }}</td>
                   <td>{{ detalle.Producto }}</td>
                   <td>{{ detalle.Descripcion }}</td>
+                  <td>{{ detalle.ProductoModelo }}</td>
+                  <td>{{ detalle.ProductoMarca }}</td>
+                  <td>{{ detalle.ProductoTalla }}</td>
+                  <td>{{ detalle.Color }}</td>
+                  <td>{{ detalle.Genero }}</td>
+                  <td>{{ detalle.Botapie }}</td>
                   <td>{{ detalle.ProductoMedicion }}</td>
                   <td>{{ detalle.Cantidad }}</td>
                   <td>{{ detalle.Precio }}</td>
