@@ -1551,7 +1551,7 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    },
+    }, 
     getAdelantos() {
       this.axios
         .post(this.API + "cierrecaja/ingresos/adelantos", {
