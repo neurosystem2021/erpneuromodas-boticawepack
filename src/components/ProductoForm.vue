@@ -772,31 +772,31 @@ export default {
       switch (tipo) {
         case 1:
           this.producto.PrecioCostoDolar = parseFloat(
-            this.producto.PrecioCosto * this.producto.TipoCambio
+            this.producto.PrecioCosto / this.producto.TipoCambio
           ).toFixed(2);
           break;
         case 2:
           this.producto.PrecioCostoDolar = parseFloat(
-            this.producto.PrecioCosto * this.producto.TipoCambio
+            this.producto.PrecioCosto / this.producto.TipoCambio
           ).toFixed(2);
           this.producto.PrecioContadoDolar = parseFloat(
-            this.producto.PrecioContado * this.producto.TipoCambio
+            this.producto.PrecioContado / this.producto.TipoCambio
           ).toFixed(2);
           this.$forceUpdate();
           break;
         case 3:
           this.producto.PrecioCosto = parseFloat(
-            this.producto.PrecioCostoDolar / this.producto.TipoCambio
+            this.producto.PrecioCostoDolar * this.producto.TipoCambio
           ).toFixed(2);
           break;
         case 4:
           this.producto.PrecioContadoDolar = parseFloat(
-            this.producto.PrecioContado * this.producto.TipoCambio
+            this.producto.PrecioContado / this.producto.TipoCambio
           ).toFixed(2);
           break;
         case 5:
           this.producto.PrecioContado = parseFloat(
-            this.producto.PrecioContadoDolar / this.producto.TipoCambio
+            this.producto.PrecioContadoDolar * this.producto.TipoCambio
           ).toFixed(2);
           break;
       }
