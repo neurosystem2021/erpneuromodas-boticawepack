@@ -1012,7 +1012,7 @@ export default {
       productosCategoria: [],
       isNota: [],
       tieneIgv: [],
-      diasValidosProf:0,
+      diasValidosProf: 0,
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1090,7 +1090,7 @@ export default {
         },
         vendedor: {},
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
-        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),        
+        FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
@@ -1687,6 +1687,10 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
+      if (prod.tienePresentacion) {
+        this.showPresentacion(prod, null);
+        return;
+      }
       productos.unshift(prod);
 
       // this.$nextTick(() => {
@@ -1903,7 +1907,6 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      console.log("top", tipo);
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
         const ventaActual = this.ventas[this.ventaActiva].pago;
@@ -2183,11 +2186,11 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
-      if(this.diasValidosProf == 0 || this.diasValidosProf=='') {
-                this.$toasted.show('Debe ingresar los días de validez de la proforma')
-                this.inProgress = false
-                return
-            }
+      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
+        this.$toasted.show("Debe ingresar los días de validez de la proforma");
+        this.inProgress = false;
+        return;
+      }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
@@ -2367,7 +2370,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      venta.diasValidosProf = this.diasValidosProf
+      venta.diasValidosProf = this.diasValidosProf;
       await this.axios.post(this.API + "proformas", venta).then(response => {
         this.diasValidosProf = 0;
         console.log(response);
@@ -2492,8 +2495,12 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-
-      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      if (this.index !== null && this.index !== undefined) {
+        console.log("index", this.index);
+        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      } else {
+        this.ventas[this.ventaActiva].productos.unshift(producto);
+      }
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
