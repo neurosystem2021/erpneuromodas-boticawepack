@@ -79,7 +79,7 @@
           
         </b-col>
     </b-row>
-    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" :title="title">
+    <b-modal v-model="dialogDetalle" id="modalxl" size="xl" modal-class="modalRegVentaDetalle" :title="title">
         
           <table class="table table-hover table-striped">
             <thead>

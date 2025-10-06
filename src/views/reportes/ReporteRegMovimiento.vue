@@ -96,7 +96,7 @@
             </b-row>
         </b-col>
     </b-row>
-    <b-modal v-model="detalleMovimiento" size="lg" no-close-on-backdrop no-close-on-esc hide-footer>
+    <b-modal v-model="detalleMovimiento" id="modalxl"  size="lg" no-close-on-backdrop no-close-on-esc hide-footer>
         <b-row>
           <b-col cols="6">
             <b-input-group>

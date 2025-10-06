@@ -30,6 +30,12 @@
                             <th>Codigo</th>
                             <th>Producto</th>
                             <th>Descripcion</th>
+                            <th>Modelo</th>
+                            <th>Marca</th>
+                            <th>Talla</th>
+                            <th>Color</th>
+                            <th>Genero</th>
+                            <th>Botapie/ Manga</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
@@ -43,6 +49,12 @@
                             <td>{{ prod.CodigoBarra }}</td>
                             <td class="detalle-producto">{{ prod.Producto }}</td>
                             <td>{{ prod.Descripcion }}</td>
+                            <td>{{ prod.ProductoModelo }}</td>
+                            <td>{{ prod.ProductoMarca }}</td>
+                            <td>{{ prod.ProductoTalla }}</td>
+                            <td>{{ prod.Color }}</td>
+                            <td>{{ prod.Genero }}</td>
+                            <td>{{ prod.Botapie }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
@@ -101,6 +113,12 @@
                       <th>Codigo</th>
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -114,6 +132,12 @@
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -170,6 +194,12 @@
                       <th>Codigo</th>
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -183,6 +213,15 @@
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -236,9 +275,15 @@
                   <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
-                      <th>Codigo</th>
+                     <th>Codigo</th>
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -252,6 +297,15 @@
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -306,6 +360,12 @@
                       <th>Codigo</th>
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -318,10 +378,16 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                       <td>{{ prod.CodigoBarra }}</td>
                       <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <td>{{ prod.Descripcion }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
+                       <td>{{ prod.Descripcion }}</td>
+                         <td>{{ prod.ProductoModelo }}</td>
+                        <td>{{ prod.ProductoMarca }}</td>
+                        <td>{{ prod.ProductoTalla }}</td>
+                        <td>{{ prod.Color }}</td>
+                        <td>{{ prod.Genero }}</td>
+                        <td>{{ prod.Botapie }}</td>
+                        <td>{{ prod.Cantidad }}</td>
+                        <td>{{ prod.Precio }}</td>
+                        <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
                         {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
                       </td>
@@ -494,6 +560,12 @@
             <tr class="thDetalle">
               <th>ID</th>
               <th>Producto</th>
+              <th>Modelo</th>
+              <th>Marca</th>
+              <th>Talla</th>
+              <th>Color</th>
+              <th>Genero</th>
+              <th>Botapie/ Manga</th>
               <th>Cantidad Vendida</th>
               <th>Monto</th>
             </tr>
@@ -502,6 +574,12 @@
             <tr v-for="(produtos,index) in reportePorProveedor" :key="index">
                <td> {{ produtos.IdProducto }} </td>
                <td> {{ produtos.Producto }} </td>
+               <td>{{ produtos.ProductoModelo }}</td>
+               <td>{{ produtos.ProductoMarca }}</td>
+               <td>{{ produtos.ProductoTalla }}</td>
+               <td>{{ produtos.Color }}</td>
+               <td>{{ produtos.Genero }}</td>
+               <td>{{ produtos.Botapie }}</td>
                <td> {{ produtos.total }} </td>
                <td> {{ produtos.Precio }} </td>
               
@@ -684,8 +762,13 @@
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
-                            <th>Producto</th>
                             <th>Descripcion</th>
+                            <th>Modelo</th>
+                            <th>Marca</th>
+                            <th>Talla</th>
+                            <th>Color</th>
+                            <th>Genero</th>
+                            <th>Botapie/ Manga</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
@@ -698,6 +781,15 @@
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td class="detalle-producto">{{ prod.Producto }}</td>
                             <td>{{ prod.Descripcion }}</td>
+                            <td>{{ prod.ProductoModelo }}</td>
+                            <td>{{ prod.ProductoMarca }}</td>
+                            <td>{{ prod.ProductoTalla }}</td>
+                            <td>{{ prod.Color }}</td>
+                            <td>{{ prod.Genero }}</td>
+                            <td>{{ prod.Botapie }}</td>
+                            <td>{{ prod.Cantidad }}</td>
+                            <td>{{ prod.Precio }}</td>
+                            <td>{{ prod.Descuento }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
@@ -756,6 +848,12 @@
                      
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -770,6 +868,12 @@
                       
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -826,6 +930,12 @@
                      
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -839,6 +949,12 @@
                      
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -895,6 +1011,12 @@
                    
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -908,6 +1030,13 @@
                      
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
+                      <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -963,6 +1092,12 @@
                      
                       <th>Producto</th>
                       <th>Descripcion</th>
+                      <th>Modelo</th>
+                      <th>Marca</th>
+                      <th>Talla</th>
+                      <th>Color</th>
+                      <th>Genero</th>
+                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -976,6 +1111,12 @@
                      
                       <td class="detalle-producto">{{ prod.Producto }}</td>
                       <td>{{ prod.Descripcion }}</td>
+                      <td>{{ prod.ProductoModelo }}</td>
+                      <td>{{ prod.ProductoMarca }}</td>
+                      <td>{{ prod.ProductoTalla }}</td>
+                      <td>{{ prod.Color }}</td>
+                      <td>{{ prod.Genero }}</td>
+                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -1189,8 +1330,8 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
-        this.totalVentasVisa + 
-        this.totalVentasMastercard + 
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
         this.totalVentasTransferencia +
         this.totalIngresos -
         this.totalSalidas -
@@ -1380,6 +1521,12 @@ export default {
         this.reportePorProveedor.push({
           IdProducto: producto.IdProducto,
           Producto: lstProducto[0].Producto,
+          ProductoModelo: lstProducto[0].ProductoModelo,
+          ProductoMarca: lstProducto[0].ProductoMarca,
+          ProductoTalla: lstProducto[0].ProductoTalla,
+          Color: lstProducto[0].Color,
+          Genero: lstProducto[0].Genero,
+          Botapie: lstProducto[0].Botapie,
           total: total,
           Precio: Precio
         });
