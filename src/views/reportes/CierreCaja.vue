@@ -1,19 +1,15 @@
 <template>
-  <b-container fluid class="px-5 pb-5">
+  <b-container fluid class="px-5 py-5">
     <b-row class="no-print">  
       <b-col cols="9" class="no-print">
-        
         <b-card no-body>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Ventas" active >
-              <div class="clsVentas">
-
-              
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Estado</th><th style="width:90px">Pagado</th>
@@ -22,7 +18,8 @@
                 <tbody>
                   
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
                     <td>
                     
@@ -72,7 +69,7 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="3"></td>
+                    <td colspan="4"></td>
                     <td class="total"><b>Total Efectivo</b></td>
                     <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
@@ -83,7 +80,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Detalle</th>
@@ -93,7 +90,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
               
@@ -142,7 +140,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Tarjeta</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
@@ -152,7 +150,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -162,7 +160,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -211,7 +210,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Yape/Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
@@ -221,7 +220,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -231,7 +230,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -275,12 +275,12 @@
               </td>
               <td>{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Transferencia | redondear }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Transferencia</b></td>
               <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
@@ -290,7 +290,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Estado</th><th>Pagado</th>
@@ -298,7 +298,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
                 
@@ -488,8 +489,7 @@
             </table>
           </b-col>
       </b-row>
-            </div>
-          </b-tab>
+            </b-tab>
             <b-tab title="Productos" >
               <h5>Resumen Por Producto</h5><br>
         <table class="table b-table table-sm">
@@ -540,21 +540,51 @@
         <b-col cols="12">
            
             <b-button-group>
-              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
+              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1 mt-1" aria-hidden="true"></i>
                 Cerrar Caja</b-button>
             </b-button-group>
-            <b-button-group>
+            <b-button-group class="my-1">
               <cierres-caja></cierres-caja>
             </b-button-group>
-            <b-button-group>
-              <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
+            <b-button-group class="my-1">
+              <b-button variant="primary" @click="imprimir(1)"><i class="fa fa-print mx-1 mt-1" aria-hidden="true"></i> Imprimir</b-button>
+            </b-button-group>
+            <b-button-group class="my-1">
+              <b-button variant="primary" @click="imprimir(2)"><i class="fa fa-print mx-1 mt-1" aria-hidden="true"></i> Productos</b-button>
             </b-button-group>
           </b-col>
         <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
-          Turno
-          
-          <b-form-select v-model="turno" :options="turnos" />
-          
+           <b-input-group prepend="Turno" class="mt-2">
+              <b-form-select v-model="turno" :options="turnos" />
+          </b-input-group>
+           <b-input-group prepend="Vendedor" class="mt-2" v-if="idPerfil==1">
+                <autocomplete
+                    required="required"
+                    ref="inputVendedor"
+                    :url="API + 'usuarios'"
+                    :customParams="{idPerfil: idPerfil}"
+                    anchor="NombreUsuario"
+                    label="writer"
+                    :on-select="setVendedorManual" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+          </b-input-group>
+           <b-input-group prepend="Vendedor" class="mt-2" v-else>
+                <input type="text" disabled v-model="vendedor.Usuario" class="form-control" style="text-transform: uppercase;">
+                <!-- <autocomplete
+
+                    required="required"
+                    ref="inputVendedor"
+                    :url="API + 'usuarios'"
+                    :customParams="{idPerfil: idPerfil}"
+                    anchor="NombreUsuario"
+                    label="writer"
+                    :on-select="setVendedorManual" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete> -->
+          </b-input-group>
         </b-col>
             <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
               <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
@@ -568,10 +598,6 @@
             <tr>
               <td>Gran Total S/.</td>
               <td>{{ granTotal | redondear }}</td>
-            </tr>
-            <tr>
-              <td>Gran Total Ventas S/.</td>
-              <td>{{ granTotalVentas | redondear }}</td>
             </tr>
             <tr>
               <td colspan="2"></td>
@@ -613,14 +639,14 @@
               <td colspan="2"></td>
             </tr>
 
-            <tr>
+            <!-- <tr>
               <td>Vales de Crédito S/.</td>
               <td>{{ totalVentasValeCredito | redondear }} </td>
             </tr>
             <tr>
               <td>Canjes S/.</td>
               <td>{{ totalVentasCanje | redondear }} </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </b-col>
@@ -640,7 +666,7 @@
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
        <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
         
-        <table class="table table-sm" width="100%">
+        <table class="table table-sm" width="100%" v-if="val==2">
           <thead>
             <tr class="thDetalle">
               <th width="5%">ID</th>
@@ -669,12 +695,12 @@
             </tr>
           </tfoot>
         </table>
-
+          <div v-if="val==1">
               <h5>Ventas Efectivo</h5><br>
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                      <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <!-- <th>Estado</th> -->
@@ -684,7 +710,8 @@
                 <tbody>
                   
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
                     <td>
                     
@@ -743,7 +770,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <!-- <th>Detalle</th> -->
@@ -753,7 +780,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
               
@@ -813,7 +841,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <!-- <th>Detalle</th> -->
@@ -823,7 +851,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -882,7 +911,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <!-- <th>Detalle</th> -->
@@ -892,7 +921,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
 
@@ -951,7 +981,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <!-- <th>Estado</th> -->
@@ -960,7 +990,8 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td style="text-transform: uppercase;"> {{item.UsuarioReg}}</td>
+                 <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
                 
@@ -1150,7 +1181,7 @@
             </table>
           </b-col>
       </b-row>
-           
+           </div>
     </b-row>
   </b-container>
 
@@ -1186,7 +1217,9 @@ export default {
       ],
       cierre: {},
       vendedor: {},
-      reportePorProveedor: []
+      reportePorProveedor: [],
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0,
+      val: 1
     };
   },
   computed: {
@@ -1292,13 +1325,13 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia;
+        if (!venta.Anulado) total += venta.Yape;
       });
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0 && !venta.EsCredito;
+        return venta.Yape > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
@@ -1312,12 +1345,18 @@ export default {
       return this.ventas.filter(venta => {
         return venta.EsCredito;
       });
-    },
-    granTotalVentas(){
-      return this.totalVentasEfectivo
     }
   },
   methods: {
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    setVendedorManual(obj) {
+      this.vendedor = obj;
+      this.loadData();
+      // this.getVendedor(obj.Usuario);
+    },
     getDetalles(idDocVenta) {
       let detalles = this.itemsDetalle.filter(
         item => item.IdDocVenta == idDocVenta
@@ -1326,17 +1365,19 @@ export default {
       //this.items[index].productos = detalles
       return detalles;
     },
-    getVendedor() {
+    async getVendedor() {
       let usuario = sessionStorage.getItem("User");
-      this.axios
+      await this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          // this.$refs.inputVendedor.$refs.input.disabled = true
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // if (!this.idPerfil == 1) {
+          //   this.$refs.inputVendedor.$refs.input.disabled = true;
+          // }
 
           if (response.data.IdUsuarioPerfil !== 1) {
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputVendedor.$refs.input.disabled = true;
           }
         })
         .catch(error => {
@@ -1344,8 +1385,13 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
-    imprimir() {
-      window.print();
+    imprimir(val) {
+      this.$nextTick(() => {
+        this.val = val;
+      });
+      setTimeout(() => {
+        window.print();
+      }, 100);
     },
     async loadData() {
       await this.getVentas();
@@ -1406,8 +1452,8 @@ export default {
         this.axios
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
-            user: sessionStorage.getItem("User"),
-            // user:         this.vendedor.Usuario,
+            // user: sessionStorage.getItem("User"),
+            user:         this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
@@ -1433,10 +1479,8 @@ export default {
     },
     async loadDetalles() {
       await this.axios
-        .get(this.API + "ventas/detalle", {
-          params: {
-            idDocVentas: this.ventas.map(item => item.idDocVenta)
-          }
+        .post(this.API + "ventas/detalle", {
+          idDocVentas: this.ventas.map(item => item.idDocVenta)
         })
         .then(response => {
           this.itemsDetalle = response.data;
@@ -1509,12 +1553,9 @@ export default {
         });
     },
     getAdelantos() {
-      let params = {
-        idDocVentas: this.ventas.map(v => v.idDocVenta)
-      };
       this.axios
-        .get(this.API + "cierrecaja/ingresos/adelantos", {
-          params: params
+        .post(this.API + "cierrecaja/ingresos/adelantos", {
+          idDocVentas: this.ventas.map(v => v.idDocVenta)
         })
         .then(res => {
           this.adelantos = res.data;
@@ -1541,10 +1582,6 @@ export default {
 };
 </script>
 <style scoped>
-.clsVentas {
-  max-height: 700px !important;
-  overflow-y: auto;
-}
 /*th {
   background-color: #f1f1f1;
 }
@@ -1620,12 +1657,12 @@ th {
     display: none;
   }
   .si-print {
-    max-width: 350px;
+    /* max-width: 80px; */
     display: block;
   }
   .table {
-    max-width: 350px;
-    font-size: 0.5em;
+    /* max-width: 80px; */
+    font-size: 1em;
   }
   th {
     background: #ffffff !important;
