@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
             <div>
                 <div class="float-right">
                     <b-button-group size="sm" class="ocularMovil2">
@@ -320,11 +320,11 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button type="button" :disabled="inProgress" class="btnAction" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <br/><br/>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" class="btnAction" variant="success" size="lg">Efectuar Venta</b-button>
                         <br/><br/>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
+                        <b-button v-if="ultimaVenta" target="_blank" class="btnAction" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
                         <br />
                         <br />
                     </b-col>
