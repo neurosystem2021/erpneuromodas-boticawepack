@@ -79,15 +79,19 @@
           
         </b-col>
     </b-row>
-    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" :title="title">
+    <b-modal v-model="dialogDetalle" id="modalxl" size="xl" modal-class="modalRegVentaDetalle" :title="title">
         
           <table class="table table-hover table-striped">
             <thead>
               <th>IdDocVenta</th>
               <th>Cod. Barra</th>
               <th>Producto</th>
+              <th>Modelo</th>
               <th>Marca</th>
-              <th>Medición</th>
+              <th>Talla</th>
+              <th>Color</th>
+              <th>Genero</th>
+              <th>Botapie/ Manga</th>
               <th>Cantidad</th>
               <th>Precio</th>
               <th>Descuento</th>
@@ -98,8 +102,12 @@
                 <td>{{ det.IdDocVenta }}</td>
                 <td>{{ det.CodigoBarra }}</td>
                 <td>{{ det.Producto }}</td>
+                <td>{{ det.ProductoModelo }}</td>
                 <td>{{ det.ProductoMarca }}</td>
-                <td>{{ det.ProductoMedicion }}</td>
+                <td>{{ det.ProductoTalla }}</td>
+                <td>{{ det.Color }}</td>
+                <td>{{ det.Genero }}</td>
+                <td>{{ det.Botapie }}</td>
                 <td>{{ det.Cantidad }}</td>
                 <td>{{ det.Precio }}</td>
                 <td>{{ det.Descuento }}</td>
@@ -166,7 +174,6 @@ export default {
   },
   methods: {
     async abrirModalDetalle(item) {
-      this.title = "Detalle Reg. Ventas:";
       this.title = `${this.title} ${item.Serie}-${item.Numero}`;
       await this.axios(`${this.API}reporte/ListarRegVenta/detalle`, {
         params: { idDocVenta: item.idDocVenta }
@@ -287,7 +294,7 @@ export default {
     footerTotal() {
       let total = 0;
       if (this.lstReporte.length > 0) {
-        total = this.lstReporte.reduce((sum, reporte) => {
+        total = this.lstReporte.filter(v=>v.Anulado ==0).reduce((sum, reporte) => {
           return sum + reporte.Total;
         }, 0);
       }

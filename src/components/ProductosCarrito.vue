@@ -365,12 +365,13 @@ export default {
         return [
           { key: "ProductoCategoria", label: "Categoria" },
           { key: "Producto", label: "Artículo" },
-          { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoModelo", label: "Modelo" },
-          { key: "Color", label: "Color" },
+          { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoTalla", label: "Talla" },
+          { key: "Color" },
           { key: "Genero" },
-          { key: "Botapie" },
+          { key: "Botapie", label: "Botapie/Manga" },
+          { key: "Anaquel" },
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
@@ -714,9 +715,19 @@ export default {
         data.CodigoBarra
       }</b></td>
                 <td style="width: 100px" >${data.ProductoCategoria}</td>
-                <td style="width: 100px" >${data.ProductoMarca}</td>
-                <td style="width: 100px" >${data.ProductoModelo}</td>
-                <td style="width: 100px" >${data.Color}</td>
+                <td style="width: 80px">${
+                  data.ProductoModelo ? data.ProductoModelo : ""
+                }</td>
+                <td style="width: 120px">${
+                  data.ProductoMarca ? data.ProductoMarca : ""
+                }</td>
+                <td style="width: 80px">${
+                  data.ProductoTalla ? data.ProductoTalla : ""
+                }</td>
+                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
+                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
+                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
+                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
                 </td>
                 <td class="table-primary"  style="width: 65px"><b>${
                   data.PrecioContado
