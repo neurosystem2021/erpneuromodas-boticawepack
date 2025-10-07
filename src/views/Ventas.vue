@@ -318,6 +318,7 @@
                         type="text"
                         style="text-align:center; font-weight:bold; width: 105px;"
                         autocomplete="false"
+                        @input="metodoPagoCambio(1)"
                          @focus="abrirModalTouch(data.index, 2)"
                          class="form-control"
                         >
@@ -564,7 +565,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -574,7 +575,7 @@
                                         <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -585,7 +586,7 @@
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -620,9 +621,9 @@
                   </b-col>
                   <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
-                        <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
+                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Venta</b-button>
                       <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
-                      <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Añadir Ventana</b-button>
+                      <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
@@ -1000,6 +1001,12 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
+        { key: "ProductoMarca", label: "Marca" },
+        { key: "ProductoTalla", label: "Talla" },
+        { key: "Color" },
+        { key: "Genero" },
+        { key: "Botapie", label: "Botapie/Manga" },
         { key: "Anaquel" },
         { key: "pres", label: "" },
         { key: "presentacion", label: "Presentacion" },
@@ -1153,6 +1160,7 @@ export default {
     };
   },
   mounted() {
+    console.log('componente montado')
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1573,7 +1581,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+          <table id="table-render" style="width: 1300px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1585,11 +1593,17 @@ export default {
                 : parseFloat(data.stock).toFixed(2)
               : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
+                <td style="width: 300px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 80px">${data.ProductoCategoria?data.ProductoCategoria:''}</td>
+                <td style="width: 80px">${data.ProductoModelo?data.ProductoModelo:''}</td>
+                <td style="width: 120px">${data.ProductoMarca?data.ProductoMarca:''}</td>
+                <td style="width: 80px">${data.ProductoTalla?data.ProductoTalla:''}</td>
+                <td style="width: 80px">${data.Color?data.Color:''}</td>
+                <td style="width: 80px">${data.Genero?data.Genero:''}</td>
+                <td style="width: 80px">${data.Botapie?data.Botapie:''}</td>
+                <td style="width: 80px">${data.Anaquel?data.Anaquel:''}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
@@ -1808,7 +1822,7 @@ export default {
         prod.precio = producto.PrecioContado;
       }
       this.$nextTick(() => {
-        let input = document.getElementById("input0");
+        let input = document.getElementById("txtCodeBar0");
         input.focus();
         input.select();
       });
@@ -2004,18 +2018,21 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
+
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
         return;
       }
+
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         return;
       }
+
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
@@ -2026,94 +2043,45 @@ export default {
         this.$toasted.show("Debe seleccionar un método de pago");
         return;
       }
-
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
 
         return;
       }
+      console.log("a");
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+
         return;
       }
-
+      console.log("b");
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        return;
-      }
-      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
 
         return;
       }
+      console.log("c");
+      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
+
+        return;
+      }
+      console.log("d");
       if (
         venta.tipoVenta.CodSunat == "07" ||
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
 
           return;
         }
@@ -2127,38 +2095,13 @@ export default {
           item => item.value == venta.NotaIdMotivo
         )[0].text;
       }
+      console.log("e");
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("DNo hay productos para vender");
 
         return;
       }
-      // console.log(productos);
-      // if (
-      //   productos.some(
-      //     v =>
-      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-      //       v.stock
-      //   )
-      // ) {
-      //   this.$swal({
-      //     position: "center",
-      //     icon: "info",
-      //     title: "No se puede vender un producto sin stock",
-      //     showConfirmButton: true,
-      //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
-      //     confirmButtonColor: "#0275d8"
-      //   });
-      //   return;
-      // }
+      console.log("f");
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
@@ -2187,6 +2130,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           window.open(
@@ -2340,60 +2284,27 @@ export default {
       }
 
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
 
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
 
         return;
       }
@@ -2402,30 +2313,12 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
 
           return;
         }
@@ -2440,15 +2333,7 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No hay productos para vender");
 
         return;
       }
