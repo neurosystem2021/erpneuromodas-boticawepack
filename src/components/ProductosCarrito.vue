@@ -620,8 +620,10 @@
                   <th>U.M.</th>
                   <th>Empresa</th>
                   <th>Stock</th>
-                  <th>Minimo</th>
+                  <!-- <th>Minimo</th> -->
                   <th>Precio</th>
+                  <th>Por Mayor</th>
+                  <th>Por Volumen</th>
                   <th>Imagen</th>
                   
                 </tr>
@@ -640,9 +642,11 @@
                   <td>{{prod.ProductoCategoria }} </td>
                   <td>{{prod.ProductoMedicion }} </td>
                   <td>{{ prod.NombreEmpresa }}</td>
-                  <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
-                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
-                  <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                  <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
                   <td>
                     <img
                     :src="
@@ -682,8 +686,10 @@
                   <th>U.M.</th>
                   <th>Empresa</th>
                   <th>Stock</th>
-                  <th>Minimo</th>
+                  <!-- <th>Minimo</th> -->
                   <th>Precio</th>
+                  <th>Por Mayor</th>
+                  <th>Por Volumen</th>
                   <th>Imagen</th>
                   
                 </tr>
@@ -702,9 +708,11 @@
                   <td>{{prod.ProductoCategoria }} </td>
                   <td>{{prod.ProductoMedicion }} </td>
                   <td>{{ prod.NombreEmpresa }}</td>
-                  <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
-                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
-                  <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                  <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
+                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
                   <td>
                     <img
                     :src="
@@ -1329,6 +1337,15 @@ export default {
     }
   },
   methods: {
+    bgStock(item) {
+      if (item.stock == 0) {
+        return "bgSinStock";
+      }
+      if (item.stock < item.StockMinimo) {
+        return "bgMinimo";
+      }
+      return "";
+    },
     limpiarBuscar() {
       this.searchProducto = "";
       document.getElementById("searchProducto").focus();
@@ -1995,7 +2012,6 @@ export default {
       );
 
       if (this.searchProducto) {
-
         const term = this.searchProducto.toLowerCase();
 
         lst = productosFiltrados.filter(p => {
@@ -2021,7 +2037,7 @@ export default {
       } else {
         lst = productosFiltrados;
       }
-     
+
       if (this.IdProducto) {
         lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
       }
@@ -2431,6 +2447,14 @@ export default {
 }
 </style>
 <style>
+.bgSinStock {
+  background: #d50000;
+  color: #ffffff;
+}
+.bgMinimo {
+  background: #ff3d00;
+  color: #ffffff;
+}
 .tblModal {
   height: 240px;
   overflow-y: auto;
