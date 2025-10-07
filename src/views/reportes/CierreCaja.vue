@@ -9,7 +9,7 @@
               <table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
-                      <th>Recibo</th><th>Fecha</th>
+                     <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                       <th v-if="$route.query.noDetalle">Cliente</th>
                       <th v-else>Productos</th>
                       <th>Estado</th><th style="width:90px">Pagado</th>
@@ -18,6 +18,7 @@
                 <tbody>
                   
                   <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+                    <td>{{ item.UsuarioReg }}</td>
                     <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
                     <td>{{ item.FechaDoc }}</td>
                     <td>
@@ -79,7 +80,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Detalle</th>
@@ -89,6 +90,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -148,7 +150,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -158,6 +160,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -217,7 +220,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
                 <th v-if="$route.query.noDetalle">Cliente</th>
                 <th v-else>Productos</th>
                 <th>Detalle</th>
@@ -227,6 +230,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -286,7 +290,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
-              <th>Recibo</th><th>Fecha</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th>
               <th v-if="$route.query.noDetalle">Cliente</th>
               <th v-else>Productos</th>
               <th>Estado</th><th>Pagado</th>
@@ -294,6 +298,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -380,11 +385,12 @@
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>Vendedor</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -407,11 +413,12 @@
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>Vendedor</th><th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -435,11 +442,12 @@
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>Vendedor</th><th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -1185,8 +1193,10 @@ export default {
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id);
       this.loadData();
+      this.getVendedor();
     } else {
       this.getVendedor();
+      this.loadData();
     }
   },
   data() {
@@ -1222,10 +1232,10 @@ export default {
         this.totalVentasMastercard +
         this.totalVentasTransferencia +
         this.totalVentasEfectivo +
-        //this.totalIngresosTarjeta +
+        this.totalIngresosTarjeta +
         this.totalIngresos -
         this.totalSalidas -
-        //this.totalSalidasTarjeta -
+        this.totalSalidasTarjeta -
         this.totalAdelantosActivos
       );
     },
@@ -1357,26 +1367,28 @@ export default {
       //this.items[index].productos = detalles
       return detalles;
     },
-    async getVendedor() {
-      let usuario = sessionStorage.getItem("User");
-      await this.axios
-        .get(this.API + "usuarios/" + usuario)
-        .then(response => {
-          this.setVendedor(response.data);
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-          // if (!this.idPerfil == 1) {
-          //   this.$refs.inputVendedor.$refs.input.disabled = true;
-          // }
+   async getVendedor() {
+        try {
+          const usuario = sessionStorage.getItem("User");
+          const response = await this.axios.get(this.API + "usuarios/" + usuario);
 
-          if (response.data.IdUsuarioPerfil !== 1) {
-            this.$refs.inputVendedor.$refs.input.disabled = true;
-          }
-        })
-        .catch(error => {
+          this.setVendedor(response.data);
+
+          this.$nextTick(() => {
+            const inputVend = this.$refs.inputVendedor;
+            if (inputVend && inputVend.setValue) {
+              inputVend.setValue(response.data.NombreUsuario);
+
+              if (response.data.IdUsuarioPerfil !== 1 && inputVend.$refs.input) {
+                inputVend.$refs.input.disabled = true;
+              }
+            }
+          });
+        } catch (error) {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-        });
-    },
+        }
+      },
     imprimir(val) {
       this.$nextTick(() => {
         this.val = val;
@@ -1490,7 +1502,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        // params.usuario = this.vendedor.Usuario;
       }
       // cierre de caja enviar el vendedor
       await this.axios
@@ -1511,7 +1523,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        //params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/ingresos", {
@@ -1530,7 +1542,7 @@ export default {
         idCierre: this.$route.params.id
       };
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario;
+        //params.usuario = this.vendedor.Usuario;
       }
       await this.axios
         .get(this.API + "cierrecaja/salidas", {
