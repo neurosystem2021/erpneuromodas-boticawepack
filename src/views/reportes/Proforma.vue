@@ -91,12 +91,12 @@
           <tr>
             <th width="3%" class="no">#</th>
             <!--<th></th>-->
-            <th width="40%" class="desc">DESCRIPCIÓN</th>
-            <th width="20%" class="de">PRESENTACIÓN</th>
+            <th width="40%" class="desc">PRODUCTO</th>
+            <th width="20%" class="de">DESCRIPCIÓN</th>
             <th width="8%" class="um">U.M.</th>
             <th width="10%" class="qty">CANT.</th>
             <th width="10%" class="unit">PRECIO U.</th>
-            <th width="10%"class="total">TOTAL</th>
+            <th width="10%" class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>

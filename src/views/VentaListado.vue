@@ -2469,8 +2469,9 @@ export default {
         );
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
+        // prod.ProductoPresentacion = producto.Descripcion;
+        prod.ProductoDesc = producto.Descripcion;
+        // prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
