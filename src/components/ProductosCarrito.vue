@@ -606,7 +606,8 @@
           ></b-form-radio-group>
         </b-form-group>
         <b-col cols="12" class="mt-3">
-          <table class="table table-hover" width="100%">
+          <div class="tblModal">
+            <table class="table table-hover" width="100%">
               <thead>
                 <tr>
                   <th></th>
@@ -619,7 +620,69 @@
                   <th>U.M.</th>
                   <th>Empresa</th>
                   <th>Stock</th>
-                  <th>Stock Minimo</th>
+                  <th>Minimo</th>
+                  <th>Precio</th>
+                  <th>Imagen</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(prod,index) in listadoProductosOrdenados()" :key="index" 
+                :class="prod.Empresa"
+                
+                @dblclick="anadirarProductosSeleccionado(prod,true)">
+                  <td><b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
+                  <td>{{ prod.CodigoBarra }}</td>
+                  <td>{{ prod.Producto }}</td>
+                  <td>{{prod.ProductoModelo }} </td>
+                  <td>{{prod.ProductoMarca }} </td>
+                  <td>{{prod.ProductoDesc3 }} </td>
+                  <td>{{prod.ProductoCategoria }} </td>
+                  <td>{{prod.ProductoMedicion }} </td>
+                  <td>{{ prod.NombreEmpresa }}</td>
+                  <td>{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                  <td>{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td>
+                  <td>{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td>
+                    <img
+                    :src="
+                       prod.Imagen == null ||  prod.Imagen == ''
+                        ? 'static/no-photo.png'
+                        : `/resources/images/productos/${ prod.Imagen}`
+                    "
+                    class="imagen"
+                  />
+                  </td>
+                  
+                 
+                </tr>
+              </tbody>
+          </table>
+
+          <div class="pagination mt-3">
+            <b-button size="sm" variant="outline-dark"  @click="prevPage" :disabled="currentPage === 1">Anterior</b-button>
+            <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
+            <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
+          </div>
+          </div>
+
+          <div class="mt-2">            <hr>
+          </div>
+          <div class="tblModal">
+            <table class="table table-hover" width="100%">
+              <thead>
+                 <tr>
+                  <th></th>
+                  <th>Cód</th>
+                  <th>Producto</th>
+                  <th>Modelo</th>
+                  <th>Marca</th>
+                  <th>Procedencia</th>
+                  <th>Categoria</th>
+                  <th>U.M.</th>
+                  <th>Empresa</th>
+                  <th>Stock</th>
+                  <th>Minimo</th>
                   <th>Precio</th>
                   <th>Imagen</th>
                   
@@ -663,6 +726,8 @@
             <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
             <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
           </div>
+          </div>
+          
            <!-- <b-table
             :items="listadoProductos()"
             :fields="headerModalProducts"
@@ -1861,9 +1926,9 @@ export default {
       vm.modalNuevoProductos = !vm.modalNuevoProductos;
       vm.$store.state.consideraAppendEmpresa = false;
     },
-    listadoProductos() {
+    listadoProductosOrdenados() {
       let lst = [];
-      let productosFiltrados = this.lstProductos.filter(
+      let productosFiltrados = [...this.lstProductos].filter(
         listadoProducto =>
           !this.$store.state.cart.productos.some(
             producto =>
@@ -1900,7 +1965,7 @@ export default {
 
         // ordenar SIEMPRE por nombre de producto
         lst.sort((a, b) =>
-          (a.Producto || "").localeCompare(b.Producto || "", "es", {
+          (a.CodigoBarra || "").localeCompare(b.CodigoBarra || "", "es", {
             sensitivity: "base"
           })
         );
@@ -1908,6 +1973,55 @@ export default {
         lst = productosFiltrados;
       }
 
+      if (this.IdProducto) {
+        lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
+      }
+
+      const perPage = parseInt(this.perPageModal) || lst.length;
+      const start = (this.currentPage - 1) * perPage;
+      const end = start + perPage;
+
+      return lst.slice(start, end);
+    },
+    listadoProductos() {
+      let lst = [];
+      let productosFiltrados = [...this.lstProductos].filter(
+        listadoProducto =>
+          !this.$store.state.cart.productos.some(
+            producto =>
+              producto.IdProducto == listadoProducto.IdProducto &&
+              producto.Empresa == listadoProducto.Empresa
+          )
+      );
+
+      if (this.searchProducto) {
+
+        const term = this.searchProducto.toLowerCase();
+
+        lst = productosFiltrados.filter(p => {
+          const prod = (p.Producto || "").toLowerCase();
+          const cat = (p.ProductoCategoria || "").toLowerCase();
+          const marca = (p.ProductoMarca || "").toLowerCase();
+
+          switch (this.selected) {
+            case 1:
+              return prod.startsWith(term);
+            case 2:
+              return cat.startsWith(term);
+            case 3:
+              return marca.startsWith(term);
+            default:
+              return (
+                prod.startsWith(term) ||
+                cat.startsWith(term) ||
+                marca.startsWith(term)
+              );
+          }
+        });
+      } else {
+        lst = productosFiltrados;
+      }
+     
       if (this.IdProducto) {
         lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
       }
@@ -1959,11 +2073,11 @@ export default {
       this.abrirModal = abrirModal;
       this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
-      // let productoSerie = await this.obtenerSeriePorProducto(
-      //   item.IdProducto,
-      //   item.Empresa
-      // );
-      let productoSerie = [];
+      let productoSerie = await this.obtenerSeriePorProducto(
+        item.IdProducto,
+        item.Empresa
+      );
+      // let productoSerie = [];
       delete item._rowVariant;
       // itemProducto.backgroundColor =
       // this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
@@ -2317,6 +2431,23 @@ export default {
 }
 </style>
 <style>
+.tblModal {
+  height: 240px;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: block;
+}
+.tblModal table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.tblModal thead th {
+  position: sticky;
+  top: 0;
+  background: #1a237e;
+  color: #ffffff;
+  z-index: 2;
+}
 .modasm {
   background: #eff9ff;
 }

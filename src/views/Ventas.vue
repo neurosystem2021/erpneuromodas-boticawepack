@@ -693,6 +693,16 @@
           </b-col>
           <b-col cols="4" style="text-align: center;">
             <b-button
+              type="submit"
+              :disabled="inProgress"
+              style="background: #28A745;"
+              size="lg"
+              class="btnAction"
+              v-if="idPerfil == 1 || idPerfil == 14"
+              > 
+                <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
+            </b-button>
+            <b-button
               type="button"
               v-if="!this.$route.query.idPedido"
               :disabled="inProgress"
@@ -710,16 +720,7 @@
                 @onSelectProforma="setCliente"
               />
 
-            <b-button
-              type="submit"
-              :disabled="inProgress"
-              style="background: #28A745;"
-              size="lg"
-              class="btnAction"
-              v-if="idPerfil == 1 || idPerfil == 14"
-              > 
-                <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
-              </b-button>
+            
             <b-button
               type="button"
               @click="anularPagoDelivery"
