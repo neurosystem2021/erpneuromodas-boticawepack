@@ -91,6 +91,8 @@
                         &nbsp;&nbsp;
                         <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
                         &nbsp;&nbsp;
+                        <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
+                        &nbsp;&nbsp;
                     </div>
                   </template>
   
@@ -179,6 +181,35 @@
           this.loading = false
         })
       },
+
+      regenerarDescarga(doc) {
+      this.$refs.tablaVentas.refresh();
+      this.loading = true;
+
+      this.axios.get(this.API + 'imprimirguiapdf/' + doc.IdDocVentaRemision, { responseType: 'blob' })
+        .then(res => {
+
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'Guia-' + doc.IdDocVentaRemision + '.pdf');
+          document.body.appendChild(link);
+          link.click();
+
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+
+          this.$toasted.success('El PDF fue generado y descargado', { duration: 7000 });
+          this.loading = false;
+        })
+        .catch(err => {
+          console.error(err);
+          this.$toasted.error('Hubo un error al generar el PDF');
+          this.loading = false;
+        });
+      },
+
       setFechaReferencia () {
         this.generateFilter('fechaReferencia', this.fechaReferencia)
         
