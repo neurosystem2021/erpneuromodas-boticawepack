@@ -734,6 +734,7 @@ export default {
 };
 </script>
 
+
 <style>
 #modalImagen .modal-dialog {
   max-width: 75% !important;
