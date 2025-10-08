@@ -170,7 +170,7 @@
             <label>Genero:</label>            
             <b-form-select required="required" v-model="producto.Genero" :options="generos" />
           </b-form-group>
-          <!--<b-form-group>
+          <b-form-group>
             <label>Botapie/Manga:</label>
             <autocomplete
                 required="required"
@@ -183,12 +183,12 @@
                 :onInput="val => producto.Botapie = val && val.toUpperCase()"
                 :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
                 :classes="{input: 'form-control upper'}">
-              </autocomplete>-->
-            <!--<b-form-input v-model="producto.Botapie"
+              </autocomplete>
+             <!-- <b-form-input v-model="producto.Botapie"
               type="text"
               @input="(val) => producto.Botapie = val && val.toUpperCase()"              
-              ></b-form-input>-->
-          <!--</b-form-group>-->
+              ></b-form-input> -->
+          </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <input 
@@ -423,7 +423,7 @@ export default {
         this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         
         this.$refs.inputColor.setValue(newVal.Color)
-        //this.$refs.inputBotapie.setValue(newVal.Botapie)
+        this.$refs.inputBotapie.setValue(newVal.Botapie)
         
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,

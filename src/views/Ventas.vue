@@ -244,6 +244,7 @@
                                             <td colspan="3" class="text-center">Metodo de Pago</td>
                                         </tr>
                                         <tr>
+                                            <td> <b-button @click="cambiarTipoPago(1)" size="sm" variant="info"><i class="fa fa-check" aria-hidden="true"></i></b-button> </td>
                                             <td>Efectivo</td>
                                             <td>
                                                 <b-form-input
@@ -266,6 +267,7 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td> <b-button @click="cambiarTipoPago(2)" size="sm" variant="info"><i class="fa fa-check" aria-hidden="true"></i></b-button> </td>
                                             <td>Tarjeta</td>
                                             <td>
                                                 <b-form-input
@@ -289,6 +291,7 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td> <b-button @click="cambiarTipoPago(3)" size="sm" variant="info"><i class="fa fa-check" aria-hidden="true"></i></b-button> </td>
                                             <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
@@ -311,6 +314,30 @@
                                                 />
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td> <b-button @click="cambiarTipoPago(4)" size="sm" variant="info"><i class="fa fa-check" aria-hidden="true"></i></b-button> </td>
+                                            <td>Yape/ Plin</td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.yape.descripcion"
+                                                    :disabled="bloquearInput?true:false"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.yape.monto"
+                                                    :disabled="bloquearInput?true:false"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.yape.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </template>
@@ -320,9 +347,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" class="btnAction" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <br/><br/>
-                        <b-button type="submit" :disabled="inProgress" class="btnAction" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="button" :disabled="inProgress" class="btnAction mx-1" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        
+                        <b-button type="submit" :disabled="inProgress" class="btnAction mx-1" variant="success" size="lg">Efectuar Venta</b-button>
                         <br/><br/>
                         <b-button v-if="ultimaVenta" target="_blank" class="btnAction" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir Comprobante</b-button>
                         <br />
@@ -444,6 +471,29 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    cambiarTipoPago(tipo) {
+      this.venta.pago.efectivo.monto = 0;
+      this.venta.pago.visa.monto = 0;
+      this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.yape.monto = 0;
+      switch (tipo) {
+        case 1:
+          this.venta.pago.efectivo.monto = this.totalCart;
+          break;
+        case 2:
+          this.venta.pago.visa.monto = this.totalCart;
+          break;
+        case 3:
+          this.venta.pago.mastercard.monto = this.totalCart;
+          break;
+        case 4:
+          this.venta.pago.yape.monto = this.totalCart;
+          break;
+
+        default:
+          break;
+      }
+    },
     configStock() {
       this.axios
         .get(this.API + "config/stock")
@@ -505,7 +555,8 @@ export default {
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
-          mastercard: { IdMetodoPago: 3, monto: 0 }
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          yape: { IdMetodoPago: 4, monto: 0 }
         },
         CampoDireccion: "Direccion",
         NroComprobanteModifica: "",
@@ -846,6 +897,9 @@ export default {
       totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
         ? 0
         : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))
+        ? 0
+        : parseFloat(this.venta.pago.yape.monto);
       if (
         (isNaN(parseFloat(this.venta.pago.efectivo.monto))
           ? 0

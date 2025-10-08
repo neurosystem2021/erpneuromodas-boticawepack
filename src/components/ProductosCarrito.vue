@@ -741,6 +741,16 @@ export default {
 .imagenGrande {
   width: 100%;
 }
+.imgProducto {
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+  display: inline-block;
+}
+.imgProducto:hover {
+  transform: scale(3);
+  z-index: 100;
+  position: relative;
+}
 #modalCodigoBarra .modal-dialog {
   max-width: 25% !important;
   margin: 5% auto;
