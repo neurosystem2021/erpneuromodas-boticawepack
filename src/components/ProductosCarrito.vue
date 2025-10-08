@@ -391,6 +391,20 @@
             </b-form-text>
         </template>
 
+        <template slot="desc" slot-scope="data">
+          <input
+            v-model="productos[data.index].desc"
+            style="width:90px"
+            type="number"
+            min="0"
+            step="0.01"
+            class="form-control"
+            value="0"
+            @input="actualizarDesc(data.index)"/>
+            <b-form-text>
+            </b-form-text>
+        </template>
+
         <template slot="FechaAlquiler" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].FechaAlquiler"

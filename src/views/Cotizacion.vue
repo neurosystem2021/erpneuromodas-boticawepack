@@ -170,12 +170,14 @@
                     <template slot="precio" slot-scope="data">
                       <input class="form-control" type="number" v-model="data.item.precio">
                     </template>
-                    <template slot="descuento" slot-scope="data">
-                      <input class="form-control" type="number" v-model="data.item.descuento" 
-                        :class="
-                        data.item.cantidad * data.item.precio < data.item.descuento ? 'clsError' : ''
+                    <template slot="desc" slot-scope="data">
+                       <b-input-group  append="%">
+                         <input class="form-control" type="number" v-model="data.item.desc" 
+                         :class="
+                        data.item.cantidad * data.item.precio < data.item.precio * data.item.desc/100  ? 'clsError' : ''
                         "
                       >
+                    </b-input-group>
                     </template>
                     <template slot="cantidadSucursal" slot-scope="data">
                       <input class="form-control" type="number" v-model="data.item.cantidadSucursal">
@@ -460,7 +462,7 @@ export default {
         { key: "diasEntrega" },
         { key: "cantidadImportacion" },
         { key: "diasEntregaImportacion" },
-        { key: "descuento", label: "Desc." },
+        { key: "desc", label: "Desc (%)" },
         // { key: "Anaquel", label: "Anaquel" },
         {
           key: "subtotal",
@@ -553,7 +555,15 @@ export default {
           parseFloat(item.cantidadSucursal ? item.cantidadSucursal : 0) +
           parseFloat(item.cantidadImportacion ? item.cantidadImportacion : 0)) *
         (item.precio ? item.precio : 0);
-      return parseFloat(subTotal - item.descuento).toFixed(2);
+      let descuento = (subTotal * (item.desc ? item.desc : 0)) / 100;
+      let index = this.productos.findIndex(
+        v => v.IdProducto == item.IdProducto
+      );
+
+      Vue.set(this.productos[index], "descuento", descuento);
+      return parseFloat(
+        subTotal - (subTotal * (item.desc ? item.desc : 0)) / 100
+      ).toFixed(2);
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -806,6 +816,7 @@ export default {
         this.TipoCambio == 1 || this.TipoCambio == 0
           ? parseFloat(item.PrecioContado).toFixed(2)
           : parseFloat(item.PrecioContado / this.TipoCambio).toFixed(2);
+      obj.desc = 0;
       obj.descuento = 0;
       obj.cantidadSucursal = 0;
       obj.diasEntrega = 0;
