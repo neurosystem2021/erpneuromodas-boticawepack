@@ -168,7 +168,7 @@
                       <input :id="`cantidad${data.index}`" :ref="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
                     <template slot="precio" slot-scope="data">
-                      <input class="form-control" type="number" v-model="data.item.precio">
+                      <input class="form-control" type="number" v-model="data.item.precio" disabled>
                     </template>
                     <template slot="desc" slot-scope="data">
                        <b-input-group  append="%">

@@ -11,6 +11,14 @@
                 body-bg-variant="light"
                 body-text-variant="dark">           
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                    <b-form-group>
+                      <b-form-radio-group
+                        id="radio-group-1"
+                        v-model="tipoBusqueda"
+                        :options="options"
+                        name="radio-options"
+                      ></b-form-radio-group>
+                    </b-form-group>
                     <b-table 
                         v-if="show"
                         id="table-proformas"
@@ -98,6 +106,12 @@ export default {
         "verTicket",
         "Eliminar"
       ],
+      tipoBusqueda: 2,
+      options: [
+        { text: "Nro Cotizacion", value: 1 },
+        { text: "RAZÓN SOCIAL", value: 2 },
+        { text: "DNI/ RUC", value: 3 }
+      ],
       totalRows: 50,
       perPage: 5,
       currentPage: 1
@@ -147,6 +161,8 @@ export default {
           ctx.perPage +
           "&page=" +
           ctx.currentPage +
+          "&tipoBusqueda=" +
+          this.tipoBusqueda+
           "&filter=" +
           ctx.filter
       );
