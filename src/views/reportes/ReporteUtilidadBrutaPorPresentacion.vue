@@ -208,21 +208,7 @@ export default {
       `,
         "_blank"
       );
-      // this.axios(`${this.API}reporte/utilidabruta/presentacion/exportar`, {
-      //   params: {
-      //     fechaIni: this.fechaIni,
-      //     fechaFin: this.fechaFin,
-      //     UsuarioReg: this.UsuarioReg
-      //   }
-      // })
-      //   .then(res => {
-      //     if (res.data) {
-      //       window.open(res.data, "_blank");
-      //     }
-      //   })
-      //   .catch(e => {
-      //     console.log(e);
-      //   });
+      
     },
     getUtilidadBruta(item) {
       return parseFloat(

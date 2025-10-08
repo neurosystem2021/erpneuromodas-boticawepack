@@ -323,7 +323,7 @@
                 />
             </b-form-group>
             
-            <b-form-group>
+            <!-- <b-form-group>
               <label>Precio Costo:</label>
               <input 
                 v-model="producto.precios[i-1].precioc"
@@ -332,7 +332,7 @@
                 class="form-control"
                 step="0.00001"
                 />
-            </b-form-group>
+            </b-form-group> -->
             <b-form-group>
               <label>Precio:</label>
               <input 
