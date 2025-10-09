@@ -46,20 +46,32 @@
                     Fecha Fin
                     <input type="date" class="form-control" v-model="FechaFin">
                 </b-col>
-                <strong style="font-size: 23px; margin-left: 25px;margin-top: 15px;">TOTAL: S/.{{  totalImporte }}</strong>
             </b-row>
             <b-row>
                 
             </b-row>
         </b-col>
         <b-col cols="12">
-            <b-table class="mt-2" :fields="fields" :items="lstCajaBancos"
-                :per-page="perPage"
-                :current-page="currentPage"
+            <b-table
+              class="mt-2"
+              :fields="fields"
+              :items="lstCajaBancos"
+              :per-page="perPage"
+              :current-page="currentPage"
             >
-
             </b-table>
 
+            <!-- Fila TOTAL -->
+            <table class="table table-sm mt-0">
+              <tfoot>
+                <tr class="bg-totalImporte">
+                  <td class="text-right font-weight-bold" style="border: none; position: relative; right: 97px;">
+                   TOTAL: S/. {{ totalImporte | moneda }}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>    
+            
              <b-pagination
                 v-model="currentPage"
                 :total-rows="lstCajaBancos.length"
@@ -78,7 +90,7 @@ export default {
     return {
       API: config.API,
       currentPage: 1,
-      perPage: 5,
+      perPage: 10,
       Cuenta: {},
       FechaIni: "",
       FechaFin: "",
@@ -108,8 +120,7 @@ export default {
   computed: {
     totalImporte() {
       return this.lstCajaBancos.reduce((total, item) => {
-        const valor = parseFloat(item.Importe);
-        return total + (isNaN(valor) ? 0 : valor);
+        return total + (parseFloat(item.Importe) || 0);
       }, 0);
     }
   },
@@ -195,4 +206,7 @@ export default {
 </script>
 
 <style>
+.bg-totalImporte {
+  background-color: #e0f3ff;
+}
 </style>

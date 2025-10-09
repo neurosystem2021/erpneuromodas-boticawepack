@@ -49,7 +49,7 @@
           <b-row>
             <table class="table b-table table-striped table-hover table-sm">
               <thead>
-                <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                <tr style="color:#000; border: 1px solid #ffffff;">
                   <th>ID</th>
                   <th>Fecha Cierre</th>
                   <th>Turno</th>
