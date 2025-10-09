@@ -46,6 +46,7 @@
                     Fecha Fin
                     <input type="date" class="form-control" v-model="FechaFin">
                 </b-col>
+                <strong style="font-size: 23px; margin-left: 25px;margin-top: 15px;">TOTAL: S/.{{  totalImporte }}</strong>
             </b-row>
             <b-row>
                 
@@ -103,6 +104,14 @@ export default {
       .format("YYYY-MM-DD");
     // this.cargarCuentas();
     this.ListarTipoOpe();
+  },
+  computed: {
+    totalImporte() {
+      return this.lstCajaBancos.reduce((total, item) => {
+        const valor = parseFloat(item.Importe);
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
+    }
   },
   methods: {
     setCuenta(obj) {
