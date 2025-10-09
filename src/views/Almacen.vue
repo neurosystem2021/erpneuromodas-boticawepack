@@ -357,7 +357,7 @@ export default {
       this.axios.get(this.API + 'productos/kardex/' + this.productoSelect.IdProducto + '?limit=0', {
           params: {
               idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+              fechaHasta: this.$moment().format("YYYY-MM-DD")
           }
       }).then((response) => {
           this.kardexSelect = response.data
