@@ -154,182 +154,205 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
-import ProductoKardex from '@/components/ProductoKardex'
+import config from "@/store/config.js";
+import ProductoKardex from "@/components/ProductoKardex";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count', {
-      params: { idAlmacen: this.almacen.IdAlmacen }
-    }).then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios
+      .get(this.API + "ventas/count", {
+        params: { idAlmacen: this.almacen.IdAlmacen }
+      })
+      .then(response => {
+        this.totalRows = response.data.total;
+      });
 
-    this.getPrimerAlmacen()
+    this.getPrimerAlmacen();
   },
   data() {
     return {
       API: config.API,
-      vendedor: '',
+      vendedor: "",
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       declarado: 1,
-      filters: { },
-      filter: '',
-      sortBy: 'FechaDoc',
+      filters: {},
+      filter: "",
+      sortBy: "FechaDoc",
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1,
-        Almacen: ''
+        Almacen: ""
       },
-      tipoDoc: {
-      },
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      tipoDoc: {},
+      pageOptions: [5, 10, 15, 50, 100],
       ventaSelect: {},
       ventaDetalleSelect: [],
       items: [],
       showVenta: false,
       isBusy: false,
       fields: [
-            { key: 'idDocVenta', label: 'ID', sortable: true },
-            { key: 'FechaDoc', label: 'Fecha', sortable: true },
-            { key: 'TipoDoc', label: 'Documento', sortable: true},
-            { key: 'Serie', label: 'Serie', sortable: true },
-            { key: 'Numero', sortable: true },
-            { key: 'Cliente', sortable: true },
-            { key: 'Anulado', label: 'Anulado', sortable: true },
-            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
-            { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
+        { key: "idDocVenta", label: "ID", sortable: true },
+        { key: "FechaDoc", label: "Fecha", sortable: true },
+        { key: "TipoDoc", label: "Documento", sortable: true },
+        { key: "Serie", label: "Serie", sortable: true },
+        { key: "Numero", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Anulado", label: "Anulado", sortable: true },
+        { key: "UsuarioReg", label: "Vendedor", sortable: true },
+        {
+          key: "Total",
+          sortable: false,
+          variant: "success",
+          class: "text-center"
+        }
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1
-    }
+    };
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    getPrimerAlmacen(){
-        this.axios.get(this.API + '/almacenes/id/1').then(r => {
-          if (r.data) {
-            this.setAlmacen(r.data)
-            this.$refs.inputAlmacen.setValue(r.data.Almacen)
-            this.getVentasAcumuladas()
-          }
-        })
+    getPrimerAlmacen() {
+      this.axios.get(this.API + "/almacenes/id/1").then(r => {
+        if (r.data) {
+          this.setAlmacen(r.data);
+          this.$refs.inputAlmacen.setValue(r.data.Almacen);
+          this.getVentasAcumuladas();
+        }
+      });
     },
-    setTipoVenta (obj) {
-        this.tipoDoc = obj || {}
-        this.getVentasAcumuladas()
-        this.$refs.tablaVentas.refresh()
+    setTipoVenta(obj) {
+      this.tipoDoc = obj || {};
+      this.getVentasAcumuladas();
+      this.$refs.tablaVentas.refresh();
     },
-    setVendedor (obj) {
-      this.currentPage = 1
-      this.vendedor = obj
-      this.generateFilter('vendedor', obj.Usuario)
-  
+    setVendedor(obj) {
+      this.currentPage = 1;
+      this.vendedor = obj;
+      this.generateFilter("vendedor", obj.Usuario);
     },
     getVentasAcumuladas() {
-      if(this.filters.vendedor) {
-        this.axios.get(this.API + 'ventas/usuario', {
-         params: {
-           usuario: this.vendedor.Usuario,
-           fechaInicio: this.fechaInicio,
-           fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
-         }
-       }).then((response) => {
-         this.ventasAcumuladas = response.data.total
-       })
+      if (this.filters.vendedor) {
+        this.axios
+          .get(this.API + "ventas/usuario", {
+            params: {
+              usuario: this.vendedor.Usuario,
+              fechaInicio: this.fechaInicio,
+              fechaFin: this.fechaFin,
+              idTipoDoc: this.tipoDoc.IdTipoDoc || ""
+            }
+          })
+          .then(response => {
+            this.ventasAcumuladas = response.data.total;
+          });
       } else {
-        this.axios.get(this.API + 'ventas/total', {
-          params: {
-            fechaInicio: this.fechaInicio,
-            fechaFin: this.fechaFin,
-            idTipoDoc: this.tipoDoc.IdTipoDoc || ''
-          }
-        }).then((response) => {
-          this.ventasAcumuladas = response.data.total
-        })
+        this.axios
+          .get(this.API + "ventas/total", {
+            params: {
+              fechaInicio: this.fechaInicio,
+              fechaFin: this.fechaFin,
+              idTipoDoc: this.tipoDoc.IdTipoDoc || ""
+            }
+          })
+          .then(response => {
+            this.ventasAcumuladas = response.data.total;
+          });
       }
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    setAlmacen (obj) {
-      this.almacen = obj
-      this.limpiarFiltros()
-      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+    setAlmacen(obj) {
+      this.almacen = obj;
+      this.limpiarFiltros();
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh());
     },
-    rowClick (item) {
-      this.ventaSelect = item
-      this.showKardex = true
+    rowClick(item) {
+      this.ventaSelect = item;
+      this.showKardex = true;
 
-      this.axios.get(this.API + 'productos/kardex/' + 10 + '?limit=0', {
+      this.axios
+        .get(this.API + "productos/kardex/" + 10 + "?limit=0", {
           params: {
-              idAlmacen: this.almacen.IdAlmacen,
-              fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
+            idAlmacen: this.almacen.IdAlmacen,
+            fechaHasta: this.$moment().format("YYYY-MM-DDTH:mm:ss")
           }
-      }).then((response) => {
-          this.ventaDetalleSelect = response.data
-      })
+        })
+        .then(response => {
+          this.ventaDetalleSelect = response.data;
+        });
     },
     actualizarTabla() {
-      this.$refs.tablaVentas.refresh()
+      this.$refs.tablaVentas.refresh();
     },
-    myProvider (ctx) {
+    myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let tipoDocFilter = ''
+      let tipoDocFilter = "";
       if (this.tipoDoc.IdTipoDoc) {
-        tipoDocFilter = 'idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&'
+        tipoDocFilter = "idTipoDoc[]=" + this.tipoDoc.IdTipoDoc + "&";
       }
-      let url = this.API + 'ventas?' + tipoDocFilter + 'idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
-      let promise = this.axios.get( url )
+      let url =
+        this.API +
+        "ventas?" +
+        tipoDocFilter +
+        "idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      console.log(url);
+      let promise = this.axios.get(url);
 
-      return promise.then((result) => {
-        this.items = result.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
     },
-    limpiarFiltros () {
-      this.filters = {}
-      this.filter = ''
-      this.$refs.inputVendedor.setValue('')
+    limpiarFiltros() {
+      this.filters = {};
+      this.filter = "";
+      this.$refs.inputVendedor.setValue("");
       //document.location.reload()
-     //  this.getVentasAcumuladas()
+      //  this.getVentasAcumuladas()
     },
-    generateFilter (key, value) {
-      this.filters[key] = value
+    generateFilter(key, value) {
+      this.filters[key] = value;
 
-      let filter = ''
+      let filter = "";
       for (var key in this.filters) {
-        filter += '&filter[' + key + ']=' + this.filters[key]
+        filter += "&filter[" + key + "]=" + this.filters[key];
       }
-      this.filter = filter
-      this.getVentasAcumuladas()
+      this.filter = filter;
+      this.getVentasAcumuladas();
     },
-    exportarProductos () {
-
-    }
+    exportarProductos() {}
   },
   components: {
     ProductoKardex
   }
-}
+};
 </script>
 
 <style scope>
@@ -349,7 +372,7 @@ console.log(url)
 }
 .table-detalle th {
   color: #fff;
-  background-color: #6c757d; 
+  background-color: #6c757d;
 }
 .table-detalle tbody td {
   font-size: 18px;
@@ -360,8 +383,8 @@ console.log(url)
   max-width: 300px;
 }
 @media (min-width: 992px) {
-    .modal-xl .modal-dialog {
-        max-width: 1200px;
-    }
+  .modal-xl .modal-dialog {
+    max-width: 1200px;
+  }
 }
 </style>

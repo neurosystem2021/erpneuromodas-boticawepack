@@ -52,22 +52,26 @@ export default new Router({
     {
       path: "/",
       name: "Movimiento",
-      component: Movimiento
+      component: Movimiento,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/productos",
       name: "Productos",
-      component: Productos
+      component: Productos,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reimpresion",
       name: "VentaReimpresion",
-      component: VentaReimpresion
+      component: VentaReimpresion,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/clientes",
       name: "Clientes",
-      component: Clientes
+      component: Clientes,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/habitaciones",
@@ -77,12 +81,14 @@ export default new Router({
     {
       path: "/almacen",
       name: "Almacen",
-      component: Almacen
+      component: Almacen,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/ventas",
       name: "Ventas",
-      component: Ventas
+      component: Ventas,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/VentasMV",
@@ -97,7 +103,8 @@ export default new Router({
     {
       path: "/reportes/cierrecaja",
       name: "CierreCaja",
-      component: CierreCaja
+      component: CierreCaja,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/proforma/:id",
@@ -112,7 +119,8 @@ export default new Router({
     {
       path: "/reportes/cierrecaja/:id",
       name: "CierreCajaId",
-      component: CierreCaja
+      component: CierreCaja,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/reportecierrecaja",
@@ -132,12 +140,14 @@ export default new Router({
     {
       path: "/reportes/deudaclientes",
       name: "DeudaClientes",
-      component: DeudaClientes
+      component: DeudaClientes,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/deudaproveedores",
       name: "DeudaProveedores",
-      component: DeudaProveedores
+      component: DeudaProveedores,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/rankingclientes",
@@ -182,12 +192,14 @@ export default new Router({
     {
       path: "/proveedores",
       name: "Proveedores",
-      component: Proveedores
+      component: Proveedores,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/estadisticas",
       name: "Estadisticas",
-      component: Estadisticas
+      component: Estadisticas,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/articulosresumen",
@@ -247,12 +259,13 @@ export default new Router({
     {
       path: "/usuario",
       name: "Usuario",
-      component: Usuario
+      component: Usuario,
+      meta: { muestraComboEmpresa: true }
     },
     {
       path: "/reportes/proformaticket/:id",
       name: "ProformaTicket",
       component: ProformaTicket
-    },
+    }
   ]
 });

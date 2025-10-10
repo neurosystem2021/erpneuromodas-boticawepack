@@ -11,6 +11,8 @@
               :options="$store.state.empresas"
               size="lg"
               class="form-control"
+              value-field="IDEMPRESA"
+              text-field="RAZONSOCIAL"
               @change="cambiarEmpresa"
               ></b-form-select>
             </b-input-group>

@@ -15,6 +15,8 @@
               :options="$store.state.empresas"
               size="lg"
               class="form-control"
+              value-field="IDEMPRESA"
+              text-field="RAZONSOCIAL"
               @change="cambiarEmpresa"
               ></b-form-select>
             </b-input-group>
@@ -1283,19 +1285,19 @@ export default {
     async recalcularTotalesPorEmpresa() {
       this.lstTotalPorEmpresa = [];
       await this.$store.state.empresas.forEach(empresa => {
-        if (this.productos.some(p => p.Empresa == empresa.value)) {
+        if (this.productos.some(p => p.Empresa == empresa.IDEMPRESA)) {
           let total = this.productos
-            .filter(p => p.Empresa == empresa.value)
+            .filter(p => p.Empresa == empresa.IDEMPRESA)
             .reduce((total, prod) => {
               return parseFloat(total) + parseFloat(prod.total);
             }, 0);
           this.lstTotalPorEmpresa.push({
-            nombre: empresa.text,
+            nombre: empresa.RAZONSOCIAL,
             total: parseFloat(total).toFixed(2)
           });
         } else {
           this.lstTotalPorEmpresa.push({
-            nombre: empresa.text,
+            nombre: empresa.RAZONSOCIAL,
             total: 0
           });
         }
@@ -1743,7 +1745,7 @@ export default {
             console.log(error);
           });
       }
-
+      this.recalcularTotalesPorEmpresa();
       //this.actualizarPrecioConvenio(obj)
       // Actualizar DisabledTotal
     },
@@ -2140,12 +2142,12 @@ export default {
       this.loading = true;
       await this.$store.state.empresas.forEach(async element => {
         let data = { ...this.venta };
-        let serie = await this.obtenerSerie(element.value);
-        let almacen = await this.obtenerAlmacen(element.value);
-        let empresa = await this.obtenerDatosEmpresa(element.value);
-        let impresora = await this.obtenerDatosImpresora(element.value);
+        let serie = await this.obtenerSerie(element.IDEMPRESA);
+        let almacen = await this.obtenerAlmacen(element.IDEMPRESA);
+        let empresa = await this.obtenerDatosEmpresa(element.IDEMPRESA);
+        let impresora = await this.obtenerDatosImpresora(element.IDEMPRESA);
         let total = data.productos
-          .filter(v => v.Empresa == element.value)
+          .filter(v => v.Empresa == element.IDEMPRESA)
           .reduce((total, prod) => {
             return total + parseFloat(prod.total);
           }, 0);
@@ -2165,7 +2167,7 @@ export default {
           IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
           LimitItems: this.venta.tipoVenta.LimitItems,
           TipoDoc: this.venta.tipoVenta.TipoDoc,
-          empresa: element.value,
+          empresa: element.IDEMPRESA,
           nombre_comercial: empresa.razoncial,
           documento: empresa.ruc,
           direccion: empresa.direccion,
@@ -2174,7 +2176,7 @@ export default {
           direccion_cliente: data.cliente.Direccion,
           total: total,
           impresora: impresora,
-          productos: data.productos.filter(v => v.Empresa == element.value)
+          productos: data.productos.filter(v => v.Empresa == element.IDEMPRESA)
         };
         data.almacen = almacen;
         data.Numero = serie.numero;
@@ -2191,9 +2193,9 @@ export default {
           `${this.API}/proformas/cambiarPagado?id_empresa=` + this.empresa,
           dataProfs
         );
-        if (data.productos.some(v => v.Empresa == element.value)) {
+        if (data.productos.some(v => v.Empresa == element.IDEMPRESA)) {
           let productos = data.productos.filter(
-            v => v.Empresa == element.value
+            v => v.Empresa == element.IDEMPRESA
           );
           let totalCarr = productos.reduce((total, pr) => {
             return parseFloat(total) + parseFloat(pr.total);
@@ -2220,10 +2222,10 @@ export default {
           // console.log(comandaJson);
           console.log("dataCredito", data.EsCredito);
           await this.axios
-            .post(this.API + "ventas?id_empresa=" + element.value, data)
+            .post(this.API + "ventas?id_empresa=" + element.IDEMPRESA, data)
             .then(async response => {
               /** --------RECUERDA ESTA PARTE  */
-              this.emitirauto(response.data.insertId, element.value);
+              this.emitirauto(response.data.insertId, element.IDEMPRESA);
               // -------------------------
               await fetch("http://localhost:5000/imprimir/getcmdped.php", {
                 method: "POST",

@@ -263,7 +263,8 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        empresa: sessionStorage.getItem("empresa")
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params

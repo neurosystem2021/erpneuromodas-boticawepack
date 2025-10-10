@@ -15,7 +15,9 @@
                         v-model="empresa"
                         :options="$store.state.empresas"
                         size="lg"
-                        class="form-control my-2"
+                        class="form-control"
+                        value-field="IDEMPRESA"
+                        text-field="RAZONSOCIAL"
                         @change="cambiarEmpresa"
                         ></b-form-select>
                     </b-button-group>
@@ -111,7 +113,7 @@ export default {
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
         { key: "UsuarioReg", label: "Empleado" },
-        // { key: "Total" },
+        { key: "Total" },
         "update",
         "ver",
         "verTicket",
@@ -128,7 +130,8 @@ export default {
     ...mapActions({
       add: "agregarProducto",
       obtenerStok: "obtenerStock",
-      limpiarCarrito: "limpiarCarrito"
+      limpiarCarrito: "limpiarCarrito",
+      buscarSeriesxProduto: "buscarSeriesxProduto"
     }),
     cambiarEmpresa() {
       setTimeout(() => {
@@ -154,79 +157,18 @@ export default {
           }
         );
 
-        // 2. Obtener empresas únicas
-        const empresas = [...new Set(detalles.map(d => d.Empresa))];
-        let productos = [];
+        let productos = detalles;
+        const promesas = detalles.map(async producto => {
+          const params = {
+            IdProducto: producto.IdProducto,
+            Todos: false
+          };
+          const serie = await this.buscarSeriesxProduto(params);
+          producto.productoSerie = serie;
+          this.$store.state.cart.productos.push(producto);
+        });
 
-        // 3. Consultar en paralelo el stock de cada empresa
-        await Promise.all(
-          empresas.map(async empresa => {
-            const productosPorEmpresa = detalles.filter(
-              d => d.Empresa === empresa
-            );
-            const idProductos = productosPorEmpresa.map(d => d.IdProducto);
-
-            const { data: stock } = await this.axios.get(
-              `${this.API}productos/stock/1`,
-              {
-                params: { id_empresa: empresa, idProductos }
-              }
-            );
-
-            // 4. Fusionar stock con productos
-            const productosConStock = productosPorEmpresa.map(det => {
-              const encontrado = stock.find(
-                s => s.IdProducto === det.IdProducto
-              );
-              console.log(det,'det')
-              return {
-                ...det,
-                Producto: encontrado ? encontrado.Producto : det.Producto,
-                stock: encontrado ? encontrado.stock : 0,
-                Series: encontrado
-                  ? encontrado["Series"]
-                  : null,
-                ProductoModelo: encontrado
-                  ? encontrado["ProductoModelo"]
-                  : null,
-                ProductoDesc3: encontrado
-                  ? encontrado["ProductoDesc3"]
-                  : null,
-                ProductoCategoria: encontrado
-                  ? encontrado["ProductoCategoria"]
-                  : null,
-                ProductoMarca: encontrado
-                  ? encontrado["ProductoMarca"]
-                  : null,
-                ProductoMedicion: encontrado
-                  ? encontrado["ProductoMedicion"]
-                  : null
-              };
-            });
-
-            // 5. Normalizar productos e ir agregando al store
-            productosConStock.forEach(item => {
-              const empresaInfo = this.$store.state.empresas.find(
-                e => e.value == item.Empresa
-              );
-              console.log("item", item);
-              const normalizado = {
-                ...item,
-                Empresa: empresaInfo.value,
-                NombreEmpresa: empresaInfo.text.substring(0, 20) + "...",
-                estadoPxP: !!item.estadoPxP
-              };
-
-              this.add([
-                normalizado,
-                () => {},
-                { setPreOr: item.Precio, cantidad: item.Cantidad }
-              ]);
-
-              productos.push(normalizado);
-            });
-          })
-        );
+        await Promise.all(promesas);
 
         // 6. Finalizar
         this.filter = "";

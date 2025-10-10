@@ -236,18 +236,20 @@ export default {
         });
     },
     ObtenerDatosDellate(productos) {
-      productos.forEach(producto => {
-        this.axios(`${this.API}ver_productos`, {
-          params: {
-            id_empresa: producto.Empresa,
-            id: producto.IdProducto
-          }
-        }).then(res => {
-          producto.Producto = res.data.Producto;
-          this.productos.unshift(producto);
-        });
-      });
       console.log(productos);
+      this.productos = productos;
+      // console.log(productos);
+      // productos.forEach(producto => {
+      //   this.axios(`${this.API}ver_productos`, {
+      //     params: {
+      //       id_empresa: producto.Empresa,
+      //       id: producto.IdProducto
+      //     }
+      //   }).then(res => {
+      //     producto.Producto = res.data.Producto;
+      //     this.productos.unshift(producto);
+      //   });
+      // });
     },
     calcularFechaHasta(actual, dias) {
       var date = new Date(actual);

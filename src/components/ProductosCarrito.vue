@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive" :disabled="lstProductos.length==0" v-if="$store.state.MostrarBotonMultipleEmpresa">Agregar Productos
+          <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive">Agregar Productos
           </b-button>
           <autocomplete
             ref="autocompleteProducto"
@@ -224,7 +224,7 @@
         </template>
 
         <template slot="NombreEmpresa" slot-scope="data">
-          <div :class="`${data.item.Empresa} vChip`">
+          <div :class="`${getSyle(data.item.Empresa)} vChip`">
             {{ data.item.NombreEmpresa }}
           </div> 
           </template>
@@ -571,6 +571,7 @@
               v-model="searchProducto"
               placeholder="Buscar..."
               class="form-control inputResponsive"
+              @input="cargarListadoProductos"
               id="searchProducto"
             >
             <b-button  @click="limpiarBuscar" variant="warning"> X </b-button>
@@ -663,11 +664,7 @@
               </tbody>
           </table>
 
-          <div class="pagination mt-3">
-            <b-button size="sm" variant="outline-dark"  @click="prevPage" :disabled="currentPage === 1">Anterior</b-button>
-            <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
-            <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
-          </div>
+          
           </div>
 
           <div class="mt-2">            <hr>
@@ -728,12 +725,6 @@
                 </tr>
               </tbody>
           </table>
-
-          <div class="pagination mt-3">
-            <b-button size="sm" variant="outline-dark"  @click="prevPage" :disabled="currentPage === 1">Anterior</b-button>
-            <span class="mx-2 my-3">Página {{ currentPage }} de {{ totalPages }}</span>
-            <b-button size="sm" variant="outline-dark"  @click="nextPage" :disabled="isLastPage">Siguiente</b-button>
-          </div>
           </div>
           
            <!-- <b-table
@@ -765,12 +756,13 @@
           </b-table> -->
           <b-row>
             <b-col cols="8">
-              <!-- <b-pagination
+              <b-pagination
                 v-model="currentPageModal"
-                :total-rows="listadoProductos().length"
+                :total-rows="10000000000"
                 :per-page="perPageModal"
                 aria-controls="my-table"
-              ></b-pagination> -->
+                @change="cargarListadoProductos"
+              ></b-pagination>
           </b-col>
             <b-col cols="4">
               <b-row>
@@ -783,6 +775,7 @@
                     :options="perPageModalList"
                     size="small"
                     class="form-control"
+                    @change="cambiarPorPaginate($event)"
                   ></b-form-select>
                 </b-col>
               </b-row>
@@ -1046,31 +1039,31 @@ export default {
   },
   async mounted() {
     let vm = this;
-    vm.lstProductos = [];
-    for (const empresa of vm.$store.state.empresas) {
-      let url = `${
-        vm.API
-      }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
-        empresa.value
-      }&limit=`;
+    // vm.lstProductos = [];
+    // for (const empresa of vm.$store.state.empresas) {
+    //   let url = `${
+    //     vm.API
+    //   }productos/puntoventa/modal/stock/1?q&sortBy=stock&sortDesc=1&id_empresa=${
+    //     empresa.value
+    //   }&limit=`;
 
-      let res = await vm.axios(url); // Espera la respuesta antes de continuar
+    //   let res = await vm.axios(url); // Espera la respuesta antes de continuar
 
-      res.data.forEach(element => {
-        vm.lstProductos.push({
-          ...element,
-          Empresa: empresa.value,
-          Selected: false,
-          NombreEmpresa: empresa.desc.substring(0, 15),
-          _rowVariant:
-            element.stock <= 0
-              ? "danger"
-              : element.stock < element.StockMinimo
-                ? "warning"
-                : "success"
-        });
-      });
-    }
+    //   res.data.forEach(element => {
+    //     vm.lstProductos.push({
+    //       ...element,
+    //       Empresa: empresa.value,
+    //       Selected: false,
+    //       NombreEmpresa: empresa.desc.substring(0, 15),
+    //       _rowVariant:
+    //         element.stock <= 0
+    //           ? "danger"
+    //           : element.stock < element.StockMinimo
+    //             ? "warning"
+    //             : "success"
+    //     });
+    //   });
+    // }
   },
   data() {
     return {
@@ -1146,7 +1139,7 @@ export default {
         { valor: "fas fa-backspace", tipo: "backspace" },
         { valor: "CE", tipo: "limpiar" }
       ],
-      perPageModal: 100,
+      perPageModal: 20,
       currentPageModal: 1,
       API: config.API,
       loadCode: "",
@@ -1168,8 +1161,8 @@ export default {
       productoUrl: "",
       itemProducto: {},
       primerMonto: true,
-      currentPage: 1,
-      perPageModal: 100
+      currentPage: 1
+      // perPageModal: 100
     };
   },
   watch: {
@@ -1248,34 +1241,34 @@ export default {
       filtrados: state => state.cart.productosFiltrados,
       totalCart: state => state.cart.totalCart
     }),
-    totalPages() {
-      let productosFiltrados = this.lstProductos.filter(
-        listadoProducto =>
-          !this.$store.state.cart.productos.some(
-            producto =>
-              producto.IdProducto == listadoProducto.IdProducto &&
-              producto.Empresa == listadoProducto.Empresa
-          )
-      );
+    // totalPages() {
+    //   let productosFiltrados = this.lstProductos.filter(
+    //     listadoProducto =>
+    //       !this.$store.state.cart.productos.some(
+    //         producto =>
+    //           producto.IdProducto == listadoProducto.IdProducto &&
+    //           producto.Empresa == listadoProducto.Empresa
+    //       )
+    //   );
 
-      if (this.searchProducto) {
-        productosFiltrados = productosFiltrados.filter(
-          p =>
-            p.Producto.toLowerCase().includes(
-              this.searchProducto.toLowerCase()
-            ) || !!p.Selected
-        );
-      }
+    //   if (this.searchProducto) {
+    //     productosFiltrados = productosFiltrados.filter(
+    //       p =>
+    //         p.Producto.toLowerCase().includes(
+    //           this.searchProducto.toLowerCase()
+    //         ) || !!p.Selected
+    //     );
+    //   }
 
-      if (this.IdProducto) {
-        productosFiltrados = productosFiltrados.filter(
-          v => v.CodigoBarra == this.IdProducto
-        );
-      }
+    //   if (this.IdProducto) {
+    //     productosFiltrados = productosFiltrados.filter(
+    //       v => v.CodigoBarra == this.IdProducto
+    //     );
+    //   }
 
-      const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
-      return Math.ceil(productosFiltrados.length / perPage);
-    },
+    //   const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
+    //   return Math.ceil(productosFiltrados.length / perPage);
+    // },
     isLastPage() {
       return this.currentPage >= this.totalPages;
     },
@@ -1443,7 +1436,8 @@ export default {
       buscar: "buscarProductos",
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
-      actualizarProd: "actualizarProducto"
+      actualizarProd: "actualizarProducto",
+      buscarSeriesxProduto: "buscarSeriesxProduto"
       // obtenerStok: "obtenerStock",
     }),
     abrirImagen(producto, url) {
@@ -1631,13 +1625,7 @@ export default {
       // let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto,);
       prod.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
-      if (!obj.Empresa) {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        obj.Empresa = datoEmpresa[0].value;
-        obj.NombreEmpresa = datoEmpresa[0].desc.substring(0, 20) + "...";
-      }
+
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
       }
@@ -1661,13 +1649,6 @@ export default {
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
-      if (!obj.Empresa) {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        obj.Empresa = datoEmpresa[0].value;
-        obj.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
 
       if (!this.isVentas) {
         obj.PreciosPorProducto = "";
@@ -1934,18 +1915,53 @@ export default {
         return "";
       }
     },
+    getSyle(IDEMPRESA) {
+      switch (IDEMPRESA) {
+        case 1:
+          return "modasm";
+          break;
+        case 2:
+          return "modasgio";
+          break;
+        case 3:
+          return "modasjes";
+          break;
+        default:
+          return "";
+          break;
+      }
+    },
     // ZURITA
     async abrirModaProductos() {
-      let vm = this;
-      vm.searchProducto = "";
-      this.selected = 1;
-      this.currentPage = 1;
-      vm.modalNuevoProductos = !vm.modalNuevoProductos;
-      vm.$store.state.consideraAppendEmpresa = false;
+      this.modalNuevoProductos = !this.modalNuevoProductos;
+      await this.cargarListadoProductos();
     },
+    cambiarPorPaginate(val) {
+      this.currentPageModal = 1;
+      this.perPageModal = val;
+      this.cargarListadoProductos();
+    },
+    async cargarListadoProductos() {
+      await this.axios(
+        `${this.API}/productos/puntoventa/modal/stock/${this.idAlmacen}`,
+        {
+          params: {
+            sortBy: null,
+            sortDesc: 1,
+            limit: null,
+            search: this.searchProducto,
+            tipo: this.selected,
+            limit: this.perPageModal,
+            page: this.currentPageModal
+          }
+        }
+      ).then(res => {
+        this.lstProductos = res.data;
+      });
+    },
+
     listadoProductosOrdenados() {
-      let lst = [];
-      let productosFiltrados = [...this.lstProductos].filter(
+      let lst = [...this.lstProductos].filter(
         listadoProducto =>
           !this.$store.state.cart.productos.some(
             producto =>
@@ -1955,50 +1971,14 @@ export default {
       );
 
       if (this.searchProducto) {
-        const term = this.searchProducto.toLowerCase();
-
-        lst = productosFiltrados.filter(p => {
-          const prod = (p.Producto || "").toLowerCase();
-          const cat = (p.ProductoCategoria || "").toLowerCase();
-          const marca = (p.ProductoMarca || "").toLowerCase();
-
-          // depende del radio seleccionado
-          switch (this.selected) {
-            case 1: // Producto
-              return prod.startsWith(term);
-            case 2: // Categoría
-              return cat.startsWith(term);
-            case 3: // Marca
-              return marca.startsWith(term);
-            default:
-              // si no hay selección, que busque en todos
-              return (
-                prod.startsWith(term) ||
-                cat.startsWith(term) ||
-                marca.startsWith(term)
-              );
-          }
-        });
-
-        // ordenar SIEMPRE por nombre de producto
         lst.sort((a, b) =>
           (a.CodigoBarra || "").localeCompare(b.CodigoBarra || "", "es", {
             sensitivity: "base"
           })
         );
-      } else {
-        lst = productosFiltrados;
       }
 
-      if (this.IdProducto) {
-        lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
-      }
-
-      const perPage = parseInt(this.perPageModal) || lst.length;
-      const start = (this.currentPage - 1) * perPage;
-      const end = start + perPage;
-
-      return lst.slice(start, end);
+      return lst;
     },
     listadoProductos() {
       let lst = [];
@@ -2010,55 +1990,15 @@ export default {
               producto.Empresa == listadoProducto.Empresa
           )
       );
-
-      if (this.searchProducto) {
-        const term = this.searchProducto.toLowerCase();
-
-        lst = productosFiltrados.filter(p => {
-          const prod = (p.Producto || "").toLowerCase();
-          const cat = (p.ProductoCategoria || "").toLowerCase();
-          const marca = (p.ProductoMarca || "").toLowerCase();
-
-          switch (this.selected) {
-            case 1:
-              return prod.startsWith(term);
-            case 2:
-              return cat.startsWith(term);
-            case 3:
-              return marca.startsWith(term);
-            default:
-              return (
-                prod.startsWith(term) ||
-                cat.startsWith(term) ||
-                marca.startsWith(term)
-              );
-          }
-        });
-      } else {
-        lst = productosFiltrados;
-      }
-
-      if (this.IdProducto) {
-        lst = lst.filter(v => v.CodigoBarra == this.IdProducto);
-      }
-
-      const perPage = parseInt(this.perPageModal) || lst.length;
-      const start = (this.currentPage - 1) * perPage;
-      const end = start + perPage;
-
-      return lst.slice(start, end);
+      return productosFiltrados;
     },
     async obtenerSeriePorProducto(id) {
       let productoSerie = [];
-      await this.axios
-        .get(this.API + "productos/serie", {
-          params: { IdProducto: id, Todos: false }
-        })
-        .then(res => {
-          if (res) {
-            productoSerie = res.data;
-          }
-        });
+      let params = {
+        IdProducto: id,
+        Todos: false
+      };
+      await this.buscarSeriesxProduto(params);
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
@@ -2111,14 +2051,6 @@ export default {
         this.modalPresentaciones = true;
         this.primerMonto = true;
       } else {
-        if (!this.itemProducto.Empresa) {
-          let empresa = this.$store.state.empresas.filter(
-            v => v.value == this.empresa
-          )[0];
-          this.itemProducto.Empresa = empresa.value;
-          this.itemProducto.NombreEmpresa =
-            empresa.text.substring(0, 20) + "...";
-        }
         this.itemProducto.tipo = "UNIDAD";
         this.itemProducto.estadoPxP = true;
         this.itemProducto.precio = this.itemProducto.PrecioContado;
@@ -2153,13 +2085,6 @@ export default {
       prod.descuento = 0;
       prod.disabled = true;
       prod.Presentacion = JSON.stringify(presentacion);
-      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
 
       if (this.itemProducto.PreciosPorProducto.length > 0) {
         prod.total = this.monto * presentacion.precio;
@@ -2189,13 +2114,6 @@ export default {
       prod.descuento = 0;
       prod.disabled = false;
       prod.Presentacion = null;
-      if (!prod.Empresa || typeof prod.Empresa == "undefined") {
-        let datoEmpresa = this.$store.state.empresas.filter(
-          v => v.value == empresa
-        );
-        prod.Empresa = datoEmpresa[0].value;
-        prod.NombreEmpresa = datoEmpresa[0].text.substring(0, 20) + "...";
-      }
       prod.total = 0;
       prod.precio = prod.PrecioContado;
       prod.cantidadPres = 0;
@@ -2474,18 +2392,23 @@ export default {
 }
 .modasm {
   background: #eff9ff;
+  font-size: 0.9rem;
 }
 .modasgio {
   background: #c1e7ff;
+  font-size: 0.9rem;
 }
 .modasjes {
   background: #cdcdcd;
+  font-size: 0.9rem;
 }
 .modasjun {
   background: #c2ffc0;
+  font-size: 0.9rem;
 }
 .modaspau {
   background: #ffdaf0;
+  font-size: 0.9rem;
 }
 .vChip {
   font-weight: bold;

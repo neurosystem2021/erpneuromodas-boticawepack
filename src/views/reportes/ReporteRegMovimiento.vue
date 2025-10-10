@@ -292,7 +292,8 @@ export default {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
         descripcion: this.descripcion,
-        declarado: this.declarado
+        declarado: this.declarado,
+        empresa: sessionStorage.getItem("empresa")
       };
       await this.axios(`${this.API}reporte/listarregmov`, {
         params: params

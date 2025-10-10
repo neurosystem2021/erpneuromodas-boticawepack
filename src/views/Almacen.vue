@@ -4,13 +4,15 @@
         <b-row>
           <b-col md="12"  class="my-1">
              <label>Empresa:</label>
-                  <b-form-select
-                    v-model="empresa"
-                    :options="$store.state.empresas"
-                    style="font-weight: bold; width: 350px"
-                    class="form-control my-2"
-                    @change="cambiarEmpresa"
-                  ></b-form-select>
+             <b-form-select
+              v-model="empresa"
+              :options="$store.state.empresas"
+              size="lg"
+              class="form-control"
+              value-field="IDEMPRESA"
+              text-field="RAZONSOCIAL"
+              @change="cambiarEmpresa"
+              ></b-form-select>
           </b-col>
           <b-col md="12"  class="my-1">
             <b-row>

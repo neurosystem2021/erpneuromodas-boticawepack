@@ -10,10 +10,11 @@
               v-model="empresa"
               :options="$store.state.empresas"
               size="lg"
-              style="font-weight: bold; width: 350px"
-              class="form-control my-2"
+              class="form-control"
+              value-field="IDEMPRESA"
+              text-field="RAZONSOCIAL"
               @change="cambiarEmpresa"
-            ></b-form-select>
+              ></b-form-select>
             </b-col>
               <b-col md="8">
 

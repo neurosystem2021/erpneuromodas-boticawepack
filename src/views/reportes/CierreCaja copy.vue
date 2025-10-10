@@ -7,12 +7,13 @@
               <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <b-form-select
-                      v-model="empresa"
-                      :options="$store.state.empresas"
-                      size="lg"
-                      style="font-weight: bold; width: 350px"
-                      class="form-control my-2"
-                      @change="cambiarEmpresa"
+                    v-model="empresa"
+                    :options="$store.state.empresas"
+                    size="lg"
+                    class="form-control"
+                    value-field="IDEMPRESA"
+                    text-field="RAZONSOCIAL"
+                    @change="cambiarEmpresa"
                     ></b-form-select>
                   </b-button-group>
               </div>
