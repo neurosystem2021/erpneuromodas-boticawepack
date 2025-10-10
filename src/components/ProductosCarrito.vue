@@ -1173,13 +1173,18 @@ export default {
       if (fPP.length == 4) {
         obj.estadoPxP = true;
         obj.cantxPrecio = 1;
+        /*
         this.setProductoUni(obj);
         return;
+        */
       }
-
+      this.setProductoUni(obj);
+      obj.cantxPrecio = 1;
       this.indexProdSelect = null;
+      /*
       this.$refs["modalCant"].show();
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
+      */
       this.objProd = obj;
     },
     setProductoUni(obj) {
