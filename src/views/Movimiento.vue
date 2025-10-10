@@ -117,7 +117,7 @@
                   </b-col>
                 </b-row>
 
-                <b-row>
+                <b-row v-if="idPerfil==1">
                   <b-col md="6">
                     <b-form-group>
                       <b-form-checkbox id="alterar-productos"
@@ -381,7 +381,7 @@ export default {
       currentMonth = currentMonth < 10 ? "0" + currentMonth : currentMonth;
       return {
         EsCredito: 0,
-        alterarProductos: 1,
+        alterarProductos: 0,
         FechaVenCredito: "",
         Moneda: "USD",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
