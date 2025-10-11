@@ -42,7 +42,8 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <b-input-group prepend="Doc." class="mt-2">
+                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -73,9 +74,10 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="Alm." class="mt-2">
+                                    <label>Almacen:</label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputAlmacen"
@@ -95,9 +97,10 @@
                                     <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocularMovil2">
                                 <b-form-group>
-                                    <b-input-group prepend="P.V." class="mt-2">
+                                    <label>Punto de Venta:</label>
+                                    <b-input-group>
                                     <autocomplete
                                         required="required"
                                         ref="inputPuntoVenta"
@@ -113,9 +116,10 @@
                                     </b-input-group>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="12" style="margin-top:-10px">
+                            <b-col md="12">
                                 <b-form-group>
-                                    <b-input-group prepend="Cliente ">
+                                    <label>Cliente:</label>
+                                    <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             style="width:40%"
@@ -133,7 +137,7 @@
                                         <input v-model="dni"
                                             @keydown.enter.prevent="loadClienteBarcode"
                                             type="text"
-                                            class="form-control"
+                                            class="form-control ocularMovil2"
                                             placeholder="Cod. Barra" />
                                         <b-input-group-append>
                                             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -181,7 +185,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="3" class="ocularMovil2">
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -204,7 +208,7 @@
                            Cliente VIP con Precio Convenio
                         </b-form-text>
                     </b-col>
-                    <b-col md="2" >
+                    <b-col md="2" class="ocularMovil2">
                         <b-form-group class="text-center">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
@@ -354,7 +358,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -377,7 +381,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Yape / Plin</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -396,6 +400,29 @@
                                                     type="number"
                                                     placeholder="S/."
                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: middle !important;">Transferencia</td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.transferencia.descripcion"
+                                                    :disabled="bloquearInput?true:false"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.transferencia.monto"
+                                                    :disabled="bloquearInput?true:false"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -421,7 +448,7 @@
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
                         <br />
                         <br />
                     </b-col>
@@ -514,7 +541,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto))).toFixed(2);
+                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))).toFixed(2);
         }
     },
     computed: {
@@ -644,7 +671,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    transferencia: { IdMetodoPago: 4, monto: 0 }
                 },
                 IdPreOrden: [],
                 CampoDireccion: 'Direccion',
@@ -987,18 +1015,25 @@ export default {
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)
             if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
             if((isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago tarjeta/transferencia no puede ser negativo')
+                this.$toasted.show('El metodo de pago Tarjeta no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
             if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago Yape o Plin no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+
+            if((isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
@@ -1273,10 +1308,28 @@ export default {
 .big-text {
     font-size: 30px;
 }
+.tablaMetodo {
+    display: none !important;
+}
 @media only screen and (max-width: 700px) {
   /* For desktop: */
     .ocularMovil{
         display: none;
+    }
+}
+@media only screen and (min-width: 777px) and (max-width: 1800px) {
+  /* For desktop: */
+    .ancho{
+        width: calc(100% - 300px)
+    }
+}
+@media only screen and (max-width: 750px) {
+  /* For desktop: */
+    .ocularMovil2{
+        display: none;
+    }
+    .mostrarSerie{
+      display: inline !important;
     }
 }
 

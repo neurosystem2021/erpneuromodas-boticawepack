@@ -180,7 +180,7 @@
             type="number"
             style="width: 120px"
             min="0"
-            step="0.00001"
+            step="0.000000000000000001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -195,7 +195,7 @@
             type="number"
             style="width: 105px"
             min="0"
-            step="0.00001"
+            step="0.00000001"
             placeholder="Subtotal"
             class="form-control"
             v-model="productos[data.index].subt"
@@ -560,7 +560,7 @@ export default {
       obtenerStok: 'obtenerStock',
     }),
     setSubtotal(index, val, prod) {
-      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 3)
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 18)
       Vue.set(this.productos[index], 'precio', precio)
       this.actualizarProd(prod)
     },
@@ -888,7 +888,8 @@ export default {
       }
 
       Vue.set(this.productos[index], 'normalPrecioContado', parseFloat(normalPrecio).toFixed(2))
-      Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      //Vue.set(this.productos[index], 'nuevoPrecioContado', Math.ceil(nuevoPrecio))
+      Vue.set(this.productos[index], 'nuevoPrecioContado', parseFloat(nuevoPrecio.toFixed(8)))
       this.getSubtotal(index)
 
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
@@ -900,11 +901,16 @@ export default {
        this.actualizarProd(obj)
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
-      // this.productos[index].subtotal = subtotal
-      return subtotal
+      let cantidad = this.productos[index].cantidad || 0;
+      let precio = this.productos[index].precio || 0;
+
+      let subtotal = cantidad * precio;
+
+      // Redondear a 8 decimales
+      subtotal = parseFloat(subtotal.toFixed(8));
+
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+      return subtotal;
     },
     getIgv (index) {
       let igv = 0

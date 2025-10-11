@@ -276,7 +276,7 @@
             <label>Precio de Costo: <b>(En $ {{ producto.PrecioCostoDol | redondear(2) }})</b></label>
             <input
               v-model="producto.PrecioCosto"
-              step="0.0001"
+              step="0.00000001"
               type="number"
               class="form-control"
               />
