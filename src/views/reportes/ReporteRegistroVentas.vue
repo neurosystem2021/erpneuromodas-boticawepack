@@ -4,15 +4,15 @@
        <b-col cols="12">
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Fecha
             <input type="date" class="form-control" v-model="fechaInicio">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Fecha
             <input type="date" class="form-control" v-model="fechaFin">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Almacén
             <b-form-select v-model="almacen" 
                  value-field="IdAlmacen"
@@ -30,9 +30,10 @@
             Declarado
           </b-form-checkbox>
         </b-col>
-        <b-col cols="2" class="pt-4">
+        <b-col cols="3" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+            <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
             <table class="table table-hover table-striped ">
@@ -252,6 +253,24 @@ export default {
     },
     exportar() {
       this.seleccionarTipoFlag = true;
+    },
+    async exportarDetallado() {
+      let params = {
+        fechaIni: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        declarado: this.declarado,
+        almacen: this.almacen
+      };
+      await this.axios(`${this.API}reporte/ListarRegVenta/exceldetallado`, {
+        params: params
+      }).then(res => {
+        let url = res.data;
+        url = url.replace(/\\/g, "");
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          url = "https://" + url; // O "https://" si es necesario
+        }
+        window.open(url, "_blank");
+      });
     },
     async exportarReporte(tipo) {
       let params = {
