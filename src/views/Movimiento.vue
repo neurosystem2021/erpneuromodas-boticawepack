@@ -269,7 +269,8 @@ export default {
         { key: "FechaReg", label: "Fecha" },
         { key: "Proveedor" },
         { key: "action", label: "" }
-      ]
+      ],
+      ordenCompra: {}
     };
   },
   computed: {
@@ -396,7 +397,8 @@ export default {
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
-        user: sessionStorage.getItem("User")
+        user: sessionStorage.getItem("User"),
+        ordenCompra: {}
       };
     },
     onReset(evt) {
@@ -551,7 +553,8 @@ export default {
       this.axios
         .post(this.API + "movimientos", {
           movimiento: this.movimiento,
-          productos: this.productos
+          productos: this.productos,
+          ordenCompra: this.ordenCompra
         })
         .then(response => {
           if (response.data.error) {
@@ -581,6 +584,8 @@ export default {
         IdProveedor: item.IdProveedor,
         Proveedor: item.Proveedor
       };
+      this.ordenCompra = item;
+      console.log(this.ordenCompra);
       this.setProveedor(proveedor);
       this.$refs.inputProveedor.setValue(item.Proveedor);
       this.mostrarDetalles(item);
