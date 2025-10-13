@@ -900,18 +900,26 @@ export default {
       let obj = this.productos[index];
        this.actualizarProd(obj)
     },
-    getSubtotal(index) {
-      let cantidad = this.productos[index].cantidad || 0;
-      let precio = this.productos[index].precio || 0;
+   getSubtotal(index) {
+    let cantidad = Number(this.productos[index].cantidad) || 0;
+    let precio = Number(this.productos[index].precio) || 0;
 
-      let subtotal = cantidad * precio;
+    let subtotal = cantidad * precio;
 
-      // Redondear a 8 decimales
-      subtotal = parseFloat(subtotal.toFixed(8));
+    // Precisión base
+    subtotal = Number(subtotal.toFixed(8));
 
-      Vue.set(this.productos[index], 'subtotal', subtotal);
-      return subtotal;
-    },
+    // Si el producto tiene presentación, redondear hacia arriba a número entero
+    if (this.productos[index].cantidadPres > 1) {
+      subtotal = Math.ceil(subtotal - 0.000001); // evita errores tipo 399.999999 → 400
+    } else {
+      // Si es unidad, mantener precisión con decimales
+      subtotal = Number(subtotal.toFixed(8));
+    }
+
+    Vue.set(this.productos[index], 'subtotal', subtotal);
+    return subtotal;
+  },
     getIgv (index) {
       let igv = 0
       if (this.productos[index].TieneIgv) {
