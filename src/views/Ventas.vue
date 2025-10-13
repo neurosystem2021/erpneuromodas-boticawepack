@@ -376,7 +376,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -399,7 +399,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.transferencia.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -422,7 +422,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.visa.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
