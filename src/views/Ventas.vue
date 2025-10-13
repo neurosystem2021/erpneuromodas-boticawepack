@@ -1827,11 +1827,11 @@ export default {
         return;
       }
 
-      if (this.totalCart <= 0) {
+      /*if (this.totalCart <= 0) {
         this.$toasted.show("La venta en S/. 0.00 no está permitido");
         this.inProgress = false;
         return;
-      }
+      }*/
       console.log(this.venta);
       if (this.venta.idProforma) {
         this.modalRepartidor = true;
