@@ -484,7 +484,7 @@ export default {
     },
     setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio);
+      let precio = parseFloat(this.productos[index].precio).toFixed(2);
       if (this.productos[index].TieneIgv) {
         precio += precio * 0.18;
       }
