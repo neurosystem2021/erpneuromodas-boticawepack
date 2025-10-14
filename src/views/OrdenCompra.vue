@@ -3,7 +3,7 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
             <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="10">
@@ -103,6 +103,12 @@ export default {
           { key: "Producto" },
           { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoFormaFarmaceutica", label: "Lab." },
+          // { key: "eventPres", label: "", thStyle: { width: "5%" } },
+          // {
+          //   key: "presentacion",
+          //   label: "Pres.",
+          //   thStyle: { width: "5%" }
+          // },
           { key: "ProductoMedicion", label: "Med." },
           {
             key: "StockMinimo",

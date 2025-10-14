@@ -5,6 +5,10 @@
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid class="anchomov" id="conten">
           <b-row>
+              <b-col md="12" style="text-align: right;">
+               
+                <b-button @click="abrirModalOrdenCompra" :disabled="Object.keys(movimiento.movimientoTipo).length==0"  variant="info">Cargar Orden Compra</b-button>
+              </b-col>
               <b-col md="8">
 
                 <b-row>
@@ -189,9 +193,10 @@
                 </b-row>
               </b-col>
           </b-row>
-          <b-row>
+          <b-row >
             <b-col>
               <productos-carrito 
+                
                 ref="carrito"
                 :fields="carrito.fields"
                 @onAddProducto="onAddProducto" 
@@ -212,7 +217,13 @@
         </b-container>
         <br><br>
     </b-form>
-
+     <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
+          <b-table :items="productosInf"  :fields="fields">
+            <template slot="action" slot-scope="data">
+              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
+    </b-modal>
   </div>
 </template>
 
@@ -223,16 +234,27 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
+import Movimiento from "@/components/Movimiento";
 
 export default {
   mounted() {},
   data() {
     return {
+      modalMovimientos: false,
       inProgress: false,
       newRuc: "",
       API: config.API,
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
+      productosInf: [],
+      fields: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ],
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
@@ -273,6 +295,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
+      ordenCompra: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false
@@ -455,6 +478,84 @@ export default {
         this.movimiento.TipoCambio = 1;
       }
     },
+    async verArticulos() {
+      this.productosInf = [];
+      await this.axios
+        .get(this.API + "ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: -1,
+            idAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
+    },
+    abrirModalOrdenCompra() {
+      this.verArticulos();
+      this.modalMovimientos = true;
+    },
+    addPreOrdenCompra(item) {
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.ordenCompra = item;
+
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      this.mostrarDetalles(item);
+
+      this.modalMovimientos = false;
+    },
+    addPreOrdenCompra(item) {
+      let almacenDest = { ...item };
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.ordenCompra = item;
+      this.setAlmacenDestino(item);
+      this.$refs.inputAlmacenDestino.setValue(item.Almacen);
+
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      setTimeout(() => {
+        this.mostrarDetalles(item);
+      }, 100);
+      this.modalMovimientos = false;
+    },
+    async mostrarDetalles(data) {
+      this.$store.state.cart.productos = [];
+      await this.axios
+        .get(this.API + "ordencompra/detalle", {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra,
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          let detalle = response.data;
+          detalle.forEach(element => {
+            let prod = {...element, Presentacion : 'UNIDAD'}
+            this.$store.state.cart.productos.unshift(prod);
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado
+          ? this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+          : this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1
+      });
+    },
     onSetProducto(obj, precio = false, precioc = false) {
       obj.cantidad = 1;
       obj.precio = obj.PrecioCosto || 0;
@@ -591,7 +692,8 @@ export default {
         this.axios
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
-            productos: this.productos
+            productos: this.productos,
+            ordenCompra: this.ordenCompra
           })
           .then(response => {
             if (response.data.error) {

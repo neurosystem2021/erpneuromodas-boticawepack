@@ -21,4 +21,7 @@ export default {
   font-weight: bold;
   text-transform: uppercase;
 }
+#modalOrdenCompra .modal-dialog {
+  min-width: 70% !important;
+}
 </style>
