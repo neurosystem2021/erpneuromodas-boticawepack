@@ -5,6 +5,14 @@
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container fluid class="anchomov" id="conten">
           <b-row>
+            <b-col md="12" style="text-align: right">
+              <b-button
+                @click="abrirModalOrdenCompra"
+                :disabled="Object.keys(movimiento.movimientoTipo).length==0"
+                variant="info"
+                >Cargar Orden Compra</b-button
+              >
+            </b-col>
               <b-col md="8">
 
                 <b-row>
@@ -213,6 +221,20 @@
         <br><br>
     </b-form>
 
+    <b-modal
+      v-model="modalMovimientos"
+      id="modalOrdenCompra"
+      no-close-on-backdrop
+      no-close-on-esc
+    >
+      <b-table :items="productosInf" :fields="fields">
+        <template slot="action" slot-scope="data">
+          <b-button variant="info" @click="addPreOrdenCompra(data.item)"
+            ><i class="fa fa-plus" aria-hidden="true"></i
+          ></b-button>
+        </template>
+      </b-table>
+    </b-modal>
   </div>
 </template>
 
@@ -233,6 +255,7 @@ export default {
       API: config.API,
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
+      modalMovimientos: false,
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
@@ -273,6 +296,15 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
+      productosInf: [],
+      fields: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ],
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false
@@ -293,6 +325,73 @@ export default {
       obtenerStok: "obtenerStock",
       limpiarCart: "limpiarCarrito"
     }),
+    async verArticulos() {
+      this.productosInf = [];
+      await this.axios
+        .get(this.API + "ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: -1,
+            idAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
+    },
+    abrirModalOrdenCompra() {
+      this.verArticulos();
+      this.modalMovimientos = true;
+    },
+
+    addPreOrdenCompra(item) {
+      let almacenDest = { ...item };
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.ordenCompra = item;
+      this.setAlmacenDestino(item);
+      this.$refs.inputAlmacenDestino.setValue(item.Almacen);
+
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      setTimeout(() => {
+        this.mostrarDetalles(item);
+      }, 100);
+      this.modalMovimientos = false;
+    },
+    async mostrarDetalles(data) {
+      this.$store.state.cart.productos = [];
+      await this.axios
+        .get(this.API + "ordencompra/detalle", {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra,
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          let detalle = response.data;
+          detalle.forEach(element => {
+            let prod = { ...element, Presentacion: "UNIDAD" };
+            this.$store.state.cart.productos.unshift(prod);
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.obtenerStok({
+        IdAlmacen: !this.isTraslado
+          ? this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+          : this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1
+      });
+    },
+
     prevent(evt) {
       if (evt.target.tagName !== "TEXTAREA") {
         evt.preventDefault();
@@ -591,7 +690,8 @@ export default {
         this.axios
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
-            productos: this.productos
+            productos: this.productos,
+            ordenCompra: this.ordenCompra
           })
           .then(response => {
             if (response.data.error) {
