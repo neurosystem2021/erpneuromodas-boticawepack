@@ -258,7 +258,7 @@
                 </b-row> -->
                 <div class="">
                 <b-row class="mt-2 clsCart">
-                  <b-table striped hover :fields="headerTable"  :items="venta.productos">
+                  <b-table striped hover :fields="headerTable"  :items="venta.productos" sticky-header="80vh">
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -2758,12 +2758,7 @@ export default {
 .txtAutoComplete {
   min-width: 960px;
 }
-.divCart {
-  height: 40vh;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-}
+
 .clsCart {
   position: relative;
   max-height: 40vh;
@@ -2778,12 +2773,7 @@ export default {
   /* background-color: white;  */
 }
 @media (max-width: 1250px) {
-  .divCart {
-    height: 80vh;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: auto;
-  }
+
   .clsCart {
     position: relative;
     max-height: 80vh;
