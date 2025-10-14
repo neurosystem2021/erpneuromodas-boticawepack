@@ -256,7 +256,7 @@
                     </b-form-group>
                   </b-col>
                 </b-row> -->
-                <div class="divCart">
+                <div class="">
                 <b-row class="mt-2 clsCart">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos">
                     <template slot="pres" slot-scope="data">
@@ -1160,7 +1160,7 @@ export default {
     };
   },
   mounted() {
-    console.log('componente montado')
+    console.log("componente montado");
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1596,14 +1596,22 @@ export default {
                 <td style="width: 300px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 80px">${data.ProductoCategoria?data.ProductoCategoria:''}</td>
-                <td style="width: 80px">${data.ProductoModelo?data.ProductoModelo:''}</td>
-                <td style="width: 120px">${data.ProductoMarca?data.ProductoMarca:''}</td>
-                <td style="width: 80px">${data.ProductoTalla?data.ProductoTalla:''}</td>
-                <td style="width: 80px">${data.Color?data.Color:''}</td>
-                <td style="width: 80px">${data.Genero?data.Genero:''}</td>
-                <td style="width: 80px">${data.Botapie?data.Botapie:''}</td>
-                <td style="width: 80px">${data.Anaquel?data.Anaquel:''}</td>
+                <td style="width: 80px">${
+                  data.ProductoCategoria ? data.ProductoCategoria : ""
+                }</td>
+                <td style="width: 80px">${
+                  data.ProductoModelo ? data.ProductoModelo : ""
+                }</td>
+                <td style="width: 120px">${
+                  data.ProductoMarca ? data.ProductoMarca : ""
+                }</td>
+                <td style="width: 80px">${
+                  data.ProductoTalla ? data.ProductoTalla : ""
+                }</td>
+                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
+                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
+                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
+                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
@@ -2752,15 +2760,29 @@ export default {
 }
 .divCart {
   height: 40vh;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 .clsCart {
   position: relative;
   max-height: 40vh;
+  max-width: 100%;
   overflow-y: scroll;
+  overflow-x: scroll;
+}
+.clsCart table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* background-color: white;  */
 }
 @media (max-width: 1250px) {
   .divCart {
     height: 80vh;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
   }
   .clsCart {
     position: relative;
