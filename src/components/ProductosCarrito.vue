@@ -1622,7 +1622,7 @@ export default {
       this.objProd = {};
       obj.EsObsequio = 0;
 
-      // let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto,);
+      let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto);
       prod.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
 
@@ -1996,9 +1996,11 @@ export default {
       let productoSerie = [];
       let params = {
         IdProducto: id,
-        Todos: false
+        Todos: false,
+        empresa: sessionStorage.getItem("empresa")
       };
-      await this.buscarSeriesxProduto(params);
+      productoSerie = await this.buscarSeriesxProduto(params);
+
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {

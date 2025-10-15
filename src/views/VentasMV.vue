@@ -1783,6 +1783,7 @@ export default {
             productoSerie = res.data;
           }
         });
+        console.log('ssss')
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {

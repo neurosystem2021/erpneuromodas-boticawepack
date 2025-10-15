@@ -8,12 +8,14 @@ export default {
     });
   },
   async buscarSeriesxProduto({ commit }, search) {
-    console.log("search", search);
+    let res = [];
     await axios
       .get(API + "productos/serie", { params: search })
       .then(response => {
-        return response.data;
+        console.log(response.data);
+        res = response.data;
       });
+    return res;
   },
   buscarAlmacenes({ commit }, search) {
     axios.get(API + "almacenes?q=" + search).then(response => {
