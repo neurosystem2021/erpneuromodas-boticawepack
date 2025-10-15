@@ -1734,10 +1734,8 @@ export default {
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         let prod = productos.filter(v => v.IdProducto == producto.IdProducto);
         if (prod[0].presentacion == "UNIDAD") {
-          console.log("a");
           prod[0].cantidad += parseFloat(1);
         } else {
-          console.log("b");
           prod[0].CantidadPresentacion += parseFloat(1);
         }
         this.metodoPagoCambio(1);
