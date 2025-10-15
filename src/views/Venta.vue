@@ -1186,7 +1186,6 @@ export default {
         .then(res => {
           //this.ventaSinStock = parseInt(res.data); // por si devuelve string
           this.ventaSinStock = parseInt(res.data.VENTASINSTOCK); // CORREGIDO
-          console.log("Respuesta de /config/stock:", res.data);
         })
         .catch(err => {
           this.ventaSinStock = 0; // fallback: sí permite la venta si hay error
@@ -1629,6 +1628,7 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
+      console.log(producto.precio);
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
@@ -1656,8 +1656,8 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
+      prod.cantidad = producto.cantidad ? producto.cantidad : 1;
+      prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
@@ -1882,7 +1882,6 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      console.log("top", tipo);
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
         const ventaActual = this.ventas[this.ventaActiva].pago;
