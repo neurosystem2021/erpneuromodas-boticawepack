@@ -40,6 +40,7 @@
                     <tr>
                       <th>Id</th>
                       <th>Vendedor</th>
+                      <th>Cliente</th>
                       <th>Fecha Doc</th>
                       <th>Cod. Sunat</th>
                       <th>Tipo Doc.</th>
@@ -56,6 +57,7 @@
                     <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirModalDetalle(reporte)" :class="{'clsAnulado': reporte.Anulado == 1}">
                         <td style="text-align: center;">{{reporte.idDocVenta}}</td>
                         <td>{{reporte.UsuarioReg}}</td>
+                        <td style="text-align: left;">{{reporte.Cliente}}</td>
                         <td style="text-align: center;">{{reporte.FechaDoc}}</td>
                         <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
