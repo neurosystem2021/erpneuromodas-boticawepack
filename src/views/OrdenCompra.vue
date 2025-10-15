@@ -40,6 +40,21 @@
                                     :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-input-group>
+                                <label>Vendedor:</label>
+                                <b-input-group>
+                                    <autocomplete
+                                    required="required"
+                                    ref="inputVendedor"
+                                    :url="API + 'vendedor'"
+                                    anchor="Vendedor"
+                                    label="writer"
+                                    placeholder=""                          
+                                    :on-select="setVendedor"
+                                    :customParams="{IdProveedor: Object.keys(movimiento.proveedor).length>0 ? movimiento.proveedor.IdProveedor : 0}"
+                                    :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                    :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-input-group>
                                 </b-form-group>
                             </b-col>
                             <b-col md="2">
@@ -229,7 +244,15 @@ export default {
     },
     setProveedor(obj) {
       this.movimiento.proveedor = obj;
+      this.movimiento.Vendedor = "";
+      this.$refs.inputVendedor.setValue("");
       this.$store.state.cart.productos = [];
+    },
+    setVendedor(obj) {
+      this.movimiento.Vendedor = obj.Vendedor;
+      /* this.movimiento.proveedor = obj;
+      this.$store.state.cart.productos = [];
+    */
     },
     initMovimiento() {
       let currentMonth = this.$moment().month() + 1;
@@ -274,6 +297,17 @@ export default {
 
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show("Por favor seleccione un proveedor");
+        this.inProgress = false;
+        return;
+      }
+      if (!this.movimiento.Vendedor) {
+        this.movimiento.Vendedor = this.$refs.inputVendedor.$el
+          .querySelector("input")
+          .value.trim();
+      }
+      
+      if (!this.movimiento.Vendedor) {
+        this.$toasted.show("Por favor seleccione un vendedor");
         this.inProgress = false;
         return;
       }

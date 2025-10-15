@@ -63,7 +63,7 @@
               </thead>
               <tbody>
                 <tr v-for="(prod, i) in productos" :key="i">
-                  <td style="width: 5% !important">{{ prod.CodigoBarra }}</td>
+                  <td style="width: 5% !important">{{ prod.CodigoFrabricante }}</td>
                   <td>{{ prod.Producto }}</td>
                   <td>{{ prod.ProductoCategoria }}</td>
                   <td class="table-success">{{ prod.TotalVentas ? prod.TotalVentas.toFixed(2):0 }}</td>
