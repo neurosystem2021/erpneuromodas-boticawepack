@@ -475,7 +475,7 @@
                                                 <b-input-group prepend="Proforma válidez: " append="días">
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="diasValidosProf"
+                                                    v-model="ventas[ventaActiva].diasValidosProf"
                                                     min="0"
                                                     value="0"
                                                     type="number"
@@ -1069,6 +1069,7 @@ export default {
         pagocon: 0,
         cliente: {},
         EsCredito: 0,
+        diasValidosProf: 1,
         Serie: "",
         Numero: "",
         Observacion: "",
@@ -1122,6 +1123,7 @@ export default {
           pagocon: 0,
           cliente: {},
           EsCredito: 0,
+          diasValidosProf: 1,
           Serie: "",
           Numero: "",
           Observacion: "",
@@ -2186,7 +2188,7 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
-      if (this.diasValidosProf == 0 || this.diasValidosProf == "") {
+      if (venta.diasValidosProf == 0 || venta.diasValidosProf == "") {
         this.$toasted.show("Debe ingresar los días de validez de la proforma");
         this.inProgress = false;
         return;
@@ -2370,9 +2372,8 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      venta.diasValidosProf = this.diasValidosProf;
+      // venta.diasValidosProf = this.diasValidosProf;
       await this.axios.post(this.API + "proformas", venta).then(response => {
-        this.diasValidosProf = 0;
         console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");
