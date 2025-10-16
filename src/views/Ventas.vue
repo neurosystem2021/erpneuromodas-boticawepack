@@ -998,12 +998,12 @@ export default {
       tieneIgv: [],
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
-        { key: "CodigoBarra" },
         { key: "Producto" },
-        { key: "Anaquel" },
-        { key: "pres", label: "" },
-        { key: "presentacion", label: "Presentacion" },
-        { key: "cantxPrecio", label: "	Cant X Precio" },
+        { key: "eventPres", label: "Img" },
+        { key: "ProductoModelo", label: "Modelo" },
+        { key: "ProductoMarca", label: "Marca" },
+        { key: "ProductoTalla", label: "Talla" },
+        { key: "Genero" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         {
@@ -1020,6 +1020,30 @@ export default {
           class: "text-center"
         },
         { key: "acciones", label: "" }
+
+        // { key: "stock", label: "Stock", variant: "info", class: "text-center" },
+        // { key: "CodigoBarra" },
+        // { key: "Producto" },
+        // { key: "Anaquel" },
+        // { key: "pres", label: "" },
+        // { key: "presentacion", label: "Presentacion" },
+        // { key: "cantxPrecio", label: "	Cant X Precio" },
+        // { key: "cantidad" },
+        // { key: "precio", label: "Precio" },
+        // {
+        //   key: "subtotal",
+        //   label: "SubTotal",
+        //   variant: "success",
+        //   class: "text-center"
+        // },
+        // { key: "descuento", label: "Descuento" },
+        // {
+        //   key: "total",
+        //   label: "Total",
+        //   variant: "danger",
+        //   class: "text-center"
+        // },
+        // { key: "acciones", label: "" }
       ],
       busqueda: "",
       loadCode: "",
@@ -1724,11 +1748,7 @@ export default {
     async setProducto(producto, esNota = false) {
       let productos = this.ventas[this.ventaActiva].productos;
       console.log(productos.some(v => v.IdProducto == producto.IdProducto));
-      console.log(
-        productos.map(v => {
-          return v.IdProducto;
-        })
-      );
+      console.log(productos[0]);
       console.log(producto);
       // console.log(producto))
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
