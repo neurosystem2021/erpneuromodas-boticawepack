@@ -212,24 +212,23 @@
 </template>
 
 <script>
-import Menu from '@/components/Menu'
-import ProductosCarrito from '@/components/ProductosCarrito'
+import Menu from "@/components/Menu";
+import ProductosCarrito from "@/components/ProductosCarrito";
 //import ProveedoresTabla from 'components/ProveedoresTabla'
-import ProveedoresForm from '@/components/ProveedoresForm'
-import { mapState, mapActions } from 'vuex'
-import config from '@/store/config.js'
+import ProveedoresForm from "@/components/ProveedoresForm";
+import { mapState, mapActions } from "vuex";
+import config from "@/store/config.js";
 
 export default {
-  mounted () {
-  },
-  data () {
+  mounted() {},
+  data() {
     return {
       inProgress: false,
-      newRuc: '',
+      newRuc: "",
       API: config.API,
-      ultimoMovimiento: '',
+      ultimoMovimiento: "",
       movimiento: this.initMovimiento()
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -240,54 +239,65 @@ export default {
   },
   methods: {
     ...mapActions({
-      buscarProveedores: 'buscarProveedores',
-      buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito',
-      obtenerStok: 'obtenerStock'
+      buscarProveedores: "buscarProveedores",
+      buscarAlmacenes: "buscarAlmacenes",
+      limpiar: "limpiarCarrito",
+      obtenerStok: "obtenerStock"
     }),
-    onAddProducto (obj) {
-        this.obtenerStok({
-          IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1
+    onAddProducto(obj) {
+      this.obtenerStok({
+        IdAlmacen:
+          this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+      });
+    },
+    afe(e) {
+      return false;
+    },
+    cargarNumero() {
+      this.axios
+        .get(this.API + "movimientos/numero", {
+          params: {
+            serie: this.movimiento.Serie,
+            idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo
+          }
         })
+        .then(response => {
+          Vue.set(
+            this.movimiento,
+            "Numero",
+            response.data.NuevoNumero || "0001"
+          );
+        })
+        .catch(error => {
+          console.log(error);
+          // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+        });
     },
-    afe (e) {
-return false
-    },
-    cargarNumero () {
-      this.axios.get(this.API + 'movimientos/numero', {
-        params: {
-          serie: this.movimiento.Serie,
-          idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo
-        }
-      })
-      .then((response) => {
-        Vue.set(this.movimiento, 'Numero', response.data.NuevoNumero || '0001')
-      })
-      .catch((error) => {
-        console.log(error)
-        // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
-    },
-    initMovimiento () {
-      let currentMonth = this.$moment().month() + 1
-      currentMonth = currentMonth < 10 ? '0' + currentMonth : currentMonth
+    initMovimiento() {
+      let currentMonth = this.$moment().month() + 1;
+      currentMonth = currentMonth < 10 ? "0" + currentMonth : currentMonth;
       return {
         EsCredito: 0,
         alterarProductos: 1,
-        FechaVenCredito: '',
-        Moneda: 'PEN',
-        FechaPeriodoTributario: this.$moment().year() + '' + currentMonth,
+        FechaVenCredito: "",
+        Moneda: "PEN",
+        FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
-        MovimientoFecha: (this.$browser.name == 'chrome') ? this.$moment().format("YYYY-MM-DDThh:mm:ss") : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
+        MovimientoFecha:
+          this.$browser.name == "chrome"
+            ? this.$moment().format("YYYY-MM-DDThh:mm:ss")
+            : this.$moment().format("YYYY-MM-DD hh:mm:ss"),
         FechaStock: this.$moment().format("YYYY-MM-DD"),
         TipoCambio: 1,
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 }
-      }
+      };
     },
-    onReset (evt) {
+    onReset(evt) {
       evt.preventDefault();
       /* Reset our form values */
       /*this.form.email = '';
@@ -298,99 +308,105 @@ return false
       /*this.show = false;
       this.$nextTick(() => { this.show = true });*/
     },
-    setTipoMovimiento (obj) {
+    setTipoMovimiento(obj) {
       if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: -1 }
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-      }else if (obj.Tipo == 1) {
-        this.movimiento.almacenDestino = { IdAlmacen: -1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-      }else {
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-      }
-      this.movimiento.movimientoTipo = obj
-
-      this.cargarNumero()
-    },
-    setProveedor (obj) {
-      this.movimiento.proveedor = obj
-    },
-    setAlmacenOrigen (obj) {
-      this.movimiento.almacenOrigen = obj
-    },
-    setAlmacenDestino (obj) {
-      this.movimiento.almacenDestino = obj
-      this.obtenerStok({ IdAlmacen: this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1 })
-    },
-    setMoneda (obj) {
-      this.movimiento.Moneda = obj.Moneda
-      if (obj.Moneda === 'USD') {
-        this.movimiento.TipoCambio = 3.7
+        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
+        this.movimiento.almacenDestino = { IdAlmacen: 1 };
+      } else if (obj.Tipo == 1) {
+        this.movimiento.almacenDestino = { IdAlmacen: -1 };
+        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
       } else {
-        this.movimiento.TipoCambio = 1
+        this.movimiento.almacenDestino = { IdAlmacen: 1 };
+        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
+      }
+      this.movimiento.movimientoTipo = obj;
+
+      this.cargarNumero();
+    },
+    setProveedor(obj) {
+      this.movimiento.proveedor = obj;
+    },
+    setAlmacenOrigen(obj) {
+      this.movimiento.almacenOrigen = obj;
+    },
+    setAlmacenDestino(obj) {
+      this.movimiento.almacenDestino = obj;
+      this.obtenerStok({
+        IdAlmacen:
+          this.movimiento.almacenDestino.IdAlmacen > 0
+            ? this.movimiento.almacenDestino.IdAlmacen
+            : 1
+      });
+    },
+    setMoneda(obj) {
+      this.movimiento.Moneda = obj.Moneda;
+      if (obj.Moneda === "USD") {
+        this.movimiento.TipoCambio = 3.7;
+      } else {
+        this.movimiento.TipoCambio = 1;
       }
     },
-    getProveedores (value) {
-      this.buscarProveedores(value)
+    getProveedores(value) {
+      this.buscarProveedores(value);
     },
-    getAlmacenes (value) {
-      this.buscarAlmacenes(value)
+    getAlmacenes(value) {
+      this.buscarAlmacenes(value);
     },
-    guardarMovimiento (evt) {
+    guardarMovimiento(evt) {
       evt.preventDefault();
-      this.inProgress = true
+      this.inProgress = true;
 
       if (!this.movimiento.proveedor.IdProveedor) {
-        this.$toasted.show('Por favor seleccione un proveedor')        
-        this.inProgress = false            
-        return
-      }
-
-      if(!this.productos.length) {
-          this.$toasted.show('No ha seleccionado ningun producto')
-          this.inProgress = false            
-          return          
-      }
-
-      let faltaLlenar = false
-      this.productos.forEach((prod, index) => {
-        if (prod.total <= 0) {
-          faltaLlenar = true
-        }
-      })
-
-      if (faltaLlenar && this.movimiento.alterarProductos) {
-        this.$toasted.show('Falta llenar cantidad / precio')
-        this.inProgress = false
+        this.$toasted.show("Por favor seleccione un proveedor");
+        this.inProgress = false;
         return;
       }
 
-      this.axios.post(this.API + 'movimientos', {
-        movimiento: this.movimiento,
-        productos: this.productos
-      })
-      .then((response) => {
-        if (response.data.error) {
-          this.$toasted.show(response.data.error)
-        } else {
-          this.ultimoMovimiento = response.data.hash
-          this.movimiento = this.initMovimiento()
-          this.limpiar()
-          this.$refs.inputMovimiento.setValue('')
-          this.$refs.inputProveedor.setValue('')
-          this.$toasted.show('Movimiento guardado correctamente ')          
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
+        return;
+      }
+
+      let faltaLlenar = false;
+      this.productos.forEach((prod, index) => {
+        if (prod.total <= 0) {
+          faltaLlenar = true;
         }
-        this.inProgress = false
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        this.inProgress = false
-      })
+      });
+
+      if (faltaLlenar && this.movimiento.alterarProductos) {
+        this.$toasted.show("Falta llenar cantidad / precio");
+        this.inProgress = false;
+        return;
+      }
+
+      this.axios
+        .post(this.API + "movimientos", {
+          movimiento: this.movimiento,
+          productos: this.productos
+        })
+        .then(response => {
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.ultimoMovimiento = response.data.hash;
+            this.movimiento = this.initMovimiento();
+            this.limpiar();
+            this.$refs.inputMovimiento.setValue("");
+            this.$refs.inputProveedor.setValue("");
+            this.$toasted.show("Movimiento guardado correctamente ");
+          }
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     }
   },
   components: {
@@ -398,10 +414,10 @@ return false
     ProductosCarrito,
     ProveedoresForm
   }
-}
+};
 </script>
 <style>
-  .input-group {
-    /*margin: 0.25rem 0 !important;*/
-  }
+.input-group {
+  /*margin: 0.25rem 0 !important;*/
+}
 </style>

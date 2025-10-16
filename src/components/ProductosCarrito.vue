@@ -467,7 +467,7 @@ export default {
     }),
     APIProductos () {
       if (this.idAlmacen) {
-        return this.API + 'productos/stock/' + this.idAlmacen
+        return this.API + 'productos/stock/' + 1
       } else {
         return this.API + 'productos'
       }
