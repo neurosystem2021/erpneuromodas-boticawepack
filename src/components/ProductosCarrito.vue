@@ -2376,7 +2376,7 @@ export default {
   color: #ffffff;
 }
 .tblModal {
-  height: 240px;
+  height: 520px;
   overflow-y: auto;
   overflow-x: auto;
   display: block;
@@ -2474,7 +2474,7 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 100%;
+  max-width: 100%;  min-height: 150vh;
 }
 #modalSelectProduct .modal-dialog {
   max-width: 100%;
