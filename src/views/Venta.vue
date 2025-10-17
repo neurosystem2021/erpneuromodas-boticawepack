@@ -623,9 +623,9 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="getProductosCategoriaSearch"
                 @focus.prevent=""
-              ></b-form-input>
+                ></b-form-input>
+                <!-- @input="getProductosCategoriaSearch" -->
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
                   <i class="fas fa-microphone"></i>
@@ -1452,6 +1452,7 @@ export default {
       }
     },
     getProductosCategoriaSearch(search) {
+      if (!this.busqueda || !this.busqueda.trim()) return;
       if (search.length < 3) {
         return;
       }
@@ -2653,6 +2654,11 @@ export default {
       });
     }
     //Fin Sockets
+  },
+  watch: {
+    busqueda() {
+      this.getProductosCategoriaSearch(this.busqueda);
+    }
   }
 };
 </script>
