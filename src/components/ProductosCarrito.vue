@@ -1997,7 +1997,8 @@ export default {
       let params = {
         IdProducto: id,
         Todos: false,
-        empresa: sessionStorage.getItem("empresa")
+        empresa: sessionStorage.getItem("empresa"),
+        IdAlmacen:this.idAlmacen
       };
       productoSerie = await this.buscarSeriesxProduto(params);
 

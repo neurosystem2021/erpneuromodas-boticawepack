@@ -790,6 +790,7 @@
                 @click="togglePopover">
                 <i class="fas fa-credit-card"></i>
               </b-button>
+              
                <b-popover 
                   :target="`popover-metodopago`" 
                   title="Método de Pago" 
