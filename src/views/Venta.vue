@@ -194,6 +194,7 @@
                       min="0"
                       step="0.00001"
                       type="number"
+                      :class="data.item.precio < data.item.PrecioCosto ? 'clsError': ''"
                       @focus="abrirModalTouch(data.index,2)"
                       style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
                       autocomplete="false"  @input="metodoPagoCambio(1)"
@@ -661,8 +662,9 @@
                 placeholder="INGRESE UN PRODUCTO"
                 autocomplete="off"
                 v-model="busqueda"
-                @input="getProductosSearch"
-              ></b-form-input>
+                @focus.prevent=""
+                ></b-form-input>
+                <!-- @input="getProductosCategoriaSearch" -->
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
                   <i class="fas fa-microphone"></i>
@@ -1468,7 +1470,8 @@ export default {
       this.recognition.onresult = event => {
         if (event.results.length > 0) {
           this.busqueda = event.results[0][0].transcript;
-          this.search();
+          this.getProductosCategoriaSearch(this.busqueda);
+          this.busqueda = "";
         }
       };
 
@@ -1489,30 +1492,21 @@ export default {
         alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
-    search() {
-      this.getProductosSearch(this.busqueda);
-    },
-    irTxtLoadBarcode(event) {
-      if (event) {
-        event.preventDefault();
+    getProductosCategoriaSearch(search) {
+      if (!this.busqueda || !this.busqueda.trim()) return;
+      if (search.length < 3) {
+        return;
       }
-      document.getElementById("txtLoadBarcode").focus();
-    },
-    f(d) {
-      console.log(d);
-    },
-    getProductosCategoria(idProductoCategoria) {
-      console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
-        this.busqueda = "";
+
         this.axios
           .get(this.API + "productos/categoria", {
             params: {
-              IdProductoCategoria: idProductoCategoria,
+              q: search,
               idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
-              MasMovido: idProductoCategoria == 0 ? 1 : 0
+              MasMovido: search == 0 ? 1 : 0
             }
           })
           .then(response => {
@@ -1527,9 +1521,14 @@ export default {
           });
       }
     },
+    irTxtLoadBarcode(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      document.getElementById("txtLoadBarcode").focus();
+    },
 
-    getProductosSearch(idProductoCategoria) {
-      console.log(idProductoCategoria);
+    getProductosCategoria(idProductoCategoria) {
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1538,6 +1537,7 @@ export default {
           .get(this.API + "productos/categoria", {
             params: {
               q: idProductoCategoria,
+              IdProductoCategoria: idProductoCategoria,
               idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
               MasMovido: idProductoCategoria == 0 ? 1 : 0
             }
@@ -1701,8 +1701,8 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
+      prod.cantidad = producto.cantidad ? producto.cantidad : 1;
+      prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
@@ -1710,7 +1710,9 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      productos.unshift(prod);
+      prod.PrecioCost = producto.PrecioCosto;
+      this.showPresentacion(prod, null);
+      // productos.unshift(prod);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
@@ -1926,7 +1928,6 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
-      console.log("top", tipo);
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
         const ventaActual = this.ventas[this.ventaActiva].pago;
@@ -2206,11 +2207,6 @@ export default {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
       }
-      // if (this.diasValidosProf < 0 || this.diasValidosProf == "") {
-      //   this.$toasted.show("Debe ingresar los días de validez de la proforma");
-      //   this.inProgress = false;
-      //   return;
-      // }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
@@ -2357,7 +2353,7 @@ export default {
       //     title: "No se puede vender un producto sin stock",
       //     showConfirmButton: true,
       //     confirmButtonText: "Entiendo",
-      //     target: document.getElementById("conten"),
+      //     // target: document.getElementById("conten"),
       //     confirmButtonColor: "#0275d8"
       //   });
       //   return;
@@ -2512,15 +2508,18 @@ export default {
       this.modalPresentacion = true;
     },
     cambiarPresentacion(obj, esPresentacion) {
+      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
+        producto.PrecioCost = obj.precioc;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
       } else {
+        producto.PrecioCost = producto.PrecioCost;
         producto.Descripcion = obj.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
@@ -2528,8 +2527,11 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-
-      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      if (this.index) {
+        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      } else {
+        productos.unshift(producto);
+      }
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
@@ -2701,10 +2703,18 @@ export default {
       });
     }
     //Fin Sockets
+  },
+  watch: {
+    busqueda() {
+      this.getProductosCategoriaSearch(this.busqueda);
+    }
   }
 };
 </script>
 <style scoped>
+.clsError {
+  border: 1px solid red !important;
+}
 .alert {
   margin-bottom: 0;
 }
@@ -2769,6 +2779,9 @@ export default {
 .pagocon .input-group-text {
   font-size: 0.8rem;
   font-weight: bold;
+}
+.clsError {
+  border: 1px solid red !important;
 }
 </style>
 <style>
