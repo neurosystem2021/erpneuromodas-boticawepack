@@ -30,10 +30,12 @@
             Declarado
           </b-form-checkbox>
         </b-col>
-        <b-col cols="3" class="pt-4">
+        <b-col cols="5" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
             <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button>
+            <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button>
+            <b-button variant="secondary" @click="exportarSunat(2)"><i class="fa fa-file-archive" aria-hidden="true"></i> zip</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
             <table class="table table-hover table-striped ">
@@ -271,6 +273,39 @@ export default {
         }
         window.open(url, "_blank");
       });
+    },
+    async exportarSunat(tipo) {
+      const params = {
+        fechaIni: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        declarado: this.declarado,
+        almacen: this.almacen
+      };
+
+      try {
+        const res = await this.axios.get(`${this.API}exportar/ventas/zip`, {
+          params
+        });
+        console.log(res.data);
+
+        let url = tipo == 1 ? res.data.txt : res.data.zip;
+
+        if (!url) return alert("No se generó el archivo correctamente.");
+
+        // limpiar barras invertidas
+        url = url.replace(/\\/g, "");
+
+        // asegurar protocolo HTTPS
+        if (!/^https?:\/\//i.test(url)) {
+          url = "https://" + url;
+        }
+
+        // descargar (abrir en nueva pestaña)
+        window.open(url, "_blank");
+      } catch (err) {
+        console.error("Error exportando a SUNAT:", err);
+        alert("Error al exportar. Revisa la consola para más detalles.");
+      }
     },
     async exportarReporte(tipo) {
       let params = {

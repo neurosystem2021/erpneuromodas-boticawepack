@@ -677,9 +677,9 @@ export default {
         this.totalVentasVisa +
         this.totalVentasMastercard +
         this.totalVentasTransferencia +
-        this.totalVentasCanje +
-        this.totalIngresos -
-        this.totalSalidas
+        this.totalVentasCanje
+        // + this.totalIngresos -
+        // this.totalSalidas
       );
     },
     totalSalidas() {

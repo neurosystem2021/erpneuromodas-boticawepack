@@ -25,14 +25,16 @@
           </b-form-checkbox>
 
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
           Buscar detalle del movimiento (buscar serie)
             <input type="text" class="form-control" v-model="descripcion">
         </b-col>
-        <b-col cols="3" class="pt-4">
+        <b-col cols="4" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" :disabled="activarBotones" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Excel</b-button>
-            <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button>
+            <!-- <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button> -->
+             <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button>
+            <b-button variant="secondary" @click="exportarSunat(2)"><i class="fa fa-file-archive" aria-hidden="true"></i> zip</b-button>
         </b-col>
         <b-col cols="12" class="mt-4">
             <table ref="miTabla" class="table table-hover table-striped ">
@@ -326,6 +328,39 @@ export default {
           this.TotalUSD = parseFloat(TotalUSD).toFixed(2);
         }
       });
+    },
+    async exportarSunat(tipo) {
+      const params = {
+        fechaIni: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        declarado: this.declarado,
+        almacen: this.almacen
+      };
+
+      try {
+        const res = await this.axios.get(`${this.API}exportar/compras/zip`, {
+          params
+        });
+        console.log(res.data);
+
+        let url = tipo == 1 ? res.data.txt : res.data.zip;
+
+        if (!url) return alert("No se generó el archivo correctamente.");
+
+        // limpiar barras invertidas
+        url = url.replace(/\\/g, "");
+
+        // asegurar protocolo HTTPS
+        if (!/^https?:\/\//i.test(url)) {
+          url = "https://" + url;
+        }
+
+        // descargar (abrir en nueva pestaña)
+        window.open(url, "_blank");
+      } catch (err) {
+        console.error("Error exportando a SUNAT:", err);
+        alert("Error al exportar. Revisa la consola para más detalles.");
+      }
     },
     async abrirDedetalle(reporte) {
       console.log(reporte);
