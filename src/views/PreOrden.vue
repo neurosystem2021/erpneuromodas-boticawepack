@@ -319,6 +319,7 @@ export default {
   components: { ClientesForm },
   data() {
     return {
+      presentacionSeleccionada: null, // guardará el id o índice del item clickeado
       vendedor: {},
       API: config.API,
       idAlmacen: "",
@@ -547,11 +548,24 @@ export default {
         ? prod.ProductoPresentacion
         : "UNIDAD";
       obj.tienePresentacion = pres.some(v => v.cantidad > 0);
+
+      // Añadir producto a la lista
       this.productos.unshift(obj);
+
+      // Si el producto tiene presentaciones, mostrar el modal
+      if (obj.tienePresentacion) {
+        this.showPresentacion(obj, 0); // muestra el modal automáticamente
+      }
+
+      // Foco en cantidad solo si no tiene presentaciones
       this.$nextTick(() => {
-        let element = document.getElementById("cantidad0");
-        element.focus();
-        element.select();
+        if (!obj.tienePresentacion) {
+          let element = document.getElementById("cantidad0");
+          if (element) {
+            element.focus();
+            element.select();
+          }
+        }
       });
     },
     async loadBarcode(e) {
@@ -675,6 +689,9 @@ export default {
     },
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
+       // Guardar presentación seleccionada
+      this.presentacionSeleccionada = esPresentacion ? obj.nombre : producto.ProductoPresentacion;
+
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
@@ -694,7 +711,10 @@ export default {
       }
 
       Vue.set(this.productos, this.index, producto);
-      this.modalPresentacion = false;
+       // Esperar 200ms para mostrar animación de selección
+      setTimeout(() => {
+        this.modalPresentacion = false;
+      }, 200);
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -757,6 +777,41 @@ export default {
   .btnGuardar {
     display: block;
     width: 100%;
+  }
+}
+
+.contentCard {
+  cursor: pointer; 
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover visual */
+.contentCard:hover {
+  transform: scale(1.03);
+  background-color: #f5fbff;
+  border-color: #cce5ff;
+}
+
+/* Cuando está seleccionada */
+.contentCard.seleccionado {
+  border-color: #007bff;
+  background-color: #e6f2ff;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.4);
+  animation: rebote 0.3s ease;
+}
+
+/* Animación rebote */
+@keyframes rebote {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 </style>

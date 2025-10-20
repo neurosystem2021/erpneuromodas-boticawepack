@@ -255,6 +255,24 @@
                       v-if="venta.EsOrganizacion"
                     />
                   </b-input-group>
+                  <b-input-group>
+                    <b-form-checkbox
+                      :disabled="bloquearInput ? true : false"
+                      v-model="venta.EsObservacion"
+                      :value="1"
+                      :unchecked-value="0"
+                    >
+                      Observación
+                    </b-form-checkbox>
+                    <input
+                      v-model="venta.ObservacionVenta"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Observacion de la Venta"
+                      v-if="venta.EsObservacion"
+                    />
+                  </b-input-group>
                   <b-row v-if="this.$route.query.idPedido">
                     <b-col>
                       <b-form-group>
@@ -1173,7 +1191,9 @@ export default {
         IdPreOrden: [],
         CampoDireccion: "Direccion",
         EsOrganizacion: 0,
+        EsObservacion: 0,
         NombreOrganizacion: "",
+        ObservacionVenta: "",
         NroComprobanteModifica: "",
         EsSeparado: 0,
         Separado: 0,
@@ -1896,6 +1916,7 @@ export default {
         }
         let dataImprimir = {
           NombreOrganizacion: this.venta.NombreOrganizacion,
+          ObservacionVenta: this.venta.ObservacionVenta,
           vendedor: this.venta.vendedor.NombreUsuario,
           tipoPago: tipoPago,
           numero: this.venta.Numero,
