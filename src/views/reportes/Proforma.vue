@@ -104,7 +104,7 @@
             <td width="3%" class="no">{{ index+1 }}</td>
             <!--<td></td>-->
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
-            <td width="40%" class="desc"><h3 style="color:black !important;">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td width="40%" class="desc"><h3 style="color:black !important;">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }} <br><!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
             <td width="20%" class="de" style="text-align:center">{{ prod.Descripcion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
             <td width="8%" class="um" style="text-align:center">{{ prod.ProductoMedicion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
@@ -280,9 +280,31 @@ export default {
   border: none !important;
   background: white !important;
 }
+
 @media print {
   #printBtn {
     display: none;
   }
+
+  @page {
+    margin-top: 20mm;
+    margin-bottom: 20mm;
+    margin-left: 15mm;
+    margin-right: 15mm;
+  }
+
+  thead {
+    display: table-row-group;  /*cabecera solo una vez */
+  }
+
+  tfoot {
+    display: table-row-group;  /*total solo al final */
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
+
 </style>
