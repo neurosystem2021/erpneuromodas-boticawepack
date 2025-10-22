@@ -1761,12 +1761,32 @@ export default {
 
           this.ventas.productos = [];
 
-          response.data.forEach(element => {
-            this.setProducto(element);
+          response.data.forEach(async element => {
+            console.log("Presentacion", element.Presentacion);
+            element.Descripcion = element.Presentacion;
+            let productoStock = await this.obtenerStockBuscador(
+              element.IdProducto
+            );
+            element.stock =
+              Object.keys(productoStock).length > 0 ? productoStock.stock : 0;
+            this.ventas[this.ventaActiva].productos.push(element);
+            // this.setProducto(element);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.metodoPagoCambio(1);
+            }, 1000);
+          });
         });
+    },
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
     },
     someMethod(text) {
       this.someMethod = text;
@@ -1884,6 +1904,7 @@ export default {
       }
     },
     metodoPagoCambio(tipo = null) {
+      console.log("llegó");
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
         const ventaActual = this.ventas[this.ventaActiva].pago;
