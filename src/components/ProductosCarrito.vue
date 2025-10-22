@@ -376,6 +376,21 @@
             <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
 
+        <template slot="DescPorcentaje" slot-scope="data">
+          <input
+            :disabled="bloquearInput?true:false  || esDelivery"
+            v-model="productos[data.index].DescPorcentaje"
+            style="width:90px"
+            type="number"
+            min="0"
+            step="0.01"
+            class="form-control"
+            value="0"
+            @input="actualizarDescuentoPorcentaje(data.index)"/>
+            <b-form-text>
+            </b-form-text>
+        </template>
+
         <template slot="descuento" slot-scope="data">
           <input
             :disabled="bloquearInput?true:false  || esDelivery"

@@ -593,7 +593,8 @@ export default {
             variant: "success",
             class: "text-center"
           },
-          { key: "descuento", label: "Desc." },
+          // { key: "descuento", label: "Desc." },
+          { key: "DescPorcentaje", label: "Desc.(%)" },
           {
             key: "total",
             label: "Total",

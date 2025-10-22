@@ -822,6 +822,9 @@ export default {
       obj.diasEntrega = 0;
       obj.cantidadImportacion = 0;
       obj.diasEntregaImportacion = 0;
+      obj.precio = parseFloat(
+        obj.precio * (1 + (this.igv == 1 ? 0.18 : 0))
+      ).toFixed(2);
       this.productos.unshift(obj);
       this.$nextTick(() => {
         setTimeout(() => {
@@ -1107,6 +1110,17 @@ export default {
           this.$set(this.productos[index], "precio", nuevoPrecio);
         });
       }
+    },
+    igv() {
+      this.productos.forEach((prod, index) => {
+        const nuevoPrecio =
+          prod.PrecioContado * (1 + (this.igv == 1 ? 0.18 : 0));
+        this.$set(
+          this.productos[index],
+          "precio",
+          parseFloat(nuevoPrecio).toFixed(2)
+        );
+      });
     }
   }
 };
