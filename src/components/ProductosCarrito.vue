@@ -1430,6 +1430,11 @@ export default {
       let obj = this.productos[index];
       this.actualizarProd({ Producto: obj, Pos: index });
     },
+    actualizarDescuentoPorcentaje(index) {
+      let obj = this.productos[index];
+      obj.descuento = (obj.precio * obj.DescPorcentaje) / 100;
+      this.actualizarProd({ Producto: obj, Pos: index });
+    },
     getSubtotal(index) {
       let subtotal = this.$options.filters.redondear(
         this.productos[index].cantidad * this.productos[index].precio
