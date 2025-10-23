@@ -93,6 +93,7 @@ export default {
         { key: "Anio", label: "Año" },
         "Numero",
         "Cliente",
+        { key: "Descripcion", label: "Desc." },
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
         { key: "UsuarioReg", label: "Empleado" },
