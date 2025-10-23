@@ -6,10 +6,10 @@
     </b-col>
     <b-col cols="12">
         <b-table :fields="fields" :items="lstIsla">
-          <template slot="Estado" scope="data">
+          <template slot="Estado" slot-scope="data">
             {{ data.item.Estado == '1' ? 'Activo' : 'Inactivo' }}
           </template>
-          <template slot="action" scope="data">
+          <template slot="action" slot-scope="data">
             <b-button variant="danger" v-if="data.item.Estado==1" @click="cambiarEstado(data.item)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
             <b-button variant="warning" v-else @click="cambiarEstado(data.item)"><i class="fa fa-power-off" aria-hidden="true"></i></b-button>
             

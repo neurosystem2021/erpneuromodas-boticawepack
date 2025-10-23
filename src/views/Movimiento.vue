@@ -133,18 +133,26 @@
                   <b-col md="5">
                     <b-form-group>
                       <label>Serie:</label>                    
-                      <b-form-input v-model="movimiento.Serie"
+                      <b-form-input 
+                        ref="inputSerie"
+                        v-model="movimiento.Serie"
                         required="required"
                         @input="cargarNumero"
+                        :disable="bloquearSerie"
                         type="text"
                         placeholder=""></b-form-input>
                     </b-form-group>
                     <b-form-group>
                       <label>Número:</label>                    
-                      <b-form-input v-model="movimiento.Numero"
+                      <b-form-input
+                        ref="inputNumero"
+                        v-model="movimiento.Numero"
                         required="required"
+                        :disable="bloquearSerie"
                         type="text"
-                        placeholder=""></b-form-input>
+                        placeholder=""
+                        
+                        ></b-form-input>
                     </b-form-group>
                     
                     <b-form-group v-if="isNotaCredito">
@@ -243,6 +251,7 @@ export default {
   mounted() {},
   data() {
     return {
+      bloquearSerie: false,
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -271,12 +280,23 @@ export default {
     }),
     isNotaCredito() {
       let val = false;
-      console.log(this.movimiento.movimientoTipo);
       if (Object.keys(this.movimiento.movimientoTipo).length > 0) {
         if (this.movimiento.movimientoTipo.CodSunat == "07") {
+          this.movimiento.Serie = "_C01";
+          this.cargarNumero();
+          setTimeout(() => {
+            this.$refs.inputSerie.$refs.input.disabled = true;
+            this.$refs.inputNumero.$refs.input.disabled = true;
+          }, 100);
           val = true;
+        } else {
+          setTimeout(() => {
+            this.$refs.inputSerie.$refs.input.disabled = false;
+            this.$refs.inputNumero.$refs.input.disabled = false;
+          }, 100);
         }
       }
+
       return val;
     }
   },
@@ -286,15 +306,22 @@ export default {
       buscarAlmacenes: "buscarAlmacenes",
       limpiar: "limpiarCarrito"
     }),
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
+    },
     setDocRef(obj) {
       console.log(obj);
       this.movimiento.almacenDestino.IdAlmacen = obj.IdAlmacenDestino;
       this.movimiento.almacenOrigen.IdAlmacen = obj.IdAlmacenOrigen;
-      this.movimiento.TipoCambio = obj.TipoCambio
+      this.movimiento.TipoCambio = obj.TipoCambio;
       this.setMoneda({
         Moneda: obj.Moneda,
-        TipoCambio: obj.TipoCambio,
-      })
+        TipoCambio: obj.TipoCambio
+      });
       this.movimiento.EsConsumoVale = obj.EsConsumoVale;
       this.movimiento.CodSunatModifica = obj.CodSunat;
       this.movimiento.NroComprobanteModifica = obj.NroComprobante;
@@ -403,6 +430,10 @@ export default {
       return false;
     },
     setTipoMovimiento(obj) {
+      this.movimiento.IdComprobanteModifica = 0;
+      this.movimiento.CodSunatModifica = "";
+      this.movimiento.NotaIdMotivo = "";
+      this.movimiento.NotaDescMotivo = "";
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 };
         // this.movimiento.almacenDestino = { IdAlmacen: 1 }
@@ -428,6 +459,7 @@ export default {
           this.movimiento.almacenDestino = data;
         });
       }
+
       this.movimiento.movimientoTipo = obj;
 
       this.cargarNumero();
@@ -480,9 +512,11 @@ export default {
         this.inProgress = false;
         return;
       }
-
+      this.movimiento.NotaDescMotivo = this.itemsMotivoNota.filter(
+        item => item.value == this.movimiento.NotaIdMotivo
+      )[0].text;
       this.axios
-        .post(this.API + "movimientoss", {
+        .post(this.API + "movimientos", {
           movimiento: this.movimiento,
           productos: this.productos
         })
