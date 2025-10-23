@@ -6,6 +6,18 @@
                 <h2>Entrega de Pedido Asignado</h2>
             </center>
         </b-col>
+        <b-col cols="12" v-if="IdPerfil==1"> 
+          Usuario:
+          <b-select 
+              style="max-width: 350px;" 
+              class="my-2"  
+              :options="lstEmpleados"
+              text-field="NombreUsuario"
+              value-field="Usuario"
+              @change="obtenerPedidosAsignado"
+              v-model="IdRepatidor"
+          ></b-select>
+        </b-col>
         <b-col cols="12"> 
             <b-table :items="lstRepartos" :fields="headers" :per-page="perPage"
             :current-page="currentPage" small>
@@ -109,6 +121,9 @@ export default {
       perPage: 5,
       currentPage: 1,
       lstRepartos: [],
+      lstEmpleados: [],
+      IdPerfil: sessionStorage.getItem("IdPerfil"),
+      IdRepatidor: sessionStorage.getItem("User"),
       headers: [
         { key: "Correlativo", thStyle: { width: "5%" } },
         { key: "DniRuc", label: "Documento", thStyle: { width: "10%" } },
@@ -134,9 +149,20 @@ export default {
     };
   },
   mounted() {
+    this.ObtenerEmpleado();
     this.obtenerPedidosAsignado();
   },
   methods: {
+    ObtenerEmpleado() {
+      this.axios(`${this.API}/usuarios`, {
+        params: {
+          IdPerfil: this.IdPerfil
+        }
+      }).then(res => {
+        let data = res.data;
+        this.lstEmpleados = data;
+      });
+    },
     async obtenerPedidosAsignado() {
       this.$swal({
         title: "Procesando...",
@@ -149,14 +175,16 @@ export default {
       });
 
       this.lstRepartos = [];
-      await this.axios(`${this.API}listado/entregas_por_repatidor`, {
-        params: {
-          IdRepatidor: sessionStorage.getItem("User")
-        }
-      }).then(res => {
-        if (res) {
-          this.lstRepartos = res.data;
-        }
+      this.$nextTick(async () => {
+        await this.axios(`${this.API}listado/entregas_por_repatidor`, {
+          params: {
+            IdRepatidor: this.IdRepatidor
+          }
+        }).then(res => {
+          if (res) {
+            this.lstRepartos = res.data;
+          }
+        });
       });
       this.$swal.close();
     },

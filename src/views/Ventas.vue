@@ -386,7 +386,7 @@
                 }}</b-badge>
               </h5>
               <b-button
-                class="ml-1 mb-1 btnAction"
+                class="ml-1 mb-1 "
                 size="sm"
                 variant="warning"
                 @click="limpiarProforma"
@@ -418,28 +418,9 @@
                     <tr>
                       <td class="text-center">Opciones</td>
                     </tr>
-                    <!-- <tr v-if="puntosAplicados == 0">
-                      <td>
-                        <b-input-group prepend="S/" append="Descuento">
-                          <input
-                            v-model="descuentoGeneral"
-                            min="0"
-                            value="0"
-                            :disabled="bloquearInput ? true : false"
-                            @input="
-                              (val) => {
-                                aplicarDescuentoGeneral(val.target.value);
-                              }
-                            "
-                            type="number"
-                            class="form-control"
-                          />
-                        </b-input-group>
-                        <b-form-text>
-                          Descuento general a toda la venta.
-                        </b-form-text>
-                      </td>
-                    </tr> -->
+                    <tr>
+                        <td> Descripción: <textarea v-model="venta.Descripcion" id="txtDescripcion" class="form-control"></textarea> </td>
+                    </tr>
                     <tr>
                       <td>
                         <b-form-checkbox
@@ -1438,8 +1419,10 @@ export default {
 
       if (typeof obj === "object") {
         if (obj.IdProforma > 0) {
+          this.setTipoVenta(obj);
           this.venta.idProforma = obj.IdProforma;
           this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
+          this.venta.Descripcion = obj.Descripcion;
           this.getVendedor(obj.UsuarioReg);
           delete obj.productos;
           this.axios

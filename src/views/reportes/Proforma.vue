@@ -62,10 +62,10 @@
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
               </tr>
-              <!--<tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>-->
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Descripción</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Descripcion }}</td>
+              </tr>
             </tbody>
           </table>
         </div>

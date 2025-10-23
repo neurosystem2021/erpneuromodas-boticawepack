@@ -1,23 +1,46 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col cols="12" lg="4" xl="4"> 
-            Almacén
+      <b-col cols="12" lg="3" xl="3"> 
+        <b-form-group>
+          <b-input-group prepend="Doc." class="mt-2">
+            <autocomplete
+              required="required"
+              ref="inputTipoVenta"
+              :url="API + 'ventas/tipos'"
+              anchor="TipoDoc"
+              initValue="NOTA DE VENTA"
+              label="writer"
+              placeholder=""
+              :on-select="setTipoVenta"
+              :customParams="{ id_empresa: empresa }"
+              :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+              :classes="{ input: 'form-control' }"
+            >
+            </autocomplete>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col cols="12" lg="3" xl="3"> 
+           <b-input-group prepend="Almacén." class="mt-2">
             <b-form-select v-model="idAlmacen" 
                  value-field="IdAlmacen"
                  text-field="Almacen"
                  disabled
                 :options="lstAlmances"></b-form-select>
+                </b-input-group>
         </b-col>
-        <b-col cols="12" lg="4" xl="4"> 
-            Fecha:
+        <b-col cols="12" lg="3" xl="3"> 
+           <b-input-group prepend="Fecha." class="mt-2">
             <input type="date" v-model="fechaEntrega" class="form-control">
+           </b-input-group>
         </b-col>
-        <b-col cols="12" lg="4" xl="4"> 
-          Hora de Entrega
+        <b-col cols="12" lg="3" xl="3"> 
+          <b-input-group prepend="Hora Entrega." class="mt-2">
           <input type="time" class="form-control" required
           v-model="HoraEntrega"
           >
+          </b-input-group>
         </b-col>
         
         <b-col cols="12" class="mt-2">  <b-input-group prepend="Cliente ">
@@ -50,6 +73,7 @@
                 :ruc="newDniRuc"
                 @onAddCliente="setCliente"
               ></clientes-form>
+              <textarea id="txtDescripcion" v-model="venta.Descripcion" class="form-control" placeholder="Descripcion"  />
               </b-input-group>
         </b-col>
         <b-col cols="12" lg="7" xl="7" v-if="idAlmacen" class="mt-2 mx-0"> 
@@ -319,6 +343,7 @@ export default {
   components: { ClientesForm },
   data() {
     return {
+      empresa:'imperiop2',
       vendedor: {},
       API: config.API,
       idAlmacen: "",
@@ -421,8 +446,14 @@ export default {
     this.fechaEntrega = this.$moment().format("YYYY-MM-DD");
     this.obtenerAlmance();
     this.getVendedor();
+    if (sessionStorage.getItem("empresa")) {
+      this.empresa = sessionStorage.getItem("empresa");
+    }
   },
   methods: {
+    setTipoVenta(obj) {
+      this.venta.tipoVenta = obj;
+    },
     quitarProducto(index) {
       this.productos.splice(index, 1);
     },
@@ -731,6 +762,7 @@ export default {
 </script>
 
 <style scoped>
+
 .clsTblProductos {
   /* border: 1px solid red; */
   overflow-x: auto;

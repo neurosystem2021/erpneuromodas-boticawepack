@@ -11,6 +11,9 @@ export default {
 </script>
 
 <style>
+#txtDescripcion {
+  field-sizing: content;
+}
 .align-center {
   min-width: 100%;
   align-content: center !important;
