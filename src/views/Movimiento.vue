@@ -484,7 +484,7 @@ export default {
     getAlmacenes(value) {
       this.buscarAlmacenes(value);
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
       this.inProgress = true;
 
@@ -515,7 +515,7 @@ export default {
       this.movimiento.NotaDescMotivo = this.itemsMotivoNota.filter(
         item => item.value == this.movimiento.NotaIdMotivo
       )[0].text;
-      this.axios
+      await this.axios
         .post(this.API + "movimientos", {
           movimiento: this.movimiento,
           productos: this.productos
@@ -538,6 +538,8 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.$refs.inputSerie.$refs.input.disabled = false;
+      this.$refs.inputNumero.$refs.input.disabled = false;
     },
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
