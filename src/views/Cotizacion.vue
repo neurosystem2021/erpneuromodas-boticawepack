@@ -56,6 +56,19 @@
                     :classes="{input: 'form-control'}">
                 </autocomplete>
               </b-input-group>
+             <b-input-group  class="my-2" prepend="Responsable:">
+                <autocomplete
+                    required="required"
+                    ref="inputResponsable"
+                    :url="API + 'responsable'"
+                    anchor="Responsable"
+                    label="writer"
+                    :on-select="setResponsable" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputResponsable')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-input-group>
+              
             </b-col>
             <b-col cols="2">
              <b-input-group  class="my-2" prepend="Almacén:">
@@ -504,6 +517,7 @@ export default {
       CampoDireccion: "",
       cliente: {},
       vendedor: {},
+      responsable: {},
       almacen: {},
       puntoVenta: {},
       moneda: {
@@ -548,6 +562,9 @@ export default {
           parseFloat(item.cantidadImportacion ? item.cantidadImportacion : 0)) *
         (item.precio ? item.precio : 0);
       return parseFloat(subTotal).toFixed(2);
+    },
+    setResponsable(obj) {
+      this.responsable(obj);
     },
     getTotalDet(item) {
       let subTotal =
@@ -896,8 +913,18 @@ export default {
         );
         return;
       }
-
+      console.log(this.responsable);
+      console.log(Object.keys(this.responsable));
+      let Responsable = "";
+      if (Object.keys(this.responsable).length == 0) {
+        Responsable = this.$refs.inputResponsable.$el
+          .querySelector("input")
+          .value.trim();
+      } else {
+        Responsable = this.responsable.Responsable;
+      }
       let data = {
+        Responsable: Responsable,
         IdProforma: this.IdProforma,
         IdCliente: this.cliente.IdCliente,
         IdVendedor: this.vendedor.Usuario,
