@@ -530,7 +530,7 @@ export default {
                     { key: 'precio', label: 'Precio' },
                     //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
                     { key: 'subtotal', label: 'SubTotal', variant: 'success', class:'text-center' }, 
-                    { key: 'descuento', label: 'Desc.'},
+                    //{ key: 'descuento', label: 'Desc.'},
                     { key: 'total', label: 'Total', variant: 'danger', class:'text-center' },
                     { key: 'acciones', label: ''}
                 ]

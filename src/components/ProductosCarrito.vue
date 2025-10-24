@@ -39,7 +39,10 @@
             <b-card
               align="center"
               class="mb-3 contentCard"
-              @click="setProductoUni(objProd)"
+                @click="() => {
+                objProd.EsPresentacion = 0;  //aquí marcamos como unidad
+                setProductoUni(objProd);
+              }"
             >
               <b-row>
                 <b-col md="6" class="nomCart">
@@ -745,10 +748,11 @@ export default {
       
       if (!obj.PreciosPorProducto || fPP.length === 4) {
         obj.estadoPxP = true
+        obj.EsPresentacion = 0
         this.setProductoUni(obj)
         return
       }
-
+     // obj.EsPresentacion = 0
       this.$refs['modalCant'].show()
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj
@@ -775,6 +779,7 @@ export default {
       this.actualizarProd(obj)
     },
     setProductoCant (prod) {
+      this.objProd.EsPresentacion = 1   // aquí sí marcamos con 1
       this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
       let obj = this.objProd
@@ -909,11 +914,9 @@ export default {
     // Precisión base
     subtotal = Number(subtotal.toFixed(8));
 
-    // Si el producto tiene presentación, redondear hacia arriba a número entero
-    if (this.productos[index].cantidadPres > 1) {
-      subtotal = Math.ceil(subtotal - 0.000001); // evita errores tipo 399.999999 → 400
+    if (this.productos[index].EsPresentacion === 1) {
+      subtotal = Math.ceil(subtotal - 0.000001);
     } else {
-      // Si es unidad, mantener precisión con decimales
       subtotal = Number(subtotal.toFixed(8));
     }
 
