@@ -607,7 +607,7 @@ export default {
         prod.diasEntrega = p.DiasEntrega;
         prod.cantidadImportacion = p.CantidadImportacion;
         prod.diasEntregaImportacion = p.DiasEntregaImportacion;
-        this.productos.unshift(prod);
+        this.productos.push(prod);
         this.$nextTick(() => {
           setTimeout(() => {
             let cantidad = document.getElementById("cantidad0");
@@ -790,8 +790,9 @@ export default {
       // this.getNumeroVenta();
     },
     async setProducto(obj) {
+      console.log(obj);
       let res = await this.axios(`${this.API}/busqueda/productos/id`, {
-        params: obj
+        params: { ...obj, ...this.almacen }
       });
       console.log((this.lstProducto = res.data));
       this.modalSeleccionarProducto = true;
@@ -802,15 +803,8 @@ export default {
       }
       let obj = { ...item };
       console.log(this.almacen);
-      let res = await this.axios(
-        `${this.API}productos/puntoventa/stock/${this.almacen.IdAlmacen}`,
-        {
-          params: {
-            idProductos: [item.IdProducto]
-          }
-        }
-      );
-      obj.stock = res.data[0].stock;
+
+      obj.stock = obj.stock;
       obj.cantidad = 1;
       obj.precio =
         this.TipoCambio == 1 || this.TipoCambio == 0
@@ -825,7 +819,7 @@ export default {
       obj.precio = parseFloat(
         obj.precio * (1 + (this.igv == 1 ? 0.18 : 0))
       ).toFixed(2);
-      this.productos.unshift(obj);
+      this.productos.push(obj);
       this.$nextTick(() => {
         setTimeout(() => {
           document.getElementById("cantidad0").focus();

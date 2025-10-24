@@ -65,7 +65,7 @@
                   <td style="text-align: left !important;"><b>DOCUMENTO</b></td>
                 <td style="text-align: left !important;">{{ proforma.Documento }}</td>
                 <td style="text-align: left !important;"><b>ATENCIÓN</b></td>
-                <td style="text-align: left !important;">{{ proforma.UsuarioReg }}</td>
+                <td style="text-align: left !important;">{{ proforma.NombreUsuario }}</td>
                 <td style="text-align: left !important;"><b>TELÉFONO</b></td>
                 <td style="text-align: left !important;"></td>
               </tr>
