@@ -282,44 +282,49 @@
 </template>
 
 <script>
-import Menu from '@/components/Menu'
-import ProductosCarrito from '@/components/ProductosCarrito'
-import { mapState, mapActions } from 'vuex'
-import config from '@/store/config.js'
+import Menu from "@/components/Menu";
+import ProductosCarrito from "@/components/ProductosCarrito";
+import { mapState, mapActions } from "vuex";
+import config from "@/store/config.js";
 export default {
-  mounted () {
+  mounted() {
     this.limpiarCamposRefs();
+    if (Object.keys(this.$route.params).length > 0) {
+      this.IdDocVenta = this.$route.params.IdDocVenta;
+      this.obtenerDatosVenta();
+    }
   },
-  data () {
+  data() {
     return {
       inProgress: false,
       API: config.API,
+      IdDocVenta: "",
       remision: {
-        codUndPesoBruto: 'KGM',
-        codModalidadTraslado: '01',
-        codMotivoTraslado: '01',
-        descripcionMotivoTraslado:'VENTA',
+        codUndPesoBruto: "KGM",
+        codModalidadTraslado: "01",
+        codMotivoTraslado: "01",
+        descripcionMotivoTraslado: "VENTA",
         fechaTraslado: this.$moment().format("YYYY-MM-DD"),
-        placaCarreta: '',
-        nombresChofer: '',
-        apellidosChofer: '',
-        licenciaChofer: '',
-        nroDocumentoTransportista: '',
-        razonSocialTransportista: '',
-        placaVehiculo: '',
-        nroDocChofer: '',
-        direccionCliente: ''
+        placaCarreta: "",
+        nombresChofer: "",
+        apellidosChofer: "",
+        licenciaChofer: "",
+        nroDocumentoTransportista: "",
+        razonSocialTransportista: "",
+        placaVehiculo: "",
+        nroDocChofer: "",
+        direccionCliente: ""
       },
       cliente: {},
       carrito: {
         fields: [
-          { key: 'CodigoBarra', label: 'Código' }, 
-          { key: 'Producto' }, 
-          { key: 'cantidad' },
-          { key: 'acciones', label: ''}
+          { key: "CodigoBarra", label: "Código" },
+          { key: "Producto" },
+          { key: "cantidad" },
+          { key: "acciones", label: "" }
         ]
       }
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -328,340 +333,424 @@ export default {
   },
   methods: {
     ...mapActions({
-      limpiarCart: 'limpiarCarrito',
-      add:'agregarProducto'
+      limpiarCart: "limpiarCarrito",
+      add: "agregarProducto"
     }),
-    afe (e) {
-      return false
+    afe(e) {
+      return false;
     },
-    motivoTrasladoChange (e) {
-      let descripcionMotivoTraslado = e.target.options[e.target.selectedIndex].text;
-      this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado
+    motivoTrasladoChange(e) {
+      let descripcionMotivoTraslado =
+        e.target.options[e.target.selectedIndex].text;
+      this.remision.descripcionMotivoTraslado = descripcionMotivoTraslado;
     },
-    onReset (evt) {
-      evt.preventDefault();
-    },
-    guardarRemision (evt) {
-      evt.preventDefault();
-      this.inProgress = true
-
-      if((''+this.remision.codUbigeoOrigen).trim().length!=6 || (''+this.remision.codUbigeoDestino).trim().length!=6){
-          this.$toasted.show('Verificar los codigos de ubigeo origen y destino; debe tener 6 digitos',{duration:3000})
-          this.inProgress = false            
-          return
-      }
-
-      if(!this.productos.length) {
-          this.$toasted.show('No ha seleccionado ningun producto')
-          this.inProgress = false            
-          return
-      }
-      let faltaLlenar = false
-      this.productos.forEach((prod, index) => {
-        if (prod.cantidad <= 0) {
-          faltaLlenar = true
+    async obtenerDatosVenta() {
+      let data = {};
+      await this.axios(`${this.API}/venta/info`, {
+        params: {
+          IdDocVenta: this.IdDocVenta
         }
-      })
-      if (faltaLlenar) {
-        this.$toasted.show('Falta llenar cantidad')
-        this.inProgress = false
+      }).then(res => {
+        if (res.data) {
+          data = res.data;
+        }
+      });
+      this.setDocRef({
+        NroComprobante: data.Correlativo,
+        IdDocVenta: this.IdDocVenta
+      });
+      this.$refs.inputDocRef.setValue(data.Correlativo);
+      // this.remision.nroDocumentoCliente = data.DniRuc;
+      // this.remision.razonSocialCliente = data.Cliente;
+      // this.remision.direccionCliente = data.Direccion;
+      // data.Detalle.forEach(element => {
+      //   this.productos.push({ ...element, cantidad: element.Cantidad });
+      // });
+      // this.$refs.input.$inputDocRef.setValue()
+      // // this.setDocRef(data);
+      // console.log(data);
+    },
+    onReset(evt) {
+      evt.preventDefault();
+    },
+    guardarRemision(evt) {
+      evt.preventDefault();
+      this.inProgress = true;
+
+      if (
+        ("" + this.remision.codUbigeoOrigen).trim().length != 6 ||
+        ("" + this.remision.codUbigeoDestino).trim().length != 6
+      ) {
+        this.$toasted.show(
+          "Verificar los codigos de ubigeo origen y destino; debe tener 6 digitos",
+          { duration: 3000 }
+        );
+        this.inProgress = false;
         return;
       }
-      this.remision.placaVehiculo = (''+this.remision.placaVehiculo).toUpperCase();
-      this.axios.post(this.API + 'remision', {
-        remision: this.remision,
-        productos: this.productos
-      })
-      .then((response) => {
-        console.log(response);
-        
-        if (response.data.error) {
-          this.$toasted.show(response.data.error,{duration:3000})
-        } else {
-          this.limpiarCart()
-          this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
-          this.remision.observacion = '';
-          this.remision.pesoBruto = '';
-          this.remision.codModalidadTraslado = '01';
-          this.remision.codMotivoTraslado = '01';
-          this.remision.codUbigeoOrigen = '';
-          this.remision.direccionOrigen = '';
-          this.remision.nroDocumentoCliente = '';
-          this.remision.razonSocialCliente = '';
-          this.remision.direccionCliente = '';
-          this.remision.codUbigeoDestino = '';
-          this.remision.direccionDestino = '';
-          this.remision.nroDocumentoTransportista = '';
-          this.remision.razonSocialTransportista = '';
-          this.remision.placaVehiculo = '';
-          this.remision.placaCarreta = '';
-          this.remision.nroDocChofer = '';
-          this.remision.apellidosChofer = '';
-          this.remision.nombresChofer = '';
-          this.remision.licenciaChofer = '';
-          this.remision.descripcionMotivoTraslado = 'VENTA';
-          this.remision.totalBultos = '';
-          this.$refs.inputDocRef.setValue('');
-          this.$refs.inputMovRef.setValue('');
-          this.limpiarCamposRefs();
-          this.$toasted.success('Guia de remisión guardada correctamente ')          
+
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
+        return;
+      }
+      let faltaLlenar = false;
+      this.productos.forEach((prod, index) => {
+        if (prod.cantidad <= 0) {
+          faltaLlenar = true;
         }
-        this.inProgress = false
-      })
-      .catch((error) => {
-        this.$toasted.error('Ha ocurrido un error, vuelva a intentarlo')
-        this.inProgress = false
-      })
+      });
+      if (faltaLlenar) {
+        this.$toasted.show("Falta llenar cantidad");
+        this.inProgress = false;
+        return;
+      }
+      this.remision.placaVehiculo = (
+        "" + this.remision.placaVehiculo
+      ).toUpperCase();
+      this.axios
+        .post(this.API + "remision", {
+          remision: this.remision,
+          productos: this.productos
+        })
+        .then(response => {
+          console.log(response);
+
+          if (response.data.error) {
+            this.$toasted.show(response.data.error, { duration: 3000 });
+          } else {
+            this.limpiarCart();
+            this.remision.fechaTraslado = this.$moment().format("YYYY-MM-DD");
+            this.remision.observacion = "";
+            this.remision.pesoBruto = "";
+            this.remision.codModalidadTraslado = "01";
+            this.remision.codMotivoTraslado = "01";
+            this.remision.codUbigeoOrigen = "";
+            this.remision.direccionOrigen = "";
+            this.remision.nroDocumentoCliente = "";
+            this.remision.razonSocialCliente = "";
+            this.remision.direccionCliente = "";
+            this.remision.codUbigeoDestino = "";
+            this.remision.direccionDestino = "";
+            this.remision.nroDocumentoTransportista = "";
+            this.remision.razonSocialTransportista = "";
+            this.remision.placaVehiculo = "";
+            this.remision.placaCarreta = "";
+            this.remision.nroDocChofer = "";
+            this.remision.apellidosChofer = "";
+            this.remision.nombresChofer = "";
+            this.remision.licenciaChofer = "";
+            this.remision.descripcionMotivoTraslado = "VENTA";
+            this.remision.totalBultos = "";
+            this.$refs.inputDocRef.setValue("");
+            this.$refs.inputMovRef.setValue("");
+            this.limpiarCamposRefs();
+            this.$toasted.success("Guia de remisión guardada correctamente ");
+          }
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.error("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    limpiarCamposRefs(){
-      this.$refs.inputplacaVehiculo.disabled = true
-      this.$refs.inputnroDocChofer.disabled = true
-      this.$refs.inputapellidosChofer.disabled = true
-      this.$refs.inputnombresChofer.disabled = true
-      this.$refs.inputlicenciaChofer.disabled = true
-      this.$refs.inputplacaVehiculo.required = false
-      this.$refs.inputnroDocChofer.required = false
-      this.$refs.inputapellidosChofer.required = false
-      this.$refs.inputnombresChofer.required = false
-      this.$refs.inputlicenciaChofer.required = false
-      this.$refs.inputnroDocumentoTransportista.disabled = false
-      this.$refs.inputrazonSocialTransportista.disabled = false
-      this.$refs.inputnroDocumentoTransportista.required = true
-      this.$refs.inputrazonSocialTransportista.required = true
+    limpiarCamposRefs() {
+      this.$refs.inputplacaVehiculo.disabled = true;
+      this.$refs.inputnroDocChofer.disabled = true;
+      this.$refs.inputapellidosChofer.disabled = true;
+      this.$refs.inputnombresChofer.disabled = true;
+      this.$refs.inputlicenciaChofer.disabled = true;
+      this.$refs.inputplacaVehiculo.required = false;
+      this.$refs.inputnroDocChofer.required = false;
+      this.$refs.inputapellidosChofer.required = false;
+      this.$refs.inputnombresChofer.required = false;
+      this.$refs.inputlicenciaChofer.required = false;
+      this.$refs.inputnroDocumentoTransportista.disabled = false;
+      this.$refs.inputrazonSocialTransportista.disabled = false;
+      this.$refs.inputnroDocumentoTransportista.required = true;
+      this.$refs.inputrazonSocialTransportista.required = true;
     },
-    cambioModalidad(val){
-      if(val.target.value=="01"){
+    cambioModalidad(val) {
+      if (val.target.value == "01") {
         this.limpiarCamposRefs();
-        this.remision.placaVehiculo = '';
-        this.remision.nroDocChofer = '';
-        this.remision.apellidosChofer = '';
-        this.remision.nombresChofer = '';
-        this.remision.licenciaChofer = '';
+        this.remision.placaVehiculo = "";
+        this.remision.nroDocChofer = "";
+        this.remision.apellidosChofer = "";
+        this.remision.nombresChofer = "";
+        this.remision.licenciaChofer = "";
+      } else {
+        this.$refs.inputplacaVehiculo.disabled = false;
+        this.$refs.inputnroDocChofer.disabled = false;
+        this.$refs.inputapellidosChofer.disabled = false;
+        this.$refs.inputnombresChofer.disabled = false;
+        this.$refs.inputlicenciaChofer.disabled = false;
 
-      }else{
-        this.$refs.inputplacaVehiculo.disabled = false
-        this.$refs.inputnroDocChofer.disabled = false
-        this.$refs.inputapellidosChofer.disabled = false
-        this.$refs.inputnombresChofer.disabled = false
-        this.$refs.inputlicenciaChofer.disabled = false
+        this.$refs.inputplacaVehiculo.required = true;
+        this.$refs.inputnroDocChofer.required = true;
+        this.$refs.inputapellidosChofer.required = true;
+        this.$refs.inputnombresChofer.required = true;
+        this.$refs.inputlicenciaChofer.required = true;
 
-        this.$refs.inputplacaVehiculo.required = true
-        this.$refs.inputnroDocChofer.required = true
-        this.$refs.inputapellidosChofer.required = true
-        this.$refs.inputnombresChofer.required = true
-        this.$refs.inputlicenciaChofer.required = true
+        this.$refs.inputnroDocumentoTransportista.disabled = true;
+        this.$refs.inputrazonSocialTransportista.disabled = true;
+        this.$refs.inputnroDocumentoTransportista.required = false;
+        this.$refs.inputrazonSocialTransportista.required = false;
 
-        this.$refs.inputnroDocumentoTransportista.disabled = true
-        this.$refs.inputrazonSocialTransportista.disabled = true
-        this.$refs.inputnroDocumentoTransportista.required = false
-        this.$refs.inputrazonSocialTransportista.required = false
-
-        this.remision.nroDocumentoTransportista = '';
-        this.remision.razonSocialTransportista = '';
+        this.remision.nroDocumentoTransportista = "";
+        this.remision.razonSocialTransportista = "";
       }
     },
-    consultaDocConductor () {
-
-      if ((''+this.remision.nroDocChofer).trim()=='' || this.remision.nroDocChofer == undefined) {
-          this.$toasted.show('Debe ingresar Número Documento del Conductor')
-          return
+    consultaDocConductor() {
+      if (
+        ("" + this.remision.nroDocChofer).trim() == "" ||
+        this.remision.nroDocChofer == undefined
+      ) {
+        this.$toasted.show("Debe ingresar Número Documento del Conductor");
+        return;
       }
 
-      let esNumerico = Number.isInteger(parseInt(this.remision.nroDocChofer))
+      let esNumerico = Number.isInteger(parseInt(this.remision.nroDocChofer));
       if (!esNumerico) {
-          this.$toasted.show('El DNI/RUC debe ser numérico, editar Número Documento Conductor')
-          return
+        this.$toasted.show(
+          "El DNI/RUC debe ser numérico, editar Número Documento Conductor"
+        );
+        return;
       }
 
-      this.axios.get(this.API + 'consultarRUC', {
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-              type: 'DNI',
-              numero: this.remision.nroDocChofer
+            type: "DNI",
+            numero: this.remision.nroDocChofer
           }
-      }).then((response) => {
+        })
+        .then(response => {
           if (response.data) {
-              this.$toasted.info('Conductor encontrado, se llenarán sus datos')                  
-              var data = response.data
-              this.remision.nombresChofer = data.nombres
-              this.remision.apellidosChofer = data.apellidoPaterno + ' ' + data.apellidoMaterno
-              document.getElementById("nombresChofer").value = data.nombres
-              document.getElementById("apellidosChofer").value = data.apellidoPaterno + ' ' + data.apellidoMaterno
+            this.$toasted.info("Conductor encontrado, se llenarán sus datos");
+            var data = response.data;
+            this.remision.nombresChofer = data.nombres;
+            this.remision.apellidosChofer =
+              data.apellidoPaterno + " " + data.apellidoMaterno;
+            document.getElementById("nombresChofer").value = data.nombres;
+            document.getElementById("apellidosChofer").value =
+              data.apellidoPaterno + " " + data.apellidoMaterno;
           } else {
-              this.$toasted.show('No se encontró el Conductor')                
+            this.$toasted.show("No se encontró el Conductor");
           }
-          
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el Conductor')        
-          console.log(error)
-      })
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el Conductor");
+          console.log(error);
+        });
     },
-    consultarDNIRUC () {
-      if ((''+this.remision.nroDocumentoTransportista).trim()=='' || this.remision.nroDocumentoTransportista == undefined) {
-          this.$toasted.show('Debe ingresar Número Documento Transportista')
-          return
+    consultarDNIRUC() {
+      if (
+        ("" + this.remision.nroDocumentoTransportista).trim() == "" ||
+        this.remision.nroDocumentoTransportista == undefined
+      ) {
+        this.$toasted.show("Debe ingresar Número Documento Transportista");
+        return;
       }
-      let esNumerico = Number.isInteger(parseInt(this.remision.nroDocumentoTransportista))
+      let esNumerico = Number.isInteger(
+        parseInt(this.remision.nroDocumentoTransportista)
+      );
       if (!esNumerico) {
-          this.$toasted.show('El RUC debe ser numérico, editar Número Documento Transportista')
-          return
+        this.$toasted.show(
+          "El RUC debe ser numérico, editar Número Documento Transportista"
+        );
+        return;
       }
-      
-      this.axios.get(this.API + 'consultarRUC', {
+
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-              type: 'RUC',
-              numero: this.remision.nroDocumentoTransportista
+            type: "RUC",
+            numero: this.remision.nroDocumentoTransportista
           }
-      }).then((response) => {
+        })
+        .then(response => {
           if (response.data) {
-              if(response.data.success==false){
-                this.$toasted.show('No se encontro al Transportista');
-                return
-              }
-              this.$toasted.info('Transportista encontrado, se llenarán sus datos')                  
-              let data = response.data
-              this.remision.razonSocialTransportista = data.razonSocial
-              document.getElementById("razonSocialTransportista").value = data.razonSocial
+            if (response.data.success == false) {
+              this.$toasted.show("No se encontro al Transportista");
+              return;
+            }
+            this.$toasted.info(
+              "Transportista encontrado, se llenarán sus datos"
+            );
+            let data = response.data;
+            this.remision.razonSocialTransportista = data.razonSocial;
+            document.getElementById("razonSocialTransportista").value =
+              data.razonSocial;
           } else {
-              this.$toasted.show('No se encontró el Transportista')                
+            this.$toasted.show("No se encontró el Transportista");
           }
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el Transportista')        
-          console.log(error)
-      })
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el Transportista");
+          console.log(error);
+        });
     },
-    setMovRef (obj) {
-      this.$set(this.remision, 'nroDocumentoCliente', '');
-      this.$set(this.remision, 'razonSocialCliente', '');
-      this.$set(this.remision, 'direccionCliente', '');
-      this.$refs.inputDocRef.setValue('');
+    setMovRef(obj) {
+      this.$set(this.remision, "nroDocumentoCliente", "");
+      this.$set(this.remision, "razonSocialCliente", "");
+      this.$set(this.remision, "direccionCliente", "");
+      this.$refs.inputDocRef.setValue("");
       this.remision.documentoReferencia = obj.NroComprobante;
       this.limpiarCart();
-      
+
       // Cargar producto del movimiento
-      this.axios.get(this.API + 'movimiento/detalle/comprobante', {
-            params: {
-              hashMovimiento: obj.Hash
-            }
-        }).then((response) => {
-          
+      this.axios
+        .get(this.API + "movimiento/detalle/comprobante", {
+          params: {
+            hashMovimiento: obj.Hash
+          }
+        })
+        .then(response => {
           if (response.data[0]) {
-            this.axios.get(this.API + 'proveedor', {
-              params: {
+            this.axios
+              .get(this.API + "proveedor", {
+                params: {
                   idProveedor: response.data[0].IdProveedor
-              }})
-              .then((response) => {
-                if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
-                  this.$set(this.remision, 'direccionCliente', response.data.Direccion);
-                  this.cliente = response.data;
-                } else {
-                  this.$toasted.show('No se encontro al proveedor');
                 }
               })
-              .catch((error) => {
-                  console.log(error)
+              .then(response => {
+                if (response.data) {
+                  this.$set(
+                    this.remision,
+                    "nroDocumentoCliente",
+                    response.data.Ruc
+                  );
+                  this.$set(
+                    this.remision,
+                    "razonSocialCliente",
+                    response.data.Proveedor
+                  );
+                  this.$set(
+                    this.remision,
+                    "direccionCliente",
+                    response.data.Direccion
+                  );
+                  this.cliente = response.data;
+                } else {
+                  this.$toasted.show("No se encontro al proveedor");
+                }
               })
-              // this.limpiarCart();
-              
-              response.data.map((item) => {
-                    item.estadoPxP = false
-                    let preciosProd = []
-                    item.precioCont = item.PrecioContado
-                    preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                    let fPP = preciosProd.filter(p => p.cantidad === 0)
-                    
-                    if (!item.PreciosPorProducto || fPP.length === 4) {
-                        item.estadoPxP = true
-                    }
-                this.add([item, () => {}, false ])
-              })             
+              .catch(error => {
+                console.log(error);
+              });
+            // this.limpiarCart();
+
+            response.data.map(item => {
+              item.estadoPxP = false;
+              let preciosProd = [];
+              item.precioCont = item.PrecioContado;
+              preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+              let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+              if (!item.PreciosPorProducto || fPP.length === 4) {
+                item.estadoPxP = true;
+              }
+              this.add([item, () => {}, false]);
+            });
           }
-      })
+        });
     },
-    setDocRef (obj) {
-      this.$set(this.remision, 'nroDocumentoCliente', '');
-      this.$set(this.remision, 'razonSocialCliente', '');
-      this.$set(this.remision, 'direccionCliente', '');
-      this.$refs.inputMovRef.setValue('');
+    setDocRef(obj) {
+      this.$set(this.remision, "nroDocumentoCliente", "");
+      this.$set(this.remision, "razonSocialCliente", "");
+      this.$set(this.remision, "direccionCliente", "");
+      this.$refs.inputMovRef.setValue("");
       this.limpiarCart();
       this.remision.documentoReferencia = obj.NroComprobante;
       //Cargar producto del documento afectado
-      this.axios.get(this.API + 'venta/detalle/comprobante/guia', {
-            params: {
-                NroComprobante: obj.NroComprobante,
-                idDocVenta: obj.IdDocVenta
-            }
-        }).then((response) => {
-          this.axios.get(this.API + 'cliente', {
-            params: {
+      this.axios
+        .get(this.API + "venta/detalle/comprobante/guia", {
+          params: {
+            NroComprobante: obj.NroComprobante,
+            idDocVenta: obj.IdDocVenta
+          }
+        })
+        .then(response => {
+          this.axios
+            .get(this.API + "cliente", {
+              params: {
                 idCliente: response.data[0].IdCliente
-            }})
-            .then((response) => {
-              if (response.data) {
-                this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
-                this.$set(this.remision, 'direccionCliente', response.data.Direccion);
-                
-                this.cliente = response.data;
-              } else {
-                this.$toasted.show('No se encontro al cliente');
               }
             })
-            .catch((error) => {
-                console.log(error)
+            .then(response => {
+              if (response.data) {
+                this.$set(
+                  this.remision,
+                  "nroDocumentoCliente",
+                  response.data.DniRuc
+                );
+                this.$set(
+                  this.remision,
+                  "razonSocialCliente",
+                  response.data.Cliente
+                );
+                this.$set(
+                  this.remision,
+                  "direccionCliente",
+                  response.data.Direccion
+                );
+
+                this.cliente = response.data;
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
             })
-            // this.limpiarCart();
-            
-            response.data.map((item) => {
-                  item.estadoPxP = false
-                  let preciosProd = []
-                  item.precioCont = item.PrecioContado
-                  preciosProd = JSON.parse(item.PreciosPorProducto || '[]')
-                  let fPP = preciosProd.filter(p => p.cantidad === 0)
-                  
-                  if (!item.PreciosPorProducto || fPP.length === 4) {
-                      item.estadoPxP = true
-                  }
-              this.add([item, () => {
-              }, false ])
-            })             
-      })
-    },
+            .catch(error => {
+              console.log(error);
+            });
+          // this.limpiarCart();
+
+          response.data.map(item => {
+            item.estadoPxP = false;
+            let preciosProd = [];
+            item.precioCont = item.PrecioContado;
+            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+            let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+            if (!item.PreciosPorProducto || fPP.length === 4) {
+              item.estadoPxP = true;
+            }
+            this.add([item, () => {}, false]);
+          });
+        });
+    }
   },
   components: {
     Menu,
     ProductosCarrito
   }
-}
+};
 </script>
 <style>
-  #remision-form .input-group {
-    /*margin: 0.25rem 0 !important;*/
-  }
-  #remision-form fieldset .row {
-    margin-bottom: 5pX;
-  }
-  #remision-form fieldset {
-    border: 1px solid #cacaca;
-    padding: 10px;
-    margin-bottom: 14px;
-  }
-  #remision-form fieldset legend {
-    padding-left: 10px;
-    border: 1px solid #cacaca;
-  }
-  #remision-form fieldset legend h5 {
-    margin: 4px;
-  }
-  #remision-form fieldset > h5 {
-    border-bottom: 1px solid #cacaca;
-    padding-bottom: 4px;
-  }
+#remision-form .input-group {
+  /*margin: 0.25rem 0 !important;*/
+}
+#remision-form fieldset .row {
+  margin-bottom: 5px;
+}
+#remision-form fieldset {
+  border: 1px solid #cacaca;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+#remision-form fieldset legend {
+  padding-left: 10px;
+  border: 1px solid #cacaca;
+}
+#remision-form fieldset legend h5 {
+  margin: 4px;
+}
+#remision-form fieldset > h5 {
+  border-bottom: 1px solid #cacaca;
+  padding-bottom: 4px;
+}
 </style>

@@ -155,7 +155,7 @@ export default new Router({
       component: PorEntregar
     },
     {
-      path: "/remision",
+      path: "/remision/:IdDocVenta?",
       name: "Remision",
       component: Remision
     },
@@ -223,6 +223,6 @@ export default new Router({
       path: "/ReporteRegMovimiento",
       name: "ReporteRegMovimiento",
       component: ReporteRegMovimiento
-    },
+    }
   ]
 });
