@@ -236,16 +236,18 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
-import ProductoKardex from '@/components/ProductoKardex'
+import config from "@/store/config.js";
+import ProductoKardex from "@/components/ProductoKardex";
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ventas/count', {
-      params: { idAlmacen: this.almacen.IdAlmacen }
-    }).then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios
+      .get(this.API + "ventas/count", {
+        params: { idAlmacen: this.almacen.IdAlmacen }
+      })
+      .then(response => {
+        this.totalRows = response.data.total;
+      });
 
     /*this.axios.get(this.API + 'ventas/tiposelectronicos')
       .then((response) => {
@@ -254,40 +256,40 @@ export default {
         })
       })*/
 
-    this.getVentasAcumuladas()
-    this.loadFirstAlmacen()
+    this.getVentasAcumuladas();
+    this.loadFirstAlmacen();
   },
   data() {
     return {
       API: config.API,
       imgCaptcha: true,
-      captcha: '',
+      captcha: "",
       loading: false,
       tipoDoc: {
         IdTipoDoc: 1,
-        CodSunat: '01'
+        CodSunat: "01"
       },
       estadoVenta: 1,
       optionsEstado: [
-        { value: '1', text: 'PENDIENTE'},
-        { value: '2', text: 'EMITIDOS' },
-        { value: '0', text: 'ANULADOS' }
+        { value: "1", text: "PENDIENTE" },
+        { value: "2", text: "EMITIDOS" },
+        { value: "0", text: "ANULADOS" }
       ],
       // optionsTipoDoc: [],
-      vendedor: '',
+      vendedor: "",
       // fechaInicio: this.$moment().format("YYYY") + '-01-01',
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       fechaReferencia: this.$moment().format("YYYY-MM-DD"),
-      filters: { },
-      filter: '',
-      sortBy: 'FechaDoc',
+      filters: {},
+      filter: "",
+      sortBy: "FechaDoc",
       sortDesc: false,
       ventasAcumuladas: 0,
       almacen: {
         IdAlmacen: 1
       },
-      pageOptions: [ 5, 10, 15, 50, 100 ],
+      pageOptions: [5, 10, 15, 50, 100],
       ventaSelect: {},
       ventaDetalleSelect: [],
       items: [],
@@ -295,18 +297,23 @@ export default {
       showVenta: false,
       isBusy: false,
       fields: [
-            { key: 'detalles', label: '' },
-            { key: 'idDocVenta', label: 'ID', sortable: true },
-            { key: 'FechaDoc', label: 'Fecha', sortable: true },
-            { key: 'TipoDoc', label: 'Documento', sortable: true},
-            { key: 'Serie', label: 'Serie', sortable: true },
-            { key: 'Numero', sortable: true },
-            { key: 'Cliente', sortable: true },
-            { key: 'Anulado', label: 'Anulado', sortable: true },
-            { key: 'UsuarioReg', label: 'Vendedor', sortable: true },
-            { key: 'Total', sortable: false, variant: 'success', class:'text-center'},
-            { key: 'estado', sortable: false, class: 'text-center' },
-            { key: 'consulta', class: 'text-center'}
+        { key: "detalles", label: "" },
+        { key: "idDocVenta", label: "ID", sortable: true },
+        { key: "FechaDoc", label: "Fecha", sortable: true },
+        { key: "TipoDoc", label: "Documento", sortable: true },
+        { key: "Serie", label: "Serie", sortable: true },
+        { key: "Numero", sortable: true },
+        { key: "Cliente", sortable: true },
+        { key: "Anulado", label: "Anulado", sortable: true },
+        { key: "UsuarioReg", label: "Vendedor", sortable: true },
+        {
+          key: "Total",
+          sortable: false,
+          variant: "success",
+          class: "text-center"
+        },
+        { key: "estado", sortable: false, class: "text-center" },
+        { key: "consulta", class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
@@ -314,9 +321,9 @@ export default {
       itemsStatus: {},
       isBoleta: false,
       itemsMotivoNota: [
-        { value: null, text: '-- SELECCIONE EL MOTIVO --' },
-        { value: '01', text: 'ANULACION DE LA OPERACION' },
-        { value: '02', text: 'ANULACION POR ERROR EN EL RUC' },
+        { value: null, text: "-- SELECCIONE EL MOTIVO --" },
+        { value: "01", text: "ANULACION DE LA OPERACION" },
+        { value: "02", text: "ANULACION POR ERROR EN EL RUC" }
         /*{ value: '03', text: 'CORRECION POR ERROR EN LA DESCRIPCION' },
         { value: '04', text: 'DESCUENTO GLOBAL' },
         { value: '05', text: 'DESCUENTO POR ITEM' },
@@ -327,173 +334,197 @@ export default {
       ],
       notaIdMotivo: null,
       notaCredito: {}
-    }
+    };
   },
   watch: {
-    estadoVenta (id)  {
-     // this.$refs.imgSuccess
-     // this.$refs.tablaVentas.refresh()
+    estadoVenta(id) {
+      // this.$refs.imgSuccess
+      // this.$refs.tablaVentas.refresh()
     },
-    items (items) {
-      if (items.length){
-        this.axios.get(this.API + 'ventas/detalle', {
-           params: {
-             idDocVentas: items.map((item) => item.idDocVenta),
-           }
-         }).then((response) => {
-              this.itemsDetalle = response.data
-              this.items.map((item) => {
-                item.productos = this.getDetalles(item.idDocVenta)
-                return item
-              })
-         })
-         .catch((error) => {
-           console.log(error)
-         })
+    items(items) {
+      if (items.length) {
+        this.axios
+          .get(this.API + "ventas/detalle", {
+            params: {
+              idDocVentas: items.map(item => item.idDocVenta)
+            }
+          })
+          .then(response => {
+            this.itemsDetalle = response.data;
+            this.items.map(item => {
+              item.productos = this.getDetalles(item.idDocVenta);
+              return item;
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
     }
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    loadFirstAlmacen (cb) {
-      this.axios.get(this.API + 'almacenes/primero')
-        .then(res => {
-          this.$refs.inputAlmacen.setValue(res.data.Almacen)
-          this.setAlmacen(res.data)
+    loadFirstAlmacen(cb) {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.setAlmacen(res.data);
+      });
+    },
+    regenerarPDF(doc) {
+      this.$refs.tablaVentas.refresh();
+      this.loading = true;
+      this.axios
+        .post(this.API + "generarpdfelectronico", {
+          docVenta: doc
         })
+        .then(res => {
+          console.log(res);
+          this.$toasted.success("El PDF fue generado nuevamente", {
+            duration: 7000
+          });
+          this.loading = false;
+        });
     },
-    regenerarPDF (doc) {
-      this.$refs.tablaVentas.refresh()
-      this.loading = true
-      this.axios.post(this.API + 'generarpdfelectronico', { 
-        docVenta: doc 
-      }).then(res => {
-        console.log(res)
-        this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
-        this.loading = false
-      })
-    },
-    regenerarXML (doc) {
-      this.$refs.tablaVentas.refresh()
-      this.loading = true
+    regenerarXML(doc) {
+      this.$refs.tablaVentas.refresh();
+      this.loading = true;
 
       this.emitirElectronico(doc, true);
-
     },
-    setFechaReferencia (value) {
+    setFechaReferencia(value) {
       //this.fechaReferencia = ''
-      this.fechaInicio = value
-      this.fechaFin = value
+      this.fechaInicio = value;
+      this.fechaFin = value;
     },
-    setTipoDoc (obj) {
-      console.log(obj)
-      this.tipoDoc = obj
+    setTipoDoc(obj) {
+      console.log(obj);
+      this.tipoDoc = obj;
       if (this.tipoDoc.CodSunat == 3) {
-        this.isBoleta = true
-        this.fechaInicio = this.fechaReferencia
-        this.fechaFin = this.fechaReferencia
+        this.isBoleta = true;
+        this.fechaInicio = this.fechaReferencia;
+        this.fechaFin = this.fechaReferencia;
       } else {
-        this.isBoleta = false
+        this.isBoleta = false;
       }
 
       Vue.nextTick(() => {
-        this.$refs.tablaVentas.refresh()
-      })
+        this.$refs.tablaVentas.refresh();
+      });
     },
-    getStatus (idDocVenta) {
-      let obj = this.itemsStatus[idDocVenta] || {}
+    getStatus(idDocVenta) {
+      let obj = this.itemsStatus[idDocVenta] || {};
 
       if (obj.Estado) {
-        obj.image = obj.Estado == 2 ? 'success.png' : 'error.png'
+        obj.image = obj.Estado == 2 ? "success.png" : "error.png";
       }
-      
-      return obj
+
+      return obj;
     },
-    emitirNotaCredito (item) {
+    emitirNotaCredito(item) {
       let doc = Object.assign({}, item);
-      this.loading = true
-      doc.codSunatModifica = doc.CodSunat // almacenamos el codsunat original
-      doc.nroComprobanteModifica = doc.Serie + '-' + doc.Numero
-      doc.notaIdMotivo = this.notaIdMotivo
-      doc.notaDescMotivo = this.itemsMotivoNota.filter(item => item.value == this.notaIdMotivo)[0].text
+      this.loading = true;
+      doc.codSunatModifica = doc.CodSunat; // almacenamos el codsunat original
+      doc.nroComprobanteModifica = doc.Serie + "-" + doc.Numero;
+      doc.notaIdMotivo = this.notaIdMotivo;
+      doc.notaDescMotivo = this.itemsMotivoNota.filter(
+        item => item.value == this.notaIdMotivo
+      )[0].text;
 
-      doc.CodSunat = '07' // codsunat 07 es nota de credito  / 08 nota de debito
-      doc.Serie = this.notaCredito.serie
-      doc.Numero = this.notaCredito.numero
+      doc.CodSunat = "07"; // codsunat 07 es nota de credito  / 08 nota de debito
+      doc.Serie = this.notaCredito.serie;
+      doc.Numero = this.notaCredito.numero;
       //this.axios.post
-      console.log(JSON.stringify(doc))
-      
-      this.axios.post(this.API + 'emitirelectronico', { 
-        docVenta: doc 
-      }).then(res => {
-        console.log(res)
-        this.$toasted.success(res.data.msj_sunat, { duration: 7000 })
-        this.notaIdMotivo = null
-        this.loading = false
-      })
 
-
+      this.axios
+        .post(this.API + "emitirelectronico", {
+          docVenta: doc
+        })
+        .then(res => {
+          this.$toasted.success(res.data.msj_sunat, { duration: 7000 });
+          this.notaIdMotivo = null;
+          this.loading = false;
+        });
     },
-    async emitirElectronico (doc, generarXml) {
-      if(!this.items.length) {
-        this.$toasted.show('No hay documentos para emitir');
-        return
+    async emitirElectronico(doc, generarXml) {
+      if (!this.items.length) {
+        this.$toasted.show("No hay documentos para emitir");
+        return;
       }
 
-      this.loading = true
-      let arr = []
+      this.loading = true;
+      let arr = [];
 
-      if (this.tipoDoc.CodSunat == '01' || this.tipoDoc.CodSunat == '03' || this.tipoDoc.CodSunat == '07' ) { // Factura / boleta
+      if (
+        this.tipoDoc.CodSunat == "01" ||
+        this.tipoDoc.CodSunat == "03" ||
+        this.tipoDoc.CodSunat == "07"
+      ) {
+        // Factura / boleta
         if (doc.idDocVenta && generarXml) {
-          arr.push(await this.axios.post(this.API + 'emitirelectronico', {
-            generarXml: true,
-            docVenta: doc
-          }).then((response) => {
-            console.log(response)
-            if(response.data.Estado == 1) {
-              this.$toasted.error('')                  
-            } else {
-              this.$toasted.success('XML Generado')
-              // ocultar el documento emitido
-              // Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
-              // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
-              // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
-            }
-            // Vue.set(this.itemsStatus, item.idDocVenta, response.data)
-
-          }))
-        } else {
-        for (let item of this.items) {
-          if (item.Estado == 1) { // estado 1 es pendiente / 0 anulado / 2 emitido
-          console.log(JSON.stringify(item))
-              arr.push(await this.axios.post(this.API + 'emitirelectronico', {
-                docVenta: item
-              }).then((response) => {
-                console.log(response)
-                if(response.data.Estado == 1) {
-                  this.$toasted.error(response.data.msj_sunat)                  
+          arr.push(
+            await this.axios
+              .post(this.API + "emitirelectronico", {
+                generarXml: true,
+                docVenta: doc
+              })
+              .then(response => {
+                console.log(response);
+                if (response.data.Estado == 1) {
+                  this.$toasted.error("");
                 } else {
-                  this.$toasted.success(response.data.msj_sunat)
+                  this.$toasted.success("XML Generado");
                   // ocultar el documento emitido
-                  Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
-                  let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
-                  let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
+                  // Vue.set(this, 'items', this.items.filter(el => el.idDocVenta !== item.idDocVenta) )
+                  // let serie = response.data.data.txtNRO_COMPROBANTE.split('-')[0]
+                  // let numero = response.data.data.txtNRO_COMPROBANTE.split('-')[1]
                 }
-                Vue.set(this.itemsStatus, item.idDocVenta, response.data)
-
-              }))
+                // Vue.set(this.itemsStatus, item.idDocVenta, response.data)
+              })
+          );
+        } else {
+          for (let item of this.items) {
+            if (item.Estado == 1) {
+              // estado 1 es pendiente / 0 anulado / 2 emitido
+              console.log(JSON.stringify(item));
+              arr.push(
+                await this.axios
+                  .post(this.API + "emitirelectronico", {
+                    docVenta: item
+                  })
+                  .then(response => {
+                    console.log(response);
+                    if (response.data.Estado == 1) {
+                      this.$toasted.error(response.data.msj_sunat);
+                    } else {
+                      this.$toasted.success(response.data.msj_sunat);
+                      // ocultar el documento emitido
+                      Vue.set(
+                        this,
+                        "items",
+                        this.items.filter(
+                          el => el.idDocVenta !== item.idDocVenta
+                        )
+                      );
+                      let serie = response.data.data.txtNRO_COMPROBANTE.split(
+                        "-"
+                      )[0];
+                      let numero = response.data.data.txtNRO_COMPROBANTE.split(
+                        "-"
+                      )[1];
+                    }
+                    Vue.set(this.itemsStatus, item.idDocVenta, response.data);
+                  })
+              );
+            }
           }
         }
-        }
         Promise.all(arr).then(values => {
-
-          this.loading = false
-        })
+          this.loading = false;
+        });
       }
 
-      if (this.tipoDoc.CodSunat == '07') { // Nota de credito
-        
+      if (this.tipoDoc.CodSunat == "07") {
+        // Nota de credito
       }
 
       /*if (this.tipoDoc.CodSunat == '030') { // Boleta emitir resumen diario
@@ -532,189 +563,236 @@ export default {
         })
       }
     },*/
-    eliminarElectronico (venta) {
-      let r = confirm('¿Desea Anular la venta?')
+    eliminarElectronico(venta) {
+      let r = confirm("¿Desea Anular la venta?");
       if (r == true) {
-        this.loading = true
-        
-        if (this.tipoDoc.CodSunat == '01' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '01')) { // Factura
-          let desc = prompt('Escriba el motivo por el cual desea dar de baja esta factura')
-          if (desc) {  
-            this.axios.post(this.API + 'bajaelectronico', {
-              facturas: [venta],
-              descripcion: desc,
-              codSunat: this.tipoDoc.CodSunat
-              // fechaReferencia: this.fechaReferencia
-            }).then(res => {
-              console.log(res)
-              this.$toasted.show('Comprobante Anulado')
-              this.$refs.tablaVentas.refresh()
-              this.loading = false
-              //mensaje success
-            })
+        this.loading = true;
+
+        if (
+          this.tipoDoc.CodSunat == "01" ||
+          (this.tipoDoc.CodSunat == "07" && venta.CodSunatModifica == "01")
+        ) {
+          // Factura
+          let desc = prompt(
+            "Escriba el motivo por el cual desea dar de baja esta factura"
+          );
+          if (desc) {
+            this.axios
+              .post(this.API + "bajaelectronico", {
+                facturas: [venta],
+                descripcion: desc,
+                codSunat: this.tipoDoc.CodSunat
+                // fechaReferencia: this.fechaReferencia
+              })
+              .then(res => {
+                console.log(res);
+                this.$toasted.show("Comprobante Anulado");
+                this.$refs.tablaVentas.refresh();
+                this.loading = false;
+                //mensaje success
+              });
           }
         }
 
-        if (this.tipoDoc.CodSunat == '03' || (this.tipoDoc.CodSunat == '07' && venta.CodSunatModifica == '03')) { // Boleta
-          this.axios.post(this.API + 'emitirelectronicoboleta', {
-            boletas: [venta],
-            statu: 3, // Statu 3 = dar de baja / 1 = emitir
-            codSunat: this.tipoDoc.CodSunat,
-            fechaReferencia: this.fechaReferencia
-          }).then(res => {
-            console.log(res)
-            this.$toasted.show('Comprobante Anulado')
-            this.$refs.tablaVentas.refresh()
-            this.loading = false
-          })
+        if (
+          this.tipoDoc.CodSunat == "03" ||
+          (this.tipoDoc.CodSunat == "07" && venta.CodSunatModifica == "03")
+        ) {
+          // Boleta
+          this.axios
+            .post(this.API + "emitirelectronicoboleta", {
+              boletas: [venta],
+              statu: 3, // Statu 3 = dar de baja / 1 = emitir
+              codSunat: this.tipoDoc.CodSunat,
+              fechaReferencia: this.fechaReferencia
+            })
+            .then(res => {
+              console.log(res);
+              this.$toasted.show("Comprobante Anulado");
+              this.$refs.tablaVentas.refresh();
+              this.loading = false;
+            });
         }
-      }      
-
+      }
     },
-    getDetalles (idDocVenta) {
-      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+    getDetalles(idDocVenta) {
+      let detalles = this.itemsDetalle.filter(
+        item => item.IdDocVenta == idDocVenta
+      );
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
       //this.items[index].productos = detalles
-      return detalles
+      return detalles;
     },
     getVentasAcumuladas() {
-      if(this.filters.vendedor) {
-        this.axios.get(this.API + 'ventas/usuario', {
-         params: {
-           usuario: this.vendedor.Usuario,
-           fechaInicio: this.fechaInicio,
-           fechaFin: this.fechaFin
-         }
-       }).then((response) => {
-         this.ventasAcumuladas = response.data.total
-       })
+      if (this.filters.vendedor) {
+        this.axios
+          .get(this.API + "ventas/usuario", {
+            params: {
+              usuario: this.vendedor.Usuario,
+              fechaInicio: this.fechaInicio,
+              fechaFin: this.fechaFin
+            }
+          })
+          .then(response => {
+            this.ventasAcumuladas = response.data.total;
+          });
       } else {
-        this.axios.get(this.API + 'ventas/total', {
-          params: {
-            fechaInicio: this.fechaInicio,
-            fechaFin: this.fechaFin
-          }
-        }).then((response) => {
-          this.ventasAcumuladas = response.data.total
-        })
+        this.axios
+          .get(this.API + "ventas/total", {
+            params: {
+              fechaInicio: this.fechaInicio,
+              fechaFin: this.fechaFin
+            }
+          })
+          .then(response => {
+            this.ventasAcumuladas = response.data.total;
+          });
       }
     },
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    setAlmacen (obj) {
-      this.almacen = obj
-      this.limpiarFiltros()
-      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
+    setAlmacen(obj) {
+      this.almacen = obj;
+      this.limpiarFiltros();
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh());
     },
     actualizarTabla() {
-      this.$refs.tablaVentas.refresh()
+      this.$refs.tablaVentas.refresh();
     },
-    myProvider (ctx) {
+    myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      
-      let url = this.API + 'ventas?estado=' + this.estadoVenta + '&idTipoDoc[]=' + this.tipoDoc.IdTipoDoc + '&idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-console.log(url)
-      let promise = this.axios.get( url )
 
-      return promise.then((result) => {
-        
-        //this.items = result.data
-        this.items = result.data.map(el => {
-          if (el.Anulado === 1) {
-            el._rowVariant = 'warning'
-          }
+      let url =
+        this.API +
+        "ventas?estado=" +
+        this.estadoVenta +
+        "&idTipoDoc[]=" +
+        this.tipoDoc.IdTipoDoc +
+        "&idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&filter=" +
+        (ctx.filter || "") +
+        "&sortBy=" +
+        ctx.sortBy;
+      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
+      console.log(url);
+      let promise = this.axios.get(url);
 
-          return el
+      return promise
+        .then(result => {
+          //this.items = result.data
+          this.items = result.data.map(el => {
+            if (el.Anulado === 1) {
+              el._rowVariant = "warning";
+            }
+
+            return el;
+          });
+
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
         })
-
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
     },
-    limpiarFiltros () {
-      this.filters = {}
-      this.filter = ''
-      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
-      this.fechaFin = this.$moment().format("YYYY-MM-DD")
+    limpiarFiltros() {
+      this.filters = {};
+      this.filter = "";
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD");
+      this.fechaFin = this.$moment().format("YYYY-MM-DD");
       //this.$refs.inputVendedor.setValue('')
     },
-    generateFilter (key, value) {
-      this.filters[key] = value
+    generateFilter(key, value) {
+      this.filters[key] = value;
 
-      let filter = ''
+      let filter = "";
       for (var key in this.filters) {
-        filter += '&filter[' + key + ']=' + this.filters[key]
+        filter += "&filter[" + key + "]=" + this.filters[key];
       }
-      this.filter = filter
-      this.getVentasAcumuladas()
+      this.filter = filter;
+      this.getVentasAcumuladas();
     },
-    exportarProductos () {
-
-    },
-    moverAEmitidos (doc) {
-      this.loading = true
-      this.axios.post(this.API + 'moveraemitidos', {
-        idDocVenta: doc.idDocVenta
-      }).then( response => {
-        this.$refs.tablaVentas.refresh()
-        this.loading = false
-      })
-    },
-    cambiarAAnonimo (doc) {
-      let r = confirm('¿Desea Cambiar a Cliente Anónimo?')
-      if (r == true) {
-        this.loading = true
-        this.axios.post(this.API + 'cambiaraanonimo', {
+    exportarProductos() {},
+    moverAEmitidos(doc) {
+      this.loading = true;
+      this.axios
+        .post(this.API + "moveraemitidos", {
           idDocVenta: doc.idDocVenta
-        }).then( response => {
-          this.$refs.tablaVentas.refresh()
-          this.loading = false
         })
+        .then(response => {
+          this.$refs.tablaVentas.refresh();
+          this.loading = false;
+        });
+    },
+    cambiarAAnonimo(doc) {
+      let r = confirm("¿Desea Cambiar a Cliente Anónimo?");
+      if (r == true) {
+        this.loading = true;
+        this.axios
+          .post(this.API + "cambiaraanonimo", {
+            idDocVenta: doc.idDocVenta
+          })
+          .then(response => {
+            this.$refs.tablaVentas.refresh();
+            this.loading = false;
+          });
       }
     },
-    consultaElectronico (doc) {
-      console.log(doc)
-      let tipocomprobante = ''
-      let cantidad=''
-      let fecha = this.$moment(doc.FechaDoc, 'YYYY-MM-DD hh:mm:ss').format('DD/MM/YYYY')
-      console.log(fecha)
+    consultaElectronico(doc) {
+      console.log(doc);
+      let tipocomprobante = "";
+      let cantidad = "";
+      let fecha = this.$moment(doc.FechaDoc, "YYYY-MM-DD hh:mm:ss").format(
+        "DD/MM/YYYY"
+      );
+      console.log(fecha);
 
-      if (doc.CodSunat == '03') {
-        tipocomprobante = '06'
+      if (doc.CodSunat == "03") {
+        tipocomprobante = "06";
       }
-      if (doc.CodSunat == '01') {
-        cantidad = doc.Total
-        tipocomprobante = '03'
+      if (doc.CodSunat == "01") {
+        cantidad = doc.Total;
+        tipocomprobante = "03";
       }
 
-      this.imgCaptcha = false
-      window.open('http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20573027125&tipocomprobante=' + tipocomprobante + '&num_serie=' + doc.Serie + '&num_comprob=' + doc.Numero + '&fec_emision=' + encodeURI(fecha) + '&codigo=' + this.captcha + (cantidad ? '&cantidad=' + cantidad : ''))
-      
+      this.imgCaptcha = false;
+      window.open(
+        "http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?accion=CapturaCriterioValidez&num_ruc=20573027125&tipocomprobante=" +
+          tipocomprobante +
+          "&num_serie=" +
+          doc.Serie +
+          "&num_comprob=" +
+          doc.Numero +
+          "&fec_emision=" +
+          encodeURI(fecha) +
+          "&codigo=" +
+          this.captcha +
+          (cantidad ? "&cantidad=" + cantidad : "")
+      );
+
       /*this.$nextTick(() => {
         this.imgCaptcha = true
         this.captcha = ''
       })*/
       setTimeout(() => {
-        this.imgCaptcha = true
-        this.captcha = ''
-      }, 1000)
+        this.imgCaptcha = true;
+        this.captcha = "";
+      }, 1000);
     }
   },
   components: {
     ProductoKardex
   }
-}
+};
 </script>
 
 <style scope>
@@ -734,7 +812,7 @@ console.log(url)
 }
 .table-detalle th {
   color: #fff;
-  background-color: #6c757d; 
+  background-color: #6c757d;
 }
 .table-detalle tbody td {
   font-size: 18px;
@@ -745,14 +823,15 @@ console.log(url)
   max-width: 300px;
 }
 @media (min-width: 992px) {
-    .modal-xl .modal-dialog {
-        max-width: 1200px;
-    }
+  .modal-xl .modal-dialog {
+    max-width: 1200px;
+  }
 }
 .prod-detalle {
   margin: 0 30px;
 }
-.prod-detalle th, .prod-detalle td{
+.prod-detalle th,
+.prod-detalle td {
   background-color: #ffffff;
 }
 </style>

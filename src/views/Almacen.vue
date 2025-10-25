@@ -683,10 +683,8 @@ export default {
       });
     },
     setAlmacen(obj) {
-      console.log(obj);
       this.almacen = obj;
       this.limpiarFiltros();
-      console.log(this.filter);
       Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
     rowClick(item, index, e) {
@@ -763,8 +761,7 @@ export default {
         (ctx.filter || "") +
         "&sortBy=" +
         ctx.sortBy;
-      console.log("empresa", this.empresa);
-      console.log(url);
+
       url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
       let promise = this.axios.get(url);
 
@@ -800,7 +797,7 @@ export default {
 
       this.productoSelect = {};
       this.limpiarClassRows();
-      console.log(this.filter);
+    
     },
     generateFilter(key, value) {
       this.filters[key] = value;

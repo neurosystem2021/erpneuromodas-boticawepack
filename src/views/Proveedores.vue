@@ -116,7 +116,6 @@ export default {
 
         return promise.then((result) => {
           this.items = result.data
-          console.log(result.data);
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false

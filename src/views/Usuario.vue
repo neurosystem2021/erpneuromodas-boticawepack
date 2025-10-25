@@ -404,7 +404,7 @@ export default {
       });
     },
     abrirNuevoUsuario() {
-      console.log("ddd");
+     
       this.usuario = {};
       this.nuevoUsuarioFlag = true;
     },
@@ -430,7 +430,7 @@ export default {
         .post(`${this.API}usuario/registro`, this.usuario)
         .then(res => {
           let response = res.data;
-          console.log(res.data);
+
           if (response.estado) {
             this.cargarListadoUsuario();
             this.editarUsuarioFlag = false;

@@ -172,7 +172,6 @@ export default {
           if (res.data) {
             if (res.data) {
               window.open(res.data.file, "_blank");
-              console.log(res.data);
             }
           }
         })

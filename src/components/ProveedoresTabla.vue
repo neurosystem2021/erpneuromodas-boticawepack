@@ -20,49 +20,51 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.axios.get(API + 'proveedores/count').then((response) => {
-      this.totalRows = response.data.total
-    })
+    this.axios.get(API + "proveedores/count").then(response => {
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
       items: [],
       isBusy: false,
-      fields: [ 'Proveedor', 'Direccion' ],
+      fields: ["Proveedor", "Direccion"],
       totalRows: 50,
       perPage: 5,
       currentPage: 1
-    }
+    };
   },
   methods: {
-      myProvider (ctx) {
-        console.log(ctx)
-        // Here we don't set isBusy prop, so busy state will be handled by table itself
-        // this.isBusy = true
-        let promise = this.axios.get(API + 'proveedores?limit='+ctx.perPage+'&page='+ctx.currentPage)
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let promise = this.axios.get(
+        API + "proveedores?limit=" + ctx.perPage + "&page=" + ctx.currentPage
+      );
 
-        return promise.then((result) => {
-          this.items = result.data
+      return promise
+        .then(result => {
+          this.items = result.data;
           //this.totalRows = this.items.length
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
-          return(this.items)
-        }).catch(error => {
+          return this.items;
+        })
+        .catch(error => {
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error
-          return []
-        })
-      }
+          return [];
+        });
+    }
   }
-}
+};
 </script>
 
 <style>
-
 </style>

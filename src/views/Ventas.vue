@@ -1193,6 +1193,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           this.recalcularTotalesPorEmpresa();
+          this.metodoPagoCambio(1);
           // this.metodoPagoCambio(1);
         }, 100);
       });

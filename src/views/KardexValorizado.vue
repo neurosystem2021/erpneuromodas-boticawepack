@@ -18,6 +18,10 @@
                         placeholder="Agregar Producto"
                         :on-select="setProducto"
                         :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                        :customParams="{
+                          id_empresa: empresa,
+                          IdAlmacen : idAlmacen
+                        }"
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                 </b-col>
@@ -106,7 +110,9 @@ export default {
       precio: 0,
       idAlmacen: 1,
       producto: {},
-      lstReporte: []
+      lstReporte: [],
+      empresa: sessionStorage.getItem("empresa"),
+      idAlmacen:sessionStorage.getItem("IdAlmacen")
     };
   },
   mounted() {
@@ -136,7 +142,8 @@ export default {
           stock: this.stock,
           precio: this.precio,
           anno: this.anno,
-          Tipo: this.Tipo
+          Tipo: this.Tipo,
+          id_empresa:this.empresa
         }
       }).then(response => {
         this.generarListado(response.data);
@@ -161,7 +168,6 @@ export default {
       datosFiltrados.shift();
 
       let datosFinales = datosFiltrados;
-      console.log("this.Mes", this.Mes);
       if (this.Mes) {
         datosFinales = [];
         datosFiltrados.forEach(element => {
@@ -199,11 +205,9 @@ export default {
           clasName = "clsAnno";
           break;
         case "DESDE":
-          console.log(item.d1);
           clasName = "clsDesde";
           break;
         case "HASTA":
-          console.log(item.d1);
           clasName = "clsHasta";
           break;
         case "FECHA":

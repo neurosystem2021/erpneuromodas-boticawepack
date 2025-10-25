@@ -559,7 +559,7 @@ export default {
 
             this.$refs.inputProductoDesc.$el.value = newVal.ProductoDesc;
             //this.$refs.inputProductoDesc2.$el.value = newVal.ProductoDesc2
-            this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3
+            this.$refs.inputProductoDesc3.$el.value = newVal.ProductoDesc3;
 
             // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
             // this.$refs.inputProducto.$el.disabled = true
@@ -643,6 +643,9 @@ export default {
     }
   },
   methods: {
+    eliminarRegistroSerie(item, index) {
+      this.productoSerie[index].Estado = 0;
+    },
     obtenerSerie(id) {
       this.axios
         .get(this.API + "productos/serie", {

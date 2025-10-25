@@ -121,7 +121,7 @@ export default {
           .toUpperCase()
           .trim();
       });
-      console.log(this.proveedor);
+
 
       if (this.proveedor.Ruc == "") {
         this.$toasted.show("Ingrese el RUC del proveedor");

@@ -1492,7 +1492,6 @@ export default {
       }
     },
     async setProducto(obj) {
-      console.log(setProducto);
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1502,7 +1501,7 @@ export default {
       this.preciosProd = [];
       this.objProd = {};
       obj.EsObsequio = 0;
-      console.log(obj);
+
       // let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto,);
       prod.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
@@ -1533,7 +1532,6 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log("setProductoUni");
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1573,12 +1571,10 @@ export default {
       this.$refs["modalCant"].hide();
       obj.cantidadPres = obj.cantidad;
       this.producto.unshift(obj);
-      console.log("dddddd");
+
       // this.actualizarProd(obj);
     },
     setProductoCant(prod) {
-      console.log("setProductoCant");
-
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1702,7 +1698,6 @@ export default {
     },
 
     setNuevoPrecioContado(index) {
-      console.log("setNuevoPrecioContado");
       let precio = parseFloat(this.productos[index].precio);
       if (this.productos[index].TieneIgv) {
         precio += precio * 0.18;
@@ -1858,7 +1853,6 @@ export default {
       return lst.slice(start, end);
     },
     async obtenerSeriePorProducto(id) {
-      console.log("obtenerSeriePorProducto", id);
       let productoSerie = [];
       await this.axios
         .get(this.API + "productos/serie", {
@@ -1872,7 +1866,6 @@ export default {
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
-      console.log(item);
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
           v => v.IdProducto == item.IdProducto
@@ -1905,7 +1898,7 @@ export default {
         item.Empresa
       );
       item.productoSerie = productoSerie;
-      console.log(productoSerie);
+
       this.itemProducto = { ...item };
       this.itemProducto.tipo = "PRESENTACION";
       this.itemProducto.PreciosPorProducto = PreciosPorProducto;

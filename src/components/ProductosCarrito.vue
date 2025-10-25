@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" variant="info" class="mx-2 btnResponsive">Agregar Productos
+          <b-button @click="abrirModaProductos" v-if="isVentas" variant="info" class="mx-2 btnResponsive">Agregar Productos
           </b-button>
           <autocomplete
             ref="autocompleteProducto"
@@ -12,7 +12,8 @@
               sortBy: isVentas ? 'stock' : 'IdProducto',
               sortDesc: 1,
               limit: '25',
-              id_empresa: empresa 
+              id_empresa: empresa ,
+              IdAlmacen : idAlmacen
             }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
@@ -581,8 +582,8 @@
               </b-button>
             </b-input-group-append>
             <input
-              v-model="IdProducto"
-              @input="buscarProductosCodigoBarrasModal"
+              v-model="CodigoBarra"
+              @input="cargarListadoProductos"
               type="text"
               class="form-control ml-2  inputResponsive"
               placeholder="Codigo de Barra"
@@ -755,7 +756,7 @@
               </template>
           </b-table> -->
           <b-row>
-            <b-col cols="8">
+            <!-- <b-col cols="8">
               <b-pagination
                 v-model="currentPageModal"
                 :total-rows="10000000000"
@@ -763,7 +764,7 @@
                 aria-controls="my-table"
                 @change="cargarListadoProductos"
               ></b-pagination>
-          </b-col>
+          </b-col> -->
             <b-col cols="4">
               <b-row>
                 <b-col cols="6">  
@@ -1078,6 +1079,7 @@ export default {
       index: false,
       empresa: "",
       IdProducto: "",
+      CodigoBarra: "",
       errorMessage: "",
       modalNuevoProductos: false,
       lstProductos: [],
@@ -1140,7 +1142,7 @@ export default {
         { valor: "CE", tipo: "limpiar" }
       ],
       perPageModal: 20,
-      currentPageModal: 1,
+      currentPageModal: 0,
       API: config.API,
       loadCode: "",
       pasteCode: false,
@@ -1472,16 +1474,13 @@ export default {
     cambiarPrecioConvenioBloque(index, item) {
       if (item.precioBloque > 0 && item.cantidad >= item.PrecioPorBloque) {
         this.productos[index].precio = item.precioBloque;
-        console.log("c");
       } else if (
         item.PrecioPorMayor > 0 &&
         item.cantidad >= item.PrecioPorMayor
       ) {
         this.productos[index].precio = item.precioConvenio;
-        console.log("b");
       } else {
         this.productos[index].precio = item.PrecioContado;
-        console.log("a");
       }
     },
     cambiarPrecio(index, prod) {
@@ -1558,7 +1557,11 @@ export default {
       let idProducto = this.loadCode;
       let id_empresa = this.empresa;
       if (idProducto) {
-        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
+        let params = {
+          codigoBarra: idProducto,
+          id_empresa: id_empresa,
+          idAlmacen: this.idAlmacen
+        };
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
@@ -1851,7 +1854,12 @@ export default {
     },
     actualizarDescu(index) {
       let obj = this.productos[index];
+
       this.actualizarProd(obj);
+      this.$nextTick(() => {
+        this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
+          .recalcularTotalPorEmpresaFlag;
+      });
     },
     getSubtotal(index) {
       let subtotal =
@@ -1934,16 +1942,17 @@ export default {
     // ZURITA
     async abrirModaProductos() {
       this.modalNuevoProductos = !this.modalNuevoProductos;
+      this.CodigoBarra = "";
       await this.cargarListadoProductos();
     },
     cambiarPorPaginate(val) {
-      this.currentPageModal = 1;
+      this.currentPageModal = 0;
       this.perPageModal = val;
       this.cargarListadoProductos();
     },
     async cargarListadoProductos() {
       await this.axios(
-        `${this.API}/productos/puntoventa/modal/stock/${this.idAlmacen}`,
+        `${this.API}productos/puntoventa/modal/stock/${this.idAlmacen}`,
         {
           params: {
             sortBy: null,
@@ -1952,7 +1961,8 @@ export default {
             search: this.searchProducto,
             tipo: this.selected,
             limit: this.perPageModal,
-            page: this.currentPageModal
+            page: 0,
+            CodigoBarra: this.CodigoBarra
           }
         }
       ).then(res => {
@@ -1998,7 +2008,7 @@ export default {
         IdProducto: id,
         Todos: false,
         empresa: sessionStorage.getItem("empresa"),
-        IdAlmacen:this.idAlmacen
+        IdAlmacen: this.idAlmacen
       };
       productoSerie = await this.buscarSeriesxProduto(params);
 
@@ -2475,7 +2485,8 @@ export default {
   table-layout: fixed;
 }
 .modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 100%;  min-height: 150vh;
+  max-width: 100%;
+  min-height: 150vh;
 }
 #modalSelectProduct .modal-dialog {
   max-width: 100%;

@@ -620,7 +620,6 @@ export default {
       );
     },
     async exportarOperaciones() {
-      console.log("ssss");
       // this.lstCajaBanco = [];
       let params = {
         IdCuenta: this.IdCuenta,
@@ -632,7 +631,6 @@ export default {
       }).then(res => {
         if (res.data) {
           window.open(res.data.file, "_blank");
-          console.log(res.data);
         }
       });
     },
@@ -692,7 +690,7 @@ export default {
       }
     },
     generarLetras(deuda) {
-      console.log(deuda);
+    
       this.deuda = deuda;
       this.letras = [];
       this.nroLetras = 0;
@@ -816,7 +814,7 @@ export default {
       this.Tipo = val.Tipo;
     },
     eliminarPago(data) {
-      console.log("cajabanco", data);
+   
       this.$swal({
         icon: "question",
         title: "Eliminar",

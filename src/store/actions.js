@@ -12,7 +12,7 @@ export default {
     await axios
       .get(API + "productos/serie", { params: search })
       .then(response => {
-        console.log(response.data);
+       
         res = response.data;
       });
     return res;

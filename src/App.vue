@@ -33,7 +33,6 @@ export default {
     };
   },
   mounted() {
-    console.log("empresa", this.empresa);
     this.obtenerEmpresa();
   },
   methods: {
