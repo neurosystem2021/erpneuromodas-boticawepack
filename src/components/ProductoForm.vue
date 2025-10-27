@@ -424,9 +424,9 @@
                 @input="actualizarPrecioDolar(4)"
                 class="form-control"
                 />
-                <b-form-text v-if="producto.precioContadoNormal">
+                <!-- <b-form-text v-if="producto.precioContadoNormal">
                   Original - {{ producto.precioContadoNormal | redondear }}
-                </b-form-text>
+                </b-form-text> -->
               </b-form-group>
               
               <b-form-group>
@@ -437,9 +437,9 @@
                 @input="actualizarPrecioDolar(5)"
                 class="form-control"
                 />
-                <b-form-text v-if="producto.precioContadoNormal">
-                  Original - {{ producto.precioContadoNormal | redondear }}
-                </b-form-text>
+                <!-- <b-form-text v-if="producto.precioContadoNormal">
+                  Original - {{ producto.precioContadoNormal/producto.TipoCambio | redondear }}
+                </b-form-text> -->
               </b-form-group>
 
               <b-form-group>
@@ -867,6 +867,11 @@ export default {
         precioCosto / ((100 - parseFloat(utilidad)) / 100);
 
       this.producto.precioContadoNormal = nuevoPrecioContado;
+      this.producto.PrecioContadoDolar = this.$options.filters.redondear(
+        nuevoPrecioContado / this.producto.TipoCambio,
+        1
+      );
+
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
       this.producto.PrecioContado = this.$options.filters.redondear(
         nuevoPrecioContado,
