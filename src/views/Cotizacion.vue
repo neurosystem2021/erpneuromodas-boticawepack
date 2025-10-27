@@ -1135,7 +1135,7 @@ export default {
     igv() {
       this.productos.forEach((prod, index) => {
         const nuevoPrecio =
-          prod.PrecioContado * (1 + (this.igv == 1 ? 0.18 : 0));
+          prod.PrecioContado * (1 + (this.igv == 1 ? 0 : 0));
         this.$set(
           this.productos[index],
           "precio",

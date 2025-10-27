@@ -922,7 +922,7 @@ export default {
         this.$refs.inputMarca.setValue("");
         this.$refs.inputMedicion.setValue("UNIDAD");
         this.$refs.inputTipos.setValue("");
-        this.$refs.inputProductoDesc.setValue("");
+        // this.$refs.inputProductoDesc.setValue("");
         this.$refs.inputAnaquel.setValue("");
         this.producto.Anaquel = "";
         // this.$refs.inputTalla.setValue('')
