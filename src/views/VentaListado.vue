@@ -1152,12 +1152,12 @@ export default {
       }
     },
     togglePopoverMetodo(index) {
-    if (this.mostrarMetodo[index]) {
-      this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
-    } else {
-      this.$set(this.mostrarMetodo, index, true);
-      this.$nextTick(() => {
-        this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
+      if (this.mostrarMetodo[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+      } else {
+        this.$set(this.mostrarMetodo, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
         });
       }
     },
@@ -1886,9 +1886,7 @@ export default {
               ).toFixed(2)
             );
           } else {
-            return parseFloat(
-              total + parseFloat(prod.cantidad * prod.precio)
-            );
+            return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
           }
           // return (
           //   total +
@@ -2133,6 +2131,14 @@ export default {
       }
       venta.PagoCon = venta.pagocon;
       venta.totalCart = this.getTotal();
+      if (
+        parseFloat(this.totalCart).toFixed(2) !=
+        parseFloat(totalPagos).toFixed(2)
+      ) {
+        this.$toasted.show("Los pagos no coinciden con la venta");
+        this.inProgress = false;
+        return;
+      }
       venta.Observacion = (venta.Observacion + "").toUpperCase();
       venta.idProductos = productos.map(prod => prod.IdProducto);
       if (venta.cliente.DniRuc != "00000000") {
@@ -2145,7 +2151,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      await this.axios.post(this.API + "ventass", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
