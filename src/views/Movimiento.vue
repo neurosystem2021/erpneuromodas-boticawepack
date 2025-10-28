@@ -512,9 +512,11 @@ export default {
         this.inProgress = false;
         return;
       }
-      this.movimiento.NotaDescMotivo = this.itemsMotivoNota.filter(
-        item => item.value == this.movimiento.NotaIdMotivo
-      )[0].text;
+      if (this.movimiento.movimientoTipo.CodSunat == "07") {
+        this.movimiento.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.movimiento.NotaIdMotivo
+        )[0].text;
+      }
       await this.axios
         .post(this.API + "movimientos", {
           movimiento: this.movimiento,
