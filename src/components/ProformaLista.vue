@@ -6,6 +6,7 @@
         
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
+                class="modalOrdenCompra"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
