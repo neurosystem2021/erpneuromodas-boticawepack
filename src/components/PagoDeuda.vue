@@ -307,7 +307,7 @@ import config from '@/store/config.js'
                     this.$toasted.show('Se pagó la deuda del cliente.')
                     this.show = false
                     this.initForm()
-                    // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
+                    window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {
                     console.log(error)
