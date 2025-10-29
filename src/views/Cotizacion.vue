@@ -834,7 +834,7 @@ export default {
       obj.cantidadImportacion = 0;
       obj.diasEntregaImportacion = 0;
       obj.precio = parseFloat(
-        obj.precio * (1 + (this.igv == 1 ? 0.18 : 0))
+        obj.precio * (1 + (this.igv == 1 ? 0 : 0))
       ).toFixed(2);
       this.productos.push(obj);
       this.$nextTick(() => {
@@ -1134,8 +1134,7 @@ export default {
     },
     igv() {
       this.productos.forEach((prod, index) => {
-        const nuevoPrecio =
-          prod.PrecioContado * (1 + (this.igv == 1 ? 0 : 0));
+        const nuevoPrecio = prod.PrecioContado * (1 + (this.igv == 1 ? 0 : 0));
         this.$set(
           this.productos[index],
           "precio",
