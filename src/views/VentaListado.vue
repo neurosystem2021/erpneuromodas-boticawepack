@@ -947,6 +947,7 @@ export default {
     return {
       mostrarMetodo: [],
       mostrarNav: true,
+      descuentoGeneral: 0,
       isNota: [],
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
@@ -2132,7 +2133,7 @@ export default {
       venta.PagoCon = venta.pagocon;
       venta.totalCart = this.getTotal();
       if (
-        parseFloat(this.totalCart).toFixed(2) !=
+        parseFloat(this.getTotal()).toFixed(2) !=
         parseFloat(totalPagos).toFixed(2)
       ) {
         this.$toasted.show("Los pagos no coinciden con la venta");
@@ -2151,7 +2152,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventass", venta).then(response => {
+      await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(

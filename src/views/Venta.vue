@@ -2128,7 +2128,14 @@ export default {
         // });
         return;
       }
-
+      if (
+        parseFloat(this.getTotal()).toFixed(2) !=
+        parseFloat(totalPagos).toFixed(2)
+      ) {
+        this.$toasted.show("Los pagos no coinciden con la venta");
+        this.inProgress = false;
+        return;
+      }
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
