@@ -211,7 +211,7 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
-                :idAlmacen="movimiento.almacenDestino.IdAlmacen"
+                :idAlmacen="IdAlmacen"
                 :fields="carrito.fields"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
@@ -299,7 +299,16 @@ export default {
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
-    })
+    }),
+    IdAlmacen() {
+      let IdAlmacen = 1;
+      if (this.isSalida) {
+        IdAlmacen = this.movimiento.almacenOrigen.IdAlmacen;
+      } else {
+        IdAlmacen = this.movimiento.almacenDestino.IdAlmacen;
+      }
+      return IdAlmacen;
+    }
   },
   methods: {
     ...mapActions({
