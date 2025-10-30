@@ -24,7 +24,7 @@
         </b-col>
       </b-row>-->
 
-      <b-form-group v-if="(type === 'mov') ? true : false">
+      <b-form-group >
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
