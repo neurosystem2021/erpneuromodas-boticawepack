@@ -55,11 +55,18 @@ Vue.component('editable',{
     }
   }
 })
-
+const socketOptions = {
+  transports: ['websocket', 'polling'],
+  secure: true, // Importante para WSS
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionAttempts: 10,
+  autoConnect: false // Tu preferencia
+}
 Vue.use(new VueSocketIO({
   debug: false,
   connection: 'https://panel.pedi2.pe',
-  options: { autoConnect: false } //Optional options
+  options: socketOptions//Optional options
 }))
 
 Vue.filter('redondear', (value, length) => {
