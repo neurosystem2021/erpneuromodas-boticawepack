@@ -1173,6 +1173,6 @@ export default {
   min-width: 80% !important;
 }
 .tblTotal {
-  border: 1px solid #;
+  border: 1px solid;
 }
 </style>
