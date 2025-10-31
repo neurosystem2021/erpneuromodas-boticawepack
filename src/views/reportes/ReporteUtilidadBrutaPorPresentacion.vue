@@ -42,7 +42,7 @@
                     
                   </template>
                 <template slot="TotalVenta" slot-scope="data">
-                  {{ parseFloat(data.item.PrecioVenta * data.item.Cantidad) .toFixed(2)}} 
+                  {{ parseFloat(data.item.Total) .toFixed(2)}} 
                   
                 </template>
                 <template slot="UtilidadBruta" slot-scope="data">
@@ -141,9 +141,9 @@ export default {
         }, 0);
 
         let TotalVenta = productos.reduce((sum, prod) => {
-          let cant = parseFloat(prod.Cantidad || 0);
-          let pv = parseFloat(prod.PrecioVenta || 0); // 👈 si viene null → 0
-          return sum + cant * pv;
+          // let cant = parseFloat(prod.Cantidad || 0);
+          // let pv = parseFloat(prod.PrecioVenta || 0); // 👈 si viene null → 0
+          return sum + parseFloat(prod.Total);
         }, 0);
 
         // Precios unitarios (promedio ponderado)
