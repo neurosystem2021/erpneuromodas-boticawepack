@@ -6,6 +6,7 @@
         
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
+                class="modalOrdenCompra"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
@@ -75,7 +76,7 @@
                      <b-table 
                         v-if="show"
                         id="table-proformas" 
-                        ref="tableProformasFavoritas"
+                        ref="tableProformas"
                        :filter="filter"
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"
@@ -182,7 +183,7 @@ export default {
         "ver",
         "verTicket",
         ,
-        // "Anular"
+        "Anular"
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -217,7 +218,8 @@ export default {
       this.axios
         .get(this.API + "proformas/detalle", {
           params: {
-            idProforma: proforma.IdProforma
+            idProforma: proforma.IdProforma,
+            IdAlmacen: sessionStorage.getItem("IdAlmacen")
           }
         })
         .then(response => {
@@ -249,12 +251,14 @@ export default {
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
       let promise = this.axios.get(
         this.API +
           "proformas?limit=" +
           ctx.perPage +
           "&page=" +
           ctx.currentPage +
+          "&IdAlmacen="+IdAlmacen +
           "&filter=" +
           ctx.filter
       );
@@ -299,10 +303,7 @@ export default {
             .then(res => {
               if (res.data) {
                 this.$toasted.info("¡PROFORMA ANULADA!");
-                if (this.$refs.tableProformas) {
-                  this.$refs.tableProformas.refresh();
-                  this.$refs.tableProformasFavoritas.refresh();
-                }
+                this.$refs.tableProformas.refresh();
               }
             })
             .catch(err => {
