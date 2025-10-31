@@ -218,7 +218,8 @@ export default {
       this.axios
         .get(this.API + "proformas/detalle", {
           params: {
-            idProforma: proforma.IdProforma
+            idProforma: proforma.IdProforma,
+            IdAlmacen: sessionStorage.getItem("IdAlmacen")
           }
         })
         .then(response => {
@@ -250,12 +251,14 @@ export default {
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
+      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
       let promise = this.axios.get(
         this.API +
           "proformas?limit=" +
           ctx.perPage +
           "&page=" +
           ctx.currentPage +
+          "&IdAlmacen="+IdAlmacen +
           "&filter=" +
           ctx.filter
       );
