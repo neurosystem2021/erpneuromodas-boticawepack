@@ -951,6 +951,9 @@ export default {
         //this.setProductoUni(obj)
         //return
       }
+
+      console.log(obj);
+
       if (fpp.length == 4) {
         this.setProductoUni(obj);
         return;

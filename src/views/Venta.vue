@@ -1660,7 +1660,7 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
-      console.log(producto.precio);
+      console.log(producto);
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
@@ -1695,6 +1695,12 @@ export default {
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
+      console.log("length", pres.length);
+
+      if (pres.length == 0) {
+        productos.unshift(prod);
+        return;
+      }
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
       prod.PrecioCost = producto.PrecioCosto;
@@ -2395,18 +2401,12 @@ export default {
           );
         }
 
-        // setTimeout(() => {
-        //   if (this.ventas.length == 1) {
-        //     window.location.reload();
-        //   } else {
-        //     this.eliminarVentana();
-        //     this.getVendedorInfo();
-        //   }
-        // }, 100);
-        // if (response.data.actualizar) {
-        //   this.$toasted.show(response.data.msg);
-        //   return;
-        // }
+        if (this.ventas.length == 1) {
+          window.location.reload();
+        } else {
+          this.eliminarVentana();
+          this.getVendedorInfo();
+        }
       });
     },
     obtenerMonto(valor) {
