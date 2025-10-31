@@ -1834,7 +1834,11 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      productos.unshift(prod);
+      if (pres.length == 0) {
+        productos.unshift(prod);
+        return;
+      }
+      this.showPresentacion(prod, null);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
@@ -2563,6 +2567,7 @@ export default {
       this.metodoPagoCambio(1);
     },
     cambiarPresentacion(obj, esPresentacion) {
+      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
@@ -2580,7 +2585,12 @@ export default {
         producto.presentacion = null;
       }
 
-      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      if (this.index) {
+        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
+      } else {
+        productos.unshift(producto);
+      }
+
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
