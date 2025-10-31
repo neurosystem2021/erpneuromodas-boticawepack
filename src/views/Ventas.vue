@@ -1757,10 +1757,8 @@ export default {
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         let prod = productos.filter(v => v.IdProducto == producto.IdProducto);
         if (prod[0].presentacion == "UNIDAD") {
-          console.log("a");
           prod[0].cantidad += parseFloat(1);
         } else {
-          console.log("b");
           prod[0].CantidadPresentacion += parseFloat(1);
         }
         this.metodoPagoCambio(1);
@@ -1800,11 +1798,11 @@ export default {
         prod.cantidad = producto.cantidad;
         prod.precio = producto.PrecioContado;
       }
-      this.$nextTick(() => {
-        let input = document.getElementById("input0");
-        input.focus();
-        input.select();
-      });
+      // this.$nextTick(() => {
+      //   let input = document.getElementById("input0");
+      //   input.focus();
+      //   input.select();
+      // });
       this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
