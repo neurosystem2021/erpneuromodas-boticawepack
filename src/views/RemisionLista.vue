@@ -91,6 +91,8 @@
                       &nbsp;&nbsp;
                       <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
                       &nbsp;&nbsp;
+                      <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
+                      &nbsp;&nbsp;
                   </div>
                 </template>
 
