@@ -83,7 +83,6 @@
                         <autocomplete
                             required="required"
                             :id="`inputAlmacen${index}`"
-                            :ref="`inputAlmacen${index}`"
                             :url="API + 'almacenes'"
                             anchor="Almacen"
                             class="font-weight-bold"
@@ -103,7 +102,6 @@
                             <autocomplete
                             required="required"
                             :id="`inputPuntoVenta${index}`"
-                            :ref="`inputPuntoVenta${index}`"
                             :url="API + 'ventas/puntos'"
                             anchor="PuntoVenta"
                             class="font-weight-bold"
@@ -480,7 +478,7 @@
                   <b-col md="4" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" :disabled="pagarFlag" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Nueva Ventana</b-button>
                       <delivery-modal v-if="mostrarVendedor" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
@@ -996,7 +994,6 @@ export default {
   },
   data() {
     return {
-      pagarFlag: false,
       mostrarNav: true,
       isNota: [],
       itemsMotivoNota: [
@@ -1533,7 +1530,6 @@ export default {
 
           let e = `inputAlmacen${this.ventaActiva}`;
           document.getElementById(e).disabled = true;
-
           let p = `inputPuntoVenta${this.ventaActiva}`;
           document.getElementById(p).disabled = true;
 
@@ -1565,9 +1561,6 @@ export default {
       this.ventas[this.ventaActiva].vendedor = obj;
     },
     setAlmacen(obj) {
-      let refs = `inputAlmacen${this.ventaActiva}`;
-      this.$refs[refs][0].setValue(obj.Almacen);
-
       this.ventas[this.ventaActiva].almacen = obj;
 
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
@@ -1675,8 +1668,6 @@ export default {
       this.loadCode = "";
     },
     setPuntoVenta(obj) {
-      let refs = `inputPuntoVenta${this.ventaActiva}`;
-      this.$refs[refs][0].setValue(obj.PuntoVenta);
       this.ventas[this.ventaActiva].puntoVenta = obj;
       this.getNumeroVenta();
     },
@@ -1843,13 +1834,11 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-
-      if (prod.tienePresentacion) {
-        this.showPresentacion(prod, null);
+      if (pres.length == 0) {
+        productos.unshift(prod);
         return;
       }
-
-      productos.unshift(prod);
+      this.showPresentacion(prod, null);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
@@ -2027,7 +2016,6 @@ export default {
     },
 
     async guardarVenta() {
-      this.pagarFlag = true;
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2039,33 +2027,28 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.pagarFlag = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        this.pagarFlag = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.pagarFlag = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.pagarFlag = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        this.pagarFlag = false;
         return;
       }
 
@@ -2081,7 +2064,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.pagarFlag = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2096,7 +2078,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.pagarFlag = false;
         return;
       }
 
@@ -2113,7 +2094,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.pagarFlag = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2128,7 +2108,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.pagarFlag = false;
         return;
       }
       if (
@@ -2147,7 +2126,6 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.pagarFlag = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2162,14 +2140,12 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.pagarFlag = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.pagarFlag = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2187,7 +2163,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.pagarFlag = false;
         return;
       }
 
@@ -2202,7 +2177,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.pagarFlag = false;
         return;
       }
 
@@ -2242,7 +2216,7 @@ export default {
             "noopener"
           );
         }
-        this.pagarFlag = false;
+
         if (this.ventas.length == 1) {
           window.location.reload();
         } else {
@@ -2485,9 +2459,8 @@ export default {
         );
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
-        // prod.ProductoPresentacion = producto.Descripcion;
-        prod.ProductoDesc = producto.Descripcion;
-        // prod.Descripcion = producto.Descripcion;
+        prod.ProductoPresentacion = producto.Descripcion;
+        prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
@@ -2594,6 +2567,7 @@ export default {
       this.metodoPagoCambio(1);
     },
     cambiarPresentacion(obj, esPresentacion) {
+      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
@@ -2610,11 +2584,13 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-      if (this.index !== null && this.index !== undefined) {
+
+      if (this.index) {
         Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       } else {
-        this.ventas[this.ventaActiva].productos.unshift(producto);
+        productos.unshift(producto);
       }
+
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
