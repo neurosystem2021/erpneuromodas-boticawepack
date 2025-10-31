@@ -1134,7 +1134,10 @@ export default {
     },
     igv() {
       this.productos.forEach((prod, index) => {
-        const nuevoPrecio = prod.PrecioContado * (1 + (this.igv == 1 ? 0 : 0));
+        const nuevoPrecio =
+          this.TipoCambio == 1 || this.TipoCambio == 0
+            ? Number(parseFloat(prod.PrecioContado).toFixed(2))
+            : Number((prod.PrecioContado / this.TipoCambio).toFixed(2));
         this.$set(
           this.productos[index],
           "precio",
