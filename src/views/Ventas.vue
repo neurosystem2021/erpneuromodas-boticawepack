@@ -1161,7 +1161,11 @@ export default {
         },
         vendedor: {},
         adelantosPreOrden: [],
-        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        //FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        // Incrementar un dia mas a la fecha actual
+        FechaCredito: this.$moment()
+          .add(1, "day")
+          .format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
