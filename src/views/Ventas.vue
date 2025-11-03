@@ -1364,7 +1364,12 @@ export default {
           this.$refs.inputVendedor.setValue("");
           //this.$refs.inputComisionista.setValue('')
           this.$refs.carrito.pagocon = 0;
+          const url = this.$router.resolve({
+            name: "Shipment",
+            params: { id: response.data.insertId }
+          }).href;
 
+          window.open(url, "_blank");
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
             "_blank",
