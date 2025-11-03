@@ -732,6 +732,7 @@ export default {
     },
     initForm() {
       this.venta = {
+        IdProforma: false,
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -963,6 +964,7 @@ export default {
       }
 
       if (typeof obj === "object") {
+        this.venta.IdProforma = obj.IdProforma;
         this.$refs.inputCliente.setValue(obj.Cliente);
         this.$refs.inputMoneda.setValue(obj.IdMoneda);
         if (typeof obj.IdMoneda !== "undefined") {

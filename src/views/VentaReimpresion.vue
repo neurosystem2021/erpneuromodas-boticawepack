@@ -43,9 +43,10 @@
             :current-page="currentPage">
           
               <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+                  <a class="btn btn-info" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               
                   <b-button class="btn btn-success" target="_blank" @click="irARemision(data.item.idDocVenta)"  > GUÍA REMISIÓN</b-button>
+                  <b-button class="btn btn-warning" target="_blank" @click="irAShipment(data.item.idDocVenta)"  > SHIPMENT</b-button>
               </template>
           </b-table>
             <b-row>
@@ -105,6 +106,14 @@ export default {
         name: "Remision",
         params: {
           IdDocVenta: IdDocVenta
+        }
+      });
+    },
+    irAShipment(IdDocVenta) {
+      this.$router.push({
+        name: "Shipment",
+        params: {
+          id: IdDocVenta
         }
       });
     },

@@ -36,6 +36,7 @@ import Cotizacion from "@/views/Cotizacion.vue";
 import Cobros from "@/views/Cobros.vue";
 import Usuario from "@/views/Usuario.vue";
 import Ordenes from "../views/reportes/Ordenes.vue";
+import Shipment from "../views/reportes/Shipment.vue";
 import ReporteRegMovimiento from "../views/reportes/ReporteRegMovimiento.vue";
 import ReporteUtilidadBrutaPorUsuario from "../views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 
@@ -223,6 +224,11 @@ export default new Router({
       path: "/ReporteRegMovimiento",
       name: "ReporteRegMovimiento",
       component: ReporteRegMovimiento
+    },
+    {
+      path: "/shipment/:id",
+      name: "Shipment",
+      component: Shipment
     }
   ]
 });
