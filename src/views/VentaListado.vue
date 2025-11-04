@@ -2445,12 +2445,12 @@ export default {
           pres = newPres.filter(v => v.cantidad > 0);
         }
         prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
+        // prod.Descripcion = producto.ProductoPresentacion
+        //   ? prod.ProductoPresentacion
+        //   : "UNIDAD";
+        // prod.ProductoPresentacion = producto.ProductoPresentacion
+        //   ? prod.ProductoPresentacion
+        //   : "UNIDAD";
         prod.cantidad = 1;
         prod.precio = producto.PrecioContado;
         prod.descuento = 0;
@@ -2459,12 +2459,15 @@ export default {
         );
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
+        // prod.ProductoPresentacion = producto.Descripcion;
+        // prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        prod.ProductoPresentacion = producto.ProductoPresentacion;
+        prod.Descripcion = producto.presentacion;
+        prod.ProductoDesc = producto.ProductoDesc;
         productos.push(prod);
       });
 

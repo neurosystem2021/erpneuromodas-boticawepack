@@ -6,7 +6,6 @@
         
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
-                class="modalOrdenCompra"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
@@ -76,7 +75,7 @@
                      <b-table 
                         v-if="show"
                         id="table-proformas" 
-                        ref="tableProformas"
+                        ref="tableProformasFavoritas"
                        :filter="filter"
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"
@@ -182,8 +181,8 @@ export default {
         "update",
         "ver",
         "verTicket",
+        // "Anular"
         ,
-        "Anular"
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -218,12 +217,22 @@ export default {
       this.axios
         .get(this.API + "proformas/detalle", {
           params: {
-            idProforma: proforma.IdProforma,
-            IdAlmacen: sessionStorage.getItem("IdAlmacen")
+            idProforma: proforma.IdProforma
           }
         })
         .then(response => {
           response.data.map(item => {
+            let ProductoPresentacion = "";
+            let presentacion = null;
+            let ProductoDesc = item.Descripcion;
+
+            if (!item.Presentacion) {
+              presentacion = "UNIDAD";
+            } else {
+              let pres = JSON.parse(item.Presentacion);
+              presentacion = pres.nombre;
+              ProductoPresentacion = pres;
+            }
             this.add([
               item.IdProducto,
               () => {
@@ -237,11 +246,14 @@ export default {
               }
             ]);
 
+            item.ProductoPresentacion = ProductoPresentacion;
+            item.presentacion = presentacion;
+            item.ProductoDesc = ProductoDesc;
             this.filter = "";
             this.show = false;
           });
           proforma.productos = response.data;
-          // console.log(proforma);
+          console.log(proforma.productos);
 
           // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
           this.$emit("onSelectProforma", proforma);
@@ -249,16 +261,17 @@ export default {
         });
     },
     myProvider(ctx) {
+      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
       let promise = this.axios.get(
         this.API +
           "proformas?limit=" +
           ctx.perPage +
           "&page=" +
           ctx.currentPage +
-          "&IdAlmacen="+IdAlmacen +
+          "&IdAlmacen=" +
+          IdAlmacen +
           "&filter=" +
           ctx.filter
       );
@@ -303,7 +316,10 @@ export default {
             .then(res => {
               if (res.data) {
                 this.$toasted.info("¡PROFORMA ANULADA!");
-                this.$refs.tableProformas.refresh();
+                if (this.$refs.tableProformas) {
+                  this.$refs.tableProformas.refresh();
+                  this.$refs.tableProformasFavoritas.refresh();
+                }
               }
             })
             .catch(err => {
