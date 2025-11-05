@@ -790,7 +790,7 @@
           ></b-select> 
           <br>
           <br>
-        <b-button type="submit" variant="success">Aceptar</b-button>
+        <b-button type="submit" variant="success" :disabled="loading">Aceptar</b-button>
         <b-button variant="danger">Cancelar</b-button>
       </b-form>
   </b-modal>
@@ -885,6 +885,7 @@ export default {
       diasValidosProf: 1,
       adelantosPreOrden: [],
       lstTotalPorEmpresa: [],
+      
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -936,7 +937,8 @@ export default {
       },
       empresa: "imperiop2",
       ventaSinStock: 0,
-      idPerfil: sessionStorage.getItem("IdPerfil") || 0
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0,
+      loading: false
     };
   },
   watch: {
@@ -1884,7 +1886,12 @@ export default {
         : "";
       // ------------------------- aqui paga
       this.loading = true;
-      await this.$store.state.empresas.forEach(async element => {
+      const empresas = [
+        ...new Map(this.$store.state.empresas.map(e => [e.value, e])).values()
+      ];
+      // console.log(empresas);
+      // return
+      for (const element of empresas) {
         let data = { ...this.venta };
         let serie = await this.obtenerSerie(element.value);
         let almacen = await this.obtenerAlmacen(element.value);
@@ -1975,7 +1982,8 @@ export default {
 
           this.$toasted.success("Venta realizada con exito");
         }
-      });
+        this.loading = false;
+      }
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios

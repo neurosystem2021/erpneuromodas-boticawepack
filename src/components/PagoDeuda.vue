@@ -161,162 +161,191 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 
-    export default {
-        mounted () {
-            this.initForm()
-            this.getVendedor()
-        },
-        data () {
-            return {
-                API: config.API,
-                documentos: [],
-                pagos: [],
-                cajaBanco: {},
-                vendedor: {},
-                show: false,
-                cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
-            }
-        },
-        methods: {
-            initForm () {
-                this.vendedor = {}
-                this.documentos = []
-                this.pagos = []
-                this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
-                this.cajaBanco = {
-                    FechaDoc: this.$moment().format("YYYY-MM-DD")
-                }
-                this.$refs.inputCliente.setValue('')
-            },
-            getVendedor () {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'usuarios/' + usuario)
-                .then((response) => {
-                    this.setVendedor(response.data)
-                    this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                    // this.$refs.inputVendedor.$refs.input.disabled = true
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            setVendedor (obj) {
-                this.vendedor = obj
-            },
-            focusAutocomplete (ref) {
-                this.$refs[ref].handleDoubleClick()
-            },
-            cargarDeuda (cliente) {
-                this.cajaBanco.cliente = cliente
+export default {
+  mounted() {
+    this.initForm();
+    this.getVendedor();
+  },
+  props: {
+    Cliente: {}
+  },
+  data() {
+    return {
+      API: config.API,
+      documentos: [],
+      pagos: [],
+      cajaBanco: {},
+      vendedor: {},
+      show: false,
+      cuentas: [{ value: null, text: "-- SELECCIONE CUENTA --" }]
+    };
+  },
+  methods: {
+    initForm() {
+      console.log(this.Cliente);
+      this.vendedor = {};
+      this.documentos = [];
+      this.pagos = [];
+      this.cuentas = [{ value: null, text: "-- SELECCIONE CUENTA --" }];
+      this.cajaBanco = {
+        FechaDoc: this.$moment().format("YYYY-MM-DD")
+      };
+      this.$refs.inputCliente.setValue("");
+    },
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          this.setVendedor(response.data);
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.$refs.input.disabled = true
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    setVendedor(obj) {
+      this.vendedor = obj;
+    },
+    focusAutocomplete(ref) {
+      this.$refs[ref].handleDoubleClick();
+    },
+    cargarDeuda(cliente) {
+      this.cajaBanco.cliente = cliente;
 
-                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
-                .then((response) => {
-                    response.data.map(data=>data.NotasCredito=JSON.parse(data.NotasCredito) )
-                    this.documentos = response.data
-                    this.documentos.map(d=>d.cuenta=null)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
+      this.axios
+        .get(this.API + "cliente/deudas?idCliente=" + cliente.IdCliente)
+        .then(response => {
+          response.data.map(
+            data => (data.NotasCredito = JSON.parse(data.NotasCredito))
+          );
+          this.documentos = response.data;
+          this.documentos.map(d => (d.cuenta = null));
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
 
-                this.cargarPagos(cliente)
-                this.cargarCuentas()
-            },
-            cargarPagos (cliente) {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
-                .then((response) => {
-                   this.pagos = response.data
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            cargarCuentas(){
-                 this.axios.get(this.API + 'cuentas')
-                .then((response) => {
-                   this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
-                   response.data.map(c=>{
-                       this.cuentas.push({value:c.IdCuenta,text:c.Cuenta})
-                       })
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            },
-            guardarPago (evt) {
-                evt.preventDefault()
-                let importe = 0
-                let cuentaSelec= true
-                this.documentos.map(doc => {
-                    if (doc.aplicar > 0) {
-                        importe += doc.aplicar
-                    }
-                })
-
-                if(importe === 0) {
-                    this.$toasted.show('Error: no ha ingresado ningun importe');
-                    this.isLoading = false;
-                    return;
-                }
-
-                for (let index = 0; index < this.documentos.length; index++) {
-                    if (Math.round(this.documentos[index].aplicar* 100) / 100 > Math.round(this.documentos[index].Saldo * 100) / 100){
-                        this.isLoading = false;
-                        this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo');
-                        return;
-                    }
-                    
-                }
-
-                this.documentos.map(doc => {
-                    if(parseFloat(doc.aplicar)>0 && doc.cuenta == null){
-                        cuentaSelec = false
-                    }
-                });
-
-                if(!cuentaSelec){
-                        this.$toasted.show('Error: Seleccione la cuenta para completar el pago');
-                        this.isLoading = false;
-                        return
-                }
-
-                let cuentasId =[]
-                this.cuentas.map(c=>{
-                        if(c.value!==null){                        
-                        cuentasId.push(c.value)
-                        }
-                })  
-
-                this.axios.post(this.API + 'cliente/deudas/pagar', {
-                    cajaBanco: this.cajaBanco,
-                    documentos: this.documentos,
-                    vendedor: this.vendedor,
-                    cuentas: cuentasId
-                })
-                .then((response) => {
-                    console.log(response.data)
-                    this.$toasted.show('Se pagó la deuda del cliente.')
-                    this.show = false
-                    this.initForm()
-                    // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-                })
-            }
+      this.cargarPagos(cliente);
+      this.cargarCuentas();
+    },
+    cargarPagos(cliente) {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "cliente/pagos?idCliente=" + cliente.IdCliente)
+        .then(response => {
+          this.pagos = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    cargarCuentas() {
+      this.axios
+        .get(this.API + "cuentas")
+        .then(response => {
+          this.cuentas = [{ value: null, text: "-- SELECCIONE CUENTA --" }];
+          response.data.map(c => {
+            this.cuentas.push({ value: c.IdCuenta, text: c.Cuenta });
+          });
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    guardarPago(evt) {
+      evt.preventDefault();
+      let importe = 0;
+      let cuentaSelec = true;
+      this.documentos.map(doc => {
+        if (doc.aplicar > 0) {
+          importe += doc.aplicar;
         }
+      });
+
+      if (importe === 0) {
+        this.$toasted.show("Error: no ha ingresado ningun importe");
+        this.isLoading = false;
+        return;
+      }
+
+      for (let index = 0; index < this.documentos.length; index++) {
+        if (
+          Math.round(this.documentos[index].aplicar * 100) / 100 >
+          Math.round(this.documentos[index].Saldo * 100) / 100
+        ) {
+          this.isLoading = false;
+          this.$toasted.show(
+            "Error: No puede ingresar un monto mayor al Saldo"
+          );
+          return;
+        }
+      }
+
+      this.documentos.map(doc => {
+        if (parseFloat(doc.aplicar) > 0 && doc.cuenta == null) {
+          cuentaSelec = false;
+        }
+      });
+
+      if (!cuentaSelec) {
+        this.$toasted.show(
+          "Error: Seleccione la cuenta para completar el pago"
+        );
+        this.isLoading = false;
+        return;
+      }
+
+      let cuentasId = [];
+      this.cuentas.map(c => {
+        if (c.value !== null) {
+          cuentasId.push(c.value);
+        }
+      });
+
+      this.axios
+        .post(this.API + "cliente/deudas/pagar", {
+          cajaBanco: this.cajaBanco,
+          documentos: this.documentos,
+          vendedor: this.vendedor,
+          cuentas: cuentasId
+        })
+        .then(response => {
+          console.log(response.data);
+          this.$toasted.show("Se pagó la deuda del cliente.");
+          this.show = false;
+          this.initForm();
+          // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
+        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
+  },
+  watch: {
+    show() {
+      if (this.show) {
+        this.$nextTick(() => {
+          this.cargarDeuda(this.Cliente);
+          setTimeout(() => {
+            this.$refs.inputCliente.setValue(this.Cliente.Cliente);
+          }, 1000);
+        });
+      }
+    }
+  }
+};
 </script>
 <style>
-#modalConfigVenta .modal-dialog{
-    max-width: 65% !important;
+#modalConfigVenta .modal-dialog {
+  max-width: 65% !important;
 }
 </style>

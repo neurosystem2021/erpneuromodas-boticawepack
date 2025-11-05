@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="bv-example-row px-5" fluid >
         <b-row>
           <!-- <b-col md="12" class="my-1">
             <b-form-select
@@ -12,7 +12,7 @@
               @change="cambiarEmpresa"
             ></b-form-select>
           </b-col> -->
-             <b-col md="6" class="my-1">
+             <b-col md="3" class="my-1">
             <b-form-group horizontal label="Buscar" class="mb-0">
              
               <b-input-group>
@@ -24,7 +24,17 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="6" class="my-1">
+          <b-col md="3">
+             <b-form-group horizontal label="Desde:" class="mb-0">
+               <input type="date" v-model="fechaDesde" class="form-control">
+              </b-form-group>
+          </b-col>
+          <b-col md="3">
+             <b-form-group horizontal label="Hasta:" class="mb-0">
+               <input type="date" v-model="fechaHasta" class="form-control">
+              </b-form-group>
+          </b-col>
+          <b-col md="3" class="my-1">
             <b-row>
             <b-col md="8">
 
@@ -110,6 +120,8 @@ export default {
       productoSelect: {},
       items: [],
       isBusy: false,
+      fechaDesde: this.$moment().format("YYYY-MM-DD"),
+      fechaHasta: this.$moment().format("YYYY-MM-DD"),
       fields: [
         { key: "idDocVenta", label: "ID", sortable: true },
         { key: "Correlativo", sortable: true },
@@ -148,7 +160,9 @@ export default {
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-      let url = `${this.API}ventas?noFecha=1&limit=${ctx.perPage}&page=${
+      let url = `${this.API}ventas?noFecha=0&limit=${ctx.perPage}&fechaDesde=${
+        this.fechaDesde
+      }&fechaHasta=${this.fechaHasta}&page=${
         ctx.currentPage
       }&filter=${ctx.filter || ""}&sortBy=${ctx.sortBy}&id_empresa=${
         this.empresa
@@ -182,7 +196,15 @@ export default {
         });
     }
   },
-  components: {}
+  components: {},
+  watch: {
+    fechaDesde() {
+      this.$refs.tablaVentas.refresh();
+    },
+    fechaHasta() {
+      this.$refs.tablaVentas.refresh();
+    }
+  }
 };
 </script>
 

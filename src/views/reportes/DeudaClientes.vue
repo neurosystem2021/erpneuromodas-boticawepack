@@ -84,7 +84,11 @@
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage"
-            @row-clicked="myRowClickHandler"></b-table>
+            @row-clicked="myRowClickHandler">
+            <template slot="pagar" slot-scope="data">
+              <pago-deuda :Cliente="data.item"> </pago-deuda>
+            </template>
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -101,12 +105,14 @@
       <b-modal id="modalDetalleDeuda" size="lg" modal-class="modal-xl" v-model="showLetras" ok-only ok-title="Cerrar" title="Detalle de Deuda">
            <detalle-deuda-cliente ref="detDeuCli"></detalle-deuda-cliente>
       </b-modal>
+      
   </div>
 </template>
 
 <script>
 import config from '@/store/config.js'
 import DetalleDeudaCliente from '@/components/DetalleDeudaCliente.vue'
+import PagoDeuda from "@/components/PagoDeuda";
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
@@ -136,6 +142,7 @@ export default {
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
             { key: 'Letras', label: 'Letras', sortable: true },
+            { key: 'pagar', label: '', sortable: false },
       ],
       totalRows: 50,
       perPage: 50,
@@ -190,7 +197,8 @@ export default {
   },
   components: {
       // ProductoForm
-    DetalleDeudaCliente
+    DetalleDeudaCliente,
+     PagoDeuda,
   }
 }
 </script>
