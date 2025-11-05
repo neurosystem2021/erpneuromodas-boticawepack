@@ -874,6 +874,8 @@ export default {
         //prod.cantidad = Number(val)
       }
       prod.subt = "";
+      prod.descuento =
+        (prod.cantidad * prod.precio * prod.DescPorcentaje) / 100;
       this.$nextTick(() => {
         this.actualizarProd({ Producto: prod, Pos: index });
       });
@@ -1432,7 +1434,7 @@ export default {
     },
     actualizarDescuentoPorcentaje(index) {
       let obj = this.productos[index];
-      obj.descuento = (obj.precio * obj.DescPorcentaje) / 100;
+      obj.descuento = (obj.cantidad * obj.precio * obj.DescPorcentaje) / 100;
       this.actualizarProd({ Producto: obj, Pos: index });
     },
     getSubtotal(index) {
