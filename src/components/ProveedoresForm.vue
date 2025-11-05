@@ -70,10 +70,21 @@ export default {
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data.result
-          this.proveedor.Proveedor = data.RazonSocial
-          this.proveedor.Direccion = data.Direccion
+            // Verificar si la respuesta trae datos válidos
+          if (response.data && response.data.result) {
+            const data = response.data.result
+            this.proveedor.Proveedor = data.RazonSocial || ''
+            this.proveedor.Direccion = data.Direccion || ''
+            this.$toasted.show('Proveedor encontrado, se llenarán sus datos')
+          } else if (response.data && response.data.razonSocial) {
+            // Algunos servicios devuelven en minúscula o sin "result"
+            this.proveedor.Proveedor = response.data.razonSocial || ''
+            this.proveedor.Direccion = response.data.direccion || ''
+            this.$toasted.show('Proveedor encontrado, se llenarán sus datos')
+          } else {
+            this.$toasted.show('No se encontró el RUC')
+            console.log('Respuesta inesperada:', response.data)
+          }
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el RUC')        
