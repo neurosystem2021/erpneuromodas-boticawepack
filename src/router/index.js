@@ -43,6 +43,8 @@ import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -260,6 +262,16 @@ export default new Router({
       path: "/reporte/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
-    }
+    },
+    {
+      path: "/reportes/ReporteRegMovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
   ]
 });
