@@ -2587,8 +2587,7 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-
-      if (this.index) {
+      if (this.index != null) {
         Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       } else {
         productos.unshift(producto);
