@@ -41,6 +41,9 @@ import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import Dashboard from "@/views/reportes/Dashboard.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
@@ -259,6 +262,21 @@ export default new Router({
       path: "/reporte/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
+    },
+    {
+      path: "/reportes/ReporteRegMovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
+    {
+      path: "/reportes/Dashboard",
+      name: "Dashboard",
+      component: Dashboard
     }
   ]
 });
