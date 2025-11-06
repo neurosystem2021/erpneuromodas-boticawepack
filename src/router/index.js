@@ -45,6 +45,7 @@ import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrut
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import Dashboard from "@/views/reportes/Dashboard.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -272,6 +273,11 @@ export default new Router({
       path: "/reportes/ReporteRegistroVentas",
       name: "ReporteRegistroVentas",
       component: ReporteRegistroVentas
+    },
+    {
+      path: "/reportes/Dashboard",
+      name: "Dashboard",
+      component: Dashboard
     },
   ]
 });
