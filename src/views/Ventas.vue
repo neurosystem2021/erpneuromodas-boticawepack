@@ -457,19 +457,32 @@ import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
 import DeliveryModal from '@/components/DeliveryModal.vue'
 import Swal from 'sweetalert2'
+
 export default {
     beforeMount () {
         this.initForm()
     },
+
     mounted () {
         // this.getNumeroVenta()
         this.getVendedor()
         //setInterval(this.updateTime, 1000)
         this.loadClienteVarios()
         this.loadComisionista()
-        this.escucharPedidos()
+        
+        // ✅ NUEVO: Conectar socket y configurar listeners
+        this.conectarSocket()
+        this.setupSocketListeners()
+        
         this.getEstadoSistema()
     },
+
+    beforeDestroy() {
+        // ✅ NUEVO: Remover listeners y desconectar
+        this.removeSocketListeners()
+        this.$socket.disconnect()
+    },
+
     data () {
         return {
             isNota: false,
@@ -489,6 +502,14 @@ export default {
             bloquearInput:false,
             diasValidosProf:1,
             adelantosPreOrden:[],
+            
+            // ✅ NUEVO: Guardar referencias de listeners
+            listeners: {
+                nuevoPedido: null,
+                connect: null,
+                disconnect: null
+            },
+            
             itemsMotivoNota: [
                 { value: null, text: '-- SELECCIONE EL MOTIVO --' },
                 { value: '01', text: 'ANULACION DE LA OPERACION' },
@@ -510,9 +531,6 @@ export default {
                     { key: 'Descripcion', label: 'Descripción'},
                     { key: 'eventPres', label: '' },
                     { key: 'cantxPrecio', variant: 'warning' },
-                    // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
-                    // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
-                    /*{ key: 'ProductoMedicion', label: 'Medición' },*/
                     { key: 'cantidad' },
                     { key: 'precio', label: 'Precio' },
                     { key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -526,11 +544,13 @@ export default {
             fechaUltPago:''
         }
     },
+
     watch: {
         totalCart (newVal) {
-             this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.yape.monto))).toFixed(2)
+            this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.yape.monto))).toFixed(2)
         }
     },
+
     computed: {
         ...mapState({
             productos: state => state.cart.productos,
@@ -539,16 +559,15 @@ export default {
         manoDeObraBruta () {
             let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
             let precio = pManoObra ? pManoObra.precioBruta : 0;
-
             return precio
         },
         manoDeObraNeta () {
             let pManoObra = this.productos.find(p => p.CodigoBarra === 'MANODEOBRA');
             let precio = pManoObra ? pManoObra.precio : 0;
-
             return precio
         }
     },
+
     methods: {
         ...mapActions({
             aplicarDescuento: 'aplicarDescuentoGeneral',
@@ -557,6 +576,75 @@ export default {
             actualizarPrecioConvenio: 'actualizarPrecioConvenio',
             add:'agregarProducto'
         }),
+
+        /**
+         * ✅ NUEVO: Conectar socket
+         */
+        conectarSocket() {
+            if (!this.$socket.connected) {
+                console.log('🔗 Conectando socket...')
+                this.$socket.connect()
+            }
+        },
+
+        /**
+         * ✅ NUEVO: Configurar todos los listeners
+         */
+        setupSocketListeners() {
+            // Evento: Conectado
+            this.listeners.connect = () => {
+                console.log('✅ Socket conectado en VentasForm')
+            }
+            this.$socket.on('connect', this.listeners.connect)
+
+            // Evento: Desconectado
+            this.listeners.disconnect = () => {
+                console.log('❌ Socket desconectado en VentasForm')
+            }
+            this.$socket.on('disconnect', this.listeners.disconnect)
+
+            // Evento: Nuevo pedido
+            this.listeners.nuevoPedido = (data) => {
+                if(this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
+                    this.$toasted.success('Nuevo Pedido de ' + "<strong>" + data.nombre + "</strong>");  
+                    this.$refs.deliveryModal.getPedidos();  
+                } else {
+                    if(this.$refs.deliveryModal) {
+                        this.$refs.deliveryModal.getPedidos();
+                    }
+                    this.$swal({
+                        position: 'top-end',
+                        icon: 'info',
+                        target: document.getElementById('conten'),
+                        title: 'Pedido de Delivery de: <br> ' + "<strong>" + data.nombre + "</strong>",
+                        showConfirmButton: true,
+                        confirmButtonText: 'Mostrar Pedidos',
+                        confirmButtonColor:'#3880ff'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if(this.$refs.deliveryModal) {
+                                this.$refs.deliveryModal.show = true
+                            }
+                        } else if (result.isDenied) {
+                            console.log("Denegado");
+                        }
+                    })
+                }
+            }
+            this.$socket.on('nuevo-pedido', this.listeners.nuevoPedido)
+        },
+
+        /**
+         * ✅ NUEVO: Remover todos los listeners
+         */
+        removeSocketListeners() {
+            this.$socket.off('connect', this.listeners.connect)
+            this.$socket.off('disconnect', this.listeners.disconnect)
+            this.$socket.off('nuevo-pedido', this.listeners.nuevoPedido)
+        },
+
+        // ===== MÉTODOS ORIGINALES (sin cambios) =====
+
         getEstadoSistema(){
             let hostUrl = sessionStorage.getItem('HostUrl')
             if(hostUrl != null){
@@ -579,6 +667,7 @@ export default {
                 this.pagosPendientes = 0
             }
         },
+
         loadClienteVarios () {
             this.axios.get(this.API + 'clientes/00000000')
                 .then(res => {
@@ -587,6 +676,7 @@ export default {
                     }
                 })
         },
+
         loadComisionista () {
             this.axios.get(this.API + 'comisionista/0000')
                 .then(res => {
@@ -595,19 +685,16 @@ export default {
                     }
                 })
         },
+
         prevent (evt) {
             if (evt.target.tagName !== 'TEXTAREA') {
                 evt.preventDefault();
             }
         },
-        selectPreOrden (orden) {
-            // console.log(orden)
-           // this.venta.IdPreOrden = this.venta.IdPreOrden || []
-           // if (Array.isArray(this.venta.IdPreOrden) ) {
-            this.venta.IdPreOrden.push(orden)
-            //}
 
-            // obtener total adelantos
+        selectPreOrden (orden) {
+            this.venta.IdPreOrden.push(orden)
+
             this.axios.get(this.API + 'preorden/cajaybanco', { 
                 params: { 
                     IdPreOrden      : orden.IdPreOrden,
@@ -625,6 +712,7 @@ export default {
                 this.adelanto = suma
             })
         },
+
         loadFirstAlmacen () {
             this.axios.get(this.API + 'almacenes/primero')
                 .then(res => {
@@ -632,18 +720,19 @@ export default {
                     this.venta.almacen = res.data
                 })
         },
+
         loadClienteBarcode (e) {
             e.preventDefault()
             let dni = this.dni;
-
             if (dni) {
                 this.setCliente(false, dni)
             }
         },
+
         focusAutocomplete (ref) {
-            // this.$refs[ref].type = ""
             this.$refs[ref].handleDoubleClick()
         },
+
         initForm () {
             this.venta = {
                 EsCredito: 0,
@@ -693,6 +782,7 @@ export default {
             this.adelanto = 0
             this.infoDelivery = {}
         },
+
         setTipoVenta (obj) {
             this.isNota = false
             this.bloquearInput=false,
@@ -701,7 +791,7 @@ export default {
             this.venta.NotaIdMotivo = ''
             this.venta.NotaDescMotivo = ''
             this.$refs.inputDocRef && this.$refs.inputDocRef.setValue('');
-            if (obj.CodSunat == "07" || obj.CodSunat == "08") { // 07 - nota de credito, 08 - Nota de debito
+            if (obj.CodSunat == "07" || obj.CodSunat == "08") {
                 this.isNota = true
             }
 
@@ -714,6 +804,7 @@ export default {
             this.venta.tipoVenta = obj
             this.getNumeroVenta()
         },
+
         setDocRef (obj) {
             this.venta.CodSunatModifica = obj.CodSunat
             this.venta.NroComprobanteModifica = obj.NroComprobante
@@ -733,7 +824,6 @@ export default {
                 console.log(error)
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
-             //Cargar producto del documento afectado nota credito
              this.axios.get(this.API + 'venta/detalle/comprobante', {
                     params: {
                         NroComprobante: obj.NroComprobante,
@@ -775,6 +865,7 @@ export default {
                     this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen})                 
                 })
         },
+
         setMotivo(ev){
             if(ev == '01' || ev == '02' || ev == '06' || ev == null){
                 this.bloquearInput=true;
@@ -782,17 +873,20 @@ export default {
                 this.bloquearInput=false;
             }
         },
+
         loadAlmacen(id) {
             this.axios.get(this.API + 'almacenes/id/' + id)
             .then(res => {
                 this.setAlmacen(res.data)
             })
         },
+
         setAlmacen (obj) {
             this.venta.almacen = obj
             this.$refs.inputAlmacen.setValue(obj.Almacen)
             this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen })
         },
+
         loadPuntoVenta (id) {
             this.axios.get(this.API + 'puntoventa/id/' + id)
             .then(res => {
@@ -800,17 +894,20 @@ export default {
                 this.getNumeroVenta()
             })
         },
+
         getTipoDoc (id) {
             this.axios.get(this.API + 'tipodoc/' + id)
                 .then(response => {
                     if (response.data) this.setTipoVenta(response.data)
                 })
         },
+
         setPuntoVenta (obj) {
             this.venta.puntoVenta = obj
             this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta)
             this.getNumeroVenta()
         },
+
         getVendedor () {
             let usuario = sessionStorage.getItem('User')
             this.axios.get(this.API + 'usuarios/' + usuario)
@@ -820,10 +917,8 @@ export default {
                 this.$refs.inputVendedor.$refs.input.disabled = true
                 this.loadAlmacen(response.data.IdAlmacen)
                 this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta)
-                // bloquear ambos inputs
                 this.$refs.inputAlmacen.$refs.input.disabled = true
                 this.$refs.inputPuntoVenta.$refs.input.disabled = true
-                //this.getNumeroVenta()
                 this.getTipoDoc(response.data.IdTipoDoc)
             })
             .catch((error) => {
@@ -831,12 +926,12 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
         },
-        setVendedor (obj) {
-            // console.log(obj)
-            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
+        setVendedor (obj) {
+            if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
             this.venta.vendedor = obj
         },
+
         setComisionista (obj) {
             if (typeof obj === 'object') {
                 this.$refs.inputComisionista.setValue(obj.Cliente)
@@ -845,6 +940,7 @@ export default {
                 this.venta.comisionista = {}
             }
         },
+
         setCliente (obj, dni = false) {
             let params = {}
             if (dni) {
@@ -878,10 +974,8 @@ export default {
                     console.log(error)
                 })
             }
-            
-            //this.actualizarPrecioConvenio(obj)
-            // Actualizar DisabledTotal
         },
+
         onSetProducto (obj, cant, precio) {
             if (cant && precio) {
                 obj.cantidad = cant
@@ -893,12 +987,14 @@ export default {
             obj.precio = obj.PrecioContado || 0
             return obj
         },
+
         onAddProducto (obj) {
             this.actualizarDescuento()
             this.obtenerStok({
                 IdAlmacen: this.venta.almacen.IdAlmacen
             })
         },
+
         actualizarDescuento () {
             if (this.puntosAplicados > 0) {
                 this.aplicarPuntos(this.puntosAplicados)
@@ -908,6 +1004,7 @@ export default {
                 this.aplicarDescuentoGeneral(this.descuentoGeneral)
             }
         },
+
         aplicarPuntos (val) {
             if (parseFloat(val) > this.venta.cliente.Puntos) { 
                 this.puntosAplicados = this.venta.cliente.Puntos
@@ -923,10 +1020,12 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
         },
+
         aplicarDescuentoGeneral (val) {
             this.puntosAplicados = 0
             this.aplicarDescuento(val)
         },
+
         getNumeroVenta () {
             this.axios.get(this.API + 'ventas/numero', {
                 params: {
@@ -943,9 +1042,11 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
             })
         },
+
         updateTime () {
             this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss")
         },
+
         limpiarDespuesVenta () {
             this.inProgress = false
             this.tieneIgv = false
@@ -953,12 +1054,8 @@ export default {
             this.limpiarCart()
             this.getVendedor()
             this.$refs.inputCliente.setValue('')
-            // this.getNumeroVenta()
-            // this.$refs.inputTipoVenta.setValue('TICKET')
-            // this.$refs.inputAlmacen.setValue('VENTA')
-            // this.$refs.inputPuntoVenta.setValue('CAJA1')
-            // this.$refs.inputVendedor.setValue('')
         },
+
         guardarProforma () {
             this.inProgress = true
 
@@ -985,6 +1082,7 @@ export default {
                 this.inProgress = false
                 return
             }
+
             if(this.venta.ProformaSinPrecio == 1){
                 this.productos.map((p)=>{
                     p.disabledProf = 1
@@ -993,6 +1091,7 @@ export default {
 
             this.venta.productos = this.productos
             this.venta.diasValidosProf = this.diasValidosProf
+
             this.axios.post(this.API + 'proformas', this.venta)
             .then((response) => {
                 this.$toasted.success('Proforma Guardada con exito')
@@ -1008,6 +1107,7 @@ export default {
                 this.inProgress = false
             })
         },
+
         guardarVenta (evt) {
             evt.preventDefault();
 
@@ -1067,7 +1167,6 @@ export default {
                 return
             }
 
-            //Nota de Creadito
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
                 if (!this.venta.CodSunatModifica || !this.venta.NroComprobanteModifica) {
                     this.$toasted.show('Debe seleccionar un Documento de Referencia...')
@@ -1088,10 +1187,10 @@ export default {
                 return          
             }
 
-            // NO PERMITE CANTIDAD Y PRECIOS 0
             let sinStock = 0
             let totalCero = 0 
             let menosUtilidad = 0
+
             this.productos.forEach(pro => {
                 if((pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA') && ((pro.stock <= 0) || (parseFloat(pro.cantidad) > pro.stock))) {
                     sinStock += 1
@@ -1100,10 +1199,6 @@ export default {
                 if(parseFloat(pro.total) <= 0) {
                     totalCero += 1
                 }
-
-                /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
-                    menosUtilidad += 1
-                }*/
 
                 if((parseFloat(pro.precio)-pro.PrecioCosto < 0) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')){
                     menosUtilidad += 1
@@ -1115,7 +1210,7 @@ export default {
                 this.inProgress = false            
                 return;
             }
-
+            
             if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != '07') {
                 this.$toasted.error('No se puede vender un producto sin stock');
                 this.inProgress = false            
@@ -1142,10 +1237,9 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
-
-                // limpiar preorden seleccionado
                 this.$router.replace('/ventas')
                 this.$toasted.success('Venta realizada con exito')
                 this.inProgress = false
@@ -1172,14 +1266,17 @@ export default {
                 this.inProgress = false
             })
         },
+
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
             this.venta.cliente = {}
         },
+
         eliminarComisionista () {
             this.$refs.inputComisionista.setValue('')
             this.venta.comisionista = {}
         },
+
         onPagarDelivery(obj){
             this.$route.query.idPedido = obj.IdPedido
             if(this.$route.query.idPedido){
@@ -1187,7 +1284,7 @@ export default {
                 this.infoDelivery = obj
                 this.venta.EsDelivery = true
                 this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2)
-                //cargar costo de delivery
+                
                 let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2)
                 if (costoDelivery>0) {
                     this.axios.get(this.API +'costo/delivery')
@@ -1201,9 +1298,8 @@ export default {
                                 costoDeliverObj.descuento = 0
                                 costoDeliverObj.indicacion = ''
                                 this.add([response.data, () => {
-                                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }) 
                                 }, { setPrecioCosto: false }, false ,false ])
-                                //Cargar Productos Delivery
+                                
                                 let productos = JSON.parse(obj.Productos)
                                 console.log(productos);
                                 productos.map((item) => {
@@ -1222,7 +1318,6 @@ export default {
                         this.$toasted.show('HUBO UN ERROR')
                     })
                 } else {
-                    //Cargar Productos Delivery
                     let productos = JSON.parse(obj.Productos)
                     productos.map((item) => {
                         this.add([item.IdProducto, () => {
@@ -1232,9 +1327,9 @@ export default {
                     this.venta.nombreLlevar = (obj.Cliente || 'SIN NOMBRE')
                     this.venta.DireccionEntrega = obj.Direccion
                 }
-                 
             }
         },
+
         anularPagoDelivery(){
             this.limpiarCart()
             this.venta.EsDelivery = false
@@ -1247,36 +1342,9 @@ export default {
             this.venta.nombreLlevar = ''
             this.venta.DireccionEntrega = ''
             this.$router.replace('/ventas')
-        },
-        //Sockets
-        escucharPedidos(){
-            this.sockets.subscribe('nuevo-pedido', (data) => {
-            if(this.$refs.deliveryModal.show){
-                this.$toasted.success('Nuevo Pedido de' + "<strong>"+data.nombre+"</strong>");  
-                this.$refs.deliveryModal.getPedidos();  
-            }else{
-                this.$refs.deliveryModal.getPedidos();
-                this.$swal({
-                    position: 'top-end',
-                    icon: 'info',
-                    target: document.getElementById('conten'),
-                    title: 'Pedido de Delivery de: <br> ' + "<strong>"+data.nombre+"</strong>",
-                    showConfirmButton: true,
-                    confirmButtonText: 'Mostrar Pedidos',
-                    confirmButtonColor:'#3880ff'
-                }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                this.$refs.deliveryModal.show=true;
-                } else if (result.isDenied) {
-                    console.log("Denegado");
-                }
-                })
-            }
-            });
-        },
-        //Fin Sockets
+        }
     },
+
     components: {
         ProductosCarrito,
         ClientesForm,
@@ -1288,6 +1356,7 @@ export default {
     }
 }
 </script>
+
 <style scoped>
 .alert {
     margin-bottom: 0;
