@@ -1629,51 +1629,44 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
-      console.log(producto.precio);
       let productos = this.ventas[this.ventaActiva].productos;
+
+      // Si ya existe, solo suma cantidad
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+        productos.filter(v => v.IdProducto == producto.IdProducto)[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
         });
-
         return false;
       }
-      // console.log("producto", producto);
+
+      // Obtiene el producto completo con stock y presentaciones
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod.PreciosPorProducto);
+
+      // Filtra solo las presentaciones válidas
       let pres = [];
       if (prod.PreciosPorProducto) {
         let newPres = JSON.parse(prod.PreciosPorProducto);
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.PrecioCostoPre = producto.PrecioCosto;
+
+      // Inicializa datos base
+      prod.Descripcion = prod.ProductoPresentacion || "UNIDAD";
+      prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
+      prod.PrecioCosto = producto.PrecioCosto;
+      prod.PrecioCostoBase = producto.PrecioCosto; //  guarda el costo base real
       prod.cantidad = producto.cantidad ? producto.cantidad : 1;
       prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
+      prod.tienePresentacion = prod.PreciosPorProducto.some(v => v.cantidad > 0);
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      prod.PrecioCost = producto.PrecioCosto;
-      this.showPresentacion(prod, null);
-      // productos.unshift(prod);
 
-      // this.$nextTick(() => {
-      //   this.irTxtLoadBarcode();
-      // });
+      // Muestra modal de presentaciones con una copia aislada
+      this.showPresentacion(JSON.parse(JSON.stringify(prod)), null);
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
@@ -2481,35 +2474,41 @@ export default {
       });
     },
     showPresentacion(prod, index) {
-      this.producto = { ...prod };
+      this.producto = JSON.parse(JSON.stringify(prod));
       this.index = index;
       this.modalPresentacion = true;
     },
     cambiarPresentacion(obj, esPresentacion) {
       let productos = this.ventas[this.ventaActiva].productos;
-      let producto = { ...this.producto };
+      let producto = JSON.parse(JSON.stringify(this.producto));
+
       if (esPresentacion) {
+        // Si elige una presentación
         producto.Descripcion = obj.nombre;
-        producto.CantidadPresentacion = obj.cantidad;
-        producto.PrecioCost = obj.precioc;
+        producto.CantidadPresentacion = parseFloat(obj.cantidad);
+        producto.PrecioCost = parseFloat(obj.precioc);
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
-        producto.precio = obj.precio;
+        producto.precio = parseFloat(obj.precio);
         producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.PrecioCost = producto.PrecioCosto;
-        producto.Descripcion = obj.ProductoPresentacion;
+        //Si vuelve a "UNIDAD", restaura costo original
+        producto.PrecioCost = producto.PrecioCostoBase || producto.PrecioCosto;
+        producto.Descripcion = producto.ProductoPresentacion || "UNIDAD";
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = false;
-        producto.precio = producto.PrecioContado;
+        producto.precio = parseFloat(producto.PrecioContado);
         producto.presentacion = null;
       }
+
+      // Inserta o reemplaza en la venta
       if (this.index != null) {
         Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       } else {
         productos.unshift(producto);
       }
+
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
