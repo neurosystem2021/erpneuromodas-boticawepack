@@ -1,5 +1,3 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
 import router from './router'
@@ -14,9 +12,9 @@ import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
 import VueQuagga from "vue-quaggajs";
 import VueBarcodeScanner from "vue-barcode-scanner";
-import VueSocketIO from 'vue-socket.io';
-import VueSweetalert2 from 'vue-sweetalert2';
 
+import VueSweetalert2 from 'vue-sweetalert2';
+ import { io } from 'socket.io-client'
 const browser = detect();
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -24,7 +22,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
 import 'leaflet/dist/leaflet.css';
-
 Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
@@ -55,12 +52,28 @@ Vue.component('editable',{
     }
   }
 })
-
-Vue.use(new VueSocketIO({
-  debug: false,
-  connection: 'https://panel.pedi2.pe',
-  options: { autoConnect: false } //Optional options
-}))
+const socket = io('https://panel.pedi2.pe',{
+  // TRANSPORTE
+  transports: ['websocket', 'polling'],     // WebSocket primero, fallback a polling
+  
+  // SSL/TLS
+  secure: true,                              // Usar wss:// (WSS seguro)
+  rejectUnauthorized: false,                // Aceptar certificados autofirmados
+  
+  // RECONEXIÓN
+  reconnection: true,                        // Reconectar si se desconecta
+  reconnectionDelay: 1000,                  // Esperar 1s antes de reconectar
+  reconnectionDelayMax: 5000,               // Máximo 5s entre intentos
+  reconnectionAttempts: Infinity,           // Intentos infinitos
+  
+  // CONEXIÓN AUTOMÁTICA
+  autoConnect: false,                       // NO conectar al cargar (manual)
+  
+  // OTROS
+  forceNew: false,                          // Reutilizar conexión existente
+  multiplex: true                           // Permitir múltiples conexiones
+})
+Vue.prototype.$socket = socket
 
 Vue.filter('redondear', (value, length) => {
   return parseFloat(value || 0).toFixed(length || 2)
