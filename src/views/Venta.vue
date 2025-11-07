@@ -1657,6 +1657,7 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
+      prod.PrecioCostoPre = producto.PrecioCosto;
       prod.cantidad = producto.cantidad ? producto.cantidad : 1;
       prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
@@ -2496,7 +2497,7 @@ export default {
         producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
       } else {
-        producto.PrecioCost = producto.PrecioCost;
+        producto.PrecioCost = producto.PrecioCosto;
         producto.Descripcion = obj.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
@@ -2504,7 +2505,7 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-      if (this.index) {
+      if (this.index != null) {
         Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       } else {
         productos.unshift(producto);
