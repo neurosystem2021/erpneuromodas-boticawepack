@@ -280,7 +280,7 @@
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-            :disabled="isVentas"
+            :disabled="isVentas && idPerfil != 1"
             @input="setNuevoPrecioContado(data.index)"
             />
         </template>
