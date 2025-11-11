@@ -945,6 +945,11 @@ export default {
   },
   data() {
     return {
+      listeners: {
+        nuevoPedido: null,
+        connect: null,
+        disconnect: null
+      },
       mostrarMetodo: [],
       mostrarNav: true,
       descuentoGeneral: 0,
@@ -1140,8 +1145,101 @@ export default {
       let autocompleteInput = document.getElementById(inputElement);
       autocompleteInput.focus();
     });
+    this.conectarSocket();
+    this.setupSocketListeners();
+    this.getEstadoSistema();
   },
+  beforeDestroy() {
+    this.removeSocketListeners();
+    this.$socket.disconnect();
+  },
+
   methods: {
+    getEstadoSistema() {
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      if (hostUrl != null) {
+        this.axios
+          .get(this.APIADMIN + "/api/sistema", {
+            params: { Url: hostUrl }
+          })
+          .then(res => {
+            if (res.data.success == true) {
+              let info = res.data.data;
+              this.pagosPendientes = info.length;
+              this.fechaUltPago =
+                info.slice(-1)[0].FechaVencimientoFormat || "";
+            } else {
+              this.pagosPendientes = 0;
+              console.log(res.data.msg);
+            }
+          })
+          .catch(err => {
+            this.pagosPendientes = 0;
+            console.log("Error de conexión al admin");
+          });
+      } else {
+        this.pagosPendientes = 0;
+      }
+    },
+    conectarSocket() {
+      if (!this.$socket.connected) {
+        console.log("🔗 Conectando socket...");
+        this.$socket.connect();
+      }
+    },
+
+    /**
+     * ✅ NUEVO: Configurar todos los listeners
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado en VentasForm");
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado en VentasForm");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Nuevo pedido
+      this.listeners.nuevoPedido = data => {
+        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          if (this.$refs.deliveryModal) {
+            this.$refs.deliveryModal.getPedidos();
+          }
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            if (result.isConfirmed) {
+              if (this.$refs.deliveryModal) {
+                this.$refs.deliveryModal.show = true;
+              }
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      };
+      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
+    },
     togglePopoverOpcion(index) {
       if (this.mostrarOp[index]) {
         this.$root.$emit("bv::hide::popover", `popover-opciones${index}`);
@@ -1781,11 +1879,7 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      if (pres.length == 0) {
-        productos.unshift(prod);
-        return;
-      }
-      this.showPresentacion(prod, null);
+      productos.unshift(prod);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
@@ -2502,7 +2596,6 @@ export default {
       this.metodoPagoCambio(1);
     },
     cambiarPresentacion(obj, esPresentacion) {
-      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
@@ -2520,11 +2613,7 @@ export default {
         producto.presentacion = null;
       }
 
-      if (this.index) {
-        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
-      } else {
-        productos.unshift(producto);
-      }
+      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
