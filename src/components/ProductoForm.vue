@@ -417,6 +417,20 @@
               </b-form-group>
 
               <b-form-group>
+                <label>Flete:</label>
+                <input v-model="producto.Flete"
+                type="number"
+                step="0.00001"
+                @input="sumarFlete()"
+                class="form-control"
+                />
+                <!-- <b-form-text v-if="producto.precioContadoNormal">
+                  Original - {{ producto.precioContadoNormal | redondear }}
+                </b-form-text> -->
+              </b-form-group>
+
+
+              <b-form-group>
                 <label>Precio de Venta:</label>
                 <input v-model="producto.PrecioContado"
                 type="number"
@@ -721,6 +735,7 @@ export default {
             this.producto.CodigoInterno = newVal.CodigoInterno;
             this.producto.CodigoFrabricante = newVal.CodigoFrabricante;
             this.producto.CodigoSunat = newVal.CodigoSunat;
+            this.producto.Flete = newVal.Flete;
             if (newVal.PreciosPorProducto) {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
             }
@@ -802,6 +817,20 @@ export default {
       }
       this.actualizarPorcentajeUtilidad();
     },
+    sumarFlete() {
+      var precioCosto = Number(this.producto.PrecioCosto);
+      var Flete = Number(this.producto.Flete);
+      var utilidad = Number(this.producto.PorcentajeUtilidad);
+      var nuevoPrecioContado =
+        precioCosto / ((100 - parseFloat(utilidad)) / 100) +
+        parseFloat(Flete ? Flete : 0);
+      this.producto.PrecioContado = this.$options.filters.redondear(
+        nuevoPrecioContado,
+        1
+      );
+      this.actualizarPorcentajeUtilidad();
+      this.actualizarPrecioDolar(4);
+    },
     cargarAlmacenes() {
       this.axios
         .get(this.API + "almacenes")
@@ -860,18 +889,20 @@ export default {
     },
     actualizarPrecioContado() {
       var precioCosto = Number(this.producto.PrecioCosto);
+      var Flete = Number(this.producto.Flete);
       var utilidad = Number(this.producto.PorcentajeUtilidad);
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
       //var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
       var nuevoPrecioContado =
-        precioCosto / ((100 - parseFloat(utilidad)) / 100);
+        precioCosto / ((100 - parseFloat(utilidad)) / 100) +
+        parseFloat(Flete ? Flete : 0);
 
       this.producto.precioContadoNormal = nuevoPrecioContado;
       this.producto.PrecioContadoDolar = this.$options.filters.redondear(
         nuevoPrecioContado / this.producto.TipoCambio,
         1
       );
-
+      nuevoPrecioContado = nuevoPrecioContado;
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
       this.producto.PrecioContado = this.$options.filters.redondear(
         nuevoPrecioContado,

@@ -167,7 +167,7 @@
             </b-col>
             <b-col cols="12" class="mt-2">
               <div class="clsProductos">
-                  <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+                  <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" :isVentas="true">
                     <template slot="img" slot-scope="data">
                       <b-button @click="abrirImagen(data.item.Producto,data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;" :id="'popover-imagen' + data.item.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
                        <b-popover  placement="right" :target="'popover-imagen' + data.item.IdProducto" :title="data.item.Producto" triggers="hover">
@@ -181,7 +181,12 @@
                       <input :id="`cantidad${data.index}`" :ref="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
                     <template slot="precio" slot-scope="data">
-                      <input class="form-control" type="number" v-model="data.item.precio" disabled>
+                      <input class="form-control" type="number" step="0.01" v-model="data.item.precio"
+                        :class="data.item.precio < data.item.precioMin ? 'clsError' : ''"
+                      min="data.item.precioMin">
+                      <span v-if="data.item.precio < data.item.precioMin" style="font-size: 0.8rem; color: red;">
+                          P. Mín. <b> {{ data.item.precioMin }} </b>
+                      </span>
                     </template>
                     <template slot="desc" slot-scope="data">
                        <b-input-group  append="%">
@@ -547,7 +552,8 @@ export default {
       },
       nuevoRegistroFlag: false,
       productoNombre: "",
-      productoUrl: ""
+      productoUrl: "",
+      IdPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   mounted() {
@@ -828,6 +834,7 @@ export default {
           ? parseFloat(item.PrecioContado).toFixed(2)
           : parseFloat(item.PrecioContado / this.TipoCambio).toFixed(2);
       obj.desc = 0;
+      obj.precioMin = obj.precio;
       obj.descuento = 0;
       obj.cantidadSucursal = 0;
       obj.diasEntrega = 0;
@@ -891,6 +898,15 @@ export default {
       if (this.productos.some(v => v.cantidad < 0)) {
         this.$toasted.error(
           "No puede vender un producto con 0 o menos, cantidad. Verifique.",
+          {
+            duration: 2000
+          }
+        );
+        return;
+      }
+      if (this.productos.some(v => v.precio < v.precioMin)) {
+        this.$toasted.error(
+          "No puede vender un producto con menos precio. Verifique.",
           {
             duration: 2000
           }

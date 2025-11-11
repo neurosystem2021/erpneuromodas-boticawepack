@@ -1314,6 +1314,16 @@ export default {
         return;
       }
 
+      if (this.productos.some(v => v.precio < v.precioMin)) {
+        this.$toasted.error(
+          "No puede vender un producto con menos precio. Verifique.",
+          {
+            duration: 2000
+          }
+        );
+        return;
+      }
+
       this.venta.productos = this.productos;
       this.venta.puntosAplicados = this.puntosAplicados || 0;
       this.venta.totalCart = this.totalCart || 0;

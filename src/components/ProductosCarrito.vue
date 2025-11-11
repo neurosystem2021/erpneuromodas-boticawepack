@@ -280,9 +280,12 @@
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-            :disabled="isVentas && idPerfil != 1"
+             :class="productos[data.index].precio < productos[data.index].precioMin ? 'clsError' : ''" 
             @input="setNuevoPrecioContado(data.index)"
             />
+             <span v-if="productos[data.index].precio < productos[data.index].precioMin" style="font-size: 0.8rem; color: red;">
+                P. Mín. <b> {{ productos[data.index].precioMin }} </b>
+              </span>
         </template>
         <template slot="flete" slot-scope="data">
           <input
@@ -1070,7 +1073,6 @@ export default {
       obj.EsObsequio = 0;
       obj.EsVenta = this.isVentas;
       obj.EsVentaNew = true;
-
       /*this.preciosProd = JSON.parse(obj.PreciosPorProducto || '[]')
       let fPP = this.preciosProd.filter(p => p.cantidad === 0 || p.cantidad === '0')
       
@@ -1130,13 +1132,12 @@ export default {
       // obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
       obj.EsVentaNew = true;
-
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      console.log("TipoCambio", this.TipoCambio);
       obj = this.onSetProducto(obj, false, precio);
       obj.cantidadPres = obj.cantidad;
       obj.PrecioContado = parseFloat(obj.PrecioContado).toFixed(2);
+      obj.precioMin = obj.PrecioContado;
       this.add([
         obj,
         () => {
@@ -1593,5 +1594,9 @@ canvas {
 }
 #modalCantidad .modal-dialog {
   max-width: 40% !important;
+}
+
+.clsError {
+  border: 1px solid #d50000;
 }
 </style>
