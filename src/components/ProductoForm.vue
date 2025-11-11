@@ -198,7 +198,7 @@
           </b-form-group>
         </b-col>
       </b-row>
-
+      <!-- readonly="readonly" -->
       <hr v-if="producto.IdProducto" />
       <b-row v-if="producto.IdProducto">
         <b-col md="6">
@@ -206,7 +206,6 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
               type="number"
               class="form-control"
               step="0.001"
