@@ -1314,7 +1314,7 @@ export default {
         return;
       }
 
-      if (this.productos.some(v => v.precio < v.precioMin)) {
+      if (this.productos.some(v => Number(v.precio) < Number(v.precioMin))) {
         this.$toasted.error(
           "No puede vender un producto con menos precio. Verifique.",
           {

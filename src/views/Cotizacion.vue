@@ -181,7 +181,7 @@
                       <input :id="`cantidad${data.index}`" :ref="`cantidad${data.index}`" class="form-control" type="number" v-model="data.item.cantidad">
                     </template>
                     <template slot="precio" slot-scope="data">
-                      <input class="form-control" type="number" step="0.01" v-model="data.item.precio"
+                      <input class="form-control" type="number" step="0.01" v-model.number="data.item.precio"
                         :class="data.item.precio < data.item.precioMin ? 'clsError' : ''"
                       min="data.item.precioMin">
                       <span v-if="data.item.precio < data.item.precioMin" style="font-size: 0.8rem; color: red;">
@@ -454,6 +454,7 @@ export default {
         { key: "CodigoFrabricante" },
         { key: "CodigoInterno" },
         { key: "Producto" },
+        { key: "ProductoDesc",label:'Desc.' },
         { key: "PrecioContado", label: "Precio" },
         { key: "action", label: "" }
       ],
@@ -904,7 +905,7 @@ export default {
         );
         return;
       }
-      if (this.productos.some(v => v.precio < v.precioMin)) {
+      if (this.productos.some(v => Number(v.precio) < Number(v.precioMin))) {
         this.$toasted.error(
           "No puede vender un producto con menos precio. Verifique.",
           {

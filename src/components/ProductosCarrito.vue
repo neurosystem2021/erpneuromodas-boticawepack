@@ -273,14 +273,14 @@
         </template>
         <template slot="precio" slot-scope="data">
           <input
-            v-model="productos[data.index].precio"
+            v-model.number="productos[data.index].precio"
             type="number"
             style="width: 100px"
             min="0"
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-             :class="productos[data.index].precio < productos[data.index].precioMin ? 'clsError' : ''" 
+             :class="Number(productos[data.index].precio) < Number(productos[data.index].precioMin) ? 'clsError' : ''" 
             @input="setNuevoPrecioContado(data.index)"
             />
              <span v-if="productos[data.index].precio < productos[data.index].precioMin" style="font-size: 0.8rem; color: red;">
