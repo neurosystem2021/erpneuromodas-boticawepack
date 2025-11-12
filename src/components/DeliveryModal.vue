@@ -502,6 +502,7 @@ export default {
     getEmpresaDatos() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       let idAlmacen = sessionStorage.getItem("IdAlmacen");
+
       if (hostUrl != null && idAlmacen != null) {
         this.axios
           .get(this.APINODE + "/api/plataforma/empresa", {

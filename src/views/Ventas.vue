@@ -482,7 +482,7 @@ export default {
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
-    this.escucharPedidos();
+    // this.escucharPedidos();
     this.configStock();
     this.conectarSocket();
     this.setupSocketListeners();
@@ -604,106 +604,6 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
-    conectarSocket() {
-      if (!this.$socket.connected) {
-        console.log("🔗 Conectando socket...");
-        this.$socket.connect();
-      }
-    },
-
-    /**
-     * ✅ NUEVO: Configurar todos los listeners
-     */
-    setupSocketListeners() {
-      // Evento: Conectado
-      this.listeners.connect = () => {
-        console.log("✅ Socket conectado en VentasForm");
-      };
-      this.$socket.on("connect", this.listeners.connect);
-
-      // Evento: Desconectado
-      this.listeners.disconnect = () => {
-        console.log("❌ Socket desconectado en VentasForm");
-      };
-      this.$socket.on("disconnect", this.listeners.disconnect);
-
-      // Evento: Nuevo pedido
-      this.listeners.nuevoPedido = data => {
-        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
-          this.$toasted.success(
-            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
-          );
-          this.$refs.deliveryModal.getPedidos();
-        } else {
-          if (this.$refs.deliveryModal) {
-            this.$refs.deliveryModal.getPedidos();
-          }
-          this.$swal({
-            position: "top-end",
-            icon: "info",
-            target: document.getElementById("conten"),
-            title:
-              "Pedido de Delivery de: <br> " +
-              "<strong>" +
-              data.nombre +
-              "</strong>",
-            showConfirmButton: true,
-            confirmButtonText: "Mostrar Pedidos",
-            confirmButtonColor: "#3880ff"
-          }).then(result => {
-            if (result.isConfirmed) {
-              if (this.$refs.deliveryModal) {
-                this.$refs.deliveryModal.show = true;
-              }
-            } else if (result.isDenied) {
-              console.log("Denegado");
-            }
-          });
-        }
-      };
-      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
-    },
-
-    /**
-     * ✅ NUEVO: Remover todos los listeners
-     */
-    removeSocketListeners() {
-      this.$socket.off("connect", this.listeners.connect);
-      this.$socket.off("disconnect", this.listeners.disconnect);
-      this.$socket.off("nuevo-pedido", this.listeners.nuevoPedido);
-    },
-    escucharPedidos() {
-      this.sockets.subscribe("nuevo-pedido", data => {
-        if (this.$refs.deliveryModal.show) {
-          this.$toasted.success(
-            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
-          );
-          this.$refs.deliveryModal.getPedidos();
-        } else {
-          this.$refs.deliveryModal.getPedidos();
-          this.$swal({
-            position: "top-end",
-            icon: "info",
-            target: document.getElementById("conten"),
-            title:
-              "Pedido de Delivery de: <br> " +
-              "<strong>" +
-              data.nombre +
-              "</strong>",
-            showConfirmButton: true,
-            confirmButtonText: "Mostrar Pedidos",
-            confirmButtonColor: "#3880ff"
-          }).then(result => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-              this.$refs.deliveryModal.show = true;
-            } else if (result.isDenied) {
-              console.log("Denegado");
-            }
-          });
-        }
-      });
-    },
     getEstadoSistema() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       if (hostUrl != null) {
@@ -1607,6 +1507,74 @@ export default {
       this.$router.replace("/ventas");
     },
     //Sockets
+    conectarSocket() {
+      if (!this.$socket.connected) {
+        console.log("🔗 Conectando socket...");
+        this.$socket.connect();
+      }
+    },
+
+    /**
+     * ✅ NUEVO: Configurar todos los listeners
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado en VentasForm");
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado en VentasForm");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Nuevo pedido
+      this.listeners.nuevoPedido = data => {
+        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          if (this.$refs.deliveryModal) {
+            this.$refs.deliveryModal.getPedidos();
+          }
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            if (result.isConfirmed) {
+              if (this.$refs.deliveryModal) {
+                this.$refs.deliveryModal.show = true;
+              }
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      };
+      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
+    },
+
+    /**
+     * ✅ NUEVO: Remover todos los listeners
+     */
+    removeSocketListeners() {
+      this.$socket.off("connect", this.listeners.connect);
+      this.$socket.off("disconnect", this.listeners.disconnect);
+      this.$socket.off("nuevo-pedido", this.listeners.nuevoPedido);
+    },
     escucharPedidos() {
       this.sockets.subscribe("nuevo-pedido", data => {
         if (this.$refs.deliveryModal.show) {
@@ -1639,7 +1607,6 @@ export default {
         }
       });
     }
-    //Fin Sockets
   },
   components: {
     ProductosCarrito,
