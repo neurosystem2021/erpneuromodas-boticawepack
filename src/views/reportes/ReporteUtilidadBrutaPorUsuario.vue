@@ -115,7 +115,8 @@ export default {
         { label: "Prom. Precio Venta", key: "PrecioVenta" },
         { label: "Total Venta", key: "TotalVenta" },
         { label: "Total Costo", key: "TotalCosto" },
-        { label: "Utilidad Bruta", key: "UtilidadBruta" }
+        // { label: "Utilidad Bruta", key: "UtilidadBruta" }
+        { label: "% Ut. Bruta", key: "porcentaje" }
       ]
     };
   },
@@ -145,7 +146,12 @@ export default {
         .get(`${this.API}reporte/utlidadbruta/usuario`, filtro)
         .then(response => {
           if (response.data) {
-            this.lstReporte = response.data;
+            let res = response.data;
+            res = res.map(v => {
+              let porcentaje = (v.PrecioVenta - v.PrecioCosto) / v.PrecioVenta;
+              return { ...v, porcentaje: parseFloat(porcentaje).toFixed(2) };
+            });
+            this.lstReporte = res;
           }
         });
     },
