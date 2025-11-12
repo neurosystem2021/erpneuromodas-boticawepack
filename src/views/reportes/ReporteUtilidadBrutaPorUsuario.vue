@@ -108,7 +108,7 @@ export default {
       lstUsuario: [],
       fields: [
         { label: "Fecha", key: "FechaReg" },
-        { label: "Id Producto", key: "IdProducto" },
+        { label: "Id Producto", key: "CodigoFrabricante" },
         { label: "Producto", key: "Producto" },
         { label: "Cantidad", key: "Cantidad" },
         { label: "Prom. Precio Costo", key: "PrecioCosto" },
