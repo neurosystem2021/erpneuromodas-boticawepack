@@ -11,6 +11,14 @@ export default {
 </script>
 
 <style>
+.modal .modal-xl {
+  min-width: 80%;
+  width: 80%;
+}
+/* #modalProformas___BV_modal_body_ {
+  min-width: 80%;
+  width: 80%;
+} */
 .btnAction {
   margin: 2px 0;
   border-radius: 25px !important;

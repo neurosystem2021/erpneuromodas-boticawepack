@@ -6,7 +6,9 @@
         
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
-                size="lg" v-model="show"
+                class="mdlProforma"
+                v-model="show"
+                size="xl"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
@@ -331,5 +333,8 @@ export default {
 <style>
 #modalProformas .modal-dialog {
   max-width: 85% !important;
+}
+.mdlProforma{
+  width: 80%;
 }
 </style>
