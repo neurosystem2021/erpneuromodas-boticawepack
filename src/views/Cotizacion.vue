@@ -152,9 +152,9 @@
                     ref="inputProductos"
                     :url="API + 'busqueda/productos'"
                     anchor="Producto"
-                    initValue="Producto"
+                    initValue=""
                     label="writer"
-                    placeholder=""
+                    placeholder="Producto"
                     :on-select="setProducto" 
                     :onFocus="focusAutocomplete.bind(null, 'inputProductos')"
                      :customParams="{ tipoBusqueda: tipoBusqueda,idAlmacen:almacen.IdAlmacen }"
@@ -756,7 +756,7 @@ export default {
       this.TipoCambioUSD = tipoCambio.data.Cotizacion[0].Compra;
     },
     focusAutocomplete(ref) {
-      this.$refs[ref].type = "";
+      // this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
     },
     setCliente(obj, dni = false) {
