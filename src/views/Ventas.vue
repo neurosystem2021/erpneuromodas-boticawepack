@@ -467,7 +467,7 @@ export default {
       newUrl = new URL(newUrl);
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "modasgio"
+        sessionStorage.getItem("empresa") || "modasjes"
       );
       url = newUrl.toString();
       arguments[1] = url;
@@ -566,7 +566,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      empresa: "modasgio",
+      empresa: "modasjes",
       rubroTexto: "---"
     };
   },
