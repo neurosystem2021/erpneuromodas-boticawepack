@@ -454,7 +454,7 @@ export default {
         { key: "CodigoFrabricante" },
         { key: "CodigoInterno" },
         { key: "Producto" },
-        { key: "ProductoDesc",label:'Desc.' },
+        { key: "ProductoDesc", label: "Desc." },
         { key: "PrecioContado", label: "Precio" },
         { key: "action", label: "" }
       ],
@@ -631,6 +631,8 @@ export default {
         prod.diasEntrega = p.DiasEntrega;
         prod.cantidadImportacion = p.CantidadImportacion;
         prod.diasEntregaImportacion = p.DiasEntregaImportacion;
+        console.log("sss", p);
+        prod.observacion = p.ProductoDesc;
         this.productos.push(prod);
         this.$nextTick(() => {
           setTimeout(() => {
@@ -826,7 +828,8 @@ export default {
         return;
       }
       let obj = { ...item };
-      console.log(this.almacen);
+
+      obj.observacion = obj.ProductoDesc;
 
       obj.stock = obj.stock;
       obj.cantidad = 1;
