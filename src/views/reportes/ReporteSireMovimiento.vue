@@ -27,8 +27,8 @@
             <!-- <b-button variant="success" :disabled="activarBotones" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Excel</b-button> -->
             <!-- <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button> -->
              <!-- <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button> -->
-            <button class="btn"  @click="exportarSunat(2)" style="border: 1px solid #B5BD00; ">
-                <img  src="static/sire.png" style="width: 120px;cursor: pointer; "/>
+            <button class="btn bnt-sire"  @click="exportarSunat(2)">
+              <img  src="static/sire.png" style="width: 120px;cursor: pointer; "/>
             </button>
         </b-col>
         <b-col cols="12" class="mt-4">
@@ -440,5 +440,16 @@ export default {
 .modal-dialog {
   max-width: 60% !important;
   width: 60% !important;
+}
+.bnt-sire {
+  border: 1px solid #b5bd00;
+  background: #ffffff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #b5bd00;
+}
+.bnt-sire:hover {
+  border: 1px solid #b5bd00;
+  background: #dadf7d;
 }
 </style>

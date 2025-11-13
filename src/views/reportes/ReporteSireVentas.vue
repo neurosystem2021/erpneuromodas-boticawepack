@@ -32,7 +32,7 @@
             <!-- <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button> -->
             <!-- <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button> -->
             <!-- <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button> -->
-            <button class="btn"  @click="exportarSunat(2)" style="border: 1px solid #B5BD00; ">
+            <button class="btn bnt-sire"  @click="exportarSunat(2)">
                 <img  src="static/sire.png" style="width: 120px;cursor: pointer;"/>
             </button>
         </b-col>
@@ -426,5 +426,14 @@ tfoot td {
   background: #006064;
   color: white;
   font-weight: bold;
+}
+
+.bnt-sire {
+  border: 1px solid #b5bd00;
+  background: #ffffff;
+}
+.bnt-sire:hover {
+  border: 1px solid #b5bd00;
+  background: #dadf7d;
 }
 </style>
