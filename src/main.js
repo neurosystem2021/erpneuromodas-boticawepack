@@ -1,85 +1,92 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import store from './store'
+import Vue from "vue";
+import App from "./App";
+import router from "./router";
+import store from "./store";
 
-import BootstrapVue from 'bootstrap-vue'
-import Autocomplete from 'vue2-autocomplete-js'
-import axios from 'axios';
-import VueAxios from 'vue-axios'
-import Toasted from 'vue-toasted';
-import VueMoment from 'vue-moment'
-import { detect } from 'detect-browser';
-import VueSocketIO from 'vue-socket.io';
-import VueSweetalert2 from 'vue-sweetalert2';
+import BootstrapVue from "bootstrap-vue";
+import Autocomplete from "vue2-autocomplete-js";
+import axios from "axios";
+import VueAxios from "vue-axios";
+import Toasted from "vue-toasted";
+import VueMoment from "vue-moment";
+import { detect } from "detect-browser";
+import { io } from "socket.io-client";
+import VueSweetalert2 from "vue-sweetalert2";
 
 const browser = detect();
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import '../static/vue2-autocomplete.css'
-import '../static/styles.css'
-import 'leaflet/dist/leaflet.css';
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import "../static/vue2-autocomplete.css";
+import "../static/styles.css";
+import "leaflet/dist/leaflet.css";
 
-Vue.prototype.$browser = detect()
+Vue.prototype.$browser = detect();
 
-Vue.config.productionTip = false
-Vue.use(VueSweetalert2)
-Vue.use(VueAxios, axios)
+Vue.config.productionTip = false;
+Vue.use(VueSweetalert2);
+Vue.use(VueAxios, axios);
 Vue.use(Toasted, {
   theme: "bubble",
   position: "top-center",
-  duration : 3000
-})
+  duration: 3000
+});
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 
-// Componentes 
-Vue.component('autocomplete', Autocomplete)
-Vue.component('editable',{
-  template:'<div contenteditable="true" @input="update"></div>',
-  props:['content'],
-  mounted:function(){
+// Componentes
+Vue.component("autocomplete", Autocomplete);
+Vue.component("editable", {
+  template: '<div contenteditable="true" @input="update"></div>',
+  props: ["content"],
+  mounted: function() {
     this.$el.innerText = this.content;
   },
-  methods:{
-    update:function(event){
-      this.$emit('update',event.target.innerText);
+  methods: {
+    update: function(event) {
+      this.$emit("update", event.target.innerText);
     }
   }
-})
+});
 
-Vue.use(new VueSocketIO({
-  debug: false,
-  connection: 'http://198.211.103.92:5000',
-  options: { autoConnect: false } //Optional options
-}))
+const socket = io("https://panel.pedi2.pe", {
+  transports: ["websocket", "polling"],
+  secure: true,
+  rejectUnauthorized: false,
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: Infinity,
+  autoConnect: false,
+  forceNew: false,
+  multiplex: true
+});
+Vue.prototype.$socket = socket;
+Vue.filter("redondear", (value, length) => {
+  return parseFloat(value || 0).toFixed(length || 2);
+});
+Vue.filter("redondeoMayor", value => {
+  return Math.ceil(value || 0);
+});
+Vue.filter("redondeoMenor", value => {
+  return Math.floor(value || 0);
+});
+Vue.filter("moneda", value => {
+  return parseFloat(value || 0)
+    .toFixed(2)
+    .replace(/\d(?=(\d{3})+\.)/g, "$&,");
+});
 
-Vue.filter('redondear', (value, length) => {
-  return parseFloat(value || 0).toFixed(length || 2)
-})
-Vue.filter('redondeoMayor', (value) => {
-  return Math.ceil(value || 0)
-})
-Vue.filter('redondeoMenor', (value) => {
-  return Math.floor(value || 0)
-})
-Vue.filter('moneda', value => {
-  return parseFloat(value || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
-})
-
-
-window.Vue = Vue
-
+window.Vue = Vue;
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: "#app",
   router,
   store,
   components: { App },
-  template: '<App/>'
-})
+  template: "<App/>"
+});
