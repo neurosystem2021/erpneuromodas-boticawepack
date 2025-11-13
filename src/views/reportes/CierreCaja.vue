@@ -832,7 +832,14 @@ export default {
     totalIngresos() {
       let total = 0;
       this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe;
+        if (!ingreso.Anulado && ingreso.IdCuenta == 1) total += ingreso.Importe;
+      });
+      return total;
+    },
+    totalIngresosBCP() {
+      let total = 0;
+      this.ingresos.forEach(ingreso => {
+        if (!ingreso.Anulado && ingreso.IdCuenta == 2) total += ingreso.Importe;
       });
       return total;
     },
@@ -865,7 +872,11 @@ export default {
       this.ventasMastercard.forEach(venta => {
         if (!venta.Anulado) total += venta.Yape + venta.Mastercard;
       });
-      return total;
+     let totalBCP = 0;
+      this.ingresos.forEach(ingreso => {
+        if (!ingreso.Anulado && ingreso.IdCuenta == 2) totalBCP += ingreso.Importe;
+      });
+      return total ;
     },
     ventasMastercard() {
       return this.ventas.filter(venta => {
