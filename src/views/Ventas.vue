@@ -467,7 +467,7 @@ export default {
       newUrl = new URL(newUrl);
       newUrl.searchParams.append(
         "empresa",
-        sessionStorage.getItem("empresa") || "modasgio"
+        sessionStorage.getItem("empresa") || "modasjun"
       );
       url = newUrl.toString();
       arguments[1] = url;
@@ -485,7 +485,6 @@ export default {
     }
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
-
     this.getRubro();
     this.conectarSocket();
     this.setupSocketListeners();
@@ -566,7 +565,7 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      empresa: "modasgio",
+      empresa: "modasjun",
       rubroTexto: "---"
     };
   },
@@ -883,7 +882,7 @@ export default {
           });
           this.venta.NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          //   this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
     setMotivo(ev) {
@@ -901,12 +900,12 @@ export default {
     setAlmacen(obj) {
       this.venta.almacen = obj;
       this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      //   this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
     },
     loadPuntoVenta(id) {
-      this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
-        this.setPuntoVenta(res.data);
-        this.getNumeroVenta();
+      this.axios.get(this.API + "puntoventa/id/" + id).then(async res => {
+        await this.setPuntoVenta(res.data);
+        // this.getNumeroVenta()
       });
     },
     getTipoDoc(id) {
