@@ -32,7 +32,7 @@
             <!-- <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button> -->
             <!-- <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button> -->
             <!-- <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button> -->
-            <button class="btn"  @click="exportarSunat(2)" >
+            <button class="btn"  @click="exportarSunat(2)" style="border: 1px solid #B5BD00; ">
                 <img  src="static/sire.png" style="width: 120px;cursor: pointer;"/>
             </button>
         </b-col>
