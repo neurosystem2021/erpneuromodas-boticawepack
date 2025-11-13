@@ -14,11 +14,10 @@ import VueMoment from "vue-moment";
 import { detect } from "detect-browser";
 import VueQuagga from "vue-quaggajs";
 import VueBarcodeScanner from "vue-barcode-scanner";
+import { io } from "socket.io-client";
+import VueSweetalert2 from "vue-sweetalert2";
 
-import VueSweetalert2 from 'vue-sweetalert2';
-
-import 'sweetalert2/dist/sweetalert2.min.css';
-
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const browser = detect();
 
@@ -57,6 +56,20 @@ Vue.component("editable", {
     }
   }
 });
+
+const socket = io("https://panel.pedi2.pe", {
+  transports: ["websocket", "polling"],
+  secure: true,
+  rejectUnauthorized: false,
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: Infinity,
+  autoConnect: false,
+  forceNew: false,
+  multiplex: true
+});
+Vue.prototype.$socket = socket;
 
 Vue.filter("redondear", value => {
   return parseFloat(value || 0).toFixed(2);
