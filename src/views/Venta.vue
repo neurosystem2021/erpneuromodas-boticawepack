@@ -2090,6 +2090,7 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
+      this.inProgress = true;
       // this.$swal({
       //   title: "Procesando...",
       //   text: "Por favor espera",
@@ -2111,28 +2112,33 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
+        this.inProgress = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
+        this.inProgress = false;
         return;
       }
 
@@ -2148,6 +2154,7 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
 
+        this.inProgress = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2162,6 +2169,7 @@ export default {
         //   target: document.getElementById("conten"),
         //   confirmButtonColor: "#0275d8"
         // });
+        this.inProgress = false;
         return;
       }
 
@@ -2180,6 +2188,7 @@ export default {
         //   target: document.getElementById("conten"),
         //   confirmButtonColor: "#0275d8"
         // });
+        this.inProgress = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2194,6 +2203,7 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
 
+        this.inProgress = false;
         return;
       }
       if (
@@ -2212,6 +2222,7 @@ export default {
           //   confirmButtonColor: "#0275d8"
           // });
 
+          this.inProgress = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2226,12 +2237,14 @@ export default {
           //   confirmButtonColor: "#0275d8"
           // });
 
+          this.inProgress = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
+          this.inProgress = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2250,9 +2263,10 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
 
+        this.inProgress = false;
         return;
       }
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+
       if (
         productos.some(
           v =>
@@ -2270,6 +2284,7 @@ export default {
         //   target: document.getElementById("conten"),
         //   confirmButtonColor: "#0275d8"
         // });
+        this.inProgress = false;
         return;
       }
       if (
@@ -2277,6 +2292,7 @@ export default {
         parseFloat(totalPagos).toFixed(2)
       ) {
         this.$toasted.show("Los pagos no coinciden con la venta");
+
         this.inProgress = false;
         return;
       }
@@ -2326,7 +2342,7 @@ export default {
 
         // if (response.data.actualizar) {
         //   this.$toasted.show(response.data.msg);
-        //   return;
+        //   this.inProgress = false;  return;
         // }
       });
       this.$swal.close();
