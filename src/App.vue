@@ -21,7 +21,15 @@ export default {
   font-weight: bold;
   text-transform: uppercase;
 }
-#modalOrdenCompra .modal-dialog {
-  min-width: 70% !important;
+.btn .bnt-sire {
+  border: 1px solid #b5bd00;
+  background: #ffffff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #b5bd00;
+}
+.btn .bnt-sire:hover {
+  border: 1px solid #b5bd00;
+  background: #dadf7d;
 }
 </style>
