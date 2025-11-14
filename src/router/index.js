@@ -47,6 +47,8 @@ import RemisionVer from "@/views/RemisionVer.vue";
 import RemisionListado from "@/views/reportes/RemisionListado.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
+import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
+import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -288,6 +290,16 @@ export default new Router({
       path: "/CargarComprasXml",
       name: "CargarComprasXml",
       component: CargarComprasXml
-    }
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
+    },
   ]
 });
