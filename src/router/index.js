@@ -46,8 +46,10 @@ import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
-import RemisionListado from '@/views/reportes/RemisionListado.vue'
-import ReporteUtilidadBrutaPorUsuario from '@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue'
+import RemisionListado from "@/views/reportes/RemisionListado.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
+import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
 
 Vue.use(Router);
 
@@ -288,6 +290,16 @@ export default new Router({
       path: "/reportes/reporte_utilidad_bruta",
       name: "ReporteUtilidadBrutaPorUsuario",
       component: ReporteUtilidadBrutaPorUsuario
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
     }
   ]
 });
