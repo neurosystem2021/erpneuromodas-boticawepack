@@ -967,7 +967,10 @@ export default {
     },
     initForm() {
       this.producto = {
+        TipoCambio: 1,
         EsPadre: 0,
+        PrecioCostoDolar: 0,
+        PrecioContadoDolar: 0,
         Anulado: 0,
         EsHabitacion: 0,
         Piso: 1,
@@ -998,6 +1001,7 @@ export default {
         precioConvenio: 0,
         PrecioEspecial: 0,
         CodigoFrabricante: "",
+        Flete: 0,
         CodigoSunat: "",
         CodigoInterno: "",
         // Botapie: '',
