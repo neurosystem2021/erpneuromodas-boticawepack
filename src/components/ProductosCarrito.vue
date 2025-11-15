@@ -280,11 +280,11 @@
             step="0.00001"
             class="form-control"
             placeholder="Precio"
-             :class="Number(productos[data.index].precio) < Number(productos[data.index].precioMin) ? 'clsError' : ''" 
+             :class="Number(productos[data.index].precio) < Number(productos[data.index].precioMin/TipoCambio) ? 'clsError' : ''" 
             @input="setNuevoPrecioContado(data.index)"
             />
-             <span v-if="productos[data.index].precio < productos[data.index].precioMin" style="font-size: 0.8rem; color: red;">
-                P. Mín. <b> {{ productos[data.index].precioMin }} </b>
+             <span v-if="productos[data.index].precio < (productos[data.index].precioMin/TipoCambio)" style="font-size: 0.8rem; color: red;">
+                P. Mín. <b> {{ parseFloat(productos[data.index].precioMin/TipoCambio).toFixed(2) }} </b>
               </span>
         </template>
         <template slot="flete" slot-scope="data">
