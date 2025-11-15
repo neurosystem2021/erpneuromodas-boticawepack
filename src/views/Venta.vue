@@ -1214,6 +1214,7 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
+    this.getProductosCategoria();
     this.conectarSocket();
     this.setupSocketListeners();
     this.getEstadoSistema();
