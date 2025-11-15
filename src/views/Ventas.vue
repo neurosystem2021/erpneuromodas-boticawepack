@@ -1929,40 +1929,8 @@ export default {
       this.venta.nombreLlevar = "";
       this.venta.DireccionEntrega = "";
       this.$router.replace("/ventas");
-    },
-    //Sockets
-    escucharPedidos() {
-      this.sockets.subscribe("nuevo-pedido", data => {
-        if (this.$refs.deliveryModal.show) {
-          this.$toasted.success(
-            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
-          );
-          this.$refs.deliveryModal.getPedidos();
-        } else {
-          this.$refs.deliveryModal.getPedidos();
-          this.$swal({
-            position: "top-end",
-            icon: "info",
-            target: document.getElementById("conten"),
-            title:
-              "Pedido de Delivery de: <br> " +
-              "<strong>" +
-              data.nombre +
-              "</strong>",
-            showConfirmButton: true,
-            confirmButtonText: "Mostrar Pedidos",
-            confirmButtonColor: "#3880ff"
-          }).then(result => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-              this.$refs.deliveryModal.show = true;
-            } else if (result.isDenied) {
-              console.log("Denegado");
-            }
-          });
-        }
-      });
     }
+    //Sockets
     //Fin Sockets
   },
   components: {
