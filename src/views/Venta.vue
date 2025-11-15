@@ -1914,7 +1914,7 @@ export default {
               .IdDocVentaPuntoVenta
           }
         })
-        .then(response => {
+        .then(async response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
@@ -1945,13 +1945,51 @@ export default {
             });
 
           this.ventas.productos = [];
-
-          response.data.forEach(element => {
-            this.setProducto(element);
-          });
+          for (let index = 0; index < response.data.length; index++) {
+            // console.log("ssssss", response.data[index]);
+            await this.setProductoNotaCredito(response.data[index]);
+          }
+          // response.data.forEach(element => {
+          //   console.log("ssssss", element);
+          //   this.setProductoNotaCredito(element);
+          // });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
         });
+    },
+    async setProductoNotaCredito(producto) {
+      let productos = this.ventas[this.ventaActiva].productos;
+      let presNew = producto.Presentacion
+        ? JSON.parse(producto.Presentacion)
+        : {};
+
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+      let pres = [];
+
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+
+      console.log("presNew", presNew.nombre);
+      prod.PreciosPorProducto = pres;
+      prod.ProductoDesc = producto.Descripcion;
+      prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      prod.cantidad = producto.cantidad;
+      prod.CantidadPresentacion = producto.CantidadPresentacion;
+      prod.precio = producto.PrecioCosto;
+      prod.descuento = 0;
+      prod.presentacion = null;
+      prod.tienePresentacion = prod.PreciosPorProducto.some(
+        v => v.cantidad > 0
+      );
+      
+      prod.bloquearInputPrecio = false;
+      prod.CantidadPresentacion = null;
+      productos.unshift(prod);
+      this.metodoPagoCambio(1);
     },
     someMethod(text) {
       this.someMethod = text;
