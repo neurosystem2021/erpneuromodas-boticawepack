@@ -102,36 +102,37 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
-import DetalleDeudaProveedor from '@/components/DetalleDeudaProveedor.vue'
+import config from "@/store/config.js";
+import DetalleDeudaProveedor from "@/components/DetalleDeudaProveedor.vue";
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'proveedores/deuda/count').then((response) => {
-      console.log(response)
-      this.totalRows = response.data.total
-    })
+    this.axios.get(this.API + "proveedores/deuda/count").then(response => {
+      console.log(response);
+      this.totalRows = response.data.total;
+    });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: '',
-      sortBy: 'IdDocVenta',
+      pageOptions: [5, 10, 15, 50, 100],
+      filter: "",
+      sortBy: "IdDocVenta",
       sortDesc: false,
       items: [],
       isBusy: false,
       fields: [
-            { key: 'Ruc', label: 'RUC', sortable: true },
-            { key: 'Proveedor', label: 'Cliente', sortable: true },
-            { key: 'Correlativo', label: 'Serie', sortable: true },
-            { key: 'Total', label: 'Total', sortable: true},
-            { key: 'Aplicado', label: 'Aplicado', sortable: true},
-            { key: 'Saldo', label: 'Saldo', sortable: true },
-            { key: 'FechaDoc', label: 'Emision', sortable: true },
-            { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
-            { key: 'Letras', label: 'Letras', sortable: true },
+        { key: "Ruc", label: "RUC", sortable: true },
+        { key: "Proveedor", label: "Cliente", sortable: true },
+        { key: "Correlativo", label: "Serie", sortable: true },
+        { key: "Moneda", label: "Moneda", sortable: true },
+        { key: "Total", label: "Total", sortable: true },
+        { key: "Aplicado", label: "Aplicado", sortable: true },
+        { key: "Saldo", label: "Saldo", sortable: true },
+        { key: "FechaDoc", label: "Emision", sortable: true },
+        { key: "FechaCredito", label: "Vencimiento", sortable: true },
+        { key: "Letras", label: "Letras", sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
@@ -142,68 +143,86 @@ export default {
       proveedor: {
         Proveedor: undefined
       },
-      showLetras: false,
-    }
+      showLetras: false
+    };
   },
   methods: {
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    setAlmacen (obj) {
+    setAlmacen(obj) {
       // this.almacen = obj
       // Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
-    setProveedor (obj) {
-      this.proveedor = obj
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    setProveedor(obj) {
+      this.proveedor = obj;
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
-    limpiarFiltros () {
-      this.filter = ''
+    limpiarFiltros() {
+      this.filter = "";
       this.proveedor.Proveedor = undefined;
-      this.$refs.inputProveedor.setValue('TODOS')
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+      this.$refs.inputProveedor.setValue("TODOS");
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
-    myProvider (ctx) {
+    myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'proveedores/deudas?q=' + ctx.filter + '&proveedor=' + this.proveedor.Proveedor + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get(
+        this.API +
+          "proveedores/deudas?q=" +
+          ctx.filter +
+          "&proveedor=" +
+          this.proveedor.Proveedor +
+          "&limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage
+      );
 
-      return promise.then((response) => {
-        console.log(response)
-        this.items = response.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+      return promise
+        .then(response => {
+          console.log(response);
+          this.items = response.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
     },
     myRowClickHandler(record, index) {
-      if(record.Letras!='Ninguna' && record.Letras!=''){
-        this.showLetras = true
-        this.$refs.detDeuPro.cargarDeudasProveedor(record.Id,record.Total,record.Ruc,record.Proveedor,record.Correlativo);
+      if (record.Letras != "Ninguna" && record.Letras != "") {
+        this.showLetras = true;
+        this.$refs.detDeuPro.cargarDeudasProveedor(
+          record.Id,
+          record.Total,
+          record.Ruc,
+          record.Proveedor,
+          record.Correlativo
+        );
       }
     }
   },
   components: {
-      // ProductoForm
+    // ProductoForm
     DetalleDeudaProveedor
   }
-}
+};
 </script>
 
 <style>
-#my-tableDeuda tbody tr:last-child{
-    color: black;
-    background: transparent;
-    font-weight: bold;
-}
+/* #my-tableDeuda tbody tr:last-child {
+  color: black;
+  background: transparent;
+  font-weight: bold;
+} */
 </style>
