@@ -18,6 +18,7 @@ import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import Usuario from "@/views/Usuario.vue";
 
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -90,6 +91,11 @@ export default new Router({
       path: "/OrdenCompra",
       name: "OrdenCompra",
       component: OrdenCompra
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: "/reportes/ventas",
