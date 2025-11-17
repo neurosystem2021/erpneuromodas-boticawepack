@@ -603,7 +603,7 @@ export default {
       this.getCierre(this.$route.params.id);
       this.loadData();
     } else {
-      //this.getVendedor()
+      this.getVendedor()
       this.loadData();
     }
 
@@ -786,7 +786,7 @@ export default {
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
       this.axios
-        .get(this.API + "usuarios/" + usuario + `&id_empresa=${this.empresa}`)
+        .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
           //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
@@ -824,7 +824,7 @@ export default {
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
             user: sessionStorage.getItem("User"),
-            //user:         this.vendedor.Usuario,
+            user:         this.vendedor.Usuario,
             ingresos: this.totalIngresos.toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
@@ -874,7 +874,7 @@ export default {
         id_empresa: this.empresa
       };
       if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
+        params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios
