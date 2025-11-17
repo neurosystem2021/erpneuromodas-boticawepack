@@ -18,9 +18,10 @@ import Traslado from "@/views/Traslado.vue";
 import ConfigurarOferta from "@/views/ConfigurarOferta.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
-import Ordenes from "@/views/reportes/Ordenes.vue";
+import Usuario from "@/views/Usuario.vue";
 
 // Reportes
+import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
 import Comisionistas from "@/views/reportes/Comisionistas.vue";
@@ -39,13 +40,13 @@ import RemisionLista from "@/views/RemisionLista.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
 import ReporteProyectos from "@/views/reportes/ReporteProyectos.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
+import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import HistorialVentaKit from "@/views/reportes/HistorialVentaKit.vue";
 import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
-import Confrontacion from "@/views/reportes/Confrontacion.vue";
-import CargarComprasXml from "@/views/CargarComprasXml.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -87,25 +88,31 @@ export default new Router({
       component: Ventas
     },
     {
-      path: "/reportes/ventas",
-      name: "ReporteVentas",
-      component: ReporteVentas
-    },
-    {
-      path: "/reportes/cierrecaja",
-      name: "CierreCaja",
-      component: CierreCaja
-    },
-    {
       path: "/OrdenCompra",
       name: "OrdenCompra",
       component: OrdenCompra
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
+    },
+    {
+      path: "/reportes/ventas",
+      name: "ReporteVentas",
+      component: ReporteVentas
     },
     {
       path: "/reportes/Ordenes",
       name: "Ordenes",
       component: Ordenes
     },
+    {
+      path: "/reportes/cierrecaja",
+      name: "CierreCaja",
+      component: CierreCaja
+    },
+
     {
       path: "/reportes/proforma/:id",
       name: "Proforma",
@@ -244,6 +251,11 @@ export default new Router({
       component: ConfigurarOferta
     },
     {
+      path: "/CargarComprasXml",
+      name: "CargarComprasXml",
+      component: CargarComprasXml
+    },
+    {
       path: "/reportes/reporte_utilidad_bruta",
       name: "ReporteUtilidadBrutaPorUsuario",
       component: ReporteUtilidadBrutaPorUsuario
@@ -252,11 +264,6 @@ export default new Router({
       path: "/reporte/confrontacion",
       name: "Confrontacion",
       component: Confrontacion
-    },
-    {
-      path: "/CargarComprasXml",
-      name: "CargarComprasXml",
-      component: CargarComprasXml
     },
     {
       path: "/reporte/BuscadorCajaBanco",
@@ -277,6 +284,6 @@ export default new Router({
       path: "/reportes/Dashboard",
       name: "Dashboard",
       component: Dashboard
-    }
+    },
   ]
 });
