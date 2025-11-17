@@ -232,4 +232,5 @@ export default {
   box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.78);
   /* margin: 1%; */
 }
+
 </style>
