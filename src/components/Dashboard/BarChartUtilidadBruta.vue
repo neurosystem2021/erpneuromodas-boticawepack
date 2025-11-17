@@ -33,7 +33,7 @@ export default {
           .sort((a, b) => b.UtilidadBruta - a.UtilidadBruta)
           .slice(0, 10);
 
-        let labels = topProductos.map(item => item.Producto);
+        let labels = topProductos.map(item => item.DescProducto);
         let totalVenta = topProductos.map(item => item.TotalVenta);
         let totalCosto = topProductos.map(item => item.TotalCosto);
         let utilidadBruta = topProductos.map(item => item.UtilidadBruta);
