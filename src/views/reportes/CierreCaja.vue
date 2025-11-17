@@ -1508,7 +1508,9 @@ export default {
     async getVendedor() {
       let usuario = sessionStorage.getItem("User").toLocaleLowerCase();
       await this.axios
-        .get(this.API + "usuarios/" + usuario)
+        .get(this.API + "usuarios", {
+          params: { usuario: usuario }
+        })
         .then(response => {
           this.setVendedor(response.data);
           // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
