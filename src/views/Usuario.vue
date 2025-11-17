@@ -378,7 +378,7 @@ export default {
   },
   methods: {
     async cargarListadoUsuario() {
-      await this.axios(`${this.API}usuarios/listado`).then(res => {
+      await this.axios(`${this.API}lstusuarios/listado`).then(res => {
         if (res.data) {
           this.lstUsuario = res.data;
         }
