@@ -1,7 +1,10 @@
 <template>
-  <div>
+  <div style="padding: 0 12%;">
     <Menu v-if="false"></Menu>
     <br />
+    <div style="text-align: end;">
+      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+    </div>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container class="bv-example-row" fluid>
           <b-row>
@@ -247,6 +250,10 @@
         </b-row>
       </b-form>
     </b-modal>
+
+    <b-modal v-model="OrdenCompraFlag" size="lg" hide-footer title="Listado Orden de Compra">
+      {{ lstOrdenCompra }}
+    </b-modal>
   </div>
 </template>
 
@@ -264,6 +271,8 @@ export default {
   },
   data() {
     return {
+      OrdenCompraFlag: false,
+      lstOrdenCompra: [],
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -328,6 +337,14 @@ export default {
     }),
     abrirModalImprimir() {
       this.imprimirCodigoBarra = true;
+    },
+    async abrirModalOrdenCompra() {
+      this.OrdenCompraFlag = true;
+      await this.axios(this.API + "ordencompra", {
+        params: { estado: 1 }
+      }).then(res => {
+        this.lstOrdenCompra = res.data;
+      });
     },
     async obtnerTipoCambio() {
       await this.axios(this.API + "tipocambio/usd").then(res => {
