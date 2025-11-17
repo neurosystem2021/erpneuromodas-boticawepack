@@ -1499,7 +1499,7 @@ export default {
       }
     },
     async getListadoVendedor() {
-      await this.axios(`${this.API}usuarios`).then(res => {
+      await this.axios(`${this.API}lstusuarios/listado`).then(res => {
         if (res.data) {
           this.lstVendedor = res.data;
         }
@@ -1508,9 +1508,7 @@ export default {
     async getVendedor() {
       let usuario = sessionStorage.getItem("User").toLocaleLowerCase();
       await this.axios
-        .get(this.API + "usuarios", {
-          params: { usuario: usuario }
-        })
+        .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
           // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
@@ -1551,7 +1549,6 @@ export default {
       // console.log(this.ventas);
     },
     generarReporte() {
-      console.log(this.ventas)
       let productos = [];
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
         venta.productos.forEach(producto => {
