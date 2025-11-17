@@ -342,7 +342,7 @@
           <input
             v-model="productos[data.index].precio"
             :disabled="
-              productos[data.index].disabled || bloquearInput
+             idPerfil != 1 || productos[data.index].disabled || bloquearInput
                 ? true
                 : false ||
                   esDelivery ||
