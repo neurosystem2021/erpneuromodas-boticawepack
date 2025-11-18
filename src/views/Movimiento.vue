@@ -138,7 +138,6 @@
                         v-model="movimiento.Serie"
                         required="required"
                         @input="cargarNumero"
-                        :disable="bloquearSerie"
                         type="text"
                         placeholder=""></b-form-input>
                     </b-form-group>
@@ -148,7 +147,6 @@
                         ref="inputNumero"
                         v-model="movimiento.Numero"
                         required="required"
-                        :disable="bloquearSerie"
                         type="text"
                         placeholder=""
                         
@@ -285,14 +283,14 @@ export default {
           this.movimiento.Serie = "_C01";
           this.cargarNumero();
           setTimeout(() => {
-            this.$refs.inputSerie.$refs.input.disabled = true;
-            this.$refs.inputNumero.$refs.input.disabled = true;
+            // this.$refs.inputSerie.$refs.input.disabled = true;
+            // this.$refs.inputNumero.$refs.input.disabled = true;
           }, 100);
           val = true;
         } else {
           setTimeout(() => {
-            this.$refs.inputSerie.$refs.input.disabled = false;
-            this.$refs.inputNumero.$refs.input.disabled = false;
+            // this.$refs.inputSerie.$refs.input.disabled = false;
+            // this.$refs.inputNumero.$refs.input.disabled = false;
           }, 100);
         }
       }
