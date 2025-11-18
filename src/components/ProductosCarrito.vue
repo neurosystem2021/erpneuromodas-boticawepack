@@ -1152,22 +1152,31 @@ export default {
     },
     setProductoCant(prod) {
       console.log("prod", prod);
-      this.objProd.cantxPrecio = 1;
-      this.cant = prod.cantidad;
+
       let obj = this.objProd;
+
+      // limpiar input de búsqueda
       this.$refs.autocompleteProducto.setValue("");
-      obj.subt = "";
-      //obj.FLETE = 0
-      // this.objProd.precio = 0
-      // this.objProd.cantidad = 0
-      obj.precio = 0;
-      obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
-      obj.descuento = 0;
+
+      // ASIGNAR PRECIO Y CANTIDAD DE LA PRESENTACIÓN
+      obj.cantidad = parseFloat(prod.cantidad);
+      obj.precio   = parseFloat(prod.precio);
+      obj.cantidadPres = obj.cantidad;
+
+      // CALCULAR SUBTOTAL
+      obj.subtotal = obj.cantidad * obj.precio;
+
+      // guardar la presentación seleccionada
       obj.Presentacion = JSON.stringify(prod);
+
+      // limpiar valores innecesarios
+      obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+
+      // callback interno del sistema
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
+
+      // agregar al carrito
       this.add([
         obj,
         () => {
@@ -1178,9 +1187,9 @@ export default {
         false,
         this.cliente.EsVIP
       ]);
+
+      // cerrar modal
       this.$refs["modalCant"].hide();
-      obj.cantidadPres = this.cant;
-      //this.actualizarProd(obj)
     },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
