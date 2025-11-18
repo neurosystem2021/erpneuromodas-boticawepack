@@ -452,9 +452,9 @@
                   <b-col md="4" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" :disabled="inProgress" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button v-if="mostrarVentaFlag()"  block class="mx-1 btnAction" :disabled="inProgress" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Nueva Ventana</b-button>
-                      <delivery-modal v-if="mostrarVendedor" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <delivery-modal v-if="mostrarVentaFlag()" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else style="background: #A1887F; color:#ffffff" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
@@ -945,7 +945,7 @@ export default {
   },
   data() {
     return {
-      inProgress:false,
+      inProgress: false,
       listeners: {
         nuevoPedido: null,
         connect: null,
@@ -1156,6 +1156,11 @@ export default {
   },
 
   methods: {
+    mostrarVentaFlag() {
+      let IdPerfil = [1, 25, "1", "25"];
+      let val = sessionStorage.getItem("IdPerfil");
+      return IdPerfil.includes(val);
+    },
     getEstadoSistema() {
       let hostUrl = sessionStorage.getItem("HostUrl");
       if (hostUrl != null) {
@@ -1907,6 +1912,7 @@ export default {
         if (inputCliente && typeof inputCliente.setValue === "function") {
           // inputCliente.setValue(obj.Cliente);
         }
+        console.log("sss");
         this.ventas[this.ventaActiva].cliente = obj;
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
@@ -2493,6 +2499,8 @@ export default {
           }
         });
       venta.cliente = proforma;
+      venta.vendedor = { Usuario: proforma.UsuarioReg };
+      // console.log("proforma", proforma);
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
