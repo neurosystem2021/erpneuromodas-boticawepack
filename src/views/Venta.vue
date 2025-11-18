@@ -1214,13 +1214,6 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
-    this.conectarSocket();
-    this.setupSocketListeners();
-    this.getEstadoSistema();
-  },
-  beforeDestroy() {
-    this.removeSocketListeners();
-    this.$socket.disconnect();
   },
   methods: {
     conectarSocket() {
