@@ -156,7 +156,7 @@ export default {
     ObtenerEmpleado() {
       this.axios(`${this.API}/usuarios`, {
         params: {
-          IdPerfil: this.IdPerfil
+          idPerfil: this.IdPerfil
         }
       }).then(res => {
         let data = res.data;
@@ -178,7 +178,7 @@ export default {
       this.$nextTick(async () => {
         await this.axios(`${this.API}listado/entregas_por_repatidor`, {
           params: {
-            IdRepatidor: this.IdRepatidor
+            IdRepatidor: this.IdRepatidor,
           }
         }).then(res => {
           if (res) {

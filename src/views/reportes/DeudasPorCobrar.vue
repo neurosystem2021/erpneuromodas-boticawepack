@@ -47,8 +47,10 @@
                             <th>Usuario</th>
                             <th>Correlativo</th>
                             <th>Cliente</th>
+                            <th>Estado</th>
                             <th>Detalle</th>
-                            <th>Fecha</th>
+                            <th>F. Reg</th>
+                            <th>F. Entrega</th>
                             <th style="text-align: center;">Monto</th>
                             <th style="text-align: center;">Metodo</th>
                             <th style="text-align: center;">Monto Cobrado</th>
@@ -60,6 +62,7 @@
                             <td>{{deuda.NombreUsuario}}</td>
                             <td>{{deuda.Serie}} - {{ deuda.Numero }}</td>
                             <td>{{deuda.Cliente}}</td>
+                            <td>{{deuda.EstadoEntrega}}</td>
                             <td style="font-size: 0.85rem;">
                               <table width="100%">
 
@@ -83,6 +86,7 @@
                               </table>
                             </td>
                             <td>{{deuda.FechaReg}}</td>
+                            <td>{{deuda.FechaEntrega}}</td>
                             <td style="text-align: center;">{{parseFloat(deuda.MontoPago).toFixed(2)}}</td>
                             <td style="text-align: center;">
                                 <tr>
@@ -257,7 +261,7 @@ export default {
             }
           };
         }
-
+        
         item.metodospago.forEach(metodo => {
           const label = metodo.label;
           const monto = parseFloat(metodo.monto);
