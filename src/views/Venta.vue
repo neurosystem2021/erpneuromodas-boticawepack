@@ -289,7 +289,7 @@
                   <b-col md="12" class="text-left">
                     <b-row class="centrado d-flex justify-content-center my-1" >
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button v-if="mostrarVentaFlag()"  class="mx-1 btnAction" block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i>PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
@@ -596,18 +596,8 @@
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
-              <autocomplete
-                required="required"
-                ref="inputVendedor"
-                :url="API + 'usuarios'"
-                anchor="NombreUsuario"
-                class="font-weight-bold"
-                label="writer"
-                :on-select="setVendedor"
-                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                :classes="{ input: 'form-control' }"
-              >
-              </autocomplete>
+             <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario" disabled style="max-width: 150px;">
+
             </b-input-group>
           </b-col>
           <b-col md="4">
@@ -1214,8 +1204,23 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
+    this.getProductosCategoria();
+    this.conectarSocket();
+    this.setupSocketListeners();
+    this.getEstadoSistema();
+  },
+  beforeDestroy() {
+    this.removeSocketListeners();
+    this.$socket.disconnect();
   },
   methods: {
+    mostrarVentaFlag() {
+      let IdPerfil = [1, 25, "1", "25"];
+      let val = sessionStorage.getItem("IdPerfil");
+      console.log(IdPerfil);
+      console.log(val);
+      return IdPerfil.includes(val);
+    },
     conectarSocket() {
       if (!this.$socket.connected) {
         console.log("🔗 Conectando socket...");
@@ -1493,11 +1498,11 @@ export default {
           this.APPTOKEN = response.data.APPTOKEN;
           this.setAlmacen(almacen);
           this.setPuntoVenta(puntoVenta);
-          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
           // bloquear ambos inputs
           this.$refs.inputAlmacen.$refs.input.disabled = true;
           this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          this.$refs.inputVendedor.$refs.input.disabled = true;
+          // this.$refs.inputVendedor.$refs.input.disabled = true;
         })
         .catch(error => {
           console.log(error);
@@ -2564,6 +2569,7 @@ export default {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
+      venta.vendedor = { Usuario: proforma.UsuarioReg };
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -2594,21 +2600,6 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
       });
       // console.log(proforma.productos);
       venta.productos = productos;
