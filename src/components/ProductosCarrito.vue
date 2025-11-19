@@ -926,16 +926,59 @@ export default {
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
-    changeCant(val, prod, index) {
-      if (val > 0) {
-        prod.cantidad = prod.cantidadPres;
-        prod.cantidad *= val;
-      }
-      prod.subt = "";
-      this.$nextTick(() => {
-        this.actualizarProd({ Producto: prod, Pos: index });
-      });
-    },
+changeCant(val, prod, index) {
+  const multiplicador = Number(val) || 0;
+  const unidadesPorPres = Number(prod.cantidadPres) || 0;
+  const precio = Number(prod.precio) || 0;
+
+  // cantidad total = presentaciones * unidades por presentación
+  if (multiplicador > 0 && unidadesPorPres > 0) {
+    prod.cantidad = multiplicador * unidadesPorPres;
+  } else {
+    prod.cantidad = 0;
+  }
+
+  // guardar multiplicador
+  prod.cantxPrecio = multiplicador;
+
+  // SUBTOTAL
+  let subtotal = prod.cantidad * precio;
+  if (this.$options.filters && this.$options.filters.redondear) {
+    subtotal = this.$options.filters.redondear(subtotal);
+  }
+  prod.subtotal = subtotal;
+
+  // IGV (si tiene)
+  let igv = 0;
+  if (prod.TieneIgv) {
+    igv = subtotal * 0.18;
+    if (this.$options.filters && this.$options.filters.redondear) {
+      igv = this.$options.filters.redondear(igv);
+    }
+  }
+  prod.igv = igv;
+
+  // TOTAL
+  let total = subtotal + igv;
+
+  if (prod.FLETE) {
+    total += Number(prod.FLETE) || 0;
+  }
+  if (prod.descuento) {
+    total -= Number(prod.descuento) || 0;
+  }
+
+  if (this.$options.filters && this.$options.filters.redondear) {
+    total = this.$options.filters.redondear(total);
+  }
+
+  prod.total = total;
+
+  // actualizar en store
+  this.$nextTick(() => {
+    this.actualizarProd({ Producto: prod, Pos: index });
+  });
+},
 
     cambiarPrecio(index, prod) {
       var utilidad =
@@ -1151,32 +1194,27 @@ export default {
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
-      console.log("prod", prod);
-
       let obj = this.objProd;
 
-      // limpiar input de búsqueda
       this.$refs.autocompleteProducto.setValue("");
 
-      // ASIGNAR PRECIO Y CANTIDAD DE LA PRESENTACIÓN
-      obj.cantidad = parseFloat(prod.cantidad);
-      obj.precio   = parseFloat(prod.precio);
-      obj.cantidadPres = obj.cantidad;
+      // 1 presentación por defecto
+      obj.cantxPrecio = 1;
 
-      // CALCULAR SUBTOTAL
+      // ASIGNAR PRECIO Y CANTIDAD DE LA PRESENTACIÓN
+      obj.cantidad = parseFloat(prod.cantidad);   // unidades por presentación
+      obj.precio   = parseFloat(prod.precio);     // precio de la presentación
+      obj.cantidadPres = obj.cantidad;            // guarda unidades por presentación
+
+      // SUBTOTAL INICIAL
       obj.subtotal = obj.cantidad * obj.precio;
 
-      // guardar la presentación seleccionada
       obj.Presentacion = JSON.stringify(prod);
-
-      // limpiar valores innecesarios
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
 
-      // callback interno del sistema
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
 
-      // agregar al carrito
       this.add([
         obj,
         () => {
@@ -1188,7 +1226,6 @@ export default {
         this.cliente.EsVIP
       ]);
 
-      // cerrar modal
       this.$refs["modalCant"].hide();
     },
     showPresentacion(obj) {
