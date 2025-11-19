@@ -1,7 +1,10 @@
 <template>
-  <div>
+  <div style="padding: 0 12%;">
     <Menu v-if="false"></Menu>
     <br />
+    <div style="text-align: end;">
+      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+    </div>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
         <b-container class="bv-example-row" fluid>
           <b-row>
@@ -247,6 +250,14 @@
         </b-row>
       </b-form>
     </b-modal>
+
+     <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
+          <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
+            <template slot="action" slot-scope="data">
+              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
+    </b-modal>
   </div>
 </template>
 
@@ -264,6 +275,9 @@ export default {
   },
   data() {
     return {
+      ordenCompra: {},
+      modalMovimientos: false,
+      productosInf: [],
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -283,6 +297,14 @@ export default {
       tipocambio: 3.7,
       gravadaflag: 0,
       igvflag: 0,
+      fieldsOrdenCompra: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ],
       fields: [
         {
           key: "stock",
@@ -329,6 +351,58 @@ export default {
     abrirModalImprimir() {
       this.imprimirCodigoBarra = true;
     },
+    addPreOrdenCompra(item) {
+      console.log(item);
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.ordenCompra = item;
+      console.log(this.ordenCompra);
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      this.mostrarDetalles(item);
+      this.modalMovimientos = false;
+    },
+    async abrirModalOrdenCompra() {
+      this.verArticulos();
+      this.modalMovimientos = true;
+    },
+    mostrarDetalles(data) {
+      this.$store.state.cart.productos = [];
+      this.axios
+        .get(this.API + "ordencompra/detalle", {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra,
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          let detalle = response.data;
+          detalle.forEach(element => {
+            this.$store.state.cart.productos.unshift(element);
+          });
+          console.log(detalle);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    verArticulos() {
+      this.productosInf = [];
+      this.axios
+        .get(this.API + "ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: 1
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
+    },
+
     async obtnerTipoCambio() {
       await this.axios(this.API + "tipocambio/usd").then(res => {
         this.tipocambio = res.data;
@@ -568,7 +642,8 @@ export default {
         this.axios
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
-            productos: this.productos
+            productos: this.productos,
+            ordenCompra: this.ordenCompra
           })
           .then(response => {
             if (response.data.error) {
@@ -604,6 +679,9 @@ export default {
 };
 </script>
 <style>
+#modalOrdenCompra .modal-dialog {
+  min-width: 70% !important;
+}
 .input-group {
   /*margin: 0.25rem 0 !important;*/
 }
