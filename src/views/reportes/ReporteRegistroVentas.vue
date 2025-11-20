@@ -40,39 +40,74 @@
                     <tr>
                       <th>Id</th>
                       <th>Vendedor</th>
-                      <th>Fecha Doc</th>
-                      <th>Cod. Sunat</th>
-                      <th>Tipo Doc.</th>
-                      <th>Anulado</th>
-                      <th>Serie</th>
-                      <th>Número</th>
-                      <th>SubTotal</th>
-                      <th>IGV</th>
-                      <th>Total</th>
+                      <th>Tipo Doc</th>
+                      <th>Nro. Documento</th>
+                      <th>FECHA EMIS.</th>
+                      <th>FECHA VENCE</th>
+                      <th>RUC DNI</th>
+                      <th>RUC</th>
+                      <th>CLIENTE</th>
+                      <th>VTA GRAB</th>
+                      <th>IMPUESTO</th>
+                      <th>VTA NOGRAB</th>
+                      <th>TOTAL VTA</th>
+                      <th>COND PAGO</th>
+                      <th>FORMA PAGO</th>
+                      <th>BANCO</th>
+                      <th>NRO OPE</th>
+                      <th>DIAS CREDITO</th>
+                      <th>DOC REF</th>
+                      <th>SERIE REF</th>
+                      <th>NRO REF</th>
+                      <th>ESTADO</th>
                       <th></th>
+
                     </tr>
                 </thead>
                 <tbody class="scrollable-tbody">
                     <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirModalDetalle(reporte)" :class="{'clsAnulado': reporte.Anulado == 1}">
                         <td style="text-align: center;">{{reporte.idDocVenta}}</td>
                         <td>{{reporte.UsuarioReg}}</td>
-                        <td style="text-align: center;">{{reporte.FechaDoc}}</td>
-                        <td style="text-align: center;">{{reporte.CodSunat}}</td>
                         <td style="text-align: center;">{{reporte.TipoDoc}}</td>
-                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
-                        <td style="text-align: center;">{{reporte.Serie}}</td>
-                        <td style="text-align: center;">{{reporte.Numero}}</td>
-                        <td style="text-align: center;">{{reporte.SubTotal}}</td>
+                        <td style="text-align: center;">{{reporte.Serie}} - {{ reporte.Numero }}</td>
+                        <td style="text-align: center;">{{reporte.FechaDoc}}</td>
+                        <td style="text-align: center;">{{reporte.EsCredito ? reporte.FechaCredito : ''}}</td>
+                        <td style="text-align: center;">{{reporte.DniRuc}}</td>
+                        <td style="text-align: center;"></td>
+                        <td style="text-align: center;">{{ reporte.Cliente }}</td>
+                        <td style="text-align: center;">{{reporte.Total}}</td>
                         <td style="text-align: center;">{{reporte.Igv}}</td>
                         <td style="text-align: center;">{{reporte.Total}}</td>
+                        <td style="text-align: center;">{{reporte.Total}}</td>
+                        <td style="text-align: center;">{{reporte.EsCredito ==1  ? 'Crédito' : 'Contado'}}</td>
+                        <td style="text-align: center;">
+                          
+                            {{  
+                                Number(reporte.Efectivo) >0 ? 'Efectivo' : 
+                                Number(reporte.Visa) >0 ? reporte.VisaDesc : 
+                                Number(reporte.Mastercard) >0 ? reporte.MastercardDesc : 
+                                Number(reporte.Deposito) >0 ? reporte.DepositoDesc : 
+                                Number(reporte.Transferencia) >0 ? reporte.TransferenciaDesc : ''
+                            }}</td>
+                         <td style="text-align: center;"></td>
+                         <td style="text-align: center;"></td>
+                         <td style="text-align: center;">{{ reporte.DiasCredito }}</td>
+                         <td style="text-align: center;"></td>
+                         <td style="text-align: center;"></td>
+                         <td style="text-align: center;"></td>
+
+
+                        
+                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
                         <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="10">Total</td>
+                        <td colspan="12">Total</td>
                         <td style="text-align: center;">{{footerTotal}}</td>
                         <td colspan="1"></td>
+                        <td colspan="9"></td>
                     </tr>
                 </tfoot>
             </table>
