@@ -44,6 +44,8 @@ import Ordenes from "@/views/reportes/Ordenes.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
+import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -266,6 +268,16 @@ export default new Router({
       path: "/reportes/proformaticket/:id",
       name: "ProformaTicket",
       component: ProformaTicket
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
     }
   ]
 });

@@ -737,9 +737,9 @@
               </b-button>
             </b-col>
             <b-col cols="6">
-                <table class="table">
+                <table class="table table-hover tblModal" width="100%">
                     <thead>
-                      <tr style="background: #1A237E; color: #ffffff;">
+                      <tr class="" >
                         <th>Código</th>
                         <th>Producto</th>
                         <th>Tienda/ Almacén</th>
@@ -752,6 +752,12 @@
                         <td>{{ p.Producto }}</td>
                         <td>{{ p.Almacen }}</td>
                         <td>{{ p.stock }}</td>
+                      </tr>
+                      <tr v-for="n in 3" :key="n">
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
                       </tr>
                     </tbody>
                 </table>
