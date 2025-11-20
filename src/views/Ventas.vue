@@ -1374,7 +1374,8 @@ export default {
       }, 50);
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/00000000").then(res => {
+      this.axios.get(this.API + "clientes/10000010").then(res => {
+        console.log("res", res.data);
         if (res.data.IdCliente) {
           this.setCliente(res.data);
         }

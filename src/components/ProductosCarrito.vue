@@ -1528,6 +1528,7 @@ export default {
       if (!obj.stockMax) {
         obj.stockMax = obj.stock;
       }
+      console.log(obj);
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1952,6 +1953,7 @@ export default {
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
+      item.stockMax = item.stock;
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
           v => v.IdProducto == item.IdProducto
@@ -1966,7 +1968,7 @@ export default {
         if (prod.tipo == "PRESENTACION") {
           prod.cantxPrecio++;
         }
-
+        prod.stockMax = prod.stock;
         Vue.set(this.productos, index, prod);
         this.$nextTick(() => {
           this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
