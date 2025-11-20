@@ -1217,8 +1217,6 @@ export default {
     mostrarVentaFlag() {
       let IdPerfil = [1, 25, "1", "25"];
       let val = sessionStorage.getItem("IdPerfil");
-      console.log(IdPerfil);
-      console.log(val);
       return IdPerfil.includes(val);
     },
     conectarSocket() {
@@ -1796,7 +1794,6 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
-      console.log(producto);
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
@@ -1831,10 +1828,9 @@ export default {
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
-      console.log("length", pres.length);
-
       if (pres.length == 0) {
         productos.unshift(prod);
+        this.metodoPagoCambio(1);
         return;
       }
       prod.bloquearInputPrecio = false;
@@ -1846,7 +1842,9 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      this.metodoPagoCambio(1);
+      setTimeout(() => {
+        this.metodoPagoCambio(1);
+      }, 1000);
     },
     irAlPrimerProducto(event) {
       if (event) {
@@ -2544,7 +2542,6 @@ export default {
         .toUpperCase()
         .trim();
       await this.axios.post(this.API + "proformas", venta).then(response => {
-        console.log(response);
         if (response.data.insertId) {
           this.$toasted.success("Proforma realizada con exito");
           window.open(
@@ -2565,7 +2562,6 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     cargarProforma(proforma) {
-      console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
       venta.cliente = proforma;
@@ -2613,7 +2609,6 @@ export default {
       this.ventas[this.ventaActiva].cliente = proforma;
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
           this.metodoPagoCambio(1);
         }, 1000);
       });
@@ -2692,7 +2687,6 @@ export default {
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
-        console.log(obj);
         this.infoDelivery = obj;
         this.venta.EsDelivery = true;
         this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
@@ -2721,7 +2715,6 @@ export default {
                 ]);
                 //Cargar Productos Delivery
                 let productos = JSON.parse(obj.Productos);
-                console.log(productos);
                 productos.map(item => {
                   this.add([
                     item.IdProducto,
