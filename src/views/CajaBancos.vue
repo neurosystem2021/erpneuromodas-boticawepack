@@ -410,7 +410,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button :disabled="bloquearGuardar()" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
                     <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
@@ -545,7 +545,6 @@ export default {
       Proveedor: {},
       newDniRuc: {},
       newRuc: {},
-      IdTipoCajaBanco: "",
       FechaDocReg: "",
       Concepto: "",
       Importe: "",
@@ -614,7 +613,8 @@ export default {
       await this.axios(`${this.API}ListarCajaBanco`, { params: params }).then(
         res => {
           if (res.data) {
-            this.lstCajaBanco = res.data;
+            console.log(res.data.data);
+            this.lstCajaBanco = res.data.data;
           }
         }
       );
@@ -690,7 +690,6 @@ export default {
       }
     },
     generarLetras(deuda) {
-    
       this.deuda = deuda;
       this.letras = [];
       this.nroLetras = 0;
@@ -814,7 +813,6 @@ export default {
       this.Tipo = val.Tipo;
     },
     eliminarPago(data) {
-   
       this.$swal({
         icon: "question",
         title: "Eliminar",
@@ -979,6 +977,21 @@ export default {
           this.getHabitaciones();
           this.show = false;
         });
+    },
+    bloquearGuardar() {
+      if (!this.IdTipoCajaBanco) {
+        return true;
+      }
+
+      if (this.IdTipoCajaBanco == 1 || this.IdTipoCajaBanco == 2) {
+        if (this.lstAplicado.length == 0) {
+          return true;
+        }
+      }
+      // console.log("Tipo", this.IdTipoCajaBanco);
+      // console.log("Tipo", TipoCajaBanco);
+      // lstAplicado.length==0
+      return false;
     }
   },
   computed: {

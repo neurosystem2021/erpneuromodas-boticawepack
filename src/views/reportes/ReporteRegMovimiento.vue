@@ -260,7 +260,7 @@ export default {
       window.open(
         `/views/ReporteExcel6.php?&fechaIni=${this.fechaInicio}&fechaFin=${
           this.fechaFin
-        }&descripcion=${this.descripcion}&declarado=${this.declarado}`,
+        }&descripcion=${this.descripcion}&declarado=${this.declarado}&empresa=${sessionStorage.getItem("empresa")}`,
         "_blank"
       );
     },
