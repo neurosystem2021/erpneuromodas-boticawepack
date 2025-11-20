@@ -2072,8 +2072,8 @@ export default {
           pro.CodigoBarra !== "COSTODELIVERY" &&
           pro.CodigoBarra !== "MANODEOBRA" &&
           (pro.stock <= 0 ||
-            parseFloat(pro.cantidad) > pro.stock ||
-            pro.stock == undefined)
+            parseFloat(pro.cantidad) > pro.stockMax ||
+            pro.stockMax == undefined)
         ) {
           sinStock += 1;
         }

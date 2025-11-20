@@ -564,15 +564,24 @@
       class="modalSelectProduct modal-xl"
       ref="modalSelectProduct"
       id="modalSelectProduct"
+      hide-footer
     >
       <b-row>
         <b-col cols="12">
           <b-input-group>
             <input
               v-model="searchProducto"
-              placeholder="Buscar..."
+              placeholder="Búsqueda Rápida"
               class="form-control inputResponsive"
-              @input="cargarListadoProductos"
+              @input="cargarListadoProductos(1)"
+              id="searchProducto"
+              label="Búsqueda Rápida"
+            >
+            <input
+              v-model="searchProductoDesc"
+              placeholder="Filtrar Por Descripción"
+              class="form-control inputResponsive"
+              @input="cargarListadoProductos(2)"
               id="searchProducto"
             >
             <b-button  @click="limpiarBuscar" variant="warning"> X </b-button>
@@ -583,7 +592,7 @@
             </b-input-group-append>
             <input
               v-model="CodigoBarra"
-              @input="cargarListadoProductos"
+              @input="cargarListadoProductos(3)"
               type="text"
               class="form-control ml-2  inputResponsive"
               placeholder="Codigo de Barra"
@@ -599,57 +608,49 @@
             </b-input-group-append>
           </b-input-group>
         </b-col>
-        <b-form-group class="ml-3">
-          <b-form-radio-group
-            id="radio-group-1"
-            v-model="selected"
-            :options="options"
-            name="radio-options"
-          ></b-form-radio-group>
-        </b-form-group>
         <b-col cols="12" class="mt-3">
           <div class="tblModal">
             <table class="table table-hover" width="100%">
               <thead>
                 <tr>
-                  <th></th>
-                  <th>Cód</th>
-                  <th>Producto</th>
-                  <th>Modelo</th>
-                  <th>Marca</th>
-                  <th>Procedencia</th>
-                  <th>Categoria</th>
-                  <th>U.M.</th>
-                  <th>Empresa</th>
-                  <th>Stock</th>
+                  <!-- <th class="py-0"></th> -->
+                  <th class="py-0">Cód</th>
+                  <th class="py-0">Producto</th>
+                  <th class="py-0">Modelo</th>
+                  <th class="py-0">Marca</th>
+                  <th class="py-0">Procedencia</th>
+                  <th class="py-0">Categoria</th>
+                  <th class="py-0">U.M.</th>
+                  <th class="py-0">Empresa</th>
+                  <!-- <th class="py-0">Stock</th> -->
                   <!-- <th>Minimo</th> -->
-                  <th>Precio</th>
-                  <th>Por Mayor</th>
-                  <th>Por Volumen</th>
-                  <th>Imagen</th>
+                  <th class="py-0">Precio</th>
+                  <th class="py-0">Por Mayor</th>
+                  <th class="py-0">Por Volumen</th>
+                  <th class="py-0">Imagen</th>
                   
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(prod,index) in listadoProductosOrdenados()" :key="index" 
+                <tr v-for="(prod,index) in lstProductosRapido" :key="index" 
                 :class="prod.Empresa"
-                
-                @dblclick="anadirarProductosSeleccionado(prod,true)">
-                  <td><b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
-                  <td>{{ prod.CodigoBarra }}</td>
-                  <td>{{ prod.Producto }}</td>
-                  <td>{{prod.ProductoModelo }} </td>
-                  <td>{{prod.ProductoMarca }} </td>
-                  <td>{{prod.ProductoDesc3 }} </td>
-                  <td>{{prod.ProductoCategoria }} </td>
-                  <td>{{prod.ProductoMedicion }} </td>
-                  <td>{{ prod.NombreEmpresa }}</td>
-                  <td style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                @click="obtenerStockAlmacen(prod)"
+                >
+                  <!-- <td class="py-0"> <b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td> -->
+                  <td class="py-0">{{ prod.CodigoBarra }}</td>
+                  <td class="py-0">{{ prod.Producto }}</td>
+                  <td class="py-0">{{prod.ProductoModelo }} </td>
+                  <td class="py-0">{{prod.ProductoMarca }} </td>
+                  <td class="py-0">{{prod.ProductoDesc3 }} </td>
+                  <td class="py-0">{{prod.ProductoCategoria }} </td>
+                  <td class="py-0">{{prod.ProductoMedicion }} </td>
+                  <td class="py-0">{{ prod.NombreEmpresa }}</td>
+                  <!-- <td class="py-0" style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td> -->
                   <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
-                  <td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
+                  <td class="py-0">
                     <img
                     :src="
                        prod.Imagen == null ||  prod.Imagen == ''
@@ -674,44 +675,44 @@
             <table class="table table-hover" width="100%">
               <thead>
                  <tr>
-                  <th></th>
-                  <th>Cód</th>
-                  <th>Producto</th>
-                  <th>Modelo</th>
-                  <th>Marca</th>
-                  <th>Procedencia</th>
-                  <th>Categoria</th>
-                  <th>U.M.</th>
-                  <th>Empresa</th>
-                  <th>Stock</th>
+                  <!-- <th class="py-0"></th> -->
+                  <th class="py-0">Cód</th>
+                  <th class="py-0">Producto</th>
+                  <th class="py-0">Modelo</th>
+                  <th class="py-0">Marca</th>
+                  <th class="py-0">Procedencia</th>
+                  <th class="py-0">Categoria</th>
+                  <th class="py-0">U.M.</th>
+                  <th class="py-0">Empresa</th>
+                  <!-- <th class="py-0">Stock</th> -->
                   <!-- <th>Minimo</th> -->
-                  <th>Precio</th>
-                  <th>Por Mayor</th>
-                  <th>Por Volumen</th>
-                  <th>Imagen</th>
+                  <th class="py-0">Precio</th>
+                  <th class="py-0">Por Mayor</th>
+                  <th class="py-0">Por Volumen</th>
+                  <th class="py-0">Imagen</th>
                   
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(prod,index) in listadoProductos()" :key="index" 
+                <tr v-for="(prod,index) in lstProductosDescripcion" :key="index" 
                 :class="prod.Empresa"
-                
-                @dblclick="anadirarProductosSeleccionado(prod,true)">
-                  <td><b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
-                  <td>{{ prod.CodigoBarra }}</td>
-                  <td>{{ prod.Producto }}</td>
-                  <td>{{prod.ProductoModelo }} </td>
-                  <td>{{prod.ProductoMarca }} </td>
-                  <td>{{prod.ProductoDesc3 }} </td>
-                  <td>{{prod.ProductoCategoria }} </td>
-                  <td>{{prod.ProductoMedicion }} </td>
-                  <td>{{ prod.NombreEmpresa }}</td>
-                  <td style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td>
+                @click="obtenerStockAlmacen(prod)"
+                >
+                  <!-- <td class="py-0"><b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td> -->
+                  <td class="py-0">{{ prod.CodigoBarra }}</td>
+                  <td class="py-0">{{ prod.Producto }}</td>
+                  <td class="py-0">{{prod.ProductoModelo }} </td>
+                  <td class="py-0">{{prod.ProductoMarca }} </td>
+                  <td class="py-0">{{prod.ProductoDesc3 }} </td>
+                  <td class="py-0">{{prod.ProductoCategoria }} </td>
+                  <td class="py-0">{{prod.ProductoMedicion }} </td>
+                  <td class="py-0">{{ prod.NombreEmpresa }}</td>
+                  <!-- <td class="py-0" style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td> -->
                   <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
-                  <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
-                  <td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
+                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
+                  <td class="py-0">
                     <img
                     :src="
                        prod.Imagen == null ||  prod.Imagen == ''
@@ -728,135 +729,40 @@
           </table>
           </div>
           
-           <!-- <b-table
-            :items="listadoProductos()"
-            :fields="headerModalProducts"
-            responsive="sm"
-            :per-page="perPageModal"
-            :current-page="currentPageModal"
-            
-          >
-              <template slot="img" slot-scope="data">
 
-                <img
-                    :src="
-                       data.item.Imagen == null ||  data.item.Imagen == ''
-                        ? 'static/no-photo.png'
-                        : `/resources/images/productos/${ data.item.Imagen}`
-                    "
-                    class="imagen"
-                  />
-
-              </template>
-              <template slot="add" slot-scope="data">
-                    <b-button pill variant="primary" @click="anadirarProductosSeleccionado(data.item,true)">
-                      <i class="fas fa-check"/>    
-                    </b-button>
-
-              </template>
-          </b-table> -->
-          <b-row>
-            <!-- <b-col cols="8">
-              <b-pagination
-                v-model="currentPageModal"
-                :total-rows="10000000000"
-                :per-page="perPageModal"
-                aria-controls="my-table"
-                @change="cargarListadoProductos"
-              ></b-pagination>
-          </b-col> -->
+          <b-row class="mt-5">
             <b-col cols="4">
-              <b-row>
-                <b-col cols="6">  
-                  Nro De Filas:
-                </b-col>
-                <b-col cols="6">
-                  <b-form-select
-                    v-model="perPageModal"  
-                    :options="perPageModalList"
-                    size="small"
-                    class="form-control"
-                    @change="cambiarPorPaginate($event)"
-                  ></b-form-select>
-                </b-col>
-              </b-row>
-            
-            
+              <b-button variant="success" :disabled="lstProductoStock.length==0" @click="anadirProductoSeleccionado()">
+                <i class="fa fa-check" aria-hidden="true"></i> Aceptar
+              </b-button>
+            </b-col>
+            <b-col cols="6">
+                <table class="table">
+                    <thead>
+                      <tr style="background: #1A237E; color: #ffffff;">
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Tienda/ Almacén</th>
+                        <th>Stock</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(p,index) in lstProductoStock" :key="index">
+                        <td>{{ p.CodigoBarra }}</td>
+                        <td>{{ p.Producto }}</td>
+                        <td>{{ p.Almacen }}</td>
+                        <td>{{ p.stock }}</td>
+                      </tr>
+                    </tbody>
+                </table>
+            </b-col>
+            <b-col cols="2">
+                Stock Total Por Empresa
+                <input type="text" class="form-control"  disabled :value="lstProductoStock.reduce((sum,prod)=>{return sum + parseFloat(prod.stock)},0)">
             </b-col>
           </b-row>
            
-           
-          <!-- <table class="table tblProductosModal">
-            <thead>
-              <tr>              
-                <th width="15%">Empresa</th>
-                <th width="15%">Categoria</th>
-                <th width="20%">Marca</th>
-                <th width="28%">Producto</th>
-                <th width="5%">Stock</th>
-                <th width="5%">Stock Mínimo</th>
-                <th width="5%">Precio</th>
-                <th width="7%">Imagen</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(producto, index) in listadoProductos()" :key="index"
-               :class="producto.Selected?'optionSelect' :''" 
-                @click="producto.Selected=!producto.Selected" 
-                @dblclick="anadirarProductosSeleccionado(producto)">
-                <td width="15%">{{ producto.NombreEmpresa }}</td>
-                <td width="15%">{{ producto.ProductoCategoria }}</td>
-                <td width="20%">{{ producto.ProductoMarca }}</td>
-                <td width="28%">{{ producto.Producto }}</td>
-                <td width="5%">{{ producto.stock }}</td>
-                <td width="5%">{{ producto.StockMinimo }}</td>
-                <td width="5%">{{ producto.PrecioContado }}</td>
-                 <td>{{ producto.Imagen }} 
-                <td width="7%">
-                  <img
-                    :src="
-                      producto.Imagen == null || producto.Imagen == ''
-                        ? 'static/no-photo.png'
-                        : `/resources/images/productos/${producto.Imagen}`
-                    "
-                    class="imagen"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table> -->
-          <!-- <b-table
-            hover
-            :items="listadoProductos()"
-            :fields="fieldsNuevoProductos"
-            :per-page="perPage"
-            :current-page="currentPage"
-            small
-          >
-            <template slot="Selected" slot-scope="data">
-              <b-form-checkbox
-                size="lg"
-                v-model="data.item.Selected"
-                class="ml-2"
-              />
-            </template>
-            <template slot="Imagen" slot-scope="data">
-              <img
-                :src="
-                  data.Imagen == null || data.Imagen == ''
-                    ? 'static/no-photo.png'
-                    : `/resources/images/productos/${data.Imagen}`
-                "
-                class="imagen"
-              />
-            </template>
-           
-          </b-table> 
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="listadoProductos().length"
-            :per-page="perPage"
-          ></b-pagination>-->
+        
         </b-col>
       </b-row>
       
@@ -1068,6 +974,9 @@ export default {
   },
   data() {
     return {
+      lstProductosRapido: [],
+      lstProductosDescripcion: [],
+      lstProductoStock: [],
       Serie: "",
       Series: [],
       page: 0,
@@ -1087,6 +996,7 @@ export default {
       // perPage: 7,
       currentPage: 1,
       searchProducto: "",
+      searchProductoDesc: "",
       errorMontoPresentacion: "",
       monto: 0,
       selected: 1,
@@ -1615,6 +1525,9 @@ export default {
       }
     },
     async setProducto(obj) {
+      if (!obj.stockMax) {
+        obj.stockMax = obj.stock;
+      }
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
         : "modasm";
@@ -1626,7 +1539,7 @@ export default {
       obj.EsObsequio = 0;
 
       let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto);
-      prod.productoSerie = productoSerie;
+      obj.productoSerie = productoSerie;
       obj.EsVenta = this.isVentas;
 
       if (!this.isVentas) {
@@ -1637,7 +1550,7 @@ export default {
       let fPP = this.preciosProd.filter(
         p => p.cantidad === 0 || p.cantidad === "0"
       );
-
+      console.log(obj);
       if (!obj.PreciosPorProducto || fPP.length === 5) {
         obj.estadoPxP = true;
         this.setProductoUni(obj);
@@ -1943,14 +1856,13 @@ export default {
     async abrirModaProductos() {
       this.modalNuevoProductos = !this.modalNuevoProductos;
       this.CodigoBarra = "";
-      await this.cargarListadoProductos();
+      await this.cargarListadoProductos(4);
     },
-    cambiarPorPaginate(val) {
-      this.currentPageModal = 0;
-      this.perPageModal = val;
-      this.cargarListadoProductos();
-    },
-    async cargarListadoProductos() {
+    async cargarListadoProductos(tipo) {
+      let IdProductos = this.productos.map(v => {
+        return v.IdProducto;
+      });
+      console.log("IdProductos", IdProductos.join(","));
       await this.axios(
         `${this.API}productos/puntoventa/modal/stock/${this.idAlmacen}`,
         {
@@ -1958,15 +1870,40 @@ export default {
             sortBy: null,
             sortDesc: 1,
             limit: null,
-            search: this.searchProducto,
-            tipo: this.selected,
+            search:
+              tipo == 1
+                ? this.searchProducto
+                : tipo == 2
+                  ? this.searchProductoDesc
+                  : "",
+            // tipo: this.selected,
             limit: this.perPageModal,
             page: 0,
-            CodigoBarra: this.CodigoBarra
+            CodigoBarra: this.CodigoBarra,
+            tipo: tipo,
+            IdProductos: IdProductos.join(",")
           }
         }
       ).then(res => {
-        this.lstProductos = res.data;
+        switch (tipo) {
+          case 1:
+            this.lstProductosRapido = res.data;
+
+            break;
+          case 2:
+            this.lstProductosDescripcion = res.data;
+            break;
+          case 3:
+            this.lstProductosRapido = res.data;
+            this.lstProductosDescripcion = res.data;
+            break;
+          case 4:
+            this.lstProductosRapido = res.data;
+            this.lstProductosDescripcion = res.data;
+            break;
+          default:
+            break;
+        }
       });
     },
 
@@ -2327,6 +2264,30 @@ export default {
     },
     variantPorEmpresa(empresa) {
       return null;
+    },
+    async obtenerStockAlmacen(Producto) {
+      await this.axios(`${this.API}/productos/almacen/stock`, {
+        params: { IdProducto: Producto.IdProducto }
+      }).then(res => {
+        this.lstProductoStock = res.data;
+      });
+      let stockMax = this.lstProductoStock.reduce((sum, prod) => {
+        return sum + parseFloat(prod.stock);
+      }, 0);
+      Producto.stockMax = stockMax;
+      this.producto = Producto;
+    },
+    async anadirProductoSeleccionado() {
+      this.modalNuevoProductos = false;
+      await this.setProducto(this.producto);
+      // setTimeout(async () => {
+      await this.cargarListadoProductos(4);
+      this.modalNuevoProductos = true;
+      this.lstProductoStock = [];
+      this.producto = {};
+      this.searchProducto = "";
+      this.searchProductoDesc = "";
+      // }, 1000);
     }
   },
   components: {
@@ -2387,7 +2348,7 @@ export default {
   color: #ffffff;
 }
 .tblModal {
-  height: 520px;
+  height: 25vh;
   overflow-y: auto;
   overflow-x: auto;
   display: block;
