@@ -27,6 +27,7 @@ import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
+import Dashboard from '@/views/reportes/Dashboard.vue'
 
 Vue.use(Router)
 
@@ -72,6 +73,11 @@ export default new Router({
       path: '/reportes/ventas',
       name: 'ReporteVentas',
       component: ReporteVentas
+    },
+    {
+      path: '/reportes/Dashboard',
+      name: 'Dashboard',
+      component: Dashboard
     },
     {
       path: '/reportes/cierrecaja',
