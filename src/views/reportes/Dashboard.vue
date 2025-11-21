@@ -108,14 +108,14 @@ export default {
     };
   },
   methods: {
-    recargarReportes() {
-      Promise.all([
-        this.getDataRankinVendedor(),
-        this.getProdcutosMasVendidos(),
-        this.getUtilidadBruta(),
-        this.getMovimientos(),
-        this.getDataDias()
-      ]);
+    async recargarReportes() {
+      // await Promise.all([
+      await this.getMovimientos();
+      await this.getDataDias();
+      await this.getDataRankinVendedor();
+      await this.getUtilidadBruta();
+      await this.getProdcutosMasVendidos();
+      // ]);
     },
     getDataDias(anio, mes, dias, idAlmacen) {
       this.lstDia = [];
@@ -143,8 +143,8 @@ export default {
 
       this.totalDia = totalDia.toFixed(2);
     },
-    getDataRankinVendedor(anio, mes, dias, idAlmacen) {
-      this.axios
+    async getDataRankinVendedor(anio, mes, dias, idAlmacen) {
+      await this.axios
         .get(this.API + "reporte/rankingvendedor", {
           params: {
             fechaInicio: this.fechaInicio,
@@ -160,8 +160,8 @@ export default {
           console.log(error);
         });
     },
-    getProdcutosMasVendidos(anio, mes, dias, idAlmacen) {
-      this.axios
+    async getProdcutosMasVendidos(anio, mes, dias, idAlmacen) {
+      await this.axios
         .get(this.API + "reporte/productomasvendidos", {
           params: {
             fechaInicio: this.fechaInicio,
@@ -194,8 +194,8 @@ export default {
           console.log(error);
         });
     },
-    getMovimientos(anio, mes, dias, idAlmacen) {
-      this.axios
+    async getMovimientos(anio, mes, dias, idAlmacen) {
+      await this.axios
         .get(this.API + "reporte/movimientos", {
           params: {
             fechaInicio: this.fechaInicio,
