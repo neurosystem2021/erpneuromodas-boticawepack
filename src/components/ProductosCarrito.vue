@@ -388,6 +388,11 @@ import config from "@/store/config.js";
 
 export default {
   mounted() {
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.irABuscarProducto();
+      }, 500);
+    });
     // this.alterarBuscadorProductos()
   },
   data() {
