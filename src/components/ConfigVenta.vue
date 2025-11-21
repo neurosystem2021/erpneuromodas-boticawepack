@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="MostrarConfiguracion" variant="outline-primary">Configurar</b-button>
+        <b-button class="btnAction" @click="MostrarConfiguracion" size="lg" variant="danger">Configurar</b-button>
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 

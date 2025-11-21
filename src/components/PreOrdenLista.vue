@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Cargar Pre Orden</b-button>
+        <b-button @click="show=true" variant="warning"  size="lg" class="btnAction">Cargar Pre Orden</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
