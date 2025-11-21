@@ -16,6 +16,7 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}"
             id="autocompleteProducto"
+            @keydown.native.tab.prevent="irCodeBar"
             >
           </autocomplete>
           <input v-model="loadCode"
@@ -25,7 +26,8 @@
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" 
-                  id="barcodeInput"
+                  id="txtCodeBar"
+                   @keydown.tab.prevent="irABuscarProducto"
                   />
           <b-input-group-append>
             <!--<proveedores-tabla></proveedores-tabla>-->
@@ -552,8 +554,16 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
-    irABarcode(){}
-    irABuscarProducto(){}
+    irCodeBar() {
+      let inputElement = `txtCodeBar`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+    },
+    irABuscarProducto() {
+      let inputElement = `autocompleteProducto`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;

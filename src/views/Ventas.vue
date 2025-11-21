@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div @keypress.enter="mostrarAlert" class="mt-0">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid class="ancho">
+        <b-container fluid class="ancho mt-0" >
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
@@ -420,9 +420,9 @@
                 <b-row align-h="center" class="text-center" style="margin-top:-15px">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
+                        <b-button class="btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -440,17 +440,22 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
+import { onMounted, onUnmounted } from "vue";
 
 export default {
   beforeMount() {
     this.initForm();
   },
   mounted() {
+    window.addEventListener("keyup", this.realizarVenta);
     // this.getNumeroVenta()
     this.getVendedor();
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
     this.configStock();
+  },
+  beforeDestroy() {
+    window.removeEventListener("keyup", this.realizarVenta);
   },
   data() {
     return {
@@ -1528,6 +1533,11 @@ export default {
       if (this.$refs.inputComisionista) {
         this.$refs.inputComisionista.setValue("");
         this.venta.comisionista = {};
+      }
+    },
+    realizarVenta(event) {
+      if (event.key === "Enter") {
+        this.guardarVenta(event)
       }
     }
   },
