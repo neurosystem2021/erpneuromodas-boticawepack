@@ -2606,6 +2606,14 @@ export default {
       });
     }
     //Fin Sockets
+  },
+  watch: {
+    ventaActiva() {
+      console.log("cambio de ventana");
+      setTimeout(() => {
+        this.metodoPagoCambio(1);
+      }, 100);
+    }
   }
 };
 </script>

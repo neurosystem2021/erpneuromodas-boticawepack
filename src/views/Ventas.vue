@@ -311,7 +311,7 @@
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="venta.pago.efectivo.descripcion"
+                                                    v-model="ventas[ventaActiva].pago.efectivo.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -319,7 +319,7 @@
                                             <td>
                                                 <input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="venta.pago.efectivo.monto"
+                                                    v-model="ventas[ventaActiva].pago.efectivo.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
@@ -333,7 +333,7 @@
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="venta.pago.visa.descripcion"
+                                                    v-model="ventas[ventaActiva].pago.visa.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -342,12 +342,12 @@
                                                 <input
                                                     :disabled="bloquearInput?true:false"
                                                     class="form-control"
-                                                    v-model="venta.pago.visa.monto"
+                                                    v-model="ventas[ventaActiva].pago.visa.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -356,7 +356,7 @@
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
-                                                    v-model="venta.pago.mastercard.descripcion"
+                                                    v-model="ventas[ventaActiva].pago.mastercard.descripcion"
                                                     type="text"
                                                     placeholder="Descripcion"
                                                 ></b-form-input>
@@ -365,12 +365,12 @@
                                                 <input
                                                     :disabled="bloquearInput?true:false"
                                                     class="form-control"
-                                                    v-model="venta.pago.mastercard.monto"
+                                                    v-model="ventas[ventaActiva].pago.mastercard.monto"
                                                     min="0"
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
