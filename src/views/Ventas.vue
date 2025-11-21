@@ -1380,7 +1380,7 @@ export default {
       document.getElementById(txtCodeBar).focus();
     },
     irBusquedaProducto() {
-      console.log('ss')
+      console.log("ss");
       let txtCodeBar = `autocompleteProducto${this.ventaActiva}`;
       document.getElementById(txtCodeBar).focus();
       document.getElementById(txtCodeBar).select();
@@ -2337,6 +2337,9 @@ export default {
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
+          setTimeout(() => {
+            this.metodoPagoCambio(1);
+          }, 100);
         }
 
         // if (response.data.actualizar) {
@@ -2760,6 +2763,11 @@ export default {
       } else {
         return this.API + "productos";
       }
+    }
+  },
+  watch: {
+    ventaActiva() {
+      this.metodoPagoCambio(1);
     }
   }
 };
