@@ -217,6 +217,14 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.TienePresentacion"
+                   :value="1"
+                   :unchecked-value="0">
+              Tiene Presentación
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group>
             <label>Activar SubProductos:</label>
             <b-form-checkbox
                      v-model="producto.EsPadre"
@@ -299,7 +307,7 @@
       </b-row>
 
       <hr>
-      <b-row>
+      <b-row v-if="producto.TienePresentacion==1">
         <b-col md="3" v-for="i in 4" :key="i.id">
           <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
             <b-form-group>
@@ -515,6 +523,7 @@ export default {
             this.producto.PrecioContado = newVal.PrecioContado;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.EsHabitacion = newVal.EsHabitacion;
+            this.producto.TienePresentacion = newVal.TienePresentacion;
             this.producto.Piso = newVal.Piso;
             this.producto.ControlaStock = newVal.ControlaStock;
             this.producto.Imagen = newVal.Imagen;

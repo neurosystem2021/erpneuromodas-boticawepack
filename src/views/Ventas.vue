@@ -235,7 +235,9 @@
                                 @keydown.enter.prevent="loadBarcode"
                                 type="text"
                                 class="form-control"
-                                placeholder="Codigo de Barra" />
+                                placeholder="Codigo de Barra" 
+                                 @keydown.tab.prevent="irABuscarProducto"
+                                />
                         <b-input-group-append>
                             <!--<proveedores-tabla></proveedores-tabla>-->
                             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
@@ -260,6 +262,15 @@
                 <div class="divCarrito">
                 <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos">
+                    <template slot="stock" slot-scope="data">
+                    <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
+                        <img src="static/moto-delivery.png" style="width: 24px" />
+                    </div>
+                    <div v-else>
+                      <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+                      <div v-else>{{ data.item.stock }}</div>
+                    </div>
+                  </template>
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -1170,6 +1181,7 @@ export default {
     this.setupSocketListeners();
     this.getEstadoSistema();
   },
+
   beforeDestroy() {
     this.removeSocketListeners();
     this.$socket.disconnect();
@@ -1181,7 +1193,16 @@ export default {
         this.$socket.connect();
       }
     },
-
+    irABarCode() {
+      let inputElement = `txtCodeBar${this.ventaActiva}`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+    },
+    irABuscarProducto() {
+      let inputElement = `autocompleteProducto${this.ventaActiva}`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+    },
     /**
      * ✅ NUEVO: Configurar todos los listeners
      */
@@ -1359,6 +1380,7 @@ export default {
       document.getElementById(txtCodeBar).focus();
     },
     irBusquedaProducto() {
+      console.log('ss')
       let txtCodeBar = `autocompleteProducto${this.ventaActiva}`;
       document.getElementById(txtCodeBar).focus();
       document.getElementById(txtCodeBar).select();
