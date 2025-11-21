@@ -250,7 +250,6 @@
 
         <template slot="utilidad" slot-scope="data">
           <input 
-            :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
             style="width: 80px"
@@ -259,7 +258,7 @@
             @input="cambiarPrecio(data.index, productos[data.index])" 
             @mouseup="cambiarPrecio(data.index, productos[data.index])" 
             />
-            <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+            <small v-if="idPerfil==1">ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
 
         <template slot="descuento" slot-scope="data">
