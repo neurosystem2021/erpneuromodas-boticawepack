@@ -43,6 +43,8 @@ import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
+import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
+import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
 Vue.use(Router);
 
 export default new Router({
@@ -252,6 +254,16 @@ export default new Router({
       path: "/BuscadorCajaBanco",
       name: "BuscadorCajaBanco",
       component: BuscadorCajaBanco
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
     }
   ]
 });
