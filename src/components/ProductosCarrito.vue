@@ -259,7 +259,7 @@
             @input="cambiarPrecio(data.index, productos[data.index])" 
             @mouseup="cambiarPrecio(data.index, productos[data.index])" 
             />
-            <small>ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
+            <small v-if="idPerfil == 1">ganancia: {{ (productos[data.index].precio - productos[data.index].PrecioCosto) | redondear }}</small>
         </template>
 
         <template slot="descuento" slot-scope="data">
