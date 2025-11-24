@@ -57,6 +57,7 @@
                   <th>Anular</th>
                 </tr>
               </thead>
+              
               <tbody>
                 <tr v-for="(prod, i) in productosInf" :key="i">
                   <td class="text-center" :class="{'table-danger': prod.Estado == 0}" style="width: 5% !important;">{{ prod.IdOrdenCompra }}</td>
