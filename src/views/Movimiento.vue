@@ -1,18 +1,13 @@
 <template>
-  <div>
+  <div style="padding: 0 12%;">
     <Menu v-if="false"></Menu>
     <br />
+    <div style="text-align: end;">
+      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+    </div>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
-        <b-container fluid class="anchomov" id="conten">
+       <b-container class="bv-example-row" fluid>
           <b-row>
-            <b-col md="12" style="text-align: right">
-              <b-button
-                @click="abrirModalOrdenCompra"
-                :disabled="Object.keys(movimiento.movimientoTipo).length==0"
-                variant="info"
-                >Cargar Orden Compra</b-button
-              >
-            </b-col>
               <b-col md="8">
 
                 <b-row>
@@ -220,20 +215,14 @@
         </b-container>
         <br><br>
     </b-form>
+    
 
-    <b-modal
-      v-model="modalMovimientos"
-      id="modalOrdenCompra"
-      no-close-on-backdrop
-      no-close-on-esc
-    >
-      <b-table :items="productosInf" :fields="fields">
-        <template slot="action" slot-scope="data">
-          <b-button variant="info" @click="addPreOrdenCompra(data.item)"
-            ><i class="fa fa-plus" aria-hidden="true"></i
-          ></b-button>
-        </template>
-      </b-table>
+     <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
+          <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
+            <template slot="action" slot-scope="data">
+              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
     </b-modal>
   </div>
 </template>
@@ -250,12 +239,22 @@ export default {
   mounted() {},
   data() {
     return {
+      ordenCompra: {},
+      modalMovimientos: false,
+      productosInf: [],
+      fieldsOrdenCompra: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ],
       inProgress: false,
       newRuc: "",
       API: config.API,
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
-      modalMovimientos: false,
       carrito: {
         fields: [
           //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
@@ -296,15 +295,6 @@ export default {
           { key: "acciones", label: "" }
         ]
       },
-      productosInf: [],
-      fields: [
-        { key: "Correlativo" },
-        { key: "Ruc" },
-        { key: "Total" },
-        { key: "FechaReg", label: "Fecha" },
-        { key: "Proveedor" },
-        { key: "action", label: "" }
-      ],
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false
@@ -325,42 +315,39 @@ export default {
       obtenerStok: "obtenerStock",
       limpiarCart: "limpiarCarrito"
     }),
-    async verArticulos() {
-      this.productosInf = [];
-      await this.axios
-        .get(this.API + "ordencompra", {
-          params: {
-            // fechaDesde: "1990-01-01",
-            fechaHasta: this.$moment().format("YYYY-MM-DD"),
-            estado: -1,
-            idAlmacen: this.movimiento.almacenDestino.IdAlmacen
-          }
-        })
-        .then(response => {
-          this.productosInf = response.data;
-        });
+    abrirModalImprimir() {
+      this.imprimirCodigoBarra = true;
     },
-    abrirModalOrdenCompra() {
-      this.verArticulos();
-      this.modalMovimientos = true;
-    },
-
     addPreOrdenCompra(item) {
-      let almacenDest = { ...item };
+      console.log(item);
       let proveedor = {
         IdProveedor: item.IdProveedor,
         Proveedor: item.Proveedor
       };
       this.ordenCompra = item;
-      this.setAlmacenDestino(item);
-      this.$refs.inputAlmacenDestino.setValue(item.Almacen);
-
+      console.log(this.ordenCompra);
       this.setProveedor(proveedor);
       this.$refs.inputProveedor.setValue(item.Proveedor);
-      setTimeout(() => {
-        this.mostrarDetalles(item);
-      }, 100);
+      this.mostrarDetalles(item);
       this.modalMovimientos = false;
+    },
+    async abrirModalOrdenCompra() {
+      this.verArticulos();
+      this.modalMovimientos = true;
+    },
+    verArticulos() {
+      this.productosInf = [];
+      this.axios
+        .get(this.API + "ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: 1
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
     },
     async mostrarDetalles(data) {
       this.$store.state.cart.productos = [];
@@ -374,9 +361,13 @@ export default {
         .then(response => {
           let detalle = response.data;
           detalle.forEach(element => {
-            let prod = { ...element, Presentacion: "UNIDAD" };
-            this.$store.state.cart.productos.unshift(prod);
+            element.Presentacion = "UNIDAD";
+            element.CantidadPresentacion = 1;
+            element.EsPresentacion = 0;
+            element.subt = "";
+            this.$store.state.cart.productos.unshift(element);
           });
+          console.log(detalle);
         })
         .catch(error => {
           console.log(error);
@@ -733,8 +724,8 @@ td.centrarTd {
   display: flex !important;
   justify-content: center !important;
 }
-.input-group {
-  /*margin: 0.25rem 0 !important;*/
+#modalOrdenCompra .modal-dialog {
+  min-width: 70% !important;
 }
 .anchomov {
   width: calc(100% - 300px) !important;
