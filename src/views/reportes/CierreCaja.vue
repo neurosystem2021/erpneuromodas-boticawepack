@@ -70,7 +70,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in productosVendidos" :key="index">
-              <td>{{ item.IdProducto }}</td>
+              <td>{{ item.CodigoFrabricante }}</td>
               <td>{{ item.Producto }}</td>
               <td>{{ item.CantidadVendida }}</td>
               <td>S/. {{ item.MontoVendido | redondear }}</td>
@@ -144,7 +144,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3"></td>
+              <td colspan="4"></td>
               <td class="total"><b>Total Efectivo</b></td>
               <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
             </tr>
@@ -208,7 +208,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Tarjetas</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
@@ -273,7 +273,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Yape / Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
@@ -337,7 +337,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Transferencias </b></td>
               <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
@@ -483,7 +483,7 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="3"></td>
                 <td class="total"><b>Total Ingresos Tarjetas</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
@@ -566,7 +566,7 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos + this.totalIngresosTarjeta - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia  - this.totalSalidas

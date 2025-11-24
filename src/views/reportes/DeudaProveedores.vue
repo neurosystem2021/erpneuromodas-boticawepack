@@ -118,7 +118,7 @@ export default {
       API: config.API,
       pageOptions: [5, 10, 15, 50, 100],
       filter: "",
-      sortBy: "IdDocVenta",
+      sortBy: "FechaDoc",
       sortDesc: false,
       items: [],
       isBusy: false,
@@ -166,42 +166,42 @@ export default {
       Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
     myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      // console.log(ctx.filter)
-      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get(
-        this.API +
-          "proveedores/deudas?q=" +
-          ctx.filter +
-          "&proveedor=" +
-          this.proveedor.Proveedor +
-          "&limit=" +
-          ctx.perPage +
-          "&page=" +
-          ctx.currentPage
-      );
+      const url =
+      this.API +
+      'proveedores/deudas?' +
+      'q=' + (ctx.filter || '') +
+      '&proveedor=' + (
+      this.proveedor && this.proveedor.Proveedor
+      ? this.proveedor.Proveedor
+      : ''
+      ) +
+      '&limit=' + ctx.perPage +
+      '&page=' + ctx.currentPage +
+      '&sortBy=' + (ctx.sortBy || 'FechaDoc') +
+      '&sortDesc=' + (ctx.sortDesc ? 1 : 0)
 
-      return promise
-        .then(response => {
-          console.log(response);
-          this.items = response.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
-        })
-        .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return [];
-        });
+      return this.axios.get(url)
+      .then(response => {
+
+        // SI DEVUELVE ARRAY NORMAL
+        if (Array.isArray(response.data)) {
+          this.items = response.data
+          this.totalRows = response.data.length
+          return this.items
+        }
+
+        // SI DEVUELVE { total, data }
+        this.items = response.data.data
+        this.totalRows = response.data.total
+        return this.items
+      })
+      .catch(() => {
+        return []
+      })
     },
     myRowClickHandler(record, index) {
-      if (record.Letras != "Ninguna" && record.Letras != "") {
-        this.showLetras = true;
+      if(record.Letras!='Ninguna' && record.Letras!=''){
+        this.showLetras = true
         this.$refs.detDeuPro.cargarDeudasProveedor(
           record.Id,
           record.Total,
@@ -213,7 +213,7 @@ export default {
     }
   },
   components: {
-    // ProductoForm
+      // ProductoForm
     DetalleDeudaProveedor
   }
 };
@@ -221,8 +221,8 @@ export default {
 
 <style>
 /* #my-tableDeuda tbody tr:last-child {
-  color: black;
-  background: transparent;
-  font-weight: bold;
+    color: black;
+    background: transparent;
+    font-weight: bold;
 } */
 </style>
