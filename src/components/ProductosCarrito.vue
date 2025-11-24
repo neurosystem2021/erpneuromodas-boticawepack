@@ -250,6 +250,7 @@
 
         <template slot="utilidad" slot-scope="data">
           <input 
+            :disabled="bloquearInput?true:false || (idPerfil == 1) ? false : true || esDelivery"
             class="form-control"
             v-model="productos[data.index].PorcentajeUtilidad"
             style="width: 80px"

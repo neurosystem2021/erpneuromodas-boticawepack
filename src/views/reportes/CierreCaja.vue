@@ -186,11 +186,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th style="width:90px">Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -249,11 +250,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -313,11 +315,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -375,11 +378,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-                <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+                <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -437,11 +441,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Productos</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>
@@ -539,7 +544,14 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + 
+      this.totalVentasVisa + 
+      this.totalVentasMastercard + 
+      this.totalVentasTransferencia + 
+      this.totalIngresosTarjeta +
+      this.totalIngresos - 
+      this.totalSalidas - 
+      this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia  - this.totalSalidas
@@ -650,23 +662,26 @@ export default {
       //this.items[index].productos = detalles
       return detalles
     },
-    getVendedor () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            this.setVendedor(response.data)
-            this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+    async getVendedor() {
+        try {
+          const usuario = sessionStorage.getItem("User");
+          const response = await this.axios.get(this.API + "usuarios/" + usuario);
+          this.setVendedor(response.data);
+          this.$nextTick(() => {
+            const inputVend = this.$refs.inputVendedor;
+            if (inputVend && inputVend.setValue) {
+              inputVend.setValue(response.data.NombreUsuario);
 
-            if(response.data.IdUsuarioPerfil !== 1) {
-              this.$refs.inputVendedor.$refs.input.disabled = true
+              if (response.data.IdUsuarioPerfil !== 1 && inputVend.$refs.input) {
+                inputVend.$refs.input.disabled = true;
+              }
             }
-        })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-    },
+          });
+        } catch (error) {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        }
+      },
     imprimir () {
       window.print();
     },
@@ -746,7 +761,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+       // params.usuario = this.vendedor.Usuario
       }
       // cierre de caja enviar el vendedor
       this.axios.get(this.API + 'cierrecaja/ventas', {
@@ -768,7 +783,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        // params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -785,7 +800,7 @@ export default {
         idCierre: this.$route.params.id
       }
       if (this.vendedor.Usuario) {
-        params.usuario = this.vendedor.Usuario
+        // params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
