@@ -59,17 +59,17 @@
               </thead>
               <tbody>
                 <tr v-for="(prod, i) in productosInf" :key="i">
-                  <td class="text-center" :class="{'table-danger': prod.Estado == 1}" style="width: 5% !important;">{{ prod.IdOrdenCompra }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">{{ prod.Correlativo }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">{{ prod.FechaOrdenCompra }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">{{ prod.Ruc }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">{{ prod.Proveedor }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}">S/ {{ prod.Total | moneda }}</td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><b-button variant="info" v-if="prod.Estado == 0" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><a v-if="prod.Estado == 0" class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra/id?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
-                  <td :class="{'table-danger': prod.Estado == 1}"><b-button  v-if="prod.Estado == 0" variant="danger" @click="anularOrden(prod)"><i class="fas fa-ban"></i> Anular</b-button></td>
+                  <td class="text-center" :class="{'table-danger': prod.Estado == 0}" style="width: 5% !important;">{{ prod.IdOrdenCompra }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Correlativo }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.FechaOrdenCompra }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Ruc }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Proveedor }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}">S/ {{ prod.Total | moneda }}</td>
+                  <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
+                  <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="info" v-if="prod.Estado == 1" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
+                  <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
+                  <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra/id?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
+                  <td :class="{'table-danger': prod.Estado == 0}"><b-button  v-if="prod.Estado == 1" variant="danger" @click="anularOrden(prod)"><i class="fas fa-ban"></i> Anular</b-button></td>
                 </tr>
               </tbody>
             </table>
