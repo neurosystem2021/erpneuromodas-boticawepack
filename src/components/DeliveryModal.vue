@@ -522,12 +522,12 @@ export default {
           .catch(err => {
             this.idEmpresa = null;
             this.empresa = {};
-            this.$swal({
-              icon: "error",
-              title: "Sin servicio de delivery",
-              text: "No hay conexión con el servidor de delivery",
-              footer: "Por favor cierre sesión e ingrese nuevamente"
-            });
+            // this.$swal({
+            //   icon: "error",
+            //   title: "Sin servicio de delivery",
+            //   text: "No hay conexión con el servidor de delivery",
+            //   footer: "Por favor cierre sesión e ingrese nuevamente"
+            // });
           });
       } else {
         this.idEmpresa = null;
