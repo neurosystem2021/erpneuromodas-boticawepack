@@ -2283,8 +2283,8 @@ export default {
         }
         this.inProgress = true;
         if (this.ventas.length == 1) {
-          window.location.reload();
           this.inProgress = false;
+          window.location.reload();
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
