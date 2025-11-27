@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="body">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
         <Menu v-if="false"></Menu>
         <b-row v-if="pagosPendientes>0">
@@ -1957,6 +1957,9 @@ export default {
 }
 .big-text {
   font-size: 30px;
+}
+.body {
+  background: #e3f2fd;
 }
 </style>
 <style>

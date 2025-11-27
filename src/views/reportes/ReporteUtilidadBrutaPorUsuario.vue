@@ -124,7 +124,7 @@ export default {
   },
   methods: {
     async cargarUsuarios() {
-      await this.axios.get(`${this.API}usuarios`).then(response => {
+      await this.axios.get(`${this.API}lstusuarios`).then(response => {
         if (response.data) {
           this.lstUsuario = response.data;
         }
