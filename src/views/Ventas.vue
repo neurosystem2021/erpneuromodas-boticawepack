@@ -422,7 +422,7 @@ export default {
                 Numero: '',
                 cliente: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
+                    IdTipoDoc: 3,
                     TipoDoc: 'TICKET NO VALIDO',
                     LimitItems: 8,
                     CodSunat: '12',
