@@ -186,7 +186,7 @@ export default {
         ,
         "Anular"
       ],
-      currentPageFav:1,
+      currentPageFav: 1,
       totalRows: 50,
       perPage: 5,
       currentPage: 1
@@ -213,7 +213,6 @@ export default {
       await this.axios.put(`${this.API}proforma/cambiarfavorito`, item);
       console.log(EsFavoritoFlag);
       this.cargarFavoritas();
-
     },
     selectProformas(proforma) {
       this.$emit("guardarDatosProforma", proforma.IdProforma);
@@ -225,18 +224,22 @@ export default {
         })
         .then(response => {
           response.data.map(item => {
-            this.add([
-              item.IdProducto,
-              () => {
-                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-              },
-              {
-                setPrecio: true,
-                setPreOr: item.Precio,
-                cantidad: item.Cantidad,
-                descuento: item.Descuento
-              }
-            ]);
+            item.setPrecio = true;
+            item.precio = item.Precio;
+            item.cantidad = item.Cantidad;
+            item.descuento = item.Descuento;
+            // this.add([
+            //   item.IdProducto,
+            //   () => {
+            //     this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+            //   },
+            //   {
+            //     setPrecio: true,
+            //     setPreOr: item.Precio,
+            //     cantidad: item.Cantidad,
+            //     descuento: item.Descuento
+            //   }
+            // ]);
 
             this.filter = "";
             this.show = false;
@@ -334,7 +337,7 @@ export default {
 #modalProformas .modal-dialog {
   max-width: 85% !important;
 }
-.mdlProforma{
+.mdlProforma {
   width: 80%;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="body">
         <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
         <Menu v-if="false"></Menu>
         <b-row v-if="pagosPendientes>0">
@@ -22,8 +22,10 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group  class="my-0">
-                                  <span class="ocularMovil">Tipo de Venta</span>
-                                    <label><b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                  <span class="ocultarMovil">Tipo de Venta</span>
+                                  
+                                    <label class="lblSerie"><b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                  
                                     <b-input-group>
                                     <autocomplete
                                         required="required"
@@ -98,7 +100,7 @@
                             </b-col>
                             <b-col md="12" class="my-0">
                                 <b-form-group  class="my-0">
-                                  <label class="ocularMovil">Cliente</label>
+                                  <label class="ocultarMovil">Cliente</label>
                                     <b-input-group>
                                      <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -191,7 +193,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3" class="ocularMovil" >
+                    <b-col md="3" class="ocultarMovil" >
                         <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -221,7 +223,7 @@
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group class="ocularMovil">
+                        <b-form-group class="ocultarMovil">
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
@@ -234,7 +236,7 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                         </b-form-group>
-                        <b-form-group class="ocularMovil">
+                        <b-form-group class="ocultarMovil">
                             <label>Comisionista</label>
                             <autocomplete
                                 ref="inputComisionista"
@@ -267,6 +269,7 @@
                   </b-col>
                 </b-row>
                 <b-row>
+
                     <b-col cols="12"> 
                         <productos-carrito 
                             @onInputCantidad="actualizarDescuento"
@@ -295,28 +298,61 @@
                         <!--  -->
                     </b-col>
 
-                          <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" >
+                    <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocultarMovil">
+                          <table class="table b-table border table-footer table-sm text-center "  >
+                              <tbody>
+                                  <tr>
+                                    <td>Descripción:</td>
+                                    <td>
+                                      <b-form-textarea
+                                        placeholder="Descripción"
+                                        rows="3"
+                                        max-rows="6"
+                                        v-model="venta.descripcion"
+                                        style="field-sizing: content !important;"
+                                      ></b-form-textarea>
+                                    </td>
+                                  </tr>
+                                  <tr class="ocultarMovil"><td colspan="2">Mano de obra bruta</td></tr>
+                                  <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+                                  <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
+                                  <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                              </tbody>
+                          </table>
+                        </b-col>
+                              <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocultarWeb">
                                 <table class="table b-table border table-footer table-sm text-center "  >
                                     <tbody>
                                         <tr>
-                                          <td>Descripción:</td>
-                                          <td>
+                                          <td width="50%">
+                                            <b-form-checkbox
+                                              v-model="mostrarDescripcion"
+                                              :value="1"
+                                              :unchecked-value="0"
+                                            >
+                                              Descripción
+                                            </b-form-checkbox>
+                                          </td>
+                                          <td width="50%">
                                             <b-form-textarea
                                               placeholder="Descripción"
                                               rows="3"
                                               max-rows="6"
                                               v-model="venta.descripcion"
+                                              style="field-sizing: content;"
+                                              v-if="mostrarDescripcion==1"
                                             ></b-form-textarea>
                                           </td>
                                         </tr>
-                                        <tr class="ocularMovil"><td colspan="2">Mano de obra bruta</td></tr>
-                                        <tr class="ocularMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
-                                        <tr class="ocularMovil"><td colspan="2">Mano de obra neta</td></tr>
-                                        <tr class="ocularMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                        <tr class="ocultarMovil"><td colspan="2">Mano de obra bruta</td></tr>
+                                        <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
+                                        <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
+                                        <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
-                                </table>
+                                </table>   
+                                
+                                
                               </b-col>
-
                               <b-col cols="12" md="4" lg="3" >
                                   <table class="table b-table border table-footer">
                                     <tbody>
@@ -487,9 +523,9 @@
                                             <table class="table b-table border table-footer">
                                               <tbody>
                                                 <tr>
-                                                  <td class="text-center ocularMovil">Opciones</td>
+                                                  <td class="text-center ocultarMovil">Opciones</td>
                                                 </tr>
-                                                <tr v-if="puntosAplicados == 0" class="ocularMovil">
+                                                <tr v-if="puntosAplicados == 0" class="ocultarMovil">
                                                   <td>
                                                     <b-input-group prepend="S/">
                                                       <input
@@ -647,14 +683,18 @@ export default {
     //setInterval(this.updateTime, 1000)
     this.loadClienteVarios();
     this.loadComisionista();
-    this.escucharPedidos();
+    // this.escucharPedidos();
     this.getEstadoSistema();
     this.ObtenerLstOfertas();
+    this.conectarSocket();
+    this.setupSocketListeners();
+    this.getEstadoSistema();
   },
   data() {
     return {
       vuelto: 0,
       pagocon: 0,
+      mostrarDescripcion: 0,
       fieldsDocRef: [
         { key: "idDocVenta" },
         { key: "IdProductos" },
@@ -701,7 +741,7 @@ export default {
           {
             key: "manoobra",
             label: "M.O.",
-            class: "text-center ocularMovil"
+            class: "text-center ocultarMovil"
           },
           {
             key: "stock",
@@ -710,7 +750,7 @@ export default {
             class: "text-center"
           },
           { key: "Producto", class: "Producto", class: "clsProducto" },
-          { key: "Descripcion", label: "Descripción", class: "ocularMovil" },
+          { key: "Descripcion", label: "Descripción", class: "ocultarMovil" },
           { key: "eventPres", label: "" },
           { key: "cantxPrecio", label: "CantxP", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -723,9 +763,9 @@ export default {
             key: "subtotal",
             label: "SubTotal",
             variant: "success",
-            class: "text-center"
+            class: "text-center ocultarMovil"
           },
-          { key: "descuento", label: "Desc", class: "ocularMovil" },
+          { key: "descuento", label: "Desc", class: "ocultarMovil" },
           {
             key: "total",
             label: "Total",
@@ -736,7 +776,12 @@ export default {
         ]
       },
       pagosPendientes: 0,
-      fechaUltPago: ""
+      fechaUltPago: "",
+      listeners: {
+        nuevoPedido: null,
+        connect: null,
+        disconnect: null
+      }
     };
   },
   watch: {
@@ -810,6 +855,10 @@ export default {
       });
       return this.$options.filters.redondear(sumatoria);
     }
+  },
+  beforeDestroy() {
+    this.removeSocketListeners();
+    this.$socket.disconnect();
   },
   methods: {
     ...mapActions({
@@ -1819,15 +1868,76 @@ export default {
       this.$router.replace("/ventas");
     },
     //Sockets
-    escucharPedidos() {
-      this.sockets.subscribe("nuevo-pedido", data => {
-        if (this.$refs.deliveryModal.show) {
+    // escucharPedidos() {
+    //   this.sockets.subscribe("nuevo-pedido", data => {
+    //     if (this.$refs.deliveryModal.show) {
+    //       this.$toasted.success(
+    //         "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+    //       );
+    //       this.$refs.deliveryModal.getPedidos();
+    //     } else {
+    //       this.$refs.deliveryModal.getPedidos();
+    //       this.$swal({
+    //         position: "top-end",
+    //         icon: "info",
+    //         target: document.getElementById("conten"),
+    //         title:
+    //           "Pedido de Delivery de: <br> " +
+    //           "<strong>" +
+    //           data.nombre +
+    //           "</strong>",
+    //         showConfirmButton: true,
+    //         confirmButtonText: "Mostrar Pedidos",
+    //         confirmButtonColor: "#3880ff"
+    //       }).then(result => {
+    //         /* Read more about isConfirmed, isDenied below */
+    //         if (result.isConfirmed) {
+    //           this.$refs.deliveryModal.show = true;
+    //         } else if (result.isDenied) {
+    //           console.log("Denegado");
+    //         }
+    //       });
+    //     }
+    //   });
+    // },
+    //Fin Sockets
+    /**
+     * ✅ NUEVO: Conectar socket
+     */
+    conectarSocket() {
+      if (!this.$socket.connected) {
+        console.log("🔗 Conectando socket...");
+        this.$socket.connect();
+      }
+    },
+
+    /**
+     * ✅ NUEVO: Configurar todos los listeners
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado en VentasForm");
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado en VentasForm");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Nuevo pedido
+      this.listeners.nuevoPedido = data => {
+        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
           this.$toasted.success(
-            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
           );
           this.$refs.deliveryModal.getPedidos();
         } else {
-          this.$refs.deliveryModal.getPedidos();
+          if (this.$refs.deliveryModal) {
+            this.$refs.deliveryModal.getPedidos();
+          }
           this.$swal({
             position: "top-end",
             icon: "info",
@@ -1841,17 +1951,27 @@ export default {
             confirmButtonText: "Mostrar Pedidos",
             confirmButtonColor: "#3880ff"
           }).then(result => {
-            /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-              this.$refs.deliveryModal.show = true;
+              if (this.$refs.deliveryModal) {
+                this.$refs.deliveryModal.show = true;
+              }
             } else if (result.isDenied) {
               console.log("Denegado");
             }
           });
         }
-      });
+      };
+      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
+    },
+
+    /**
+     * ✅ NUEVO: Remover todos los listeners
+     */
+    removeSocketListeners() {
+      this.$socket.off("connect", this.listeners.connect);
+      this.$socket.off("disconnect", this.listeners.disconnect);
+      this.$socket.off("nuevo-pedido", this.listeners.nuevoPedido);
     }
-    //Fin Sockets
   },
   components: {
     ProductosCarrito,
@@ -1874,6 +1994,9 @@ export default {
 }
 .big-text {
   font-size: 30px;
+}
+.body {
+  background: #e3f2fd;
 }
 </style>
 <style>
@@ -1902,9 +2025,12 @@ export default {
 
 @media only screen and (max-width: 920px) {
   /* For desktop: */
-  .ocularMovil {
+  .ocultarMovil {
     display: none !important;
   }
+}
+.ocultarWeb {
+  display: none;
 }
 @media only screen and (min-width: 777px) and (max-width: 1800px) {
   /* For desktop: */
@@ -1914,15 +2040,23 @@ export default {
 }
 @media only screen and (max-width: 750px) {
   /* For desktop: */
+  .ocultarWeb {
+    display: inline;
+  }
   .ocularMovil2 {
     display: none !important;
   }
   .mostrarSerie {
     display: inline !important;
+    font-size: 1.5rem;
+  }
+  .lblSerie {
+    text-align: center !important;
+    padding: auto;
   }
 }
 /* @media (max-width: 850px) {
-  .ocularMovil {
+  .ocultarMovil {
     display: none !important;
   }
 } */

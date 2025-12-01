@@ -1,6 +1,6 @@
 <template>
   <b-row>
-   <b-col md="12">
+    <b-col md="12">
       <b-row>
         <b-col cols="12" lg="6">
           <b-form-group>
@@ -333,6 +333,7 @@
             step="0.01"
             class="form-control"
             value="0"
+            style="max-width: 100px;"
             @input="actualizarDescu(data.index)"/>
             <b-form-text>
             </b-form-text>
@@ -355,13 +356,14 @@
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <textarea 
+          
+          <b-textarea 
             :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
-            style="width: 150px"
-            v-model="productos[data.index].Descripcion"></textarea>
+            style="width: 150px;field-sizing: content;"
+            v-model="productos[data.index].Descripcion"></b-textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
@@ -381,9 +383,9 @@
         <template slot="show_details" slot-scope="row">
            <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
-        <template slot="row-details" slot-scope="row">
+        <!-- <template slot="row-details" slot-scope="row">
 
-        </template>
+        </template> -->
 
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
@@ -565,10 +567,7 @@ export default {
     }
   },
   props: {
-    productos: {
-      type: Array,
-      default: []
-    },
+    productos: Array,
     gravadaflag: Number,
     igvflag: Number,
     isVentas: Boolean,
@@ -1101,7 +1100,8 @@ export default {
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
-      
+      obj.Descripcion = null;
+      console.log(obj);
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
 
@@ -1116,7 +1116,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      
+      obj.Descripcion = null;
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
@@ -1126,17 +1126,19 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      obj = this.onSetProducto(obj);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        { setPrecioCosto: this.tipo == "mov" ? true : false },
-        false,
-        this.cliente.EsVIP
-      ]);
+      // obj = this.onSetProducto(obj);
+      
+      this.$emit("setProducto", obj);
+      // this.add([
+      //   obj,
+      //   () => {
+      //     this.$emit("onAddProducto", obj);
+      //     this.$toasted.success("Producto añadido correctamente");
+      //   },
+      //   { setPrecioCosto: this.tipo == "mov" ? true : false },
+      //   false,
+      //   this.cliente.EsVIP
+      // ]);
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
       obj.cantidadPres = obj.cantidad;
@@ -1151,6 +1153,7 @@ export default {
       });
     },
     setProductoCant(prod) {
+      prod.Descripcion = null;
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1164,17 +1167,23 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
-      obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        false,
-        false,
-        this.cliente.EsVIP
-      ]);
+      obj = {
+        ...obj,
+        cantidad: prod.cantidad,
+        precio: prod.precio
+      };
+      // obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
+      this.$emit("setProducto", obj);
+      // this.add([
+      //   obj,
+      //   () => {
+      //     this.$emit("onAddProducto", obj);
+      //     this.$toasted.success("Producto añadido correctamente");
+      //   },
+      //   false,
+      //   false,
+      //   this.cliente.EsVIP
+      // ]);
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
       this.actualizarProd(obj);
@@ -1231,7 +1240,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1244,9 +1253,13 @@ export default {
                 <td style="width: 200px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td  style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
                 <td style="width: 5%">
@@ -1463,10 +1476,16 @@ canvas {
   width: auto;
   margin: 0 auto;
 }
+.tblProductos {
+  width: 830px;
+}
 @media only screen and (max-width: 1440px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
     max-height: 50vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
   .cameraBarra {
     height: 50vh;
@@ -1477,6 +1496,9 @@ canvas {
   #modalCodigoBarra .modal-dialog {
     max-width: 100vw !important;
     max-height: 80vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
   .cameraBarra {
     height: 80vh;
@@ -1491,6 +1513,9 @@ canvas {
   .cameraBarra {
     height: 80vh;
     width: auto;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
 }
 

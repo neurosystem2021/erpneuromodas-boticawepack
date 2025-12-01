@@ -74,7 +74,7 @@ export default {
       currentPage: 1
     };
   },
-  props: ["idAlmacen"],
+  props: { idAlmacen: 1 },
   props: {
     EsVenta: {
       type: Boolean,
@@ -91,9 +91,8 @@ export default {
       this.show = true;
       this.$refs.tablaPreOrden.refresh();
     },
-    selectPreOrden(item) {
-      console.log("ya ha");
-      this.axios
+    async selectPreOrden(item) {
+      await this.axios
         .get(this.API + "preorden/detalle", {
           params: {
             idPreOrden: item.IdPreOrden
@@ -105,29 +104,9 @@ export default {
 
           if (this.EsVenta) {
             res = res.filter(r => r.Pagado == 0);
-          } // console.log(response);
-          res.map(item => {
-            console.log(item);
-            if (!item.EsHabitacion) {
-              this.add([
-                item.IdProducto,
-                () => {
-                  this.obtenerStok({ IdAlmacen: this.idAlmacen });
-                },
-                {
-                  setPrecio: true,
-                  cantidad: item.Cantidad,
-                  precio: item.Precio,
-                  EsManoDeObra: item.EsManoDeObra
-                }
-              ]);
-
-              this.filter = "";
-              this.show = false;
-            }
-          });
+          }
           this.$emit("onPreOrden", item);
-          this.$emit("onSelectPreOrden", item.IdCliente);
+          this.$emit("cargarDetalleProforma", res);
         });
       //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
     },

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="body">
     <router-view/>
   </div>
 </template>
@@ -11,7 +11,6 @@ export default {
 </script>
 
 <style>
-
 .modal .modal-xl {
   min-width: 80%;
   width: 80%;
@@ -20,6 +19,9 @@ export default {
   min-width: 80%;
   width: 80%;
 } */
+.body {
+  background: #e3f2fd;
+}
 .btnAction {
   margin: 2px 0;
   border-radius: 25px !important;

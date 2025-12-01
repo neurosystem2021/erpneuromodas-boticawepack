@@ -287,7 +287,7 @@ export default {
     setupSocketListeners() {
       // Evento: Conectado
       this.listeners.connect = () => {
-        console.log("✅ Socket conectado");
+        // console.log("✅ Socket conectado");
         this.$socket.emit("conectar", {
           tipo: "PLATAFORMA",
           objeto: {
