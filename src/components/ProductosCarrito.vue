@@ -396,6 +396,29 @@
             <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
           </div>
         </template>
+
+        <template slot="Serie" slot-scope="data">
+          <ul>
+            <li v-for="(serie,index) in generarSerie(data.item.productoSerie)" :key="index">
+              {{ serie.Serie }}
+            </li>
+          </ul>
+        </template>
+        <template slot="Series" slot-scope="data">
+          <b-select 
+              v-if="generarSerie(data.item.productoSerie).length>0"
+              :options="generarSerie(data.item.productoSerie)" 
+              v-model="data.item.IdProductoSerie"
+              text-field="Serie"
+              value-field="IdProductoSerie"
+          />
+          </template>
+
+          <template slot="AddSeries" slot-scope="data">
+          <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
+            <i class="fa fa-barcode" aria-hidden="true"></i>
+          </b-button>
+        </template>
       </b-table>
     </b-col>
     <b-col md="3">
@@ -684,6 +707,14 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+
+    generarSerie(serie) {
+      if (serie) {
+        return serie;
+      }
+      return [];
+    },
+
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;

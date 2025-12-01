@@ -316,6 +316,8 @@ export default {
         // { key: 'ProductoCategoria', label: 'Categoria'},
         { key: "Producto", label: "Artículo" },
         { key: "Descripcion", label: "Descripción" },
+        { key: "Serie", label: "Series" },
+        { key: "AddSeries" },
         { key: "ProductoMarca", label: "Marca" },
         { key: "ProductoModelo", label: "Modelo" },
         // { key: 'ProductoPresentacion', label: 'Present.' },
