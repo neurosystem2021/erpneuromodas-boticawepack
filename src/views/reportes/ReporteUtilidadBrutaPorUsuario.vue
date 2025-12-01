@@ -93,6 +93,7 @@
 
 <script>
 import config from "@/store/config.js";
+import momemnt from "moment";
 export default {
   data() {
     return {
@@ -121,6 +122,13 @@ export default {
   },
   mounted() {
     this.cargarUsuarios();
+    this.fechaInicio = this.$moment()
+      .startOf("day")
+      .format("YYYY-MM-DD");
+    console.log("fechaInicio", this.fechaInicio);
+    this.fechaFin = this.$moment().format("YYYY-MM-DD");
+   this.usuarioReg=sessionStorage.getItem('User')
+    
   },
   methods: {
     async cargarUsuarios() {
