@@ -80,42 +80,13 @@
                 </b-col>
                   <b-col md="4" class="ocultarMovil">
                     <b-input-group prepend="Alm." class="mt-2">
-                        <autocomplete
-                            required="required"
-                            :id="`inputAlmacen${index}`"
-                            :url="API + 'almacenes'"
-                            anchor="Almacen"
-                            class="font-weight-bold"
-                            initValue="PRINCIPAL"
-                            label="writer"
-                            placeholder=""
-                            :on-select="setAlmacen"
-                            :value="ventas[ventaActiva].almacen"
-                            :onFocus="focusAutocomplete.bind(null, `inputAlmacen${index}`)"
-                            :classes="{ input: 'form-control' }"
-                            >
-                        </autocomplete>
+                      <input type="text" v-model="venta.almacen.Almacen" class="form-control" disabled>
                     </b-input-group>
-                    </b-col>
-                    <b-col md="4" class="ocultarMovil">
-                        <b-input-group prepend="P.V. " class="mt-2">
-                            <autocomplete
-                            required="required"
-                            :id="`inputPuntoVenta${index}`"
-                            :url="API + 'ventas/puntos'"
-                            anchor="PuntoVenta"
-                            class="font-weight-bold"
-                            initValue="PRINCIPAL"
-                            label="writer"
-                            placeholder=""
-                            :on-select="setPuntoVenta"
-                            :onFocus="focusAutocomplete.bind(null,`inputPuntoVenta${index}`)"
-                            :classes="{ input: 'form-control' }"
-                            >
-                            </autocomplete>
-                        </b-input-group>
-                        </b-col>
-                    <b-col cols="12" class="mt-1">
+                  </b-col>
+                  <b-col md="4" class="ocultarMovil">
+                    <input type="text" v-model="venta.puntoVenta.PuntoVenta" class="form-control" disabled>
+                  </b-col>
+                  <b-col cols="12" class="mt-1">
                         
                         <b-form-group >
                           <b-input-group class="py-0">
@@ -214,7 +185,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
-                                :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :customParams="{ 'sortBy':'stock', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
                                 label="writer"
@@ -1168,18 +1139,21 @@ export default {
       cantidadInput: ""
     };
   },
+  beforeMount() {},
   mounted() {
-    this.getVendedorInfo();
-    this.getNumeroVenta();
-    this.loadClienteVarios();
-    this.$nextTick(() => {
-      let inputElement = `autocompleteProducto${this.ventaActiva}`;
-      let autocompleteInput = document.getElementById(inputElement);
-      autocompleteInput.focus();
-    });
     this.conectarSocket();
     this.setupSocketListeners();
     this.getEstadoSistema();
+    this.$nextTick(() => {
+      // setTimeout(() => {
+      this.getVendedorInfo();
+      this.getNumeroVenta();
+      this.loadClienteVarios();
+      let inputElement = `autocompleteProducto${this.ventaActiva}`;
+      let autocompleteInput = document.getElementById(inputElement);
+      autocompleteInput.focus();
+      // }, 10000);
+    });
   },
 
   beforeDestroy() {
@@ -1209,13 +1183,13 @@ export default {
     setupSocketListeners() {
       // Evento: Conectado
       this.listeners.connect = () => {
-        console.log("✅ Socket conectado en VentasForm");
+        // console.log("✅ Socket conectado en VentasForm");
       };
-      this.$socket.on("connect", this.listeners.connect);
+      // this.$socket.on("connect", this.listeners.connect);
 
       // Evento: Desconectado
       this.listeners.disconnect = () => {
-        console.log("❌ Socket desconectado en VentasForm");
+        // console.log("❌ Socket desconectado en VentasForm");
       };
       this.$socket.on("disconnect", this.listeners.disconnect);
 
@@ -1639,11 +1613,12 @@ export default {
           this.APPTOKEN = response.data.APPTOKEN;
           this.setAlmacen(almacen);
           this.setPuntoVenta(puntoVenta);
-
-          let e = `inputAlmacen${this.ventaActiva}`;
-          document.getElementById(e).disabled = true;
-          let p = `inputPuntoVenta${this.ventaActiva}`;
-          document.getElementById(p).disabled = true;
+          // this.ventas[this.ventaActiva].almacen = obj;
+          // console.log(ref);
+          // let e = `inputAlmacen${this.ventaActiva}`;
+          // document.getElementById(e).disabled = true;
+          // let p = `inputPuntoVenta${this.ventaActiva}`;
+          // document.getElementById(p).disabled = true;
           // this.$refs.inputVendedor.$refs.input.disabled = true;
         })
         .catch(error => {
@@ -1673,7 +1648,7 @@ export default {
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
-
+      // this.$refs[ref][0].setValue(obj.Almacen)
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
         this.cargarPreOrden();
         this.setCliente(this.$route.query.idCliente);

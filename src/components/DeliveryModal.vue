@@ -287,7 +287,7 @@ export default {
     setupSocketListeners() {
       // Evento: Conectado
       this.listeners.connect = () => {
-        console.log("✅ Socket conectado");
+        // console.log("✅ Socket conectado");
         this.$socket.emit("conectar", {
           tipo: "PLATAFORMA",
           objeto: {
@@ -301,7 +301,7 @@ export default {
 
       // Evento: Desconectado
       this.listeners.disconnect = () => {
-        console.log("❌ Socket desconectado");
+        // console.log("❌ Socket desconectado");
       };
       this.$socket.on("disconnect", this.listeners.disconnect);
 
@@ -521,23 +521,23 @@ export default {
           .catch(err => {
             this.idEmpresa = null;
             this.empresa = {};
-            this.$swal({
-              icon: "error",
-              title: "Sin servicio de delivery",
-              text: "No hay conexión con el servidor de delivery",
-              footer: "Por favor cierre sesión e ingrese nuevamente"
-            });
+            // this.$swal({
+            //   icon: "error",
+            //   title: "Sin servicio de delivery",
+            //   text: "No hay conexión con el servidor de delivery",
+            //   footer: "Por favor cierre sesión e ingrese nuevamente"
+            // });
           });
       } else {
         this.idEmpresa = null;
         this.empresa = {};
-        this.$swal({
-          icon: "error",
-          title: "Error en la autentificación de delivery",
-          text: "No hay conexión con el servidor de delivery",
-          target: document.getElementById("conten"),
-          footer: "Por favor cierre sesión e ingrese nuevamente"
-        });
+        // this.$swal({
+        //   icon: "error",
+        //   title: "Error en la autentificación de delivery",
+        //   text: "No hay conexión con el servidor de delivery",
+        //   target: document.getElementById("conten"),
+        //   footer: "Por favor cierre sesión e ingrese nuevamente"
+        // });
       }
     },
 
