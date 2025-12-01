@@ -403,7 +403,7 @@
         </b-col>
       </b-row>
 
-      <hr />  
+      <hr  v-if="showProductoDet && show" />  
       <b-row>
         <b-col>
           <producto-form-det 
@@ -415,6 +415,49 @@
             ></producto-form-det>
         </b-col>
       </b-row>
+
+       <b-row>
+        <b-col cols="12">
+          <b-button  size="sm" class="my-2" variant="success" v-if="!nuevaSerie" @click="activarInactivarAgregarNuevaSerie">Añadir Nueva Serie</b-button>
+          
+        </b-col>
+        <b-col cols="12" v-if="nuevaSerie">
+          <b-row>
+            <b-col cols="3">Serie:</b-col>
+            <b-col cols="9"><input type="text" class="form-control" required v-model="Serie"></b-col>
+             <b-col style="text-align: right;" class="my-2">
+               <b-button  size="sm" variant="success" @click="anadirSerie">Guardar</b-button>
+               <b-button  size="sm" variant="danger" @click="activarInactivarAgregarNuevaSerie">Cancelar</b-button>
+              </b-col>   
+           </b-row>   
+        </b-col>    
+        <b-col cols="12">         
+           <b-table 
+                striped 
+                hover 
+                :items="productoSerie" 
+                :fields="headerSerie" 
+                small
+                v-if="!nuevaSerie"
+
+            >
+              <template slot="Estado" slot-scope="data">
+                {{ data.item.Estado==1 ? 'Activo' : data.item.Estado==3? 'Vendido' :'Anulado'  }}
+              </template>
+               <template slot="action" slot-scope="data">
+                  <b-button  size="sm" v-if="data.item.Estado==1" variant="danger" 
+                    @click="eliminarRegistroSerie(data.item,data['index'])">
+                    <i  class="fa fa-trash" aria-hidden="true"></i>
+                  </b-button>
+               </template>
+           </b-table>
+
+        
+
+        </b-col> 
+      </b-row>
+
+
 
       <div slot="modal-footer" >
         <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
@@ -474,7 +517,16 @@ export default {
       manterproducto: {
         default: false,
         type: Boolean
-      }
+      },
+      Serie: "",
+      nuevaSerie: false,
+      headerSerie: [
+        { label: "Serie", key: "Serie" },
+        { label: "Estado", key: "Estado" },
+        { label: "Doc Venta", key: "CorrelativoVenta" },
+        { label: "", key: "action" }
+      ],
+      productoSerie: []
     };
   },
   beforeMount() {
@@ -497,7 +549,7 @@ export default {
 
         let newVal = this.productoUpdate || {};
         if (newVal.IdProducto && !this.nuevo) {
-          await this.axios
+          await this.axios;
           await this.axios
             .get(this.API + "productos/id/" + newVal.IdProducto)
             .then(response => {
@@ -618,6 +670,9 @@ export default {
               this.initForm();
               this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
             });
+          if (val) {
+            this.obtenerSerie(newVal.IdProducto);
+          }
         } else {
           this.title = "Nuevo Producto";
           this.clearForm();
@@ -637,6 +692,37 @@ export default {
     }
   },
   methods: {
+    // SERIE
+    activarInactivarAgregarNuevaSerie() {
+      this.Serie = "";
+      this.nuevaSerie = !this.nuevaSerie;
+    },
+    anadirSerie() {
+      if (this.Serie) {
+        this.productoSerie.unshift({
+          IdProductoSerie: 0,
+          Serie: this.Serie,
+          Estado: 1
+        });
+        this.nuevaSerie = false;
+      }
+    },
+    eliminarRegistroSerie(item, index) {
+      this.productoSerie[index].Estado = 0;
+    },
+    obtenerSerie(id) {
+      this.axios
+        .get(this.API + "productos/serie", {
+          params: { IdProducto: id, Todos: true }
+        })
+        .then(res => {
+          if (res) {
+            this.productoSerie = res.data;
+          }
+        });
+    },
+    // SERIE
+
     setOferta(e) {
       console.log(e);
       if (e == null) {
@@ -909,7 +995,8 @@ export default {
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
-          PreciosPorProducto: this.producto.precios
+          PreciosPorProducto: this.producto.precios,
+          productoSerie: this.productoSerie
         })
         .then(response => {
           this.$emit("productoactualizado", response.data.insertId);
