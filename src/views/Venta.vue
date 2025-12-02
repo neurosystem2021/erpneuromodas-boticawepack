@@ -2331,11 +2331,11 @@ export default {
 
         if (this.ventas.length == 1) {
           window.location.reload();
-          this.inProgress = false
+          this.inProgress = false;
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
-          this.inProgress = false
+          this.inProgress = false;
         }
 
         // if (response.data.actualizar) {
@@ -2818,6 +2818,13 @@ export default {
   watch: {
     busqueda() {
       this.getProductosCategoriaSearch(this.busqueda);
+    },
+    ventaActiva() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
     }
   }
 };

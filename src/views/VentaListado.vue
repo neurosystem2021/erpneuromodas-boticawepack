@@ -2778,6 +2778,15 @@ export default {
         return this.API + "productos";
       }
     }
+  },
+  watch: {
+    ventaActiva() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
+    }
   }
 };
 </script>
