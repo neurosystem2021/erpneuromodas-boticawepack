@@ -123,6 +123,7 @@ export default {
       });
     },
     myProvider(ctx) {
+      let idAlmacen = sessionStorage.getItem("IdAlmacen");
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       let url =
@@ -131,6 +132,8 @@ export default {
         ctx.perPage +
         "&page=" +
         ctx.currentPage +
+        "&idAlmacen=" +
+        idAlmacen +
         "&filter=" +
         (ctx.filter || "") +
         "&sortBy=" +
