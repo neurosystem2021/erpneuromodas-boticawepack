@@ -1,6 +1,6 @@
 <template>
   
-            <b-container class="bv-example-row px-5" id="conten" fluid >
+            <b-container class="bv-example-row px-5" id="conten" fluid>
                
               <h1> REPORTES  </h1>
                
@@ -222,9 +222,6 @@ export default {
 </script>
 
 <style>
-#conten{
-  padding: 0 5% !important;
-}
 .cards {
   /* border: 1px solid red; */
   padding: 5%;
@@ -232,5 +229,4 @@ export default {
   box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.78);
   /* margin: 1%; */
 }
-
 </style>

@@ -333,6 +333,7 @@
             step="0.01"
             class="form-control"
             value="0"
+            style="max-width: 100px;"
             @input="actualizarDescu(data.index)"/>
             <b-form-text>
             </b-form-text>
@@ -355,13 +356,14 @@
         </template>
 
         <template slot="Descripcion" slot-scope="data">
-          <textarea 
+          
+          <b-textarea 
             :disabled="bloquearInput?true:false"
             class="form-control"
             placeholder="Descripción"
             cols="9" rows="3"
-            style="width: 150px"
-            v-model="productos[data.index].Descripcion"></textarea>
+            style="width: 150px;field-sizing: content;"
+            v-model="productos[data.index].Descripcion"></b-textarea>
           <!--<b-form-input
             v-model="productos[data.index].Descripcion"
             type="text"
@@ -393,6 +395,30 @@
             <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
             <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
           </div>
+        </template>
+
+        
+        <template slot="Series" slot-scope="data">
+          <b-select 
+              v-if="generarSerie(data.item.productoSerie).length>0"
+              :options="generarSerie(data.item.productoSerie)" 
+              v-model="data.item.IdProductoSerie"
+              text-field="Serie"
+              value-field="IdProductoSerie"
+          />
+          </template>
+
+          <template slot="AddSeries" slot-scope="data">
+          <b-button variant="info" size="sm" @click="abrirmodalNuevaSerie(data['index'],data.item)">
+            <i class="fa fa-barcode" aria-hidden="true"></i>
+          </b-button>
+        </template>
+        <template slot="Serie" slot-scope="data">
+          <ul>
+            <li v-for="(serie,index) in data.item.Serie" :key="index">
+              {{ serie.Serie }}
+            </li>
+          </ul>
         </template>
       </b-table>
     </b-col>
@@ -461,6 +487,59 @@
         </b-row>
       </b-modal>
 
+      <!-- SERIE -->
+       <b-modal v-model="anadirSerieFlag" hide-footer size="md" title="Agregar Series">
+      <h5 class="mt-2 mb-4">Producto: {{ objProd.Producto }}</h5>
+      <b-row>
+        <b-col cols="12">
+          <b-input-group prepend="Serie">
+            <b-input-group-append>
+                <input type="text" class="form-control" id="txtSerie" v-model="Serie">
+            </b-input-group-append>
+            <b-button variant="info" size="sm" @click="anadirSerie()">AÑADIR</b-button>
+          </b-input-group>
+        </b-col>
+        <b-col cols="6">
+          
+        </b-col>
+     
+         <b-col cols="12">   
+          <table width="100%" class="mt-3">
+              <thead>
+                <tr>
+
+                  <th>#</th>
+                  <th>Serie</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(serie,index) in Series" :key="index">
+                  <td>{{ index+1 }}</td>
+                  <td>
+                    <input
+                    type="text"
+                    class="form-control"
+                    v-model="serie.Serie"
+                  >
+                  </td>
+                  <td>
+                    <b-button variant="danger" @click="eliminarSerieModal(index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </b-button>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+       </b-col>
+       <b-col cols="12" style="text-align: right;" class="mt-3">
+          <b-button @click="guardarSerie" variant="success">Guardar</b-button>
+          <b-button @click="anadirSerieFlag=!anadirSerieFlag" variant="danger">Cancelar</b-button>
+       </b-col>
+      </b-row>
+       
+    </b-modal>
+      <!-- SERIE -->
   </b-row>
 </template>
 
@@ -529,7 +608,12 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       modalAbiertCode: false,
       queryCodeBar: "",
-      query: ""
+      query: "",
+      objProd: {},
+      Serie: "",
+      Series: [],
+      page: 0,
+      anadirSerieFlag: false
     };
   },
   created() {
@@ -682,6 +766,14 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    // SERIES
+    generarSerie(serie) {
+      if (serie) {
+        return serie;
+      }
+      return [];
+    },
+
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
@@ -703,8 +795,55 @@ export default {
       }
       return false;
     },
+    abrirmodalNuevaSerie(index, producto) {
+      this.Serie = "";
+      this.Series = [];
+      this.objProd = { ...producto };
+
+      if (this.objProd.Serie) {
+        this.Series = [...this.objProd.Serie];
+      }
+      this.index = index;
+      this.anadirSerieFlag = true;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          let txtSerie = document.getElementById("txtSerie");
+          txtSerie.focus();
+        }, 500);
+      });
+    },
+    guardarSerie() {
+      this.objProd.Serie = [];
+      this.objProd.Serie = [...this.Series];
+      console.log("objProd", this.objProd);
+      Vue.set(this.productos, this.index, this.objProd);
+      this.anadirSerieFlag = false;
+    },
+    eliminarSerieModal(index) {
+      this.Series.splice(index, 1);
+    },
+    anadirSerie() {
+      if (!this.Serie) {
+        return;
+      }
+      console.log(this.Series);
+      if (this.Series.some(v => v == this.Serie)) {
+        this.$toasted.error(
+          "La serie ya se encuentra en el listado. Modifique"
+        );
+        return;
+      }
+      this.Series.unshift({ IdProductoSerie: "", Serie: this.Serie });
+      setTimeout(() => {
+        this.Serie = "";
+        let txtSerie = document.getElementById("txtSerie");
+
+        txtSerie.focus();
+      }, 200);
+    },
+
+    // SERIES
     abrirModal() {
-      console.log("dddd");
       this.touchModal = true;
     },
     cambiarPrecioVenta(index) {
@@ -1097,6 +1236,7 @@ export default {
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
+      obj.Descripcion = null;
       console.log(obj);
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
@@ -1112,7 +1252,7 @@ export default {
       this.objProd = obj;
     },
     setProductoUni(obj) {
-      console.log(obj);
+      obj.Descripcion = null;
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
@@ -1147,6 +1287,7 @@ export default {
       });
     },
     setProductoCant(prod) {
+      prod.Descripcion = null;
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
@@ -1227,7 +1368,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1240,9 +1381,13 @@ export default {
                 <td style="width: 200px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td  style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
                 <td style="width: 5%">
@@ -1459,10 +1604,16 @@ canvas {
   width: auto;
   margin: 0 auto;
 }
+.tblProductos {
+  width: 830px;
+}
 @media only screen and (max-width: 1440px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
     max-height: 50vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
   .cameraBarra {
     height: 50vh;
@@ -1473,6 +1624,9 @@ canvas {
   #modalCodigoBarra .modal-dialog {
     max-width: 100vw !important;
     max-height: 80vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
   .cameraBarra {
     height: 80vh;
@@ -1487,6 +1641,9 @@ canvas {
   .cameraBarra {
     height: 80vh;
     width: auto;
+  }
+  .tblProductos {
+    width: 400px !important;
   }
 }
 
