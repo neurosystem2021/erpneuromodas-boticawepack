@@ -903,12 +903,20 @@
             </div>
         </b-modal>
 
+        
         <!-- MODALS TOUCH -->
         <producto-form 
         :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit"
          :producto-update="productoSelect"  @actualizarProducto="actualizarRegistro($event)"
          ></producto-form>
         
+        <b-modal v-model="cargando" hide-header hide-footer hide-header-close>
+          <div>
+           <div class="spinner-loading"></div>
+           <p>Cargando datos ....</p>
+          </div>
+        </b-modal>
+
       </b-container>
   </template>
   <script>
@@ -945,6 +953,7 @@ export default {
   },
   data() {
     return {
+      cargando: false,
       inProgress: false,
       listeners: {
         nuevoPedido: null,
@@ -2504,7 +2513,12 @@ export default {
       venta.vendedor = { Usuario: proforma.UsuarioReg };
       // console.log("proforma", proforma);
       let productos = [];
-      proforma.productos.forEach(async producto => {
+      this.cargando = true;
+      for (let index = 0; index < proforma.productos.length; index++) {
+        const producto = proforma.productos[index];
+
+        // }
+        // proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
         if (prod.PreciosPorProducto) {
@@ -2533,12 +2547,13 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         productos.push(prod);
-      });
+      }
 
       venta.productos = productos;
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
+        this.cargando = false;
         this.getNumeroVenta();
         this.getVendedorInfo();
         // this.loadClienteVarios();
@@ -2967,5 +2982,26 @@ export default {
   .tblCarrito {
     font-size: 0.7rem;
   }
+}
+.spinner-loading {
+  /* 1. Dimensiones y forma */
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3; /* Borde principal (color claro) */
+  border-top: 5px solid #3498db; /* Borde superior (color de énfasis) */
+  border-radius: 50%; /* Lo hace circular */
+
+  /* 2. Animación de giro */
+  animation: spin 1s linear infinite; /* Nombre, duración, tipo y repetición */
+}
+
+/* Definición de la animación de giro */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  } /* Empieza en 0 grados */
+  100% {
+    transform: rotate(360deg);
+  } /* Termina en 360 grados (un giro completo) */
 }
 </style>
