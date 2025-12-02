@@ -220,6 +220,7 @@
                             :esDelivery="tab.EsDelivery"
                             :productos="tab.productos"
                             :id="`prodiuctos${i}`"
+                            @eliminarProducto="eliminarProducto"
                             >
                         </productos-carrito>
                     </b-col>
@@ -736,6 +737,7 @@ export default {
           },
           { key: "Producto", class: "Producto", class: "clsProducto" },
           { key: "Descripcion", label: "Descripción", class: "ocultarMovil" },
+          { key: "Series", label: "Serie" },
           { key: "eventPres", label: "" },
           { key: "cantxPrecio", label: "CantxP", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
@@ -866,7 +868,6 @@ export default {
       }));
 
       for (let i = 0; i < detalle.length; i++) {
-        console.log(detalle[i]);
         const res = await this.axios(
           `${this.API}/productos/stock/${
             this.ventas[this.index].almacen.IdAlmacen
@@ -894,19 +895,25 @@ export default {
       this.index = this.index - 1;
       return;
     },
+    eliminarProducto(index) {
+      this.ventas[this.index].productos.splice(index, 1);
+      // console.log("index", index);
+    },
     setProducto(evt) {
       let prods = this.ventas[this.index].productos;
-
       if (prods.some(v => v.IdProducto == evt.IdProducto)) {
         let index = this.ventas[this.index].productos.findIndex(
           v => v.IdProducto == evt.IdProducto
         );
+        prods.precio = evt.PrecioContado;
         Vue.set(prods, index, evt);
         // console.log(index);
       } else {
-        this.ventas[this.index].productos.unshift(evt);
+        this.ventas[this.index].productos.unshift({
+          ...evt,
+          precio: evt.PrecioContado
+        });
       }
-      console.log(this.ventas[this.index].productos);
     },
     setProforma(e) {
       let ven = { ...this.preVenta, productos: e.productos };
@@ -1557,8 +1564,6 @@ export default {
     async guardarVenta(evt) {
       this.venta = {};
       this.venta = this.ventas[this.index];
-      console.log(typeof this.venta);
-      console.log("venta", this.venta);
       // evt.preventDefault();
 
       this.inProgress = true;
@@ -1622,8 +1627,6 @@ export default {
       }
 
       if (!this.venta.EsCredito) {
-        console.log(this.venta.totalCart);
-        console.log(totalPagos);
         if (
           parseFloat(this.venta.totalCart).toFixed(2) !=
           parseFloat(totalPagos).toFixed(2)
@@ -1655,7 +1658,17 @@ export default {
         this.inProgress = false;
         return;
       }
+      // validar serie
+      let prods = this.venta.productos;
+      let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
 
+      if (val) {
+        this.$toasted.show(
+          "Debe Seleccionar la serie del produto. Verifique."
+        );
+        this.inProgress = false;
+        return;
+      }
       //Nota de Creadito
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
@@ -1806,7 +1819,6 @@ export default {
           );
         })
         .catch(error => {
-          console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
@@ -1855,7 +1867,6 @@ export default {
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
-        console.log(obj);
         this.infoDelivery = obj;
         this.venta.EsDelivery = true;
         // this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
@@ -1884,7 +1895,6 @@ export default {
                 ]);
                 //Cargar Productos Delivery
                 let productos = JSON.parse(obj.Productos);
-                console.log(productos);
                 productos.map(item => {
                   this.add([
                     item.IdProducto,

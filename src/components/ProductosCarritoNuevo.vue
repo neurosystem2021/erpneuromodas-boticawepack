@@ -19,7 +19,7 @@
                 @keydown.native.prevent.tab="irtxtBarcode"
                 :classes="{input: 'form-control'}">
               </autocomplete>
-              <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
+              <b-button @click="startRecognition" :class="microActivo?'alerta':''" style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
               </b-input-group>
               </b-form-group>
               Busqueda avanzada (Producto, Modelo, Categoria)
@@ -39,7 +39,7 @@
           <b-input-group-append>
             <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
             
-            <b-button @click="startRecognitionCodeBar" variant="info"><i class="fas fa-microphone"></i> </b-button>
+            <b-button @click="startRecognitionCodeBar" :class="microActivoBarCode?'alerta':''"  style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
@@ -375,8 +375,9 @@
           <br>
           
         </template>
+
         <template slot="acciones" slot-scope="data">
-          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
+          <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="$emit('eliminarProducto',data.index)"><i class="fas fa-times fa-lg"></i></b-button>
           <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
@@ -385,7 +386,18 @@
         </template>
         <!-- <template slot="row-details" slot-scope="row">
 
+          
         </template> -->
+
+         <template slot="Series" slot-scope="data">
+          <b-select 
+              v-if="data.item.Series.length>0"
+              :options="data.item.Series" 
+              v-model="data.item.IdProductoSerie"
+              text-field="Serie"
+              value-field="IdProductoSerie"
+          />
+          </template>
 
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.CodigoBarra=='COSTODELIVERY'">
@@ -493,6 +505,8 @@ export default {
       productoUrl: "",
       cantidadInput: "",
       touchModal: false,
+      microActivo: false,
+      microActivoBarCode: false,
       vuelto: 0,
       readerSize: {
         width: 1600,
@@ -548,7 +562,6 @@ export default {
     },
     igvflag() {
       this.productos.forEach((element, index) => {
-        console.log("index", index);
         Vue.set(this.productos[index], "TieneIgv", this.igvflag);
         // this.productos[index] = element;
         this.setNuevoPrecioContado(index);
@@ -707,7 +720,6 @@ export default {
       return false;
     },
     abrirModal() {
-      console.log("dddd");
       this.touchModal = true;
     },
     cambiarPrecioVenta(index) {
@@ -742,7 +754,7 @@ export default {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
         return;
       }
-
+      this.microActivo = true;
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = "es-ES";
       this.recognition.continuous = false;
@@ -760,11 +772,13 @@ export default {
       };
 
       this.recognition.onerror = event => {
+        this.microActivo = false;
         console.error("Speech Recognition Error:", event);
         alert(`Error en el reconocimiento de voz: ${event.error}`);
       };
 
       this.recognition.onend = async () => {
+        this.microActivo = false;
         if (!this.query) {
           alert("No se pudo captar ninguna palabra");
         }
@@ -782,7 +796,7 @@ export default {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
         return;
       }
-
+      this.microActivoBarCode = true;
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = "es-ES";
       this.recognition.continuous = false;
@@ -793,6 +807,7 @@ export default {
       };
 
       this.recognition.onresult = event => {
+        this.microActivoBarCode = false;
         if (event.results.length > 0) {
           this.queryCodeBar = event.results[0][0].transcript;
           this.searchCodeBar();
@@ -800,11 +815,13 @@ export default {
       };
 
       this.recognition.onerror = event => {
+        this.microActivoBarCode = false;
         console.error("Speech Recognition Error:", event);
         alert(`Error en el reconocimiento de voz: ${event.error}`);
       };
 
       this.recognition.onend = async () => {
+        this.microActivoBarCode = false;
         if (!this.queryCodeBar) {
           alert("No se pudo captar ninguna palabra");
         }
@@ -818,6 +835,7 @@ export default {
       }
     },
     search() {
+      this.microActivo = false;
       // console.log("Búsqueda:", this.query);
       const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
         "input"
@@ -1090,18 +1108,21 @@ export default {
       }
     },
 
-    setProducto(obj) {
+    async setProducto(obj) {
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
       this.preciosProd = [];
       this.objProd = {};
       obj.PrecioContado = parseFloat(obj.PrecioContado).toFixed(1);
+      let productoSerie = await this.obtenerSeriePorProducto(obj.IdProducto);
+      obj.Series = productoSerie;
+
       // if (!this.isVentas) {
       //   obj.PreciosPorProducto = "";
       // }
       obj.Descripcion = null;
-      console.log(obj);
+
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
 
@@ -1115,6 +1136,25 @@ export default {
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj;
     },
+    async obtenerSeriePorProducto(id) {
+      let productoSerie = [];
+      let params = {
+        IdProducto: id,
+        Todos: false,
+        empresa: sessionStorage.getItem("empresa"),
+        IdAlmacen: this.idAlmacen
+      };
+      productoSerie = await this.axios(`${this.API}/productos/serie`, {
+        params: {
+          IdProducto: id,
+          IdAlmacen: this.idAlmacen
+        }
+      }).then(res => {
+        return res.data;
+      });
+
+      return productoSerie;
+    },
     setProductoUni(obj) {
       obj.Descripcion = null;
       this.objProd.cantxPrecio = 1;
@@ -1127,7 +1167,7 @@ export default {
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       // obj = this.onSetProducto(obj);
-      
+
       this.$emit("setProducto", obj);
       // this.add([
       //   obj,
@@ -1521,5 +1561,26 @@ canvas {
 
 #modalCodigoBarra {
   padding: 0 !important;
+}
+@keyframes parpadeo-color {
+  0%,
+  100% {
+    /* Color normal o "apagado" */
+    background: #9fa8da;
+    color: black;
+  }
+  50% {
+    /* Color "encendido" */
+    background: #1a237e;
+    color: #ffffff;
+  }
+}
+
+.alerta {
+  /*
+    Usamos 'ease-in-out' en lugar de 'steps' para una transición de color más suave,
+    o mantenemos 'steps' si queremos que el cambio de color sea instantáneo.
+  */
+  animation: parpadeo-color 1.5s ease-in-out infinite;
 }
 </style>
