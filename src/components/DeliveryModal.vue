@@ -532,13 +532,13 @@ export default {
       } else {
         this.idEmpresa = null;
         this.empresa = {};
-        this.$swal({
-          icon: "error",
-          title: "Error en la autentificación de delivery",
-          text: "No hay conexión con el servidor de delivery",
-          target: document.getElementById("conten"),
-          footer: "Por favor cierre sesión e ingrese nuevamente"
-        });
+        // this.$swal({
+        //   icon: "error",
+        //   title: "Error en la autentificación de delivery",
+        //   text: "No hay conexión con el servidor de delivery",
+        //   target: document.getElementById("conten"),
+        //   footer: "Por favor cierre sesión e ingrese nuevamente"
+        // });
       }
     },
 

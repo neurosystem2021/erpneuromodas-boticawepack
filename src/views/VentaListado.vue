@@ -2283,6 +2283,7 @@ export default {
         }
         this.inProgress = true;
         if (this.ventas.length == 1) {
+          this.inProgress = false;
           window.location.reload();
           this.inProgress = false;
         } else {
@@ -2777,6 +2778,15 @@ export default {
       } else {
         return this.API + "productos";
       }
+    }
+  },
+  watch: {
+    ventaActiva() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
     }
   }
 };

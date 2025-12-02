@@ -2818,6 +2818,13 @@ export default {
   watch: {
     busqueda() {
       this.getProductosCategoriaSearch(this.busqueda);
+    },
+    ventaActiva() {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.metodoPagoCambio(1);
+        }, 1000);
+      });
     }
   }
 };
