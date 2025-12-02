@@ -674,6 +674,7 @@ export default {
     },
     initForm() {
       this.producto = {
+        TienePresentacion: 0,
         EsPadre: 0,
         Anulado: 0,
         EsHabitacion: 0,
