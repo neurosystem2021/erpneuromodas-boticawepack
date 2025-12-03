@@ -1703,6 +1703,15 @@ export default {
       let prods = this.venta.productos;
       let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
 
+<<<<<<< HEAD
+      if (val) {
+        this.$toasted.show(
+          "Debe Seleccionar la serie del produto. Verifique."
+        );
+        this.inProgress = false;
+        return;
+      }
+=======
       // if (val) {
       //   this.$toasted.show(
       //     "Debe Seleccionar la serie del produto. Verifique."
@@ -1710,6 +1719,7 @@ export default {
       //   this.inProgress = false;
       //   return;
       // }
+>>>>>>> 2c2ac58e84dfa34d69cd41ba1cb8e11ed46f3c0f
       //Nota de Creadito
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
