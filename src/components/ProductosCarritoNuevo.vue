@@ -393,7 +393,6 @@
 
          <template slot="Series" slot-scope="data">
           <b-select 
-              v-if="data.item.Series.length>0"
               :options="data.item.Series" 
               v-model="data.item.IdProductoSerie"
               text-field="Serie"
