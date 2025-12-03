@@ -1,5 +1,5 @@
 <template>
-  <b-row>
+  <b-row style="background: #ffffff;">
     <b-col md="12">
       <b-row>
         <b-col cols="12" lg="6">
@@ -22,7 +22,7 @@
               <b-button @click="startRecognition" :class="microActivo?'alerta':''" style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
               </b-input-group>
               </b-form-group>
-              Busqueda avanzada (Producto, Modelo, Categoria)
+              <span class="ocultarMovil">Busqueda avanzada (Producto, Modelo, Categoria)</span>
         </b-col>
         <b-col cols="12" lg="6">
           <b-form-group>
@@ -33,7 +33,7 @@
                   v-model="loadCode"
                   @keydown.prevent.tab="irtxtAddProduct"
                   @keydown.enter.prevent="loadBarcode"
-                  type="text"
+                  type="number"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
@@ -149,8 +149,10 @@
           </div>
         </div>
       </b-modal>
+      <div class="divTBl">
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+     
+      <b-table small responsive id="tblProductos"  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <br>
@@ -210,7 +212,7 @@
 
             }"
             placeholder="Cantidad"/>
-            <p><span class="mx-2">Prof.</span>  
+            <!-- <p><span class="mx-2">Prof.</span>  
           <input 
             class="form-check-input" 
             type="checkbox" 
@@ -220,7 +222,7 @@
               asignarDisabledProf(data.index, e)
             }"
           />
-        </p>
+        </p> -->
         </template>
         <template slot="precio" slot-scope="data">
           <input
@@ -409,6 +411,7 @@
           </div>
         </template>
       </b-table>
+       </div>
     </b-col>
     <b-col md="3">
       <slot name="operaciones"></slot>
@@ -1028,7 +1031,7 @@ export default {
     //   }
     // },
 
-    loadBarcode(e) {
+    async loadBarcode(e) {
       if (e) {
         e.preventDefault();
       }
@@ -1036,17 +1039,32 @@ export default {
 
       if (idProducto) {
         let params = { codigoBarra: idProducto };
-        this.axios
+        let prod = {};
+        await this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
             if (response.data.IdProducto) {
-              this.setProducto(response.data);
+              prod = response.data;
             } else {
               this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
           });
+        prod.Series = await this.obtenerSeriePorProducto(idProducto);
+        let p = await this.axios(
+          `${this.API}/productos/stock/${this.idAlmacen}`,
+          {
+            params: {
+              idProductos: [idProducto]
+            }
+          }
+        ).then(res => {
+          return res.data[0];
+        });
+
+        this.$emit("setProducto", { ...prod, stock: p.stock });
       }
+      // this.setProducto();
     },
 
     /*alterarBuscadorProductos() {
@@ -1275,11 +1293,17 @@ export default {
             heigth: 100%;
           }
           .imagen:hover{
-            width: 250px;
+            width: 100%;
             heigth: 250px;
           }
+          @media only screen and (max-width: 920px) {
+            .dvdProductos{
+              margin-left:-180px;
+              background: #ffffff
+            }
+          }
         </style>
-        <div>
+        <div class="dvdProductos">
           <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
@@ -1519,6 +1543,14 @@ canvas {
 .tblProductos {
   width: 830px;
 }
+.ocultarMovil {
+  /* display: inline; */
+}
+.divTBl {
+  font-size: 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
 @media only screen and (max-width: 1440px) {
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
@@ -1557,6 +1589,15 @@ canvas {
   .tblProductos {
     width: 400px !important;
   }
+
+  .table-responsive {
+    font-size: 0.7rem !important;
+  }
+  .divTBl {
+    font-size: 0.7rem;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 
 #modalCodigoBarra {
@@ -1577,10 +1618,6 @@ canvas {
 }
 
 .alerta {
-  /*
-    Usamos 'ease-in-out' en lugar de 'steps' para una transición de color más suave,
-    o mantenemos 'steps' si queremos que el cambio de color sea instantáneo.
-  */
   animation: parpadeo-color 1.5s ease-in-out infinite;
 }
 </style>
