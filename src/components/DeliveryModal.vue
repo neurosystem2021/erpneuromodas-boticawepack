@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" variant="info" class="btnAction" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -287,7 +287,7 @@ export default {
     setupSocketListeners() {
       // Evento: Conectado
       this.listeners.connect = () => {
-        console.log("✅ Socket conectado");
+        // console.log("✅ Socket conectado");
         this.$socket.emit("conectar", {
           tipo: "PLATAFORMA",
           objeto: {

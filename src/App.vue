@@ -19,6 +19,9 @@ export default {
   min-width: 80%;
   width: 80%;
 } */
+.body {
+  background: #e3f2fd;
+}
 .btnAction {
   margin: 2px 0;
   border-radius: 25px !important;

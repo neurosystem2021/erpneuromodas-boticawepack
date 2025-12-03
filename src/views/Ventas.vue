@@ -2,14 +2,14 @@
     <b-container class="body" fluid>
        <b-card no-body v-if="ventas.length>0">
         <b-tabs card pills  v-model="index" justified  align="center">
-          <b-tab :title="`Venta ${i+1}`" v-for="(tab,i) in ventas" :key="i">
+          <b-tab :title="`Venta ${i+1}`" v-for="(tab,i) in ventas" :key="i" style="background: #e3f2fd;">
               <b-row>
                  <b-col md="7">
                     <b-row>
                      <b-col md="4">
                         <b-form-group  class="my-0">
                           <span class="ocultarMovil">Tipo de Venta</span>
-                            <label class="lblSerie"><b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                            <label class="lblSerie"><b style="display:none" class="mostrarSerie">{{ tab.Serie }} - {{ tab.Numero }}</b></label>
                             <b-input-group>
                               <autocomplete
                                   required="required"
@@ -293,6 +293,18 @@
                                   <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                   <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                  <tr class="ocultarMovil"><td colspan="2" v-if="ventas[index].productos.length>0">
+                                    <b-form-checkbox
+                                      id="checkbox-1"
+                                      v-model="ventas[index].asignarDisabledProf"
+                                      name="checkbox-1"
+                                      :value="1"
+                                      :unchecked-value="0"
+                                    >
+                                       Mostrar Proforma 
+                                    </b-form-checkbox>
+                                   
+                                  </td></tr>
                               </tbody>
                           </table>
                         </b-col>
@@ -591,7 +603,7 @@
                                           {{ 
                                             
                                            parseFloat(
-                                            productos.reduce((sum,prod)=>{
+                                            ventas[index].productos.reduce((sum,prod)=>{
                                               return sum + (prod.precio - prod.PrecioCosto) * prod.cantidad 
                                             },0)
                                            ).toFixed(2)
@@ -780,6 +792,14 @@ export default {
             parseFloat(this.ventas[this.index].pago.mastercard.monto) +
             parseFloat(this.ventas[this.index].pago.yape.monto))
       ).toFixed(2);
+    },
+    asignarDisabledProfComputed(newVal) {
+      let prods = [...this.ventas[this.index].productos];
+      prods = prods.map(v => {
+        return { ...v, disabledProf: newVal };
+      });
+      this.ventas[this.index].productos = [];
+      this.ventas[this.index].productos = prods;
     }
   },
   computed: {
@@ -787,6 +807,16 @@ export default {
       productos: state => state.cart.productos,
       totalCart: state => state.cart.totalCart
     }),
+    asignarDisabledProfComputed() {
+      if (
+        this.ventas &&
+        this.ventas[this.index] &&
+        typeof this.ventas[this.index].asignarDisabledProf !== "undefined"
+      ) {
+        return this.ventas[this.index].asignarDisabledProf;
+      }
+      return null;
+    },
     manoDeObraBruta() {
       let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
@@ -902,16 +932,26 @@ export default {
     setProducto(evt) {
       let prods = this.ventas[this.index].productos;
       if (prods.some(v => v.IdProducto == evt.IdProducto)) {
-        let index = this.ventas[this.index].productos.findIndex(
+        let i = this.ventas[this.index].productos.findIndex(
           v => v.IdProducto == evt.IdProducto
         );
-        prods.precio = evt.PrecioContado;
+        let producto = this.ventas[this.index].productos[i];
+        console.log("producto", producto.estadoPxP);
+        if (producto.estadoPxP == evt.estadoPxP) {
+          if (producto.estadoPxP) {
+            producto.cantidad = parseFloat(producto.cantidad) + 1;
+          } else {
+            producto.cantxPrecio = parseFloat(producto.cantxPrecio) + 1;
+          }
+        }
         Vue.set(prods, index, evt);
         // console.log(index);
       } else {
         this.ventas[this.index].productos.unshift({
           ...evt,
-          precio: evt.PrecioContado
+          precio: evt.PrecioContado,
+          cantidad: 1,
+          cantxPrecio: 1
         });
       }
     },
@@ -1148,6 +1188,7 @@ export default {
     },
     initForm() {
       this.venta = {
+        asignarDisabledProf: 0,
         descripcion: "",
         IdProforma: null,
         EsCredito: 0,
@@ -1662,13 +1703,13 @@ export default {
       let prods = this.venta.productos;
       let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
 
-      if (val) {
-        this.$toasted.show(
-          "Debe Seleccionar la serie del produto. Verifique."
-        );
-        this.inProgress = false;
-        return;
-      }
+      // if (val) {
+      //   this.$toasted.show(
+      //     "Debe Seleccionar la serie del produto. Verifique."
+      //   );
+      //   this.inProgress = false;
+      //   return;
+      // }
       //Nota de Creadito
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
@@ -2156,5 +2197,10 @@ export default {
   min-width: 200px !important;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.body {
+  background: #e3f2fd !important;
+  min-height: 100vh;
 }
 </style>

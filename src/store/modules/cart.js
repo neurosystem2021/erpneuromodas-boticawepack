@@ -129,8 +129,7 @@ const actions = {
         if (arr[i].desc == null) {
           arr[i].desc = "";
         }
-        producto.Descripcion =
-          arr[0].desc + "\n" + arr[1].desc + "\n" + arr[2].desc;
+        producto.Descripcion ="";
       }
 
       // console.log(producto);
