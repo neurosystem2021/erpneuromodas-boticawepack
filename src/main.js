@@ -3,13 +3,13 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-import BootstrapVue from "bootstrap-vue";
-import Autocomplete from "vue2-autocomplete-js";
-import axios from "axios";
-import VueAxios from "vue-axios";
-import Toasted from "vue-toasted";
-import VueMoment from "vue-moment";
-import { detect } from "detect-browser";
+import BootstrapVue from 'bootstrap-vue'
+import Autocomplete from 'vue2-autocomplete-js'
+import axios from 'axios';
+import VueAxios from 'vue-axios'
+import Toasted from 'vue-toasted';
+import VueMoment from 'vue-moment'
+import { detect } from 'detect-browser';
 import VueQuagga from "vue-quaggajs";
 import VueBarcodeScanner from "vue-barcode-scanner";
 
@@ -24,31 +24,31 @@ import '../static/styles.css'
 import 'leaflet/dist/leaflet.css';
 Vue.prototype.$browser = detect()
 
-Vue.config.productionTip = false;
-Vue.use(VueSweetalert2);
-Vue.use(VueAxios, axios);
+Vue.config.productionTip = false
+Vue.use(VueSweetalert2)
+Vue.use(VueAxios, axios)
 Vue.use(Toasted, {
   theme: "bubble",
   position: "top-center",
-  duration: 3000
-});
+  duration : 3000
+})
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 Vue.use(VueQuagga);
 Vue.use(VueBarcodeScanner);
 
-// Componentes
-Vue.component("autocomplete", Autocomplete);
-Vue.component("editable", {
-  template: '<div contenteditable="true" @input="update"></div>',
-  props: ["content"],
-  mounted: function() {
+// Componentes 
+Vue.component('autocomplete', Autocomplete)
+Vue.component('editable',{
+  template:'<div contenteditable="true" @input="update"></div>',
+  props:['content'],
+  mounted:function(){
     this.$el.innerText = this.content;
   },
-  methods: {
-    update: function(event) {
-      this.$emit("update", event.target.innerText);
+  methods:{
+    update:function(event){
+      this.$emit('update',event.target.innerText);
     }
   }
 })
@@ -75,42 +75,28 @@ const socket = io('https://panel.pedi2.pe',{
 })
 Vue.prototype.$socket = socket
 
-Vue.filter("redondear", (value, length) => {
-  return parseFloat(value || 0).toFixed(length || 2);
-});
-Vue.filter("redondeoMayor", value => {
-  return Math.ceil(value || 0);
-});
-Vue.filter("redondeoMenor", value => {
-  return Math.floor(value || 0);
-});
-Vue.filter("moneda", value => {
-  return parseFloat(value || 0)
-    .toFixed(2)
-    .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-});
+Vue.filter('redondear', (value, length) => {
+  return parseFloat(value || 0).toFixed(length || 2)
+})
+Vue.filter('redondeoMayor', (value) => {
+  return Math.ceil(value || 0)
+})
+Vue.filter('redondeoMenor', (value) => {
+  return Math.floor(value || 0)
+})
+Vue.filter('moneda', value => {
+  return parseFloat(value || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+})
 
-const socket = io("https://panel.pedi2.pe", {
-  transports: ["websocket", "polling"],
-  secure: true,
-  rejectUnauthorized: false,
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: Infinity,
-  autoConnect: false,
-  forceNew: false,
-  multiplex: true
-});
-Vue.prototype.$socket = socket;
 
-window.Vue = Vue;
+window.Vue = Vue
+
 
 /* eslint-disable no-new */
 new Vue({
-  el: "#app",
+  el: '#app',
   router,
   store,
   components: { App },
-  template: "<App/>"
-});
+  template: '<App/>'
+})
