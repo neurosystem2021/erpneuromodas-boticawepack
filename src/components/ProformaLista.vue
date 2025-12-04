@@ -96,7 +96,7 @@ export default {
         { key: "DniRuc", label: "Documento" },
         "FechaReg",
         { key: "UsuarioReg", label: "Empleado" },
-        {key:"total"},
+        { key: "total" },
         "update",
         "ver",
         "verTicket",
@@ -130,10 +130,18 @@ export default {
         .then(response => {
           this.limpiarCarrito();
           response.data.map(item => {
+            let pres = JSON.parse(item.Presentacion);
+            item.Presentacion = pres.nombre;
+            item.pres = pres;
             this.add([
               item,
               () => {},
-              { setPreOr: item.Precio, cantidad: item.Cantidad }
+              {
+                setPreOr: item.Precio,
+                cantidad: item.Cantidad,
+                pres: pres,
+                Presentacion: pres.nombre
+              }
             ]);
             this.filter = "";
             this.show = false;
@@ -141,6 +149,7 @@ export default {
           setTimeout(() => {
             this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
           }, 300);
+          console.log(response.data);
           proforma.productos = response.data;
           // console.log(proforma);
 
