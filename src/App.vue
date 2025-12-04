@@ -12,7 +12,9 @@ export default {
 
 <style>
 .btnAction {
-  margin: 2px 0;
+  margin: 2% 10px;
+  display: block !important; /* <--- aquí */
+  min-width: 100% !important; /* <--- aquí si quieres ancho completo */
   border-radius: 25px !important;
   -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);

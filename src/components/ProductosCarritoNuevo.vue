@@ -163,13 +163,13 @@
         <template slot="show_details" slot-scope="row">
            <b-button size="sm" variant="info" :disabled="bloquearInput?true:false" @click.stop="row.toggleDetails">></b-button>
         </template>
-        <template slot="row-details" slot-scope="row">
+        <!-- <template slot="row-details" slot-scope="row">
 
-        </template>
+        </template> -->
 
       </b-table>
     </b-col>
-    <b-col md="3">
+    <!-- <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
@@ -213,7 +213,7 @@
               </tr>
             </tbody>
           </table>
-    </b-col>
+    </b-col> -->
     <br><br>
   </b-row>
 </template>
@@ -261,9 +261,9 @@ export default {
     sumatoriaTotal(sum) {
       this.asignarVuelto();
     },
-    productos(){
-      console.log(this.productos)
-    }
+    // productos(){
+    //   console.log(this.productos)
+    // }
   },
   props: {
     setPrecio: Boolean,
