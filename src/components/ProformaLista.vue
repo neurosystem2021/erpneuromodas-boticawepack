@@ -17,7 +17,7 @@
                 <b-tabs pills card>
                   <b-tab title="Proformas" active>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <div class="table-responsive">
+                    <div class="table-responsive ">
                       <b-table 
                           v-if="show"
                           id="table-proformas" 

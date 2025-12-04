@@ -60,7 +60,11 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage">
+            <template slot="action"  slot-scope="data">
+               <pago-deuda @registro="recargarTabla" :Cliente="data.item"> </pago-deuda>
+            </template> 
+          </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -78,35 +82,42 @@
 </template>
 
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
+import PagoDeuda from "@/components/PagoDeuda";
+// import DetalleDeudaCliente from '@/components/DetalleDeudaCliente.vue'
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'clientes/deuda/count?idalmacen=' + this.almacen.IdAlmacen ).then((response) => {
-      console.log(response)
-      this.totalRows = response.data.total
-    })
+    this.axios
+      .get(
+        this.API + "clientes/deuda/count?idalmacen=" + this.almacen.IdAlmacen
+      )
+      .then(response => {
+        console.log(response);
+        this.totalRows = response.data.total;
+      });
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: '',
-      sortBy: 'IdDocVenta',
+      pageOptions: [5, 10, 15, 50, 100],
+      filter: "",
+      sortBy: "IdDocVenta",
       sortDesc: false,
       items: [],
       isBusy: false,
       fields: [
-            { key: 'DniRuc', label: 'DNI/RUC', sortable: true },
-            { key: 'Cliente', label: 'Cliente', sortable: true },
-            { key: 'Correlativo', label: 'Serie', sortable: true },
-            { key: 'Total', label: 'Total', sortable: true},
-            { key: 'Aplicado', label: 'Aplicado', sortable: true},
-            { key: 'NotaCreApli', label: 'Apli. Nota Cred.', sortable: true},
-            { key: 'Saldo', label: 'Saldo', sortable: true },
-            { key: 'FechaDoc', label: 'Emision', sortable: true },
-            { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
+        { key: "DniRuc", label: "DNI/RUC", sortable: true },
+        { key: "Cliente", label: "Cliente", sortable: true },
+        { key: "Correlativo", label: "Serie", sortable: true },
+        { key: "Total", label: "Total", sortable: true },
+        { key: "Aplicado", label: "Aplicado", sortable: true },
+        { key: "NotaCreApli", label: "Apli. Nota Cred.", sortable: true },
+        { key: "Saldo", label: "Saldo", sortable: true },
+        { key: "FechaDoc", label: "Emision", sortable: true },
+        { key: "FechaCredito", label: "Vencimiento", sortable: true },
+        { key: "action", label: "", sortable: false }
       ],
       totalRows: 50,
       perPage: 10,
@@ -114,46 +125,67 @@ export default {
       almacen: {
         IdAlmacen: 1
       }
-    }
+    };
   },
   methods: {
-    focusAutocomplete (ref) {
+    focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     },
-    setAlmacen (obj) {
-      this.almacen = obj
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+    pagarDeuda(IdCliente) {
+      console.log("IdCliente", IdCliente);
     },
-    myProvider (ctx) {
+    recargarTabla() {
+      setTimeout(() => {
+        Vue.nextTick(() => this.$refs.tablaProductos.refresh());
+      }, 100);
+    },
+    setAlmacen(obj) {
+      this.almacen = obj;
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
+    },
+    myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'cliente/deudas?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      let promise = this.axios.get(
+        this.API +
+          "cliente/deudas?idalmacen=" +
+          this.almacen.IdAlmacen +
+          "&q=" +
+          ctx.filter +
+          "&limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage
+      );
 
-      return promise.then((response) => {
-        console.log(response)
-        this.items = response.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+      return promise
+        .then(response => {
+          console.log(response);
+          this.items = response.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
     }
   },
   components: {
-      // ProductoForm
+    // ProductoForm
+    // DetalleDeudaCliente,
+    PagoDeuda
   }
-}
+};
 </script>
 
 <style>
-
 </style>

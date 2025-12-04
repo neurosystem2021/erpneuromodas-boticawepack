@@ -293,7 +293,7 @@
                                   <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                   <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
-                                  <tr class="ocultarMovil"><td colspan="2" v-if="ventas[index].productos.length>0">
+                                  <tr><td colspan="2" v-if="ventas[index].productos.length>0">
                                     <b-form-checkbox
                                       id="checkbox-1"
                                       v-model="ventas[index].asignarDisabledProf"
@@ -542,7 +542,7 @@
                                                     </b-form-checkbox>
                                                     <b-form-input 
                                                       :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
-                                                      v-if="venta.EsCredito"
+                                                      v-if="ventas[index].EsCredito==1"
                                                       v-model="ventas[index].FechaCredito"
                                                       type="date">
                                                     </b-form-input>
@@ -647,6 +647,11 @@
             </div>
             </b-form>
         </b-container>
+
+        <b-modal v-model="cargando" hide-header hide-footer>
+          <div class="spinner"></div>
+          <p><b>Obteniendo los datos, un momento por favor....</b></p>
+        </b-modal>
     </b-container>
 </template>
 <script>
@@ -687,6 +692,7 @@ export default {
   },
   data() {
     return {
+      cargando:false,
       ventas: [],
       index: 0,
       preVenta: {},
@@ -955,10 +961,35 @@ export default {
         });
       }
     },
-    setProforma(e) {
-      let ven = { ...this.preVenta, productos: e.productos };
+    async setProforma(e) {
+      let productos = e.productos.map(v => {
+        return { ...v, cantidadPres: 1 };
+      });
+      this.cargando = true
+      for (let index = 0; index < productos.length; index++) {
+        const producto = productos[index];
+        let series = await this.obtenerSeriePorProducto(producto.IdProducto);
+        let p = await this.axios(
+          `${this.API}/productos/stock/${
+            this.ventas[this.index].almacen.IdAlmacen
+          }`,
+          {
+            params: {
+              idProductos: [producto.IdProducto]
+            }
+          }
+        ).then(res => {
+          return res.data[0];
+        });
+        producto.stock = p.stock;
+        producto.Series = series;
+        producto.PrecioCosto = p.PrecioCosto;
+      }
+      console.log(productos);
+      let ven = { ...this.preVenta, productos: productos };
       this.ventas.push(ven);
       this.$nextTick(() => {
+        this.cargando = false
         this.index = this.ventas.length - 1;
         this.getVendedor();
         let v = this.ventas[this.index];
@@ -1866,6 +1897,25 @@ export default {
       // window.location.reload();
       this.eliminarVentana();
     },
+    async obtenerSeriePorProducto(id) {
+      let productoSerie = [];
+      let params = {
+        IdProducto: id,
+        Todos: false,
+        empresa: sessionStorage.getItem("empresa"),
+        IdAlmacen: this.idAlmacen
+      };
+      productoSerie = await this.axios(`${this.API}/productos/serie`, {
+        params: {
+          IdProducto: id,
+          IdAlmacen: this.IdAlmacen
+        }
+      }).then(res => {
+        return res.data;
+      });
+
+      return productoSerie;
+    },
     generarOfertas() {
       let IdOferta = [];
 
@@ -2203,4 +2253,24 @@ export default {
   background: #e3f2fd !important;
   min-height: 100vh;
 }
+
+
+
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ddd;
+  border-top-color: #3498db; /* Color del borde superior */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 20px auto; /* Centrado */
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 </style>

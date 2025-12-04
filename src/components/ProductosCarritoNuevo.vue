@@ -391,7 +391,6 @@
 
          <template slot="Series" slot-scope="data">
           <b-select 
-              v-if="data.item.Series.length>0"
               :options="data.item.Series" 
               v-model="data.item.IdProductoSerie"
               text-field="Serie"
@@ -1166,6 +1165,7 @@ export default {
       //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+      obj.cantidadPres = 1;
       // obj = this.onSetProducto(obj);
 
       this.$emit("setProducto", obj);
@@ -1181,7 +1181,7 @@ export default {
       // ]);
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
-      obj.cantidadPres = obj.cantidad;
+     
       this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {
