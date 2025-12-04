@@ -1,111 +1,208 @@
 <template>
-  <b-container fluid>
-        <b-row>
-            <b-col cols="3">
-                Almacén
-                <b-select 
-                  :options="lstAlmacen"
-                  value-field="IdAlmacen"
-                  text-field="Almacen"
-                  v-model="idAlmacen"
-                  >
-                </b-select>
-
-            </b-col>
-            <b-col cols="3">
-              Usuario
-              <b-select 
-                :options="lstUsuarios"
-                value-field="Usuario"
-                text-field="NombreUsuario"
-                v-model="idUsuario"
-                >
-            </b-select>
-             
-            </b-col>
-            <b-col cols="3">
-              Desde
-                <b-form-input v-model="desde" type="date" placeholder="Desde" />
-            </b-col>
-            <b-col cols="3">
-              Hasta
-                <b-form-input v-model="hasta" type="date" placeholder="Hasta" />
-            </b-col>
-            <b-col>
-              <b-button variant="success" @click="Generar()"> GENERAR</b-button>
-            </b-col>
-            <b-col cols="12">
-              <b-table striped hover :items="lstReporte" :fields="headers"
+  <b-container fluid class="px-5 mb-5">
+    <b-row>
+       <b-col cols="12">
+        <b-breadcrumb :items="items"></b-breadcrumb>
+       </b-col>
+        <b-col cols="3">
+            Fecha
+            <input type="date" class="form-control" v-model="fechaInicio">
+        </b-col>
+        <b-col cols="3">
+            Fecha
+            <input type="date" class="form-control" v-model="fechaFin">
+        </b-col>
+        <b-col cols="3">
+            Almacén
+            <b-form-select v-model="almacen" 
+                 value-field="IdAlmacen"
+                 text-field="Almacen"
+                :options="lstAlmances"></b-form-select>
+        </b-col>
+        <b-col cols="3" class="pt-4">
+            <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+            <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+        </b-col>
+        <b-col cols="12" class="mt-4">
+            <table class="table table-hover table-striped ">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">IdProducto </th>
+                        <th>Producto </th>
+                        <th style="text-align: center;">Cantidad </th>
+                        <th style="text-align: center;">Precio Costo </th>
+                        <th style="text-align: center;">Precio Venta </th>
+                        <th style="text-align: center;">Total Venta </th>
+                        <th style="text-align: center;">Total Costo </th>
+                        <th style="text-align: center;">Utilidad Bruta </th>
+                        <th style="text-align: center;">% Utilidad </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(reporte,index) in lstReporte" :key="index">
+                        <td style="text-align: center;">{{reporte.IdProducto}}</td>
+                        <td>{{reporte.Producto}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.Cantidad).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.TotalCosto).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.UtilidadBruta).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.PorcentajeUti).toFixed(2)}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr style="background: #006064; color: #ffffff; font-weight: bold;">
+                        <td colspan="5">{{footer.Producto}}</td>
+                       
+                        <td style="text-align: center;">{{footer.TotalVenta}}</td>
+                        <td style="text-align: center;">{{footer.TotalCosto}}</td>
+                        <td style="text-align: center;">{{footer.UtilidadBruta}}</td>
+                        <td style="text-align: center;">{{footer.PorcentajeUti}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <!-- <b-table
+                id="my-table"
+                :items="lstReporte"
                 :per-page="perPage"
                 :current-page="currentPage"
-              ></b-table>
-              <b-pagination
-                v-model="currentPage"
-                :total-rows="lstReporte.length"
-                :per-page="perPage"
-                aria-controls="my-table"
-              ></b-pagination>
-            </b-col>
-        </b-row>
+                small
+                :fields="header"
+                ></b-table> -->
+        </b-col>
+    </b-row>
   </b-container>
 </template>
 
 <script>
 import config from "@/store/config.js";
 export default {
-  name: "ReporteUtilidadBrutaPorVendedor",
   data() {
     return {
-      perPage: 10,
-      currentPage: 1,
+      fechaInicio: "",
+      fechaFin: "",
+      almacen: 0,
       API: config.API,
-      desde: "",
-      hasta: "",
-      idAlmacen: "",
-      idUsuario: "",
-      lstUsuarios: [],
-      lstAlmacen: [],
-      headers: [
-        { key: "UsuarioReg" },
+      lstReporte: [],
+      items: [
+        {
+          text: "VENTAS",
+          href: "#"
+        },
+        {
+          text: "REPORTE",
+          href: "#"
+        },
+        {
+          text: "UTILIDAD BRUTA VENTAS",
+          active: true
+        }
+      ],
+      header: [
+        { key: "IdProducto" },
         { key: "Producto" },
         { key: "Cantidad" },
         { key: "PrecioCosto" },
         { key: "PrecioVenta" },
-        { key: "TotalCosto" },
         { key: "TotalVenta" },
-        { key: "PorcentajeUti" },
-        { key: "UtilidadBruta" }
-        // { key: "IdProducto" },
+        { key: "TotalCosto" },
+        { key: "UtilidadBruta" },
+        { key: "PorcentajeUti" }
       ],
-      lstReporte: []
+      lstAlmances: [],
+      footer: {
+        Producto: "TOTAL",
+        Cantidad: 0,
+        PrecioCosto: 0,
+        PrecioVenta: 0,
+        TotalVenta: 0,
+        TotalCosto: 0,
+        UtilidadBruta: 0,
+        PorcentajeUti: 0
+      }
     };
   },
   mounted() {
-    this.cargarUsuarios();
-    this.cargarAlmancen();
+    this.fechaInicio = this.$moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    this.fechaFin = this.$moment()
+      .endOf("month")
+      .format("YYYY-MM-DD");
+    this.generarReporte();
+    this.obtenerAlmance();
   },
   methods: {
-    async cargarUsuarios() {
-      await this.axios(`${this.API}usuarios`).then(response => {
-        this.lstUsuarios = response.data;
-      });
-    },
-    async cargarAlmancen() {
-      await this.axios(`${this.API}almacenes`).then(response => {
-        this.lstAlmacen = response.data;
-      });
-    },
-    async Generar() {
-      this.lstReporte = [];
-      await this.axios(`${this.API}reporte/utlidadbruta_operador`, {
-        params: {
-          desde: this.desde,
-          hasta: this.hasta,
-          idAlmacen: this.idAlmacen,
-          idUsuario: this.idUsuario
+    async obtenerAlmance() {
+      await this.axios(`${this.API}almacenes`).then(res => {
+        if (res.data) {
+          this.lstAlmances = res.data;
+          this.lstAlmances.unshift({
+            Almacen: "TODOS",
+            IdAlmacen: 0
+          });
         }
-      }).then(response => {
-        this.lstReporte = response.data;
+      });
+    },
+    async exportarReporte() {
+      // http://localhost/api/index.php/reporte/utilidadbruta/excel?fechaInicio=2024-01-01&fechaFin=2026-01-01&almacen=0
+
+      let params = {
+        fechaInicio: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        almacen: this.almacen
+      };
+      await this.axios(`${this.API}reporte/utilidadbruta/excel`, {
+        params: params
+      }).then(res => {
+        let url = res.data;
+        url = url.replace(/\\/g, "");
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          url = "http://" + url; // O "https://" si es necesario
+        }
+        window.open(url, "_blank");
+      });
+    },
+    async generarReporte() {
+      let params = {
+        fechaInicio: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        almacen: this.almacen
+      };
+      await this.axios(`${this.API}reporte/utlidadbruta`, {
+        params: params
+      }).then(res => {
+        if (res.data) {
+          let data = res.data;
+          this.lstReporte = data;
+          let Cantidad = 0;
+          let PrecioCosto = 0;
+          let PrecioVenta = 0;
+          let TotalVenta = 0;
+          let TotalCosto = 0;
+          let UtilidadBruta = 0;
+          let PorcentajeUti = 0;
+          data.forEach(element => {
+            Cantidad += element.Cantidad;
+            PrecioCosto += element.PrecioCosto;
+            PrecioVenta += element.PrecioVenta;
+            TotalVenta += element.TotalVenta;
+            TotalCosto += element.TotalCosto;
+            UtilidadBruta += element.UtilidadBruta;
+            PorcentajeUti += element.PorcentajeUti;
+          });
+          this.footer = {
+            Producto: "TOTAL",
+            Cantidad: parseFloat(Cantidad).toFixed(2),
+            PrecioCosto: parseFloat(PrecioCosto).toFixed(2),
+            PrecioVenta: parseFloat(PrecioVenta).toFixed(2),
+            TotalVenta: parseFloat(TotalVenta).toFixed(2),
+            TotalCosto: parseFloat(TotalCosto).toFixed(2),
+            UtilidadBruta: parseFloat(UtilidadBruta).toFixed(2),
+            PorcentajeUti: parseFloat(PorcentajeUti).toFixed(2)
+          };
+        }
       });
     }
   }
