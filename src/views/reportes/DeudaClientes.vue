@@ -62,7 +62,7 @@
             :per-page="perPage"
             :current-page="currentPage">
             <template slot="action"  slot-scope="data">
-              <b-button variant="warning" @click="pagarDeuda(data.item)"> <i class="fa fa-money" aria-hidden="true"></i> Pagar </b-button>
+               <pago-deuda @registro="recargarTabla" :Cliente="data.item"> </pago-deuda>
             </template> 
           </b-table>
             <b-row>
@@ -83,6 +83,8 @@
 
 <script>
 import config from "@/store/config.js";
+import PagoDeuda from "@/components/PagoDeuda";
+// import DetalleDeudaCliente from '@/components/DetalleDeudaCliente.vue'
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
@@ -133,6 +135,11 @@ export default {
     pagarDeuda(IdCliente) {
       console.log("IdCliente", IdCliente);
     },
+    recargarTabla() {
+      setTimeout(() => {
+        Vue.nextTick(() => this.$refs.tablaProductos.refresh());
+      }, 100);
+    },
     setAlmacen(obj) {
       this.almacen = obj;
       Vue.nextTick(() => this.$refs.tablaProductos.refresh());
@@ -174,6 +181,8 @@ export default {
   },
   components: {
     // ProductoForm
+    // DetalleDeudaCliente,
+    PagoDeuda
   }
 };
 </script>

@@ -675,10 +675,7 @@ export default {
         "deuda",
         parseFloat(deuda.Total).toFixed(2) - parseFloat(deuda.Saldo).toFixed(2)
       );
-      if (
-        this.Importe <=
-        parseFloat(deuda.Total).toFixed(2) - parseFloat(deuda.Saldo).toFixed(2)
-      ) {
+      if (this.Importe <= parseFloat(deuda.Saldo).toFixed(2)) {
         deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,

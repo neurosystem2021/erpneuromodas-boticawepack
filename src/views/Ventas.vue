@@ -542,7 +542,7 @@
                                                     </b-form-checkbox>
                                                     <b-form-input 
                                                       :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
-                                                      v-if="venta.EsCredito"
+                                                      v-if="ventas[index].EsCredito==1"
                                                       v-model="ventas[index].FechaCredito"
                                                       type="date">
                                                     </b-form-input>
