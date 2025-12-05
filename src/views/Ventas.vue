@@ -257,7 +257,6 @@
                         </b-button>
                       </template>
                       </b-table>
-                      
                   </b-col>
                 </b-row>
                 <b-row>
@@ -265,11 +264,14 @@
                    
                     <b-col cols="12"  md="4" lg="3" class="text-center" align-h="center">
                         <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" style="background-color: #D50000; color:#ffffff" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" style="background-color: #FF3D00; color:#ffffff" @click="guardarProforma">Crear Proforma</b-button>
                         <b-button class="btnAction" @click="guardarVenta" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
                         <b-button class="btnAction" @click="anadirVenta" style="background-color: #757575; color:#ffffff" >Añadir Ventana</b-button>
                         <b-button class="btnAction" @click="eliminarVentana" v-if="index!=0" style="background-color: #FFD600; color:#ffffff" >Eliminar Ventana</b-button>
                         <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info"  :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setProforma"  @guardarDatosProforma="guardarDatosProforma"></proformas>
+                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                         
                         <!--  -->
                       
                     </b-col>
@@ -619,12 +621,10 @@
                             <b-col cols="12"  md="4" lg="3" class="text-center" align-h="center">
                         <!--  -->
                        
-                          <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                       
+                          
                             <movimiento></movimiento>
                        
                             <pago-deuda></pago-deuda>
-                            <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setProforma"  @guardarDatosProforma="guardarDatosProforma"></proformas>
                             <pre-orden-lista 
                                 v-show="!this.$route.query.idPreOrden"
                                 :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectPreOrden="setCliente"
@@ -635,7 +635,8 @@
                       
                             <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                             <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                       
+                            <b-button target="_blank"  href="/views/proyectos.php?id=1" class=" btnAction" style="background: #0D47A1; color:#ffffff">CREAR/ EDITAR PROYECTOS</b-button>
+                            <b-button target="_blank"  href="/views/reg_proyectos.php" class=" btnAction" style="background: #004D40; color:#ffffff">VER PROYECTOS</b-button>
                     </b-col>
                    
                 </b-row>
@@ -692,7 +693,7 @@ export default {
   },
   data() {
     return {
-      cargando:false,
+      cargando: false,
       ventas: [],
       index: 0,
       preVenta: {},
@@ -936,6 +937,8 @@ export default {
       // console.log("index", index);
     },
     setProducto(evt) {
+      console.log("evt.PrecioContado", evt.PrecioContado);
+
       let prods = this.ventas[this.index].productos;
       if (prods.some(v => v.IdProducto == evt.IdProducto)) {
         let i = this.ventas[this.index].productos.findIndex(
@@ -943,7 +946,7 @@ export default {
         );
         let producto = this.ventas[this.index].productos[i];
         console.log("producto", producto.estadoPxP);
-        if (producto.estadoPxP == evt.estadoPxP) {
+        if (producto.estadoPxP === evt.estadoPxP) {
           if (producto.estadoPxP) {
             producto.cantidad = parseFloat(producto.cantidad) + 1;
           } else {
@@ -953,6 +956,7 @@ export default {
         Vue.set(prods, index, evt);
         // console.log(index);
       } else {
+        console.log("evt.PrecioContado", evt.PrecioContado);
         this.ventas[this.index].productos.unshift({
           ...evt,
           precio: evt.PrecioContado,
@@ -965,7 +969,7 @@ export default {
       let productos = e.productos.map(v => {
         return { ...v, cantidadPres: 1 };
       });
-      this.cargando = true
+      this.cargando = true;
       for (let index = 0; index < productos.length; index++) {
         const producto = productos[index];
         let series = await this.obtenerSeriePorProducto(producto.IdProducto);
@@ -989,7 +993,7 @@ export default {
       let ven = { ...this.preVenta, productos: productos };
       this.ventas.push(ven);
       this.$nextTick(() => {
-        this.cargando = false
+        this.cargando = false;
         this.index = this.ventas.length - 1;
         this.getVendedor();
         let v = this.ventas[this.index];
@@ -1583,7 +1587,7 @@ export default {
     },
     async guardarProforma() {
       this.venta = {};
-      this.venta = this.ventas[this.index];
+      this.venta = {...this.ventas[this.index]};
       this.inProgress = true;
 
       if (!this.venta.productos.length) {
@@ -1615,7 +1619,7 @@ export default {
         });
       }
 
-      this.venta.productos = this.productos;
+      // this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
       await this.axios
         .post(this.API + "proformas", this.venta)
@@ -2254,9 +2258,6 @@ export default {
   min-height: 100vh;
 }
 
-
-
-
 .spinner {
   width: 50px;
   height: 50px;
@@ -2272,5 +2273,4 @@ export default {
     transform: rotate(360deg);
   }
 }
-
 </style>
