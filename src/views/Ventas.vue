@@ -303,9 +303,7 @@ export default {
     };
   },
   watch: {
-    productos() {
-      console.log("dddd", this.productos);
-    },
+    productos() {},
     totalCart(newVal) {
       this.venta.pago.efectivo.monto =
         newVal -
@@ -333,8 +331,8 @@ export default {
         let productos = this.ventas[this.index].productos;
         let suma = productos.reduce((sum, value) => {
           return sum + parseFloat(value.subtotal);
-        });
-        return suma;
+        }, 0);
+        return parseFloat(suma).toFixed(2);
       }
       return 0;
     },
@@ -346,8 +344,8 @@ export default {
         let productos = this.ventas[this.index].productos;
         let suma = productos.reduce((sum, value) => {
           return sum + parseFloat(value.total);
-        });
-        return suma;
+        }, 0);
+        return parseFloat(suma).toFixed(2);
       }
       return 0;
     },
@@ -358,8 +356,9 @@ export default {
       ) {
         let productos = this.ventas[this.index].productos;
         let suma = productos.reduce((sum, value) => {
+          console.log(value);
           return sum + parseFloat(value.descuento || 0);
-        });
+        }, 0);
         return suma;
       }
       return 0;
