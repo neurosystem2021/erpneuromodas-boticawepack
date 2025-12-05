@@ -1,13 +1,30 @@
 <template>
     <b-container fluid>
       <b-card no-body>
-        <b-tabs card pills >
+        <b-tabs card pills  v-model="index">
           <b-tab :title="`VENTA ${i+1}`" v-for="(tab,i) in ventas" :key="i">
             <b-row>
                 <b-col md="6">
                   <b-row>
                     <b-col md="4">
-                      tipo de venta
+                     <b-form-group  class="my-0">
+                        <span class="ocultarMovil">Tipo de Venta</span>
+                          <label class="lblSerie"><b style="display:none" class="mostrarSerie">{{ tab.Serie }} - {{ tab.Numero }}</b></label>
+                          <b-input-group>
+                            <autocomplete
+                                required="required"
+                                :ref="`inputTipoVenta${i}`"
+                                :url="API + 'ventas/tipos'"
+                                anchor="TipoDoc"
+                                initValue="BOLETA ELEC."
+                                label="writer"
+                                placeholder=""
+                                :on-select="setTipoVenta" 
+                                :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${i}`)"
+                                :classes="{input: 'form-control'}">
+                            </autocomplete>
+                          </b-input-group>
+                    </b-form-group>
                     </b-col>
                      <b-col md="4">
                         <b-form-group>
@@ -114,71 +131,241 @@
                       >
                       </productos-carrito>
                  </b-col>
-                 <b-col cols="3">
+                 <b-col cols="4">
                      <b-button class="btnAction"  block :disabled="inProgress" variant="primary" @click="guardarProforma">Crear Proforma</b-button>
-                      <b-button class="btnAction" block  :disabled="inProgress" variant="success">Efectuar Venta</b-button>
+                      <b-button class="btnAction" block  :disabled="inProgress" variant="success"  @click="guardarVenta">Efectuar Venta</b-button>
                       <b-button class="btnAction" block style="background: #263238; color: #ffffff;"  @click="anadirVentana()" variant="success">Añadir Ventana</b-button>
+                      <b-button class="btnAction" v-if="index>0" block style="background: #DD2C00; color: #ffffff;"  @click="eliminarVentana()" >Eliminar Ventana</b-button>
                         
                  </b-col>
-                 <b-col cols="3">
-                  <table class="table b-table border table-footer">
-                      <tbody>
-                          <tr>
-                              <td  class="text-center">Opciones</td>
-                          </tr>
-                          <tr v-if="puntosAplicados == 0">
-                              <td>
-                                  <b-input-group prepend="%" append="Descuento">
-                                      <b-form-input
-                                          v-model="descuentoGeneral"
-                                          :disabled="bloquearInput?true:false"
-                                          min="0"
-                                          value="0"
-                                          max="100"
-                                          :readonly="(idPerfil == 3) ? true : false"
-                                          @input="aplicarDescuentoGeneral"
-                                          type="number"
-                                      ></b-form-input>
-                                  </b-input-group>
-                                  <b-form-text>
-                                      Descuento general a toda la venta.
-                                  </b-form-text>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>
-                                  <b-form-checkbox
-                                      v-model="ventas[index].EsCredito"
-                                      :disabled="bloquearInput?true:false"
-                                      :value="1"
-                                      :unchecked-value="0">
-                                      Venta a credito
-                                  </b-form-checkbox>
-                                  <b-form-input
-                                      v-if="ventas[index].EsCredito"
-                                      :disabled="bloquearInput?true:false"
-                                      v-model="ventas[index].FechaCredito"
-                                      type="date">
-                                  </b-form-input>
-                              </td>
-                          </tr>
-                      </tbody>
-                  </table>
-                 </b-col>
-                 <b-col cols="3">
+                 
+                 <b-col cols="4">
                      <table class="table b-table border table-footer">
                       <tbody>
                         <tr>
-                          <td class="table-danger">Descuento</td>
+                            <td>
+                              <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
+                              <b-popover
+                                  target="popover-opciones"
+                                  placement="bottom" 
+                                  custom-class="custom-popover"
+                                  title="Opciones" triggers="click"
+                                  auto-hide
+                                  style="min-width: 400px;"
+                              >
+                                <table class="table b-table border table-footer">
+                                  <tbody>
+                                    <tr v-if="puntosAplicados == 0" class="ocultarMovil">
+                                      <td>
+                                        <b-input-group prepend="%">
+                                          <input
+                                            v-model="descuentoGeneral"
+                                            min="0"
+                                            value="0"
+                                            :disabled="bloquearInput ? true : false"
+                                            @input="(val) => { aplicarDescuentoGeneral(val.target.value) }"
+                                            type="number"
+                                            class="form-control"
+                                          />
+                                        </b-input-group>
+                                        <b-form-text>
+                                          Descuento general a toda la venta.
+                                        </b-form-text>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                        <b-form-checkbox
+                                          :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
+                                          v-model="ventas[index].EsCredito"
+                                          :value="1"
+                                          :unchecked-value="0">
+                                          Venta a crédito
+                                        </b-form-checkbox>
+                                        <b-form-input 
+                                          :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
+                                          v-if="ventas[index].EsCredito==1"
+                                          v-model="ventas[index].FechaCredito"
+                                          type="date">
+                                        </b-form-input>
+                                        <b-form-checkbox 
+                                          :disabled="bloquearInput ? true : false || ventas[index].EsDelivery"
+                                          v-model="ventas[index].PorEntregar"
+                                          :value="1"
+                                          :unchecked-value="0">
+                                          Por entregar
+                                        </b-form-checkbox>
+                                        <!-- <b-form-checkbox 
+                                          :disabled="bloquearInput ? true : false || ventas[index].EsDelivery"
+                                          v-model="ventas[index].ProformaSinPrecio"
+                                          :value="1"
+                                          :unchecked-value="0">
+                                          Sin precios en proforma
+                                        </b-form-checkbox> -->
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                        <b-input-group prepend="Proforma válido por:" append="días">
+                                          <b-form-input
+                                            :disabled="bloquearInput ? true : false"
+                                            v-model="ventas[index].diasValidosProf"
+                                            min="0"
+                                            value="0"
+                                            type="number"
+                                          ></b-form-input>
+                                        </b-input-group>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </b-popover>  
+                            </td>
+                             <td><b>SubTotal</b></td>
+                          <td class="table-success">{{ sumatoriaSubTotal }}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                              <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                                              <br>
+                                              <b-badge v-if="ventas[index].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                                              <b-badge v-if="ventas[index].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                                              <b-badge v-if="ventas[index].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                                              <b-badge v-if="ventas[index].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                                              <b-popover 
+                                                  target="popover-metodopago" 
+                                                  placement="bottom" 
+                                                  triggers="click" 
+                                                  custom-class="custom-popover"
+                                                  auto-hide
+                                                >
+                                                  <div class="table-responsive p-2">
+                                                    <table class="table table-bordered table-sm">
+                                                      <tbody>
+                                                        <tr>
+                                                          <td colspan="3" class="text-center font-weight-bold">Método de Pago</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Efectivo</td>
+                                                          <td>
+                                                            <b-button @click="cargarMonto('efectivo')" size="sm" variant="primary">
+                                                              <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </b-button>
+                                                          </td>
+                                                          <td>
+                                                            <b-form-input
+                                                              v-model="ventas[index].pago.efectivo.descripcion"
+                                                              type="text"
+                                                              :disabled="bloquearInput"
+                                                              placeholder="Descripcion"
+                                                            ></b-form-input>
+                                                          </td>
+                                                          <td>
+                                                            <input
+                                                              v-model="ventas[index].pago.efectivo.monto"
+                                                              min="0"
+                                                              :disabled="bloquearInput"
+                                                              step="0.01"
+                                                              type="number"
+                                                              class="form-control"
+                                                              placeholder="S/."
+                                                            />
+                                                          </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Tarjeta</td>
+                                                          <td>
+                                                            <b-button size="sm" @click="cargarMonto('visa')" variant="primary">
+                                                              <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </b-button>
+                                                          </td>
+                                                          <td>
+                                                            <b-form-input
+                                                              v-model="ventas[index].pago.visa.descripcion"
+                                                              type="text"
+                                                              :disabled="bloquearInput"
+                                                              placeholder="Descripcion"
+                                                            ></b-form-input>
+                                                          </td>
+                                                          <td>
+                                                            <input
+                                                              class="form-control"
+                                                              :disabled="bloquearInput"
+                                                              v-model="ventas[index].pago.visa.monto"
+                                                              min="0"
+                                                              step="0.01"
+                                                              type="number"
+                                                              placeholder="S/."
+                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(ventas[index].totalCart - ventas[index].pago.mastercard.monto - ventas[index].pago.otro.monto - $event.target.value)"
+                                                            />
+                                                          </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Transferencia</td>
+                                                          <td>
+                                                            <b-button size="sm" @click="cargarMonto('mastercard')" variant="primary">
+                                                              <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </b-button>
+                                                          </td>
+                                                          <td>
+                                                            <b-form-input
+                                                              v-model="ventas[index].pago.mastercard.descripcion"
+                                                              :disabled="bloquearInput"
+                                                              type="text"
+                                                              placeholder="Descripcion"
+                                                            ></b-form-input>
+                                                          </td>
+                                                          <td>
+                                                            <input
+                                                              class="form-control"
+                                                              v-model="ventas[index].pago.mastercard.monto"
+                                                              :disabled="bloquearInput"
+                                                              min="0"
+                                                              step="0.01"
+                                                              type="number"
+                                                              placeholder="S/."
+                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(totalCart - ventas[index].pago.visa.monto - ventas[index].pago.otro.monto - $event.target.value)"
+                                                            />
+                                                          </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>YAPE / PLIN</td>
+                                                          <td>
+                                                            <b-button size="sm" @click="cargarMonto('otro')" variant="primary">
+                                                              <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </b-button>
+                                                          </td>
+                                                          <td>
+                                                            <b-form-input
+                                                              v-model="ventas[index].pago.otro.descripcion"
+                                                              type="text"
+                                                              placeholder="Descripcion"
+                                                            ></b-form-input>
+                                                          </td>
+                                                          <td>
+                                                            <input
+                                                              class="form-control"
+                                                              v-model="ventas[index].pago.otro.monto"
+                                                              min="0"
+                                                              step="0.01"
+                                                              type="number"
+                                                              placeholder="S/."
+                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(totalCart - ventas[index].pago.visa.monto - ventas[index].pago.mastercard.monto - $event.target.value)"
+                                                            />
+                                                          </td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </div>
+                                                </b-popover>
+                                        </td>
+                            
+                          <td>Descuento</td>
                           <td class="table-danger">- {{ sumatoriaDescuento }}</td>
                         </tr>
                         <tr>
-                          <td><b>SubTotal</b></td>
-                          <td class="table-danger">{{ sumatoriaSubTotal }}</td>
-                        </tr>
-                        <tr>
-                          <td><b>TOTAL</b></td>
-                          <td class="table-danger">{{ sumatoriaTotal }}</td>
+                          <td colspan="2"><b>TOTAL</b></td>
+                          <td>{{ sumatoriaTotal }}</td>
                         </tr>
                         <tr>
                           <td  colspan="2">
@@ -197,7 +384,7 @@
                       </tbody>
                     </table>
                  </b-col>
-                 <b-col cols="3">
+                 <b-col cols="4">
                     <pago-deuda></pago-deuda>
                     <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     <pre-orden-lista :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
@@ -227,11 +414,11 @@ import Proformas from "@/components/ProformaLista.vue";
 export default {
   beforeMount() {
     this.initForm();
-    this.loadClienteVarios();
   },
   mounted() {
     // this.getNumeroVenta()
     this.getVendedor();
+    this.loadClienteVarios();
     //setInterval(this.updateTime, 1000)
     /* this.loadFirstAlmacen()
         this.loadFirstPuntoVenta() */
@@ -305,11 +492,11 @@ export default {
   watch: {
     productos() {},
     totalCart(newVal) {
-      this.venta.pago.efectivo.monto =
+      this.ventas[this.index].pago.efectivo.monto =
         newVal -
-        (parseFloat(this.venta.pago.visa.monto) +
-          parseFloat(this.venta.pago.mastercard.monto) +
-          parseFloat(this.venta.pago.otro.monto));
+        (parseFloat(this.ventas[this.index].pago.visa.monto) +
+          parseFloat(this.ventas[this.index].pago.mastercard.monto) +
+          parseFloat(this.ventas[this.index].pago.otro.monto));
     }
   },
   computed: {
@@ -381,6 +568,14 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    finalizarVentaOProforma() {
+      if (this.index > 0) {
+        this.ventas[this.index].splice(this.index, 1);
+        this.index = this.ventas.length - 1;
+        return;
+      }
+      window.location.reload();
+    },
     setProducto(prod) {
       let productos = this.ventas[this.index].productos;
       if (productos.some(v => v.IdProducto == prod.IdProducto)) {
@@ -395,22 +590,26 @@ export default {
       });
     },
     cambiarMetodoPago(type = null) {
-      this.venta.pago.efectivo.monto = 0;
-      this.venta.pago.visa.monto = 0;
-      this.venta.pago.mastercard.monto = 0;
-      this.venta.pago.otro.monto = 0;
+      this.ventas[this.index].pago.efectivo.monto = 0;
+      this.ventas[this.index].pago.visa.monto = 0;
+      this.ventas[this.index].pago.mastercard.monto = 0;
+      this.ventas[this.index].pago.otro.monto = 0;
 
       if (type == 1) {
-        this.venta.pago.efectivo.monto = parseFloat(this.totalCart);
+        this.ventas[this.index].pago.efectivo.monto = parseFloat(
+          this.totalCart
+        );
       }
       if (type == 2) {
-        this.venta.pago.visa.monto = parseFloat(this.totalCart);
+        this.ventas[this.index].pago.visa.monto = parseFloat(this.totalCart);
       }
       if (type == 3) {
-        this.venta.pago.mastercard.monto = parseFloat(this.totalCart);
+        this.ventas[this.index].pago.mastercard.monto = parseFloat(
+          this.totalCart
+        );
       }
       if (type == 4) {
-        this.venta.pago.otro.monto = parseFloat(this.totalCart);
+        this.ventas[this.index].pago.otro.monto = parseFloat(this.totalCart);
       }
     },
     loadClienteVarios() {
@@ -446,6 +645,7 @@ export default {
     },
     initForm() {
       this.venta = {
+        idMetodoPago: 1,
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -467,10 +667,10 @@ export default {
         FechaCredito: this.$moment().format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
-          efectivo: { IdMetodoPago: 1, monto: 0 },
-          visa: { IdMetodoPago: 2, monto: 0 },
-          mastercard: { IdMetodoPago: 3, monto: 0 },
-          otro: { IdMetodoPago: 4, monto: 0 }
+          efectivo: { IdMetodoPago: 1, monto: 0, descripcion: "" },
+          visa: { IdMetodoPago: 2, monto: 0, descripcion: "" },
+          mastercard: { IdMetodoPago: 3, monto: 0, descripcion: "" },
+          otro: { IdMetodoPago: 4, monto: 0, descripcion: "" }
         },
         NroComprobanteModifica: "",
         CodSunatModifica: "",
@@ -489,10 +689,10 @@ export default {
     setTipoVenta(obj) {
       this.isNota = false;
       this.bloquearInput = false;
-      this.venta.NroComprobanteModifica = "";
-      this.venta.CodSunatModifica = "";
-      this.venta.NotaIdMotivo = "";
-      this.venta.NotaDescMotivo = "";
+      this.ventas[this.index].NroComprobanteModifica = "";
+      this.ventas[this.index].CodSunatModifica = "";
+      this.ventas[this.index].NotaIdMotivo = "";
+      this.ventas[this.index].NotaDescMotivo = "";
 
       // this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
 
@@ -508,17 +708,18 @@ export default {
       }
 
       this.venta.tipoVenta = obj;
+      this.ventas[this.index].tipoVenta = obj;
       this.getNumeroVenta();
     },
     setDocRef(obj) {
-      this.venta.CodSunatModifica = obj.CodSunat;
-      this.venta.NroComprobanteModifica = obj.NroComprobante;
+      this.ventas[this.index].CodSunatModifica = obj.CodSunat;
+      this.ventas[this.index].NroComprobanteModifica = obj.NroComprobante;
 
       if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
+        this.ventas[this.index].tipoVenta.CodSunat == "07" ||
+        this.ventas[this.index].tipoVenta.CodSunat == "08"
       ) {
-        this.venta.Serie = this.venta.Serie.replace(
+        this.ventas[this.index].Serie = this.ventas[this.index].Serie.replace(
           /^./,
           obj.NroComprobante[0]
         );
@@ -527,12 +728,12 @@ export default {
       this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
-            serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc
+            serie: this.ventas[this.index].Serie,
+            idTipoDoc: this.ventas[this.index].tipoVenta.IdTipoDoc
           }
         })
         .then(response => {
-          this.venta.Numero = response.data.numero;
+          this.ventas[this.index].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -545,7 +746,8 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.ventas[this.index].puntoVenta
+              .IdDocVentaPuntoVenta
           }
         })
         .then(response => {
@@ -558,7 +760,7 @@ export default {
             .then(response => {
               if (response.data) {
                 // this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
+                this.ventas[this.index].cliente = response.data;
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
@@ -570,9 +772,11 @@ export default {
           response.data.map(item => {
             this.add([item, () => {}, false, true]);
           });
-          this.venta.NotaIdMotivo = null;
+          this.ventas[this.index].NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          this.obtenerStok({
+            IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
+          });
         });
     },
     setMotivo(ev) {
@@ -591,7 +795,9 @@ export default {
       this.preVenta.almacen = obj;
       this.ventas[this.index].almacen = obj;
       // this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+      this.obtenerStok({
+        IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
+      });
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -602,8 +808,6 @@ export default {
     setPuntoVenta(obj) {
       this.preVenta.puntoVenta = obj;
       this.ventas[this.index].puntoVenta = obj;
-      // this.venta.puntoVenta = obj;
-      // this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
     getVendedor() {
@@ -630,7 +834,7 @@ export default {
       this.preVenta.vendedor = obj;
       this.ventas[this.index].vendedor = obj;
     },
-    setCliente(obj, dni = false) {
+    async setCliente(obj, dni = false) {
       let params = {};
       if (dni) {
         params = {
@@ -643,18 +847,22 @@ export default {
       }
 
       if (typeof obj === "object") {
+        let ref = `inputTipoVenta${this.index}`;
+        let comp = this.$refs[ref][0].setValue(obj.Cliente);
+        console.log(comp);
         // this.$refs.inputCliente.setValue(obj.Cliente);
         this.ventas[this.index].cliente = obj;
         this.ventas[this.index].CampoDireccion = this.ventas[
           this.index
         ].cliente.Direccion;
       } else {
-        this.axios
+        await this.axios
           .get(this.API + "cliente", {
             params: params
           })
           .then(response => {
             if (response.data) {
+              // .setValue(response.data.Cliente);
               // this.$refs.inputCliente.setValue(response.data.Cliente);
               this.ventas[this.index].cliente = response.data;
               this.ventas[this.index].CampoDireccion = this.ventas[
@@ -682,7 +890,7 @@ export default {
     onAddProducto(obj) {
       this.actualizarDescuento();
       this.obtenerStok({
-        IdAlmacen: this.venta.almacen.IdAlmacen
+        IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
       });
     },
     actualizarDescuento() {
@@ -695,8 +903,8 @@ export default {
       }
     },
     aplicarPuntos(val) {
-      if (parseFloat(val) > this.venta.cliente.Puntos) {
-        this.puntosAplicados = this.venta.cliente.Puntos;
+      if (parseFloat(val) > this.ventas[this.index].cliente.Puntos) {
+        this.puntosAplicados = this.ventas[this.index].cliente.Puntos;
       }
 
       this.axios
@@ -740,22 +948,25 @@ export default {
         });
     },
     updateTime() {
-      this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
+      this.ventas[this.index].FechaDoc = this.$moment().format(
+        "YYYY-MM-DDTH:mm:ss"
+      );
     },
-    guardarProforma() {
+    async guardarProforma() {
+      this.venta = this.ventas[this.index];
       if (!this.productos.length) {
         this.$toasted.show("No hay productos para crear la proforma");
         this.inProgress = false;
         return;
       }
 
-      if (!this.venta.cliente.IdCliente) {
+      if (!this.ventas[this.index].cliente.IdCliente) {
         this.$toasted.show("Debe seleccionar un cliente");
         this.inProgress = false;
         return;
       }
 
-      if (!this.venta.vendedor.Usuario) {
+      if (!this.ventas[this.index].vendedor.Usuario) {
         this.$toasted.show("Debe seleccionar un vendedor");
         this.inProgress = false;
         return;
@@ -763,7 +974,7 @@ export default {
 
       this.venta.productos = this.productos;
 
-      this.axios
+      await this.axios
         .post(this.API + "proformas", this.venta)
         .then(response => {
           this.$toasted.show("Proforma Guardada con exito");
@@ -785,10 +996,10 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.finalizarVentaOProforma();
     },
-    guardarVenta(evt) {
-      evt.preventDefault();
-
+    async guardarVenta() {
+      this.venta = this.ventas[this.index];
       this.inProgress = true;
       let totalPagos = 0;
       totalPagos += parseFloat(this.venta.pago.efectivo.monto);
@@ -867,8 +1078,8 @@ export default {
       this.venta.totalCart = this.totalCart || 0;
       // this.venta.PagoCon = this.$refs.carrito.pagocon;
       // console.log(this.venta);return;
-      this.axios
-        .post(this.API + "ventas", this.venta)
+      await this.axios
+        .post(this.API + "ventass", this.venta)
         .then(response => {
           this.$toasted.success("Venta realizada con exito");
           this.inProgress = false;
@@ -895,6 +1106,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.finalizarVentaOProforma();
     },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
@@ -917,7 +1129,31 @@ export default {
         });
     },
     anadirVentana() {
-      console.log("añadir");
+      this.ventas.push({ ...this.preVenta, productos: [] });
+      this.$nextTick(() => {
+        this.index = this.ventas.length - 1;
+        this.getVendedor();
+      });
+    },
+    eliminarVentana() {
+      this.ventas.splice(this.index, 1);
+      this.index = this.ventas.length - 1;
+    },
+    cargarMonto(tipo) {
+      if (
+        this.ventas[this.index].pago &&
+        this.ventas[this.index].pago.hasOwnProperty(tipo)
+      ) {
+        Object.keys(this.ventas[this.index].pago).forEach((key, index) => {
+          this.ventas[this.index].pago[key].monto =
+            key === tipo ? this.totalCart : 0;
+          if (key === tipo) {
+            this.idMetodoPago = index + 1;
+          }
+        });
+      } else {
+        console.error(`El tipo de pago "${tipo}" no existe en pago`);
+      }
     }
   },
   components: {
@@ -939,5 +1175,8 @@ export default {
 }
 .divCarrito {
   min-height: 480px !important;
+}
+.popover.custom-popover {
+  min-width: 400px !important;
 }
 </style>
