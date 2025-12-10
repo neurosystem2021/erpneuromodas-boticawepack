@@ -1062,7 +1062,12 @@ export default {
         });
 
         this.$emit("setProducto", { ...prod, stock: p.stock });
+        setTimeout(() => {
+          this.loadCode = null;
+          document.getElementById("txtBarcode").focus();
+        }, 100);
       }
+
       // this.setProducto();
     },
 
@@ -1199,7 +1204,7 @@ export default {
       // ]);
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
-     
+
       this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {

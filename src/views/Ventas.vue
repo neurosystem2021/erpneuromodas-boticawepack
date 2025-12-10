@@ -953,7 +953,7 @@ export default {
             producto.cantxPrecio = parseFloat(producto.cantxPrecio) + 1;
           }
         }
-        Vue.set(prods, index, evt);
+        Vue.set(prods, this.index, evt);
         // console.log(index);
       } else {
         console.log("evt.PrecioContado", evt.PrecioContado);
