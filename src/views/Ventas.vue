@@ -24,6 +24,21 @@
                                 :classes="{input: 'form-control'}">
                             </autocomplete>
                           </b-input-group>
+                          <b-form-group v-if="tab.isNota">
+                              <label>Doc. Referencia:</label>
+                              <autocomplete
+                                  required="required"
+                                  :ref="`inputDocRef${i}`"
+                                  :url="API + 'ventas/lista/'+tab.puntoVenta.IdDocVentaPuntoVenta"
+                                  anchor="NroComprobante"
+                                  initValue=""
+                                  label="writer"
+                                  placeholder=""
+                                  :on-select="setDocRef"
+                                  :onFocus="focusAutocomplete.bind(null, `inputDocRef${i}`)"
+                                  :classes="{input: 'form-control'}">
+                              </autocomplete>
+                          </b-form-group>
                     </b-form-group>
                     </b-col>
                      <b-col md="4">
@@ -31,10 +46,10 @@
                             <label>Almacen:</label>
                             <input type="text" v-model="tab.almacen.Almacen" class="form-control" disabled>
                         </b-form-group>
-                        <!-- <b-form-group v-if="isNota">
+                        <b-form-group v-if="tab.isNota">
                             <label>Motivo :</label>
-                            <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
-                        </b-form-group> -->
+                            <b-form-select v-model="tab.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
+                        </b-form-group>
                     </b-col>
                     <b-col md="4">
                         <b-form-group>
@@ -122,7 +137,7 @@
                         ref="carrito"
                         :isVentas="true"
                         :showButton="false"
-                        :bloquearInput="bloquearInput"
+                        :bloquearInput="tab.bloquearInput"
                         :fields="carrito.fields"
                         :idAlmacen="tab.almacen.IdAlmacen"
                         :productos="tab.productos"
@@ -177,14 +192,14 @@
                                     <tr>
                                       <td>
                                         <b-form-checkbox
-                                          :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
+                                          :disabled="bloquearInput ? true : false || ventas[this.index].isNota || ventas[index].EsDelivery"
                                           v-model="ventas[index].EsCredito"
                                           :value="1"
                                           :unchecked-value="0">
                                           Venta a crédito
                                         </b-form-checkbox>
                                         <b-form-input 
-                                          :disabled="bloquearInput ? true : false || isNota || ventas[index].EsDelivery"
+                                          :disabled="bloquearInput ? true : false || ventas[this.index].isNota || ventas[index].EsDelivery"
                                           v-if="ventas[index].EsCredito==1"
                                           v-model="ventas[index].FechaCredito"
                                           type="date">
@@ -490,11 +505,12 @@ export default {
   watch: {
     productos() {},
     totalCart(newVal) {
-      this.ventas[this.index].pago.efectivo.monto =
-       parseFloat( newVal -
-        (parseFloat(this.ventas[this.index].pago.visa.monto) +
-          parseFloat(this.ventas[this.index].pago.mastercard.monto) +
-          parseFloat(this.ventas[this.index].pago.otro.monto))).toFixed(2);
+      this.ventas[this.index].pago.efectivo.monto = parseFloat(
+        newVal -
+          (parseFloat(this.ventas[this.index].pago.visa.monto) +
+            parseFloat(this.ventas[this.index].pago.mastercard.monto) +
+            parseFloat(this.ventas[this.index].pago.otro.monto))
+      ).toFixed(2);
     }
   },
   computed: {
@@ -712,13 +728,13 @@ export default {
       };
       this.preVenta = { ...this.venta };
       this.ventas.push({ ...this.venta, productos: [] });
-      this.isNota = false;
+      this.ventas[this.index].isNota = false;
       this.bloquearInput = false;
       this.descuentoGeneral = 0;
       this.puntosAplicados = 0;
     },
     setTipoVenta(obj) {
-      this.isNota = false;
+      this.ventas[this.index].isNota = false;
       this.bloquearInput = false;
       this.ventas[this.index].NroComprobanteModifica = "";
       this.ventas[this.index].CodSunatModifica = "";
@@ -729,7 +745,7 @@ export default {
 
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
-        this.isNota = true;
+        this.ventas[this.index].isNota = true;
       }
 
       if (obj.TieneIgv) {
@@ -742,7 +758,7 @@ export default {
       this.ventas[this.index].tipoVenta = obj;
       this.getNumeroVenta();
     },
-    setDocRef(obj) {
+    async setDocRef(obj) {
       this.ventas[this.index].CodSunatModifica = obj.CodSunat;
       this.ventas[this.index].NroComprobanteModifica = obj.NroComprobante;
 
@@ -756,7 +772,7 @@ export default {
         );
       }
 
-      this.axios
+      await this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
             serie: this.ventas[this.index].Serie,
@@ -772,7 +788,7 @@ export default {
         });
 
       //Cargar producto del documento afectado nota credito
-      this.axios
+      await this.axios
         .get(this.API + "venta/detalle/comprobante", {
           params: {
             NroComprobante: obj.NroComprobante,
@@ -791,7 +807,7 @@ export default {
             .then(response => {
               if (response.data) {
                 // this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.ventas[this.index].cliente = response.data;
+                this.setCliente(response.data);
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
@@ -799,16 +815,41 @@ export default {
             .catch(error => {
               console.log(error);
             });
-          this.limpiarCart();
-          response.data.map(item => {
-            this.add([item, () => {}, false, true]);
+          console.log(response.data);
+          this.ventas[this.index].productos = [];
+          response.data.forEach(element => {
+            this.ventas[this.index].productos.push({
+              ...element
+            });
           });
+
+          this.ventas[this.index].bloquearInput = true;
+
           this.ventas[this.index].NotaIdMotivo = null;
-          this.bloquearInput = true;
-          this.obtenerStok({
-            IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
-          });
         });
+      this.recalcularStock();
+    },
+    async recalcularStock() {
+      const productos = this.ventas[this.index].productos;
+
+      const stocks = await this.axios(
+        `${this.API}/productos/puntoventa/stock`,
+        {
+          params: {
+            idProductos: productos.map(p => p.IdProducto),
+            idAlmacen: this.ventas[this.index].almacen.IdAlmacen,
+            noLimit: 1
+          }
+        }
+      ).then(res => res.data);
+
+      this.ventas[this.index].productos = productos.map(v => {
+        const p = stocks.find(s => s.IdProducto == v.IdProducto);
+        return {
+          ...v,
+          stock: p ? p.stock : 0
+        };
+      });
     },
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
