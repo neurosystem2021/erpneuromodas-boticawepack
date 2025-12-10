@@ -5,7 +5,7 @@
         <b-form >    
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
-                size="lg" v-model="show"
+                v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
@@ -52,103 +52,140 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import { mapActions } from 'vuex'
+import config from "@/store/config.js";
+import { mapActions } from "vuex";
 
-    export default {
-        mounted () {
-            
-        },
-        watch: {
-          items () {
-            this.axios.get(this.API + 'proformas/count').then((response) => {
-                this.totalRows = response.data.total
-            })
-          }
-        },
-        data () {
-            return {
-                API: config.API,
-                show: false,
-                filter: '',
-                items: [],
-                isBusy: false,
-                fields: [ 
-                    { key: 'IdProforma', label: 'Id' }, 
-                    { key: 'Anio', label: 'Año' } , 
-                    { key: 'Numero', label: 'N°' }, 'Cliente', 
-                    { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'ver' ],
-                totalRows: 50,
-                perPage: 5,
-                currentPage: 1
-            }
-        },
-        props: ['idAlmacen'],
-        methods: {
-            ...mapActions({
-                add: 'agregarProducto',
-                obtenerStok: 'obtenerStock',
-                limpiar: 'limpiarCarrito'
-            }),
-            selectCierre (item) {
-               // console.log(item)
-                
-            },
-            eliminarProforma (item) {
-                let r = confirm('¿Esta seguro que desea eliminar la proforma?')
-                if (r) {
-                    this.axios.post(this.API + 'proforma/delete', {
-                            idProforma: item.IdProforma
-                    }).then((response) => {
-                        this.$toasted.show('Se eliminó correctamente la proforma: ' + response.data.idProforma)
-                        this.$refs.tableProforma.refresh();
-                    })
-                }
-            },
-            selectProforma (item) {
-                this.limpiar()
-
-                this.axios.get(this.API + 'proforma/detalle', {
-                    params: {
-                        idProforma: item.IdProforma
-                    }
-                }).then((response) => {
-                    response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio:true, setPreOr: item.Precio, cantidad: item.Cantidad, fechaVen: item.FechaVen, idLote: item.Lote } ])
-
-                        this.filter = ''
-                        this.show = false
-                    })
-
-                    this.$emit('onSelectProforma', item.IdCliente)
-                })
-            },
-            myProvider (ctx) {
-                // Here we don't set isBusy prop, so busy state will be handled by table itself
-                // this.isBusy = true
-                let promise = this.axios.get(this.API + 'proformas?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter)
-
-                return promise.then((result) => {
-                this.items = result.data
-                //this.totalRows = this.items.length
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                return(this.items)
-                }).catch(error => {
-                // Here we could override the busy state, setting isBusy to false
-                // this.isBusy = false
-                // Returning an empty array, allows table to correctly handle busy state in case of error
-                return []
-                })
-            }
-        }
+export default {
+  mounted() {},
+  watch: {
+    items() {
+      this.axios.get(this.API + "proformas/count").then(response => {
+        this.totalRows = response.data.total;
+      });
     }
+  },
+  data() {
+    return {
+      API: config.API,
+      show: false,
+      filter: "",
+      items: [],
+      isBusy: false,
+      fields: [
+        { key: "IdProforma", label: "Id" },
+        { key: "Anio", label: "Año" },
+        { key: "Numero", label: "N°" },
+        "Cliente",
+        { key: "DniRuc", label: "Documento" },
+        "FechaReg",
+        { key: "UsuarioReg", label: "Empleado" },
+        "ver"
+      ],
+      totalRows: 50,
+      perPage: 5,
+      currentPage: 1
+    };
+  },
+  props: ["idAlmacen"],
+  methods: {
+    ...mapActions({
+      add: "agregarProducto",
+      obtenerStok: "obtenerStock",
+      limpiar: "limpiarCarrito"
+    }),
+    selectCierre(item) {
+      // console.log(item)
+    },
+    eliminarProforma(item) {
+      let r = confirm("¿Esta seguro que desea eliminar la proforma?");
+      if (r) {
+        this.axios
+          .post(this.API + "proforma/delete", {
+            idProforma: item.IdProforma
+          })
+          .then(response => {
+            this.$toasted.show(
+              "Se eliminó correctamente la proforma: " +
+                response.data.idProforma
+            );
+            this.$refs.tableProforma.refresh();
+          });
+      }
+    },
+    async selectProforma(item) {
+      this.limpiar();
+
+      let det = [];
+      await this.axios
+        .get(this.API + "proforma/detalle", {
+          params: {
+            idProforma: item.IdProforma
+          }
+        })
+        .then(response => {
+          det = response.data;
+          //   response.data.map(item => {
+          // this.add([
+          //   item.IdProducto,
+          //   () => {
+          //     this.obtenerStok({ IdAlmacen: this.idAlmacen });
+          //   },
+          //   {
+          //     setPrecio: true,
+          //     setPreOr: item.Precio,
+          //     cantidad: item.Cantidad,
+          //     fechaVen: item.FechaVen,
+          //     idLote: item.Lote
+          //   }
+          // ]);
+
+          // this.filter = "";
+          // this.show = false;
+          //   });
+
+          //   this.$emit("onSelectProforma", item.IdCliente);
+        });
+      item.det;
+      console.log(item);
+    },
+    myProvider(ctx) {
+      // Here we don't set isBusy prop, so busy state will be handled by table itself
+      // this.isBusy = true
+      let promise = this.axios.get(
+        this.API +
+          "proformas?limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          ctx.filter
+      );
+
+      return promise
+        .then(result => {
+          this.items = result.data;
+          //this.totalRows = this.items.length
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          return this.items;
+        })
+        .catch(error => {
+          // Here we could override the busy state, setting isBusy to false
+          // this.isBusy = false
+          // Returning an empty array, allows table to correctly handle busy state in case of error
+          return [];
+        });
+    }
+  }
+};
 </script>
 <style scoped>
-    #table-proformas {
-        font-size: .9em;
-    }
+#table-proformas {
+  font-size: 0.9em;
+}
+</style>
+<style>
+.modal .modal-dialog {
+  min-width: 80% !important;
+}
 </style>

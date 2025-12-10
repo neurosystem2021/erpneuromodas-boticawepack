@@ -131,30 +131,31 @@
                       >
                       </productos-carrito>
                  </b-col>
-                 <b-col cols="4">
-                     <b-button class="btnAction"  block :disabled="inProgress" variant="primary" @click="guardarProforma">Crear Proforma</b-button>
-                      <b-button class="btnAction" block  :disabled="inProgress" variant="success"  @click="guardarVenta">Efectuar Venta</b-button>
-                      <b-button class="btnAction" block style="background: #263238; color: #ffffff;"  @click="anadirVentana()" variant="success">Añadir Ventana</b-button>
-                      <b-button class="btnAction" v-if="index>0" block style="background: #DD2C00; color: #ffffff;"  @click="eliminarVentana()" >Eliminar Ventana</b-button>
-                        
-                 </b-col>
+                
                  
-                 <b-col cols="4">
-                     <table class="table b-table border table-footer">
+              </b-row>
+          </b-tab>
+        </b-tabs>
+      <b-row>
+        <b-col cols="4">
+          <b-button class="btnAction"  block :disabled="inProgress" variant="primary" @click="guardarProforma">Crear Proforma</b-button>
+          <b-button class="btnAction" block  :disabled="inProgress" variant="success"  @click="guardarVenta">Efectuar Venta</b-button>
+          <b-button class="btnAction" block style="background: #263238; color: #ffffff;"  @click="anadirVentana()" variant="success">Añadir Ventana</b-button>
+          <b-button class="btnAction" v-if="index>0" block style="background: #DD2C00; color: #ffffff;"  @click="eliminarVentana()" >Eliminar Ventana</b-button>    
+        </b-col>
+        <b-col cols="4">
+          <table class="table b-table border table-footer">
+            <tbody>
+              <tr>
+                <td>
+                  <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
+                     <b-popover
+                         target="popover-opciones"
+                         placement="bottom" 
+                         custom-class="custom-popover"
+                         title="Opciones" triggers="click" auto-hide>
+                    <table class="table b-table border table-footer">
                       <tbody>
-                        <tr>
-                            <td>
-                              <b-button class="p-1 ml-1 mt-1" id="popover-opciones" variant="warning"><i class="fas fa-tags" ></i></b-button>
-                              <b-popover
-                                  target="popover-opciones"
-                                  placement="bottom" 
-                                  custom-class="custom-popover"
-                                  title="Opciones" triggers="click"
-                                  auto-hide
-                                  style="min-width: 400px;"
-                              >
-                                <table class="table b-table border table-footer">
-                                  <tbody>
                                     <tr v-if="puntosAplicados == 0" class="ocultarMovil">
                                       <td>
                                         <b-input-group prepend="%">
@@ -217,17 +218,25 @@
                                         </b-input-group>
                                       </td>
                                     </tr>
-                                  </tbody>
-                                </table>
-                              </b-popover>  
-                            </td>
-                             <td><b>SubTotal</b></td>
-                          <td class="table-success">{{ sumatoriaSubTotal }}</td>
-                        </tr>
-                        <tr>
+                      </tbody>
+                    </table>
+                  </b-popover>  
+                </td>
+                <td><b>SubTotal</b></td>
+                <td class="table-success">{{ sumatoriaSubTotal }}</td>
+              </tr>
+              <tr>
                             <td>
-                                              <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
-                                              <br>
+                                             
+                                        </td>
+                            
+                          <td>Descuento</td>
+                          <td class="table-danger">- {{ sumatoriaDescuento }}</td>
+              </tr>
+              <tr>
+                          <td>
+                              <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                                                               <br>
                                               <b-badge v-if="ventas[index].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
                                               <b-badge v-if="ventas[index].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                                               <b-badge v-if="ventas[index].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
@@ -243,7 +252,7 @@
                                                     <table class="table table-bordered table-sm">
                                                       <tbody>
                                                         <tr>
-                                                          <td colspan="3" class="text-center font-weight-bold">Método de Pago</td>
+                                                          <td colspan="4" class="text-center font-weight-bold">Método de Pago</td>
                                                         </tr>
                                                         <tr>
                                                           <td>Efectivo</td>
@@ -358,42 +367,34 @@
                                                     </table>
                                                   </div>
                                                 </b-popover>
-                                        </td>
-                            
-                          <td>Descuento</td>
-                          <td class="table-danger">- {{ sumatoriaDescuento }}</td>
-                        </tr>
-                        <tr>
-                          <td colspan="2"><b>TOTAL</b></td>
-                          <td>{{ sumatoriaTotal }}</td>
-                        </tr>
-                        <tr>
-                          <td  colspan="2">
-                            <label>pagó con:</label>
-                            <b-form-input
-                              type="text"
-                              placeholder="Pagó con"
-                              v-model="ventas[index].pagocon"
-                              :disabled="bloquearInput?true:false"
-                              />
-                              <!-- @input="asignarVuelto"  -->
-                            <label>Vuelto:</label>
-                            <b>S/  {{ ventas[index].vuelto | redondear }}</b>
                           </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                 </b-col>
-                 <b-col cols="4">
-                    <pago-deuda></pago-deuda>
-                    <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    <pre-orden-lista :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
-                    <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                 </b-col>
-                 
-              </b-row>
-          </b-tab>
-        </b-tabs>
+                          <td colspan="1"><b>TOTAL</b></td>
+                          <td>{{ sumatoriaTotal }}</td>
+              </tr>
+              <tr>
+                <td  colspan="2">
+                  <label>pagó con:</label>
+                  <b-form-input
+                    type="text"
+                    placeholder="Pagó con"
+                    v-model="ventas[index].pagocon"
+                    :disabled="bloquearInput?true:false"
+                    />
+                    <!-- @input="asignarVuelto"  -->
+                  <label>Vuelto:</label>
+                  <b>S/  {{ ventas[index].vuelto | redondear }}</b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </b-col>
+        <b-col cols="4">
+           <pago-deuda></pago-deuda>
+           <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+           <pre-orden-lista :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
+           <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
+        </b-col>
+      </b-row>
       </b-card>
 
 
@@ -401,6 +402,7 @@
       {{ ventas }}
     </b-container>
 </template>
+
 <script>
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
@@ -847,7 +849,7 @@ export default {
       }
 
       if (typeof obj === "object") {
-        let ref = `inputTipoVenta${this.index}`;
+        let ref = `inputCliente${this.index}`;
         let comp = this.$refs[ref][0].setValue(obj.Cliente);
         console.log(comp);
         // this.$refs.inputCliente.setValue(obj.Cliente);
@@ -1176,7 +1178,12 @@ export default {
 .divCarrito {
   min-height: 480px !important;
 }
-.popover.custom-popover {
-  min-width: 400px !important;
+
+.popover {
+  min-width: 400px;
+}
+
+.custom-popover {
+  z-index: 99999 !important;
 }
 </style>
