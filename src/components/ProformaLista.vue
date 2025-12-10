@@ -77,6 +77,7 @@
                       </b-input-group>
                     <b-form-group>
                     </b-form-group>
+                    <div class="table-responsive ">
                      <b-table 
                         v-if="show"
                         id="table-proformas" 
@@ -112,7 +113,7 @@
                       </template>
 
                     </b-table>
-
+                    </div>
                     <b-pagination
                       v-model="currentPageFav"
                       :total-rows="filteredItems.length"
