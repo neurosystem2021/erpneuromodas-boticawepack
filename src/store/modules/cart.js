@@ -87,7 +87,7 @@ const actions = {
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {
-      axios.get(API + 'productos/id/' + producto).then((response) => {
+      axios.get(API + 'productos/id/' + producto + '?esId=1').then((response) => {
         if (response.data) {
           let obj = response.data
 
