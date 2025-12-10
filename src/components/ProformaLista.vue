@@ -123,7 +123,7 @@ export default {
           }
         })
         .then(response => {
-          det = response.data;
+          item.productos = response.data;
           //   response.data.map(item => {
           // this.add([
           //   item.IdProducto,
@@ -145,8 +145,9 @@ export default {
 
           //   this.$emit("onSelectProforma", item.IdCliente);
         });
-      item.det;
-      console.log(item);
+
+      this.$emit("seleccionarProforma", item);
+      this.show = false;
     },
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself

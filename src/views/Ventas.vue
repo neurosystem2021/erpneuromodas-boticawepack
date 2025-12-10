@@ -390,16 +390,12 @@
         </b-col>
         <b-col cols="4">
            <pago-deuda></pago-deuda>
-           <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+           <proformas :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectProforma="setCliente" @seleccionarProforma="cargaProforma"></proformas>
            <pre-orden-lista :idAlmacen="ventas[index].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
            <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
         </b-col>
       </b-row>
       </b-card>
-
-
-      
-      {{ ventas }}
     </b-container>
 </template>
 
@@ -495,10 +491,10 @@ export default {
     productos() {},
     totalCart(newVal) {
       this.ventas[this.index].pago.efectivo.monto =
-        newVal -
+       parseFloat( newVal -
         (parseFloat(this.ventas[this.index].pago.visa.monto) +
           parseFloat(this.ventas[this.index].pago.mastercard.monto) +
-          parseFloat(this.ventas[this.index].pago.otro.monto));
+          parseFloat(this.ventas[this.index].pago.otro.monto))).toFixed(2);
     }
   },
   computed: {
@@ -545,7 +541,6 @@ export default {
       ) {
         let productos = this.ventas[this.index].productos;
         let suma = productos.reduce((sum, value) => {
-          console.log(value);
           return sum + parseFloat(value.descuento || 0);
         }, 0);
         return suma;
@@ -570,6 +565,40 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    async cargaProforma(proforma) {
+      let p = proforma.productos;
+      let stock = await this.axios(`${this.API}/productos/puntoventa/stock`, {
+        params: {
+          idProductos: p.map(prod => prod.IdProducto),
+          idAlmacen: this.ventas[this.index].almacen.IdAlmacen,
+          noLimit: 1
+        }
+      }).then(res => {
+        return res.data;
+      });
+      // this.preVenta
+      let productos = stock.map(prod => {
+        let producto = p.find(v => v.IdProducto == prod.IdProducto);
+        return {
+          ...prod,
+          cantidad: producto.Cantidad,
+          descuento: producto.Descuento,
+          precio: producto.Precio
+        };
+      });
+      this.ventas.push({
+        ...this.preVenta,
+        cliente: proforma,
+        proforma: proforma,
+        productos: productos
+      });
+      this.$nextTick(() => {
+        this.index = this.ventas.length - 1;
+        this.setCliente(proforma);
+        this.getVendedor();
+      });
+      console.log(productos);
+    },
     finalizarVentaOProforma() {
       if (this.index > 0) {
         this.ventas[this.index].splice(this.index, 1);
@@ -1081,7 +1110,7 @@ export default {
       // this.venta.PagoCon = this.$refs.carrito.pagocon;
       // console.log(this.venta);return;
       await this.axios
-        .post(this.API + "ventass", this.venta)
+        .post(this.API + "ventas", this.venta)
         .then(response => {
           this.$toasted.success("Venta realizada con exito");
           this.inProgress = false;
