@@ -1587,7 +1587,7 @@ export default {
     },
     async guardarProforma() {
       this.venta = {};
-      this.venta = {...this.ventas[this.index]};
+      this.venta = { ...this.ventas[this.index] };
       this.inProgress = true;
 
       if (!this.venta.productos.length) {
@@ -1635,6 +1635,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.inProgress = false;
       this.eliminarVentana();
     },
     async guardarVenta(evt) {
@@ -1899,6 +1900,7 @@ export default {
           this.inProgress = false;
         });
       // window.location.reload();
+      this.inProgress = false;
       this.eliminarVentana();
     },
     async obtenerSeriePorProducto(id) {
