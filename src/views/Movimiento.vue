@@ -2,6 +2,9 @@
   <div>
     <Menu v-if="false"></Menu>
     <br />
+    <div style="text-align: end;">
+      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+    </div>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
         <b-container class="bv-example-row" fluid>
           <b-row>
@@ -209,6 +212,13 @@
         <br><br>
     </b-form>
 
+    <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
+          <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
+            <template slot="action" slot-scope="data">
+              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
+    </b-modal>
   </div>
 </template>
 
@@ -222,10 +232,19 @@ import config from "@/store/config.js";
 import { icon } from "leaflet";
 
 export default {
-  async mounted() {
-  },
+  async mounted() {},
   data() {
     return {
+      modalMovimientos: false,
+      fieldsOrdenCompra: [
+        { key: "Correlativo" },
+        { key: "Ruc" },
+        { key: "Total" },
+        { key: "FechaReg", label: "Fecha" },
+        { key: "Proveedor" },
+        { key: "action", label: "" }
+      ],
+      productosInf: [],
       inProgress: false,
       newRuc: "",
       API: config.API,
@@ -276,6 +295,66 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    async abrirModalOrdenCompra() {
+      this.verArticulos();
+      this.modalMovimientos = true;
+    },
+    verArticulos() {
+      this.productosInf = [];
+      this.axios
+        .get(this.API + "movimiento/ordencompra", {
+          params: {
+            // fechaDesde: "1990-01-01",
+            fechaHasta: this.$moment().format("YYYY-MM-DD"),
+            estado: 1
+          }
+        })
+        .then(response => {
+          this.productosInf = response.data;
+        });
+    },
+    addPreOrdenCompra(item) {
+      console.log(item);
+      let proveedor = {
+        IdProveedor: item.IdProveedor,
+        Proveedor: item.Proveedor
+      };
+      this.ordenCompra = item;
+      console.log(this.ordenCompra);
+      this.setProveedor(proveedor);
+      this.$refs.inputProveedor.setValue(item.Proveedor);
+      this.mostrarDetalles(item);
+      this.modalMovimientos = false;
+    },
+    mostrarDetalles(data) {
+      this.$store.state.cart.productos = [];
+      this.axios
+        .get(this.API + "ordencompra/detalle", {
+          params: {
+            IdOrdenCompra: data.IdOrdenCompra,
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
+        })
+        .then(response => {
+          let detalle = response.data;
+
+          detalle.forEach(element => {
+            element.Presentacion = "UNIDAD";
+            element.cantxPrecio = 1;
+            element.subtotal = parseFloat(element.cantidad * element.precio).toFixed(2);
+            this.$store.state.cart.productos.unshift(element);
+          });
+          console.log(detalle);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    prevent(evt) {
+      if (evt.target.tagName !== "TEXTAREA") {
+        evt.preventDefault();
+      }
+    },
     onAddProducto(obj) {
       if (this.isSalida) {
         this.obtenerStok({
@@ -517,7 +596,8 @@ export default {
       this.axios
         .post(this.API + "movimientos", {
           movimiento: this.movimiento,
-          productos: this.productos
+          productos: this.productos,
+          ordenCompra: this.ordenCompra
         })
         .then(response => {
           if (response.data.error) {
@@ -552,5 +632,8 @@ export default {
 <style>
 .input-group {
   /*margin: 0.25rem 0 !important;*/
+}
+#modalOrdenCompra .modal-dialog {
+  min-width: 70% !important;
 }
 </style>
