@@ -225,7 +225,7 @@
           <input
             v-model="productos[data.index].cantidad"
             :disabled="
-              productos[data.index].estadoPxP == false || bloquearInput
+             ( productos[data.index].estadoPxP == false && !ordenCompra) || bloquearInput
                 ? true
                 : false || esDelivery
             "
@@ -597,7 +597,7 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
-      productoUrl: "",
+      productoUrl: ""
     };
   },
   watch: {
@@ -605,14 +605,18 @@ export default {
       this.asignarVuelto();
     },
     productos(prods) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
-    },
+    }
   },
   props: {
+    ordenCompra: {
+      type: Boolean,
+      default: false
+    },
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -626,11 +630,11 @@ export default {
       type: Function,
       default(obj) {
         return obj;
-      },
+      }
     },
     showButton: {
       default: true,
-      type: Boolean,
+      type: Boolean
     },
     fields: {
       default() {
@@ -639,7 +643,7 @@ export default {
             key: "stock",
             label: "Stock",
             variant: "info",
-            class: "text-center",
+            class: "text-center"
           },
           { key: "CodigoBarra", label: "Código" },
           // { key: 'ProductoCategoria', label: 'Categoria'},
@@ -659,16 +663,16 @@ export default {
           // { key: 'lote', label: 'Lote' },
           { key: "precioVenta", label: "Precio venta (S/)" },
           { key: "total", label: "Total", variant: "danger" },
-          { key: "acciones", label: "" },
+          { key: "acciones", label: "" }
         ];
       },
-      type: Array,
-    },
+      type: Array
+    }
   },
   computed: {
     ...mapState({
-      productos: (state) => state.cart.productos,
-      filtrados: (state) => state.cart.productosFiltrados,
+      productos: state => state.cart.productos,
+      filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos() {
       if (this.idAlmacen) {
@@ -683,7 +687,7 @@ export default {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
         sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
             sumatoria -= value.descuento;
@@ -694,7 +698,7 @@ export default {
     },
     sumatoriaTotal() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.total);
       });
 
@@ -708,7 +712,7 @@ export default {
         //sumatoria = sumatoria * 0.18
         sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
+        this.productos.map(value => {
           sumatoria += parseFloat(value.igv);
         });
       }
@@ -716,11 +720,11 @@ export default {
     },
     sumatoriaDescuento() {
       let sumatoria = 0;
-      this.productos.map((value) => {
+      this.productos.map(value => {
         sumatoria += parseFloat(value.descuento || 0);
       });
       return this.$options.filters.redondear(sumatoria);
-    },
+    }
   },
   methods: {
     ...mapActions({
@@ -729,13 +733,13 @@ export default {
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto",
-      obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStock"
     }),
     async abrirMicrofono() {
       console.log("si");
       const inputEvent = new Event("input", {
         bubbles: true,
-        cancelable: true,
+        cancelable: true
       });
 
       let search = "";
@@ -747,25 +751,24 @@ export default {
       this.recognition.lang = "es-ES";
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.onresult = (event) => {
+      this.recognition.onresult = event => {
         if (event.results.length > 0) {
           search = event.results[0][0].transcript;
         }
       };
 
-      this.recognition.onerror = (event) => {
+      this.recognition.onerror = event => {
         console.error("Speech Recognition Error:", event);
         this.handleError(event.error);
       };
 
       this.recognition.onend = async () => {
-        console.log(search)
+        console.log(search);
         this.$refs.autocompleteProducto.setValue(search);
         setTimeout(() => {
-          
           document
-          .getElementById("autocompleteProducto")
-          .dispatchEvent(inputEvent);
+            .getElementById("autocompleteProducto")
+            .dispatchEvent(inputEvent);
         }, 10);
       };
       this.recognition.start();
@@ -825,7 +828,7 @@ export default {
     },
 
     addManoDeObra(index, e) {
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi < 0) {
         this.$toasted.error("Primero seleccione el producto MANODEOBRA");
 
@@ -852,18 +855,14 @@ export default {
     },
 
     updateManoDeObraNeta(index) {
-      let pManoObra = this.productos.find(
-        (p) => p.CodigoBarra === "MANODEOBRA"
-      );
+      let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
 
-      this.productos
-        .filter((p) => p.EsManoDeObra)
-        .map((p) => {
-          precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
-        });
+      this.productos.filter(p => p.EsManoDeObra).map(p => {
+        precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
+      });
 
-      let pi = this.productos.findIndex((p) => p.CodigoBarra === "MANODEOBRA");
+      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
       if (pi >= 0 && index !== pi) {
         this.productos[pi].precio = precio;
@@ -906,7 +905,7 @@ export default {
         let params = { codigoBarra: idProducto };
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then((response) => {
+          .then(response => {
             if (response.data.IdProducto) {
               this.setProducto(response.data);
             } else {
@@ -964,7 +963,7 @@ export default {
         this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
       }, 200);
 
-      let fPP = pxp.filter((p) => p.cantidad === 0 || p.cantidad === "0");
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
       if (fPP.length != 4) {
         obj.ProductoMedicion = obj.medicion.ProductoMedicion;
         obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
@@ -988,7 +987,7 @@ export default {
 
       this.preciosProd = JSON.parse(obj.PreciosPorProducto || "[]");
       let fPP = this.preciosProd.filter(
-        (p) => p.cantidad === 0 || p.cantidad === "0"
+        p => p.cantidad === 0 || p.cantidad === "0"
       );
 
       if (!obj.PreciosPorProducto || fPP.length === 5) {
@@ -1021,7 +1020,7 @@ export default {
         },
         { setPrecioCosto: this.tipo == "mov" ? true : false },
         false,
-        this.cliente.EsVIP,
+        this.cliente.EsVIP
       ]);
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
@@ -1052,7 +1051,7 @@ export default {
         },
         false,
         false,
-        this.cliente.EsVIP,
+        this.cliente.EsVIP
       ]);
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
@@ -1115,19 +1114,23 @@ export default {
           data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
+              ? Number.isInteger(data.stock)
+                ? data.stock
+                : data.stock.toFixed(2)
+              : data.stock
         }</b></td>
-                <td style="width: 200px" class="${styleStock}"><b>${data.Producto} - ${
-          data.CodigoBarra
-        }</b></td>
-                <td class="${styleStock}" style="width: 100px">${data.ProductoCategoria}</td>
-                <td class="${styleStock}" style="width: 100px">${data.ProductoMarca}</td>
+                <td style="width: 200px" class="${styleStock}"><b>${
+          data.Producto
+        } - ${data.CodigoBarra}</b></td>
+                <td class="${styleStock}" style="width: 100px">${
+          data.ProductoCategoria
+        }</td>
+                <td class="${styleStock}" style="width: 100px">${
+          data.ProductoMarca
+        }</td>
                 <td class="${styleStock}" style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
+          data.PrecioContado
+        }</b></td>
                 <td style="width: 5%">
                   <img src="${
                     data.Imagen == null || data.Imagen == ""
@@ -1147,7 +1150,9 @@ export default {
         `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
       `;
     },
     // setCantidad (index, val) {
@@ -1258,11 +1263,11 @@ export default {
       } else {
         return "";
       }
-    },
+    }
   },
   components: {
-    ProductoForm,
-  },
+    ProductoForm
+  }
 };
 </script>
 
