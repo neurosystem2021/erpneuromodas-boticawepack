@@ -114,20 +114,7 @@
                       <b-col cols="6" v-if="mostrarSeccionOferta() && IdOferta">
                         <b-form-group >
                               <label>Doc. Referencias Oferta:</label>
-                              <!-- <autocomplete
-                                  required="required"
-                                  ref="inputDocRefOrden"
-                                  :url="API + '/ventas/ofertas'"
-                                  anchor="NroDocRef"
-                                  initValue=""
-                                  label="writer"
-                                  placeholder=""
-                                  :on-select="setDocRefOferta" 
-                                  :onFocus="focusAutocomplete.bind(null, 'inputDocRefOrden')"
-                                  :customParams="{ IdOferta: IdOferta , IdCliente : venta.cliente.IdCliente}"
-                                  :debounce="1000"
-                                  :classes="{input: 'form-control'}">
-                              </autocomplete> -->
+                             
                             </b-form-group>
                       </b-col>
                       <b-col cols="12" md="3" lg="3">
@@ -221,6 +208,7 @@
                             :productos="tab.productos"
                             :id="`prodiuctos${i}`"
                             @eliminarProducto="eliminarProducto"
+                            :index="i"
                             >
                         </productos-carrito>
                     </b-col>
@@ -596,7 +584,7 @@
                                             
                                             ></b-form-input><br>
                                           <label>Vuelto:</label>
-                                          <b>S/  {{ vuelto | redondear }}</b>
+                                          <b>S/  {{ ventas[index].vuelto | redondear }}</b>
                                         </td>
                                       </tr>
                                       <tr>
@@ -799,6 +787,7 @@ export default {
             parseFloat(this.ventas[this.index].pago.mastercard.monto) +
             parseFloat(this.ventas[this.index].pago.yape.monto))
       ).toFixed(2);
+      this.asignarVuelto()
     },
     asignarDisabledProfComputed(newVal) {
       let prods = [...this.ventas[this.index].productos];
@@ -937,15 +926,13 @@ export default {
       // console.log("index", index);
     },
     setProducto(evt) {
-      console.log("evt.PrecioContado", evt.PrecioContado);
-
       let prods = this.ventas[this.index].productos;
       if (prods.some(v => v.IdProducto == evt.IdProducto)) {
         let i = this.ventas[this.index].productos.findIndex(
           v => v.IdProducto == evt.IdProducto
         );
         let producto = this.ventas[this.index].productos[i];
-        console.log("producto", producto.estadoPxP);
+        producto.precio = evt.PrecioContado;
         if (producto.estadoPxP === evt.estadoPxP) {
           if (producto.estadoPxP) {
             producto.cantidad = parseFloat(producto.cantidad) + 1;
@@ -956,7 +943,6 @@ export default {
         Vue.set(prods, this.index, evt);
         // console.log(index);
       } else {
-        console.log("evt.PrecioContado", evt.PrecioContado);
         this.ventas[this.index].productos.unshift({
           ...evt,
           precio: evt.PrecioContado,
@@ -989,7 +975,6 @@ export default {
         producto.Series = series;
         producto.PrecioCosto = p.PrecioCosto;
       }
-      console.log(productos);
       let ven = { ...this.preVenta, productos: productos };
       this.ventas.push(ven);
       this.$nextTick(() => {
@@ -1016,7 +1001,8 @@ export default {
       }, 0);
     },
     asignarVuelto() {
-      this.vuelto = this.pagocon - this.sumatoriaTotal;
+      this.ventas[this.index].vuelto =
+        this.ventas[this.index].pagocon - this.ventas[this.index].totalCart;
     },
     cargarMonto(tipo) {
       if (this.venta.pago && this.venta.pago.hasOwnProperty(tipo)) {
@@ -1981,35 +1967,35 @@ export default {
                 costoDeliverObj.IdImpresora = 0;
                 costoDeliverObj.descuento = 0;
                 costoDeliverObj.indicacion = "";
-                this.add([
-                  response.data,
-                  () => {
-                    //this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                  },
-                  { setPrecioCosto: false },
-                  false,
-                  false
-                ]);
+
                 //Cargar Productos Delivery
                 let productos = JSON.parse(obj.Productos);
-                productos.map(item => {
-                  this.add([
-                    item.IdProducto,
-                    () => {
-                      this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-                    },
-                    {
-                      cantidad: item.Cantidad,
-                      precio: item.Precio,
-                      indicacion: item.Indicacion
-                    },
-                    false
+                productos = productos.map(item => {
+                  return {
+                    ...item,
+                    cantidad: item.Cantidad,
+                    precio: item.Precio,
+                    indicacion: item.Indicacion
+                  };
+                });
+                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                this.ventas.DireccionEntrega = obj.Direccion;
+                this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
+                this.ventas.push({ ...this.venta, productos: productos });
+                this.$nextTick(() => {
+                  this.index = this.ventas.length - 1;
+                  this.getVendedor();
+                  let v = this.ventas[this.index];
+
+                  Promise.all([
+                    this.cargarMonto("efectivo"),
+                    this.loadAlmacen(v.almacen.IdAlmacen),
+                    this.loadPuntoVenta(v.puntoVenta.IdDocVentaPuntoVenta),
+                    this.loadComisionista(),
+                    this.setCliente(costoDeliverObj),
+                    this.actualizarTotalCart()
                   ]);
                 });
-                this.ventas[this.index].nombreLlevar =
-                  obj.Cliente || "SIN NOMBRE";
-                this.ventas[this.index].DireccionEntrega = obj.Direccion;
-                this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
               } else {
                 this.$toasted.show(
                   "PRIMERO CREE EL PRODUCTO COSTO DE DELIVERY CON EL CODIGO DE BARRAS 'COSTODELIVERY'"
@@ -2056,43 +2042,7 @@ export default {
       this.venta.DireccionEntrega = "";
       this.$router.replace("/ventas");
     },
-    //Sockets
-    // escucharPedidos() {
-    //   this.sockets.subscribe("nuevo-pedido", data => {
-    //     if (this.$refs.deliveryModal.show) {
-    //       this.$toasted.success(
-    //         "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
-    //       );
-    //       this.$refs.deliveryModal.getPedidos();
-    //     } else {
-    //       this.$refs.deliveryModal.getPedidos();
-    //       this.$swal({
-    //         position: "top-end",
-    //         icon: "info",
-    //         target: document.getElementById("conten"),
-    //         title:
-    //           "Pedido de Delivery de: <br> " +
-    //           "<strong>" +
-    //           data.nombre +
-    //           "</strong>",
-    //         showConfirmButton: true,
-    //         confirmButtonText: "Mostrar Pedidos",
-    //         confirmButtonColor: "#3880ff"
-    //       }).then(result => {
-    //         /* Read more about isConfirmed, isDenied below */
-    //         if (result.isConfirmed) {
-    //           this.$refs.deliveryModal.show = true;
-    //         } else if (result.isDenied) {
-    //           console.log("Denegado");
-    //         }
-    //       });
-    //     }
-    //   });
-    // },
-    //Fin Sockets
-    /**
-     * ✅ NUEVO: Conectar socket
-     */
+
     conectarSocket() {
       if (!this.$socket.connected) {
         // console.log("🔗 Conectando socket...");

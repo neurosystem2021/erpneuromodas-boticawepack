@@ -380,7 +380,7 @@
 
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="$emit('eliminarProducto',data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1 && index==0) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -582,6 +582,7 @@ export default {
     }
   },
   props: {
+    index: { typeof: Number, default: 0 },
     productos: Array,
     gravadaflag: Number,
     igvflag: Number,
@@ -1109,25 +1110,27 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.add([id, false, false, false, false, true, this.isVentas]);
-      setTimeout(() => {
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-      }, 200);
+      // this.add([id, false, false, false, false, true, this.isVentas]);
+      // setTimeout(() => {
+      //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      // }, 200);
 
-      if (this.isVentas) {
-        let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
-        if (fPP.length != 4) {
-          obj.ProductoMedicion = obj.medicion.ProductoMedicion;
-          obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
-          obj.IdProductoMarca = obj.marca.IdProductoMarca;
-          obj.ProductoMarca = obj.marca.ProductoMarca;
-          obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
-          obj.ProductoCategoria = obj.categoria.ProductoCategoria;
-          this.productoSelect = obj;
-          this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
-          this.showPresentacion(this.productoSelect);
-        }
+      // if (this.isVentas) {
+      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+      if (fPP.length != 4) {
+        obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+        obj.IdProductoMarca = obj.marca.IdProductoMarca;
+        obj.ProductoMarca = obj.marca.ProductoMarca;
+        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+        obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+        this.productoSelect = obj;
+        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+        this.showPresentacion(this.productoSelect);
+        return;
+        // }
       }
+      this.setProducto(obj);
     },
 
     async setProducto(obj) {
@@ -1182,7 +1185,7 @@ export default {
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = parseFloat(obj.precio).toFixed(1);
+      obj.precio = parseFloat(obj.PrecioContado).toFixed(1);
       obj.cantidad = 1;
       //obj.IdLote = 0
       //obj.TieneIgv = 0
@@ -1249,7 +1252,7 @@ export default {
       // ]);
       this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
-      this.actualizarProd(obj);
+      // this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {
           let text = document.getElementById("txtCantidadxPrecio0");
