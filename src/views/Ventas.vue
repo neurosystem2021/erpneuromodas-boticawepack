@@ -321,8 +321,6 @@
                                           <td width="50%">
                                             <b-form-textarea
                                               placeholder="Descripción"
-                                              rows="3"
-                                              max-rows="6"
                                               v-model="venta.descripcion"
                                               style="field-sizing: content;"
                                               v-if="mostrarDescripcion==1"
@@ -333,6 +331,19 @@
                                         <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                         <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                         <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
+                                        <tr>
+                                          <td colspan="2" v-if="ventas[index].productos.length>0">
+                                            <b-form-checkbox
+                                                id="checkbox-1"
+                                                v-model="ventas[index].asignarDisabledProf"
+                                                name="checkbox-1"
+                                                :value="1"
+                                                :unchecked-value="0"
+                                             >
+                                                Mostrar Proforma 
+                                             </b-form-checkbox>
+                                          </td>
+                                        </tr>
                                     </tbody>
                                 </table>   
                                 
