@@ -24,6 +24,8 @@ import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
 import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
+import OrdenCompra from "@/views/OrdenCompra.vue";
+import Ordenes from "@/views/reportes/Ordenes.vue";
 
 Vue.use(Router)
 
@@ -139,6 +141,16 @@ export default new Router({
       path: '/porentregar',
       name: 'PorEntregar',
       component: PorEntregar
-    }
+    },
+    {
+      path: '/OrdenCompra',
+      name: 'OrdenCompra',
+      component: OrdenCompra
+    },
+    {
+      path: '/reportes/Ordenes',
+      name: 'Ordenes',
+      component: Ordenes
+    },
   ]
 })
