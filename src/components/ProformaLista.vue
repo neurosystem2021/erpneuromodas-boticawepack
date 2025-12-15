@@ -161,6 +161,7 @@ export default {
       fields: [
         { key: "EsFavoritoFlag", label: "Favorito" },
         { key: "IdProforma", label: "Id" },
+        { key: "Descripcion",label:"Desc." },
         { key: "Anio", label: "Año" },
         "Numero",
         "Cliente",
