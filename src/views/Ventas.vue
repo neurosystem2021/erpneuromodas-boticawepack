@@ -1,5 +1,5 @@
 <template>
-    <div style="padding: 0 5%;">
+    <div style="padding: 0 2%;">
         <b-container class="bv-example-row" fluid>
             <div>
                 <div class="float-right">
