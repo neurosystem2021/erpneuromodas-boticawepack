@@ -1,9 +1,29 @@
 <template>
     <div style="padding: 0 5%;">
-        <b-card no-body>
-             <b-tabs pills card>
-                <b-tab :title="`Venta ${i+1}`" active v-for="(tab,i) in ventas" :key="i">
-                     <b-row>
+        <b-container class="bv-example-row" fluid>
+            <div>
+                <div class="float-right">
+                    <b-button-group size="sm" class="ocularMovil">
+                        <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                    </b-button-group>
+                    <b-button-group size="sm" v-if="false">
+                        <pre-orden-lista 
+                            v-show="!this.$route.query.idPreOrden"
+                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
+                            @onPreOrden="selectPreOrden"></pre-orden-lista>
+                    </b-button-group>
+                    <b-button-group size="sm" v-if="false">
+                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
+                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
+                    </b-button-group>
+                </div>
+            </div>
+            <br/><br/>
+            <b-form @submit="guardarVenta" @keydown.enter="prevent">
+                <b-row>
                     <b-col md="7">
                         <b-row>
                             <b-col md="4">
@@ -11,14 +31,14 @@
                                     <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
                                     <autocomplete
                                         required="required"
-                                        :ref="`inputTipoVenta${i}`"
+                                        ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
                                         anchor="TipoDoc"
                                         initValue="BOLETA ELEC."
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
-                                        :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${i}`)"
+                                        :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
                                         :classes="{input: 'form-control'}">
                                     </autocomplete>
                                 </b-form-group>
@@ -41,7 +61,18 @@
                             <b-col md="4" class="ocularMovil">
                                 <b-form-group>
                                     <label>Almacen:</label>
-                                    <input type="text" class="form-control" v-model="tab.almacen.Almacen" disabled>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputAlmacen"
+                                        :url="API + 'almacenes'"
+                                        anchor="Almacen"
+                                        initValue="HUANUCO"
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setAlmacen" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
                                 </b-form-group>
                                 <b-form-group v-if="isNota">
                                     <label>Motivo :</label>
@@ -51,7 +82,18 @@
                             <b-col md="4" class="ocularMovil">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
-                                    <input type="text" class="form-control" v-model="tab.puntoVenta.PuntoVenta" disabled>
+                                    <autocomplete
+                                        required="required"
+                                        ref="inputPuntoVenta"
+                                        :url="API + 'ventas/puntos'"
+                                        anchor="PuntoVenta"
+                                        initValue="HUANUCO"
+                                        label="writer"
+                                        placeholder=""
+                                        :on-select="setPuntoVenta" 
+                                        :onFocus="focusAutocomplete.bind(null, 'inputPuntoVenta')"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
                                 </b-form-group>
                             </b-col>
                             <b-col md="12">
@@ -62,14 +104,14 @@
                                        <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
                                             required="required"
-                                            :ref="`inputCliente${i}`"
+                                            ref="inputCliente"
                                             :url="API + 'clientes'"
                                             anchor="ClienteDniRuc"
                                             label="writer"
                                             placeholder=""
                                             :onInput="(val) => newDniRuc = val"
                                             :on-select="setCliente" 
-                                            :onFocus="focusAutocomplete.bind(null, `inputCliente${i}`)"
+                                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                                             :classes="{input: 'form-control'}">
                                         </autocomplete>
                                         <input v-model="dni"
@@ -136,13 +178,22 @@
                     <b-col md="2" class="ocularMovil" >
                         <b-form-group class="text-center">
                             <div class="big-text">
-                                {{ tab.Serie }} - <b>{{ tab.Numero }}</b>
+                                {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
                             </div>
-                            {{ tab.FechaDoc }}
+                            {{ venta.FechaDoc }}
                         </b-form-group>
                         <b-form-group>
                             <label>Vendedor:</label>
-                            <input type="text" class="form-control" v-model="tab.vendedor.Usuario">
+                            <autocomplete
+                                required="required"
+                                ref="inputVendedor"
+                                :url="API + 'usuarios'"
+                                anchor="NombreUsuario"
+                                label="writer"
+                                :on-select="setVendedor" 
+                                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                                :classes="{input: 'form-control'}">
+                            </autocomplete>
                         </b-form-group>
                         <b-form-group v-show="false">
                             <label>Comisionista</label>
@@ -161,55 +212,11 @@
                         <b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
                         <b-badge variant="success" v-if="adelanto">Total a pagar: S/ {{ $options.filters.redondear(totalCart - adelanto) }} </b-badge>
                     </b-col>
-                    <b-col cols="12">
-                        <productos-carrito 
-                            @onInputCantidad="actualizarDescuento"
-                            @onAddProducto="onAddProducto"
-                            @onRemoveProducto="actualizarDescuento"
-                            @addProducto="addProducto"
-                            :igvTotal="tieneIgv"
-                            :setPrecio="true"
-                            :ref="`carrito${i}`" 
-                            :showButton="true" 
-                            :fields="carrito.fields"
-                            :isVentas="true"
-                            :bloquearInput="bloquearInput"
-                            :idAlmacen="venta.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto"
-                            :productos="tab.productos"
-                            />
-                    </b-col>
                 </b-row>
-                </b-tab>
-         
-             </b-tabs>
-         </b-card>
-        <b-container class="bv-example-row" fluid>
-            <div>
-                <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm" v-if="false">
-                        <pre-orden-lista 
-                            v-show="!this.$route.query.idPreOrden"
-                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm" v-if="false">
-                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                    </b-button-group>
-                </div>
-            </div>
-            <br/><br/>
-            <b-form @submit="guardarVenta" @keydown.enter="prevent">
+                <br>
                 <b-row>
                     <b-col> 
-                        <!-- <productos-carrito 
+                        <productos-carrito 
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
                             @onRemoveProducto="actualizarDescuento"
@@ -364,7 +371,7 @@
                                     </tbody>
                                 </table>
                             </template>
-                        </productos-carrito> -->
+                        </productos-carrito>
                     </b-col>
                 </b-row>
                 <b-row align-h="center" class="text-center">
@@ -384,7 +391,7 @@
 <script>
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
-import ProductosCarrito from "@/components/ProductosCarritoNuevo";
+import ProductosCarrito from "@/components/ProductosCarrito";
 import ClientesForm from "@/components/ClientesForm";
 import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
@@ -403,7 +410,6 @@ export default {
   },
   data() {
     return {
-      index: 0,
       ventas: [],
       preVenta: {},
       dni: "",
@@ -500,30 +506,6 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
-    addProducto(producto) {
-      let productos = this.ventas[this.index].productos;
-
-     
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        let index = productos.findIndex(
-          v => v.IdProducto == producto.IdProducto
-        );
-
-        let p = { ...productos[index] };
-
-     
-        p.cantxPrecio = (p.cantxPrecio || 0) + 1;
-
-        Vue.set(productos, index, p);
-        return;
-      }
-
-      // Si es un producto nuevo, inicializamos cantxPrecio
-      this.ventas[this.index].productos.push({
-        ...producto,
-        cantxPrecio: 1
-      });
-    },
     loadClienteVarios() {
       this.axios.get(this.API + "clientes/00000000").then(res => {
         if (res.data.IdCliente) {
@@ -563,9 +545,8 @@ export default {
     },
     loadFirstAlmacen() {
       this.axios.get(this.API + "almacenes/primero").then(res => {
-        let ref = `inputAlmacen${this.inex}`;
-        this.$refs[ref][0].setValue(res.data.Almacen);
-        this.ventas[this.index].almacen = res.data;
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.venta.almacen = res.data;
       });
     },
     loadClienteBarcode(e) {
@@ -577,7 +558,8 @@ export default {
       }
     },
     focusAutocomplete(ref) {
-      this.$refs[ref][0].handleDoubleClick();
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
     },
     initForm() {
       this.venta = {
@@ -629,10 +611,11 @@ export default {
     setTipoVenta(obj) {
       this.isNota = false;
       this.bloquearInput = false;
-      this.ventas[this.index].NroComprobanteModifica = "";
-      this.ventas[this.index].CodSunatModifica = "";
-      this.ventas[this.index].NotaIdMotivo = "";
-      this.ventas[this.index].NotaDescMotivo = "";
+      this.venta.NroComprobanteModifica = "";
+      this.venta.CodSunatModifica = "";
+      this.venta.NotaIdMotivo = "";
+      this.venta.NotaDescMotivo = "";
+      this.$refs.inputDocRef && this.$refs.inputDocRef.setValue("");
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
         this.isNota = true;
@@ -643,10 +626,8 @@ export default {
       } else {
         this.tieneIgv = false;
       }
-      let ref = `inputTipoVenta${this.index}`;
-
-      this.$refs[ref][0].setValue(obj.TipoDoc);
-      this.ventas[this.index].tipoVenta = obj;
+      this.$refs.inputTipoVenta.setValue(obj.TipoDoc);
+      this.venta.tipoVenta = obj;
       this.getNumeroVenta();
     },
     setDocRef(obj) {
@@ -726,8 +707,8 @@ export default {
       });
     },
     setAlmacen(obj) {
-      this.ventas[this.index].almacen = obj;
-      //   this.$refs.inputAlmacen.setValue(obj.Almacen);
+      this.venta.almacen = obj;
+      this.$refs.inputAlmacen.setValue(obj.Almacen);
       if (this.productos.length) {
         this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
       }
@@ -744,7 +725,8 @@ export default {
       });
     },
     setPuntoVenta(obj) {
-      this.ventas[this.index].puntoVenta = obj;
+      this.venta.puntoVenta = obj;
+      this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
     getVendedor() {
@@ -753,10 +735,13 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
+          // this.$refs.inputVendedor.$refs.input.disabled = true
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
           // bloquear ambos inputs
+          this.$refs.inputAlmacen.$refs.input.disabled = true;
+          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
           //this.getNumeroVenta()
           this.getTipoDoc(response.data.IdTipoDoc);
         })
@@ -769,13 +754,14 @@ export default {
       // console.log(obj)
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
 
-      this.ventas[this.index].vendedor = obj;
+      this.venta.vendedor = obj;
     },
     setComisionista(obj) {
       if (typeof obj === "object") {
-        this.ventas[this.index].comisionista = obj;
+        this.$refs.inputComisionista.setValue(obj.Cliente);
+        this.venta.comisionista = obj;
       } else {
-        this.ventas[this.index].comisionista = {};
+        this.venta.comisionista = {};
       }
     },
     setCliente(obj, dni = false) {
@@ -791,13 +777,12 @@ export default {
       }
 
       if (typeof obj === "object") {
-        let ref = `inputCliente${this.index}`;
-        this.$refs[ref][0].setValue(obj.Cliente);
-        this.ventas[this.index].cliente = obj;
-        this.ventas[this.index].CampoDireccion = this.venta.cliente.Direccion;
+        this.$refs.inputCliente.setValue(obj.Cliente);
+        this.venta.cliente = obj;
+        this.venta.CampoDireccion = this.venta.cliente.Direccion;
         if (this.venta.cliente.DniRuc == "00000000") {
-          this.ventas[this.index].EsOrganizacion = 0;
-          this.ventas[this.index].NombreOrganizacion = "";
+          this.venta.EsOrganizacion = 0;
+          this.venta.NombreOrganizacion = "";
         }
       } else {
         this.axios
@@ -806,15 +791,12 @@ export default {
           })
           .then(response => {
             if (response.data) {
-              let ref = `inputCliente${this.index}`;
-              this.$refs[ref][0].setValue(obj.Cliente);
-              this.ventas[this.index].cliente = response.data;
-              this.ventas[
-                this.index
-              ].CampoDireccion = this.venta.cliente.Direccion;
-              if (this.ventas[this.index].cliente.DniRuc == "00000000") {
-                this.ventas[this.index].EsOrganizacion = 0;
-                this.ventas[this.index].NombreOrganizacion = "";
+              this.$refs.inputCliente.setValue(response.data.Cliente);
+              this.venta.cliente = response.data;
+              this.venta.CampoDireccion = this.venta.cliente.Direccion;
+              if (this.venta.cliente.DniRuc == "00000000") {
+                this.venta.EsOrganizacion = 0;
+                this.venta.NombreOrganizacion = "";
               }
             } else {
               this.$toasted.show("No se encontro al cliente");
@@ -882,8 +864,8 @@ export default {
           }
         })
         .then(response => {
-          this.ventas[this.index].Serie = response.data.serie;
-          this.ventas[this.index].Numero = response.data.numero;
+          this.venta.Serie = response.data.serie;
+          this.venta.Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -899,7 +881,7 @@ export default {
       this.initForm();
       this.limpiarCart();
       this.getVendedor();
-
+      this.$refs.inputCliente.setValue("");
       // this.getNumeroVenta()
       // this.$refs.inputTipoVenta.setValue('TICKET')
       // this.$refs.inputAlmacen.setValue('VENTA')
@@ -1089,8 +1071,13 @@ export default {
             this.getVendedor();
             this.getNumeroVenta();
             this.loadClienteVarios();
-
+            this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
+            this.$refs.inputAlmacen.setValue("PRINCIPAL");
+            this.$refs.inputPuntoVenta.setValue("CAJA1");
+            this.$refs.inputCliente.setValue("");
+            this.$refs.inputVendedor.setValue("");
             //this.$refs.inputComisionista.setValue('')
+            this.$refs.carrito.pagocon = 0;
             window.open(
               "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
               "_blank"
@@ -1104,9 +1091,11 @@ export default {
         });
     },
     eliminarCliente() {
+      this.$refs.inputCliente.setValue("");
       this.venta.cliente = {};
     },
     eliminarComisionista() {
+      this.$refs.inputComisionista.setValue("");
       this.venta.comisionista = {};
     }
   },
