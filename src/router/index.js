@@ -32,6 +32,8 @@ import CierreCaja from "@/views/reportes/CierreCaja.vue";
 import Proforma from "@/views/reportes/Proforma.vue";
 import Vales from "@/views/reportes/Vales.vue";
 import RemisionLista from "@/views/RemisionLista.vue";
+import ReporteSireMovimiento from '@/views/reportes/ReporteSireMovimiento.vue'
+import ReporteSireVentas from '@/views/reportes/ReporteSireVentas.vue'
 import ValesFacturados from "@/views/reportes/ValesFacturados.vue";
 import ReporteCantidad from "@/views/reportes/ReporteCantidad.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
@@ -208,6 +210,16 @@ export default new Router({
       path: "/reporte/reporteutilidadbruta",
       name: "ReporteUtilidadBruta",
       component: ReporteUtilidadBruta
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
     },
     {
       path: "/reporte/reporteregmovimiento",
