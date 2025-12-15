@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0 12%;">
+  <div style="padding: 0 2%;">
     <Menu v-if="false"></Menu>
     <br />
     <div style="text-align: end;">

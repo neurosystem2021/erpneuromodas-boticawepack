@@ -46,6 +46,7 @@
                       <th>Fecha Doc</th>
                       <th>Cod. Sunat</th>
                       <th>Tipo Doc.</th>
+                      <th>Cliente</th>
                       <th>Anulado</th>
                       <th>Serie</th>
                       <th>Número</th>
@@ -73,13 +74,14 @@
                               <span style="font-weight: bold;" v-else> ({{ reporte.ComprobanteProcesado }})</span> 
                             </span> 
                         </td>
-                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} {{ reporte.IdTipoDoc }}</td>
+                        <td style="text-align: left;">{{reporte.Cliente}}</td>
+                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} </td>
                         <td style="text-align: center;">{{reporte.Serie}}</td>
                         <td style="text-align: center;">{{reporte.Numero}}</td>
                         <td style="text-align: center;">{{ parseFloat(reporte.SubTotal).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(reporte.Igv).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(reporte.Total).toFixed(2)}}</td>
-                        <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
+                        <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop.prevent="eliminarReg(reporte)"></i> </td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -93,7 +95,7 @@
           
         </b-col>
     </b-row>
-    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" :title="title">
+    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" id="mdlDetalle" :title="title">
         
           <table class="table table-hover table-striped">
             <thead>
@@ -424,5 +426,19 @@ tfoot td {
   background: #006064;
   color: white;
   font-weight: bold;
+}
+</style>
+
+<style>
+@media only screen and (max-width: 850px) {
+  #mdlDetalle .modal-dialog {
+    min-width: 100% !important;
+  }
+
+  .table-responsive {
+    /* width: 300px !important; */
+    overflow-x: auto !important;
+    /* -webkit-overflow-scrolling: touch; */
+  }
 }
 </style>
