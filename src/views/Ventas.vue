@@ -89,26 +89,33 @@
                                       
                                   </b-input-group-append>
                               </b-input-group>
-                               <!-- <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-0">
-                                  <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
-                                  <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                                  <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
-                              </b-form-select> -->
+                               <b-form-select v-if="tab.cliente.IdCliente" v-model="tab.CampoDireccion" class="mb-0">
+                                  <option :value="tab.cliente.Direccion">{{ tab.cliente.Direccion }}</option>
+                                  <option :value="tab.cliente.Direccion2">{{ tab.cliente.Direccion2 }}</option>
+                                  <option :value="tab.cliente.Direccion3">{{ tab.cliente.Direccion3 }}</option>
+                              </b-form-select>
 
-                              <!-- <b-row v-if="this.$route.query.idPedido">
+                              <b-row v-if="$route.query.idPedido">
                                   <b-col>
                                       <b-form-group>
                                           <label style="font-weight:bold">Cliente (Delivery):</label>
-                                          <b-form-input required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese cliente" autocomplete="off" v-model="venta.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar" readonly></b-form-input>
+                                          <b-form-input 
+                                            required style="text-transform:uppercase; font-size:0.9rem"
+                                            placeholder="Ingrese cliente" autocomplete="off" 
+                                            v-model="tab.nombreLlevar" ref="inputNombreCliente" type="text" name="NombreLlevar" id="NombreLlevar" readonly></b-form-input>
                                       </b-form-group>
                                   </b-col>
                                   <b-col>
                                       <b-form-group>
                                           <label style="font-weight:bold">Direccion Entrega (Delivery):</label>
-                                          <b-form-textarea required style="text-transform:uppercase; font-size:0.9rem" placeholder="Ingrese direccion" rows="3" autocomplete="off" v-model="venta.DireccionEntrega" ref="inputDireccionEntrega" type="text" name="DireccionEntrega" id="DireccionEntrega" readonly></b-form-textarea>
+                                          <b-form-textarea 
+                                            required style="text-transform:uppercase; font-size:0.9rem"
+                                            placeholder="Ingrese direccion" rows="3" 
+                                            autocomplete="off" 
+                                            v-model="tab.DireccionEntrega" ref="inputDireccionEntrega" type="text" name="DireccionEntrega" id="DireccionEntrega" readonly></b-form-textarea>
                                       </b-form-group>
                                   </b-col>
-                              </b-row> -->
+                              </b-row>
                           </b-form-group>
                       </b-col>
                       <b-col cols="6" v-if="mostrarSeccionOferta() && IdOferta">
@@ -787,7 +794,7 @@ export default {
             parseFloat(this.ventas[this.index].pago.mastercard.monto) +
             parseFloat(this.ventas[this.index].pago.yape.monto))
       ).toFixed(2);
-      this.asignarVuelto()
+      this.asignarVuelto();
     },
     asignarDisabledProfComputed(newVal) {
       let prods = [...this.ventas[this.index].productos];
@@ -1949,9 +1956,10 @@ export default {
     },
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
+      let venta = { ...this.preVenta };
       if (this.$route.query.idPedido) {
         this.infoDelivery = obj;
-        this.venta.EsDelivery = true;
+        venta.EsDelivery = true;
         // this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
         //cargar costo de delivery
         let costoDelivery = parseFloat(obj.PrecioDelivery || 0).toFixed(2);
@@ -1969,7 +1977,7 @@ export default {
                 costoDeliverObj.indicacion = "";
 
                 //Cargar Productos Delivery
-                let productos = JSON.parse(obj.Productos);
+                let productos = obj.Productos;
                 productos = productos.map(item => {
                   return {
                     ...item,
@@ -1978,10 +1986,10 @@ export default {
                     indicacion: item.Indicacion
                   };
                 });
-                this.venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
-                this.ventas.DireccionEntrega = obj.Direccion;
+                venta.nombreLlevar = obj.Cliente || "SIN NOMBRE";
+                venta.DireccionEntrega = obj.Direccion;
                 this.$toasted.success("PRODUCTOS DEL DELIVERY AGREGADOS");
-                this.ventas.push({ ...this.venta, productos: productos });
+                this.ventas.push({ ...venta, productos: productos });
                 this.$nextTick(() => {
                   this.index = this.ventas.length - 1;
                   this.getVendedor();
@@ -1991,8 +1999,9 @@ export default {
                     this.cargarMonto("efectivo"),
                     this.loadAlmacen(v.almacen.IdAlmacen),
                     this.loadPuntoVenta(v.puntoVenta.IdDocVentaPuntoVenta),
+                    this.loadClienteVarios(),
                     this.loadComisionista(),
-                    this.setCliente(costoDeliverObj),
+                    // this.setCliente(costoDeliverObj),
                     this.actualizarTotalCart()
                   ]);
                 });
@@ -2004,6 +2013,7 @@ export default {
               }
             })
             .catch(error => {
+              console.error("Error delivery", error);
               this.$toasted.show("HUBO UN ERROR");
             });
         } else {

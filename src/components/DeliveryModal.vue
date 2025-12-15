@@ -118,7 +118,7 @@
                                                 </thead>
                                                 <tbody>
                                                     <!-- <tr v-for="(detalle, index2) in JSON.parse(pedido.Productos)" :key="index2"> -->
-                                                    <tr v-for="(detalle, index2) in JSON.parse(pedido.Productos)" :key="index2">
+                                                    <tr v-for="(detalle, index2) in pedido.Productos" :key="index2">
                                                         <td scope="row" class="text-center" style="text-align: center; vertical-align: middle;">{{ index2 + 1}}</td>
                                                         <td scope="row" class="text-center font-weight-bold" style="width:25% !important; font-size:0.8rem">{{ detalle.Producto }}</td>
                                                         <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">{{ detalle.Cantidad }}</td>
