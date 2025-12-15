@@ -28,7 +28,10 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <label class="ocularMovil">Tipo de Venta:  <b style="display:none" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b></label>
+                                    <center>
+                                      <b style="display:none;font-size: 2rem;" class="mostrarSerie">{{ venta.Serie }} - {{ venta.Numero }}</b>
+                                    </center>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
