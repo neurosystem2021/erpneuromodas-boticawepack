@@ -27,7 +27,7 @@
                           :filter="filter"
                           :items="myProvider" 
                           :fields="fields"
-                          :per-page="perPage"
+                          :per-page="100"
                           :current-page="currentPage">
 
                         <template slot="EsFavoritoFlag" slot-scope="data">
@@ -85,7 +85,7 @@
                        :filter="filter"
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"
-                        :per-page="5"
+                        :per-page="100"
                         :current-page="currentPageFav"
                        >
                        <!-- <template slot="EsFavoritoFlag" slot-scope="data">
