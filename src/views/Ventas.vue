@@ -260,7 +260,7 @@
                 <b-row>
                   <b-col cols="12">
                     <b-row>
-                      <b-col cols="12" md="2" offset-md="5">
+                      <b-col cols="12" lg="2" offset-lg="5">
                         <b-button class="btnAction my-2" style="font-size: 1.5rem !important;" size="lg" @click="guardarVenta" :disabled="inProgress" variant="success" ><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Pagar</b-button>
                       </b-col>
                     </b-row>
@@ -299,7 +299,7 @@
                                   <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                   <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
-                                  <tr><td colspan="2" v-if="ventas[index].productos.length>0">
+                                  <tr><td colspan="2" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
                                     <b-form-checkbox
                                       id="checkbox-1"
                                       v-model="ventas[index].asignarDisabledProf"
@@ -317,7 +317,7 @@
                               <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocultarWeb">
                                 <table class="table b-table border table-footer table-sm text-center "  >
                                     <tbody>
-                                        <tr>
+                                        <tr style="background: #ffffff !important; ">
                                           <td width="50%">
                                             <b-form-checkbox
                                               v-model="mostrarDescripcion"
@@ -341,7 +341,8 @@
                                         <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                         <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                         <tr>
-                                          <td colspan="2" v-if="ventas[index].productos.length>0">
+                                          <td colspan="2" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
+                                            <span>
                                             <b-form-checkbox
                                                 id="checkbox-1"
                                                 v-model="ventas[index].asignarDisabledProf"
@@ -351,6 +352,7 @@
                                              >
                                                 Mostrar Proforma 
                                              </b-form-checkbox>
+                                            </span>
                                           </td>
                                         </tr>
                                     </tbody>

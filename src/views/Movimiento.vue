@@ -319,7 +319,7 @@ export default {
         { key: "Serie", label: "Series" },
         { key: "AddSeries" },
         { key: "ProductoMarca", label: "Marca" },
-        { key: "ProductoModelo", label: "Modelo" },
+        // { key: "ProductoModelo", label: "Modelo" },
         // { key: 'ProductoPresentacion', label: 'Present.' },
         // { key: 'ProductoMedicion', label: 'Medición' },
         { key: "eventPres", label: "" },

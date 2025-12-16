@@ -1304,12 +1304,6 @@ export default {
             width: 100%;
             heigth: 250px;
           }
-          @media only screen and (max-width: 920px) {
-            .dvdProductos{
-              margin-left:-180px;
-              background: #ffffff
-            }
-          }
         </style>
         <div class="dvdProductos">
           <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
