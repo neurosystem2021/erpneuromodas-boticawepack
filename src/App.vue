@@ -34,6 +34,7 @@ export default {
   display: block;
   width: 100%;
   margin: 1.5% 0px;
+  text-transform: uppercase;
   /* margin: 20px 0 0; */
 }
 </style>

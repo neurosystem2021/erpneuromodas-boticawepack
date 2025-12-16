@@ -1,7 +1,7 @@
 <template>
     <b-container class="body" fluid>
        <b-card no-body v-if="ventas.length>0">
-        <b-tabs card pills  v-model="index" justified  align="center">
+        <b-tabs card pills  v-model="index" justified>
           <b-tab :title="`Venta ${i+1}`" v-for="(tab,i) in ventas" :key="i" style="background: #e3f2fd;">
               <b-row>
                  <b-col md="7">
@@ -163,22 +163,7 @@
                     <b-form-text v-if="tab.cliente.EsVIP">
                        Cliente VIP con Precio Convenio
                     </b-form-text>
-                </b-col>
-                 <b-col md="2" class="ocularMovil2">
-                    <b-form-group class="text-center">
-                        <div class="big-text">
-                            {{ tab.Serie }} - <b>{{ tab.Numero }}</b>
-                        </div>
-                        {{ tab.FechaDoc }}
-                    </b-form-group>
-                    <b-form-group class="ocultarMovil">
-                      <span style="font-size: 12px; font-weight: bold; padding: 10px 15px; background: #FFD600; border-radius: 25px;"> Valor Referencial</span>
-                    </b-form-group>
-                    <b-form-group class="ocultarMovil">
-                        <label>Vendedor:</label>
-                        <input type="text" disabled class="form-control" v-model="tab.vendedor.NombreUsuario">
-                    </b-form-group>
-                    <b-form-group class="ocultarMovil">
+                    <b-form-group class="ocultarMovil mt-4" >
                         <label>Comisionista</label>
                         <autocomplete
                             :ref="`inputComisionista${i}`"
@@ -193,6 +178,24 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
+                </b-col>
+                 <b-col md="2" class="ocularMovil2">
+                    <b-form-group class="text-center">
+                        <div class="big-text">
+                            {{ tab.Serie }} - <b>{{ tab.Numero }}</b>
+                        </div>
+                        {{ tab.FechaDoc }}
+                    </b-form-group>
+                    <b-form-group class="ocultarMovil">
+                      <center>
+                        <span style="font-size: 12px; font-weight: bold; padding: 10px 15px; background: #FFD600; border-radius: 25px;"> Valor Referencial</span>
+                      </center>
+                    </b-form-group>
+                    <b-form-group class="ocultarMovil">
+                        <label>Vendedor:</label>
+                        <input type="text" disabled class="form-control" v-model="tab.vendedor.NombreUsuario">
+                    </b-form-group>
+                    
                     <b-badge variant="info" v-if="ventas[index].adelanto">Adelanto de: S/ {{ ventas[index].adelanto }} </b-badge>
                     <b-badge variant="success" v-if="ventas[index].adelanto">Total a pagar: S/ {{ $options.filters.redondear(ventas[index].totalCart -  ventas[index].adelanto) }} </b-badge>
                 </b-col>
@@ -255,12 +258,18 @@
                   </b-col>
                 </b-row>
                 <b-row>
-
+                  <b-col cols="12">
+                    <b-row>
+                      <b-col cols="12" md="2" offset-md="5">
+                        <b-button class="btnAction my-2" style="font-size: 1.5rem !important;" size="lg" @click="guardarVenta" :disabled="inProgress" variant="success" ><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Pagar</b-button>
+                      </b-col>
+                    </b-row>
+                  </b-col>
                    
                     <b-col cols="12"  md="4" lg="3" class="text-center" align-h="center">
                         <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" style="background-color: #FF3D00; color:#ffffff" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button class="btnAction" @click="guardarVenta" :disabled="inProgress" variant="success" >Efectuar Venta</b-button>
+                        <!-- <b-button class="btnAction" @click="guardarVenta" :disabled="inProgress" variant="success" >Efectuar Venta</b-button> -->
                         <b-button class="btnAction" @click="anadirVenta" style="background-color: #757575; color:#ffffff" >Añadir Ventana</b-button>
                         <b-button class="btnAction" @click="eliminarVentana" v-if="index!=0" style="background-color: #FFD600; color:#ffffff" >Eliminar Ventana</b-button>
                         <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info"  :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
