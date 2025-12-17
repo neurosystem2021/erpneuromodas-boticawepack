@@ -1586,7 +1586,7 @@ export default {
       return this.$moment().format("YYYY-MM-DD H:mm:ss");
     },
     async loadClienteVarios() {
-      await this.axios.get(this.API + "clientes/00000000").then(res => {
+      await this.axios.get(this.API + "clientes/000000000").then(res => {
         if (res.data.IdCliente) {
           this.setCliente(res.data);
         }
@@ -1887,7 +1887,7 @@ export default {
       // }, 1000);
     },
     async setProducto(producto, esNota = false) {
-      console.log('sssssssss')
+      console.log("sssssssss");
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
         let prod = productos.filter(v => v.IdProducto == producto.IdProducto);
@@ -2180,6 +2180,19 @@ export default {
         this.loading = false;
         return;
       }
+      if (productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No se puede vender un producto sin stock.",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        this.loading = false;
+        return;
+      }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
@@ -2326,11 +2339,13 @@ export default {
 
         if (this.ventas.length == 1) {
           window.location.reload();
+          this.loading = false;
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
           setTimeout(() => {
             this.metodoPagoCambio(1);
+            this.loading = false;
           }, 100);
         }
 

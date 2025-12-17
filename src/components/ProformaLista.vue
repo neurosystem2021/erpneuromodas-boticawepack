@@ -130,7 +130,7 @@ export default {
         .then(response => {
           this.limpiarCarrito();
           response.data.map(item => {
-            let pres = JSON.parse(item.Presentacion);
+            let pres = item.Presentacion ? JSON.parse(item.Presentacion) : [];
             item.Presentacion = pres.nombre;
             item.pres = pres;
             this.add([
