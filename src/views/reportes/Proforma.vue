@@ -68,7 +68,10 @@
       <div id="thanks">¡Muchas Gracias!</div>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los 30 dias posteriores.</div>
+        <div class="notice">Esta proforma solo tiene validez durante los {{ proforma.DiasValidos }} dias posteriores.</div>
+      </div>
+      <div style="text-align:center">
+        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
       </div>
     </main>
     <!--<footer>
@@ -114,6 +117,9 @@ export default {
 			.then(res => {
 				this.empresa = res.data
 			})
+    },
+    imprimir() {
+      window.print();
     }
   }
 }
@@ -121,4 +127,9 @@ export default {
 
 <style scoped>
 @import '../../assets/css/invoice.css';
+@media print {
+  #printBtn {
+    display: none;
+  }
+}
 </style>
