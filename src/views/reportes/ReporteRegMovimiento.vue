@@ -45,6 +45,7 @@
                         <th>FechaMov</th>
                         <th># Tipo</th>
                         <th>Tipo</th>
+                        <th>Crédito</th>
                         <th>Serie</th>
                         <th>Numero</th>
                         <th>Proveedor</th>
@@ -67,6 +68,7 @@
                         <td>{{reporte.MovimientoFecha}}</td>
                         <td>{{reporte.IdMovimientoTipo}}</td>
                         <td>{{reporte.TipoMovimiento}}</td>
+                        <td>{{ reporte.EsCredito === 1 ? 'SI' : 'NO' }}</td>
                         <td>{{reporte.Serie}}</td>
                         <td>{{reporte.Numero}}</td>
                         <td>{{reporte.Proveedor}}</td>
