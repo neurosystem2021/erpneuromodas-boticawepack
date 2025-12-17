@@ -85,7 +85,7 @@
                                       placeholder="Codigo de Barra" />
                                   <b-input-group-append>
                                       <!--<proveedores-tabla></proveedores-tabla>-->
-                                      <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                      <clientes-form :id="`cltNuevo${i}`" :ruc="newDniRuc" :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                       
                                   </b-input-group-append>
                               </b-input-group>
