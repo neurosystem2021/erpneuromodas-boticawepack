@@ -290,7 +290,7 @@
                                         placeholder="Descripción"
                                         rows="3"
                                         max-rows="6"
-                                        v-model="venta.descripcion"
+                                        v-model="ventas[index].descripcion"
                                         style="field-sizing: content !important;"
                                       ></b-form-textarea>
                                     </td>
@@ -299,18 +299,7 @@
                                   <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                   <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
-                                  <tr><td colspan="2" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
-                                    <b-form-checkbox
-                                      id="checkbox-1"
-                                      v-model="ventas[index].asignarDisabledProf"
-                                      name="checkbox-1"
-                                      :value="1"
-                                      :unchecked-value="0"
-                                    >
-                                       Mostrar Proforma 
-                                    </b-form-checkbox>
-                                   
-                                  </td></tr>
+                                  
                               </tbody>
                           </table>
                         </b-col>
@@ -340,21 +329,6 @@
                                         <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                         <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
                                         <tr class="ocultarMovil"><td colspan="2"><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
-                                        <tr>
-                                          <td colspan="2" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
-                                            <span>
-                                            <b-form-checkbox
-                                                id="checkbox-1"
-                                                v-model="ventas[index].asignarDisabledProf"
-                                                name="checkbox-1"
-                                                :value="1"
-                                                :unchecked-value="0"
-                                             >
-                                                Mostrar Proforma 
-                                             </b-form-checkbox>
-                                            </span>
-                                          </td>
-                                        </tr>
                                     </tbody>
                                 </table>   
                                 
@@ -601,8 +575,20 @@
                                         <td><b>TOTAL</b></td>
                                         <td class="table-danger">{{ sumatoriaTotal }}</td>
                                       </tr>
+                                      <tr><td colspan="3" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
+                                        <b-form-checkbox
+                                          id="checkbox-1"
+                                          v-model="ventas[index].asignarDisabledProf"
+                                          name="checkbox-1"
+                                          :value="1"
+                                          :unchecked-value="0"
+                                        >
+                                          Mostrar Proforma 
+                                        </b-form-checkbox>
+                                      
+                                      </td></tr>
                                       <tr>
-                                        <td  colspan="2">
+                                        <td  colspan="3">
                                           <label>pagó con:</label>
                                           <b-form-input
                                             type="text"
@@ -617,7 +603,7 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td>G. G</td>
+                                         <td  colspan="2">G. G</td>
                                         <td>
                                           {{ 
                                             
