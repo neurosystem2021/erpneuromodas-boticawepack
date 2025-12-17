@@ -1304,31 +1304,32 @@ export default {
             width: 100%;
             heigth: 250px;
           }
+          
         </style>
         <div class="dvdProductos">
-          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
+          <table id="table-render" class="tblProductos" style="padding:0; margin:0">
             <tbody>
               <tr>
-                <td style="width: 60px" class="${styleStock}"><b>${
+                <td style="text-align: center;width: 60px" class="${styleStock}"><b>${
           data.stock
             ? Number.isInteger(data.stock)
               ? data.stock
               : data.stock.toFixed(2)
             : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
+                <td style="width: 200px;padding:0 2%"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td class="ocultarMovil" style="width: 100px">${
+                <td class="ocultarMovil" style="padding:0 2% ;width: 100px">${
                   data.ProductoCategoria
                 }</td>
-                <td class="ocultarMovil" style="width: 100px">${
+                <td class="ocultarMovil" style="padding:0 2% ;width: 100px">${
                   data.ProductoMarca
                 }</td>
-                <td  style="width: 65px" class="table-primary"><b>${
+                <td  style="text-align: center;width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
-                <td style="width: 5%">
+                <td style="text-align: center;width: 5%">
                   <img src="${
                     data.Imagen == null || data.Imagen == ""
                       ? "static/no-photo.png"
@@ -1559,7 +1560,7 @@ canvas {
     max-height: 50vh !important;
   }
   .tblProductos {
-    width: 400px !important;
+    width: 720px !important;
   }
   .cameraBarra {
     height: 50vh;

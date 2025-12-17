@@ -260,7 +260,7 @@
                 <b-row>
                   <b-col cols="12">
                     <b-row>
-                      <b-col cols="12" lg="2" offset-lg="5">
+                      <b-col cols="12" md="4" offset-md="4" lg="2" offset-lg="5">
                         <b-button class="btnAction my-2" style="font-size: 1.5rem !important;" size="lg" @click="guardarVenta" :disabled="inProgress" variant="success" ><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Pagar</b-button>
                       </b-col>
                     </b-row>
@@ -283,18 +283,6 @@
                     <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocultarMovil">
                           <table class="table b-table border table-footer table-sm text-center "  >
                               <tbody>
-                                  <tr>
-                                    <td>Descripción:</td>
-                                    <td>
-                                      <b-form-textarea
-                                        placeholder="Descripción"
-                                        rows="3"
-                                        max-rows="6"
-                                        v-model="ventas[index].descripcion"
-                                        style="field-sizing: content !important;"
-                                      ></b-form-textarea>
-                                    </td>
-                                  </tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra bruta</td></tr>
                                   <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                   <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
@@ -306,7 +294,7 @@
                               <b-col cols="12" md="3" lg="3" v-if="!venta.EsCredito" class="ocultarWeb">
                                 <table class="table b-table border table-footer table-sm text-center "  >
                                     <tbody>
-                                        <tr style="background: #ffffff !important; ">
+                                        <!-- <tr style="background: #ffffff !important; ">
                                           <td width="50%">
                                             <b-form-checkbox
                                               v-model="mostrarDescripcion"
@@ -324,7 +312,7 @@
                                               v-if="mostrarDescripcion==1"
                                             ></b-form-textarea>
                                           </td>
-                                        </tr>
+                                        </tr> -->
                                         <tr class="ocultarMovil"><td colspan="2">Mano de obra bruta</td></tr>
                                         <tr class="ocultarMovil"><td colspan="2"><h3>{{ manoDeObraBruta | redondear }}</h3></td></tr>
                                         <tr class="ocultarMovil"><td colspan="2">Mano de obra neta</td></tr>
@@ -575,7 +563,7 @@
                                         <td><b>TOTAL</b></td>
                                         <td class="table-danger">{{ sumatoriaTotal }}</td>
                                       </tr>
-                                      <tr><td colspan="3" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
+                                      <tr  class="ocultarweb"><td colspan="3" v-if="ventas[index].productos.length>0" style="background: #ffffff !important; ">
                                         <b-form-checkbox
                                           id="checkbox-1"
                                           v-model="ventas[index].asignarDisabledProf"
@@ -583,10 +571,28 @@
                                           :value="1"
                                           :unchecked-value="0"
                                         >
-                                          Mostrar Proforma 
+                                          Ocultar Proforma 
                                         </b-form-checkbox>
                                       
-                                      </td></tr>
+                                      </td>
+                                    </tr>
+                                      <tr style="background: #ffffff !important; " >
+                                          <td colspan="3">
+                                            <b-form-checkbox
+                                              v-model="mostrarDescripcion"
+                                              :value="1"
+                                              :unchecked-value="0"
+                                            >
+                                              Descripción
+                                            </b-form-checkbox>
+                                            <b-form-textarea
+                                              placeholder="Descripción"
+                                              v-model="venta.descripcion"
+                                              style="field-sizing: content;"
+                                              v-if="mostrarDescripcion==1"
+                                            ></b-form-textarea>
+                                          </td>
+                                        </tr>
                                       <tr>
                                         <td  colspan="3">
                                           <label>pagó con:</label>
@@ -638,7 +644,7 @@
                       
                             <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                             <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                            <b-button target="_blank"  href="/views/proyectos.php?id=1" class=" btnAction" style="background: #0D47A1; color:#ffffff">CREAR/ EDITAR PROYECTOS</b-button>
+                            <b-button target="_blank"  href="/views/proyectos.php?id=1" class=" btnAction" style="background: #0D47A1; color:#ffffff">CREAR</b-button>
                             <b-button target="_blank"  href="/views/reg_proyectos.php" class=" btnAction" style="background: #004D40; color:#ffffff">VER PROYECTOS</b-button>
                     </b-col>
                    
