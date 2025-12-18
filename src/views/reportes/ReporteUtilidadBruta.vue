@@ -48,7 +48,7 @@
                         <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TotalCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.UtilidadBruta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.PorcentajeUti).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{parseFloat((reporte.TotalVenta-reporte.TotalCosto)/reporte.TotalCosto).toFixed(2)}}</td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -190,7 +190,6 @@ export default {
             TotalVenta += element.TotalVenta;
             TotalCosto += element.TotalCosto;
             UtilidadBruta += element.UtilidadBruta;
-            PorcentajeUti += element.PorcentajeUti;
           });
           this.footer = {
             Producto: "TOTAL",
@@ -200,7 +199,9 @@ export default {
             TotalVenta: parseFloat(TotalVenta).toFixed(2),
             TotalCosto: parseFloat(TotalCosto).toFixed(2),
             UtilidadBruta: parseFloat(UtilidadBruta).toFixed(2),
-            PorcentajeUti: parseFloat(PorcentajeUti).toFixed(2)
+            PorcentajeUti: parseFloat(
+              (TotalVenta - TotalCosto) / TotalCosto
+            ).toFixed(2)
           };
         }
       });

@@ -17,9 +17,11 @@
                 :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
                 id="txtAddProduct"
                 @keydown.native.prevent.tab="irtxtBarcode"
-                :classes="{input: 'form-control'}">
+                :classes="{input: 'form-control txtProducto'}"
+                
+                >
               </autocomplete>
-              <b-button @click="startRecognition" :class="microActivo?'alerta':''" style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
+              <b-button @click="startRecognition" size="lg" :class="microActivo?'alerta':''" style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
               </b-input-group>
               </b-form-group>
               <span class="ocultarMovil">Busqueda avanzada (Producto, Modelo, Categoria)</span>
@@ -37,9 +39,9 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
-            <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
+            <b-button  size="lg"  @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
             
-            <b-button @click="startRecognitionCodeBar" :class="microActivoBarCode?'alerta':''"  style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
+            <b-button  size="lg"  @click="startRecognitionCodeBar" :class="microActivoBarCode?'alerta':''"  style="background: #1A237E; color: #ffffff;"><i class="fas fa-microphone"></i> </b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
@@ -1545,6 +1547,7 @@ canvas {
 }
 .tblProductos {
   width: 830px;
+  /* font-size: 1rem !important; */
 }
 .ocultarMovil {
   /* display: inline; */
@@ -1561,6 +1564,7 @@ canvas {
   }
   .tblProductos {
     width: 720px !important;
+    font-size: 1rem !important;
   }
   .cameraBarra {
     height: 50vh;
@@ -1574,6 +1578,7 @@ canvas {
   }
   .tblProductos {
     width: 400px !important;
+    font-size: 1rem !important;
   }
   .cameraBarra {
     height: 80vh;
@@ -1591,6 +1596,7 @@ canvas {
   }
   .tblProductos {
     width: 400px !important;
+    font-size: 1rem !important;
   }
 
   .table-responsive {
@@ -1601,6 +1607,9 @@ canvas {
     overflow-x: auto;
     white-space: nowrap;
   }
+}
+.txtProducto {
+  height: 50px !important;
 }
 
 #modalCodigoBarra {

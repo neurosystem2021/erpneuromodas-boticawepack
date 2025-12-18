@@ -125,10 +125,9 @@ export default {
     this.fechaInicio = this.$moment()
       .startOf("day")
       .format("YYYY-MM-DD");
-    console.log("fechaInicio", this.fechaInicio);
+
     this.fechaFin = this.$moment().format("YYYY-MM-DD");
-   this.usuarioReg=sessionStorage.getItem('User')
-    
+    this.usuarioReg = sessionStorage.getItem("User");
   },
   methods: {
     async cargarUsuarios() {
@@ -140,6 +139,15 @@ export default {
     },
     async getReporteUtilidadPorUsuario() {
       this.lstReporte = [];
+      const inicio = this.$moment(this.fechaInicio, "YYYY-MM-DD");
+      const fin = this.$moment(this.fechaFin, "YYYY-MM-DD");
+      const diffMeses = fin.diff(inicio, "months", true);
+      if (diffMeses > 3) {
+        this.$toasted.error("El rango de fechas no puede ser mayor a 3 meses");
+
+        return;
+      }
+
       let filtro = {
         params: {
           fechaInicio: this.fechaInicio,
@@ -158,6 +166,14 @@ export default {
         });
     },
     async exportar() {
+      const inicio = this.$moment(this.fechaInicio, "YYYY-MM-DD");
+      const fin = this.$moment(this.fechaFin, "YYYY-MM-DD");
+      const diffMeses = fin.diff(inicio, "months", true);
+      if (diffMeses > 3) {
+        this.$toasted.error("El rango de fechas no puede ser mayor a 3 meses");
+
+        return;
+      }
       await this.axios(`${this.API}reporte/utlidadbruta/usuario/exportar`, {
         params: {
           fechaInicio: this.fechaInicio,

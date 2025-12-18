@@ -78,6 +78,7 @@
                                       :onFocus="focusAutocomplete.bind(null, `inputCliente${i}`)"
                                       :classes="{input: 'form-control'}">
                                   </autocomplete>
+                                  <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
                                   <input v-model="dni"
                                       @keydown.enter.prevent="loadClienteBarcode"
                                       type="text"
@@ -228,7 +229,7 @@
           
         </b-tabs>
       </b-card>
-        <Menu v-if="false"></Menu>
+     
         <b-row v-if="pagosPendientes>0">
             <b-col class="holder">
                 <h4 class="news" height="100" width="200" bgcolor="white">Tiene <b>{{pagosPendientes}} pago(s) pendientes</b> del servicio de facturación, porfavor regularizar para mantener la validez de los comprobantes emitidos.  <b>{{fechaUltPago!=''?' Fecha de Vencimiento: '+fechaUltPago:''}}</b></h4>
@@ -644,7 +645,7 @@
                       
                             <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
                             <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                            <b-button target="_blank"  href="/views/proyectos.php?id=1" class=" btnAction" style="background: #0D47A1; color:#ffffff">CREAR</b-button>
+                            <b-button target="_blank"  href="/views/proyectos.php?id=1" class=" btnAction" style="background: #0D47A1; color:#ffffff">CREAR PROYECTOS</b-button>
                             <b-button target="_blank"  href="/views/reg_proyectos.php" class=" btnAction" style="background: #004D40; color:#ffffff">VER PROYECTOS</b-button>
                     </b-col>
                    
@@ -662,6 +663,40 @@
           <div class="spinner"></div>
           <p><b>Obteniendo los datos, un momento por favor....</b></p>
         </b-modal>
+
+         <b-modal v-model="touchModal" id="mdlTouch" hide-footer class="ingDesc" title="Codigo Barra" hide-header-close>
+        <input readonly type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+        <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <!-- <td class="botones" @click="addPoint('.');">.</td> -->
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <b-button variant="success" @click="buscarCodigoBarra()">Buscar</b-button>
+                        <b-button variant="danger" @click="touchModal=!touchModal">Cerrar</b-button>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+      </b-modal>
     </b-container>
 </template>
 <script>
@@ -702,6 +737,8 @@ export default {
   },
   data() {
     return {
+      cantidadInput: "",
+      touchModal: false,
       cargando: false,
       ventas: [],
       index: 0,
@@ -764,7 +801,7 @@ export default {
             class: "text-center"
           },
           { key: "Producto", class: "Producto", class: "clsProducto" },
-          { key: "Descripcion", label: "Descripción", class: "ocultarMovil" },
+          { key: "Descripcion", label: "Descripción" },
           { key: "Series", label: "Serie" },
           { key: "eventPres", label: "" },
           { key: "cantxPrecio", label: "CantxP", variant: "warning" },
@@ -904,7 +941,27 @@ export default {
       add: "agregarProducto",
       actualizarTotal: "actualizarTotalCart"
     }),
-
+    abrirModal() {
+      this.touchModal = true;
+    },
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
+    },
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    buscarCodigoBarra() {
+      let ref = `inputCliente${this.index}`;
+      const comp = this.$refs[ref][0];
+      comp.setValue(this.cantidadInput);
+      this.$nextTick(() => {
+        const inputElement = comp.$el.querySelector("input");
+        if (inputElement) {
+          inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      });
+      this.touchModal = false;
+    },
     async cargarDetalleProforma(det) {
       let detalle = det.map(item => ({
         ...item,
@@ -1217,6 +1274,12 @@ export default {
     },
     focusAutocomplete(ref) {
       let val = `${ref}`;
+      const comp = this.$refs[ref][0];
+      const input = comp.$el.querySelector("input");
+      if (input) {
+        input.focus();
+        input.select();
+      }
       this.$refs[val][0].handleDoubleClick();
     },
     anadirVenta() {
@@ -1744,7 +1807,7 @@ export default {
       }
       // validar serie
       let prods = this.venta.productos;
-      let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
+      // let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
 
       // if (val) {
       //   this.$toasted.show(
@@ -2176,6 +2239,18 @@ export default {
   white-space: pre;
 }
 
+.botones {
+  /* border: 1px solid red; */
+  /* border-radius: 25px; */
+  padding: 5%;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+#mdlTouch .modal-dialog {
+  width: 15% !important;
+}
+
 @keyframes slide {
   0% {
     transform: translatex(100vw);
@@ -2187,6 +2262,9 @@ export default {
 }
 
 @media only screen and (max-width: 920px) {
+  #mdlTouch .modal-dialog {
+    width: 30% !important;
+  }
   /* For desktop: */
   .ocultarMovil {
     display: none !important;
@@ -2202,6 +2280,9 @@ export default {
   }
 }
 @media only screen and (max-width: 750px) {
+  #mdlTouch .modal-dialog {
+    width: 100% !important;
+  }
   /* For desktop: */
   .ocultarWeb {
     display: inline;
