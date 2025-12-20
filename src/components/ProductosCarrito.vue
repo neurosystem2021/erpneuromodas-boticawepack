@@ -562,26 +562,24 @@ export default {
       }
     },
     loadBarcode(e) {
-      if (e) {
-        e.preventDefault();
-      }
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([
-          idProducto,
-          obj => {
-            if (obj) {
-              this.$emit("onAddProducto");
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data);
               this.$toasted.show("Producto añadido correctamente");
             } else {
+              this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
-            this.loadCode = "";
-          },
-          { setPrecio: this.setPrecio, setSuma: true }
-        ]);
+          });
       }
+      this.loadCode = "";
     },
     /*alterarBuscadorProductos() {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
