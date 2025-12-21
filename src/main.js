@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-
+import './assets/css/global.css'
 import BootstrapVue from 'bootstrap-vue'
 import Autocomplete from 'vue2-autocomplete-js'
 import axios from 'axios';

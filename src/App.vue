@@ -19,8 +19,20 @@ export default {
   min-width: 80%;
   width: 80%;
 } */
-.body {
-  background: #e3f2fd;
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f5f7fa; /* tu color */
+  margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.container,
+.container-fluid {
+  background-color: transparent; /* deja ver el fondo del body */
 }
 .btnAction {
   margin: 2px 0;

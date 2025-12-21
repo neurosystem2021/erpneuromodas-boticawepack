@@ -1,0 +1,30 @@
+/* Fondo general */
+html,
+body {
+  height: 100%;
+  background-color: #f4f6f9 !important;
+  margin: 0;
+}
+
+/* Bootstrap containers */
+.container,
+.container-fluid,
+.bv-example-row {
+  background-color: transparent !important;
+}
+
+/* Formularios */
+.form-control,
+.input-group-text {
+  background-color: #ffffff;
+}
+
+/* Tablas */
+.table {
+  background-color: #ffffff;
+}
+
+/* Modales */
+.modal-content {
+  background-color: #ffffff;
+}

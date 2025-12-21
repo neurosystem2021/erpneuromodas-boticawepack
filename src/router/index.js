@@ -20,6 +20,7 @@ import OrdenCompra from "@/views/OrdenCompra.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import Usuario from "@/views/Usuario.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
+import RemisionTransportista from "@/views/RemisionTransportista.vue";
 
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -281,6 +282,11 @@ export default new Router({
       path: "/reportes/ReporteRegistroVentas",
       name: "ReporteRegistroVentas",
       component: ReporteRegistroVentas
+    },
+    {
+      path: "/RemisionTransportista",
+      name: "CajaBancos",
+      component: RemisionTransportista
     },
     {
       path: "/CajaBancos",
