@@ -1,13 +1,97 @@
 <template>
   <b-container>
+    <b-card class=" vh-100">
     <b-row>
-         <b-col cols="6" class="">
-            <b-card class=" vh-100">
-                <div class="dvTitle dvTitleSup">
-                    <span class="spnTitle">CLIENTE</span>
-                </div>
-                <b-form-group  class="mt-5">
-                    <label class="ocultarMovil">Cliente</label>
+      <b-col cols="12" md="6" lg="6" class="px-5">
+        <b-row>
+          <b-col cols="12">
+            <b-form-group  class="mt-0">
+                <label class="ocultarMovil">DOC. REMITENTE</label>
+                 <b-input-group>
+                    <input type="text"  class="form-control" v-model="remitente.docremitente">
+                    <b-button @click="buscarReminte" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
+                  </b-input-group>                                  
+            </b-form-group>
+          </b-col>
+          <b-col cols="12">
+            <b-form-group  class="mt-0">
+                <label class="ocultarMovil">RAZÓN SOCIAL</label>
+                <input type="text" v-model="remitente.razonSocial" class="form-control">
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <hr>
+        <b-row>
+                  <b-col cols="12">
+                    <b-form-group  class="mt-0">
+                        <label class="ocultarMovil">TRANSPORTISTA</label>
+                        <autocomplete
+                            required="required"
+                            :ref="`inputProveedor`"
+                            :url="API + 'proveedores'"
+                            anchor="ProveedorRuc"
+                            label="writer"
+                            placeholder=""
+                            :onInput="(val) => newDniRuc = val"
+                            :on-select="setProveedor" 
+                            :onFocus="focusAutocomplete.bind(null, `inputProveedor`)"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-form-group>
+                  </b-col>
+                  <b-col cols="12">
+                    <b-form-group  class="mt-0">
+                        <label class="ocultarMovil" >DIRECCIÓN FISCAL</label>
+                        <textarea v-model="proveedor.Direccion" class="form-control"  style="field-sizing: content;"/>
+                    </b-form-group>
+                  </b-col>
+        </b-row>
+        <hr>
+        <b-row>
+                  <b-col cols="12" md="6" lg="6"> 
+                    <b-form-group  class="">
+                        <label class="ocultarMovil">DNI CHOFER</label>
+                        <b-input-group>
+                          <input type="text" v-model="chofer.documento" class="form-control">
+                          <b-button @click="buscarChofer" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
+                        </b-input-group>
+                 
+                    </b-form-group>
+                  </b-col>
+                  <b-col cols="12" md="6" lg="6"> 
+                    <b-form-group  class="">
+                        <label class="ocultarMovil">LICENCIA CHOFER</label>
+                        <input type="text" v-model="chofer.licencia"  class="form-control">
+                    </b-form-group>
+                  </b-col>
+                  <b-col cols="12">
+                    <b-form-group  class="">
+                        <label class="ocultarMovil">DATOS DEL CHOFER</label>
+                        <input type="text" v-model="chofer.razonSocial" class="form-control">
+                    </b-form-group>
+                  </b-col>
+        </b-row>
+        <hr>
+        <b-row>
+                  <b-col cols="12" md="6" lg="6"> 
+                    <b-form-group  class="mt-0">
+                        <label class="ocultarMovil">PLACA DEL VEHÍCULO</label>
+                        <input type="text" v-model="chofer.placa" class="form-control">
+                    </b-form-group>
+                  </b-col>
+                  <b-col cols="12" md="6" lg="6"> 
+                    <b-form-group  class="mt-0">
+                        <label class="ocultarMovil">MARCA</label>
+                        <input type="text"  v-model="chofer.marca" class="form-control">
+                    </b-form-group>
+                  </b-col>
+        </b-row>
+      </b-col>
+         <b-col cols="12" md="6" lg="6" class="px-5">
+            <b-row>
+              <b-col cols="12">
+                <b-form-group  class="mt-0">
+                    <label class="ocultarMovil">CLIENTE</label>
                     <autocomplete
                         required="required"
                         :ref="`inputCliente`"
@@ -21,59 +105,74 @@
                         :classes="{input: 'form-control'}">
                     </autocomplete>
                 </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">UBIGEO ORIGEN</label>
-                    <input type="text"  class="form-control">
+              </b-col>
+            </b-row>
+            <hr>
+            <b-row>
+              <!-- <b-col cols="12"> 
+                  <b-form-group  class="">
+                    <label class="ocultarMovil">UBIG ORIGEN</label>
+                    <input type="text"  class="form-control" v-model="ubigeoorigen">
+                  </b-form-group>
+              </b-col> -->
+              <b-col cols="12" md="4" lg="4"> 
+                  <b-form-group  class="">
+                    <label class="ocultarMovil">UBIG ORIGEN</label>
+                    <input type="text"  class="form-control" v-model="ubigeoorigen">
+                  </b-form-group>
+              </b-col>
+             <b-col cols="12" md="8" lg="8"> 
+                <b-form-group  class="">
+                  <label class="ocultarMovil" >DIRECCIÓN ORIGEN</label>
+                  <textarea  class="form-control" v-model="direccionorigen"  style="field-sizing: content;"/>
                 </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">DIRECCIÓN ORIGEN</label>
-                    <input type="text"  class="form-control">
+              </b-col>
+              <b-col cols="12" md="4" lg="4"> 
+                  <b-form-group  class="">
+                    <label class="ocultarMovil">UBIG DESTINO</label>
+                    <input type="text"  class="form-control" v-model="ubigeodestino">
+                  </b-form-group>
+              </b-col>
+              <b-col cols="12" md="8" lg="8"> 
+                  <b-form-group  class="">
+                    <label class="ocultarMovil" >DIRECCIÓN DESTINO</label>
+                    <textarea  class="form-control" v-model="direcciondestino"  style="field-sizing: content;"/>
+                  </b-form-group>
+              </b-col>
+              <b-col cols="12" md="6" lg="6">
+                <b-form-group  class="">
+                    <label class="ocultarMovil">FECHA</label>
+                    <input type="date" v-model="fecha" class="form-control">
                 </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">UBIGEO DESTINO</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">DIRECCIÓN DESTINO</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">MOTIVO</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-                <b-form-group  class="my-0">
+              </b-col>
+              <b-col cols="12" md="6" lg="6">
+                <b-form-group  class="">
                     <label class="ocultarMovil">NRO. GUÍA REMISIÓN</label>
-                    <input type="text"  class="form-control">
+                    <input type="text" v-model="guiaremision" class="form-control">
                 </b-form-group>
-            </b-card>
+              </b-col>
+               <b-col cols="12" md="6" lg="6">
+                <b-form-group  class="">
+                    <label class="ocultarMovil">MODALIDAD</label>
+                    <b-form-select v-model="modalidad" :options="modalidades"></b-form-select>
+                </b-form-group>
+              </b-col>
+               <b-col cols="12" md="6" lg="6">
+                <b-form-group  class="">
+                    <label class="ocultarMovil">MOTIVO</label>
+                    <b-form-select v-model="motivo" :options="motivos"></b-form-select>
+                </b-form-group>
+              </b-col>
+            </b-row>
         </b-col>
-        <b-col cols="6" class="vh-100">
-            <b-card class=" vh-100"> 
-                <div class="dvTitle dvTitleSup">
-                    <span class="spnTitle">CHOFER</span>
-                </div>
-                <b-form-group  class="mt-5">
-                    <label class="ocultarMovil">PLACA DEL VEHÍCULO</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">DNI CHOFER</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-                <b-form-group  class="my-0">
-                    <label class="ocultarMovil">LICENCIA CHOFER</label>
-                    <input type="text"  class="form-control">
-                </b-form-group>
-              </b-card>
-        </b-col>
-        <b-col cols="12">
-            <b-card>
-                <div class="dvTitle dvTitleSup">
+       
+        <b-col cols="12" class="px-5">
+                <div class="dvTitle ">
                     <span class="spnTitle "> DETALLE</span>
                 </div>
                 <b-row>
-                    <b-col cols="4">
-                         <b-form-group class="mt-5">
+                    <b-col cols="12" md="4" lg="4"> 
+                         <b-form-group class="">
                             <label>Doc. Referencia:</label>
                             <autocomplete
                                 required="required"
@@ -89,14 +188,21 @@
                             </autocomplete>
                         </b-form-group>
                     </b-col>
-                    <b-col cols="4"></b-col>
-                    <b-col cols="12">dddd</b-col>
+                    <b-col cols="12">
+                      <b-table :items="productos" :fields="fields">
+                        <template slot="Cantidad" slot-scope="data">
+                          {{ parseFloat((data.item.cantidad) * (data.item.cantidadPres)).toFixed(2) }}
+                        </template>
+                      </b-table>
+                    </b-col>
+                    <b-col style="text-align: center;" class="mt-5">
+                      <b-button variant="success" @click="generarGuiaRemision">GENERAR GUÍA REMISIÓN</b-button>
+                    </b-col>
                 </b-row>
-            </b-card>
-        </b-col>
-    </b-row>
-   
-    
+              </b-col>
+            
+            </b-row>
+      </b-card>
   </b-container>
 </template>
 
@@ -105,23 +211,130 @@ import config from "@/store/config.js";
 export default {
   data() {
     return {
+      docremitente: "",
       API: config.API,
       CodSunatModifica: "",
       NroComprobanteModifica: "",
       productos: [],
       almacen: {},
-      puntoVenta: {}
+      puntoVenta: {},
+      cliente: {},
+      proveedor: {},
+      chofer: {
+        documento: "",
+        razonSocial: "",
+        licencia: "",
+        placa: "",
+        marca: ""
+      },
+      remitente: {
+        docremitente: "",
+        razonSocial: ""
+      },
+      fields: [
+        { key: "CodigoBarra", label: "Cód." },
+        { key: "Producto" },
+        { key: "Cantidad" }
+      ],
+      ubigeoorigen: "",
+      ubigeodestino: "",
+      direccionorigen: "",
+      direcciondestino: "",
+      fecha: "",
+      guiaremision: "",
+      motivo: "",
+      modalidad: "",
+      motivos: [
+        { value: "01", text: "Venta" },
+        { value: "02", text: "Compra" },
+        { value: "04", text: "Traslado entre establecimientos" },
+        { value: "08", text: "Importación" },
+        { value: "13", text: "Otros" }
+      ],
+      modalidades: [
+        { value: "01", text: "Público" },
+        { value: "02", text: "Privado" }
+      ]
     };
   },
   mounted() {
     this.getVendedor();
+    this.fecha = this.$moment().format("YYYY-MM-DD");
   },
   methods: {
+    async buscarDNIRUC(document) {
+      let datos = {};
+      let tipo = "";
+      switch (document.length) {
+        case 8:
+          tipo = "DNI";
+          break;
+
+        case 11:
+          tipo = "RUC";
+          break;
+
+        default:
+          tipo = false;
+          break;
+      }
+
+      if (!tipo) {
+        return;
+      }
+      await this.axios
+        .get(this.API + "consultarRUC", {
+          params: {
+            type: tipo,
+            numero: document
+          }
+        })
+        .then(res => {
+          datos = res.data;
+        });
+      return datos;
+    },
+    async buscarReminte() {
+      if (
+        this.remitente.docremitente.length != 8 &&
+        this.remitente.docremitente.length != 11
+      ) {
+        return;
+      }
+      let val = await this.buscarDNIRUC(this.remitente.docremitente);
+
+      if (val.razonSocial) {
+        this.remitente.razonSocial = val.razonSocial;
+      } else {
+        this.remitente.razonSocial =
+          val.apellidoMaterno + " " + val.apellidoPaterno + ", " + val.nombres;
+      }
+    },
+    async buscarChofer() {
+      if (
+        this.chofer.documento.length != 8 &&
+        this.chofer.documento.length != 11
+      ) {
+        return;
+      }
+      let val = await this.buscarDNIRUC(this.chofer.documento);
+
+      if (val.razonSocial) {
+        this.chofer.razonSocial = val.razonSocial;
+      } else {
+        this.chofer.razonSocial =
+          val.apellidoMaterno + " " + val.apellidoPaterno + ", " + val.nombres;
+      }
+    },
     focusAutocomplete(ref) {
       this.$refs[ref].handleDoubleClick();
     },
     async setCliente(obj, dni = false) {
+      this.cliente = obj;
+    },
+    async setProveedor(obj, dni = false) {
       console.log(obj);
+      this.proveedor = obj;
     },
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
@@ -155,9 +368,7 @@ export default {
     },
 
     setDocRef(obj) {
-      CodSunatModifica = obj.CodSunat;
-      NroComprobanteModifica = obj.NroComprobante;
-
+      console.log(obj);
       this.axios
         .get(this.API + "venta/detalle/comprobante", {
           params: {
@@ -176,7 +387,7 @@ export default {
             .then(response => {
               if (response.data) {
                 this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
+                this.cliente = response.data;
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
@@ -184,6 +395,7 @@ export default {
             .catch(error => {
               console.log(error);
             });
+          this.productos = [];
           response.data.map(item => {
             item.estadoPxP = false;
             let preciosProd = [];
@@ -194,36 +406,183 @@ export default {
             if (!item.PreciosPorProducto || fPP.length === 4) {
               item.estadoPxP = true;
             }
-            this.add([item, () => {}, false]);
+            this.productos.push(item);
           });
-          //   this.venta.NotaIdMotivo = null;
-          //   this.bloquearInput = true;
-          //   this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
+    },
+    async generarGuiaRemision() {
+      // ===============================
+      // 1️⃣ Validaciones básicas
+      // ===============================
+
+      if (!this.remitente.docremitente) {
+        this.$toasted.show("Documento del remitente requerido.");
+        return;
+      }
+
+      if (!this.remitente.razonSocial) {
+        this.$toasted.show("Razón social del remitente requerida.");
+        return;
+      }
+
+      if (!this.cliente || !this.cliente.Cliente) {
+        this.$toasted.show("Cliente / destinatario requerido.");
+        return;
+      }
+
+      if (!this.ubigeoorigen) {
+        this.$toasted.show("Ubigeo de origen requerido.");
+        return;
+      }
+
+      if (!this.ubigeodestino) {
+        this.$toasted.show("Ubigeo de destino requerido.");
+        return;
+      }
+
+      if (!this.direccionorigen) {
+        this.$toasted.show("Dirección de origen requerida.");
+        return;
+      }
+
+      if (!this.direcciondestino) {
+        this.$toasted.show("Dirección de destino requerida.");
+        return;
+      }
+
+      if (!this.guiaremision) {
+        this.$toasted.show("Número de guía de remisión requerido.");
+        return;
+      }
+
+      if (!this.motivo) {
+        this.$toasted.show("Motivo de traslado requerido.");
+        return;
+      }
+
+      if (!this.modalidad) {
+        this.$toasted.show("Modalidad de transporte requerida.");
+        return;
+      }
+
+      if (!this.productos || this.productos.length === 0) {
+        this.$toasted.show(
+          "Debe registrar al menos un producto para el traslado."
+        );
+        return;
+      }
+
+      // ===============================
+      // 2️⃣ Reglas SUNAT (lógica negocio)
+      // ===============================
+
+      // ❌ Motivo no válido para transporte privado
+      if (this.modalidad === "02" && this.motivo === "09") {
+        this.$toasted.show(
+          "El motivo de traslado no es válido para transporte privado."
+        );
+        return;
+      }
+
+      // ✔️ Traslado entre establecimientos (motivo 04)
+      // El destinatario debe ser la misma empresa (mismo RUC/DNI)
+      if (this.motivo === "04") {
+        if (this.cliente.DniRuc !== this.remitente.docremitente) {
+          this.$toasted.show(
+            "En traslado entre establecimientos, el destinatario debe ser la misma empresa."
+          );
+          return;
+        }
+      }
+
+      // ✔️ Transporte público → proveedor obligatorio
+      if (this.modalidad === "01") {
+        if (Object.keys(this.proveedor).length == 0) {
+          this.$toasted.show(
+            "Debe registrar proveedor cuando la modalidad es transporte público."
+          );
+          return;
+        }
+      }
+
+      // ❌ Transporte privado → NO proveedor
+      if (
+        this.modalidad === "02" &&
+        Object.keys(this.proveedor).length > 0
+      ) {
+        this.$toasted.show(
+          "No debe registrar proveedor cuando el transporte es privado."
+        );
+        return;
+      }
+
+      // ✔️ Transporte privado → chofer y vehículo obligatorios
+      if (this.modalidad === "02") {
+        if (
+          !this.chofer.documento ||
+          !this.chofer.razonSocial ||
+          !this.chofer.licencia ||
+          !this.chofer.placa
+        ) {
+          this.$toasted.show(
+            "Para transporte privado debe registrar chofer y vehículo."
+          );
+          return;
+        }
+      }
+
+      // ===============================
+      // 3️⃣ Armado del JSON final
+      // ===============================
+
+      const data = {
+        tipoGuia: "09", // GRE REMITENTE
+        cliente: { ...this.cliente },
+        proveedor: { ...this.proveedor },
+        remitente: { ...this.remitente },
+        chofer: this.modalidad === "02" ? { ...this.chofer } : null,
+        proveedor: this.modalidad === "01" ? this.proveedor : null,
+        productos: { ...this.productos },
+        ubigeoorigen: this.ubigeoorigen,
+        ubigeodestino: this.ubigeodestino,
+        direccionorigen: this.direccionorigen,
+        direcciondestino: this.direcciondestino,
+        fecha: this.fecha,
+        guiaremision: this.guiaremision,
+        motivo: this.motivo,
+        modalidad: this.modalidad
+      };
+
+      // ===============================
+      // 4️⃣ Envío al backend
+      // ===============================
+
+      try {
+        const res = await this.axios.post(
+          `${this.API}/guia-remision-remitente`,
+          data
+        );
+
+        this.$toasted.show("Guía de Remisión generada correctamente.");
+        console.log(res.data);
+
+        return res.data;
+      } catch (error) {
+        console.error(error);
+        this.$toasted.show(
+          "Error al generar la guía de remisión. Verifique los datos."
+        );
+      }
     }
   }
 };
 </script>
 
 <style>
-.clsFormulario {
-  border: 1px solid #bdbdbd;
-  border-radius: 25px;
-  padding: 5% 5%;
-}
 .dvTitle {
   text-align: center;
-  /* border: 1px solid blue; */
-}
-
-.spnTitle {
-  min-width: 400px !important;
-}
-.dvTitle .spnTitle {
-  text-align: center;
-  border: 1px solid #bdbdbd;
-  background: #ffffff;
-  padding: 2% 25%;
-  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 2%;
 }
 </style>
