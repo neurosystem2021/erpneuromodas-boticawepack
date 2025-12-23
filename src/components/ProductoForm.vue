@@ -285,6 +285,11 @@
             <b-form-select v-if="producto.IdOfertaCategoria!=null" v-model="producto.PosOferta" :options="itemsPosOferta" class="mb-3" size="md" required/>
           </b-form-group>
 
+           <b-form-group>
+              <label>Precio APP: </label>
+              <input type="number" v-model="producto.PrecioApp" class="form-control">
+          </b-form-group>
+
           <b-form-group v-if="false">
             <label>2da Descripción:</label>
             <b-form-textarea 
@@ -640,6 +645,7 @@ export default {
               this.producto.IdOfertaCategoria = newVal.IdOfertaCategoria;
               this.producto.MostrarApp = newVal.MostrarApp;
               this.producto.PosOferta = newVal.PosOferta;
+              this.producto.PrecioApp = newVal.PrecioApp;
               this.producto.TienePresentacion = newVal.TienePresentacion;
               this.producto.PorcentajeLiquidacion =
                 newVal.PorcentajeLiquidacion;
@@ -897,6 +903,7 @@ export default {
         PorcentajeUtilidad: 0,
         ControlaStockMinimo: 0,
         ControlaStock: 1,
+        PrecioApp: 0,
         PosOferta: 10000,
         MostrarApp: 0,
         StockMinimo: 0,
