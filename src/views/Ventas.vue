@@ -2180,7 +2180,9 @@ export default {
         this.loading = false;
         return;
       }
-      if (productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
+      if (
+        venta.tipoVenta.IdTipoDoc != 12 &&
+        productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
         this.$swal({
           position: "center",
           icon: "info",
