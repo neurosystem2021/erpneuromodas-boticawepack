@@ -346,7 +346,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Yape/Plin</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -369,7 +369,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
