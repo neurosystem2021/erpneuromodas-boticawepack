@@ -345,13 +345,42 @@
           </div>
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
-
+          
           <div style="display: flex; justify-content: space-evenly; align-items: center;">
+            <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+            <b-popover  placement="right" :target="'popover-lote' + data.index" :title="productos[data.index].Producto" triggers="focus">
+              <div style="text-align:center">
+                <b-form-select v-if="!isNota"
+                  style="width: 100%; text-align: left !important;"
+                  :disabled="bloquearInput?true:false"
+                  @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                  v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
+                </b-form-select>
+                <br>
+                <div class="text-left">
+                  Stock de Lote: <b>{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</b> 
+                </div>
+                <div class="text-left">
+                  Nro. Factura: <b>{{ productos[data.index].SerieNumero }}</b>
+                </div>
+                <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+                <div class="text-left">
+                  Registro Sanitario: <b>{{ productos[data.index].Registro }}</b> 
+                </div>
+                  
+                <!--<div style="text-align:center;" v-if="!isNota">
+                      <small style="font-size:14px;">Stock de lote: <span style="font-weight:bold;"></span> -  D: <span style="font-weight:bold; text-transform:uppercase"></span></small><br />
+                </div>-->
+                
+              </div>
+            </b-popover>
           <b-form-select v-if="!isNota"
             style="width: 135px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+
+            
             <div style="width: 135px;">
               <div v-if="!isNota">
               <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small>
@@ -485,6 +514,7 @@ export default {
       indexProdSelect: null,
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoSelect: {},
+      movimientoLotes: {},
       productoNombre: "",
       productoUrl: "",
       indexPos: null
@@ -561,7 +591,7 @@ export default {
           { key: "subtotal", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
-          { key: 'lote', label: 'Lote' },
+          { key: "lote", label: "Lote" },
           { key: "precioVenta", label: "Precio venta" },
           { key: "total", label: "Total", variant: "danger" },
           { key: "fechavencimiento", label: "Vencimiento" },
@@ -861,6 +891,9 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+    abrirLotes(target) {
+      //this.$refs.popover.$emit('open')
     },
     loadBarcode(e) {
       if (e) {

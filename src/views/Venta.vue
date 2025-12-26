@@ -164,6 +164,34 @@
                      
                      
                   </template>
+                  <template slot="movimiento" slot-scope="data">
+                      <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+                      <b-popover  placement="right" :target="'popover-lote' + data.index" :title="data.item.Producto" triggers="focus">
+                        <div style="text-align:center">
+                          <b-form-select v-if="!isNota[index]"
+                            style="width: 100%; text-align: left !important;"
+                            :disabled="bloquearInput?true:false"
+                            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                            v-model="data.item.hashMovimiento"
+                            :options="movimientoLotes[data.item.IdProducto]"
+                             text-field="Lote"
+                          >
+                           
+                          </b-form-select>
+                          <br>
+                          <div class="text-left">
+                            Stock de Lote: <b>{{ ((data.item.stockMovimiento || 0 )/(data.item.cantidadPress || 1)).toFixed(2) }}</b> 
+                          </div>
+                          <div class="text-left">
+                            Nro. Factura: <b>{{ data.item.SerieNumero }}</b>
+                          </div>
+                          <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota" v-html="data.item.fechaVenMovimiento"></div>
+                          <div class="text-left">
+                            Registro Sanitario: <b>{{ data.item.Registro }}</b> 
+                          </div>
+                        </div>
+                      </b-popover>
+                  </template>
                   <template slot="cantidad" slot-scope="data">
                     <input
                       v-model="data.item.cantidad"
@@ -1003,7 +1031,8 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "Producto", thStyle: { width: "40%" } },
+        { key: "movimiento", label: "" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
@@ -1151,6 +1180,7 @@ export default {
       index: 0,
       mostrar: {},
       mostrarOp: {},
+      movimientoLotes: {},
       cantidadInput: "",
       objProd: {},
       capturaIndex: null
@@ -1185,6 +1215,168 @@ export default {
     this.$socket.disconnect();
   },
   methods: {
+    abrirLotes() {},
+    changeMovimiento(hash, idProducto, index) {
+      console.log('movimientoLotes',this.movimientoLotes);
+      console.log('hash',hash);
+      if (hash) {
+        // Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Stock;
+        let serieNumero = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).SerieNumero;
+        let IdLote = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).IdLote;
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Lote;
+        let Registro = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).Registro;
+        console.log(Registro);
+        if (stock) {
+          // this.ventas[this.ventaActiva].productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "stockMovimiento",
+              stock
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "SerieNumero",
+              serieNumero
+            );
+          });
+        } else {
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "stockMovimiento",
+              0
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "SerieNumero",
+              "----"
+            );
+          });
+        }
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).FechaVen;
+        let hoy = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en4meses = this.$moment()
+          .add(4, "months")
+          .unix();
+        let style = "bg-success";
+        if (fechaVenUnix && fechaVenUnix < hoy) {
+          style = "bg-danger text-white";
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
+          style = "bg-warning";
+        }
+        if (fechaVen) {
+          this.$nextTick(() => {
+            if (!this.isVentas) {
+              if (this.movTipo != 0 && this.movTipo != undefined) {
+                this.ventas[this.ventaActiva].productos[
+                  index
+                ].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD");
+                this.ventas[this.ventaActiva].productos[index].IdLote = IdLote;
+                this.ventas[this.ventaActiva].productos[index].Lote = Lote;
+                this.ventas[this.ventaActiva].productos[
+                  index
+                ].Registro = Registro;
+                //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
+                //Vue.set(this.ventas[this.ventaActiva].productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
+              }
+            } else {
+              this.ventas[this.ventaActiva].productos[index].Lote = Lote;
+              this.ventas[this.ventaActiva].productos[
+                index
+              ].Registro = Registro;
+              try {
+                this.ventas[this.ventaActiva].productos[
+                  index
+                ].FechaVen = this.$moment(fechaVen).format("YYYY-MM-DD");
+              } catch (error) {}
+            }
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "fechaVenMovimiento",
+              `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${this.$moment(
+                fechaVen
+              ).format("DD-MM-YYYY")}</small>`
+            );
+          });
+        } else {
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "fechaVenMovimiento",
+              ""
+            );
+          });
+        }
+        // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+
+    loadMovimientoLotes($idProducto) {
+      this.movimientoLotes[$idProducto] = [];
+      this.axios
+        .get(
+          this.API +
+            "movimientolotes/" +
+            $idProducto +
+            "/" +
+            this.ventas[this.ventaActiva].almacen.IdAlmacen
+        )
+        .then(response => {
+          if (response.data.length > 0) {
+            let indexProducto = this.ventas[
+              this.ventaActiva
+            ].productos.findIndex(p => p.IdProducto === $idProducto);
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a, b) => {
+              return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
+                ? a
+                : b;
+            });
+
+            this.$nextTick(() => {
+              Vue.set(
+                this.ventas[this.ventaActiva].productos[indexProducto],
+                "hashMovimiento",
+                primeroVencer.hashMovimiento
+              );
+              this.changeMovimiento(
+                primeroVencer.hashMovimiento,
+                $idProducto,
+                indexProducto
+              );
+            });
+
+            this.movimientoLotes[$idProducto] = response.data.map(l => ({
+              value: l.hashMovimiento,
+              text: l.Lote,
+              Stock: l.Stock,
+              IdLote: l.IdLote,
+              Lote: l.Lote,
+              FechaVen: l.FechaVen,
+              SerieNumero: l.Serie + "-" + l.Numero,
+              Registro: l.Registro
+            }));
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     conectarSocket() {
       if (!this.$socket.connected) {
         console.log("🔗 Conectando socket...");
@@ -1792,6 +1984,7 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
+      this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
@@ -2219,7 +2412,7 @@ export default {
       }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.productos;
+      // venta.productos = this.ventas[this.ventaActiva].productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
@@ -2436,7 +2629,7 @@ export default {
       // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.productos;
+      // venta.productos = this.ventas[this.ventaActiva].productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
