@@ -263,6 +263,7 @@
                     <b-row>
                       <b-col cols="12" md="4" offset-md="4" lg="2" offset-lg="5">
                         <b-button class="btnAction my-2" style="font-size: 1.5rem !important;" size="lg" @click="guardarVenta" :disabled="inProgress" variant="success" ><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Pagar</b-button>
+                        <!-- <b-button class="btnAction my-2" style="font-size: 1.5rem !important;" size="lg" @click="generarQR"  variant="success" ><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Genear QR</b-button> -->
                       </b-col>
                     </b-row>
                   </b-col>
@@ -697,6 +698,12 @@
               </tbody>
             </table>
       </b-modal>
+      <b-modal v-model="modalQR" hide-footer hide-header>
+        <div class="text-center">
+      <img v-if="qrUrl" :src="qrUrl" width="260" />
+      <p class="mt-2">Monto: S/ {{ totalCart }}</p>
+    </div>
+      </b-modal>
     </b-container>
 </template>
 <script>
@@ -710,6 +717,7 @@ import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
 import Movimiento from "@/components/Movimiento";
+import QRpagoYape from "@/components/QRpagoYape";
 import Swal from "sweetalert2";
 export default {
   beforeMount() {
@@ -737,6 +745,7 @@ export default {
   },
   data() {
     return {
+      modalQR: false,
       cantidadInput: "",
       touchModal: false,
       cargando: false,
@@ -829,6 +838,7 @@ export default {
       },
       pagosPendientes: 0,
       fechaUltPago: "",
+      qrUrl: "",
       listeners: {
         nuevoPedido: null,
         connect: null,
@@ -941,6 +951,218 @@ export default {
       add: "agregarProducto",
       actualizarTotal: "actualizarTotalCart"
     }),
+    async generarQR() {
+      this.venta = {};
+      this.venta = this.ventas[this.index];
+      // evt.preventDefault();
+
+      this.inProgress = true;
+      let totalPagos = 0;
+      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+        ? 0
+        : parseFloat(this.venta.pago.efectivo.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+        ? 0
+        : parseFloat(this.venta.pago.visa.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        ? 0
+        : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.yape.monto))
+        ? 0
+        : parseFloat(this.venta.pago.yape.monto);
+
+      if (
+        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+          ? 0
+          : parseFloat(this.venta.pago.efectivo.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.visa.monto))
+          ? 0
+          : parseFloat(this.venta.pago.visa.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+          ? 0
+          : parseFloat(this.venta.pago.mastercard.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago Transferencia no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
+      if (
+        (isNaN(parseFloat(this.venta.pago.yape.monto))
+          ? 0
+          : parseFloat(this.venta.pago.yape.monto)
+        ).toFixed(2) < 0
+      ) {
+        this.$toasted.show(
+          "El metodo de pago YAPE / PLIN no puede ser negativo"
+        );
+        this.inProgress = false;
+        return;
+      }
+
+      if (!this.venta.EsCredito) {
+        if (
+          parseFloat(this.venta.totalCart).toFixed(2) !=
+          parseFloat(totalPagos).toFixed(2)
+        ) {
+          this.$toasted.show("Los pagos no coinciden con la venta");
+          this.inProgress = false;
+          return;
+        }
+      }
+
+      if (!this.venta.cliente.DniRuc) {
+        this.$toasted.show("Debe seleccionar un cliente.");
+        this.inProgress = false;
+        return;
+      }
+
+      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
+      if (!esNumerico) {
+        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
+        this.inProgress = false;
+        return;
+      }
+
+      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
+      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+        this.inProgress = false;
+        return;
+      }
+      // validar serie
+      let prods = this.venta.productos;
+      // let val = !prods.some(v => v.Series.length > 0 && !!v.IdProductoSerie);
+
+      // if (val) {
+      //   this.$toasted.show(
+      //     "Debe Seleccionar la serie del produto. Verifique."
+      //   );
+      //   this.inProgress = false;
+      //   return;
+      // }
+      //Nota de Creadito
+      if (
+        this.venta.tipoVenta.CodSunat == "07" ||
+        this.venta.tipoVenta.CodSunat == "08"
+      ) {
+        if (
+          !this.venta.CodSunatModifica ||
+          !this.venta.NroComprobanteModifica
+        ) {
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+          this.inProgress = false;
+          return;
+        }
+        if (!this.venta.NotaIdMotivo) {
+          this.$toasted.show("Debe seleccionar un Motivo");
+          this.inProgress = false;
+          return;
+        }
+        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.venta.NotaIdMotivo
+        )[0].text;
+      }
+
+      if (!this.venta.productos.length) {
+        this.$toasted.show("No hay productos para vender");
+        this.inProgress = false;
+        return;
+      }
+
+      // NO PERMITE CANTIDAD Y PRECIOS 0
+      let sinStock = 0;
+      let totalCero = 0;
+      let menosUtilidad = 0;
+      this.venta.productos.forEach(pro => {
+        if (
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA" &&
+          (pro.stock <= 0 || parseFloat(pro.cantidad) > pro.stock) &&
+          pro.EsPadre == 0
+        ) {
+          sinStock += 1;
+        }
+
+        if (parseFloat(pro.total) <= 0) {
+          totalCero += 1;
+        }
+
+        /*if ((!(1/(pro.PorcentajeUtilidad*0)===1/0) || (pro.PorcentajeUtilidad=='')) && (pro.CodigoBarra !== 'COSTODELIVERY') && (pro.CodigoBarra !== 'MANODEOBRA')) {
+                    menosUtilidad += 1
+                }*/
+
+        if (
+          parseFloat(pro.precio) - pro.PrecioCosto < 0 &&
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA"
+        ) {
+          menosUtilidad += 1;
+        }
+      });
+
+      if (this.venta.tipoVenta.CodSunat != "99") {
+        if (menosUtilidad >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+          this.$toasted.error(
+            "No se puede vender un producto con ganancia negativa"
+          );
+          this.inProgress = false;
+          return;
+        }
+      }
+      if (sinStock >= 1 && this.venta.tipoVenta.CodSunat != "07") {
+        this.$toasted.error("No se puede vender un producto sin stock");
+        this.inProgress = false;
+        return;
+      }
+      if (this.venta.tipoVenta.CodSunat != "99") {
+        if (totalCero >= 1) {
+          this.$toasted.error("No se puede enviar un producto en S/. 0.00");
+          this.inProgress = false;
+          return;
+        }
+
+        if (this.totalCart <= 0) {
+          this.$toasted.show("La venta en S/. 0.00 no está permitido");
+          this.inProgress = false;
+          return;
+        }
+      }
+
+      if (!this.validarDocRefOfetar()) {
+        this.inProgress = false;
+        return;
+      }
+
+      let IdOfertas = this.generarOfertas();
+      this.modalQR = true;
+      this.qrUrl = null;
+      const res = await this.axios.post(this.API + "/openpay/qr", {
+        monto: this.ventas[this.index].totalCart,
+        pedido:
+          this.ventas[this.index].Serie + "-" + this.ventas[this.index].Numero
+      });
+
+      // this.qrUrl = res.data.payment_method.barcode_url;
+    },
     abrirModal() {
       this.touchModal = true;
     },
@@ -2207,7 +2429,8 @@ export default {
     PreOrdenLista,
     Proformas,
     Movimiento,
-    DeliveryModal
+    DeliveryModal,
+    QRpagoYape
   }
 };
 </script>
