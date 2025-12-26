@@ -205,13 +205,43 @@
             placeholder="Flete"></b-form-input>
         </template>-->
         
-        <!--<template slot="lote" slot-scope="data">
+        <template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
             type="text"
             min="0"
             placeholder="Lote"></b-form-input>
-        </template>-->
+        </template>
+
+         <template slot="Lote" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Lote"
+            type="text"
+            required
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Registro" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Registro"
+            type="text"
+            required
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Presentacion" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Presentacion"
+            type="text"
+            style="text-align:center; font-weight:bold; font-size: 0.8rem; width: 140px;"
+            autocomplete="false"
+            readonly
+            ></b-form-input>
+        </template>
         
         <template slot="manoobra" slot-scope="data" v-if="false">
           <input  :disabled="bloquearInput?true:false"
@@ -531,7 +561,7 @@ export default {
           { key: "subtotal", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
-          // { key: 'lote', label: 'Lote' },
+          { key: 'lote', label: 'Lote' },
           { key: "precioVenta", label: "Precio venta" },
           { key: "total", label: "Total", variant: "danger" },
           { key: "fechavencimiento", label: "Vencimiento" },

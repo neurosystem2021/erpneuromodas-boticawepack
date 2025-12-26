@@ -1,5 +1,5 @@
 <template>
-   <div style="padding: 0 12%;">
+   <div style="padding: 0 5%;">
     <Menu v-if="false"></Menu>
     <br />
     <div style="text-align: end;">
@@ -275,6 +275,7 @@ export default {
             class: "text-center centrarTd"
           },
           { key: "cantidad" },
+
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
           { key: "precio", label: "P/U" },
           //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -292,6 +293,9 @@ export default {
             variant: "danger",
             class: "text-center"
           },
+          { key: "Lote", label: "C. Lote", class: "stocksize" },
+          { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
+          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
           { key: "acciones", label: "" }
         ]
       },
