@@ -285,7 +285,7 @@ export default {
     footerTotal() {
       let total = 0;
       if (this.lstReporte.length > 0) {
-        total = this.lstReporte.filter(v => v.Anulado == 0).reduce((sum, reporte) => {
+        total = this.lstReporte.filter(v => v.Anulado == 0 && v.CodSunat != '07').reduce((sum, reporte) => {
           return sum + reporte.Total;
         }, 0);
       }
