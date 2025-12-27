@@ -34,6 +34,10 @@
                       <template slot="verTicket" slot-scope="data">
                         <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
                       </template>
+
+                      <template slot="Total" slot-scope="data">
+                        {{ data.item.Total | moneda }}
+                      </template>
                       
                       <template slot="Eliminar" slot-scope="data">
                         <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-trash"></i></b-button>
@@ -84,7 +88,7 @@ import { mapActions } from 'vuex'
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
                     { key: 'DniRuc', label: 'Documento' }, 'FechaReg', 
-                    { key: 'UsuarioReg', label: 'Empleado' }, 'update', 'ver', 'verTicket','Eliminar' ],
+                    { key: 'UsuarioReg', label: 'Empleado' }, { key: 'Total', label: 'Total' }, 'update', 'ver', 'verTicket','Eliminar' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
