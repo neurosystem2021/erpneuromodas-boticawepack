@@ -154,16 +154,25 @@
       <div class="divTBl">
 
      
-      <b-table small responsive id="tblProductos"  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table 
+            small 
+            responsive 
+            id="tblProductos"
+            striped hover 
+            :items="productos" 
+            :fields="fields" 
+          ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <br>
-          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-button class="OcultarTable" @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
             <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
               <div style="text-align:center">
                 <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
               </div>
             </b-popover>
+          <b-button class="OcultarPC" @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+            
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].estadoPxP == false">
@@ -494,7 +503,6 @@ Vue.use(VueQuagga);
 
 export default {
   mounted() {
-    
     // document.getElementById("txtBarcode").focus();
     this.$nextTick(() => {
       setTimeout(() => {
@@ -1561,7 +1569,26 @@ canvas {
   overflow-x: auto;
   white-space: nowrap;
 }
+.OcultarPC {
+  visibility: hidden;
+}
+
+.OcultarTable {
+   visibility: visible;
+}
+
 @media only screen and (max-width: 1440px) {
+  .cameraBarra {
+    height: 50vh;
+    width: auto;
+  }
+  .OcultarPC {
+    visibility: visible;
+  }
+
+  .OcultarTable {
+    visibility: hidden;
+  }
   #modalCodigoBarra .modal-dialog {
     max-width: 50vw !important;
     max-height: 50vh !important;
@@ -1569,10 +1596,6 @@ canvas {
   .tblProductos {
     width: 720px !important;
     font-size: 1rem !important;
-  }
-  .cameraBarra {
-    height: 50vh;
-    width: auto;
   }
 }
 @media only screen and (max-width: 750px) {
