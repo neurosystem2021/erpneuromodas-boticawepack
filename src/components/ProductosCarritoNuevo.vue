@@ -470,7 +470,7 @@
           </table>
     </b-col>
     <br><br>
-       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+       <b-modal  size="lg" v-model="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
         </div>
@@ -494,10 +494,13 @@ Vue.use(VueQuagga);
 
 export default {
   mounted() {
-    document.getElementById("txtBarcode").focus();
+    
+    // document.getElementById("txtBarcode").focus();
     this.$nextTick(() => {
       setTimeout(() => {
         this.recalcularManoObra();
+        let barCode = document.getElementById("txtBarcode");
+        barCode.focus();
       }, 1000);
     });
     // this.alterarBuscadorProductos()
@@ -505,6 +508,7 @@ export default {
 
   data() {
     return {
+      modalImagen: false,
       productoNombre: "",
       productoUrl: "",
       cantidadInput: "",
@@ -706,7 +710,7 @@ export default {
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
-      this.$refs["modalImagen"].show();
+      this.modalImagen = true;
     },
     bloquearPrecio(data) {
       if (data.disabled) {

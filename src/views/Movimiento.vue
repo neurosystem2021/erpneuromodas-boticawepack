@@ -153,7 +153,7 @@
                       <autocomplete
                         ref="inputMoneda"
                         :url="API + 'monedas'"
-                        initValue="PEN"
+                        initValue="USD"
                         anchor="Moneda"
                         label="writer"
                         placeholder="Moneda"
@@ -280,6 +280,7 @@ export default {
       productosInf: [],
       inProgress: false,
       newRuc: "",
+      tipoCambio: false,
       API: config.API,
       ultimoMovimiento: "",
       imprimirCodigoBarra: false,
@@ -294,7 +295,7 @@ export default {
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false,
-      tipocambio: 3.7,
+      // tipocambio: this.obtnerTipoCambio(),
       gravadaflag: 0,
       igvflag: 0,
       fieldsOrdenCompra: [
@@ -406,9 +407,11 @@ export default {
     },
 
     async obtnerTipoCambio() {
-      await this.axios(this.API + "tipocambio/usd").then(res => {
-        this.tipocambio = res.data;
+      let res = await this.axios(this.API + "tipocambio/usd").then(res => {
+        return res.data;
       });
+      this.movimiento.TipoCambio = res;
+      this.tipoCambio = res;
     },
     imprimirCodigoMulti(evt) {
       evt.preventDefault();
@@ -474,7 +477,7 @@ export default {
         EsCredito: 0,
         alterarProductos: 1,
         FechaVenCredito: "",
-        Moneda: "PEN",
+        Moneda: "USD",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
@@ -490,6 +493,7 @@ export default {
         user: sessionStorage.getItem("User")
       };
     },
+
     onReset(evt) {
       evt.preventDefault();
       /* Reset our form values */
@@ -652,7 +656,11 @@ export default {
               this.$toasted.show(response.data.error);
             } else {
               this.ultimoMovimiento = response.data.hash;
-              this.movimiento = this.initMovimiento();
+              this.obtnerTipoCambio();
+              this.movimiento = {
+                ...this.initMovimiento(),
+                TipoCambio: this.tipoCambio ? this.tipoCambio : 1
+              };
               this.limpiar();
               this.$refs.inputMovimiento.setValue("");
               this.$refs.inputProveedor.setValue("");
