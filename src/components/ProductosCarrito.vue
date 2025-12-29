@@ -782,6 +782,15 @@ export default {
         let serieNumero = this.movimientoLotes[idProducto].find(
           m => m.value === hash
         ).SerieNumero;
+        let IdLote = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).IdLote;
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Lote;
+        let Registro = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).Registro;
+        console.log(Registro);
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -800,14 +809,14 @@ export default {
         ).FechaVen;
         let hoy = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
-        let en5dias = this.$moment()
-          .add(5, "days")
+        let en4meses = this.$moment()
+          .add(4, "months")
           .unix();
         let style = "bg-success";
         if (fechaVenUnix && fechaVenUnix < hoy) {
-          style = "bg-danger";
+          style = "bg-danger text-white";
         }
-        if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
           style = "bg-warning";
         }
         if (fechaVen) {
@@ -817,19 +826,25 @@ export default {
                 this.productos[index].FechaVen = this.$moment(fechaVen).format(
                   "YYYY-MM-DD"
                 );
+                this.productos[index].IdLote = IdLote;
+                this.productos[index].Lote = Lote;
+                this.productos[index].Registro = Registro;
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
-                this.actualizarProd({
-                  Producto: this.productos[index],
-                  Pos: index
-                });
               }
+            } else {
+              this.productos[index].Lote = Lote;
+              this.productos[index].Registro = Registro;
+              try {
+                this.productos[index].FechaVen = this.$moment(fechaVen).format(
+                  "YYYY-MM-DD"
+                );
+              } catch (error) {}
             }
-
             Vue.set(
               this.productos[index],
               "fechaVenMovimiento",
-              `<small style="font-weight:bold" class='venci ${style}'>F. Venci: ${this.$moment(
+              `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${this.$moment(
                 fechaVen
               ).format("DD-MM-YYYY")}</small>`
             );
@@ -1038,6 +1053,7 @@ export default {
         obj,
         () => {
           this.$emit("onAddProducto", obj);
+          this.loadMovimientoLotes(obj.IdProducto);
           this.$toasted.success("Producto añadido correctamente");
         },
         { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
@@ -1048,6 +1064,67 @@ export default {
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
     },
+    loadMovimientoLotes($idProducto) {
+      this.movimientoLotes[$idProducto] = [];
+      this.axios
+        .get(
+          this.API +
+            "movimientolotes/" +
+            $idProducto +
+            "/" +
+            (this.isVentas
+              ? this.idAlmacen
+              : this.movTipo == 0
+                ? this.almacenDestino
+                : this.almacenOrigen)
+        )
+        .then(response => {
+          if (response.data.length > 0) {
+            let indexProducto = this.productos.findIndex(
+              p => p.IdProducto === $idProducto
+            );
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a, b) => {
+              return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
+                ? a
+                : b;
+            });
+
+            this.$nextTick(() => {
+              Vue.set(
+                this.productos[indexProducto],
+                "hashMovimiento",
+                primeroVencer.hashMovimiento
+              );
+              this.changeMovimiento(
+                primeroVencer.hashMovimiento,
+                $idProducto,
+                indexProducto
+              );
+            });
+
+            this.movimientoLotes[$idProducto] = response.data.map(
+              l => (
+                console.log(l),
+                {
+                  value: l.hashMovimiento,
+                  text: l.Lote,
+                  Stock: l.Stock,
+                  IdLote: l.IdLote,
+                  Lote: l.Lote,
+                  FechaVen: l.FechaVen,
+                  SerieNumero: l.Serie + "-" + l.Numero,
+                  Registro: l.Registro
+                }
+              )
+            );
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     setProductoCant(prod) {
       let obj = { ...this.objProd };
       obj.Presentacion = prod.nombre;
