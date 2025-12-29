@@ -60,33 +60,33 @@
 </template>
 
 <script>
-import Menu from '@/components/Menu'
-import CarritoConfrontacion from '@/components/CarritoConfrontacion'
-import { mapState, mapActions } from 'vuex'
-import config from '@/store/config.js'
+import Menu from "@/components/Menu";
+import CarritoConfrontacion from "@/components/CarritoConfrontacion";
+import { mapState, mapActions } from "vuex";
+import config from "@/store/config.js";
 
 export default {
-  mounted () {
+  mounted() {
     this.getCategorias();
   },
-  data () {
+  data() {
     return {
       inProgress: false,
       API: config.API,
       carrito: {
-          fields: [
-              //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-              //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
-              { key: 'CodigoBarra', label:'Codigo' },
-              { key: 'Producto' },
-              { key: 'cantidad' , label:'Cantidad Fisica' },
-              { key: 'acciones', label: ''}
-          ]
+        fields: [
+          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
+          //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: "CodigoBarra", label: "Codigo" },
+          { key: "Producto" },
+          { key: "cantidad", label: "Cantidad Fisica" },
+          { key: "acciones", label: "" }
+        ]
       },
-      almacen:{},
-      idCategoria:0,
-      categoriasSelect:[ { value: 0, text: 'SELECCIONE' }]
-    }
+      almacen: {},
+      idCategoria: 0,
+      categoriasSelect: [{ value: 0, text: "SELECCIONE" }]
+    };
   },
   computed: {
     ...mapState({
@@ -97,83 +97,90 @@ export default {
   },
   methods: {
     ...mapActions({
-      buscarProveedores: 'buscarProveedores',
-      buscarAlmacenes: 'buscarAlmacenes',
-      limpiar: 'limpiarCarrito',
-      obtenerStok: 'obtenerStock',
-      add:'agregarProducto'
+      buscarProveedores: "buscarProveedores",
+      buscarAlmacenes: "buscarAlmacenes",
+      limpiar: "limpiarCarrito",
+      obtenerStok: "obtenerStock",
+      add: "agregarProducto"
     }),
-    afe (e) {
-return false
+    afe(e) {
+      return false;
     },
     async confrontarTodo() {
-    try {
-      const response = await this.axios.get(`${this.API}reporte/confrontacion/total`, {
-        params: { idAlmacen: this.almacen.IdAlmacen }
-      });
+      try {
+        const response = await this.axios.get(
+          `${this.API}reporte/confrontacion/total`,
+          {
+            params: { idAlmacen: this.almacen.IdAlmacen }
+          }
+        );
 
-      if (response.data && response.data.file) {
-        const fileUrl = window.location.origin + response.data.file;
-        window.open(fileUrl, "_blank");
-        console.log(response.data);
-      } else {
-        this.$toasted.show('No se pudo generar el reporte.');
-      }
-    } catch (error) {
-      this.$toasted.show('Error al generar el reporte.');
-      console.error(error);
-    }
-  },
-    getCategorias(){
-      this.categoriasSelect = []
-      this.categoriasSelect.push({ value: 0, text: 'SELECCIONE' })
-      this.axios.get(this.API + 'categorias?limit=300&q=').then(r => {
-        if (r.data) {
-          r.data.map(cat=>{
-            this.categoriasSelect.push({ value: cat.IdProductoCategoria, text: cat.ProductoCategoria })
-          })
+        if (response.data && response.data.file) {
+          const fileUrl = window.location.origin + response.data.file;
+          window.open(fileUrl, "_blank");
+          console.log(response.data);
+        } else {
+          this.$toasted.show("No se pudo generar el reporte.");
         }
-      })
+      } catch (error) {
+        this.$toasted.show("Error al generar el reporte.");
+        console.error(error);
+      }
     },
-    setCategoria(val){
-      this.axios.get(this.API + 'productos/categoria/carga', {
-            params: {
-                IdCategoria: val,
-            }
-        }).then((response) => {
-            this.idCategoria = 0
-            response.data.map((item) => {
-                this.add([item, () => {
-              }, { setPrecioCosto: true }, false, false])
-            })              
+    getCategorias() {
+      this.categoriasSelect = [];
+      this.categoriasSelect.push({ value: 0, text: "SELECCIONE" });
+      this.axios.get(this.API + "categorias?limit=300&q=").then(r => {
+        if (r.data) {
+          r.data.map(cat => {
+            this.categoriasSelect.push({
+              value: cat.IdProductoCategoria,
+              text: cat.ProductoCategoria
+            });
+          });
+        }
+      });
+    },
+    setCategoria(val) {
+      this.$store.state.cart.productos = [];
+      this.axios
+        .get(this.API + "productos/categoria/carga", {
+          params: {
+            IdCategoria: val
+          }
         })
+        .then(response => {
+          this.idCategoria = 0;
+          response.data.map(item => {
+            this.add([item, () => {}, { setPrecioCosto: true }, false, false]);
+          });
+        });
     },
-    onReset (evt) {
+    onReset(evt) {
       evt.preventDefault();
     },
-    setAlmacenOrigen (obj) {
-      this.almacen = obj
+    setAlmacenOrigen(obj) {
+      this.almacen = obj;
       /*this.obtenerStok({
         IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
       })*/
     },
-    guardarMovimiento (evt) {
+    guardarMovimiento(evt) {
       evt.preventDefault();
-      this.inProgress = true
+      this.inProgress = true;
 
-      if(!this.productos.length) {
-          this.$toasted.show('No ha seleccionado ningun producto')
-          this.inProgress = false            
-          return          
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
+        return;
       }
 
-      let faltaCantidad = false
+      let faltaCantidad = false;
       this.productos.forEach((prod, index) => {
-
-        if(!(prod.cantidad > 0)){
-          faltaCantidad = true
+        if (!(prod.cantidad > 0)) {
+          faltaCantidad = true;
         }
-      })
+      });
 
       /*if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
@@ -181,92 +188,106 @@ return false
         return;
       }*/
 
-      this.axios.post(this.API + 'reporte/confrontacion', {
-      Productos: this.productos.map(p => ({
-        IdProducto: p.IdProducto,
-        cantidad: p.cantidad > 0 ? p.cantidad : 0
-      })),
-      IdProductos: this.productos.map(prod => prod.IdProducto),
-      IdAlmacen: this.almacen.IdAlmacen,
-    })
-    .then((response) => {
-      if (response.data.error) {
-        this.$toasted.show(response.data.error);
-      } else {
-        this.limpiar();
-        if (this.$refs.inputAlmacenOrigen) {
-          this.$refs.inputAlmacenOrigen.setValue('');
-        }
-        this.almacen = {};
-        this.$toasted.success('Reporte de confrontación generado', { duration: 3000 });
+      this.axios
+        .post(this.API + "reporte/confrontacion", {
+          Productos: this.productos.map(p => ({
+            IdProducto: p.IdProducto,
+            cantidad: p.cantidad > 0 ? p.cantidad : 0
+          })),
+          IdProductos: this.productos.map(prod => prod.IdProducto),
+          IdAlmacen: this.almacen.IdAlmacen
+        })
+        .then(response => {
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.limpiar();
+            if (this.$refs.inputAlmacenOrigen) {
+              this.$refs.inputAlmacenOrigen.setValue("");
+            }
+            this.almacen = {};
+            this.$toasted.success("Reporte de confrontación generado", {
+              duration: 3000
+            });
 
-        // Abrir el archivo en una nueva pestaña
-        if (response.data.file) {
-          window.open(response.data.file, "_blank");
-        }
-      }
-      this.inProgress = false;
-    })
-    .catch((error) => {
-      this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo');
-      this.inProgress = false;
-    });
-    },
-    preConfrontar(){
-      this.inProgress = true
-
-      if(!this.productos.length) {
-          this.$toasted.show('No ha seleccionado ningun producto',{duration:3000})
-          this.inProgress = false            
-          return          
-      }
-      if(!(this.almacen.IdAlmacen>0)){
-          this.$toasted.show('No ha seleccionado ningun almacen',{duration:3000})
-          this.inProgress = false            
-          return  
-      }
-
-      this.axios.post(this.API + 'reporte/preconfrontacion', {
-        Productos: this.productos.map((p)=>({Producto:p.Producto,CodigoBarra:p.CodigoBarra,cantidad:(p.cantidad>0?p.cantidad:0)})),
-        IdAlmacen: this.almacen.IdAlmacen,
-      })
-      .then((response) => {
-        if (response.data.error) {
-          this.$toasted.show(response.data.error)
-        } else {
-          this.limpiar()
-          if(this.$refs.inputAlmacenOrigen){
-            this.$refs.inputAlmacenOrigen.setValue('')
+            // Abrir el archivo en una nueva pestaña
+            if (response.data.file) {
+              window.open(response.data.file, "_blank");
+            }
           }
-          this.almacen = {}
-          this.$toasted.success('Reporte de preconfrontacion generado',{duration:3000})   
-          document.open();
-          document.write(response.data);
-          document.close(); 
-          setTimeout(() => {
-              document.location.reload();
-          }, 1500);
-        }
-        this.inProgress = false
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        this.inProgress = false
-      })
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
     },
-    focusAutocomplete (ref) {
+    preConfrontar() {
+      this.inProgress = true;
+
+      if (!this.productos.length) {
+        this.$toasted.show("No ha seleccionado ningun producto", {
+          duration: 3000
+        });
+        this.inProgress = false;
+        return;
+      }
+      if (!(this.almacen.IdAlmacen > 0)) {
+        this.$toasted.show("No ha seleccionado ningun almacen", {
+          duration: 3000
+        });
+        this.inProgress = false;
+        return;
+      }
+
+      this.axios
+        .post(this.API + "reporte/preconfrontacion", {
+          Productos: this.productos.map(p => ({
+            Producto: p.Producto,
+            CodigoBarra: p.CodigoBarra,
+            cantidad: p.cantidad > 0 ? p.cantidad : 0
+          })),
+          IdAlmacen: this.almacen.IdAlmacen
+        })
+        .then(response => {
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.limpiar();
+            if (this.$refs.inputAlmacenOrigen) {
+              this.$refs.inputAlmacenOrigen.setValue("");
+            }
+            this.almacen = {};
+            this.$toasted.success("Reporte de preconfrontacion generado", {
+              duration: 3000
+            });
+            document.open();
+            document.write(response.data);
+            document.close();
+            setTimeout(() => {
+              document.location.reload();
+            }, 1500);
+          }
+          this.inProgress = false;
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.inProgress = false;
+        });
+    },
+    focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+      this.$refs[ref].handleDoubleClick();
     }
   },
   components: {
     Menu,
     CarritoConfrontacion
   }
-}
+};
 </script>
 <style>
-  .input-group {
-    /*margin: 0.25rem 0 !important;*/
-  }
+.input-group {
+  /*margin: 0.25rem 0 !important;*/
+}
 </style>
