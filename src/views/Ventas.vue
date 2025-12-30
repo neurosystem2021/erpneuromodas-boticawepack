@@ -1,5 +1,5 @@
 <template>
-    <b-container fluid class="my-0 py-0">
+    <b-container fluid class="my-0 py-0 ">
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
@@ -36,6 +36,7 @@
                       :on-select="setTipoVenta"
                       :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
                       :classes="{input: 'form-control'}"
+                     
                       >
                     </autocomplete>
                     </b-input-group>
@@ -194,21 +195,22 @@
                         <b-input-group>
                           <b-input-group-append>
                             <autocomplete
-                                :ref="`autocompleteProducto${index}`"
-                                :id="`autocompleteProducto${index}`"
-                                :url="APIProductos"
-                                :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
-                                :onShouldRenderChild="renderChild"
-                                anchor="Producto"
-                                label="writer"
-                                placeholder="Agregar Producto"
-                                :on-select="setProducto"
-                                :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
-                                :classes="{input: 'form-control'}"
-                                @keydown.native.tab.prevent="irCodeBar"
-                                class="txtAutoComplete"
-                               >
-                            </autocomplete>
+                              :ref="`autocompleteProducto${index}`"
+                              :id="`autocompleteProducto${index}`"
+                              :url="APIProductos"
+                              :customParams="{ sortBy: isVentas ? 'stock' : 'IdProducto', sortDesc: 1, limit: 50 }"
+                              :min-chars="1"
+                              :debounce="0"
+                              :limit="50"
+                              :onShouldRenderChild="renderChild"
+                              anchor="Producto"
+                              label="writer"
+                              placeholder="Agregar Producto"
+                              :on-select="setProducto"
+                              :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
+                              :classes="{ input: 'form-control' }"
+                              class="txtAutoComplete"
+                            />
                             <b-button variant="primary" @click="startRecognition">
                               <i class="fas fa-microphone"></i>
                             </b-button>
@@ -269,13 +271,14 @@
                         v-model="data.item.cantidad"
                         type="number"
                         style="text-align:center; font-weight:bold; width: 90px;"
-                      autocomplete="false"
-                      :id="`input${data.index}`"
-                      :disabled="data.item.esPresentacion"
-                      @input="metodoPagoCambio(1)"
-                       @focus="abrirModalTouch(data.index, 1)"
-                       class="form-control"
-                       @keydown.enter="irBusquedaProducto"
+                        autocomplete="false"
+                        :id="`input${data.index}${data.index}`"
+                        :disabled="data.item.esPresentacion"
+                        @input="metodoPagoCambio(1)"
+                        @focus="abrirModalTouch(data.index, 1)"
+                        class="form-control"
+                        @keydown.enter="irCodeBar"
+                        @keydown.tab.prevent="irCodeBar"
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -1293,7 +1296,7 @@ export default {
     this.loadClienteVarios();
     this.$nextTick(() => {
       setTimeout(() => {
-        let inputElement = `autocompleteProducto${this.ventaActiva}`;
+        let inputElement = `txtCodeBar${this.ventaActiva}`;
         let autocompleteInput = document.getElementById(inputElement);
         autocompleteInput.focus();
       }, 500);
@@ -1692,6 +1695,7 @@ export default {
     renderChild(data) {
       if (this.ventas[this.ventaActiva].almacen.IdAlmacen) {
         let styleStock = "";
+
         if (data.stock <= 0) {
           styleStock = "table-danger";
         } else {
@@ -1701,88 +1705,90 @@ export default {
         if (data.EsPadre == 1) {
           styleStock = "";
         }
-        // console.log(data);
+
         return `
-        <style>
+          <style>
+          .autocomplete-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+          }
+
           #table-render {
             font-size: 13px;
-            margin-bottom: 5px;
-            margin-top: 5px;
+            width: 1200px;
+            text-align: center;
+            margin: 0;
           }
-          #table-render td, #table-render th {
+
+          #table-render td, 
+          #table-render th {
             border: 1px solid #eaeaea;
-          }
-          #table-render td, #table-render th {
             color: #000000 !important;
           }
-          .imagen{
+
+          .imagen {
             width: 100%;
-            heigth: 100%;
           }
-          .imagen:hover{
+
+          .imagen:hover {
             width: 200px;
-            heigth: 200px;
           }
-        </style>
-        <div>
-          <table id="table-render" style="width: 1300px; text-align: center;padding:0; margin:0">
-            <tbody>
-              <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${
-          data.EsPadre == 1
-            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
-            : data.stock
-              ? Number.isInteger(data.stock)
-                ? data.stock
-                : parseFloat(data.stock).toFixed(2)
-              : data.stock
-        }</b></td>
-                <td style="width: 300px"><b>${data.Producto} - ${
-          data.CodigoBarra
-        }</b></td>
-                <td style="width: 80px">${
-                  data.ProductoCategoria ? data.ProductoCategoria : ""
-                }</td>
-                <td style="width: 80px">${
-                  data.ProductoModelo ? data.ProductoModelo : ""
-                }</td>
-                <td style="width: 120px">${
-                  data.ProductoMarca ? data.ProductoMarca : ""
-                }</td>
-                <td style="width: 80px">${
-                  data.ProductoTalla ? data.ProductoTalla : ""
-                }</td>
-                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
-                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
-                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
-                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
-                <td style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
-                <td style="width: 5%">
-                  <img src="${
-                    data.Imagen == null || data.Imagen == ""
-                      ? "static/no-photo.png"
-                      : "/resources/images/productos/" + data.Imagen
-                  }" class="imagen">
-                </td>
-                <!--<td style="width: 20px" class="text-center"><b>${
-                  data.VentaEstrategica == 1
-                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
-                    : ""
-                }</b></td>-->
-              </tr>
-            </tbody>
-          </table>   
-        </div>
-        `;
+          </style>
+
+          <div class="autocomplete-scroll">
+            <table id="table-render">
+              <tbody>
+                <tr>
+                  <td style="width:60px" class="${styleStock}">
+                    <b>${
+                      data.EsPadre == 1
+                        ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bc==" style="width:24px" />'
+                        : data.stock
+                          ? Number.isInteger(data.stock)
+                            ? data.stock
+                            : parseFloat(data.stock).toFixed(2)
+                          : data.stock
+                    }</b>
+                  </td>
+
+                  <td style="width:300px">
+                    <b>${data.Producto} - ${data.CodigoBarra}</b>
+                  </td>
+
+                  <td style="width:120px">${data.ProductoCategoria || ""}</td>
+                  <td style="width:80px">${data.ProductoModelo || ""}</td>
+                  <td style="width:120px">${data.ProductoMarca || ""}</td>
+                  <td style="width:80px">${data.ProductoTalla || ""}</td>
+                  <td style="width:80px">${data.Color || ""}</td>
+                  <td style="width:80px">${data.Genero || ""}</td>
+                  <td style="width:80px">${data.Botapie || ""}</td>
+                  <td style="width:80px">${data.Anaquel || ""}</td>
+
+                  <td style="width:65px" class="table-primary">
+                    <b>${data.PrecioContado}</b>
+                  </td>
+
+                  <td style="width:5%">
+                    <img
+                      src="${
+                        !data.Imagen
+                          ? "static/no-photo.png"
+                          : "/resources/images/productos/" + data.Imagen
+                      }"
+                      class="imagen"
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          `;
       }
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
-        data.ProductoMarca
-      } / ${data.ProductoModelo}
-      `;
+
+      return `<b>${data.Producto}</b>`;
     },
+
     loadBarcode(e) {
       e.preventDefault();
       let idProducto = this.loadCode;
@@ -1974,12 +1980,14 @@ export default {
         prod.precio = producto.PrecioContado;
       }
       this.$nextTick(() => {
-        let input = document.getElementById("txtCodeBar0");
+        let input = document.getElementById(`input${this.ventaActiva}0`);
+
         input.focus();
         input.select();
       });
       this.metodoPagoCambio(1);
     },
+
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
     },
@@ -3058,5 +3066,13 @@ export default {
   .txtAutoComplete {
     min-width: 280px !important;
   }
+}
+
+.autocomplete-result-list,
+.autocomplete-results,
+.autocomplete-list {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 </style>
