@@ -11,6 +11,7 @@ import VentaReimpresion from "@/views/VentaReimpresion.vue";
 import Remision from "@/views/Remision.vue";
 import RemisionLista from "@/views/RemisionLista.vue";
 import Impresoras from "@/views/Impresoras.vue";
+import BusquedaPorModelo from "@/views/BusquedaPorModelo.vue";
 
 import OrdenCompra from "@/views/OrdenCompra.vue";
 
@@ -256,6 +257,11 @@ export default new Router({
       path: "/CargarComprasXml",
       name: "CargarComprasXml",
       component: CargarComprasXml
+    },
+    {
+      path: "/BusquedaPorModelo",
+      name: "BusquedaPorModelo",
+      component: BusquedaPorModelo
     }
   ]
 });
