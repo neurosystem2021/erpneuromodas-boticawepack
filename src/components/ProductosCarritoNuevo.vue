@@ -200,8 +200,9 @@
             style="width: 80px"
             class="form-control"
             step="0.001"
+            @keydown.prevent.tab="irtxtBarcode"
             min="0"
-             @keydown.prevent.enter="irtxtAddProduct"
+            @keydown.prevent.enter="irtxtBarcode"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
               if(this.ventas){
@@ -1079,7 +1080,10 @@ export default {
         this.$emit("setProducto", { ...prod, stock: p.stock });
         setTimeout(() => {
           this.loadCode = null;
-          document.getElementById("txtBarcode").focus();
+          // document.getElementById("txtBarcode").focus();
+          let text = document.getElementById("txtCantidad0");
+          text.focus();
+          text.select();
         }, 100);
       }
 
@@ -1166,6 +1170,7 @@ export default {
       let fPP = this.preciosProd.filter(p => p.cantidad === 0);
 
       if (obj.TienePresentacion == 0) {
+        console.log("ssssssssssss");
         obj.estadoPxP = true;
         this.setProductoUni(obj);
         return;
@@ -1198,34 +1203,18 @@ export default {
       obj.Descripcion = null;
       this.objProd.cantxPrecio = 1;
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
       obj.precio = parseFloat(obj.PrecioContado).toFixed(1);
       obj.cantidad = 1;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj.cantidadPres = 1;
-      // obj = this.onSetProducto(obj);
-
       this.$emit("setProducto", obj);
-      // this.add([
-      //   obj,
-      //   () => {
-      //     this.$emit("onAddProducto", obj);
-      //     this.$toasted.success("Producto añadido correctamente");
-      //   },
-      //   { setPrecioCosto: this.tipo == "mov" ? true : false },
-      //   false,
-      //   this.cliente.EsVIP
-      // ]);
-      // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
 
       this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {
-          let text = document.getElementById("txtCantidadxPrecio0");
+          let text = document.getElementById("txtCantidad0");
           // let text = document.getElementById("txtCantidad0");
           text.focus();
           text.select();
@@ -1574,7 +1563,7 @@ canvas {
 }
 
 .OcultarTable {
-   visibility: visible;
+  visibility: visible;
 }
 
 @media only screen and (max-width: 1440px) {

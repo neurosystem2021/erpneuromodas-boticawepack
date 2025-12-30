@@ -329,7 +329,7 @@ export default {
         { key: "precio", label: "P/U" },
         { key: "subtotal", label: "SubTotal", variant: "success" },
         { key: "igv", label: "IGV" },
-        { key: "flete", label: "FLETE" },
+        { key: "flete", label: "FLETE (S/.)" },
         // { key: 'lote', label: 'Lote' },
         { key: "precioVenta", label: "Precio venta (S/)" },
         { key: "total", label: "Total", variant: "danger" },

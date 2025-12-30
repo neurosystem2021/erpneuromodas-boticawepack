@@ -123,6 +123,7 @@
                   <th>Descripcion</th>
                   <th>Medida</th>
                   <th>Cantidad</th>
+                  <th>Flete (S/.)</th>
                   <th>Precio</th>
                   <th>IGV</th>
                   <th>Total</th>
@@ -137,6 +138,7 @@
                   <td>{{ detalle.Descripcion }}</td>
                   <td>{{ detalle.ProductoMedicion }}</td>
                   <td>{{ detalle.Cantidad }}</td>
+                  <td>{{ detalle.FLETE }}</td>
                   <td>{{ detalle.Precio }}</td>
                   <td>{{ montoIGV(detalle)}}</td>
                   <td>{{ montoTotal(detalle)}}</td>
