@@ -159,7 +159,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -219,7 +219,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Visa</b></td>
+              <td class="total"><b>Total Yape/Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
@@ -229,7 +229,7 @@
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Ventas Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -289,7 +289,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Mastercard</b></td>
+              <td class="total"><b>Total Transferencia </b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
