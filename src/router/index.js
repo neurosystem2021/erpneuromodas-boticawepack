@@ -10,6 +10,7 @@ import VentasFacturacion from '@/views/VentasFacturacion.vue'
 import Clientes from '@/views/Clientes.vue'
 import Habitaciones from '@/views/Habitaciones.vue'
 import Impresoras from '@/views/Impresoras.vue'
+import Usuario from "@/views/Usuario.vue";
 import AgenteOperacion from '@/views/AgenteOperacion.vue'
 import AgenteCierreCaja from '@/views/AgenteCierreCaja.vue'
 import AgenteGeneral from '@/views/AgenteGeneral.vue'
@@ -73,6 +74,11 @@ export default new Router({
       path: '/ventas',
       name: 'Ventas',
       component: Ventas
+    },
+    {
+      path: "/usuario",
+      name: "Usuario",
+      component: Usuario
     },
     {
       path: '/reportes/ventas',
