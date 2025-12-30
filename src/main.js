@@ -37,7 +37,7 @@ Vue.use(Toasted, {
 
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
-
+Vue.use(VueSweetalert2)
 // Componentes 
 Vue.component('autocomplete', Autocomplete)
 Vue.component('editable',{

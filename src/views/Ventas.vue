@@ -7,6 +7,9 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm" v-if="false">
@@ -61,7 +64,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" class="ocularMovil">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -400,6 +403,7 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
+import Movimiento from '@/components/Movimiento'
 
 export default {
   beforeMount() {
@@ -1105,6 +1109,7 @@ export default {
   components: {
     ProductosCarrito,
     ClientesForm,
+    Movimiento,
     ConfigVenta,
     PagoDeuda,
     PreOrdenLista,

@@ -849,14 +849,7 @@ export default {
           <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
-                <td style="width: 60px" class="${styleStock}"><b>${
-          data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
-        }</b></td>
-                <td style="width: 400px"><b>${data.Producto} 
+                <td style="width: 300px"><b>${data.Producto} 
         </b></td>
                 <td class="ocultarMovil" style="width: 100px">${
                   data.ProductoCategoria
