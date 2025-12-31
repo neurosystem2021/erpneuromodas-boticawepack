@@ -88,7 +88,7 @@
                                 idModal="editCliente" @onAddCliente="setCliente"
                                 :editCliente="venta.cliente"></clientes-form>
                               <AutoComplete :value="ventas[index].cliente.Cliente" @guardarCliente="setCliente"
-                                @dniRuc="setNewDniRuc" />
+                                @dniRuc="newDniRuc=$event" />
                             </b-input-group-prepend>
                             <b-input-group-append>
                               <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>

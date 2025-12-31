@@ -1,7 +1,24 @@
 <template>
   <b-container>
     <b-row>
-        <b-col cols="12" md="4">
+        <b-col cols="12" class="my-1">
+           <b-input-group>
+            <autocomplete
+              required="required"
+              ref="inputCliente"
+              :url="API + 'clientes'"
+              anchor="ClienteDniRuc"
+              label="writer"
+              placeholder=""
+              :onInput="(val) => newDniRuc = val"
+              :on-select="setCliente" 
+              :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+              :classes="{input: 'form-control'}">
+            </autocomplete>
+            <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+          </b-input-group>
+        </b-col>
+        <b-col cols="12" md="6" class="my-1">
             <b-input-group>
               <autocomplete
                 required="required"
@@ -23,7 +40,7 @@
                 </b-button>
             </b-input-group>
         </b-col>
-        <b-col cols="12" md="4">
+        <b-col cols="12" md="6" class="my-1">
           <b-input-group>
             <input 
               v-model="loadCode"
@@ -31,9 +48,9 @@
               class="form-control"
               id="loadBarcode"
               placeholder="Codigo de Barra"   
+              @keypress.enter="busquedaPorCodeBar"
             />
-            <!-- <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button> -->
-            <b-button variant="primary" @click="busquedaPorCodeBar"><i class="fas fa-search"></i></b-button>
+          <b-button variant="primary" @click="busquedaPorCodeBar"><i class="fas fa-search"></i></b-button>
             
           </b-input-group>
         </b-col>
@@ -44,14 +61,51 @@
               <template slot="cantidad" slot-scope="data">
                 <input type="number" class="form-control" style="width: 120px;" v-model="data.item.cantidad">
               </template>
+              <template slot="descuento" slot-scope="data">
+                <input type="number" class="form-control" style="width: 120px;" v-model="data.item.descuento">
+              </template>
               <template slot="precio" slot-scope="data">
                 <input type="number" class="form-control" style="width: 120px;" v-model="data.item.precio">
+              </template>
+              <template slot="subTotal" slot-scope="data">
+                  {{ 
+                    (data.item.cantidad ? data.item.cantidad :0)  *
+                    (data.item.precio ? data.item.precio :0)
+                  }}
+
+              </template>
+              <template slot="Total" slot-scope="data">
+                  {{ 
+                    (data.item.cantidad ? data.item.cantidad :0)*
+                    (data.item.precio ? data.item.precio :0) -
+                    (data.item.descuento ? data.item.descuento :0) 
+                  }}
+
+              </template>
+              <template slot="action" slot-scope="data">
+                <b-button variant="danger" @click="eliminar(data.index)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
               </template>
             </b-table>
           </div>
         </b-col>
-        <b-col cols="12" style="text-align: center; align-items: center;">
-            <b-button variant="success">GENERAR PROFORMA</b-button>
+        <b-col cols="12" md="6" lg="6" style="text-align: center; align-items: center; align-content: center;">
+            <b-button @click="guardarProforma" variant="success">GENERAR PROFORMA</b-button>
+        </b-col>
+        <b-col cols="12" md="6" lg="6" style="align-items: center;">
+            <table class="table table-striped table-hover ">
+              <tr>
+                <td class="clsSubTotal">SubTotal:</td>
+                <td class="clsSubTotal">{{ subTotal() }}</td>
+              </tr>
+              <tr>
+                <td class="clsDescuento">Descuento:</td>
+                <td class="clsDescuento">{{ descuento() }}</td>
+              </tr>
+              <tr>
+                <td class="clsTotal">Total:</td>
+                <td class="clsTotal">{{ Total() }}</td>
+              </tr>
+            </table>
         </b-col>
     </b-row>
     <b-modal v-model="modalProducto" hide-footer size="lg" > 
@@ -74,10 +128,13 @@
 
 <script>
 import config from "@/store/config.js";
+import ClientesForm from "@/components/ClientesForm";
 export default {
   data() {
     return {
+      newDniRuc: "",
       microActivado: false,
+      cliente: {},
       loadCode: "",
       currentPage: 1,
       perPage: 15,
@@ -92,6 +149,9 @@ export default {
         { key: "ProductoTalla", label: "Talla" },
         { key: "cantidad" },
         { key: "precio" },
+        { key: "subTotal", class: "text-center clsSubTotal" },
+        { key: "descuento", class: "text-center clsDescuento" },
+        { key: "Total", class: "text-center clsTotal" },
         { key: "action", label: "" }
       ],
       fields: [
@@ -103,10 +163,49 @@ export default {
       ]
     };
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.loadClienteVarios();
+    });
+  },
   methods: {
+    subTotal() {
+      let suma = 0;
+      if (this.productosCarrito.length > 0) {
+        suma = this.productosCarrito.reduce((a, b) => {
+          return a + parseFloat(b.cantidad * b.precio);
+        }, 0);
+      }
+      return parseFloat(suma).toFixed(2);
+    },
+    descuento() {
+      let suma = 0;
+      if (this.productosCarrito.length > 0) {
+        suma = this.productosCarrito.reduce((a, b) => {
+          return a + parseFloat(b.descuento);
+        }, 0);
+      }
+      return parseFloat(suma).toFixed(2);
+    },
+    Total() {
+      let suma = 0;
+      if (this.productosCarrito.length > 0) {
+        suma = this.productosCarrito.reduce((a, b) => {
+          return a + parseFloat(b.cantidad * b.precio - b.descuento);
+        }, 0);
+      }
+      return parseFloat(suma).toFixed(2);
+    },
     focusAutocomplete(ref) {
       this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
+    },
+    loadClienteVarios() {
+      this.axios.get(this.API + "clientes/00000001").then(res => {
+        if (res.data.IdCliente) {
+          this.setCliente(res.data);
+        }
+      });
     },
     async setModelo(modelo) {
       this.productos = [];
@@ -135,7 +234,12 @@ export default {
     },
     andirProducto(item) {
       if (!this.productosCarrito.some(v => v.IdProducto == item.IdProducto)) {
-        let prod = { ...item, cantidad: 1, precio: item.PrecioContado };
+        let prod = {
+          ...item,
+          cantidad: 1,
+          precio: item.PrecioContado,
+          descuento: 0
+        };
         this.productosCarrito.unshift(prod);
         this.modalProducto = false;
       }
@@ -203,23 +307,101 @@ export default {
       }
     },
     search() {
-      const inputElement = this.$refs["ProductoModelo"].$el.querySelector(
-        "input"
-      );
+      const inputElement = this.$refs["inputModelo"].$el.querySelector("input");
+
       inputElement.focus();
       setTimeout(() => {
         inputElement.value = this.query;
         const event = new Event("input", { bubbles: true });
         inputElement.dispatchEvent(event);
       }, 100);
+    },
+    setCliente(cliente) {
+      console.log(cliente);
+      this.cliente = cliente;
+      this.$refs.inputCliente.setValue(
+        cliente.ClienteDniRuc
+          ? cliente.ClienteDniRuc
+          : cliente.Cliente.toUpperCase()
+      );
+    },
+    eliminar(index) {
+      this.productosCarrito.splice(index, 1);
+    },
+    async guardarProforma() {
+      let venta = {
+        cliente: { ...this.cliente },
+        productos: [...this.productosCarrito],
+        vendedor: { Usuario: sessionStorage.getItem("User") }
+      };
+      let productos = venta.productos;
+      let totalPagos = 0;
+
+      if (!venta.cliente.DniRuc) {
+        //this.$toasted.show('Debe seleccionar un cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "Debe seleccionar un cliente",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+      var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
+      if (!esNumerico) {
+        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "El RUC debe ser numérico, editar cliente.",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        return;
+      }
+
+      if (!productos.length) {
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "No hay productos para vender",
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+
+        return;
+      }
+
+      await this.axios.post(this.API + "proformas", venta).then(response => {
+        if (response.data.insertId) {
+          this.$toasted.success("Proforma realizada con exito");
+          window.open(
+            "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
+            "_blank"
+          );
+        }
+      });
+      this.loadClienteVarios();
+      this.productosCarrito = [];
     }
+  },
+  components: {
+    ClientesForm
   }
 };
 </script>
 
 <style>
 .btn-parpadeante {
-  background-color: #ff4757; 
+  background-color: #ff4757;
   color: white;
   border: none;
   cursor: pointer;
@@ -244,6 +426,17 @@ export default {
 }
 
 .clsTable {
-  min-height: 420px;
+  height: 520px;
+  overflow-y: auto;
+}
+
+.clsSubTotal {
+  background: #fff9c4 !important;
+}
+.clsDescuento {
+  background: #ffebee !important;
+}
+.clsTotal {
+  background: #e8f5e9 !important;
 }
 </style>
