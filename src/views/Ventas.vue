@@ -12,6 +12,9 @@
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
+                            <movimiento></movimiento>
+                    </b-button-group>
+                    <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
                     <b-button-group size="sm" v-if="false">
@@ -63,7 +66,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" class="ocularMovil">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -403,9 +406,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button class="mb-1" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button class="mb-1 btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -423,6 +426,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import Movimiento from '@/components/Movimiento'
 
 export default {
     beforeMount () {
@@ -1086,6 +1090,7 @@ export default {
         ProductosCarrito,
         ClientesForm,
         ConfigVenta,
+        Movimiento,
         PagoDeuda,
         PreOrdenLista,
         Proformas

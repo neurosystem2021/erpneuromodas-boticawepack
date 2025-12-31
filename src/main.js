@@ -20,6 +20,10 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../static/vue2-autocomplete.css'
 import '../static/styles.css'
 
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+Vue.use(VueSweetalert2)
+
 Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
@@ -34,6 +38,7 @@ Vue.use(Toasted, {
 Vue.use(BootstrapVue);
 Vue.use(VueMoment);
 
+Vue.use(VueSweetalert2)
 // Componentes 
 Vue.component('autocomplete', Autocomplete)
 Vue.component('editable',{
