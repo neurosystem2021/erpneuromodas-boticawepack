@@ -33,6 +33,7 @@
         <b-col cols="2" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+            <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Contable</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
             <table class="table table-hover table-striped ">
@@ -227,6 +228,24 @@ export default {
         almacen: this.almacen
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
+        params: params
+      }).then(res => {
+        let url = res.data;
+        url = url.replace(/\\/g, "");
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          url = "http://" + url; // O "https://" si es necesario
+        }
+        window.open(url, "_blank");
+      });
+    },
+    async exportarDetallado() {
+      let params = {
+        fechaIni: this.fechaInicio,
+        fechaFin: this.fechaFin,
+        declarado: this.declarado,
+        almacen: this.almacen
+      };
+      await this.axios(`${this.API}reporte/ListarRegVentaActivos/excel`, {
         params: params
       }).then(res => {
         let url = res.data;
