@@ -29,7 +29,7 @@
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProductoDet }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td><input type="number" class="form-control" step="0.001" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>

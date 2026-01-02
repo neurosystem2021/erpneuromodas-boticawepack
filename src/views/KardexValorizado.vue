@@ -56,23 +56,14 @@
            
         </b-col>
         <b-col cols="12" class="my-3">
-            <table width="100%" class="table table-hover">
-                <tbody>
-                    <tr v-for="(lst,index) in lstReporte.filter(v=> v.d1!=' ')" :key="index" :class="getClass(lst)"> 
-                        <td>{{ lst.d1 }}</td>
-                        <td>{{ retornarDecimal(lst.d2) }}</td>
-                        <td>{{ retornarDecimal(lst.d3) }}</td>
-                        <td>{{ retornarDecimal(lst.d4) }}</td>
-                        <td>{{ retornarDecimal(lst.d5) }}</td>
-                        <td>{{ retornarDecimal(lst.d6) }}</td>
-                        <td>{{ retornarDecimal(lst.d7) }}</td>
-                        <td>{{ retornarDecimal(lst.d8) }}</td>
-                        <td>{{ retornarDecimal(lst.d9) }}</td>
-                        <td>{{ retornarDecimal(lst.d10) }}</td>
-                        <td>{{ retornarDecimal(lst.d11) }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <b-table :items="lstReporte" :fields="fields">
+                <template slot="TotalMovimiento" slot-scope="data">
+                  {{ data.item.CantidadMovimiento * data.item.PrecioMovimiento }}
+                </template>
+                <template slot="TotalVenta" slot-scope="data">
+                  {{ data.item.CantidadVenta * data.item.PrecioVenta }}
+                </template>
+            </b-table>
             <!-- {{ lstReporte }} -->
         </b-col>
     </b-row>
@@ -106,6 +97,19 @@ export default {
       precio: 0,
       idAlmacen: 1,
       producto: {},
+      fields: [
+        { key: "Producto", label: "Producto" },
+        { key: "Serie", label: "Serie" },
+        { key: "Numero", label: "Numero" },
+        { key: "Numero", label: "Numero" },
+        { key: "CantidadMovimiento", label: "Entrada" },
+        { key: "PrecioMovimiento", label: "Precio" },
+        { key: "TotalMovimiento", label: "Total", class: "clsTotalMovimiento" },
+        { key: "CantidadVenta", label: "Salida" },
+        { key: "PrecioVenta", label: "Precio" },
+        { key: "TotalVenta", label: "Total", class: "clsTotalVenta" },
+        { key: "Saldo", label: "Saldo", class: "clsSaldo" }
+      ],
       lstReporte: []
     };
   },
@@ -136,6 +140,7 @@ export default {
           stock: this.stock,
           precio: this.precio,
           anno: this.anno,
+          mes: this.Mes,
           Tipo: this.Tipo
         }
       }).then(response => {
@@ -143,35 +148,31 @@ export default {
       });
     },
     generarListado(datos) {
-      const excluirValores = [
-        "KARDEX VALORIZADO",
-        "PRODUCTO",
-        "AÑO",
-        "DESDE",
-        "HASTA"
-      ];
+      this.lstReporte = [];
+      // Asegúrate de que this.stock sea un número desde el inicio
+      let val = parseFloat(this.stock) || 0;
 
-      const datosFiltrados = datos.filter(item => {
-        const valor = (item.d1 || "").trim();
-        return valor !== "" && !excluirValores.includes(valor);
+      datos.forEach(element => {
+        // 1. Manejo de Movimiento (Suma)
+        if (parseFloat(element.CantidadMovimiento) > 0) {
+          val += parseFloat(element.CantidadMovimiento); // Suma numérica pura
+
+          this.lstReporte.push({
+            ...element,
+            Saldo: val.toFixed(2) // Solo aquí convertimos a string para la vista
+          });
+        }
+
+        // 2. Manejo de Venta (Resta)
+        if (parseFloat(element.CantidadVenta) > 0) {
+          val -= parseFloat(element.CantidadVenta); // Resta numérica pura
+
+          this.lstReporte.push({
+            ...element,
+            Saldo: val.toFixed(2) // Solo aquí convertimos a string para la vista
+          });
+        }
       });
-
-      let header = datosFiltrados[0];
-
-      datosFiltrados.shift();
-
-      let datosFinales = datosFiltrados;
-      console.log("this.Mes", this.Mes);
-      if (this.Mes) {
-        datosFinales = [];
-        datosFiltrados.forEach(element => {
-          if (this.$moment(element.d1).format("MM") == this.Mes) {
-            datosFinales.push(element);
-          }
-        });
-      }
-      datosFinales.unshift(header);
-      this.lstReporte = datosFinales;
     },
     retornarDecimal(valor) {
       if (typeof valor === "number") {
@@ -232,25 +233,22 @@ export default {
         });
     },
     async exportPDF() {
-      await this.axios(`${this.API}reporte/kardexvalorizadopdf`, {
-        params: {
-          producto: this.producto.Producto,
-          stock: this.stock,
-          precio: this.precio,
-          anno: this.anno,
-          Tipo: this.Tipo
-        }
-      }).then(res => {
-        if (res.data) {
-          let url = res.data.url;
-          url = url.replace(/\\/g, "");
-          if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "http://" + url; // O "https://" si es necesario
+      let data = {
+        data: this.lstReporte
+      };
+      await this.axios
+        .post(`${this.API}reporte/kardexvalorizadopdf`, data)
+        .then(res => {
+          if (res.data) {
+            let url = res.data.url;
+            url = url.replace(/\\/g, "");
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+              url = "http://" + url; // O "https://" si es necesario
+            }
+            console.log(url);
+            window.open(url, "_blank");
           }
-          console.log(url);
-          window.open(url, "_blank");
-        }
-      });
+        });
     }
   },
 
@@ -269,7 +267,7 @@ export default {
 </script>
 
 <style scoped>
-.clsTitle {
+/* .clsTitle {
   background: #5c6bc0;
   font-weight: bold;
   color: white;
@@ -290,5 +288,16 @@ export default {
   background: #5c6bc0;
   font-weight: bold;
   color: white;
+} */
+</style>
+<style>
+.clsTotalMovimiento {
+  background: #e8f5e9 !important;
+}
+.clsTotalVenta {
+  background: #fff9c4 !important;
+}
+.clsSaldo {
+  background: #e3f2fd !important;
 }
 </style>
