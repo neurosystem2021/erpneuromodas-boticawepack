@@ -313,20 +313,26 @@ export default {
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
-    loadBarcode (e) {
-      e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
+    loadBarcode(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true, setPrecioCosto: this.setPrecioCosto }])
+        let params = { codigoBarra: idProducto };
+        this.axios
+          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.setProducto(response.data);
+              this.$toasted.show('Producto añadido correctamente');
+              this.loadCode = "";
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
       }
     },
     /*alterarBuscadorProductos() {
