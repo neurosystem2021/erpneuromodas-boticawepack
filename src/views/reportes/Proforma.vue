@@ -166,6 +166,7 @@
 
         <button class="btn btn-primary" id="printBtn" @click="imprimirguia()">IMPRIMIR PDF</button>
       </div>
+      <div id="thanks">¡Dios lo Bendiga!</div>
     </main>
     <!--<footer>
       Invoice was created on a computer and is valid without the signature and seal.
