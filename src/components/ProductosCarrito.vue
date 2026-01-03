@@ -325,7 +325,20 @@ export default {
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
             if (response.data.IdProducto) {
+
+            // CAMBIO CLAVE (buscar si ya existe en el carrito)
+            const index = this.productos.findIndex(
+              p => p.IdProducto === response.data.IdProducto
+            );
+
+            if (index !== -1) {
+              // ya existe → sumar cantidad
+              this.productos[index].cantidad += 1;
+            } else {
+              // no existe → agregar
+              response.data.cantidad = 1;
               this.setProducto(response.data);
+            }
               this.$toasted.show('Producto añadido correctamente');
               this.loadCode = "";
             } else {
