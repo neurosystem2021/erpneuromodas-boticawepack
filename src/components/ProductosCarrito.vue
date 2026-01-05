@@ -713,23 +713,62 @@ export default {
       }
     },
     renderChild(data) {
-      /*
+      
       if (this.idAlmacen) {
-        let style = 'ss'
-        if(parseFloat(data.stock) <= 0) {
-          style = 'danger'
+        let styleStock = "";
+        if (data.stock <= 0) {
+          styleStock = "table-danger";
+        } else {
+          styleStock = "table-success";
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (parseFloat(data.stock) > 0) {
-          style = 'success'
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
+        </style>
+        <div>
+          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr>
+                <td style="width: 300px"><b>${data.Producto} 
+        </b></td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td  style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `;
       }
       return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
-      }*/
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
+         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
