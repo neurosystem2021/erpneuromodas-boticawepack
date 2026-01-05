@@ -403,7 +403,7 @@ export default {
       this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
-      obj.cantidad = 0
+      obj.cantidad = 1
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
