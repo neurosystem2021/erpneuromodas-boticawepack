@@ -195,7 +195,17 @@ export default {
       this.dialogDetalle = true;
     },
     eliminarReg(item) {
-      console.log(item.idDocVenta);
+      if(item.IdTipoDoc == 9){
+        this.$swal({
+          icon: "error",
+          title: "Acción no permitida",
+          text: `Las notas de crédito no pueden ser anuladas`,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false
+        });
+        return;
+      }
       this.$swal({
         icon: "question",
         title: "",
