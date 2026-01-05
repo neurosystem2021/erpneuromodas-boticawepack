@@ -79,7 +79,7 @@
                   <td colspan="6"><b>{{cat.ProductoCategoria}}</b></td>
                 </tr>
                 <tr v-for="(prod, k) in cat.Productos" :key="k">
-                  <td class="text-center">{{ prod.CodigoBarra }}</td>
+                  <td class="text-center">{{ prod.CodigoFrabricante }}</td>
                   <td>{{ prod.Producto }}</td>
                   <td>{{ prod.ProductoMedicion }}</td>
                   <td>{{ prod.CantidadVentas }}</td>
