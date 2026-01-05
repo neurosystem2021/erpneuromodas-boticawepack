@@ -95,6 +95,20 @@
                                   <option :value="tab.cliente.Direccion2">{{ tab.cliente.Direccion2 }}</option>
                                   <option :value="tab.cliente.Direccion3">{{ tab.cliente.Direccion3 }}</option>
                               </b-form-select>
+                              
+                              <b-input-group style="background: #ffffff; padding: 5px 2%;">
+                                      <label style="margin-right: 10px;">Garantía: </label></br>
+
+                                      <b-form-radio-group 
+                                      v-model="tab.Garantia"
+                                      :options="[
+                                        { text: '3 Meses', value: 1 },
+                                        { text: '6 Meses', value: 2 },
+                                        { text: '12 Meses', value: 3 }
+                                      ]"
+                                      :disabled="bloquearInput?true:false">
+                                      </b-form-radio-group>
+                                </b-input-group>
 
                               <b-row v-if="$route.query.idPedido">
                                   <b-col>
@@ -1557,6 +1571,7 @@ export default {
         nombreLlevar: "",
         DireccionEntrega: "",
         diasValidosProf: 1,
+        Garantia: 0,
         ProformaSinPrecio: 0
       };
       this.bloquearInput = false;
