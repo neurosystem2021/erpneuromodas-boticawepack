@@ -219,7 +219,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
-                                :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :customParams="{ 'sortBy':'stock', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
                                 label="writer"
@@ -302,7 +302,7 @@
                         type="number"
                         style="text-align:center; font-weight:bold; width: 90px;"
                       autocomplete="false"
-                      :id="`input${data.index}`"
+                      :id="`input${ventaActiva}${data.index}`"
                       :disabled="data.item.esPresentacion"
                       @input="metodoPagoCambio(1)"
                        @focus="abrirModalTouch(data.index, 1)"
@@ -1886,11 +1886,14 @@ export default {
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
       productos.unshift(prod);
+      this.$nextTick(() => {
+        let cnt = document.getElementById(`input${this.ventaActiva}0`);
+        cnt.focus();
+        cnt.select();
+        this.metodoPagoCambio(1);
+      });
 
-      // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
-      // });
-      this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);

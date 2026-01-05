@@ -25,10 +25,10 @@
                     Stock Inicial
                      <input type="number" class="form-control" v-model="stock">
                 </b-col>
-                <b-col cols="1">
+                <!-- <b-col cols="1">
                     Costo
                      <input type="number" class="form-control" v-model="precio">
-                </b-col>
+                </b-col> -->
                 <b-col cols="2">
                     Mes:
                     <select class="form-control" v-model="Mes">
@@ -58,10 +58,10 @@
         <b-col cols="12" class="my-3">
             <b-table :items="lstReporte" :fields="fields">
                 <template slot="TotalMovimiento" slot-scope="data">
-                  {{ data.item.CantidadMovimiento * data.item.PrecioMovimiento }}
+                  {{ parseFloat(data.item.CantidadMovimiento * data.item.PrecioMovimiento).toFixed(2) }}
                 </template>
                 <template slot="TotalVenta" slot-scope="data">
-                  {{ data.item.CantidadVenta * data.item.PrecioVenta }}
+                  {{ parseFloat(data.item.CantidadVenta * data.item.PrecioVenta).toFixed(2) }}
                 </template>
             </b-table>
             <!-- {{ lstReporte }} -->
@@ -81,7 +81,7 @@ export default {
       Mes: "",
       mounth: [
         { value: "01", text: "ENERO" },
-        { value: "02", text: "FEBREO" },
+        { value: "02", text: "FEBRERO" },
         { value: "03", text: "MARZO" },
         { value: "04", text: "ABRIL" },
         { value: "05", text: "MAYO" },
@@ -99,6 +99,7 @@ export default {
       producto: {},
       fields: [
         { key: "Producto", label: "Producto" },
+        { key: "TipoDoc", label: "Tipo Doc" },
         { key: "Serie", label: "Serie" },
         { key: "Numero", label: "Numero" },
         { key: "Numero", label: "Numero" },
@@ -219,7 +220,11 @@ export default {
     },
     async exportEXCEL() {
       let data = {
-        data: this.lstReporte
+        data: this.lstReporte,
+        producto: this.producto,
+        anno: this.anno,
+        Mes: this.Mes,
+        stock: this.stock
       };
       await this.axios
         .post(`${this.API}producto/listarstockvalorizado/excel`, data)
@@ -234,7 +239,12 @@ export default {
     },
     async exportPDF() {
       let data = {
-        data: this.lstReporte
+        data: this.lstReporte,
+        stock: this.stock,
+        precio: this.precio,
+        anno: this.anno,
+        mes: this.Mes,
+        Tipo: this.Tipo
       };
       await this.axios
         .post(`${this.API}reporte/kardexvalorizadopdf`, data)

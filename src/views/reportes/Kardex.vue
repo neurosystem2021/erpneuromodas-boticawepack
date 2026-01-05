@@ -95,10 +95,10 @@
                   <td>{{ prod.IngresoCantidad }}</td>
                   <td v-if="esValorizado">{{ prod.IngresoPrecio | redondear }}</td>
                   <td v-if="esValorizado">{{ prod.IngresoCantidad * prod.IngresoPrecio | redondear }}</td>
-                  <td>{{ prod.SalidaCantidad }}</td>
+                  <td>{{ parseFloat(prod.SalidaCantidad).toFixed(2) }}</td>
                   <td v-if="esValorizado">{{ prod.SalidaPrecio | redondear }}</td>
                   <td v-if="esValorizado">{{ prod.SalidaCantidad * prod.SalidaPrecio | redondear}}</td>
-                  <td>{{ prod.saldo }}</td>
+                  <td>{{ parseFloat(prod.saldo).toFixed(2) }}</td>
                   <td v-if="esValorizado">{{ prod.saldoCostoUnitario | redondear }}</td>
                   <td v-if="esValorizado">{{ prod.saldoCostoTotal | redondear }}</td>
                 </tr>
@@ -109,12 +109,12 @@
     </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
-  mounted () {
-    this.loadFirstAlmacen()
+  mounted() {
+    this.loadFirstAlmacen();
   },
-  data () {
+  data() {
     return {
       API: config.API,
       producto: {},
@@ -125,57 +125,73 @@ export default {
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       kardexSelect: []
-    }
+    };
   },
   computed: {
-    hrefXls () {
-      let tipoKardex = 'kardexsimple'
+    hrefXls() {
+      let tipoKardex = "kardexsimple";
 
       if (this.esValorizado) {
-        tipoKardex = 'kardexvalorizado'
+        tipoKardex = "kardexvalorizado";
       }
 
-      return '/api/index.php/reporte/' + tipoKardex + '?idAlmacen=' + this.almacen.IdAlmacen + '&idProducto='+this.producto.IdProducto+'&producto='+this.producto.Producto+'&codigoBarra='+this.producto.CodigoBarra+'&fechaDesde='+this.kardex.fechaDesde+'&fechaHasta='+this.kardex.fechaHasta;
+      return (
+        "/api/index.php/reporte/" +
+        tipoKardex +
+        "?idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&idProducto=" +
+        this.producto.IdProducto +
+        "&producto=" +
+        this.producto.Producto +
+        "&codigoBarra=" +
+        this.producto.CodigoBarra +
+        "&fechaDesde=" +
+        this.kardex.fechaDesde +
+        "&fechaHasta=" +
+        this.kardex.fechaHasta
+      );
     },
-    kardexSaldo () {
-      let saldo = 0
-      let saldoCostoTotal = 0
-      let saldoCostoUnitario = 0
+    kardexSaldo() {
+      let saldo = 0;
+      let saldoCostoTotal = 0;
+      let saldoCostoUnitario = 0;
       return this.kardexSelect.map(item => {
-          saldo += (item.IngresoCantidad - item.SalidaCantidad)
-          item.saldo = saldo
-          if (item.IngresoCantidad > 0) {
-            saldoCostoTotal = saldoCostoTotal + (item.IngresoCantidad * item.IngresoPrecio)
-            saldoCostoUnitario = saldoCostoTotal / saldo
-          } else {
-            // la salida Precio es el ultimo costo unitario de saldo
-            item.SalidaPrecio = saldoCostoUnitario
-            
-            saldoCostoTotal = saldo * item.SalidaPrecio
-            saldoCostoUnitario = item.SalidaPrecio
-          }
-          item.saldoCostoUnitario = saldoCostoUnitario
-          item.saldoCostoTotal = saldoCostoTotal
-          return item
-      })
+        saldo += item.IngresoCantidad - item.SalidaCantidad;
+        item.saldo = saldo;
+        if (item.IngresoCantidad > 0) {
+          saldoCostoTotal =
+            saldoCostoTotal + item.IngresoCantidad * item.IngresoPrecio;
+          saldoCostoUnitario = saldoCostoTotal / saldo;
+        } else {
+          // la salida Precio es el ultimo costo unitario de saldo
+          item.SalidaPrecio = saldoCostoUnitario;
+
+          saldoCostoTotal = saldo * item.SalidaPrecio;
+          saldoCostoUnitario = item.SalidaPrecio;
+        }
+        item.saldoCostoUnitario = saldoCostoUnitario;
+        item.saldoCostoTotal = saldoCostoTotal;
+        return item;
+      });
     },
-    kardexSaldoFecha () {
-      let inicialEntradas = 0 
-      let inicialSalidas = 0
-      let inicialSaldoCostoTotal = 0
-      let inicialSaldoCostoUnitario = 0
+    kardexSaldoFecha() {
+      let inicialEntradas = 0;
+      let inicialSalidas = 0;
+      let inicialSaldoCostoTotal = 0;
+      let inicialSaldoCostoUnitario = 0;
 
       let arr = this.kardexSaldo.filter(item => {
         if (item.Fecha >= this.kardex.fechaDesde) {
-          return item.Fecha >= this.kardex.fechaDesde
+          return item.Fecha >= this.kardex.fechaDesde;
         } else {
-          inicialEntradas += parseFloat(item.IngresoCantidad)
-          inicialSalidas += parseFloat(item.SalidaCantidad)
-          inicialSaldoCostoTotal = item.saldoCostoTotal
-          inicialSaldoCostoUnitario = item.saldoCostoUnitario
-          return false
+          inicialEntradas += parseFloat(item.IngresoCantidad);
+          inicialSalidas += parseFloat(item.SalidaCantidad);
+          inicialSaldoCostoTotal = item.saldoCostoTotal;
+          inicialSaldoCostoUnitario = item.saldoCostoUnitario;
+          return false;
         }
-      })
+      });
 
       arr.unshift({
         Fecha: this.kardex.fechaDesde,
@@ -184,58 +200,63 @@ export default {
         SalidaCantidad: inicialSalidas,
         saldo: inicialEntradas - inicialSalidas,
         saldoCostoTotal: inicialSaldoCostoTotal,
-        saldoCostoUnitario: inicialSaldoCostoUnitario 
-      })
+        saldoCostoUnitario: inicialSaldoCostoUnitario
+      });
 
-      return arr
-
+      return arr;
     }
   },
   methods: {
-    loadFirstAlmacen () {
-      this.axios.get(this.API + 'almacenes/primero')
-        .then(res => {
-          this.$refs.inputAlmacen.setValue(res.data.Almacen)
-          this.almacen = res.data
-        })
+    loadFirstAlmacen() {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        this.$refs.inputAlmacen.setValue(res.data.Almacen);
+        this.almacen = res.data;
+      });
     },
-    setAlmacen (obj) {
-      this.almacen = obj
+    setAlmacen(obj) {
+      this.almacen = obj;
     },
-    setProducto (obj) {
-      this.producto = obj
+    setProducto(obj) {
+      this.producto = obj;
     },
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
     renderChild(data) {
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla}
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo} / ${data.ProductoTalla}
+      `;
     },
-    verKardex () {
-      this.esValorizado = false
-      this.axios.get(this.API + 'productos/kardex/' + this.producto.IdProducto + '?limit=0', {
-          params: {
+    verKardex() {
+      console.log("this.producto", this.producto);
+      this.esValorizado = false;
+      this.axios
+        .get(
+          this.API +
+            "productos/kardex/" +
+            this.producto.IdProducto +
+            "?limit=0",
+          {
+            params: {
               idAlmacen: this.almacen.IdAlmacen,
               fechaHasta: this.kardex.fechaHasta
+            }
           }
-      }).then((response) => {
-          this.kardexSelect = response.data
-      })
+        )
+        .then(response => {
+          this.kardexSelect = response.data;
+        });
     },
-    verKardexValorizado () {
-      this.verKardex()
-      this.esValorizado = true
+    verKardexValorizado() {
+      this.verKardex();
+      this.esValorizado = true;
     },
-    exportar () {
-
-    }
+    exportar() {}
   }
-}
+};
 </script>
 <style>
-    
-
 </style>

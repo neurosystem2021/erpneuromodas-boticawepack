@@ -256,6 +256,15 @@
               Tiene Presentacion
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.ParticionarFlag"
+                   :value="1"
+                   :unchecked-value="0"
+                   @input="checkParticionar">
+              Particionar
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group  v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
@@ -391,6 +400,17 @@
             v-if="showProductoDet && show" 
             ref="productoDet"
             ></producto-form-det>
+          </b-col>
+        </b-row>
+        
+        <hr />
+        <b-row>
+          <b-col>
+            <ProductoParticion 
+            :id-producto="producto.IdProducto" 
+            v-if="showProductoParticion && show" 
+            ref="productoParticion"
+            ></ProductoParticion>
         </b-col>
       </b-row>
       <b-row v-if="producto.IdProducto">
@@ -470,12 +490,14 @@ import config from "@/store/config.js";
 import CategoriaForm from "@/components/CategoriaForm";
 import MarcaForm from "@/components/MarcaForm";
 import ProductoFormDet from "@/components/ProductoFormDet";
+import ProductoParticion from "@/components/ProductoParticion";
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
   data() {
     return {
       showProductoDet: true,
+      showProductoParticion: true,
       cantidadCodigoBarra: 1,
       hashMovimiento: "",
       movimientoLotes: [],
@@ -569,6 +591,9 @@ export default {
             Vue.nextTick(() => {
               if (this.$refs.productoDet)
                 this.$refs.productoDet.show = parseInt(newVal.EsPadre);
+
+              if (this.$refs.productoDet)
+                this.$refs.productoParticion.show = Boolean(newVal.ParticionarFlag);
             });
             // this.producto.Genero = newVal.Genero
             // this.producto.Botapie = newVal.Botapie
@@ -593,6 +618,7 @@ export default {
             this.producto.ControlaStock = newVal.ControlaStock;
             this.producto.MasMovido = newVal.MasMovido;
             this.producto.TienePresentacion = newVal.TienePresentacion;
+            this.producto.ParticionarFlag = newVal.ParticionarFlag;
             this.producto.Imagen = newVal.Imagen;
             if (newVal.PreciosPorProducto) {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
@@ -871,6 +897,7 @@ export default {
         MasMovido: 0,
         StockMinimo: 0,
         TienePresentacion: 0,
+        ParticionarFlag: 0,
         StockPorMayor: 0,
         PrecioContado: 0,
         PrecioPorMayor: 0,
@@ -906,6 +933,9 @@ export default {
       // Agregar producto DET
       if (this.showProductoDet) {
         this.producto.productosDet = this.$refs.productoDet.productos;
+      }
+      if (this.showProductoParticion) {
+        this.producto.productosParticion = this.$refs.productoParticion.productos;
       }
       // console.log(JSON.stringify(this.producto))
       this.producto.precios.map(pre => {
@@ -1052,13 +1082,39 @@ export default {
         if (this.$refs.productoDet)
           this.$refs.productoDet.show = parseInt(this.producto.EsPadre);
       }
+    },
+    checkParticionar(val) {
+      if (val && this.producto.IdProducto) {
+        // this.axios
+        //   .get(this.API + "productos/eshijo", {
+        //     params: {
+        //       idProducto: this.producto.IdProducto
+        //     }
+        //   })
+        //   .then(res => {
+        //     let esHijo = res.data.esHijo;
+        //     if (esHijo) {
+        //       this.$toasted.show(
+        //         "Este producto no puede contener productos ya que es un producto hijo"
+        //       );
+        //       this.producto.EsPadre = false;
+        //     } else {
+        this.$refs.productoParticion.show = true;
+        console.log("aaa");
+        // }
+        // });
+      } else {
+        if (this.$refs.productoDet) this.$refs.productoParticion.show = false;
+        console.log("bbb");
+      }
     }
   },
   computed: {},
   components: {
     CategoriaForm,
     MarcaForm,
-    ProductoFormDet
+    ProductoFormDet,
+    ProductoParticion
   }
 };
 </script>
