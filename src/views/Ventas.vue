@@ -1160,18 +1160,6 @@ export default {
                 this.$refs.carrito.pagocon = 0
                 window.open('/imprimir/index.php?IdDocVenta=' + response.data.insertId,'_blank','noopener');
                 this.emitirauto(response.data.insertId)
-
-                this.axios.get(this.API + 'imprimirpdf/' + response.data.insertId, {
-                    responseType: 'blob'  // importante para recibir el PDF como archivo
-                })
-                .then((res) => {
-                    console.log('PDF generado correctamente en backend');
-                    // OPCIONAL: si luego quieres descargarlo, mostrarlo, etc.
-                })
-                .catch((err) => {
-                    console.error('Error al generar el PDF:', err);
-                    this.$toasted.show('No se pudo generar el comprobante PDF', { duration: 3000 });
-                });
             })
             .catch((error) => {
                 console.log(error)
