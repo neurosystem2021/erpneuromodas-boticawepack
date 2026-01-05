@@ -5,11 +5,14 @@
         <Menu v-if="false"></Menu>
 
         <br class="ocularMovil"/>
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
             <div class="ocularMovil">
                 <div class="float-right">
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                            <movimiento></movimiento>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
@@ -63,7 +66,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4" class="ocularMovil">
+                            <b-col md="4">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -299,7 +302,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Yape/Plin</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -322,7 +325,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -363,9 +366,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button class="ocularMovil" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button class="ocularMovil btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="btnAction"  type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -383,6 +386,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import Movimiento from '@/components/Movimiento'
 
 export default {
     beforeMount () {
@@ -1029,6 +1033,7 @@ export default {
     components: {
         ProductosCarrito,
         ClientesForm,
+        Movimiento,
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
