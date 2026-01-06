@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
         <b-col cols="12" class="my-1">
            <b-input-group>
@@ -89,7 +89,7 @@
           </div>
         </b-col>
         <b-col cols="12" md="6" lg="6" style="text-align: center; align-items: center; align-content: center;">
-            <b-button @click="guardarProforma" variant="success">GENERAR PROFORMA</b-button>
+            <b-button @click="guardarProforma" class="btnAction" variant="success">GENERAR PROFORMA</b-button>
         </b-col>
         <b-col cols="12" md="6" lg="6" style="align-items: center;">
             <table class="table table-striped table-hover ">
@@ -111,7 +111,7 @@
     <b-modal v-model="modalProducto" hide-footer size="lg" > 
         <b-table :items="productos" :fields="fields" size="lg" :per-page="perPage" :current-page="currentPage" small  id="my-table">
             <template slot="action" slot-scope="data">
-              <b-button variant="success" @click="andirProducto(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+              <b-button variant="info" @click="andirProducto(data.item)"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></b-button>
             </template>
         </b-table>
 
