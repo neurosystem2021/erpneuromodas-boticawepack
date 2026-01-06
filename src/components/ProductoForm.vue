@@ -589,11 +589,14 @@ export default {
             this.producto.EsPadre = newVal.EsPadre;
             this.loadAlmacen(1);
             Vue.nextTick(() => {
-              if (this.$refs.productoDet)
-                this.$refs.productoDet.show = parseInt(newVal.EsPadre);
-
-              if (this.$refs.productoDet)
-                this.$refs.productoParticion.show = Boolean(newVal.ParticionarFlag);
+              setTimeout(() => {
+                if (this.$refs.productoDet) {
+                  this.$refs.productoDet.show = parseInt(newVal.EsPadre);
+                }
+                console.log(newVal.ParticionarFlag);
+                // if (this.$refs.productoParticion)
+                this.$refs.productoParticion.show = newVal.ParticionarFlag == 1;
+              }, 100);
             });
             // this.producto.Genero = newVal.Genero
             // this.producto.Botapie = newVal.Botapie
@@ -1099,12 +1102,15 @@ export default {
         //       );
         //       this.producto.EsPadre = false;
         //     } else {
-        this.$refs.productoParticion.show = true;
-        console.log("aaa");
+        this.$nextTick(() => {
+          this.$refs.productoParticion.show = true;
+          console.log("aaa");
+        });
         // }
         // });
       } else {
-        if (this.$refs.productoDet) this.$refs.productoParticion.show = false;
+        if (this.$refs.productoParticion)
+          this.$refs.productoParticion.show = false;
         console.log("bbb");
       }
     }

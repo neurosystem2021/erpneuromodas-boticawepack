@@ -21,7 +21,8 @@
         <tr>
           <th>Id</th>
           <th>Producto</th>
-          <th>Proporción (kg)</th>
+          <th>KG</th>
+          <th>Precio Venta</th>
           <th class="text-center">Quitar</th>
         </tr>
       </thead>
@@ -29,7 +30,8 @@
         <tr v-for="(prod, index) in productos" :key="index">
           <td>{{ prod.IdProductoParte }}</td>
           <td>{{ prod.Producto }}</td>
-          <td><input type="number" class="form-control" step="0.001" v-model="prod.Cantidad" requiredv @input="emitUpdate" /></td>
+          <td><input type="number" class="form-control" disabled step="0.001" value="1"  /></td>
+          <td><input type="number" class="form-control" disabled step="0.001" v-model="prod.PrecioContado"  /></td>
           <td class="text-center"><b-button variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
@@ -41,8 +43,9 @@ import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.getProductosDet();
-    console.log("component cargado");
+    this.$nextTick(() => {
+      console.log("component cargado");
+    });
   },
   data() {
     return {
@@ -53,7 +56,10 @@ export default {
   },
   watch: {
     show() {
-      console.log("ddd");
+      if (this.show) {
+        this.getProductosDet();
+      }
+      console.log("show", this.show);
     }
   },
   props: ["idProducto"],
@@ -61,9 +67,9 @@ export default {
     emitUpdate() {
       this.$emit("onUpdateProductos", this.productos);
     },
-    getProductosDet() {
+    async getProductosDet() {
       if (this.idProducto) {
-        this.axios
+        await this.axios
           .get(this.API + "productospartes", {
             params: { idProducto: this.idProducto }
           })
