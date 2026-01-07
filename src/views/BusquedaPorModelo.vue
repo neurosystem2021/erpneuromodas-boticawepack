@@ -59,7 +59,7 @@
           <div class="clsTable">
              <b-table :items="productosCarrito" :fields="fieldsCarrito" >
               <template slot="Imagen" slot-scope="data"> 
-                <b-img style="border-radius: 10px; width:200px" fluid
+                <b-img style="border-radius: 10px; width:50px" fluid
                       :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
               </template>
               <template slot="Producto" slot-scope="data">
@@ -115,7 +115,7 @@
             </table>
         </b-col>
     </b-row>
-    <b-modal v-model="modalProducto" size="lg" hide-footer id="mdlProducto"> 
+    <b-modal v-model="modalProducto" size="xl" hide-footer id="mdlProducto"> 
         <b-table :items="productos" :fields="fields" size="lg" :per-page="perPage" :current-page="currentPage" small  id="my-table">
             <template slot="action" slot-scope="data">
               <b-button variant="info" @click="andirProducto(data.item)"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></b-button>
@@ -129,7 +129,7 @@
               </template>
         </b-table>
         <b-row>
-          <b-col cols="6">
+          <b-col cols="10">
              <b-pagination
                 v-model="currentPage"
                 :total-rows="productos.length"
@@ -137,7 +137,7 @@
                 aria-controls="my-table"
               ></b-pagination>
           </b-col>
-          <b-col cols="6">
+          <b-col cols="2">
               <b-form-select v-model="perPage" :options="options"></b-form-select>
           </b-col>
         </b-row>
@@ -174,7 +174,7 @@ export default {
       modalProducto: false,
       fieldsCarrito: [
         { key: "stock" },
-        { key: "CodigoBarra" },
+        // { key: "CodigoBarra" },
         { key: "Producto" },
         { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMarca", label: "Marca" },
@@ -183,6 +183,7 @@ export default {
         { key: "Genero" },
         { key: "Botapie" },
         { key: "ProductoTalla", label: "Talla" },
+        { key: "Imagen" },
         { key: "cantidad" },
         { key: "precio" },
         { key: "subTotal", class: "text-center clsSubTotal" },
@@ -212,6 +213,9 @@ export default {
     });
   },
   methods: {
+    setAltImg(event) {
+      event.target.src = "static/no-photo.png";
+    },
     subTotal() {
       let suma = 0;
       if (this.productosCarrito.length > 0) {

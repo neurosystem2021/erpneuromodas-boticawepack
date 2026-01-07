@@ -20,4 +20,8 @@ export default {
   font-size: 1.2rem;
   font-weight: bold;
 }
+.modal .modal-xl {
+  min-width: 80%;
+  width: 80%;
+}
 </style>
