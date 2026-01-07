@@ -73,7 +73,7 @@
                               <span style="font-weight: bold;" v-else> ({{ reporte.ComprobanteProcesado }})</span> 
                             </span> 
                         </td>
-                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} {{ reporte.IdTipoDoc }}</td>
+                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }}</td>
                         <td style="text-align: center;">{{reporte.Serie}}</td>
                         <td style="text-align: center;">{{reporte.Numero}}</td>
                         <td style="text-align: center;">{{reporte.SubTotal}}</td>
