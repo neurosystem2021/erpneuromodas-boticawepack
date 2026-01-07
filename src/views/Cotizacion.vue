@@ -1149,6 +1149,7 @@ export default {
               : Number((prod.PrecioContado / this.TipoCambio).toFixed(2));
 
           this.$set(this.productos[index], "precio", nuevoPrecio);
+          this.$set(this.productos[index], "precioMin", nuevoPrecio);
         });
       }
     },
