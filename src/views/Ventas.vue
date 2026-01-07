@@ -193,6 +193,7 @@
                           type="text" class="form-control" placeholder="Codigo de Barra" />
                         <b-input-group-append>
                           <!--<proveedores-tabla></proveedores-tabla>-->
+                          <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
                           <b-button variant="primary" class="ocultarMovil" @click="loadBarcode"><i
                               class="fas fa-search"></i></b-button>
                         </b-input-group-append>
@@ -834,17 +835,26 @@
     <producto-form :cbGuardar="(id, pxp) => agregarObj(id, pxp)" ref="productoFormEdit" :producto-update="productoSelect"
       @actualizarProducto="actualizarRegistro($event)"></producto-form>
 
+    <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
+        <div class="d-block text-center">
+          <div id="codigoBarraStyle">
+            <v-quagga
+              :onDetected="onBarcodeScanned"
+              :readerSize="readerSize"
+              :readerTypes="detecteds"
+              :patchSize="'medium'"
+              class="cameraBarra"
+            ></v-quagga>
+          </div>
+        </div>
+      </b-modal>
+
   </b-container>
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
-import momemnt from "moment";
 import ClientesForm from "@/components/ClientesForm";
-
-// import ConfigVenta from "@/components/ConfigVenta";
-// import PagoDeuda from "@/components/PagoDeuda";
-// import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
@@ -853,8 +863,10 @@ import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
 import Movimiento from "@/components/Movimiento";
-import Swal from "sweetalert2";
-import { Bar } from "vue-chartjs";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
+Vue.use(VueQuagga);
+
 export default {
   components: {
     ClientesForm,
@@ -868,8 +880,29 @@ export default {
     ProductoForm,
     AutoComplete
   },
+  created() {
+    // Add barcode scan listener and pass the callback function
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
   data() {
     return {
+      readerSize: {
+        width: 1600,
+        height: 1080
+      },
+      detecteds: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader"
+      ],
       inProgress: false,
       mostrarNav: true,
       isNota: [],
@@ -1060,7 +1093,7 @@ export default {
     };
   },
   mounted() {
-    console.log('componente montado')
+    console.log("componente montado");
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1073,6 +1106,25 @@ export default {
     });
   },
   methods: {
+    abrirCodigoBarra() {
+      this.$refs["modalCodigoBarra"].show();
+      this.modalAbiertCode = true;
+      this.result = "";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound);
+        audio.play();
+        if (this.result.length > 0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs["modalCodigoBarra"].hide();
+          this.modalAbiertCode = false;
+        }
+      }
+    },
     testImpresora() {
       var left = screen.width / 2 - 800 / 2;
       var top = screen.height / 2 - 800 / 2;
@@ -1484,36 +1536,49 @@ export default {
           <table id="table-render" style="width: 1300px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 60px" class="${styleStock}"><b>${data.EsPadre == 1
+                <td style="width: 60px" class="${styleStock}"><b>${
+          data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
               ? Number.isInteger(data.stock)
                 ? data.stock
                 : parseFloat(data.stock).toFixed(2)
               : data.stock
-          }</b></td>
-                <td style="width: 300px"><b>${data.Producto} - ${data.CodigoBarra
-          }</b></td>
-                <td style="width: 80px">${data.ProductoCategoria ? data.ProductoCategoria : ''}</td>
-                <td style="width: 80px">${data.ProductoModelo ? data.ProductoModelo : ''}</td>
-                <td style="width: 120px">${data.ProductoMarca ? data.ProductoMarca : ''}</td>
-                <td style="width: 80px">${data.ProductoTalla ? data.ProductoTalla : ''}</td>
-                <td style="width: 80px">${data.Color ? data.Color : ''}</td>
-                <td style="width: 80px">${data.Genero ? data.Genero : ''}</td>
-                <td style="width: 80px">${data.Botapie ? data.Botapie : ''}</td>
-                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ''}</td>
-                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado
-          }</b></td>
+        }</b></td>
+                <td style="width: 300px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
+                <td style="width: 80px">${
+                  data.ProductoCategoria ? data.ProductoCategoria : ""
+                }</td>
+                <td style="width: 80px">${
+                  data.ProductoModelo ? data.ProductoModelo : ""
+                }</td>
+                <td style="width: 120px">${
+                  data.ProductoMarca ? data.ProductoMarca : ""
+                }</td>
+                <td style="width: 80px">${
+                  data.ProductoTalla ? data.ProductoTalla : ""
+                }</td>
+                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
+                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
+                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
+                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
                 <td style="width: 5%">
-                  <img src="${data.Imagen == null || data.Imagen == ""
-            ? "static/no-photo.png"
-            : "/resources/images/productos/" + data.Imagen
-          }" class="imagen">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${data.VentaEstrategica == 1
-            ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
-            : ""
-          }</b></td>-->
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
               </tr>
             </tbody>
           </table>   
@@ -1521,8 +1586,9 @@ export default {
         `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca
-        } / ${data.ProductoModelo}
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
       `;
     },
     loadBarcode(e) {
@@ -1859,7 +1925,7 @@ export default {
               total +
               parseFloat(
                 prod.CantidadPresentacion * prod.cantidad * prod.precio -
-                prod.descuento
+                  prod.descuento
               )
             );
           } else {
@@ -2112,8 +2178,8 @@ export default {
         if (response.data.insertId) {
           window.open(
             "/imprimir/index.php?IdDocVenta=" +
-            response.data.insertId +
-            "&preview=1",
+              response.data.insertId +
+              "&preview=1",
             "_blank"
           );
 
@@ -2431,7 +2497,6 @@ export default {
 
     async cargarProforma(proforma) {
       try {
-        
         this.initValueCliente = `${proforma.DniRuc} ${proforma.Cliente}`;
 
         // Clonar estructura base de venta
@@ -2492,9 +2557,7 @@ export default {
           );
 
           prod.pres = prod.esPresentacion
-            ? JSON.stringify(
-              pres.find(v => v.nombre === producto.Presentacion)
-            )
+            ? JSON.stringify(pres.find(v => v.nombre === producto.Presentacion))
             : null;
 
           productos.push(prod);
@@ -2509,12 +2572,11 @@ export default {
         // Activar venta correctamente
         this.$nextTick(() => {
           this.ventaActiva = this.ventas.length - 1;
-          this.setCliente(venta.cliente)
+          this.setCliente(venta.cliente);
           this.getNumeroVenta();
           this.getVendedorInfo();
           this.metodoPagoCambio(1);
         });
-
       } catch (error) {
         console.error("Error al cargar proforma:", error);
       }
@@ -2871,6 +2933,80 @@ export default {
 
   .tblCarrito {
     font-size: 0.7rem;
+  }
+}
+</style>
+<style>
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+.mostrarMovil {
+  display: none;
+}
+@media only screen and (max-width: 1440px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 50vw !important;
+    max-height: 50vh !important;
+  }
+  .cameraBarra {
+    height: 50vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: block;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
   }
 }
 </style>

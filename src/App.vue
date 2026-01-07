@@ -24,4 +24,11 @@ export default {
   min-width: 80%;
   width: 80%;
 }
+@media only screen and (max-width: 750px) {
+  .modal .modal-xl {
+    min-width: 100%;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
 </style>

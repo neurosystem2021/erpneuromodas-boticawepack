@@ -21,6 +21,15 @@
               class="form-control upper"
               ></b-form-input>
           </b-form-group>
+          <label>Código barra Modelo:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.CodeBarModelo"
+              @input="(val) => producto.CodeBarModelo = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+          </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
@@ -499,6 +508,7 @@ export default {
         this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
         this.producto.StockMinimo = newVal.StockMinimo;
         this.producto.CodigoBarra = newVal.CodigoBarra;
+        this.producto.CodeBarModelo = newVal.CodeBarModelo;
         this.producto.ProductoModelo = newVal.ProductoModelo;
         this.producto.PrecioCosto = newVal.PrecioCosto;
         this.producto.Anaquel = newVal.Anaquel;
@@ -643,6 +653,7 @@ export default {
         IdProductoTalla: "",
         Producto: "",
         CodigoBarra: "",
+        CodeBarModelo: "",
         Color: "",
         PorcentajeUtilidad: "",
         StockMinimo: 0,
@@ -704,6 +715,7 @@ export default {
           : 0;
       this.producto.TienePresentacion = this.TienePresentacion;
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.producto.CodeBarModelo = ("" + this.producto.CodeBarModelo).trim();
 
       // Agregar producto DET
       if (this.showProductoDet) {

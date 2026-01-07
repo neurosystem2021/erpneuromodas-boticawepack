@@ -18,7 +18,7 @@
             <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
           </b-input-group>
         </b-col>
-        <b-col cols="12" md="6" class="my-1">
+        <b-col cols="12" md="4" class="my-1">
             <b-input-group>
               <autocomplete
                 required="required"
@@ -39,8 +39,22 @@
                   <i class="fas fa-microphone"></i>
                 </b-button>
             </b-input-group>
+          </b-col>
+         <b-col cols="12" md="4" class="my-1">
+            <b-input-group>
+            <input 
+              v-model="CodeBarModelo "
+              type="text"
+              class="form-control"
+              id="loadBarcode"
+              placeholder="Codigo de Barra Modelo"   
+              @keypress.enter="busquedaPorCodeBarModelo"
+            />
+          <b-button variant="primary" @click="busquedaPorCodeBarModelo"><i class="fas fa-search"></i></b-button>
+            
+          </b-input-group>
         </b-col>
-        <b-col cols="12" md="6" class="my-1">
+        <b-col cols="12" md="4" class="my-1">
           <b-input-group>
             <input 
               v-model="loadCode"
@@ -50,11 +64,11 @@
               placeholder="Codigo de Barra"   
               @keypress.enter="busquedaPorCodeBar"
             />
+          <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
           <b-button variant="primary" @click="busquedaPorCodeBar"><i class="fas fa-search"></i></b-button>
             
           </b-input-group>
         </b-col>
-        <b-col></b-col>
         <b-col cols="12" class="mt-3">
           <div class="clsTable">
              <b-table :items="productosCarrito" :fields="fieldsCarrito" >
@@ -115,10 +129,22 @@
             </table>
         </b-col>
     </b-row>
-    <b-modal v-model="modalProducto" size="xl" hide-footer id="mdlProducto"> 
+    <b-modal v-model="modalProducto" size="xl" hide-footer id="mdlProducto" :title="`MODELO: ${modelo.ProductoModelo}`"> 
         <b-table :items="productos" :fields="fields" size="lg" :per-page="perPage" :current-page="currentPage" small  id="my-table">
+            <template slot="stock" slot-scope="data">
+               <b-alert 
+                show 
+                :variant="data.item.stock > 0 ? 'primary' : 'danger'"
+                class="py-1 px-2 m-0 text-center" 
+                style="font-size: 0.85rem;"
+              >
+                {{data.item.stock}}
+               </b-alert>
+            </template>
             <template slot="action" slot-scope="data">
-              <b-button variant="info" @click="andirProducto(data.item)"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></b-button>
+              <div style="align-content: center; align-items: center; text-align: center; padding: auto;">
+                <b-button size="sm" variant="info" @click="andirProducto(data.item)"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></b-button>
+              </div>
             </template>
              <template slot="Imagen" slot-scope="data"> 
                 <b-img style="border-radius: 10px; width:50px" fluid
@@ -129,7 +155,7 @@
               </template>
         </b-table>
         <b-row>
-          <b-col cols="10">
+          <b-col cols="12" md="10" lg="10" >
              <b-pagination
                 v-model="currentPage"
                 :total-rows="productos.length"
@@ -137,7 +163,7 @@
                 aria-controls="my-table"
               ></b-pagination>
           </b-col>
-          <b-col cols="2">
+          <b-col cols="12" md="2" lg="2" >
               <b-form-select v-model="perPage" :options="options"></b-form-select>
           </b-col>
         </b-row>
@@ -146,19 +172,55 @@
         
         
     </b-modal>
+
+    <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
+        <div class="d-block text-center">
+          <div id="codigoBarraStyle">
+            <v-quagga
+              :onDetected="onBarcodeScanned"
+              :readerSize="readerSize"
+              :readerTypes="detecteds"
+              :patchSize="'medium'"
+              class="cameraBarra"
+            ></v-quagga>
+          </div>
+        </div>
+      </b-modal>
   </b-container>
 </template>
 
 <script>
 import config from "@/store/config.js";
 import ClientesForm from "@/components/ClientesForm";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
+Vue.use(VueQuagga);
 export default {
   data() {
     return {
+      modelo: {},
+      readerSize: {
+        width: 1600,
+        height: 1080
+      },
+      detecteds: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader"
+      ],
       newDniRuc: "",
       microActivado: false,
       cliente: {},
       loadCode: "",
+      CodeBarModelo: "",
       currentPage: 1,
       perPage: 10,
       API: config.API,
@@ -192,20 +254,21 @@ export default {
         { key: "action", label: "" }
       ],
       fields: [
+        { key: "action", label: "" },
         { key: "stock" },
-        // { key: "CodigoBarra" },
         { key: "Producto" },
-        { key: "ProductoModelo", label: "Modelo" },
-        { key: "ProductoMarca", label: "Marca" },
+        { key: "CodeBarModelo", label: "Cod. Bar. Modelo" },
         { key: "ProductoTalla", label: "Talla" },
+        { key: "ProductoMarca", label: "Marca" },
         { key: "Color" },
         { key: "Genero" },
         { key: "Botapie" },
-        { key: "ProductoTalla", label: "Talla" },
-        { key: "Imagen" },
-        { key: "action", label: "" }
+        { key: "Imagen" }
       ]
     };
+  },
+  created() {
+    this.$barcodeScanner.init(this.onBarcodeScanned);
   },
   mounted() {
     this.$nextTick(() => {
@@ -213,6 +276,25 @@ export default {
     });
   },
   methods: {
+    abrirCodigoBarra() {
+      this.$refs["modalCodigoBarra"].show();
+      this.modalAbiertCode = true;
+      this.result = "";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound);
+        audio.play();
+        if (this.result.length > 0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs["modalCodigoBarra"].hide();
+          this.modalAbiertCode = false;
+        }
+      }
+    },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
@@ -255,10 +337,12 @@ export default {
       });
     },
     async setModelo(modelo) {
+      console.log("modelo", modelo);
+      this.modelo = modelo;
       this.productos = [];
       this.currentPage = 1;
       let prods = await this.axios(`${this.API}productos_modelo`, {
-        params: modelo
+        params: { ...modelo, sortBy: "stock" }
       }).then(res => {
         return res.data;
       });
@@ -276,7 +360,8 @@ export default {
         });
       });
       const resultados = await Promise.all(promesas);
-      this.productos.push(...resultados);
+      // resultados = resultados.sort((a, b) => a.stock - b.stock);
+      this.productos.push(...resultados.sort((a, b) => b.stock - a.stock));
       this.modalProducto = true;
     },
     andirProducto(item) {
@@ -300,6 +385,25 @@ export default {
           .then(response => {
             if (response.data.IdProducto) {
               this.andirProducto(response.data);
+              this.$toasted.show("Producto añadido correctamente");
+            } else {
+              this.loadCode = "";
+              this.$toasted.show("No se encontró ningun producto");
+            }
+          });
+      }
+      this.loadCode = "";
+    },
+    busquedaPorCodeBarModelo() {
+      let idProducto = this.CodeBarModelo;
+      if (idProducto) {
+        let params = { CodeBarModelo: idProducto };
+        this.axios
+          .get(this.API + "productos/CodeBarModelo", { params: params })
+          .then(response => {
+            if (response.data.IdProducto) {
+              this.andirProducto(response.data);
+              this.CodeBarModelo = "";
               this.$toasted.show("Producto añadido correctamente");
             } else {
               this.loadCode = "";
@@ -488,5 +592,80 @@ export default {
 
 .modal-dialog .modal-lg {
   min-width: 80%;
+}
+</style>
+
+<style>
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+.mostrarMovil {
+  display: none;
+}
+@media only screen and (max-width: 1440px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 50vw !important;
+    max-height: 50vh !important;
+  }
+  .cameraBarra {
+    height: 50vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: block;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
+  }
 }
 </style>
