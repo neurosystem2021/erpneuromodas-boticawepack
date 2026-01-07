@@ -58,6 +58,13 @@
         <b-col cols="12" class="mt-3">
           <div class="clsTable">
              <b-table :items="productosCarrito" :fields="fieldsCarrito" >
+              <template slot="Imagen" slot-scope="data"> 
+                <b-img style="border-radius: 10px; width:200px" fluid
+                      :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+              </template>
+              <template slot="Producto" slot-scope="data">
+                {{ data.item.Producto }} - {{ data.item.CodigoBarra }}
+              </template>
               <template slot="cantidad" slot-scope="data">
                 <input type="number" class="form-control" style="width: 120px;" v-model="data.item.cantidad">
               </template>
@@ -108,19 +115,35 @@
             </table>
         </b-col>
     </b-row>
-    <b-modal v-model="modalProducto" hide-footer size="lg" > 
+    <b-modal v-model="modalProducto" size="lg" hide-footer id="mdlProducto"> 
         <b-table :items="productos" :fields="fields" size="lg" :per-page="perPage" :current-page="currentPage" small  id="my-table">
             <template slot="action" slot-scope="data">
               <b-button variant="info" @click="andirProducto(data.item)"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></b-button>
             </template>
+             <template slot="Imagen" slot-scope="data"> 
+                <b-img style="border-radius: 10px; width:50px" fluid
+                      :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+              </template>
+              <template slot="Producto" slot-scope="data">
+                {{ data.item.Producto }} - {{ data.item.CodigoBarra }}
+              </template>
         </b-table>
+        <b-row>
+          <b-col cols="6">
+             <b-pagination
+                v-model="currentPage"
+                :total-rows="productos.length"
+                :per-page="perPage"
+                aria-controls="my-table"
+              ></b-pagination>
+          </b-col>
+          <b-col cols="6">
+              <b-form-select v-model="perPage" :options="options"></b-form-select>
+          </b-col>
+        </b-row>
+        
 
-         <b-pagination
-          v-model="currentPage"
-          :total-rows="productos.length"
-          :per-page="perPage"
-          aria-controls="my-table"
-        ></b-pagination>
+        
         
     </b-modal>
   </b-container>
@@ -137,15 +160,28 @@ export default {
       cliente: {},
       loadCode: "",
       currentPage: 1,
-      perPage: 15,
+      perPage: 10,
       API: config.API,
       productos: [],
       productosCarrito: [],
+      options: [
+        { value: 5, text: "5" },
+        { value: 10, text: "10" },
+        { value: 20, text: "20" },
+        { value: 50, text: "50" },
+        { value: 100, text: "100" }
+      ],
       modalProducto: false,
       fieldsCarrito: [
         { key: "stock" },
         { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
+        { key: "ProductoMarca", label: "Marca" },
+        { key: "ProductoTalla", label: "Talla" },
+        { key: "Color" },
+        { key: "Genero" },
+        { key: "Botapie" },
         { key: "ProductoTalla", label: "Talla" },
         { key: "cantidad" },
         { key: "precio" },
@@ -156,9 +192,16 @@ export default {
       ],
       fields: [
         { key: "stock" },
-        { key: "CodigoBarra" },
+        // { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
+        { key: "ProductoMarca", label: "Marca" },
         { key: "ProductoTalla", label: "Talla" },
+        { key: "Color" },
+        { key: "Genero" },
+        { key: "Botapie" },
+        { key: "ProductoTalla", label: "Talla" },
+        { key: "Imagen" },
         { key: "action", label: "" }
       ]
     };
@@ -317,7 +360,6 @@ export default {
       }, 100);
     },
     setCliente(cliente) {
-      console.log(cliente);
       this.cliente = cliente;
       this.$refs.inputCliente.setValue(
         cliente.ClienteDniRuc
@@ -438,5 +480,9 @@ export default {
 }
 .clsTotal {
   background: #e8f5e9 !important;
+}
+
+.modal-dialog .modal-lg {
+  min-width: 80%;
 }
 </style>

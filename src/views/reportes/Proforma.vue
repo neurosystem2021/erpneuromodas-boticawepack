@@ -2,73 +2,178 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/logo.png">
+				<img src="/resources/images/banner-proforma.jpg">
 			</div>
-			<div id="company">
+			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
 				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
 				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>
+			</div>-->
 		</header>
 		<main>
       <div id="details" class="clearfix">
         <div id="client">
-          <div class="to">PROFORMA A:</div>
-          <h2 class="name">{{ proforma.Cliente }}</h2>
-          <div class="address">{{ proforma.ClienteDireccion }}</div>
-          <div class="email"><a :href="'mailto:' + proforma.ClienteEmail">{{ proforma.ClienteEmail }}</a></div>
+          <br>
+          <h5 class="to" style=":black">COTIZACION A:</h5>
+          <table>
+            <tbody>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Documento</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.Documento }}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
+              </tr>
+              <!-- <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
+                <td class="celda" style="text-transform: uppercase">: Soles</td>
+              </tr> -->
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">T. Pago:</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CRÉDITO' :'CONTADO' }}</td>
+                
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div id="invoice">
-          <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
-          <div class="date">Fecha Proforma: {{ proforma.FechaReg }}</div>
-          <!--<div class="date">Due Date: 30/06/2014</div>-->
+          <h1>COTIZACION {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
+          <div style="height:15px"></div>
+          <table>
+            <tbody>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha de emisión</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo Validez</td>
+                <td class="celda" style="text-transform: uppercase">: {{proforma.DiasValidos}} d</td>
+              </tr>
+              <!-- <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CREDITO' : 'CONTADO'}}</td>
+              </tr> -->
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.PorEntregar == 1 ? proforma.PorEntregarDias +' D' : 'INMEDIATO'}}</td>
+              </tr>
+              <!-- <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;"> Fecha Crédito</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCredito}}</td>
+              </tr>
+              <tr>
+                <td class="celda" style="font-weight:bold; width:40% !important;"> Días de Crédito</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.DiasCredito}}</td>
+              </tr> -->
+              <!--<tr>
+                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
+                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+              </tr>-->
+            </tbody>
+          </table>
         </div>
       </div>
-      <table border="0" cellspacing="0" cellpadding="0">
+      <table border="0" cellspacing="0" cellpadding="0" min-width="100%" class="tblProductos">
         <thead>
           <tr>
-            <th class="no">#</th>
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="unit">PRECIO U.</th>
+            <th class="total">#</th>
             <th class="qty">CANT.</th>
+            <th colspan="2" class="desc">DESCRIPCIÓN</th>
+            <th class="qty">U.M.</th>
+            <th class="qty">MODELO</th>
+            <th class="qty">MARCA</th>
+            <th class="qty">TALLA</th>
+            <th class="qty">COLOR</th>
+            <th class="qty">GENERO</th>
+            <th class="qty">BOTAPIE</th>
+            <th class="unit">PRECIO U.</th>
             <th class="total">TOTAL</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}</td>
-            <td class="unit">S/. {{ prod.Precio | moneda }}</td>
-            <td class="qty">{{ prod.Cantidad }}</td>
-            <td class="total">
-              S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
-              <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+           
+            <td class="total">{{ index+1 }}</td>
+            <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
+            <td colspan="2"  class="desc" style="font-size:0.75rem">
+              <h3 style="color:#000; font-size:1rem">{{ prod.Producto }} - {{ prod.CodigoBarra }} <p v-if="presentacionProducto(prod)">({{ presentacionProducto(prod)}})</p> </h3><p v-if='prod.ProductoDesc'>{{ prod.ProductoDesc }}</p><p v-if="prod.ProductoDesc2"> {{prod.ProductoDesc2}}</p><p v-if="prod.ProductoDesc3">{{ prod.ProductoDesc3 }}</p>
+            </td>
+             <td class="qty" style="font-size:1.1rem">
+              {{ getPresentacion(prod)}} 
+            </td>
+            <td class="qty">
+              {{ prod.ProductoModelo }}
+            </td>
+            <td class="qty">
+              {{ prod.ProductoMarca }}
+            </td>
+            <td class="qty">
+              {{ prod.ProductoTalla }}
+            </td>
+            <td class="qty">
+              {{ prod.Color }}
+            </td>
+            <td class="qty">
+              {{ prod.Genero }}
+            </td>
+            <td class="qty">
+              {{ prod.Botapie }}
+            </td>
+            
+            <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
+            <td class="total" style="font-size:1.1rem">
+              <div>
+                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br><span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
+              </div>
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="2"></td>
+            <td colspan="10"></td>
             <td colspan="2">SUBTOTAL</td>
             <td>S/. {{ subTotal | redondear }}</td>
           </tr>
-          <!--<tr>
-            <td colspan="2"></td>
-            <td colspan="2">TAX 25%</td>
-            <td>$1,300.00</td>
-          </tr>-->
           <tr>
-            <td colspan="2"></td>
-            <td colspan="2">GRAN TOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
+            <td colspan="10"></td>
+            <td colspan="2" style="background:#010067 ; color:#fff">TOTAL</td>
+            <td style="background:#010067 ; color:#fff">S/. {{ subTotal | redondear }}</td>
           </tr>
         </tfoot>
       </table>
-      <div id="thanks">¡Muchas Gracias!</div>
+      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+      </div>
+      <br>
       <div id="notices">
         <div>NOTA:</div>
-        <div class="notice">Esta proforma solo tiene validez durante los {{ proforma.DiasValidos }} dias posteriores.</div>
+        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
+        <!-- <div class="notice">ESTA COTIZACION SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div> -->
+        <div class="notice">PAGOS: - Factura a {{DiasCredito}} días - S/. {{ subTotal | redondear }}</div>
+        <div class="notice">Observación(es): {{proforma.Observacion}}</div>
+      </div>
+      <div>
+        <br>
+        <div id="accounts" style="margin-top:-10px; font-weight:bold; margin-left: 450px;">
+          <img style="max-width: 100%" src="/resources/images/firma.png" />
+        </div>
+        <table>
+          <tbody>
+            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:50%"></td>
+            <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
+            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:10%"></td>
+          </tbody>
+        </table>
       </div>
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
@@ -81,52 +186,118 @@
 </template>
 
 <script>
-import {API} from '@/store/config.js'
-
+import { API } from "@/store/config.js";
+import moment from "moment";
 export default {
-	mounted () {
-		this.getProforma()
-    this.getEmpresa()
-	},
-	data () {
-		return {
-			API: API,
-			idProforma: this.$route.params.id,
-			proforma: { productos: [] },
-      empresa: {}
-		}
-	},
-	computed: {
-		subTotal () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
-			})
-      return sumatoria
-		}
-	},
+  mounted() {
+    this.getProforma();
+    this.getEmpresa();
+  },
+  data() {
+    return {
+      API: API,
+      idProforma: this.$route.params.id,
+      proforma: { productos: [] },
+      empresa: {},
+      fechaHasta: "",
+      DiasCredito: 0
+    };
+  },
+  computed: {
+    subTotal() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+      });
+      return sumatoria;
+    }
+  },
   methods: {
-    getProforma () {
-      this.axios.get(API + 'proformas/id/' + this.idProforma)
-			.then(res => {
-				this.proforma = res.data
-			})
+    getProforma() {
+      this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
+        this.proforma = res.data;
+        this.fechaHasta = this.calcularFechaHasta(
+          this.proforma.FechaReg.substring(0, 10),
+          this.proforma.DiasValidos
+        );
+        this.DiasCredito = this.calcularDiasCredito(
+          this.proforma.FechaReg,
+          this.proforma.FechaCredito
+        );
+      });
     },
-    getEmpresa () {
-      this.axios.get(API + 'empresa/id/' + 1)
-			.then(res => {
-				this.empresa = res.data
-			})
+    presentacionProducto(item) {
+      if (item.presentacion) {
+        let presentacion = JSON.parse(item.presentacion);
+        return `${presentacion.nombre} de ${presentacion.cantidad} uds`;
+      }
+
+      return "";
     },
+    calcularDiasCredito(FechaReg, FechaCredito) {
+      let FechaRegFormat = moment(FechaReg, "YYYY-MM-DD");
+      let FechaCreditoFormat = moment(FechaCredito, "YYYY-MM-DD");
+      return FechaCreditoFormat.diff(FechaRegFormat, "days");
+    },
+    calcularFechaHasta(actual, dias) {
+      var new_date = moment(actual).add(dias, "days");
+      return new_date.format("YYYY-MM-DD");
+    },
+    getPresentacion(prod) {
+      if (prod.presentacion) {
+        let presentacion = JSON.parse(prod.presentacion);
+        return presentacion.nombre;
+      } else {
+        return prod.ProductoMedicion;
+      }
+    },
+    getEmpresa() {
+      this.axios.get(API + "empresa/id/" + 1).then(res => {
+        this.empresa = res.data;
+      });
+    },
+    // window.print();
     imprimir() {
-      window.print();
+      this.axios(`${API}venta/proforma/generar_pdf?id=${this.idProforma}`).then(
+        res => {
+          if (res.data.url) {
+            window.open(res.data.url, "_blank");
+          }
+        }
+      );
     }
   }
-}
+};
 </script>
 
 <style scoped>
-@import '../../assets/css/invoice.css';
+@import "../../assets/css/invoice.css";
+
+.total {
+  background: #010067 !important;
+  color: #fff !important;
+}
+
+.tblProductos {
+  background: #fd8100 !important;
+}
+
+.celda {
+  text-align: left !important;
+  border: none !important;
+  background: white !important;
+}
+
+table.tblProductos tr {
+  background: #fd8100 !important;
+}
+
+table.tblProductos td.celda {
+  text-align: left !important;
+  border: none !important;
+  background: white !important;
+}
+
 @media print {
   #printBtn {
     display: none;
