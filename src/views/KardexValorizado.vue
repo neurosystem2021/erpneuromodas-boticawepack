@@ -63,8 +63,17 @@
                 <template slot="TotalVenta" slot-scope="data">
                   {{ parseFloat(data.item.CantidadVenta * data.item.PrecioVenta).toFixed(2) }}
                 </template>
+                <template slot="bottom-row" slot-scope="data">
+                        <th style="background: #1A237E; color: #ffffff;" colspan="4">TOTALES</th>
+                        <th style="background: #1A237E; color: #ffffff;">{{ totalIngreso }}</th>
+                        <th style="background: #1A237E; color: #ffffff;"></th>
+                        <th style="background: #1A237E; color: #ffffff;"></th>
+                        <th style="background: #1A237E; color: #ffffff;">{{ totalSalida }}</th>
+                        <th style="background: #1A237E; color: #ffffff;"></th>
+                        <th style="background: #1A237E; color: #ffffff;"></th>
+                        <th style="background: #1A237E; color: #ffffff;">{{ parseFloat(totalIngreso - totalSalida).toFixed(2) }}</th>
+                </template>
             </b-table>
-            <!-- {{ lstReporte }} -->
         </b-col>
     </b-row>
   </b-container>
@@ -97,6 +106,8 @@ export default {
       precio: 0,
       idAlmacen: 1,
       producto: {},
+      totalIngreso: 0,
+      totalSalida: 0,
       fields: [
         { key: "Producto", label: "Producto" },
         { key: "TipoDoc", label: "Tipo Doc" },
@@ -150,30 +161,37 @@ export default {
     },
     generarListado(datos) {
       this.lstReporte = [];
-      // Asegúrate de que this.stock sea un número desde el inicio
+      this.totalIngreso = 0;
+      this.totalSalida = 0;
       let val = parseFloat(this.stock) || 0;
 
       datos.forEach(element => {
-        // 1. Manejo de Movimiento (Suma)
+        this.totalIngreso += parseFloat(element.CantidadMovimiento);
+        this.totalSalida += parseFloat(element.CantidadVenta);
         if (parseFloat(element.CantidadMovimiento) > 0) {
-          val += parseFloat(element.CantidadMovimiento); // Suma numérica pura
-
+          val += parseFloat(element.CantidadMovimiento);
           this.lstReporte.push({
             ...element,
-            Saldo: val.toFixed(2) // Solo aquí convertimos a string para la vista
+            Saldo: val.toFixed(2)
           });
         }
-
-        // 2. Manejo de Venta (Resta)
         if (parseFloat(element.CantidadVenta) > 0) {
-          val -= parseFloat(element.CantidadVenta); // Resta numérica pura
+          val -= parseFloat(element.CantidadVenta);
 
           this.lstReporte.push({
             ...element,
-            Saldo: val.toFixed(2) // Solo aquí convertimos a string para la vista
+            Saldo: val.toFixed(2)
           });
         }
       });
+      // this.lstReporte.push({
+      //   Producto: "TOTAL",
+      //   CantidadMovimiento: this.totalIngreso,
+      //   CantidadVenta: this.totalSalida,
+      //   Saldo: this.totalIngreso - this.totalSalida,
+      //   PrecioMovimiento: 0,
+      //   PrecioVenta: 0
+      // });
     },
     retornarDecimal(valor) {
       if (typeof valor === "number") {

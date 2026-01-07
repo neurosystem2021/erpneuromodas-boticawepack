@@ -102,6 +102,17 @@
                   <td v-if="esValorizado">{{ prod.saldoCostoUnitario | redondear }}</td>
                   <td v-if="esValorizado">{{ prod.saldoCostoTotal | redondear }}</td>
                 </tr>
+                <tr>
+                  <th :colspan="esValorizado ? 5 :5">TOTAL:</th>
+                  <th>{{ parseFloat(totalIngreso).toFixed(2) }}</th>
+                  <th v-if="esValorizado" colspan="2"></th>
+                  <th>{{ parseFloat(totalSalidas).toFixed(2) }}</th>
+                  <th v-if="esValorizado" :colspan="esValorizado ? 2 : 1"></th>
+                  <th>
+                    {{ parseFloat(totalIngreso - totalSalidas).toFixed(2) }}
+                  </th>
+                  <th v-if="esValorizado" colspan="5"></th>
+                </tr>
               </tbody>
             </table>
           </b-row>
@@ -124,7 +135,9 @@ export default {
         fechaDesde: this.$moment().format("YYYY-01-01"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
-      kardexSelect: []
+      kardexSelect: [],
+      totalIngreso: 0,
+      totalSalidas: 0
     };
   },
   computed: {
@@ -202,11 +215,27 @@ export default {
         saldoCostoTotal: inicialSaldoCostoTotal,
         saldoCostoUnitario: inicialSaldoCostoUnitario
       });
-
+      this.calcularTotales(arr);
       return arr;
     }
   },
   methods: {
+    calcularTotales(data) {
+      this.totalIngreso = 0;
+      this.totalSalidas = 0;
+      this.kardexSelect.forEach(element => {
+        console.log(element);
+        this.totalIngreso += parseFloat(element.IngresoCantidad);
+        this.totalSalidas += parseFloat(element.SalidaCantidad);
+      });
+      // IngresoCantidad;
+      // SalidaCantidad;
+      // TipoDocSunat6;
+      // saldo;
+      // saldoCostoTotal;
+      // saldoCostoUnitario;
+      console.log("calcularTotales", data);
+    },
     loadFirstAlmacen() {
       this.axios.get(this.API + "almacenes/primero").then(res => {
         this.$refs.inputAlmacen.setValue(res.data.Almacen);
