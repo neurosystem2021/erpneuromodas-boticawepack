@@ -890,206 +890,204 @@ export default {
           this.continuarGuardarVenta();
         }
         // this.continuarGuardarVenta();
-      } else {
+      } else {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         this.continuarGuardarVenta();
       }
     },
     continuarGuardarVenta() {
-      this.validarEsNota = false;
-      this.inProgress = true;
-      let totalPagos = 0;
-      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
-        ? 0
-        : parseFloat(this.venta.pago.efectivo.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
-        ? 0
-        : parseFloat(this.venta.pago.visa.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
-        ? 0
-        : parseFloat(this.venta.pago.mastercard.monto);
-      if (
-        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
-          ? 0
-          : parseFloat(this.venta.pago.efectivo.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.inProgress = false;
-        return;
-      }
-      if (
-        (isNaN(parseFloat(this.venta.pago.visa.monto))
-          ? 0
-          : parseFloat(this.venta.pago.visa.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show("El metodo de pago tarjeta no puede ser negativo");
-        this.inProgress = false;
-        return;
-      }
-      if (
-        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
-          ? 0
-          : parseFloat(this.venta.pago.mastercard.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show(
-          "El metodo de pago mastercard no puede ser negativo"
-        );
-        this.inProgress = false;
-        return;
-      }
-      if (!this.venta.EsCredito) {
-        if (
-          parseFloat(this.totalCart).toFixed(2) !=
-          parseFloat(totalPagos).toFixed(2)
-        ) {
-          this.$toasted.show("Los pagos no coinciden con la venta");
-          this.inProgress = false;
-          return;
-        }
-      }
-
-      if (!this.productos.length) {
-        this.$toasted.show("No hay productos para vender");
-        this.inProgress = false;
-        return;
-      }
-
-      var sinStock = 0;
-      let igualLote = 0;
-      let precioBajo = 0;
-      let totalCero = 0;
-      this.productos.map(pro => {
-        if (
-          (parseFloat(pro.stock) <= 0 ||
-            parseFloat(pro.stockMovimiento).toFixed(2) <
-              parseFloat(pro.cantidad) ||
-            pro.stock == undefined) &&
-          this.venta.tipoVenta.CodSunat != "07"
-        ) {
-          this.$toasted.show(
-            "El producto " +
-              pro.Producto +
-              " no tiene stock. No puede vender un producto sin stock"
-          );
-          sinStock += 1;
-        }
-
-        if (parseFloat(pro.cantidad * pro.precio) <= 0) {
-          this.$toasted.error("No se puede vender productos con total cero");
-          totalCero += 1;
-        }
-
-        let lote = this.productos.filter(
-          p =>
-            p.hashMovimiento == pro.hashMovimiento &&
-            p.IdProducto == pro.IdProducto
-        ).length;
-        if (lote > 1) {
-          igualLote += 1;
-        }
-
-        if (parseFloat(pro.precio) < parseFloat(pro.PrecioContado)) {
-          this.$toasted.show(
-            "El precio de venta del producto " +
-              pro.Producto +
-              " no debe ser menor al precio configurado en el sistema (" +
-              pro.PrecioContado +
-              ")"
-          );
-          precioBajo += 1;
-        }
+    if (
+      this.venta.tipoVenta.CodSunat !== "07" &&
+      this.productos.some(p =>
+        Number(p.cantidad) > Number(p.stockMovimiento || p.stock || 0)
+      )
+    ) {
+      this.$swal({
+        position: "center",
+        icon: "info",
+        title: "No se puede vender un producto sin stock suficiente.",
+        showConfirmButton: true,
+        confirmButtonText: "Entiendo",
+        target: document.getElementById("conten"),
+        confirmButtonColor: "#0275d8"
       });
-      if (sinStock) {
-        this.inProgress = false;
-        return;
-      }
+      return;
+    }
 
-      if (precioBajo >= 1) {
-        this.inProgress = false;
-        return;
-      }
+  this.validarEsNota = false;
+  this.inProgress = true;
+  let totalPagos = 0;
+  totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
+    ? 0
+    : parseFloat(this.venta.pago.efectivo.monto);
+  totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
+    ? 0
+    : parseFloat(this.venta.pago.visa.monto);
+  totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+    ? 0
+    : parseFloat(this.venta.pago.mastercard.monto);
+  if (
+    (isNaN(parseFloat(this.venta.pago.efectivo.monto))
+      ? 0
+      : parseFloat(this.venta.pago.efectivo.monto)
+    ).toFixed(2) < 0
+  ) {
+    this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+    this.inProgress = false;
+    return;
+  }
+  if (
+    (isNaN(parseFloat(this.venta.pago.visa.monto))
+      ? 0
+      : parseFloat(this.venta.pago.visa.monto)
+    ).toFixed(2) < 0
+  ) {
+    this.$toasted.show("El metodo de pago tarjeta no puede ser negativo");
+    this.inProgress = false;
+    return;
+  }
+  if (
+    (isNaN(parseFloat(this.venta.pago.mastercard.monto))
+      ? 0
+      : parseFloat(this.venta.pago.mastercard.monto)
+    ).toFixed(2) < 0
+  ) {
+    this.$toasted.show(
+      "El metodo de pago mastercard no puede ser negativo"
+    );
+    this.inProgress = false;
+    return;
+  }
+  if (!this.venta.EsCredito) {
+    if (
+      parseFloat(this.totalCart).toFixed(2) !=
+      parseFloat(totalPagos).toFixed(2)
+    ) {
+      this.$toasted.show("Los pagos no coinciden con la venta");
+      this.inProgress = false;
+      return;
+    }
+  }
 
-      if (totalCero >= 1) {
-        this.inProgress = false;
-        return;
-      }
+  if (!this.productos.length) {
+    this.$toasted.show("No hay productos para vender");
+    this.inProgress = false;
+    return;
+  }
 
-      if (igualLote >= 1) {
-        this.$toasted.error("Debe seleccionar diferente lote por producto");
-        this.inProgress = false;
-        return;
-      }
+  let igualLote = 0;
+  let precioBajo = 0;
+  let totalCero = 0;
+  this.productos.forEach(pro => {
+    if (parseFloat(pro.cantidad * pro.precio) <= 0) {
+      this.$toasted.error("No se puede vender productos con total cero");
+      totalCero += 1;
+    }
 
-      if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
-      ) {
-        if (
-          !this.venta.CodSunatModifica ||
-          !this.venta.NroComprobanteModifica
-        ) {
-          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
-          this.inProgress = false;
-          return;
-        }
+    let lote = this.productos.filter(
+      p =>
+        p.hashMovimiento == pro.hashMovimiento &&
+        p.IdProducto == pro.IdProducto
+    ).length;
+    if (lote > 1) {
+      igualLote += 1;
+    }
 
-        if (!this.venta.NotaIdMotivo) {
-          this.$toasted.show("Debe seleccionar un Motivo");
-          this.inProgress = false;
-          return;
-        }
+    if (parseFloat(pro.precio) < parseFloat(pro.PrecioContado)) {
+      this.$toasted.show(
+        "El precio de venta del producto " +
+          pro.Producto +
+          " no debe ser menor al precio configurado en el sistema (" +
+          pro.PrecioContado +
+          ")"
+      );
+      precioBajo += 1;
+    }
+  });
 
-        this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
-          item => item.value == this.venta.NotaIdMotivo
-        )[0].text;
-      }
+  if (precioBajo >= 1) {
+    this.inProgress = false;
+    return;
+  }
+
+  if (totalCero >= 1) {
+    this.inProgress = false;
+    return;
+  }
+
+  if (igualLote >= 1) {
+    this.$toasted.error("Debe seleccionar diferente lote por producto");
+    this.inProgress = false;
+    return;
+  }
+
+  if (
+    this.venta.tipoVenta.CodSunat == "07" ||
+    this.venta.tipoVenta.CodSunat == "08"
+  ) {
+    if (
+      !this.venta.CodSunatModifica ||
+      !this.venta.NroComprobanteModifica
+    ) {
+      this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+      this.inProgress = false;
+      return;
+    }
+
+    if (!this.venta.NotaIdMotivo) {
+      this.$toasted.show("Debe seleccionar un Motivo");
+      this.inProgress = false;
+      return;
+    }
+
+    this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+      item => item.value == this.venta.NotaIdMotivo
+    )[0].text;
+  }
 
       // check if factura DNI
-      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
-        this.$toasted.show(
-          "Una factura debe ser emitida para una empresa, no un usuario común."
-        );
-        this.inProgress = false;
-        return;
-      }
+  var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
+  if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
+    this.$toasted.show(
+      "Una factura debe ser emitida para una empresa, no un usuario común."
+    );
+    this.inProgress = false;
+    return;
+  }
 
-      this.venta.productos = this.productos;
-      this.venta.puntosAplicados = this.puntosAplicados || 0;
-      this.venta.totalCart = this.totalCart || 0;
-      this.venta.PagoCon = this.$refs.carrito.pagocon;
+  this.venta.productos = this.productos;
+  this.venta.puntosAplicados = this.puntosAplicados || 0;
+  this.venta.totalCart = this.totalCart || 0;
+  this.venta.PagoCon = this.$refs.carrito.pagocon;
       // console.log(this.venta);return;
-      this.axios
-        .post(this.API + "ventas", this.venta)
-        .then(response => {
-          this.$toasted.success("Venta realizada con exito");
-          this.inProgress = false;
-          this.tieneIgv = false;
-          this.ultimaVenta = response.data.insertId;
-          this.$refs.carrito.pagocon = 0;
-          this.initForm();
-          this.limpiarCart();
-          this.getVendedor();
-          this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
+  this.axios
+    .post(this.API + "ventas", this.venta)
+    .then(response => {
+      this.$toasted.success("Venta realizada con exito");
+      this.inProgress = false;
+      this.tieneIgv = false;
+      this.ultimaVenta = response.data.insertId;
+      this.$refs.carrito.pagocon = 0;
+      this.initForm();
+      this.limpiarCart();
+      this.getVendedor();
+      this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
           // this.$refs.inputAlmacen.setValue('VENTA')
           // this.$refs.inputPuntoVenta.setValue('CAJA1')
           // this.$refs.inputCliente.setValue('')
           // this.$refs.inputVendedor.setValue('')
 
-          window.open(
-            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
-            "_blank"
-          );
-          this.loadClienteVarios();
-        })
-        .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-          this.inProgress = false;
-        });
-    },
+      window.open(
+        "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+        "_blank"
+      );
+      this.loadClienteVarios();
+    })
+    .catch(error => {
+      console.log(error);
+      this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+      this.inProgress = false;
+    });
+},
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
       this.venta.cliente = {};
