@@ -5,14 +5,27 @@
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
     <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
+        <b-col md="12" style="margin-top: -10px; margin-bottom: -10px;">
+            <b-btn v-if="showNew" variant="success" size="md" @click="eliminaId"><b>Nuevo</b></b-btn>    
+            <hr style="margin-top: 5px;"/> 
+        </b-col>
+
         <b-col md="6">
-          <b-form-group>
-            <label>Código barra:</label>
+        <b-form-group>
+          <label>Código barra:</label>
             <b-form-input 
               ref="inputCodigoBarra"
-              required="required"
               v-model="producto.CodigoBarra"
               @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+              type="text"
+              class="form-control upper"
+              ></b-form-input>
+          </b-form-group>
+          <label>Código barra Modelo:</label>
+            <b-form-input 
+              ref="inputCodigoBarra"
+              v-model="producto.CodeBarModelo"
+              @input="(val) => producto.CodeBarModelo = val && val.toUpperCase()"
               type="text"
               class="form-control upper"
               ></b-form-input>
@@ -37,8 +50,32 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
+          <b-form-group>
+            <label>Artículo:</label>
+            <b-form-input v-model="producto.Producto"
+              required="required"
+              type="text"
+              @input="(val) => producto.Producto = val && val.toUpperCase()"
+              :value="producto.Producto"
+              ></b-form-input>
+          </b-form-group>
+          
+          <b-form-group>
+            <label>Anaquel:</label>
+            <autocomplete
+                :url="API + 'productos/anaquel'"
+                ref="inputPresentacion"
+                anchor="Anaquel"
+                label="writer"
+                :placeholder.sync="producto.Anaquel"
+                :on-select="val => producto.Anaquel = val.Anaquel && val.Anaquel.toUpperCase()"
+                :onInput="val => producto.Anaquel = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+          </b-form-group>
 
-           <b-form-group>
+          <b-form-group>
             <label>Marca:</label>
             <b-input-group>
               <autocomplete
@@ -58,46 +95,65 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          
           <b-form-group>
-            <label>Artículo:</label>
-            <b-form-input v-model="producto.Producto"
-              ref="inputProducto"
-              required="required"
-              type="text"
-              @input="(val) => producto.Producto = val && val.toUpperCase()"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
-
-         
-          <!--<b-form-group>
-            <label>Presentación:</label>
-            <autocomplete
+            <label>Modelo:</label>
+            <b-input-group>
+              <autocomplete
                 required="required"
-                :url="API + 'productos/presentaciones'"
-                ref="inputPresentacion"
-                anchor="ProductoPresentacion"
+                :url="API + 'productos/modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
                 label="writer"
-                :placeholder.sync="producto.ProductoPresentacion"
-                :on-select="val => producto.ProductoPresentacion = val.ProductoPresentacion && val.ProductoPresentacion.toUpperCase()"
-                :onInput="val => producto.ProductoPresentacion = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
+                :placeholder.sync="producto.ProductoModelo"
+                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
+                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
-          </b-form-group>-->
-
-          <b-form-group>
-            <label>Imagen:</label>
-            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-            <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
-            <b-form-text id="input-formatter-help">
-              <b style="color: red;">*La imagen debe ser en formato PNG y 500 x 500 pixeles</b>
-            </b-form-text>
+            </b-input-group>
+            <!--<b-form-input v-model="producto.ProductoModelo"
+              required="required"
+              class="upper"
+              type="text"
+              @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
+              ></b-form-input>-->
+            <!-- <b-input-group>
+              <autocomplete
+                :url="API + 'modelos'"
+                ref="inputModelo"
+                anchor="ProductoModelo"
+                label="writer"
+                :placeholder.sync="producto.modelo.ProductoModelo"
+                :on-select="setModelo"
+                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+              <b-input-group-append>
+                <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
+              </b-input-group-append>
+            </b-input-group> -->
           </b-form-group>
-          
-          
+          <b-form-group>
+            <label>Colores:</label>
+            <autocomplete
+                required="required"
+                :url="API + 'productos/colores'"
+                ref="inputColor"
+                anchor="Color"
+                label="writer"
+                :placeholder.sync="producto.Color"
+                :on-select="val => producto.Color = val.Color && val.Color.toUpperCase()"
+                :onInput="val => producto.Color = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputColor')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Color"
+              type="text"
+              @input="(val) => producto.Color = val && val.toUpperCase()"              
+              ></b-form-input>-->
+          </b-form-group>
         </b-col>
+
         <b-col md="6">
           <b-form-group>
             <label>Medición:</label>
@@ -109,114 +165,92 @@
               anchor="ProductoMedicion"
               label="writer"
               :placeholder.sync="producto.medicion.ProductoMedicion"
-              :on-select="setMedicion"
-              :onFocus="focusAutocomplete.bind(null, 'inputMedicion')" 
+              :on-select="setMedicion"              
               :classes="{input: 'form-control'}">
             </autocomplete>
+          </b-form-group>
+          
+          <b-form-group>
+            <label>Talla:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'tallas'"
+                ref="inputTalla"
+                anchor="ProductoTalla"
+                label="writer"
+                :placeholder.sync="producto.talla.ProductoTalla"
+                :on-select="setTalla"
+                :onFocus="focusAutocomplete.bind(null, 'inputTalla')"                    
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearTalla"><b>Guardar</b></b-btn>                
+                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group>
+            <label>Genero:</label>            
+            <b-form-select required="required" v-model="producto.Genero" :options="generos" />
+          </b-form-group>
+          <b-form-group>
+            <label>Botapie/Manga:</label>
+            <autocomplete
+                required="required"
+                :url="API + 'productos/botapies'"
+                ref="inputBotapie"
+                anchor="Botapie"
+                label="writer"
+                :placeholder.sync="producto.Botapie"
+                :on-select="val => producto.Botapie = val.Botapie && val.Botapie.toUpperCase()"
+                :onInput="val => producto.Botapie = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputBotapie')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!-- <b-form-input v-model="producto.Botapie"
+              type="text"
+              @input="(val) => producto.Botapie = val && val.toUpperCase()"              
+              ></b-form-input> -->
           </b-form-group>
           <b-form-group>
             <label>Porcentaje Utilidad:</label>
             <input 
-              required="required"
               v-model="producto.PorcentajeUtilidad"
-              @input.native="actualizarPrecioContado"
+              @input="actualizarPrecioContado"
               type="number"
-              min="0"
               step="0.0001"
               class="form-control"
               />
           </b-form-group>
-          <b-form-group v-if="!producto.EsPadre">
+          <b-form-group>
             <label>Stock Minimo:</label>
             <input   
               required="required"
               v-model="producto.StockMinimo"
               type="number"
+              step="0.001"
               class="form-control"
-              step="0.0001"
               />
           </b-form-group>
-          <b-form-group>
-            <label>Activar SubProductos:</label>
-            <b-form-checkbox
-                     v-model="producto.EsPadre"
-                     :value="1"
-                     :unchecked-value="0"
-                     @input="checkIsHijo">
-              Seleccione esta opción si el producto contiene mas productos
-            </b-form-checkbox>
-          </b-form-group>
-          
-          <b-form-group>
-            <b-form-checkbox
-                     v-model="producto.SoloLargo"
-                     :value="1"
-                     :unchecked-value="0">
-                     Solo Largo
-            </b-form-checkbox>
+
+          <b-form-group v-if="true">
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
           </b-form-group>
           
         </b-col>
       </b-row>
 
-      <b-row class="rendimiento">
-        <!-- <b-col md="4">
-          <b-form-group>
-            <label>Rendimiento (M²):</label>
-            <b-form-input
-              v-model="producto.Rendimiento"
-              type="number"
-              :readonly="!producto.EsPadre"
-              ></b-form-input>
-          </b-form-group>
-        </b-col> -->
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Ancho (cm):</label>
-            <input
-              v-model="producto.Ancho"
-              type="number"
-              :readonly="!!producto.EsPadre"
-               @input="val => calcularm2()"
-               class="form-control"
-               step="0.0001"
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Largo (cm):</label>
-            <input
-              v-model="producto.Largo"
-              type="number"
-              :readonly="!!producto.EsPadre"
-               @input="val => calcularm2()"
-              class="form-control"
-              step="0.0001"
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Calculo de Pie<sup>2</sup> : {{ pie2total.toFixed(1) }}</label>
-          </b-form-group>
-        </b-col>
-        <b-col md="6" v-show="!producto.SoloLargo">
-          <b-form-group>
-            <label>Precio por Pie<sup>2</sup> : {{ (producto.PrecioContado/pie2total).toFixed(2) }}</label>
-          </b-form-group>
-        </b-col>
-      </b-row>
-
-
-      <hr v-if="producto.IdProducto || producto.EsPadre" />
-      <b-row v-if="producto.IdProducto || producto.EsPadre">
+      <hr/>
+      <b-row>
         <b-col md="6">
           <b-form-group>
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              readonly="readonly"
+              @input="actualizarPorcentajeUtilidad"
               type="number"
               class="form-control"
               step="0.0001"
@@ -228,9 +262,9 @@
             <label>Precio de Venta:</label>
             <input v-model="producto.PrecioContado"
               type="number"
-              @input.native="actualizarPorcentajeUtilidad"
               class="form-control"
-              step="0.0001"
+              step="0.001"
+              @input="actualizarLiquidacion"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -238,16 +272,105 @@
           </b-form-group>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col md="6">
+
+        </b-col>
+        <b-col md="6">
+            
+            <b-row>
+              <b-col>
+                <label>% de Liquidación:</label>
+                <input v-model="producto.PorcentajeLiquidacion"
+                type="number"
+                class="form-control"
+                step="1"
+                min="0"
+                max="100"
+                @input="(val)=>actualizarLiquidacion(val.target.value)"
+                />
+              </b-col>
+              <b-col>
+                <label>Precio Final:</label>
+                <br>
+                <div style="display:flex; justify-content: start; align-items: center; margin-top: 6px;">
+                  <b>{{ precioLiquidacion }}</b>
+                </div>
+              </b-col>
+            </b-row>
+        </b-col>
+      </b-row>
+       <hr />
+      <b-row>
+        <b-col md="12" >
+          
+          <b-form-checkbox
+            v-model="TienePresentacion"
+            name="checkbox-1"
+            :value="true"
+            :unchecked-value="false"
+          >
+           Tiene Presentación
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
+     
+        <b-row v-if="TienePresentacion">
+        <b-col md="3" v-for="i in 4" :key="i.id" >
+          <b-card :border-variant="producto.precios[i-1].nombre=='OFERTA'?'danger':'light'" :header="'Precio '+i" class="text-center"  v-bind:class="[producto.precios[i-1].nombre=='OFERTA' ? 'oferta' : '']">
+            <b-form-group>
+              <b-form-input
+                v-model="producto.precios[i-1].nombre"
+                :disabled="(idPerfil == 1) ? false : true"
+                type="text"
+                style="text-transform:uppercase"
+                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
+                ></b-form-input>
+            </b-form-group>
+
+            <b-form-group>
+              <label>Cantidad:</label>
+              <input
+                v-model="producto.precios[i-1].cantidad"
+                :disabled="(idPerfil == 1) ? false : true"
+                type="number"
+                class="form-control"
+                step="0.01"
+                />
+            </b-form-group>
+            
+            <b-form-group>
+              <label>Precio Compra:</label>
+              <input 
+                v-model="producto.precios[i-1].precioc"
+                :disabled="(idPerfil == 1) ? false : true"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+
+            <b-form-group>
+              <label>Precio:</label>
+              <input 
+                v-model="producto.precios[i-1].precio"
+                :disabled="(idPerfil == 1) ? false : true"
+                type="number"
+                class="form-control"
+                step="0.00001"
+                />
+            </b-form-group>
+            <b-form-group>
+              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear }}</label>
+            </b-form-group>
+          </b-card>
+        </b-col>
+      </b-row>
 
       <hr />
       <b-row>
         <b-col>
-          <producto-form-det 
-            @onUpdateProductos="calcularPreciosPaquete"
-            :id-producto="producto.IdProducto" 
-            v-if="showProductoDet && show" 
-            ref="productoDet"
-            ></producto-form-det>
+          <producto-form-det :id-producto="producto.IdProducto" v-if="showProductoDet && show" ref="productoDet"></producto-form-det>
         </b-col>
       </b-row>
 
@@ -264,14 +387,14 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
         <b-btn  variant="primary" type="submit">
-           Guardar
+           {{this.mensajeBtn}}
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
            Close
@@ -282,421 +405,434 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CategoriaForm from '@/components/CategoriaForm'
-import MarcaForm from '@/components/MarcaForm'
-import ProductoFormDet from '@/components/ProductoFormDet'
+import config from "@/store/config.js";
+import CategoriaForm from "@/components/CategoriaForm";
+import MarcaForm from "@/components/MarcaForm";
+import ProductoFormDet from "@/components/ProductoFormDet";
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
-  data () {
+  data() {
     return {
-      showProductoDet: true,
+      mensajeBtn: "Crear",
+      showNew: false,
+      showProductoDet: false,
       cantidadCodigoBarra: 1,
-      title: 'Nuevo Producto',
+      title: "Nuevo Producto",
       API: config.API,
-      show: false, 
-      // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
+      show: false,
+      generos: ["VARON", "DAMA", "NIÑO", "NIÑA", "UNISEX", "JUNIOR"],
       producto: {},
       productosDet: [],
-      pie2total:0,
-      pie:900,
-      preciototal:0,
-      file: '',
-    }
+      precioLiquidacion: 0,
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      file: "",
+      manterproducto: {
+        default: false,
+        type: Boolean
+      },
+      TienePresentacion: false
+    };
   },
-  beforeMount () {
-    this.initForm()
+  beforeMount() {
+    this.initForm();
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
-    show (val) {
-      let newVal = this.productoUpdate  || {}
+    async show(val) {
+      this.preproducto = { ...this.productoUpdate };
+      if (val) {
+      } else {
+        this.producto.IdProducto;
+      }
+      this.$nextTick(() => {
+        if (this.manterproducto) {
+          this.producto.Producto = this.preproducto.Producto.split("-")[0].trim();
+          this.producto.PrecioCosto = this.preproducto.PrecioCosto;
+
+          this.$forceUpdate();
+        }
+      });
+    },
+    productoUpdate(newVal) {
       if (newVal.IdProducto) {
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+        this.mensajeBtn = "Guardar";
+        this.showNew = true;
+        this.title = "Editar Producto << " + newVal.CodigoBarra + " >> ";
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
           ProductoCategoria: newVal.ProductoCategoria
-        }
+        };
         this.producto.marca = {
           IdProductoMarca: newVal.IdProductoMarca,
           ProductoMarca: newVal.ProductoMarca
-        }
+        };
         this.producto.medicion = {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
-        }
-       
-       // this.$refs.inputCategoria.setValue('')
-        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
-       // this.$refs.inputMarca.setValue('')
-        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
+        };
 
-       // this.$refs.inputMedicion.setValue('')
-        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
-        
+        // this.$refs.inputCategoria.setValue('')
+        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria);
+
+        // this.$refs.inputMarca.setValue('')
+        this.$refs.inputMarca.setValue(newVal.ProductoMarca);
+
+        // this.$refs.inputMedicion.setValue('')
+        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion);
+
         // this.$refs.inputModelo.setValue('')
-        // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
-        // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
+        this.$refs.inputModelo.setValue(newVal.ProductoModelo);
+        this.$refs.inputPresentacion.setValue(newVal.Anaquel);
+        this.$refs.inputTalla.setValue(newVal.ProductoTalla);
 
-        // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
-        // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        this.$refs.inputColor.setValue(newVal.Color);
+        this.$refs.inputBotapie.setValue(newVal.Botapie)
 
-        // this.$refs.inputColor.setValue(newVal.Color)
-        // this.$refs.inputBotapie.setValue(newVal.Botapie)
-        
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
         } */
-        /*this.producto.talla = {
+        this.producto.talla = {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
-        }*/
-        //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
-        this.producto.IdProducto = newVal.IdProducto
-
-        this.producto.EsPadre = newVal.EsPadre
-        this.producto.SoloLargo = newVal.SoloLargo
-        Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
-        })
-        // this.producto.Genero = newVal.Genero
-        // this.producto.Botapie = newVal.Botapie
-        // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-        this.producto.StockMinimo = newVal.StockMinimo
-        this.producto.CodigoBarra = newVal.CodigoBarra
-        //this.producto.ProductoModelo = newVal.ProductoModelo
-        // this.producto.ProductoPresentacion = newVal.ProductoPresentacion
-        this.producto.PrecioCosto = newVal.PrecioCosto
-        this.producto.PrecioContado = newVal.PrecioContado
-        this.producto.Rendimiento = newVal.Rendimiento
-        this.producto.Ancho = newVal.Ancho
-        this.producto.Largo = newVal.Largo
-        this.producto.Imagen = newVal.Imagen
-        this.$refs.file.value=null
-        this.file = ''
+        };
+        this.producto.Producto = newVal.Producto.split("-")
+          .slice(0, -1)
+          .join();
+        this.producto.IdProducto = newVal.IdProducto;
+        this.producto.Genero = newVal.Genero;
+        this.producto.Botapie = newVal.Botapie;
+        this.producto.Talla = newVal.Talla;
+        this.producto.Color = newVal.Color;
+        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
+        this.producto.StockMinimo = newVal.StockMinimo;
+        this.producto.CodigoBarra = newVal.CodigoBarra;
+        this.producto.CodeBarModelo = newVal.CodeBarModelo;
+        this.producto.ProductoModelo = newVal.ProductoModelo;
+        this.producto.PrecioCosto = newVal.PrecioCosto;
+        this.producto.Anaquel = newVal.Anaquel;
+        this.producto.PrecioContado = newVal.PrecioContado;
+        this.TienePresentacion = Boolean(newVal.TienePresentacion);
+        this.producto.Imagen = newVal.Imagen;
+        this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion;
+        this.actualizarLiquidacion();
+        if (newVal.PreciosPorProducto) {
+          this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
+          this.producto.precios.forEach(element => {
+            if (!element.precioc) {
+              element.precioc = 0;
+            }
+          });
+        }
       } else {
-        this.$refs.file.value=null
-        this.file = ''
-        this.title = 'Nuevo Producto'
-        this.clearForm()
-
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        this.precioLiquidacion = 0;
+        this.title = "Nuevo Producto";
+        this.showNew = false;
+        this.mensajeBtn = "Crear";
+        this.clearForm();
       }
     }
   },
   methods: {
-    handleFileUpload() {
-      const file = this.$refs.file.files[0]
-      this.file = ''
-      if (!file) {
-        this.$refs.file.value=null
-        this.$toasted.error('Sin imagen, no se guardará', { duration: 4000 })
-        return;
-      }
-      
-      if (file.type != 'image/png') {
-        this.$toasted.error('La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará', { duration: 5000 })
-        this.$refs.file.value = null
-        this.file = ''
-        return;
-      }
+    actualizarPorcentajeUtilidad() {
+      const costo = parseFloat(this.producto.PrecioCosto) || 0;
+      const venta = parseFloat(this.producto.PrecioContado) || 0;
 
-      try {
-        this.getBase64(file).then((base64) => {
-          const img = new Image();
-          img.src = base64.toString();
-          img.onload = () => {
-            if(img.width == 500 && img.height == 500){
-              this.file = file
-              console.log(this.file);
-              this.$toasted.info('La imagen se cargo correctamente, presione GUARDAR para registrarla en el producto.', { duration: 6000 })
-            }else{
-              this.file = ''
-              this.$refs.file.value = null
-              this.$toasted.error("La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará.", { duration: 5000 })
-            }
-          
-          };     
-        });    
-      } catch (error) {
-        this.file = ''
-        this.$refs.file.value = null
-        this.$toasted.show("Ha ocurrido un error", { duration: 4000 })
+      if (venta > 0) {
+        this.producto.PorcentajeUtilidad = Number(((venta - costo) / costo * 100).toFixed(2));
+      } else {
+        this.producto.PorcentajeUtilidad = 0;
       }
-
     },
-    getBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
+    activarPresentacion(e) {
+      // this.producto.TienePresentacion = Number(e);
+      console.log(this.producto.TienePresentacion);
+      console.log(typeof this.producto.TienePresentacion);
+      console.log("---------");
     },
-    calcularm2(){
-      this.pie2total = Math.round((this.producto.Ancho*this.producto.Largo/this.pie)*10)/10
-      this.preciototal = this.pie2total*this.precioContado
-    },
-    calcularPreciosPaquete (prodDetalles) {
-      let sumatoriaCosto = 0
-      let sumatoriaContado = 0
-      prodDetalles.forEach(prod => {
-        if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad
-        }
-      });
-      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
-      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado)
-      
-      Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
-      Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
-      this.actualizarPorcentajeUtilidad()
-    },
-    eliminarProducto (producto) {
+    eliminarProducto(producto) {
       // NO eliminar porque no distinque movimientos ni ventas
-      let r = confirm('¿Esta seguro de Anular este producto?')
+      let r = confirm("¿Esta seguro de Anular este producto?");
       if (r) {
-        this.axios.post(this.API + 'productos/delete', {
-          id: producto.IdProducto
-        }).then(res => {
-          if (res.data.updated) {
-            this.$toasted.success('El producto con código ' + res.data.IdProducto + ' ha sido anulado')
-            if (this.cbGuardar) {
-              this.cbGuardar()
+        this.axios
+          .post(this.API + "productos/delete", {
+            id: producto.IdProducto
+          })
+          .then(res => {
+            if (res.data.updated) {
+              this.$toasted.success(
+                "El producto con código " +
+                  res.data.IdProducto +
+                  " ha sido anulado"
+              );
+              if (this.cbGuardar) {
+                this.cbGuardar();
+              }
+              this.$refs.productoForm.hide();
             }
-            this.$refs.productoForm.hide()
-          }
-        })
+          });
       }
     },
-    actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
-      // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+    },
+    eliminaId() {
+      delete this.producto.IdProducto;
+      this.mensajeBtn = "Crear";
+      this.showNew = false;
+      this.$refs.inputCodigoBarra.setValue("");
+      //console.log(this.producto,"asdasd");
+    },
+    actualizarLiquidacion() {
+      this.precioLiquidacion =
+        this.producto.PrecioContado -
+        Math.round(
+          (((this.producto.PorcentajeLiquidacion > 0
+            ? this.producto.PorcentajeLiquidacion
+            : 0) *
+            (this.producto.PrecioContado > 0
+              ? this.producto.PrecioContado
+              : 0)) /
+            100) *
+            10
+        ) /
+          10;
+      this.actualizarPorcentajeUtilidad();
+    },
+    actualizarPrecioContado() {
+      var precioCosto = this.producto.PrecioCosto;
+      var utilidad = this.producto.PorcentajeUtilidad / 100;
+      var nuevoPrecioContado =
+        parseFloat(precioCosto) + parseFloat(precioCosto * utilidad);
 
-      this.producto.precioContadoNormal = nuevoPrecioContado
-      //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
-      this.producto.PrecioContado = this.$options.filters.redondear(nuevoPrecioContado, 1)
-
+      console.log(nuevoPrecioContado);
+      this.producto.precioContadoNormal = nuevoPrecioContado;
+      this.producto.PrecioContado = this.$options.filters.redondeoMayor(
+        nuevoPrecioContado
+      );
     },
-    actualizarPorcentajeUtilidad () {
-      var precioContado = this.producto.PrecioContado
-      var precioCosto = this.producto.PrecioCosto
-
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+    setCategoria(obj) {
+      this.producto.categoria = obj;
+      this.$refs.inputCategoria.setValue(obj.ProductoCategoria);
     },
-    setCategoria (obj) {
-      this.producto.categoria = obj
-      this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
+    setMedicion(obj) {
+      this.producto.medicion = obj;
     },
-    setMedicion (obj) {
-      this.producto.medicion = obj
-    },
-    setMarca (obj) {
-      this.producto.marca = obj
-      this.$refs.inputMarca.setValue(obj.ProductoMarca)
+    setMarca(obj) {
+      this.producto.marca = obj;
+      this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
     /* setModelo (obj) {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
     }, */
-    /*setTalla (obj) {
-      this.producto.talla = obj
-      this.$refs.inputTalla.setValue(obj.ProductoTalla)
-    },*/
-    clearForm () {
-      this.$refs.inputCategoria.setValue('')
-      this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('UNIDAD')
-      // this.$refs.inputTalla.setValue('')
-      //this.$refs.inputModelo.setValue('')
-      // this.$refs.inputPresentacion.setValue('')
-      // this.$refs.inputColor.setValue('')
-      // this.$refs.inputBotapie.setValue('')
-
-      this.initForm()
+    setTalla(obj) {
+      this.producto.talla = obj;
+      this.$refs.inputTalla.setValue(obj.ProductoTalla);
     },
-    initForm () {
+    clearForm() {
+      this.$refs.inputCategoria.setValue("");
+      this.$refs.inputMarca.setValue("");
+      this.$refs.inputMedicion.setValue("UNIDAD");
+      this.$refs.inputTalla.setValue("");
+      this.$refs.inputModelo.setValue("");
+      this.$refs.inputColor.setValue("");
+      //this.$refs.inputBotapie.setValue('')
+
+      this.initForm();
+    },
+    initForm() {
       this.producto = {
-        EsPadre: 0,
-        SoloLargo: 0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
         IdProductoCategoria: null,
         // IdProductoModelo: null,
-        // IdProductoBotapie: null,
-        // IdProductoTalla: '',
-        Producto: '',
-        CodigoBarra: '',
-        // Color: '',
-        PorcentajeUtilidad: '',
-        Rendimiento: '',
-        Ancho: '',
-        Largo: '',
+        IdProductoBotapie: null,
+        IdProductoTalla: "",
+        Producto: "",
+        CodigoBarra: "",
+        CodeBarModelo: "",
+        Color: "",
+        PorcentajeUtilidad: "",
         StockMinimo: 0,
-        PrecioContado: '',
-        // Botapie: '',
-        // Genero: '',
-        Imagen: null,
+        PrecioContado: "",
+        Botapie: "",
+        Genero: "",
+        PrecioContado: 0,
+        PorcentajeLiquidacion: 0,
+        PrecioCosto: 0,
         categoria: {},
         marca: {},
+        Imagen: null,
+        precios: [
+          { nombre: "PRECIO 1", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 2", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 3", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "PRECIO 4", cantidad: 0, precio: 0, precioc: 0 },
+          { nombre: "OFERTA", cantidad: 0, precio: 0, precioc: 0 }
+        ],
         // modelo: {},
-        //talla: {},
+        talla: {},
         medicion: {
-          IdProductoMedicion:6,
-          ProductoMedicion:"UNIDAD"
+          IdProductoMedicion: 6,
+          ProductoMedicion: "UNIDAD"
         }
-      }
+      };
     },
     guardarProducto(e) {
       e.preventDefault();
 
+      // filtro si esta ingresado correctamente
+      if (
+        this.$refs.inputCategoria.$refs.input.value.toLowerCase() !=
+        this.producto.categoria.ProductoCategoria.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Categoría.");
+        return;
+      }
+
+      if (
+        this.$refs.inputMarca.$refs.input.value.toLowerCase() !=
+        this.producto.marca.ProductoMarca.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Marca.");
+        return;
+      }
+
+      if (
+        this.$refs.inputTalla.$refs.input.value.toLowerCase() !=
+        this.producto.talla.ProductoTalla.toLowerCase()
+      ) {
+        this.$toasted.show("Falta seleccionar o guardar la Talla.");
+        return;
+      }
+
+      this.producto.PorcentajeLiquidacion =
+        this.producto.PorcentajeLiquidacion > 0
+          ? this.producto.PorcentajeLiquidacion
+          : 0;
+      this.producto.TienePresentacion = this.TienePresentacion;
+      this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.producto.CodeBarModelo = ("" + this.producto.CodeBarModelo).trim();
+
       // Agregar producto DET
       if (this.showProductoDet) {
-        this.producto.productosDet = this.$refs.productoDet.productos
+        this.producto.productosDet = this.$refs.productoDet.productos;
       }
-      // console.log(JSON.stringify(this.producto))
 
-      this.axios.post(this.API + 'productos', this.producto)
-      .then((response) => {
-        if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
-        }
-        if (response.data.error) {
-          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
-          return
-        } else {
-          this.$toasted.show('Producto guardado correctamente')
-        }
-
-        // this.initForm()
-        // this.producto.talla = {}
-        // this.$refs.inputTalla.setValue('')
-
-        let formData = new FormData();
-        formData.append('imagen', this.file);
-
-        this.axios({
-            method    : 'post',
-            url       : this.API + 'producto/imagen/' + response.data.insertId,
-            data      : formData,
-            headers   : { 'Content-Type': 'multipart/form-data' }
-          })
-          .then((res) => {
-            // console.log(res);
-            this.file = ''
-            this.$refs.file.value = null
-          })
-
-        this.$refs.productoForm.hide()
-      })
-      .catch((error) => {
-        console.log(error)
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
-    },
-    focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },
-    crearCategoria () {
-      if (this.$refs.inputCategoria.type) {
-        let categoria = {}
-        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase()
-
-        this.axios.post(this.API + 'categorias', categoria)
-        .then((response) => {
-          this.$toasted.show('Categoría guardada correctamente')
-          this.setCategoria({
-            IdProductoCategoria: response.data.insertId,
-            ProductoCategoria: response.data.ProductoCategoria
-          })
+      this.axios
+        .post(this.API + "productos", {
+          ...this.producto,
+          PreciosPorProducto: this.producto.precios
         })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-      
-    },
-    crearMarca () {
-      if (this.$refs.inputMarca.type) {
-        let marca = {}
-        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase()
-  
-        this.axios.post(this.API + 'marcas', marca)
-        .then((response) => {
-          this.$toasted.show('Marca guardada correctamente')
-          this.setMarca({
-            IdProductoMarca: response.data.insertId,
-            ProductoMarca: response.data.ProductoMarca
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-    },
-    crearTalla () {
-      if (this.$refs.inputTalla.type) {
-        let talla = {}
-        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
-  
-        this.axios.post(this.API + 'tallas', talla)
-        .then((response) => {
-          this.$toasted.show('Talla guardada correctamente')
-          this.setTalla({
-            IdProductoTalla: response.data.insertId,
-            ProductoTalla: response.data.ProductoTalla
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-    },
-    checkIsHijo (val) {
-      if (val && this.producto.IdProducto) {
-        this.axios.get(this.API + 'productos/eshijo', {params: {
-          idProducto: this.producto.IdProducto
-        }})
-        .then(res => {
-          let esHijo = res.data.esHijo
-          if(esHijo) {
-            this.$toasted.show('Este producto no puede contener productos ya que es un producto hijo')
-            this.producto.EsPadre = false      
-          }else {
-            this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+        .then(response => {
+          this.$emit("productoactualizado", response.data.insertId);
+          if (this.cbGuardar) {
+            this.cbGuardar(response.data.insertId);
           }
+          if (response.data.error) {
+            this.$toasted.show(response.data.error);
+          } else {
+            this.$toasted.success("Producto guardado correctamente");
+            // this.initForm()
+            //this.producto.talla = {}
+            //this.$refs.inputTalla.setValue('')
+            this.$refs.productoForm.hide();
+          }
+
+          //INSERTANDO IMAGEN
+          let formData = new FormData();
+          formData.append("imagen", this.file);
+          this.axios({
+            method: "post",
+            url: this.API + "producto/imagen/" + response.data.insertId,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" }
+          }).then(res => {
+            // console.log(res);
+          });
+
+          this.$refs.productoForm.hide();
         })
-      } else {
-        if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    crearCategoria() {
+      if (this.$refs.inputCategoria.type) {
+        let categoria = {};
+        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "categorias", categoria)
+          .then(response => {
+            this.$toasted.show("Categoría guardada correctamente");
+            this.setCategoria({
+              IdProductoCategoria: response.data.insertId,
+              ProductoCategoria: response.data.ProductoCategoria
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearMarca() {
+      if (this.$refs.inputMarca.type) {
+        let marca = {};
+        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "marcas", marca)
+          .then(response => {
+            this.$toasted.show("Marca guardada correctamente");
+            this.setMarca({
+              IdProductoMarca: response.data.insertId,
+              ProductoMarca: response.data.ProductoMarca
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearTalla() {
+      if (this.$refs.inputTalla.type) {
+        let talla = {};
+        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "tallas", talla)
+          .then(response => {
+            this.$toasted.show("Talla guardada correctamente");
+            this.setTalla({
+              IdProductoTalla: response.data.insertId,
+              ProductoTalla: response.data.ProductoTalla
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
       }
     }
   },
-  computed : {
-  },
+  computed: {},
   components: {
-    CategoriaForm, MarcaForm, ProductoFormDet
+    CategoriaForm,
+    MarcaForm,
+    ProductoFormDet
   }
-}
+};
 </script>
-<style scoped>
-
-.rendimiento {
-  background-color: #e1f7d5;
-  padding: 5px;
-}
-
+<style>
 </style>

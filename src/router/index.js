@@ -15,6 +15,7 @@ import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import Remision from '@/views/Remision.vue'
 import RemisionLista from '@/views/RemisionLista.vue'
+import BusquedaPorModelo from '@/views/BusquedaPorModelo.vue'
 
 Vue.use(Router)
 
@@ -85,6 +86,11 @@ export default new Router({
       path: '/remision-lista',
       name: 'RemisionLista',
       component: RemisionLista
+    },
+    {
+      path: '/BusquedaPorModelo',
+      name: 'BusquedaPorModelo',
+      component: BusquedaPorModelo
     },
   ]
 })

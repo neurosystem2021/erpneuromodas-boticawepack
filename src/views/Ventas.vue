@@ -193,7 +193,7 @@
                           type="text" class="form-control" placeholder="Codigo de Barra" />
                         <b-input-group-append>
                           <!--<proveedores-tabla></proveedores-tabla>-->
-                          <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
+                          <!-- <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button> -->
                           <b-button variant="primary" class="ocultarMovil" @click="loadBarcode"><i
                               class="fas fa-search"></i></b-button>
                         </b-input-group-append>
