@@ -330,7 +330,7 @@ export default {
       this.$refs[ref].handleDoubleClick();
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/00000001").then(res => {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
         if (res.data.IdCliente) {
           this.setCliente(res.data);
         }

@@ -6,9 +6,29 @@
 
 <script>
 export default {
-  name: 'App'
-}
+  name: "App"
+};
 </script>
 
 <style>
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.modal .modal-xl {
+  min-width: 80%;
+  width: 80%;
+}
+@media only screen and (max-width: 750px) {
+  .modal .modal-xl {
+    min-width: 100%;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
 </style>
