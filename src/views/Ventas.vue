@@ -533,8 +533,8 @@
                         Venta</b-button>
                       <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar
                         Impresora</b-button>
-                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal"
-                        @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <!-- <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal"
+                        @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                       <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
                         <span v-if="mostrarNav"> Ocultar Nav</span>
@@ -874,7 +874,7 @@ export default {
     PagoDeuda,
     Movimiento,
     PreOrdenLista,
-    DeliveryModal,
+    // DeliveryModal,
     ConfigVenta,
     ConfigVenta,
     ProductoForm,
@@ -882,7 +882,7 @@ export default {
   },
   created() {
     // Add barcode scan listener and pass the callback function
-    this.$barcodeScanner.init(this.onBarcodeScanned);
+    // this.$barcodeScanner.init(this.onBarcodeScanned);
   },
   data() {
     return {
@@ -1848,7 +1848,9 @@ export default {
           idProductos: [IdProducto],
           idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen
             ? this.ventas[this.ventaActiva].almacen.IdAlmacen
-            : 1
+            : 1,
+          sortBy: "stock",
+          sortDesc: 1
         }
       }).then(response => {
         res = response.data[0];
