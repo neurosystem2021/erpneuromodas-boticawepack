@@ -858,7 +858,7 @@ import ClientesForm from "@/components/ClientesForm";
 import Proformas from "@/components/ProformaLista.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
-import DeliveryModal from "@/components/DeliveryModal.vue";
+// import DeliveryModal from "@/components/DeliveryModal.vue";
 import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
