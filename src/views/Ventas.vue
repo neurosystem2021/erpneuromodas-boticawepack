@@ -603,7 +603,7 @@
                                             </b-form-checkbox>
                                             <b-form-textarea
                                               placeholder="Descripción"
-                                              v-model="venta.descripcion"
+                                              v-model="ventas[index].descripcion"
                                               style="field-sizing: content;"
                                               v-if="mostrarDescripcion==1"
                                             ></b-form-textarea>
