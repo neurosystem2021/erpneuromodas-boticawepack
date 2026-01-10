@@ -28,7 +28,7 @@
                           <tr>
                             <th>Codigo</th>
                             <th>Producto</th>
-                            <th>Descripcion</th>
+                            <th>U.M.</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
@@ -41,7 +41,7 @@
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
                             <td class="detalle-producto">{{ prod.Producto }}</td>
-                            <td>{{ prod.Descripcion }}</td>
+                            <td>{{ prod.ProductoMedicion }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
