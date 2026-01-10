@@ -1030,6 +1030,7 @@ export default {
           thStyle: { width: "5%" }
         },
         { key: "Producto", thStyle: { width: "53%" } },
+        { key: "ProductoMedicion", label: "Medición" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
