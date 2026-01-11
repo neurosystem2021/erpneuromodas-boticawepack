@@ -263,8 +263,9 @@
                                                 />
                                             </td>
                                         </tr>
+                                        
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Tarjeta</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -282,12 +283,36 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto- venta.pago.yape.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Yape/ Plin</td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.yape.descripcion"
+                                                    :disabled="bloquearInput?true:false"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    v-model="venta.pago.yape.monto"
+                                                    :disabled="bloquearInput?true:false"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    class="form-control"
+                                                    placeholder="S/."
+                                                     @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.visa.monto - $event.target.value)"
+                                               
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tranferencia</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -305,7 +330,7 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.yape.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -416,7 +441,8 @@ export default {
       this.venta.pago.efectivo.monto =
         newVal -
         (parseFloat(this.venta.pago.visa.monto) +
-          parseFloat(this.venta.pago.mastercard.monto));
+          parseFloat(this.venta.pago.mastercard.monto) +
+          parseFloat(this.venta.pago.yape.monto));
     }
   },
   computed: {
@@ -481,7 +507,8 @@ export default {
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
-          mastercard: { IdMetodoPago: 3, monto: 0 }
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          yape: { IdMetodoPago: 4, monto: 0 }
         },
         CampoDireccion: "Direccion",
         NroComprobanteModifica: "",
@@ -792,6 +819,7 @@ export default {
       totalPagos += parseFloat(this.venta.pago.efectivo.monto);
       totalPagos += parseFloat(this.venta.pago.visa.monto);
       totalPagos += parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += parseFloat(this.venta.pago.yape.monto);
 
       if (!this.venta.EsCredito) {
         if (this.totalCart != totalPagos) {

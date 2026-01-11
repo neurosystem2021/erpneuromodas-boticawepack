@@ -86,7 +86,7 @@
 
 
       <b-row>
-        <h5>Ventas Visa</h5><br>
+        <h5>Tarjeta</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -146,11 +146,73 @@
           </tfoot>
         </table>
       </b-row>
+    
+      <b-row>
+        <h5>Yape/Plin</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Productos</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasYape" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                <table class="tabla-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                      <td>{{ prod.CodigoBarra }}</td>
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div><i><b>Cliente:</b> {{ item.Cliente }}</i></div>
+
+              </td>
+              <td>{{ item.YapeDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Yape }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Yape/ Plin</b></td>
+              <td class="total"><b>S/. {{ totalVentasYape | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
 
       
 
       <b-row>
-        <h5>Ventas Mastercard</h5><br>
+        <h5>Transferencia</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -334,17 +396,17 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CierresCaja from '@/components/CierresCaja.vue'
+import config from "@/store/config.js";
+import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
-  mounted () {
-    this.loadData()
+  mounted() {
+    this.loadData();
     if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id)
+      this.getCierre(this.$route.params.id);
     }
   },
-  data () {
+  data() {
     return {
       API: config.API,
       ventas: [],
@@ -352,13 +414,13 @@ export default {
       salidas: [],
       turno: null,
       turnos: [
-        { value: null, text: 'Seleccione un Turno' },
-        { value: 1, text: 'Mañana' },
+        { value: null, text: "Seleccione un Turno" },
+        { value: 1, text: "Mañana" }
         // { value: 2, text: 'Tarde' }
       ],
       cierre: {},
       itemsDetalle: []
-    }
+    };
   },
   watch: {
     /*ventas (items) {
@@ -381,182 +443,216 @@ export default {
     },*/
   },
   computed: {
-    getFechaCierre () {
-      //return this.$route.params.id ? 
+    getFechaCierre() {
+      //return this.$route.params.id ?
     },
-    granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+    granTotal() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasYape +
+        this.totalIngresos -
+        this.totalSalidas
+      );
     },
-    totalSalidas () {
-      let total = 0
+    totalSalidas() {
+      let total = 0;
       this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe
+        if (!salida.Anulado) total += salida.Importe;
       });
-      return total 
+      return total;
     },
-    totalIngresos () {
-      let total = 0
+    totalIngresos() {
+      let total = 0;
       this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe
+        if (!ingreso.Anulado) total += ingreso.Importe;
       });
-      return total 
+      return total;
     },
-    totalVentasEfectivo () {
-      let total = 0
+    totalVentasEfectivo() {
+      let total = 0;
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado  && venta.CodSunat!='07') total += venta.Efectivo
+        if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
       });
-      return total
+      return total;
     },
-    ventasEfectivo () {
+    ventasEfectivo() {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito
-      })
+        return venta.Efectivo > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasVisa () {
-      let total = 0
+    totalVentasVisa() {
+      let total = 0;
       this.ventasVisa.forEach(venta => {
-        if (!venta.Anulado) total += venta.Visa
+        if (!venta.Anulado) total += venta.Visa;
       });
-      return total
+      return total;
     },
-    ventasVisa () {
+    ventasVisa() {
       return this.ventas.filter(venta => {
-        return venta.Visa > 0  && !venta.EsCredito
-      })
+        return venta.Visa > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasMastercard () {
-      let total = 0
+    totalVentasYape() {
+      let total = 0;
+      this.ventasYape.forEach(venta => {
+        if (!venta.Anulado) total += venta.Yape;
+      });
+      return total;
+    },
+    ventasYape() {
+      return this.ventas.filter(venta => {
+        return venta.Yape > 0 && !venta.EsCredito;
+      });
+    },
+    totalVentasMastercard() {
+      let total = 0;
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard
+        if (!venta.Anulado) total += venta.Mastercard;
       });
-      return total
+      return total;
     },
-    ventasMastercard () {
+    ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0  && !venta.EsCredito
-      })
+        return venta.Mastercard > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasCredito () {
-      let total = 0
+    totalVentasCredito() {
+      let total = 0;
       this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total
+        if (!venta.Anulado) total += venta.Total;
       });
-      return total
+      return total;
     },
-    ventasCredito () {
+    ventasCredito() {
       return this.ventas.filter(venta => {
-        return venta.EsCredito
-      })
+        return venta.EsCredito;
+      });
     }
   },
   methods: {
-    getDetalles (idDocVenta) {
-      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+    getDetalles(idDocVenta) {
+      let detalles = this.itemsDetalle.filter(
+        item => item.IdDocVenta == idDocVenta
+      );
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
       //this.items[index].productos = detalles
-      return detalles
+      return detalles;
     },
-    imprimir () {
+    imprimir() {
       window.print();
     },
-    loadData () {
-      this.getVentas()
-      this.getIngresos()
-      this.getSalidas()
+    loadData() {
+      this.getVentas();
+      this.getIngresos();
+      this.getSalidas();
     },
-    cerrarCaja () {
+    cerrarCaja() {
       if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
-        return
+        this.$toasted.show("Seleccione un Turno");
+        return;
       }
-      let r = confirm('¿Está seguro de cerrar la caja?')
+      let r = confirm("¿Está seguro de cerrar la caja?");
       if (r) {
-        this.axios.post(this.API + 'cierrecaja', {
-          idTurno: this.turno,
-          user: sessionStorage.getItem("User")
-        }).then(res => {
-          this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
-          console.log(res)
-        })
+        this.axios
+          .post(this.API + "cierrecaja", {
+            idTurno: this.turno,
+            user: sessionStorage.getItem("User")
+          })
+          .then(res => {
+            this.loadData();
+            this.$toasted.show("¡Caja cerrada!");
+            console.log(res);
+          });
       }
     },
 
-    estadoVenta (venta) {
-      return venta.Anulado ? 'ANULADO' : 'APLICADO'
+    estadoVenta(venta) {
+      return venta.Anulado ? "ANULADO" : "APLICADO";
     },
-    loadDetalles () {
-      this.axios.get(this.API + 'ventas/detalle', {
+    loadDetalles() {
+      this.axios
+        .get(this.API + "ventas/detalle", {
           params: {
-            idDocVentas: this.ventas.map((item) => item.idDocVenta),
+            idDocVentas: this.ventas.map(item => item.idDocVenta)
           }
-        }).then((response) => {
-            this.itemsDetalle = response.data
-            this.ventas = this.ventas.map((item) => {
-              item.productos = this.getDetalles(item.idDocVenta)
-              return item
-            })
         })
-        .catch((error) => {
-          console.log(error)
+        .then(response => {
+          this.itemsDetalle = response.data;
+          this.ventas = this.ventas.map(item => {
+            item.productos = this.getDetalles(item.idDocVenta);
+            return item;
+          });
         })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    getVentas () {
-      this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
-      })
-      .then(res => {
-        this.ventas = res.data
-        this.loadDetalles()
-      }).catch(err => {
-        console.log(err)
-      })
+    getVentas() {
+      this.axios
+        .get(this.API + "cierrecaja/ventas", {
+          params: {
+            idCierre: this.$route.params.id
+          }
+        })
+        .then(res => {
+          this.ventas = res.data;
+          this.loadDetalles();
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    getIngresos () {
-      this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: {
-          idCierre: this.$route.params.id
-        }
-      })
-      .then(res => {
-        this.ingresos = res.data
-      }).catch(err => {
-        console.log(err)
-      })
+    getIngresos() {
+      this.axios
+        .get(this.API + "cierrecaja/ingresos", {
+          params: {
+            idCierre: this.$route.params.id
+          }
+        })
+        .then(res => {
+          this.ingresos = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    getSalidas () {
-      this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: {
-          idCierre: this.$route.params.id
-        }
-      })
-      .then(res => {
-        this.salidas = res.data
-      }).catch(err => {
-        console.log(err)
-      })
+    getSalidas() {
+      this.axios
+        .get(this.API + "cierrecaja/salidas", {
+          params: {
+            idCierre: this.$route.params.id
+          }
+        })
+        .then(res => {
+          this.salidas = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     getCierre(id) {
-      this.axios.get(this.API + 'cierrecaja', {
-        params: {
-          idCierre: id
-        }
-      }).then(res =>{
-        this.cierre = res.data[0]
-      })
+      this.axios
+        .get(this.API + "cierrecaja", {
+          params: {
+            idCierre: id
+          }
+        })
+        .then(res => {
+          this.cierre = res.data[0];
+        });
     }
   },
   components: {
     CierresCaja
   }
-}
+};
 </script>
 <style scoped>
-th, td {
-  font-size: .9em;
+th,
+td {
+  font-size: 0.9em;
   vertical-align: middle;
 }
 th {
@@ -566,9 +662,9 @@ th {
   background-color: #e4ff95;
 }
 .total-salida {
-  background-color: #ffd4d3;  
+  background-color: #ffd4d3;
 }
-.anulado td{
+.anulado td {
   /*font-style: italic;*/
   text-decoration: line-through;
 }
@@ -582,8 +678,9 @@ th {
   background-color: #ffffff;
   font-weight: normal;
 }
-.tabla-detalle th, .tabla-detalle td {
-  font-size: .9em;
+.tabla-detalle th,
+.tabla-detalle td {
+  font-size: 0.9em;
 }
 .detalle-producto {
   width: 270px;
