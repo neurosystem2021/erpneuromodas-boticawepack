@@ -141,9 +141,9 @@
             class="form-control"/>
         </template>
         <template slot="precio" slot-scope="data">
+          <!-- :disabled= "editarPrecioBloque !== 1" -->
           <input
             v-model="productos[data.index].precio"
-            :disabled= "editarPrecioBloque !== 1"
             type="number"
             style="width: 110px"
             min="0"
