@@ -1310,8 +1310,8 @@ export default {
         return venta.EsCredito;
       });
     },
-    granTotalVentas(){
-      return this.totalVentasEfectivo
+    granTotalVentas() {
+      return this.totalVentasEfectivo;
     }
   },
   methods: {
@@ -1345,10 +1345,12 @@ export default {
       window.print();
     },
     async loadData() {
-      await this.getVentas();
-      await this.getIngresos();
-      await this.getSalidas();
-      await this.generarReporte();
+      await Promise.all(
+        this.getVentas(),
+        this.getIngresos(),
+        this.getSalidas(),
+        this.generarReporte()
+      );
       // console.log(this.ventas);
     },
     generarReporte() {
