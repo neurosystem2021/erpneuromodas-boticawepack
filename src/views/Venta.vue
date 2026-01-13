@@ -959,6 +959,17 @@
         </b-modal>
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
+         <b-modal v-model="loading" hide-footer hide-header size="md">
+          <b-row>
+            <b-col cols="6" style="text-align: center; align-items: center; align-content: center;">
+                <div class="spinner"></div>
+            </b-col>
+            <b-col cols="6" style="text-align: center; align-items: center; align-content: center;">
+                <h3>Cargando Datos</h3> 
+                <h5>Un Momento por favor...</h5>
+            </b-col>
+          </b-row>
+        </b-modal>
   </b-container>
 </template>
 <script>
@@ -989,6 +1000,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       listeners: {
         nuevoPedido: null,
         connect: null,
@@ -2564,57 +2576,89 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
-      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
-      venta.cliente = proforma;
-      venta.vendedor = { Usuario: proforma.UsuarioReg };
-      let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
+    async cargarProforma(proforma) {
+      try {
+        // 1. Configuración inicial
+        this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
+        let venta = { ...this.venta };
+
+        // 2. Obtener información del usuario que registró la proforma
+        try {
+          const response = await this.axios.get(
+            this.API + "/usuarios/" + proforma.UsuarioReg
+          );
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
+          }
+        } catch (e) {
+          console.error("Error al obtener usuario:", e);
         }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
-      });
-      // console.log(proforma.productos);
-      venta.productos = productos;
-      this.ventas.push(venta);
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
-        // this.loadClienteVarios();
-      });
-      this.ventas[this.ventaActiva].cliente = proforma;
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.metodoPagoCambio(1);
-        }, 1000);
-      });
+        venta.proforma = proforma;
+        venta.cliente = proforma;
+        venta.vendedor = { Usuario: proforma.UsuarioReg };
+
+        // 3. Cargar productos (Usando for...of para esperar las promesas)
+        let productosCargados = [];
+
+        this.loading = true;
+
+        for (const producto of proforma.productos) {
+          // Esperamos a que la API responda por cada producto
+          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+          if (prod) {
+            // Procesar precios y presentaciones
+            let pres = [];
+            if (prod.PreciosPorProducto) {
+              try {
+                let newPres =
+                  typeof prod.PreciosPorProducto === "string"
+                    ? JSON.parse(prod.PreciosPorProducto)
+                    : prod.PreciosPorProducto;
+                pres = newPres.filter(v => v.cantidad > 0);
+              } catch (e) {
+                pres = [];
+              }
+            }
+
+            // Mapeo de propiedades necesarias para la vista de venta
+            prod.PreciosPorProducto = pres;
+            prod.tienePresentacion = pres.length > 0;
+            prod.bloquearInputPrecio = false;
+            prod.CantidadPresentacion = null;
+
+            // Priorizar datos de la proforma sobre los del buscador si es necesario
+            prod.ProductoPresentacion = producto.Descripcion;
+            prod.Descripcion = producto.Descripcion;
+            prod.cantidad = producto.Cantidad;
+            prod.precio = producto.Precio;
+            prod.descuento = producto.Descuento ? producto.Descuento : 0;
+
+            productosCargados.push(prod);
+          }
+        }
+        this.loading = false;
+        // 4. Asignar productos y agregar a la lista de ventas
+        venta.productos = productosCargados;
+        this.ventas.push(venta);
+
+        // 5. Actualizar interfaz de Vue
+        this.$nextTick(() => {
+          this.ventaActiva = this.ventas.length - 1;
+          this.getNumeroVenta();
+          this.getVendedorInfo();
+
+          // Pequeño delay para asegurar que los componentes de pago se inicialicen
+          setTimeout(() => {
+            console.log(
+              "Proforma cargada con " + productosCargados.length + " productos."
+            );
+            this.metodoPagoCambio(1);
+          }, 1000);
+        });
+      } catch (error) {
+        console.error("Error crítico al cargar proforma:", error);
+      }
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };
