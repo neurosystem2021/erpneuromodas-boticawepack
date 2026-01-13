@@ -2438,65 +2438,80 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     async cargarProforma(proforma) {
-      console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
+
       let venta = { ...this.venta };
-      await this.axios
-        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
-        .then(response => {
-          if (response.data) {
-            venta.UsuarioProforma = response.data.Usuario;
-          }
-        });
       venta.cliente = proforma;
       venta.proforma = proforma;
-      let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
-        }
-        prod.PreciosPorProducto = pres;
-        // prod.Descripcion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
-        // prod.ProductoPresentacion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        // prod.ProductoPresentacion = producto.Descripcion;
-        // prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        prod.ProductoPresentacion = producto.ProductoPresentacion;
-        prod.Descripcion = producto.presentacion;
-        prod.ProductoDesc = producto.ProductoDesc;
-        productos.push(prod);
-      });
 
+      let productos = [];
+      this.loading = true;
+      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
+      for (const producto of proforma.productos) {
+        try {
+          // Espera a que la API responda antes de pasar al siguiente producto
+          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+          if (prod) {
+            let pres = [];
+            if (prod.PreciosPorProducto) {
+              try {
+                let newPres =
+                  typeof prod.PreciosPorProducto === "string"
+                    ? JSON.parse(prod.PreciosPorProducto)
+                    : prod.PreciosPorProducto;
+                pres = newPres.filter(v => v.cantidad > 0);
+              } catch (e) {
+                pres = [];
+              }
+            }
+
+            // Asignaciones base
+            prod.PreciosPorProducto = pres;
+            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+            prod.bloquearInputPrecio = false;
+            prod.CantidadPresentacion = null;
+
+            // Asignaciones desde el objeto 'producto' de la proforma
+            prod.cantidad = producto.Cantidad;
+            prod.precio = producto.Precio;
+            prod.descuento = producto.Descuento ? producto.Descuento : 0;
+            prod.stock = prod.stock; // Mantiene el stock actual del buscador
+
+            // Mapeos específicos que tenías al final de tu código
+            prod.ProductoPresentacion = producto.ProductoPresentacion;
+            prod.Descripcion = producto.presentacion;
+            prod.ProductoDesc = producto.ProductoDesc;
+
+            productos.push(prod);
+          }
+        } catch (error) {
+          console.error(
+            "Error cargando producto individual:",
+            producto.IdProducto,
+            error
+          );
+        }
+      }
+      this.loading = false;
+      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
       venta.productos = productos;
       this.ventas.push(venta);
+
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        // this.loadClienteVarios();
+
+        // Aseguramos la asignación del cliente en la posición activa
+        if (this.ventas[this.ventaActiva]) {
+          this.ventas[this.ventaActiva].cliente = proforma;
+        }
       });
-      this.ventas[this.ventaActiva].cliente = proforma;
+
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
+          console.log("llegó con " + productos.length + " productos");
           this.metodoPagoCambio(1);
         }, 1000);
       });

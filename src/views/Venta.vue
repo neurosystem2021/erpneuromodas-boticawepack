@@ -975,6 +975,24 @@
         </b-modal>
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
+
+        <b-modal v-model="loading" hide-footer hide-header size="md">
+        <b-row>
+          <b-col
+            cols="6"
+            style="text-align: center; align-items: center; align-content: center"
+          >
+            <div class="spinner"></div>
+          </b-col>
+          <b-col
+            cols="6"
+            style="text-align: center; align-items: center; align-content: center"
+          >
+            <h3>Cargando Datos</h3>
+            <h5>Un Momento por favor...</h5>
+          </b-col>
+        </b-row>
+      </b-modal>
   </b-container>
 </template>
 <script>
@@ -1005,6 +1023,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       listeners: {
         nuevoPedido: null,
         connect: null,
@@ -2617,74 +2636,81 @@ export default {
         return proforma.Numero;
       }
     },
-    cargarProforma(proforma) {
-      console.log(proforma);
+    async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
+
       let venta = { ...this.venta };
       venta.cliente = proforma;
       venta.proforma = proforma;
+
       let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
+      this.loading = true;
+      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
+      for (const producto of proforma.productos) {
+        try {
+          // Espera a que la API responda antes de pasar al siguiente producto
+          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+          if (prod) {
+            let pres = [];
+            if (prod.PreciosPorProducto) {
+              try {
+                let newPres =
+                  typeof prod.PreciosPorProducto === "string"
+                    ? JSON.parse(prod.PreciosPorProducto)
+                    : prod.PreciosPorProducto;
+                pres = newPres.filter(v => v.cantidad > 0);
+              } catch (e) {
+                pres = [];
+              }
+            }
+
+            // Asignaciones base
+            prod.PreciosPorProducto = pres;
+            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+            prod.bloquearInputPrecio = false;
+            prod.CantidadPresentacion = null;
+
+            // Asignaciones desde el objeto 'producto' de la proforma
+            prod.cantidad = producto.Cantidad;
+            prod.precio = producto.Precio;
+            prod.descuento = producto.Descuento ? producto.Descuento : 0;
+            prod.stock = prod.stock; // Mantiene el stock actual del buscador
+
+            // Mapeos específicos que tenías al final de tu código
+            prod.ProductoPresentacion = producto.ProductoPresentacion;
+            prod.Descripcion = producto.presentacion;
+            prod.ProductoDesc = producto.ProductoDesc;
+
+            productos.push(prod);
+          }
+        } catch (error) {
+          console.error(
+            "Error cargando producto individual:",
+            producto.IdProducto,
+            error
+          );
         }
-        prod.PreciosPorProducto = pres;
-        // prod.Descripcion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
-        // prod.ProductoPresentacion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        // prod.ProductoPresentacion = producto.Descripcion;
-        // prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        prod.ProductoPresentacion = producto.ProductoPresentacion;
-        prod.Descripcion = producto.presentacion;
-        prod.ProductoDesc = producto.ProductoDesc;
-        productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
-      });
-      // console.log(proforma.productos);
+      }
+      this.loading = false;
+      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
       venta.productos = productos;
       this.ventas.push(venta);
+
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        // this.loadClienteVarios();
+
+        // Aseguramos la asignación del cliente en la posición activa
+        if (this.ventas[this.ventaActiva]) {
+          this.ventas[this.ventaActiva].cliente = proforma;
+        }
       });
-      this.ventas[this.ventaActiva].cliente = proforma;
+
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
+          console.log("llegó con " + productos.length + " productos");
           this.metodoPagoCambio(1);
         }, 1000);
       });
