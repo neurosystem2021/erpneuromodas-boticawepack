@@ -270,7 +270,7 @@ export default {
     },
     async exportarReporte() {
       await await this.axios(
-        `${this.API}reporte/movimientos?fechaIni=${this.fechaInicio}&fechaFin=${
+        `${this.API}reporte/movimientos?fechaInicio=${this.fechaInicio}&fechaFin=${
           this.fechaFin
         }&descripcion=${this.descripcion}&declarado=${this.declarado}`
       ).then(res => {

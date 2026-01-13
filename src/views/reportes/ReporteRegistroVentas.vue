@@ -229,23 +229,34 @@ export default {
       return parseFloat(total).toFixed(2);
     },
     async exportarReporte() {
-      let params = {
-        fechaIni: this.fechaInicio,
-        fechaFin: this.fechaFin,
-        declarado: this.declarado,
-        almacen: this.almacen
-      };
-      await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
-        params: params
-      }).then(res => {
-        let url = res.data;
-        url = url.replace(/\\/g, "");
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          url = "http://" + url; // O "https://" si es necesario
-        }
-        window.open(url, "_blank");
-      });
-    },
+  try {
+    const params = {
+      fechaIni: this.fechaInicio,
+      fechaFin: this.fechaFin,
+      declarado: this.declarado,
+      almacen: this.almacen
+    };
+
+    const res = await this.axios.get(
+      `${this.API}reporte/ListarRegVenta/excel`,
+      { params }
+    );
+
+    if (res.data.ok && res.data.url) {
+      window.open(res.data.url, '_blank');
+    } else {
+      if (this.$toast) {
+        this.$toast.error('No se pudo generar el reporte');
+      } else {
+        alert('No se pudo generar el reporte');
+      }
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert('Error al exportar el reporte');
+  }
+},
     async generarReporte() {
       this.lstReporte = [];
       let params = {
