@@ -1234,6 +1234,9 @@ export default {
         this.totalVentasVisa +
         this.totalVentasMastercard +
         this.totalVentasTransferencia +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia +
         this.totalIngresos -
         this.totalSalidas -
         this.totalAdelantosActivos
