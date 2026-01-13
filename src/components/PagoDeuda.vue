@@ -303,7 +303,7 @@ import config from '@/store/config.js'
                     cuentas: cuentasId
                 })
                 .then((response) => {
-                    console.log(response.data)
+                    // console.log(response.data)
                     this.$toasted.show('Se pagó la deuda del cliente.')
                     this.show = false
                     this.initForm()

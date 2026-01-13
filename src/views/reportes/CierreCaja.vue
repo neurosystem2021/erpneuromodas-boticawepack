@@ -69,7 +69,7 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="3"></td>
+                    <td colspan="4"></td>
                     <td class="total"><b>Total Efectivo</b></td>
                     <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
@@ -140,7 +140,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Tarjeta</b></td>
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
@@ -210,7 +210,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Yape/Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
@@ -275,12 +275,12 @@
               </td>
               <td>{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4"></td>
+              <td colspan="5"></td>
               <td class="total"><b>Total Transferencia</b></td>
               <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
@@ -1192,12 +1192,14 @@ import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
   mounted() {
-    if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id);
-      this.loadData();
-    } else {
-      this.getVendedor();
-    }
+    this.$nextTick(() => {
+      if (this.$route.params.id) {
+        this.getCierre(this.$route.params.id);
+        this.loadData();
+      } else {
+        this.getVendedor();
+      }
+    });
   },
   data() {
     return {
@@ -1229,6 +1231,9 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia +
         this.totalIngresos -
         this.totalSalidas -
         this.totalAdelantosActivos
@@ -1322,13 +1327,13 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia;
+        if (!venta.Anulado) total += venta.Yape;
       });
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0 && !venta.EsCredito;
+        return venta.Yape > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
@@ -1449,8 +1454,8 @@ export default {
         this.axios
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
-            user: sessionStorage.getItem("User"),
-            // user:         this.vendedor.Usuario,
+            // user: sessionStorage.getItem("User"),
+            user: this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
