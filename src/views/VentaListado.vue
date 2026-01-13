@@ -154,7 +154,7 @@
                   </b-col>
                   <b-col lg="6" xl="6"  cols="12" class="pt-0" >
                     <b-form-input 
-                    v-model="venta.NombreOrganizacion" 
+                    v-model="venta.nombreOrganizacion" 
                     v-if="venta.EsOrganizacion"
                     :id="`txtNombreOrganizacion-${index}`"
                     placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
@@ -182,25 +182,12 @@
                       <p style="padding: 2px 3px; border-radius: 25px; background: yellow; font-size: 1rem;"> Valor Referencial</p>
                     </center>
                   </b-col>
-                  <b-col md="3"  cols="12">
+                  <b-col md="3"  cols="12" style="text-align: center; align-items: center; align-content: center;">
                    
                       <b-col cols="12">
-                        <b-form-group>
-                            <label>Vendedor:</label>
-                          <autocomplete
-                              required="required"
-                              :ref="`inputVendedor${ventaActiva}`"
-                              :url="API + 'usuarios'"
-                              anchor="NombreUsuario"
-                              class="font-weight-bold"
-                              label="writer"
-                              :initValue="UsuarioLogin"
-                              :on-select="setVendedor"
-                              :onFocus="focusAutocomplete.bind(null, `inputVendedor${ventaActiva}`)"
-                              :classes="{ input: 'form-control' }"
-                            >
-                            </autocomplete>
-                        </b-form-group>
+                        <b-input-group prepend="Vendedor:" class="mt-2" >
+                          <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario" disabled style="max-width: 150px;">
+                        </b-input-group>
                       </b-col>
                   
                     </b-col>
@@ -232,7 +219,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
-                                :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :customParams="{ 'sortBy':'stock', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
                                 label="writer"
@@ -276,15 +263,8 @@
                   </b-col>
                 </b-row> -->
                 <div class="divCarrito">
-                <b-row class="mt-2 clsCarrito" v-if="getProfomaAnio()">
-                   <b-alert show> <b>PROFORMA: </b>{{ getProfomaAnio() }} - {{  getProfomaNumero()}}</b-alert>
-                </b-row>
                 <b-row class="mt-2 clsCarrito">
                   <b-table striped hover :fields="headerTable"  :items="venta.productos" class="tblCarrito">
-                     <template slot="ProductoDesc" slot-scope="data">
-                      <textarea v-model="data.item.ProductoDesc" class="form-control text-area" />
-                    </template>
-
                     <template slot="pres" slot-scope="data">
                       <b-button   
                         v-if="data.item.tienePresentacion"
@@ -307,34 +287,37 @@
                     </template>
                     <template slot="presentacion" slot-scope="data">
                       <b-form-input
-                        v-model="data.item.Descripcion"
+                        v-model="data.item.presentacion"
                         type="text"
-                        style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
+                        style="text-align:center; font-weight:bold; width: 120px;"
                         autocomplete="false"
                         disabled
-                      ></b-form-input>
+                        ></b-form-input>
+                       
+                       
                     </template>
                     <template slot="cantidad" slot-scope="data">
                       <input
                         v-model="data.item.cantidad"
                         type="number"
-                        style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
-                        autocomplete="false"
-                        :id="`input${data.index}`"
-                        @input="metodoPagoCambio(1)"
-                        @focus="abrirModalTouch(data.index, 1)"
-                        class="form-control"
-                        @keydown.enter="irTxtLoadBarcode"
-                        @keydown.tab="irTxtLoadBarcode"
+                        style="text-align:center; font-weight:bold; width: 90px;"
+                      autocomplete="false"
+                      :id="`input${ventaActiva}${data.index}`"
+                      :disabled="data.item.esPresentacion"
+                      @input="metodoPagoCambio(1)"
+                       @focus="abrirModalTouch(data.index, 1)"
+                       class="form-control"
+                       @keydown.enter="irBusquedaProducto"
                         />
-                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
-                        v-if="data.item.CantidadPresentacion">
-                          {{ data.item.CantidadPresentacion }} unid.
+                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
+                        v-if="data.item.esPresentacion">
+                          
+                          {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
                         </p>
                     </template>
                     <template slot="precio" slot-scope="data">
                       <input
-                        :class="data.item.precio < data.item.PrecioCosto ?'txtError' :''"
+                        :disabled="data.item.bloquearInputPrecio"
                         v-model="data.item.precio"
                         min="0"
                         step="0.00001"
@@ -345,7 +328,7 @@
                          @focus="abrirModalTouch(data.index, 2)"
                          class="form-control"
                         >
-                       <p v-if="data.item.precio < data.item.PrecioCosto" style="font-size: 0.9rem; color: red;"> Precio Mínimo {{ data.item.PrecioCosto }}</p>
+                       
                     </template>
                     <template slot="descuento" slot-scope="data">
                       <input
@@ -386,15 +369,6 @@
                     </b-button>
        
                     </template>
-                    <template slot="ProductoPresentacion" slot-scope="data">
-                      <input 
-                        type="text" 
-                        v-model="data.item.ProductoPresentacion"
-                        class="form-control"  
-                        style="width: 150px;"
-                        disabled
-                      >
-                      </template>
                     <template slot="cantxPrecio" slot-scope="data">
                       <b-form-input
                         v-if="data.item.esPresentacion"
@@ -478,9 +452,9 @@
                   <b-col md="4" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button v-if="mostrarVendedor" block class="mx-1 btnAction" :disabled="bloquearVenta" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button v-if="mostrarVentaFlag()"  block class="mx-1 btnAction" :disabled="inProgress" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Nueva Ventana</b-button>
-                      <delivery-modal v-if="mostrarVendedor" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <delivery-modal v-if="mostrarVentaFlag()" style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else style="background: #A1887F; color:#ffffff" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                       <b-button block v-if="ventas.length>1" variant="danger" @click="eliminarVentana()"> Cancelar Venta</b-button> 
@@ -496,33 +470,18 @@
                       <tbody>
                         <tr>
                           <td>
-                            <b-button 
-                                class="p-1 ml-1 mt-1" 
-                                :id="`popover-metodopago${index}`"
-                                tabindex="0" 
-                                 @click="toggleMetodoPago(index)" 
-                                variant="success">
-                                <i class="fas fa-credit-card" ></i>
-                              </b-button>
+                            <b-button class="p-1 ml-1 mt-1" :id="`popover-metodopago${index}`"  variant="success" @click="togglePopoverMetodo(index)"><i class="fas fa-credit-card"></i></b-button>
                             <br>
-                            <b-badge v-if="ventas[index].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
-                            <b-badge v-if="ventas[index].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
-                            <b-badge v-if="ventas[index].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
-                            <b-badge v-if="ventas[index].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover 
-                              :target="`popover-metodopago${index}`" 
-                              title="Metodo de pago" 
-                              triggers="manual" 
-                              placement="top" 
-                              :show.sync="mostrarMP[index]" 
-                              :style="{ minWidth: '600px' }">
-                            <slot :name="`metodopago${index}`" style="width: 1200px;" >
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual" placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
+                            <slot name="metodopago" style="width: 1200px;" >
                               <table class="table b-table border table-footer table-sm">
-                                
                                 <tbody>
                                   <tr>
-                                    <td>Efectivo
-                                    </td>
+                                    <td>Efectivo</td>
                                     <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                     <td>
                                       <b-form-input v-model="ventas[ventaActiva].pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
@@ -538,13 +497,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                              @input="
-                                              ventas[ventaActiva].pago.efectivo.monto = 
-                                              $options.filters.redondear(
-                                               getTotal() - 
-                                                ventas[ventaActiva].pago.mastercard.monto - 
-                                              $event.target.value)"/>
+                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -554,8 +507,7 @@
                                         <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                          @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear( getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -566,8 +518,7 @@
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                           @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear( getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -650,7 +601,7 @@
                                                     :disabled="bloquearInput?true:false"
                                                     v-model="venta.DescripcionProforma5"
                                                     min="0"
-                                                    value="0"
+                                                    value="7"
                                                     type="number"
                                                 ></b-form-input>
                                             </b-input-group>
@@ -793,7 +744,7 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x1</h5>
-                        <!-- <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br> -->
+                        <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
                         <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
                       </b-col>
                   </b-row>
@@ -823,7 +774,7 @@
                         </b-col>
                         <b-col md="6" class="text-left">
                         <h5>x{{ pres.cantidad }}</h5>
-                        <!-- <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br> -->
+                        <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
                         <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
                       </b-col>
                   </b-row>
@@ -994,8 +945,15 @@ export default {
   },
   data() {
     return {
-      bloquearVenta: false,
+      inProgress: false,
+      listeners: {
+        nuevoPedido: null,
+        connect: null,
+        disconnect: null
+      },
+      mostrarMetodo: [],
       mostrarNav: true,
+      descuentoGeneral: 0,
       isNota: [],
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
@@ -1025,11 +983,10 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         // { key: "CodigoBarra" },
         { key: "Producto" },
-        { key: "ProductoDesc", label: "Desc.", thStyle: { width: "20%" } },
         { key: "Anaquel", class: "d-none d-md-table-cell" },
-        { key: "pres", label: "", thStyle: { width: "5%" } },
-        { key: "presentacion", label: "Presentacion" },
-        // { key: "cantxPrecio", label: "	CanXPrec" },
+        { key: "pres", label: "" },
+        { key: "ProductoPresentacion", label: "Presentacion" },
+        { key: "cantxPrecio", label: "	CanXPrec" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         // {
@@ -1054,7 +1011,6 @@ export default {
       venta: {
         pagocon: 0,
         cliente: {},
-        proforma: {},
         EsCredito: 0,
         Serie: "",
         Numero: "",
@@ -1114,11 +1070,11 @@ export default {
         {
           pagocon: 0,
           cliente: {},
-          proforma: {},
           EsCredito: 0,
           Serie: "",
           Numero: "",
           Observacion: "",
+          cliente: {},
           comisionista: {},
           tipoVenta: {
             IdTipoDoc: 7,
@@ -1175,10 +1131,8 @@ export default {
       index: 0,
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
-      UsuarioLogin: sessionStorage.getItem("User"),
       objProd: {},
       cantidadInput: "",
-      mostrarMP: {},
       mostrarOp: {},
       diasValidosProf: 0
     };
@@ -1192,17 +1146,105 @@ export default {
       let autocompleteInput = document.getElementById(inputElement);
       autocompleteInput.focus();
     });
+    this.conectarSocket();
+    this.setupSocketListeners();
+    this.getEstadoSistema();
   },
+  beforeDestroy() {
+    this.removeSocketListeners();
+    this.$socket.disconnect();
+  },
+
   methods: {
-    toggleMetodoPago(index) {
-      if (this.mostrarMP[index]) {
-        this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+    mostrarVentaFlag() {
+      let IdPerfil = [1, 25, "1", "25"];
+      let val = sessionStorage.getItem("IdPerfil");
+      return IdPerfil.includes(val);
+    },
+    getEstadoSistema() {
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      if (hostUrl != null) {
+        this.axios
+          .get(this.APIADMIN + "/api/sistema", {
+            params: { Url: hostUrl }
+          })
+          .then(res => {
+            if (res.data.success == true) {
+              let info = res.data.data;
+              this.pagosPendientes = info.length;
+              this.fechaUltPago =
+                info.slice(-1)[0].FechaVencimientoFormat || "";
+            } else {
+              this.pagosPendientes = 0;
+              console.log(res.data.msg);
+            }
+          })
+          .catch(err => {
+            this.pagosPendientes = 0;
+            console.log("Error de conexión al admin");
+          });
       } else {
-        this.$set(this.mostrarMP, index, true);
-        this.$nextTick(() => {
-          this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
-        });
+        this.pagosPendientes = 0;
       }
+    },
+    conectarSocket() {
+      if (!this.$socket.connected) {
+        console.log("🔗 Conectando socket...");
+        this.$socket.connect();
+      }
+    },
+
+    /**
+     * ✅ NUEVO: Configurar todos los listeners
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado en VentasForm");
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado en VentasForm");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Nuevo pedido
+      this.listeners.nuevoPedido = data => {
+        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          if (this.$refs.deliveryModal) {
+            this.$refs.deliveryModal.getPedidos();
+          }
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            if (result.isConfirmed) {
+              if (this.$refs.deliveryModal) {
+                this.$refs.deliveryModal.show = true;
+              }
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      };
+      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
     },
     togglePopoverOpcion(index) {
       if (this.mostrarOp[index]) {
@@ -1211,6 +1253,16 @@ export default {
         this.$set(this.mostrarOp, index, true);
         this.$nextTick(() => {
           this.$root.$emit("bv::show::popover", `popover-opciones${index}`);
+        });
+      }
+    },
+    togglePopoverMetodo(index) {
+      if (this.mostrarMetodo[index]) {
+        this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
+      } else {
+        this.$set(this.mostrarMetodo, index, true);
+        this.$nextTick(() => {
+          this.$root.$emit("bv::show::popover", `popover-metodopago${index}`);
         });
       }
     },
@@ -1360,7 +1412,6 @@ export default {
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
-        this.bloquearVenta = false;
         return;
       }
 
@@ -1398,7 +1449,30 @@ export default {
         alert("No se pudo iniciar el reconocimiento de voz.");
       }
     },
+    // search() {
+    //   let text = `autocompleteProducto${this.ventaActiva}`;
+    //   console.log(text);
+    //   let autoComplete = document.getElementById(text);
+    //   // let buscarProducto = document.getElementById(text);
+    //   // let autoComplete = this.$refs[text];
 
+    //   if (!autoComplete || !autoComplete.$el) {
+    //     console.error(
+    //       "No se encontró el componente autocomplete o su elemento DOM."
+    //     );
+    //     return;
+    //   }
+
+    //   let inputElement = autoComplete.$el.querySelector("input");
+    //   if (inputElement) {
+    //     // Establece el valor
+
+    //     // Dispara el evento 'input' para notificar el cambio
+    //     let event = new Event("input", { bubbles: true });
+    //     inputElement.value = this.query;
+    //     inputElement.dispatchEvent(event);
+    //   }
+    // },
     search() {
       const inputEvent = new Event("input", {
         bubbles: true,
@@ -1420,13 +1494,11 @@ export default {
       }
       return true;
     },
-
     abrirModalTouch(index, tipo) {
       this.capturaIndex = index;
       this.cantidadInput = "";
       this.objProd = this.ventas[this.ventaActiva].productos[index];
       if (!this.touchHab) {
-        this.bloquearVenta = false;
         return;
       }
 
@@ -1512,7 +1584,6 @@ export default {
           document.getElementById(e).disabled = true;
           let p = `inputPuntoVenta${this.ventaActiva}`;
           document.getElementById(p).disabled = true;
-
           // this.$refs.inputVendedor.$refs.input.disabled = true;
         })
         .catch(error => {
@@ -1538,7 +1609,7 @@ export default {
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
-      this.ventas[this.ventaActiva].vendedor = obj;
+      this.ventas[0].vendedor = obj;
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
@@ -1814,17 +1885,15 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      if (pres.length == 0) {
-        productos.unshift(prod);
-        this.bloquearVenta = false;
-        return;
-      }
-      this.showPresentacion(prod, null);
+      productos.unshift(prod);
+      this.$nextTick(() => {
+        let cnt = document.getElementById(`input${this.ventaActiva}0`);
+        cnt.focus();
+        cnt.select();
+        this.metodoPagoCambio(1);
+      });
 
-      // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
-      // });
-      this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
@@ -1846,6 +1915,7 @@ export default {
         if (inputCliente && typeof inputCliente.setValue === "function") {
           // inputCliente.setValue(obj.Cliente);
         }
+        console.log("sss");
         this.ventas[this.ventaActiva].cliente = obj;
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
@@ -1892,7 +1962,7 @@ export default {
       let subtotal = 0;
 
       if (prod.esPresentacion) {
-        subtotal = prod.cantidad * prod.precio;
+        subtotal = prod.CantidadPresentacion * prod.cantidad * prod.precio;
       } else {
         subtotal = prod.cantidad * prod.precio;
         // console.log(prod);
@@ -1902,7 +1972,9 @@ export default {
     getTotalDetalle(prod) {
       let total = 0;
       if (prod.esPresentacion) {
-        total = prod.cantidad * prod.precio - prod.descuento;
+        total =
+          prod.CantidadPresentacion * prod.cantidad * prod.precio -
+          prod.descuento;
       } else {
         total = prod.cantidad * prod.precio - prod.descuento;
       }
@@ -1916,16 +1988,18 @@ export default {
       } else {
         let subtotal = prod.reduce((total, prod) => {
           if (prod.esPresentacion) {
-            return total + parseFloat(prod.cantidad * prod.precio);
+            return (
+              total +
+              parseFloat(
+                prod.CantidadPresentacion * prod.cantidad * prod.precio
+              ).toFixed(2)
+            );
           } else {
-            return total + parseFloat(prod.cantidad * prod.precio);
+            return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
           }
           // return (
           //   total +
-          //   parseFloat(
-          //     prod.cantidad * prod.precio
-          //   ) -
-          //   parseFloat(prod.descuento)
+          //   parseFloat(prod.cantidad * prod.CantidadPresentacion * prod.precio)
           // );
         }, 0);
         return parseFloat(subtotal).toFixed(2);
@@ -1950,7 +2024,11 @@ export default {
         let subtotal = prod.reduce((total, prod) => {
           if (prod.esPresentacion) {
             return (
-              total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
+              total +
+              parseFloat(
+                prod.CantidadPresentacion * prod.cantidad * prod.precio -
+                  prod.descuento
+              )
             );
           } else {
             return (
@@ -1960,7 +2038,7 @@ export default {
           // return (
           //   total +
           //   parseFloat(
-          //     prod.cantidad * prod.precio
+          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
           //   ) -
           //   parseFloat(prod.descuento)
           // );
@@ -1997,7 +2075,7 @@ export default {
     },
 
     async guardarVenta() {
-      this.bloquearVenta = true;
+      this.inProgress = true;
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2009,35 +2087,33 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
 
@@ -2053,7 +2129,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2068,7 +2144,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
 
@@ -2085,7 +2161,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2100,7 +2176,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
       if (
@@ -2119,7 +2195,7 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.bloquearVenta = false;
+          this.inProgress = true;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2134,14 +2210,14 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.bloquearVenta = false;
+          this.inProgress = true;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.bloquearVenta = false;
+          this.inProgress = true;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2159,22 +2235,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
-        return;
-      }
-
-      let newVal = productos.findIndex(v => v.precio < v.PrecioCosto);
-      if (newVal >= 0) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender Por debajo del precio Costo. Verifique",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        this.bloquearVenta = false;
+        this.inProgress = true;
         return;
       }
 
@@ -2193,6 +2254,15 @@ export default {
       }
       venta.PagoCon = venta.pagocon;
       venta.totalCart = this.getTotal();
+      if (
+        parseFloat(this.getTotal()).toFixed(2) !=
+        parseFloat(totalPagos).toFixed(2)
+      ) {
+        this.$toasted.show("Los pagos no coinciden con la venta");
+        this.inProgress = false;
+        this.inProgress = true;
+        return;
+      }
       venta.Observacion = (venta.Observacion + "").toUpperCase();
       venta.idProductos = productos.map(prod => prod.IdProducto);
       if (venta.cliente.DniRuc != "00000000") {
@@ -2214,21 +2284,19 @@ export default {
             "noopener"
           );
         }
-
+        this.inProgress = true;
         if (this.ventas.length == 1) {
           window.location.reload();
-          this.bloquearVenta = false;
+          this.inProgress = false;
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
-          this.bloquearVenta = false;
+          this.inProgress = false;
         }
 
         // if (response.data.actualizar) {
         //   this.$toasted.show(response.data.msg);
-        //   this.bloquearVenta = false
-        return;
-
+        //   return;
         // }
       });
     },
@@ -2244,28 +2312,24 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.bloquearVenta = false;
         return;
       }
 
@@ -2281,7 +2345,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2296,7 +2359,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
         return;
       }
 
@@ -2313,7 +2375,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2328,7 +2389,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
         return;
       }
       if (
@@ -2347,7 +2407,6 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.bloquearVenta = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2362,14 +2421,12 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.bloquearVenta = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.bloquearVenta = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2387,7 +2444,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
         return;
       }
 
@@ -2439,94 +2495,64 @@ export default {
     },
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-
       let venta = { ...this.venta };
-      venta.cliente = proforma;
-      venta.proforma = proforma;
-
-      let productos = [];
-      this.loading = true;
-      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
-      for (const producto of proforma.productos) {
-        try {
-          // Espera a que la API responda antes de pasar al siguiente producto
-          let prod = await this.obtenerStockBuscador(producto.IdProducto);
-
-          if (prod) {
-            let pres = [];
-            if (prod.PreciosPorProducto) {
-              try {
-                let newPres =
-                  typeof prod.PreciosPorProducto === "string"
-                    ? JSON.parse(prod.PreciosPorProducto)
-                    : prod.PreciosPorProducto;
-                pres = newPres.filter(v => v.cantidad > 0);
-              } catch (e) {
-                pres = [];
-              }
-            }
-
-            // Asignaciones base
-            prod.PreciosPorProducto = pres;
-            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
-            prod.bloquearInputPrecio = false;
-            prod.CantidadPresentacion = null;
-
-            // Asignaciones desde el objeto 'producto' de la proforma
-            prod.cantidad = producto.Cantidad;
-            prod.precio = producto.Precio;
-            prod.descuento = producto.Descuento ? producto.Descuento : 0;
-            prod.stock = prod.stock; // Mantiene el stock actual del buscador
-
-            // Mapeos específicos que tenías al final de tu código
-            prod.ProductoPresentacion = producto.ProductoPresentacion;
-            prod.Descripcion = producto.presentacion;
-            prod.ProductoDesc = producto.ProductoDesc;
-
-            productos.push(prod);
+      await this.axios
+        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+        .then(response => {
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
           }
-        } catch (error) {
-          console.error(
-            "Error cargando producto individual:",
-            producto.IdProducto,
-            error
-          );
+        });
+      venta.cliente = proforma;
+      venta.vendedor = { Usuario: proforma.UsuarioReg };
+      // console.log("proforma", proforma);
+      let productos = [];
+      proforma.productos.forEach(async producto => {
+        let prod = await this.obtenerStockBuscador(producto.IdProducto);
+        let pres = [];
+        if (prod.PreciosPorProducto) {
+          let newPres = JSON.parse(prod.PreciosPorProducto);
+          pres = newPres.filter(v => v.cantidad > 0);
         }
-      }
-      this.loading = false;
-      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
+        prod.PreciosPorProducto = pres;
+        prod.Descripcion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
+        prod.ProductoPresentacion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
+        prod.cantidad = 1;
+        prod.precio = producto.PrecioContado;
+        prod.descuento = 0;
+        prod.tienePresentacion = prod.PreciosPorProducto.some(
+          v => v.cantidad > 0
+        );
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = null;
+        prod.ProductoPresentacion = producto.Descripcion;
+        prod.Descripcion = producto.Descripcion;
+        prod.cantidad = producto.Cantidad;
+        prod.precio = producto.Precio;
+        prod.descuento = producto.Descuento ? producto.Descuento : 0;
+        prod.stock = prod.stock;
+        productos.push(prod);
+      });
+
       venta.productos = productos;
       this.ventas.push(venta);
-
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-
-        // Aseguramos la asignación del cliente en la posición activa
-        if (this.ventas[this.ventaActiva]) {
-          this.ventas[this.ventaActiva].cliente = proforma;
-        }
+        // this.loadClienteVarios();
       });
-
+      this.ventas[this.ventaActiva].cliente = proforma;
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó con " + productos.length + " productos");
+          console.log("llegó");
           this.metodoPagoCambio(1);
         }, 1000);
       });
-    },
-    getProfomaAnio() {
-      let proforma = this.ventas[this.ventaActiva].proforma;
-      if (Object.keys(proforma).length > 0) {
-        return proforma.Anio;
-      }
-    },
-    getProfomaNumero() {
-      let proforma = this.ventas[this.ventaActiva].proforma;
-      if (Object.keys(proforma).length > 0) {
-        return proforma.Numero;
-      }
     },
     // cargarProforma(proforma) {
     //   this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
@@ -2599,7 +2625,6 @@ export default {
       this.metodoPagoCambio(1);
     },
     cambiarPresentacion(obj, esPresentacion) {
-      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
@@ -2616,14 +2641,8 @@ export default {
         producto.precio = producto.PrecioContado;
         producto.presentacion = null;
       }
-      console.log(this.index);
 
-      if (this.index != null) {
-        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
-      } else {
-        productos.unshift(producto);
-      }
-
+      Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
     },
@@ -2745,10 +2764,10 @@ export default {
   },
   computed: {
     mostrarVendedor() {
-      return (
-        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 1 ||
-        this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 5
-      );
+      if (this.ventas[this.ventaActiva].vendedor.IdUsuarioPerfil == 3) {
+        return false;
+      }
+      return true;
     },
     APIProductos() {
       // console.log(this.ventas[this.ventaActiva].almacen.IdAlmacen);
@@ -2833,12 +2852,6 @@ export default {
 }
 </style>
   <style>
-.text-area {
-  field-sizing: content !important;
-}
-.txtError {
-  border: 1px solid red !important;
-}
 /* .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
     background-color: #e6e6e6;

@@ -1222,8 +1222,6 @@ export default {
       objProd: {},
       capturaIndex: null,
       bloquearVenta: false
-      capturaIndex: null,
-      bloquearVenta: false
     };
   },
   mounted() {
@@ -2076,7 +2074,6 @@ export default {
           }
         })
         .then(async response => {
-        .then(async response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
@@ -2688,7 +2685,6 @@ export default {
         });
 
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (
@@ -2708,7 +2704,6 @@ export default {
           });
 
           this.bloquearVenta = false;
-          this.bloquearVenta = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2724,14 +2719,12 @@ export default {
           });
 
           this.bloquearVenta = false;
-          this.bloquearVenta = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.bloquearVenta = false;
           this.bloquearVenta = false;
           return;
         }
@@ -2750,7 +2743,6 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2864,12 +2856,12 @@ export default {
           pres = newPres.filter(v => v.cantidad > 0);
         }
         prod.PreciosPorProducto = pres;
-        // prod.Descripcion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
-        // prod.ProductoPresentacion = producto.ProductoPresentacion
-        //   ? prod.ProductoPresentacion
-        //   : "UNIDAD";
+        prod.Descripcion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
+        prod.ProductoPresentacion = producto.ProductoPresentacion
+          ? prod.ProductoPresentacion
+          : "UNIDAD";
         prod.cantidad = 1;
         prod.precio = producto.PrecioContado;
         prod.descuento = 0;
@@ -2878,15 +2870,12 @@ export default {
         );
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
-        // prod.ProductoPresentacion = producto.Descripcion;
-        // prod.Descripcion = producto.Descripcion;
+        prod.ProductoPresentacion = producto.Descripcion;
+        prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
-        prod.ProductoPresentacion = producto.ProductoPresentacion;
-        prod.Descripcion = producto.presentacion;
-        prod.ProductoDesc = producto.ProductoDesc;
         productos.push(prod);
         // prod.precio = prod.Precio;
         // productos.push({
@@ -2933,7 +2922,6 @@ export default {
     },
     cambiarPresentacion(obj, esPresentacion) {
       let productos = this.ventas[this.ventaActiva].productos;
-      let productos = this.ventas[this.ventaActiva].productos;
       let producto = { ...this.producto };
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
@@ -2951,11 +2939,6 @@ export default {
         producto.presentacion = null;
       }
 
-      if (this.index != null) {
-        Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
-      } else {
-        productos.unshift(producto);
-      }
       if (this.index != null) {
         Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       } else {
