@@ -295,7 +295,6 @@
                     <b-row class="centrado d-flex justify-content-center my-1" >
                       <b-button class="mx-1 btnAction" block variant="primary"  @click="guardarProforma()"> Crear Proforma</b-button>
                       <b-button v-if="mostrarVendedor" :disabled="bloquearVenta" class="mx-1 btnAction"  block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
-                      <b-button v-if="mostrarVendedor" :disabled="bloquearVenta" class="mx-1 btnAction"  block variant="success"  @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <delivery-modal class="mx-1 btnAction" style="width: 100%; margin: 1% 0;" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <!-- <delivery-modal class="mx-1 btnAction" block ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                   </b-row>
@@ -1024,6 +1023,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       listeners: {
         nuevoPedido: null,
         connect: null,
@@ -1251,13 +1251,6 @@ export default {
   beforeDestroy() {
     this.removeSocketListeners();
     this.$socket.disconnect();
-    this.conectarSocket();
-    this.setupSocketListeners();
-    this.getEstadoSistema();
-  },
-  beforeDestroy() {
-    this.removeSocketListeners();
-    this.$socket.disconnect();
   },
   computed: {
     mostrarVendedor() {
@@ -1269,132 +1262,6 @@ export default {
     }
   },
   methods: {
-    conectarSocket() {
-      if (!this.$socket.connected) {
-        console.log("🔗 Conectando socket...");
-        this.$socket.connect();
-      }
-    },
-
-    /**
-     * ✅ NUEVO: Configurar todos los listeners
-     */
-    setupSocketListeners() {
-      // Evento: Conectado
-      this.listeners.connect = () => {
-        console.log("✅ Socket conectado en VentasForm");
-      };
-      this.$socket.on("connect", this.listeners.connect);
-
-      // Evento: Desconectado
-      this.listeners.disconnect = () => {
-        console.log("❌ Socket desconectado en VentasForm");
-      };
-      this.$socket.on("disconnect", this.listeners.disconnect);
-
-      // Evento: Nuevo pedido
-      this.listeners.nuevoPedido = data => {
-        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
-          this.$toasted.success(
-            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
-          );
-          this.$refs.deliveryModal.getPedidos();
-        } else {
-          if (this.$refs.deliveryModal) {
-            this.$refs.deliveryModal.getPedidos();
-          }
-          this.$swal({
-            position: "top-end",
-            icon: "info",
-            target: document.getElementById("conten"),
-            title:
-              "Pedido de Delivery de: <br> " +
-              "<strong>" +
-              data.nombre +
-              "</strong>",
-            showConfirmButton: true,
-            confirmButtonText: "Mostrar Pedidos",
-            confirmButtonColor: "#3880ff"
-          }).then(result => {
-            if (result.isConfirmed) {
-              if (this.$refs.deliveryModal) {
-                this.$refs.deliveryModal.show = true;
-              }
-            } else if (result.isDenied) {
-              console.log("Denegado");
-            }
-          });
-        }
-      };
-      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
-    },
-
-    /**
-     * ✅ NUEVO: Remover todos los listeners
-     */
-    removeSocketListeners() {
-      this.$socket.off("connect", this.listeners.connect);
-      this.$socket.off("disconnect", this.listeners.disconnect);
-      this.$socket.off("nuevo-pedido", this.listeners.nuevoPedido);
-    },
-    escucharPedidos() {
-      this.sockets.subscribe("nuevo-pedido", data => {
-        if (this.$refs.deliveryModal.show) {
-          this.$toasted.success(
-            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
-          );
-          this.$refs.deliveryModal.getPedidos();
-        } else {
-          this.$refs.deliveryModal.getPedidos();
-          this.$swal({
-            position: "top-end",
-            icon: "info",
-            target: document.getElementById("conten"),
-            title:
-              "Pedido de Delivery de: <br> " +
-              "<strong>" +
-              data.nombre +
-              "</strong>",
-            showConfirmButton: true,
-            confirmButtonText: "Mostrar Pedidos",
-            confirmButtonColor: "#3880ff"
-          }).then(result => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-              this.$refs.deliveryModal.show = true;
-            } else if (result.isDenied) {
-              console.log("Denegado");
-            }
-          });
-        }
-      });
-    },
-    getEstadoSistema() {
-      let hostUrl = sessionStorage.getItem("HostUrl");
-      if (hostUrl != null) {
-        this.axios
-          .get(this.APIADMIN + "/api/sistema", {
-            params: { Url: hostUrl }
-          })
-          .then(res => {
-            if (res.data.success == true) {
-              let info = res.data.data;
-              this.pagosPendientes = info.length;
-              this.fechaUltPago =
-                info.slice(-1)[0].FechaVencimientoFormat || "";
-            } else {
-              this.pagosPendientes = 0;
-              console.log(res.data.msg);
-            }
-          })
-          .catch(err => {
-            this.pagosPendientes = 0;
-            console.log("Error de conexión al admin");
-          });
-      } else {
-        this.pagosPendientes = 0;
-      }
-    },
     conectarSocket() {
       if (!this.$socket.connected) {
         console.log("🔗 Conectando socket...");
@@ -2004,14 +1871,8 @@ export default {
         return;
       }
 
-      if (pres.length == 0) {
-        productos.unshift(prod);
-        return;
-      }
-
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      this.showPresentacion(prod, null);
       this.showPresentacion(prod, null);
 
       // this.$nextTick(() => {
@@ -2112,51 +1973,9 @@ export default {
           //   console.log("ssssss", element);
           //   this.setProductoNotaCredito(element);
           // });
-          for (let index = 0; index < response.data.length; index++) {
-            // console.log("ssssss", response.data[index]);
-            await this.setProductoNotaCredito(response.data[index]);
-          }
-          // response.data.forEach(element => {
-          //   console.log("ssssss", element);
-          //   this.setProductoNotaCredito(element);
-          // });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
         });
-    },
-    async setProductoNotaCredito(producto) {
-      let productos = this.ventas[this.ventaActiva].productos;
-      let presNew = producto.Presentacion
-        ? JSON.parse(producto.Presentacion)
-        : {};
-
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-
-      let pres = [];
-
-      if (prod.PreciosPorProducto) {
-        let newPres = JSON.parse(prod.PreciosPorProducto);
-        pres = newPres.filter(v => v.cantidad > 0);
-      }
-
-      console.log("presNew", presNew.nombre);
-      prod.PreciosPorProducto = pres;
-      prod.ProductoDesc = producto.Descripcion;
-      prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
-      prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
-      prod.cantidad = producto.cantidad;
-      prod.CantidadPresentacion = producto.CantidadPresentacion;
-      prod.precio = producto.PrecioCosto;
-      prod.descuento = 0;
-      prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
-      productos.unshift(prod);
-      this.metodoPagoCambio(1);
     },
     async setProductoNotaCredito(producto) {
       let productos = this.ventas[this.ventaActiva].productos;
@@ -2341,7 +2160,6 @@ export default {
     // },
     async guardarVenta() {
       this.bloquearVenta = true;
-      this.bloquearVenta = true;
       // this.$swal({
       //   title: "Procesando...",
       //   text: "Por favor espera",
@@ -2364,14 +2182,12 @@ export default {
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2380,7 +2196,6 @@ export default {
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
@@ -2388,12 +2203,10 @@ export default {
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2411,7 +2224,6 @@ export default {
         // });
 
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2426,7 +2238,6 @@ export default {
         //   target: document.getElementById("conten"),
         //   confirmButtonColor: "#0275d8"
         // });
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2447,7 +2258,6 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2462,7 +2272,6 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
 
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2483,7 +2292,6 @@ export default {
           // });
 
           this.bloquearVenta = false;
-          this.bloquearVenta = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2499,14 +2307,12 @@ export default {
           // });
 
           this.bloquearVenta = false;
-          this.bloquearVenta = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.bloquearVenta = false;
           this.bloquearVenta = false;
           return;
         }
@@ -2516,7 +2322,6 @@ export default {
       }
       if (!productos.length) {
         this.$toasted.show("No hay productos para vender");
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2560,10 +2365,8 @@ export default {
 
         if (this.ventas.length == 1) {
           this.bloquearVenta = false;
-          this.bloquearVenta = false;
           window.location.reload();
         } else {
-          this.bloquearVenta = false;
           this.bloquearVenta = false;
           this.eliminarVentana();
           this.getVendedorInfo();
@@ -2589,7 +2392,6 @@ export default {
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       // if (this.diasValidosProf < 0 || this.diasValidosProf == "") {
@@ -2602,7 +2404,6 @@ export default {
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
@@ -2610,14 +2411,12 @@ export default {
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2635,7 +2434,6 @@ export default {
         });
 
         this.bloquearVenta = false;
-        this.bloquearVenta = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2650,7 +2448,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2668,7 +2465,6 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.bloquearVenta = false;
         this.bloquearVenta = false;
         return;
       }
@@ -2848,52 +2644,56 @@ export default {
       venta.proforma = proforma;
 
       let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
+      this.loading = true;
+      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
+      for (const producto of proforma.productos) {
+        try {
+          // Espera a que la API responda antes de pasar al siguiente producto
+          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+          if (prod) {
+            let pres = [];
+            if (prod.PreciosPorProducto) {
+              try {
+                let newPres =
+                  typeof prod.PreciosPorProducto === "string"
+                    ? JSON.parse(prod.PreciosPorProducto)
+                    : prod.PreciosPorProducto;
+                pres = newPres.filter(v => v.cantidad > 0);
+              } catch (e) {
+                pres = [];
+              }
+            }
+
+            // Asignaciones base
+            prod.PreciosPorProducto = pres;
+            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+            prod.bloquearInputPrecio = false;
+            prod.CantidadPresentacion = null;
+
+            // Asignaciones desde el objeto 'producto' de la proforma
+            prod.cantidad = producto.Cantidad;
+            prod.precio = producto.Precio;
+            prod.descuento = producto.Descuento ? producto.Descuento : 0;
+            prod.stock = prod.stock; // Mantiene el stock actual del buscador
+
+            // Mapeos específicos que tenías al final de tu código
+            prod.ProductoPresentacion = producto.ProductoPresentacion;
+            prod.Descripcion = producto.presentacion;
+            prod.ProductoDesc = producto.ProductoDesc;
+
+            productos.push(prod);
+          }
+        } catch (error) {
+          console.error(
+            "Error cargando producto individual:",
+            producto.IdProducto,
+            error
+          );
         }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
-      });
-      // console.log(proforma.productos);
+      }
+      this.loading = false;
+      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
       venta.productos = productos;
       this.ventas.push(venta);
 
