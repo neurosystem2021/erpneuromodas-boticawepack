@@ -382,7 +382,7 @@
                                   </td>
                                   <td>
                                     <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"/>
+                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"/>
                                   </td>
                                   </tr>
                                   <tr>
@@ -393,19 +393,19 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - venta.pago.transferencia.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                   <tr>
                                     <td>Transferencia</td>
                                     <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                     <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                                      <b-form-input v-model="ventas[ventaActiva].pago.transferencia.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
                                       <input
-                                        class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                        class="form-control" v-model="ventas[ventaActiva].pago.transferencia.monto" min="0" step="0.01" type="number" placeholder="S/."
+                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - venta.pago.mastercard.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                 </tbody>
@@ -1129,7 +1129,7 @@ export default {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
           mastercard: { IdMetodoPago: 3, monto: 0 },
-          delivery: { IdMetodoPago: 4, monto: 0 }
+          transferencia: { IdMetodoPago: 4, monto: 0 }
         },
         idProductos: [],
         NroComprobanteModifica: "",
@@ -1183,7 +1183,7 @@ export default {
             efectivo: { IdMetodoPago: 1, monto: 0 },
             visa: { IdMetodoPago: 2, monto: 0 },
             mastercard: { IdMetodoPago: 3, monto: 0 },
-            delivery: { IdMetodoPago: 4, monto: 0 }
+            transferencia: { IdMetodoPago: 4, monto: 0 }
           },
           idProductos: [],
           NroComprobanteModifica: "",
@@ -2129,7 +2129,7 @@ export default {
     metodoPagoCambio(tipo = null) {
       console.log("top", tipo);
       this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const metodos = ["efectivo", "visa", "mastercard", "transferencia"];
         const ventaActual = this.ventas[this.ventaActiva].pago;
         metodos.forEach(metodo => {
           ventaActual[metodo].descripcion = null;
@@ -2178,7 +2178,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.bloquearVenta = false;
@@ -2186,7 +2186,7 @@ export default {
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
-          "El metodo de pago tarjeta/transferencia no puede ser negativo"
+          "El metodo de pago tarjeta no puede ser negativo"
         );
         this.bloquearVenta = false;
         return;
@@ -2198,9 +2198,9 @@ export default {
         this.bloquearVenta = false;
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
+          "El metodo de pago tranferencia no puede ser negativo"
         );
         this.bloquearVenta = false;
         return;
@@ -2388,7 +2388,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.bloquearVenta = false;
@@ -2413,9 +2413,9 @@ export default {
         this.bloquearVenta = false;
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
+          "El metodo de pago transferencia no puede ser negativo"
         );
         this.bloquearVenta = false;
         return;

@@ -1012,7 +1012,7 @@ export default {
   },
   data() {
     return {
-      loading: true,
+      loading: false,
       bloquearVenta: false,
       mostrarNav: true,
       isNota: [],
