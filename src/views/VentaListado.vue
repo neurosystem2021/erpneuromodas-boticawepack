@@ -219,7 +219,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
-                                :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+                                :customParams="{ 'sortBy':'stock', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
                                 label="writer"
