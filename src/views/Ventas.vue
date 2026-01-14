@@ -1332,6 +1332,15 @@ export default {
             duration: 2000
           }
         );
+        this.inProgress = false;
+        return;
+      }
+
+      if (this.productos.some(v => Number(v.DescPorcentaje) > 20)) {
+        this.$toasted.error("Máximo descuento es de 20%.", {
+          duration: 2000
+        });
+        this.inProgress = false;
         return;
       }
 

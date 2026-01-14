@@ -390,8 +390,10 @@
             step="0.01"
             class="form-control"
             value="0"
-            @input="actualizarDescuentoPorcentaje(data.index)"/>
+            @input="actualizarDescuentoPorcentaje(data.index)"
+            :class="data.item.DescPorcentaje > 20 ? 'clsError' : '' "/>
             <b-form-text>
+              <span v-if="data.item.DescPorcentaje > 20" style="color:red"> Desc Max. 20%</span>
             </b-form-text>
         </template>
 
@@ -1044,23 +1046,24 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.add([id, false, false, false, false, true, this.isVentas]);
-      setTimeout(() => {
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-      }, 200);
+      this.setProducto({ ...obj, IdProducto: id });
+      // this.add([id, false, false, false, false, true, this.isVentas]);
+      // setTimeout(() => {
+      //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      // }, 200);
 
-      let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
-      if (fPP.length != 4) {
-        obj.ProductoMedicion = obj.medicion.ProductoMedicion;
-        obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
-        obj.IdProductoMarca = obj.marca.IdProductoMarca;
-        obj.ProductoMarca = obj.marca.ProductoMarca;
-        obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
-        obj.ProductoCategoria = obj.categoria.ProductoCategoria;
-        this.productoSelect = obj;
-        this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
-        this.showPresentacion(this.productoSelect);
-      }
+      // let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
+      // if (fPP.length != 4) {
+      //   obj.ProductoMedicion = obj.medicion.ProductoMedicion;
+      //   obj.IdProductoMedicion = obj.medicion.IdProductoMedicion;
+      //   obj.IdProductoMarca = obj.marca.IdProductoMarca;
+      //   obj.ProductoMarca = obj.marca.ProductoMarca;
+      //   obj.IdProductoCategoria = obj.categoria.IdProductoCategoria;
+      //   obj.ProductoCategoria = obj.categoria.ProductoCategoria;
+      //   this.productoSelect = obj;
+      //   this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
+      //   this.showPresentacion(this.productoSelect);
+      // }
     },
     setProducto(obj) {
       obj.flete = 0;
@@ -1152,7 +1155,7 @@ export default {
       this.loadCode = "";
       // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
-      this.$refs.barcodeInput.focus();
+      // this.$refs.barcodeInput.focus();
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
