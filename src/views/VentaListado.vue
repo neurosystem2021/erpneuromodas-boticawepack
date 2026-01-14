@@ -2513,13 +2513,14 @@ export default {
       venta.vendedor = { Usuario: proforma.UsuarioReg };
       // console.log("proforma", proforma);
       let productos = [];
-      this.cargando = true;
+      // this.cargando = true;
       for (let index = 0; index < proforma.productos.length; index++) {
         const producto = proforma.productos[index];
+        const prod = proforma.productos[index];
 
         // }
         // proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
+        // let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
         if (prod.PreciosPorProducto) {
           let newPres = JSON.parse(prod.PreciosPorProducto);
@@ -2561,7 +2562,6 @@ export default {
       this.ventas[this.ventaActiva].cliente = proforma;
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
           this.metodoPagoCambio(1);
         }, 1000);
       });

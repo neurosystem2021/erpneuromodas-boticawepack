@@ -2563,14 +2563,28 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
+    async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+      await this.axios
+        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+        .then(response => {
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
+          }
+        });
       venta.cliente = proforma;
       venta.vendedor = { Usuario: proforma.UsuarioReg };
+      // console.log("proforma", proforma);
       let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      // this.cargando = true;
+      for (let index = 0; index < proforma.productos.length; index++) {
+        const producto = proforma.productos[index];
+        const prod = proforma.productos[index];
+
+        // }
+        // proforma.productos.forEach(async producto => {
+        // let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
         if (prod.PreciosPorProducto) {
           let newPres = JSON.parse(prod.PreciosPorProducto);
@@ -2598,12 +2612,13 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         productos.push(prod);
-      });
-      // console.log(proforma.productos);
+      }
+
       venta.productos = productos;
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
+        this.cargando = false;
         this.getNumeroVenta();
         this.getVendedorInfo();
         // this.loadClienteVarios();
