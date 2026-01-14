@@ -626,7 +626,7 @@
                   <b-col lg="3" xl="3"  cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2" >
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear Proforma</b-button>
-                      <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <b-button block class="mx-1 btnAction" :disabled="loading" variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block variant="warning" class="btnAction"  @click="anadirVentana()"> Nueva Ventana</b-button>
                       <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                       <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
@@ -973,6 +973,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       mostrarNav: true,
       isNota: [],
       itemsMotivoNota: [
@@ -1990,7 +1991,7 @@ export default {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
-
+      this.loading = true;
       totalPagos +=
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
@@ -1998,28 +1999,33 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+        this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
+        this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
+        this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
+        this.loading = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
+        this.loading = false;
         return;
       }
 
@@ -2035,6 +2041,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
+        this.loading = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2049,6 +2056,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
+        this.loading = false;
         return;
       }
 
@@ -2065,6 +2073,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
+        this.loading = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2079,6 +2088,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
+        this.loading = false;
         return;
       }
       if (
@@ -2097,6 +2107,7 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
+          this.loading = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2111,12 +2122,14 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
+          this.loading = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
+          this.loading = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2134,18 +2147,22 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
+        this.loading = false;
         return;
       }
 
       let listaProductos = this.ventas[this.ventaActiva].productos;
 
       // revisar si hay productos sin stock
-      let sinStock = listaProductos.find(p => Number(p.cantidad) > Number(p.stock));
+      let sinStock = listaProductos.find(
+        p => Number(p.cantidad) > Number(p.stock)
+      );
 
       if (sinStock) {
         this.$toasted.show(
           `El producto "${sinStock.Producto}" no tiene stock disponible`
         );
+        this.loading = false;
         return;
       }
 
@@ -2192,7 +2209,7 @@ export default {
           this.eliminarVentana();
           this.getVendedorInfo();
         }
-
+        this.loading = false;
         // if (response.data.actualizar) {
         //   this.$toasted.show(response.data.msg);
         //   return;
