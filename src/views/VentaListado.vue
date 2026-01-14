@@ -958,6 +958,24 @@
          :producto-update="productoSelect"  @actualizarProducto="actualizarRegistro($event)"
          ></producto-form>
         
+        <b-modal v-model="loading" hide-footer hide-header size="md">
+        <b-row>
+          <b-col
+            cols="6"
+            style="text-align: center; align-items: center; align-content: center"
+          >
+            <div class="spinner"></div>
+          </b-col>
+          <b-col
+            cols="6"
+            style="text-align: center; align-items: center; align-content: center"
+          >
+            <h3>Cargando Datos</h3>
+            <h5>Un Momento por favor...</h5>
+          </b-col>
+        </b-row>
+      </b-modal>
+
       </b-container>
   </template>
   <script>
@@ -994,6 +1012,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       bloquearVenta: false,
       mostrarNav: true,
       isNota: [],
