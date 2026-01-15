@@ -351,14 +351,14 @@
                                       </tr>
                                       <tr>
                                         <td>
-                                              <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                                              <b-button class="p-1 ml-1 mt-1" :id="`popover-metodopago-${index}`" variant="success"><i class="fas fa-credit-card" ></i></b-button>
                                               <br>
                                               <b-badge v-if="idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
                                               <b-badge v-if="idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                                               <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                                               <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
                                               <b-popover 
-                                                  target="popover-metodopago" 
+                                                  :target="`popover-metodopago-${index}`"
                                                   placement="bottom" 
                                                   triggers="click" 
                                                   custom-class="custom-popover"
