@@ -1767,6 +1767,7 @@ export default {
       // this.venta.comisionista = {}
     },
     eliminarVentana() {
+      this.mostrarMetodo.splice(this.ventaActiva, 1);
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -1775,6 +1776,7 @@ export default {
         } else {
           this.ventaActiva = 0;
         }
+        this.metodoPagoCambio(1);
       });
       let header = document.getElementById("header");
       header.scrollIntoView({
@@ -1782,6 +1784,7 @@ export default {
         block: "start"
       });
       this.$toasted.info("Opción de venta cerrada.");
+     
     },
     setTipoVenta(obj) {
       this.isNota[this.ventaActiva] = false;
@@ -2543,16 +2546,15 @@ export default {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        this.ventas[this.ventaActiva].mostrarMetodo.push(false);
-        this.ventas[this.ventaActiva].mostrarOp.push(false);
+        // this.ventas[this.ventaActiva].mostrarMetodo.push(false);
+        // this.ventas[this.ventaActiva].mostrarOp.push(false);
         // this.loadClienteVarios();
       });
       this.ventas[this.ventaActiva].cliente = proforma;
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
           this.metodoPagoCambio(1);
-        }, 1000);
+        }, 100);
       });
     },
     // cargarProforma(proforma) {
@@ -2788,7 +2790,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           this.metodoPagoCambio(1);
-        }, 1000);
+        }, 100);
       });
     }
   }

@@ -1712,6 +1712,7 @@ export default {
       });
     },
     eliminarVentana() {
+      this.mostrarMetodo.splice(this.ventaActiva, 1);
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -1720,6 +1721,7 @@ export default {
         } else {
           this.ventaActiva = 0;
         }
+        this.metodoPagoCambio(1);
       });
       let header = document.getElementById("header");
       header.scrollIntoView({
@@ -2612,7 +2614,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           this.metodoPagoCambio(1);
-        }, 1000);
+        }, 100);
       });
     },
     showPresentacion(prod, index) {
