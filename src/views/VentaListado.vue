@@ -2093,33 +2093,33 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
 
@@ -2135,7 +2135,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
@@ -2150,7 +2150,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
 
@@ -2167,7 +2167,7 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
@@ -2182,7 +2182,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
       if (
@@ -2201,7 +2201,7 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.inProgress = true;
+          this.inProgress = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
@@ -2216,14 +2216,14 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.inProgress = true;
+          this.inProgress = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.inProgress = true;
+          this.inProgress = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2241,7 +2241,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.inProgress = true;
+        this.inProgress = false;
         return;
       }
 
@@ -2266,7 +2266,7 @@ export default {
       ) {
         this.$toasted.show("Los pagos no coinciden con la venta");
         this.inProgress = false;
-        this.inProgress = true;
+
         return;
       }
       venta.Observacion = (venta.Observacion + "").toUpperCase();
@@ -2281,7 +2281,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
@@ -2290,7 +2290,7 @@ export default {
             "noopener"
           );
         }
-        this.inProgress = true;
+        this.inProgress = false;
         if (this.ventas.length == 1) {
           this.inProgress = false;
           window.location.reload();
@@ -2563,7 +2563,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           this.metodoPagoCambio(1);
-        }, 1000);
+        }, 1500);
       });
     },
     // cargarProforma(proforma) {
