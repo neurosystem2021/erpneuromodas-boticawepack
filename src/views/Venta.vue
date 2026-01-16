@@ -2185,9 +2185,7 @@ export default {
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
-        this.$toasted.show(
-          "El metodo de pago tarjeta no puede ser negativo"
-        );
+        this.$toasted.show("El metodo de pago tarjeta no puede ser negativo");
         this.bloquearVenta = false;
         return;
       }
@@ -2637,11 +2635,13 @@ export default {
       }
     },
     async cargarProforma(proforma) {
+      console.log("aqui", proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
 
       let venta = { ...this.venta };
       venta.cliente = proforma;
       venta.proforma = proforma;
+      venta.UsuarioProforma = proforma.UsuarioReg;
 
       let productos = [];
       this.loading = true;
