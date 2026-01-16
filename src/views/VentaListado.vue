@@ -2462,7 +2462,7 @@ export default {
       let venta = { ...this.venta };
       venta.cliente = proforma;
       venta.proforma = proforma;
-
+      venta.UsuarioProforma = proforma.UsuarioReg;
       let productos = [];
       this.loading = true;
       // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
