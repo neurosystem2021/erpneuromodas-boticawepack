@@ -1046,7 +1046,12 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.setProducto({ ...obj, IdProducto: id });
+      this.setProducto({
+        ...obj,
+        IdProducto: id,
+        ProductoMarca: obj.marca.ProductoMarca,
+        ProductoCategoria: obj.categoria.ProductoCategoria
+      });
       // this.add([id, false, false, false, false, true, this.isVentas]);
       // setTimeout(() => {
       //   this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
