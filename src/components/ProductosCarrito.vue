@@ -3,32 +3,45 @@
     <b-col md="12">
       <b-form-group>
         <label>Agregar Productos:</label>
-        <b-input-group>
-          <autocomplete
-            style="width:55%"
-            ref="autocompleteProducto"
-            :url="APIProductos"
-            :customParams="{ limit: '25' }"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
-          </autocomplete>
-          <input v-model="loadCode"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  class="form-control"
-                  ref="barcodeInput"
-                  placeholder="C. Barra" />
-          <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
-            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
-          </b-input-group-append>
-        </b-input-group>
+        <b-row>
+          <b-col cols="12" md="6" class="mx-0 pdr">
+              <b-input-group>
+              <autocomplete
+                id="autocompleteProducto"
+                ref="autocompleteProducto"
+                :url="APIProductos"
+                :customParams="{ limit: '25' }"
+                :onShouldRenderChild="renderChild"
+                anchor="Producto"
+                label="writer"
+                placeholder="Agregar Producto"
+                :on-select="setProducto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                :classes="{input: 'form-control txtAutoComplete',}">
+              </autocomplete>
+                  <b-button 
+                  :variant="isListening ? 'danger' : 'primary'"
+                  @click="startRecognition">
+                    <i class="fas fa-microphone"></i>
+                  </b-button>
+              </b-input-group>
+          </b-col>
+          <b-col cols="12" md="6" class="mx-0 pdl">
+              <b-input-group>
+                <input v-model="loadCode"
+                    @keydown.enter.prevent="loadBarcode"
+                    type="text"
+                    class="form-control"
+                    ref="barcodeInput"
+                    placeholder="C. Barra" />
+                <b-input-group-append>
+                  <!--<proveedores-tabla></proveedores-tabla>-->
+                  <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+                  <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+                </b-input-group-append>
+              </b-input-group>
+          </b-col>
+        </b-row>  
         <b-badge v-if="isVentas && false" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
@@ -80,11 +93,11 @@
           </b-col>
         </b-row>
       </b-modal>
-
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
-        <template slot="eventPres" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
-          <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
-        </template>
+      <div class="clsTable">
+        <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+          <template slot="eventPres" slot-scope="data" v-if="productos[data.index].TienePresentacionFlag">
+            <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
+          </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].PreciosPorProducto">
           <input
@@ -275,6 +288,7 @@
           <div v-if="!data.item.EsPadre">{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
         </template>
       </b-table>
+    </div>
     </b-col>
     <b-col md="3">
       <slot name="operaciones"></slot>
@@ -354,7 +368,8 @@ export default {
       precioCont: 0,
       medicionPro:'UNIDAD',
       productoSelect: {},
-      idPerfil: sessionStorage.getItem('IdPerfil')
+      idPerfil: sessionStorage.getItem('IdPerfil'),
+      isListening: false // controla el color
     }
   },
   watch: {
@@ -479,6 +494,63 @@ export default {
       obtenerStok: 'obtenerStock',
     }),
 
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        this.isListening = true; // se pone rojo
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        this.isListening = false;
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        this.isListening = false;
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+
+    search() {
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true
+      });
+      let inputElement = `autocompleteProducto`;
+      let autocompleteInput = document.getElementById(inputElement);
+      setTimeout(() => {
+        document.getElementById(inputElement).value = this.query;
+        autocompleteInput.dispatchEvent(inputEvent);
+      }, 200);
+    },
+    
     changeCant (val, prod) {
       if (val) {
         prod.cantidad = prod.cantidadPres
@@ -504,9 +576,12 @@ export default {
       }
 
       if (this.productos[index].EsManoDeObra) {
-        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff"
-        this.productos[pi].precio = parseFloat(this.productos[pi].precio) - (parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad))
-        this.productos[index].disabled = true
+        e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
+        this.productos[pi].precio =
+          parseFloat(this.productos[pi].precio) -
+          parseFloat(this.productos[index].precio) *
+            parseFloat(this.productos[index].cantidad);
+        this.productos[index].disabled = true;
       } else {
         e.target.parentNode.parentNode.removeAttribute("style")
         this.productos[pi].precio = 0
@@ -722,23 +797,69 @@ export default {
       }
     },
     renderChild(data) {
-      /*
       if (this.idAlmacen) {
-        let style = 'ss'
-        if(parseFloat(data.stock) <= 0) {
-          style = 'danger'
+        let styleStock = "";
+        if (data.stock <= 0) {
+          styleStock = "table-danger";
+        } else {
+          styleStock = "table-success";
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (parseFloat(data.stock) > 0) {
-          style = 'success'
+
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
+        </style>
+        <div>
+          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr>
+                <!-- <td style="width: 60px" class="${styleStock}"><b>${
+          data.stock
+            ? Number.isInteger(data.stock)
+              ? data.stock
+              : data.stock.toFixed(2)
+            : data.stock
+        }</b></td> -->
+                <td style="width: 400px"><b>${data.Producto} 
+        </b></td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td  style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `;
       }
       return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
-      }*/
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
@@ -837,30 +958,62 @@ export default {
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
+<style>
+.txtAutoComplete {
+  width: 100% !important;
+  display: block;
+}
+</style>
 <style scoped>
-  .contentCard {
-    cursor: pointer;
-  }
-  .disabledMouse {
-    background: #CECECE;
-    cursor: inherit;
-  }
-  .nomCart {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-right: 2px solid black;
-  }
-  .form-check-input {
-    margin-left: -0.2rem !important;
-  }
-  @media only screen and (max-width: 700px) {
+.contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.nomCart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid black;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+#txtAutoComplete {
+  min-width: 100% !important;
+}
+.pdr {
+  padding-right: 0;
+}
+.pdl {
+  padding-left: 0;
+}
+.clsTable {
+  width: 100%;
+  overflow-x: auto;
+}
+.txtArea {
+  field-sizing: content;
+}
+@media only screen and (max-width: 700px) {
   /* For desktop: */
-    .ocularMovil{
-        display: none;
-    }
+  .ocularMovil {
+    display: none;
   }
+  .txtAutoComplete {
+    width: 100% !important;
+    display: block;
+  }
+  .pdr {
+    padding-right: 3%;
+  }
+  .pdl {
+    padding-left: 3%;
+  }
+}
 </style>
