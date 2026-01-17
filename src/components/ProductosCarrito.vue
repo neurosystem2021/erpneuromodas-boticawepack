@@ -382,7 +382,7 @@
 
         <template slot="DescPorcentaje" slot-scope="data">
           <input
-            :disabled="bloquearInput?true:false  || esDelivery"
+            :disabled="bloquearDescuento"
             v-model="productos[data.index].DescPorcentaje"
             style="width:90px"
             type="number"
@@ -736,6 +736,9 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
+    bloquearDescuento() {
+    return Number(this.idPerfil) !== 1 || this.esDelivery;
+    },
     APIProductos() {
       if (this.idAlmacen) {
         return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
