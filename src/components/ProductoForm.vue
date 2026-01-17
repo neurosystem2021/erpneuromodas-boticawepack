@@ -386,6 +386,17 @@
               <b-form-group>
                   <label>Precio de Costo:</label>
                   <input
+                    v-model="producto.PrecioCostoSinIGV "
+                    :disabled="(idPerfil == 1 || idPerfil == 23 || idPerfil == 31) ? false : true"
+                    step="0.0001"
+                    type="number"
+                     @input="actualizarPrecioDolar(6)"
+                    class="form-control"
+                    />
+              </b-form-group>
+              <b-form-group>
+                  <label>Precio de Costo + IGV:</label>
+                  <input
                     v-model="producto.PrecioCosto"
                     :disabled="(idPerfil == 1 || idPerfil == 23 || idPerfil == 31) ? false : true"
                     step="0.0001"
@@ -406,6 +417,17 @@
               </b-form-group>
               <b-form-group>
                   <label>Precio de Costo Dolar:</label>
+                  <input
+                    v-model="producto.PrecioCostoSinIGVDolar"
+                    step="0.0001"
+                    type="number"
+                    @input="actualizarPrecioDolar(3)"
+
+                    class="form-control"
+                    />
+              </b-form-group>
+              <b-form-group>
+                  <label>Precio de Costo Dolar + IGV:</label>
                   <input
                     v-model="producto.PrecioCostoDolar"
                     step="0.0001"
@@ -719,6 +741,9 @@ export default {
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
+            this.producto.PrecioCostoSinIGV = newVal.PrecioCostoSinIGV;
+            this.producto.PrecioCostoSinIGVDolar =
+              newVal.PrecioCostoSinIGVDolar;
             this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
             this.producto.TipoCambio = newVal.TipoCambio;
             this.producto.PrecioContado = newVal.PrecioContado;
@@ -813,6 +838,12 @@ export default {
           this.producto.PrecioContado = parseFloat(
             this.producto.PrecioContadoDolar * this.producto.TipoCambio
           ).toFixed(2);
+          break;
+        case 6:
+          this.producto.PrecioCosto =
+            parseFloat(this.producto.PrecioCostoSinIGV )+
+            parseFloat(this.producto.PrecioCostoSinIGV * 0.18);
+          this.actualizarPrecioDolar(1);
           break;
       }
       this.actualizarPorcentajeUtilidad();

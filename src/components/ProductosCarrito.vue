@@ -1133,10 +1133,13 @@ export default {
       //this.$refs.autocompleteProducto.setValue('')
       obj.subt = "";
 
-      obj.PrecioCosto = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(
+      obj.PrecioCosto = parseFloat(
+        obj.PrecioCostoSinIGV / this.TipoCambio
+      ).toFixed(2);
+      obj.precio = parseFloat(obj.PrecioCostoSinIGV / this.TipoCambio).toFixed(
         2
       );
-      obj.precio = parseFloat(obj.PrecioCosto / this.TipoCambio).toFixed(2);
+
       // obj.precio = obj.PrecioContado;
       obj.cantidad = 0;
       obj.EsVentaNew = true;
