@@ -284,7 +284,7 @@
             @input="setNuevoPrecioContado(data.index)"
             />
              <span v-if="isVentas && productos[data.index].precio < (productos[data.index].precioMin/TipoCambio)" style="font-size: 0.8rem; color: red;">
-                P. Mín. <b> {{ parseFloat(productos[data.index].precioMin/TipoCambio).toFixed(2) }} </b>
+                P. Mín. <b> {{ productos[data.index].precioMin/TipoCambio }} </b>
               </span>
         </template>
         <template slot="flete" slot-scope="data">
@@ -737,7 +737,7 @@ export default {
       filtrados: state => state.cart.productosFiltrados
     }),
     bloquearDescuento() {
-    return Number(this.idPerfil) !== 1 || this.esDelivery;
+      return Number(this.idPerfil) !== 1 || this.esDelivery;
     },
     APIProductos() {
       if (this.idAlmacen) {
@@ -1150,8 +1150,9 @@ export default {
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, false, precio);
       obj.cantidadPres = obj.cantidad;
+      obj.precioMin = obj.precio;
+      console.log("precioMin", obj.precioMin);
       obj.PrecioContado = parseFloat(obj.PrecioContado).toFixed(2);
-      obj.precioMin = obj.PrecioContado;
       this.add([
         obj,
         () => {
