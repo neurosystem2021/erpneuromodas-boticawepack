@@ -3,7 +3,7 @@
     <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
       <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row">
         <b-row>
-          <b-col md="4">
+          <b-col md="3">
             <b-form-group>
                   <label>Buscar:</label>
               
@@ -16,7 +16,7 @@
             </b-form-group>
             <br />
           </b-col>
-          <b-col md="4">
+          <b-col md="3">
             <b-form-group>
                   <label>Almacen:</label>
                   <autocomplete
@@ -33,7 +33,7 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4">
+          <b-col md="3">
             <b-row>
             <b-col md="8">
 
@@ -46,6 +46,21 @@
              <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
             </b-col>
             </b-row>
+          </b-col>
+          <b-col md="3">
+            <b-form-group>
+              <label>Vendedor:</label>
+              <autocomplete
+                  required="required"
+                  ref="inputVendedor"
+                  :url="API + 'usuarios'"
+                  anchor="NombreUsuario"
+                  label="writer"
+                  :on-select="setVendedor" 
+                  :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                  :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-form-group>
           </b-col>
           <b-col md="4">
             <b-form-group>
@@ -131,6 +146,7 @@ export default {
         console.log(response);
         this.totalRows = response.data.total;
       });
+    this.$refs.inputAlmacen.setValue("PRINCIPAL");
   },
   data() {
     return {
@@ -141,7 +157,9 @@ export default {
       sortDesc: false,
       items: [],
       isBusy: false,
+      vendedor: {},
       fields: [
+        { key: "UsuarioReg", label: "Vendedor", sortable: true },
         { key: "DniRuc", label: "DNI/RUC", sortable: true },
         { key: "Cliente", label: "Cliente", sortable: true },
         { key: "Correlativo", label: "Serie", sortable: true },
@@ -157,7 +175,8 @@ export default {
       perPage: 50,
       currentPage: 1,
       almacen: {
-        IdAlmacen: 1
+        IdAlmacen: 1,
+        Almacen: "PRINCIPAL"
       },
       rango: {
         fechaDesde: this.$moment().format("YYYY-01-01"),
@@ -177,6 +196,11 @@ export default {
         return sum + parseFloat(item.Saldo);
       }, 0);
       return parseFloat(sum).toFixed(2);
+    },
+    setVendedor(obj) {
+      console.log(obj);
+      this.vendedor = obj;
+      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
     },
     async imprimir() {
       // http://localhost/api/index.php/cliente/imprimir/deudas_cliente?idalmacen=1&q=&limit=50&page=1&fechaDesde=2024-01-01&fechaHasta=2024-09-20
@@ -215,7 +239,9 @@ export default {
           "&fechaDesde=" +
           this.rango.fechaDesde +
           "&fechaHasta=" +
-          this.rango.fechaHasta
+          this.rango.fechaHasta +
+          "&Usuario=" +
+          (Object.keys(this.vendedor).length > 0 ? this.vendedor.Usuario : "")
       );
 
       return promise
