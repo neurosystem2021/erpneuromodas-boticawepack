@@ -283,7 +283,7 @@
              :class="Number(productos[data.index].precio) < Number(productos[data.index].precioMin/TipoCambio) ? 'clsError' : ''" 
             @input="setNuevoPrecioContado(data.index)"
             />
-             <span v-if="productos[data.index].precio < (productos[data.index].precioMin/TipoCambio)" style="font-size: 0.8rem; color: red;">
+             <span v-if="isVentas && productos[data.index].precio < (productos[data.index].precioMin/TipoCambio)" style="font-size: 0.8rem; color: red;">
                 P. Mín. <b> {{ parseFloat(productos[data.index].precioMin/TipoCambio).toFixed(2) }} </b>
               </span>
         </template>
