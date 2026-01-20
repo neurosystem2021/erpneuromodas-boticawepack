@@ -183,7 +183,7 @@
     </b-col>
     <br><br>
     
-     <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
+      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
       <div class="d-block ">
         <b>{{ productoSelect.Producto }}</b>
         <br/>
@@ -243,16 +243,6 @@
             @input="val => calcularm2()"/>
           <br>
           <div v-show="!productoSelect.SoloLargo">
-          <label>Perdida:</label>
-          <input
-            type="number"
-            ref="inputPerdida"
-            v-model="perdida"
-            placeholder="Perdida"
-            class="form-control"
-            step="0.0001"
-            @input="val => calcularm2()"/>
-          <br>
           <label>Factor ({{factorNombre}}):</label>  
           <input
             type="number"
@@ -274,24 +264,25 @@
       <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
       <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalCalcularM2.hide()}">Cerrar</b-btn>
     </b-modal>
+
   </b-row>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import ProductoForm from './ProductoForm'
-import config from '@/store/config.js'
+import { mapState, mapActions } from "vuex";
+import ProductoForm from "./ProductoForm";
+import config from "@/store/config.js";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
-  data () {
+  data() {
     return {
       API: config.API,
-      loadCode: '',
+      loadCode: "",
       pasteCode: false,
-      esPulgadas:'0',
+      esPulgadas: "0",
       producto: {},
       items: [],
       productosDet: [],
@@ -299,35 +290,35 @@ export default {
       vuelto: 0,
       pagocon: 0,
       productoSelect: {},
-      mensajeM2: '',
-      M2: '',
+      mensajeM2: "",
+      M2: "",
       ancho: 0,
       largo: 0,
       perdida: 0,
-      factorNombre: '',
+      factorNombre: "",
       factor: 0,
       pie2corte: 0,
-      mostrarInputs:false,
+      mostrarInputs: false,
       indexFactor: null,
-      precioCorte:0
-    }
+      precioCorte: 0
+    };
   },
   watch: {
-    sumatoriaTotal (sum) {
-      this.asignarVuelto()
+    sumatoriaTotal(sum) {
+      this.asignarVuelto();
     }
   },
   props: {
     tipo: String,
     setPrecio: Boolean,
-    bloquearInput:Boolean,
+    bloquearInput: Boolean,
     noSubtotal: Boolean,
     isVentas: Boolean,
     igvTotal: Boolean,
     onSetProducto: {
       type: Function,
-      default (obj) {
-        return obj
+      default(obj) {
+        return obj;
       }
     },
     showButton: {
@@ -335,23 +326,23 @@ export default {
       type: Boolean
     },
     fields: {
-      default () {
+      default() {
         return [
-          { key: 'CodigoBarra', label: 'Código'},
-          { key: 'ProductoCategoria', label: 'Categoria'},
-          { key: 'Producto', label: 'Artículo' }, 
-          { key: 'ProductoMarca', label: 'Marca' },
-          { key: 'ProductoMedicion', label: 'Medición' },
-          { key: 'cantidad' },
-          { key: 'precio', label: 'P/U' },
-          { key: 'subtotal', label: 'SubTotal', variant: 'success' },
-          { key: 'igv', label: 'IGV' },
+          { key: "CodigoBarra", label: "Código" },
+          { key: "ProductoCategoria", label: "Categoria" },
+          { key: "Producto", label: "Artículo" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoMedicion", label: "Medición" },
+          { key: "cantidad" },
+          { key: "precio", label: "P/U" },
+          { key: "subtotal", label: "SubTotal", variant: "success" },
+          { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
           // { key: 'lote', label: 'Lote' },
-          { key: 'precioVenta', label: 'Precio venta' },
-          { key: 'total', label: 'Total', variant: 'danger' },
-          { key: 'acciones', label: ''}
-        ]
+          { key: "precioVenta", label: "Precio venta" },
+          { key: "total", label: "Total", variant: "danger" },
+          { key: "acciones", label: "" }
+        ];
       },
       type: Array
     }
@@ -361,115 +352,118 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    sumatoriaSubTotal () {
-      let sumatoria = 0
+    sumatoriaSubTotal() {
+      let sumatoria = 0;
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18
+        sumatoria = this.sumatoriaTotal / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.subtotal)
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.subtotal);
           if (value.descuento) {
-            sumatoria -= value.descuento
+            sumatoria -= value.descuento;
           }
-        })
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaTotal () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.total)
-      })
-      
-      this.actualizarTotal(sumatoria)
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaTotal() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.total);
+      });
+
+      this.actualizarTotal(sumatoria);
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaIgv () {
-      let sumatoria = 0
+    sumatoriaIgv() {
+      let sumatoria = 0;
       if (this.igvTotal) {
-        sumatoria = this.sumatoriaTotal
+        sumatoria = this.sumatoriaTotal;
         // sumatoria = sumatoria * 0.18
-        sumatoria = sumatoria - (sumatoria/1.18)
+        sumatoria = sumatoria - sumatoria / 1.18;
       } else {
-        this.productos.map((value) => {
-          sumatoria += parseFloat(value.igv)
-        })
+        this.productos.map(value => {
+          sumatoria += parseFloat(value.igv);
+        });
       }
-      return this.$options.filters.redondear(sumatoria)
+      return this.$options.filters.redondear(sumatoria);
     },
-    sumatoriaDescuento () {
-      let sumatoria = 0
-      this.productos.map((value) => {
-        sumatoria += parseFloat(value.descuento || 0)
-      })
-      return this.$options.filters.redondear(sumatoria)
+    sumatoriaDescuento() {
+      let sumatoria = 0;
+      this.productos.map(value => {
+        sumatoria += parseFloat(value.descuento || 0);
+      });
+      return this.$options.filters.redondear(sumatoria);
     }
   },
   methods: {
     ...mapActions({
-      add: 'agregarProducto',
-      buscar: 'buscarProductos',
-      eliminar: 'eliminarProducto',
-      actualizarTotal: 'actualizarTotalCart'
+      add: "agregarProducto",
+      buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
+      actualizarTotal: "actualizarTotalCart"
     }),
-    accionFactor(val){
-    this.mostrarInputs=true
+    accionFactor(val) {
+      this.mostrarInputs = true;
       switch (val) {
         case 0:
-          this.indexFactor = val
-          this.factorNombre="Público"
-          this.esPulgadas=0
-          this.factor = 620
-          this.calcularm2()
+          this.indexFactor = val;
+          this.factorNombre = "Público";
+          this.esPulgadas = 0;
+          this.factor = 620;
+          this.calcularm2();
           break;
         case 1:
-          this.indexFactor = val
-          this.factorNombre="Vidriero"
-          this.esPulgadas=0
-          this.factor = 900
-          this.calcularm2()
+          this.indexFactor = val;
+          this.factorNombre = "Vidriero";
+          this.esPulgadas = 0;
+          this.factor = 900;
+          this.calcularm2();
           break;
         case 2:
-          this.factorNombre="Pulgadas"
-          this.factor = 144
-          this.calcularm2()
+          this.factorNombre = "Pulgadas";
+          this.factor = 144;
+          this.calcularm2();
           break;
         default:
           break;
       }
-
-      
     },
-    asignarVuelto () {
-      this.vuelto = this.pagocon - this.sumatoriaTotal
+    asignarVuelto() {
+      this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
 
-    setPulgadas(esPulgadas){
-      if(!esPulgadas){
-        this.$refs.inputFactor.setValue('');
-        this.factor = {}
-        this.$refs.inputFactor.$refs.input.disable = true
-        this.$refs.inputFactor.$refs.input.required = false
-      }else{
-        this.$refs.inputFactor.$refs.input.disable = false
-        this.$refs.inputFactor.$refs.input.required = true
+    setPulgadas(esPulgadas) {
+      if (!esPulgadas) {
+        this.$refs.inputFactor.setValue("");
+        this.factor = {};
+        this.$refs.inputFactor.$refs.input.disable = true;
+        this.$refs.inputFactor.$refs.input.required = false;
+      } else {
+        this.$refs.inputFactor.$refs.input.disable = false;
+        this.$refs.inputFactor.$refs.input.required = true;
       }
     },
-    loadBarcode (e) {
-      e.preventDefault()
+    loadBarcode(e) {
+      e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
-          this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }, true])
+        this.add([
+          idProducto,
+          obj => {
+            if (obj) {
+              this.$emit("onAddProducto");
+              this.$toasted.show("Producto añadido correctamente");
+            } else {
+              this.$toasted.show("No se encontró ningun producto");
+            }
+            this.loadCode = "";
+          },
+          { setPrecio: this.setPrecio, setSuma: true },
+          true
+        ]);
       }
     },
     /*alterarBuscadorProductos() {
@@ -500,63 +494,61 @@ export default {
         this.pasteCode = false
       }
     },*/
-    focusAutocomplete (ref) {
-      this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },  
-    abrirCalcularM2 (obj) {
-      if(this.isVentas){   
-          this.largo = 0
-          this.ancho = 0
-          this.perdida = 0
-          this.pie2corte = 0 
-          this.precioCorte = 0
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
+    },
+    abrirCalcularM2(obj) {
+      if (this.isVentas) {
+        this.largo = 0;
+        this.ancho = 0;
+        this.perdida = 0;
+        this.pie2corte = 0;
+        this.precioCorte = 0;
         if (obj.Ancho && obj.Largo) {
-          this.mostrarInputs = true
-          this.$refs.modalCalcularM2.show()
+          this.mostrarInputs = true;
+          this.$refs.modalCalcularM2.show();
         } else if (obj.SoloLargo) {
           this.accionFactor(0);
-          this.$refs.modalCalcularM2.show()
+          this.$refs.modalCalcularM2.show();
           //this.setProducto(obj)
-        } else{
-          this.setProducto(obj)
+        } else {
+          this.setProducto(obj);
         }
-        obj.cantidad = 1
-        this.productoSelect = obj
-        this.mensajeM2 = ''
+        obj.cantidad = 1;
+        this.productoSelect = obj;
+        this.mensajeM2 = "";
         // this.$refs.inputM2.$refs.input.value = ''
-
-      }else{
-        this.setProducto(obj)
-        obj.precio=obj.PrecioCosto
+      } else {
+        this.setProducto(obj);
+        obj.precio = obj.PrecioCosto;
       }
-
     },
-    calcularm2 () {
+    calcularm2() {
       if (this.productoSelect.SoloLargo) {
-         // let precio = (this.largo * this.productoSelect.PrecioContado) / this.productoSelect.Largo;
-        let precio = this.productoSelect.PrecioContado * 1.2 / 6 * (this.largo / 100);
-        precio = this.redondearPrecio(precio);
+        let precio =
+          (this.largo * this.productoSelect.PrecioContado) /
+          this.productoSelect.Largo;
         this.precioCorte = precio.toFixed(2);
-        this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
+        this.mensajeM2 = "El precio del corte es " + precio.toFixed(2);
         return;
       }
-      // precio * 1.2 / 6 * (medida/100)
 
       // rendimiento = (rendimiento == '0' ) ? false : rendimiento;
       //halla el pie2
-      let pie2total = this.productoSelect.Ancho * this.productoSelect.Largo/900
+      let pie2total =
+        (this.productoSelect.Ancho * this.productoSelect.Largo) / 900;
       // let ancho = (this.ancho == '0' ) ? false : this.Ancho;
       // let largo = (largo == '0' ) ? false : prod.Largo;
 
       if (pie2total > 0 && this.ancho > 0 && this.largo > 0) {
-        this.pie2corte = ((this.ancho*this.largo/this.factor)*10)/10;
-        let precio = (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
-        precio = this.redondearPrecio(precio);
+        this.pie2corte = (((this.ancho * this.largo) / this.factor) * 10) / 10;
+        let precio =
+          (this.pie2corte * this.productoSelect.PrecioContado) / pie2total;
         this.precioCorte = precio.toFixed(2);
-        this.mensajeM2 = 'El precio del corte es ' + precio.toFixed(2);
+        this.mensajeM2 = "El precio del corte es " + precio.toFixed(2);
       }
-      
+
       // if (!ancho || !largo) {
       //   alert('El producto no cuenta con un ancho o largo establecido');
       //   return;
@@ -572,8 +564,8 @@ export default {
       //   cantidad = Math.ceil(cantidad)
       //   mensaje = "Total de cajas requeridas: " + cantidad
       // } else {
-        // console.log(ancho)
-        // console.log(largo)
+      // console.log(ancho)
+      // console.log(largo)
       //   cantidad = (parseFloat(m2) / ((ancho/100) * (largo/100))).toFixed(1)
       //   cantidad = Math.ceil(cantidad)
       //   mensaje = "Total de unidades requeridas: " + cantidad
@@ -592,149 +584,220 @@ export default {
       //         mensajeAdicional += ')';
       //       }
       //     }
-      //   } 
+      //   }
       //   this.mensajeM2 = mensaje;
       //   this.mensajeM2 += " <br /> " + mensajeAdicional
       //   this.productoSelect.cantidad = cantidad
       // }
-      
+
       // if(!m2) {
       //   this.mensajeM2 = ''
       //   this.productoSelect.cantidad = 1
       // }
-
     },
+
     redondearPrecio(precio) {
       // Siempre subir al próximo múltiplo de 0.10
       let redondeado = Math.ceil(precio * 10) / 10;
       return parseFloat(redondeado.toFixed(2));
     },
-    seleccionarCalcularM2 () {
-      if(this.productoSelect.SoloLargo==1 && (this.largo == 0 || this.largo=='')){
-         this.$toasted.show('Necesita asignar un medida  de corte largo')
-         return
+    seleccionarCalcularM2() {
+      if (
+        this.productoSelect.SoloLargo == 1 &&
+        (this.largo == 0 || this.largo == "")
+      ) {
+        this.$toasted.show("Necesita asignar un medida  de corte largo");
+        return;
       }
 
-      if(this.precioCorte==0 && this.productoSelect.Ancho>0 && this.productoSelect.Largo>0 ){
-         this.$toasted.show('Necesita asignar una medida de corte largo y ancho')
-         return
+      if (
+        this.precioCorte == 0 &&
+        this.productoSelect.Ancho > 0 &&
+        this.productoSelect.Largo > 0
+      ) {
+        this.$toasted.show(
+          "Necesita asignar una medida de corte largo y ancho"
+        );
+        return;
       }
 
-      let objCalculado = {...this.productoSelect} 
+      let objCalculado = { ...this.productoSelect };
 
       if (this.precioCorte) {
         objCalculado.precio = this.precioCorte;
-        objCalculado.Ancho = this.ancho
-        objCalculado.Largo = this.largo
-      }else{
-        objCalculado.precio = this.PrecioContado
+        objCalculado.Ancho = this.ancho;
+        objCalculado.Largo = this.largo;
+      } else {
+        objCalculado.precio = this.PrecioContado;
       }
 
-      let cantidad =  parseFloat(objCalculado.cantidad)
-      let precio = parseFloat(objCalculado.precio)
-      this.productoSelect.cantidad = 1
-      this.setProducto (objCalculado, cantidad , precio )
-      this.ancho = 0
-      this.largo = 0
-      this.perdida = 0
-      this.precioCorte = 0
-      this.pie2corte = 0
-      this.mensajeM2 = ''; 
+      let cantidad = parseFloat(objCalculado.cantidad);
+      let precio = parseFloat(objCalculado.precio);
+      this.productoSelect.cantidad = 1;
+      this.setProducto(objCalculado, cantidad, precio);
+      this.ancho = 0;
+      this.largo = 0;
+      this.perdida = 0;
+      this.precioCorte = 0;
+      this.pie2corte = 0;
+      this.mensajeM2 = "";
     },
-    setProducto (obj2, cant, precio) {
-      let obj= {...obj2}
-      this.$refs.autocompleteProducto.setValue('')
+    setProducto(obj2, cant, precio) {
+      let obj = { ...obj2 };
+      this.$refs.autocompleteProducto.setValue("");
       //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
-      obj.Descripcion = ''
+      obj.precio = 0;
+      obj.cantidad = 0;
+      obj.Descripcion = "";
       //obj.IdLote = 0
       //obj.TieneIgv = 0
-      obj.descuento = 0
-      obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj, cant, precio)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-        this.$toasted.success('Producto agregado correctamente')
-      },{setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
+      obj.descuento = 0;
+      obj.nuevoPrecioContado = 0;
+      obj = this.onSetProducto(obj, cant, precio);
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto agregado correctamente");
+        },
+        { setPrecioCosto: this.tipo == "mov" ? true : false }
+      ]);
 
       // Vue.set(this.productos, obj.IdProducto, obj)
     },
     renderChild(data) {
+      if (this.isVentas) {
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 60%;
+            heigth: 60%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
+          #table-render td {
+            padding:1px
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr style="padding:0; margin:0">
+                <td style="width: 200px"><b>${data.Producto} - ${
+          data.CodigoBarra
+        }</b></td>
+                <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 80px">${data.ProductoMarca}</td>
+                <td style="width: 80px">${data.ProductoMedicion}</td>
+                <td style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
+                <td style="width: 5%">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
+                </td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `;
+      }
       return `
-        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${data.ProductoMedicion} / <b>S/. ${data.PrecioContado}</b>
-      `
+        <b>${data.Producto} - ${data.CodigoBarra}</b> / ${
+        data.ProductoCategoria
+      } / ${data.ProductoMarca} / ${data.ProductoPresentacion} / ${
+        data.ProductoMedicion
+      } / <b>S/. ${data.PrecioContado}</b>
+      `;
     },
-    setNuevoPrecioContado (index) {
 
+    setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
-      let precio = parseFloat(this.productos[index].precio)
-      if(this.productos[index].TieneIgv) {
-        precio += (precio * 0.18)
+      let precio = parseFloat(this.productos[index].precio);
+      if (this.productos[index].TieneIgv) {
+        precio += precio * 0.18;
       }
 
       //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      precio = precio / (1 - (this.productos[index].PorcentajeUtilidad/100))
+      precio = precio / (1 - this.productos[index].PorcentajeUtilidad / 100);
       // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
 
-
-      let normalPrecio = this.$options.filters.redondear(precio)
+      let normalPrecio = this.$options.filters.redondear(precio);
       //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
-      let nuevoPrecio = this.$options.filters.redondear(precio, 1)
-      
-      Vue.set(this.productos[index], 'normalPrecioContado', normalPrecio)
-      Vue.set(this.productos[index], 'nuevoPrecioContado', nuevoPrecio)
+      let nuevoPrecio = this.$options.filters.redondear(precio, 1);
+
+      Vue.set(this.productos[index], "normalPrecioContado", normalPrecio);
+      Vue.set(this.productos[index], "nuevoPrecioContado", nuevoPrecio);
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio 
+      // return nuevoPrecio
     },
     getSubtotal(index) {
-      
-      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio)
-      Vue.set(this.productos[index], 'subtotal', subtotal)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
+      );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return subtotal
+      return subtotal;
     },
-    getIgv (index) {
-      let igv = 0
+    getIgv(index) {
+      let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18)
+        igv = this.$options.filters.redondear(
+          this.productos[index].subtotal * 0.18
+        );
       }
 
-      Vue.set(this.productos[index], 'igv', igv)
+      Vue.set(this.productos[index], "igv", igv);
       // this.productos[index].igv = igv
-      return igv
+      return igv;
     },
-    getTotal (index) {
-      let total = parseFloat(this.productos[index].subtotal)
+    getTotal(index) {
+      let total = parseFloat(this.productos[index].subtotal);
 
       if (this.productos[index].FLETE) {
-        total += parseFloat(this.productos[index].FLETE)
+        total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
-        total += parseFloat(this.productos[index].igv)
+        total += parseFloat(this.productos[index].igv);
       }
       if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento)
+        total -= parseFloat(this.productos[index].descuento);
       }
 
-      total =  this.$options.filters.redondear(total)
-      Vue.set(this.productos[index], 'total', total)
+      total = this.$options.filters.redondear(total);
+      Vue.set(this.productos[index], "total", total);
       // this.productos[index].total = total
-      return total
+      return total;
     },
-    getData (value) {
-      this.buscar(value)
+    getData(value) {
+      this.buscar(value);
     },
-    quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
-      this.$toasted.show('Producto quitado del listado')
+    quitarProducto(index) {
+      this.eliminar(index);
+      this.$emit("onRemoveProducto", index);
+      this.$toasted.show("Producto quitado del listado");
     }
   },
   components: {
     ProductoForm
   }
-}
+};
 </script>
 
 <style scoped>
