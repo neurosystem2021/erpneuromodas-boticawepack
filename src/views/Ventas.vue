@@ -5,11 +5,14 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
             <div>
                 <div class="float-right">
                     <b-button-group size="sm">
                         <pago-deuda></pago-deuda>
+                    </b-button-group>
+                    <b-button-group size="sm">
+                        <movimiento></movimiento>
                     </b-button-group>
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
@@ -135,7 +138,21 @@
                                         <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
                                         <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
                                     </b-form-select>
-
+                                    <b-input-group v-if="venta.cliente.DniRuc == '00000000'">
+                                        <b-form-checkbox 
+                                        :disabled="bloquearInput?true:false"
+                                        v-model="venta.EsOrganizacion"
+                                        :value="1"
+                                        :unchecked-value="0">
+                                            Es Organización
+                                        </b-form-checkbox>
+                                        <input v-model="venta.NombreOrganizacion"
+                                                type="text"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                required
+                                                placeholder="Nombre de la Organización" v-if="venta.EsOrganizacion" />
+                                    </b-input-group>
                                 </b-form-group>
                             </b-col>
                         </b-row>
@@ -298,7 +315,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Visa</td>
+                                            <td>Yape/Plin</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -321,7 +338,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Transferencia</td>
                                             <td>
                                                 <b-form-input
                                                     :disabled="bloquearInput?true:false"
@@ -362,9 +379,9 @@
                 <b-row align-h="center" class="text-center">
                     <b-col cols="8">
                         <br />
-                        <b-button type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                        <b-button class="btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
+                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button v-if="ultimaVenta" class="btnAction" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
@@ -382,6 +399,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import Movimiento from '@/components/Movimiento'
 
 export default {
     beforeMount () {
@@ -567,6 +585,8 @@ export default {
                 NotaIdMotivo: '',
                 NotaDescMotivo: '',
                 IdPreOrden: [],
+                EsOrganizacion: 0,
+                NombreOrganizacion: '',
                 CampoDireccion: ''
             }
             this.isNota = false
@@ -739,6 +759,10 @@ export default {
                 this.$refs.inputCliente.setValue(obj.Cliente)
                 this.venta.cliente = obj
                 this.venta.CampoDireccion = this.venta.cliente.Direccion
+                if(this.venta.cliente.DniRuc == '00000000'){
+                    this.venta.EsOrganizacion = 0
+                    this.venta.NombreOrganizacion = ''
+                }
             } else {
                 this.axios.get(this.API + 'cliente', {
                     params: params
@@ -748,6 +772,10 @@ export default {
                         this.$refs.inputCliente.setValue(response.data.Cliente)
                         this.venta.cliente = response.data
                         this.venta.CampoDireccion = this.venta.cliente.Direccion
+                        if(this.venta.cliente.DniRuc == '00000000'){
+                            this.venta.EsOrganizacion = 0
+                            this.venta.NombreOrganizacion = ''
+                        }
                     } else {
                         this.$toasted.show('No se encontro al cliente')
                     }
@@ -973,6 +1001,7 @@ export default {
             this.venta.productos = this.productos
             this.venta.puntosAplicados = this.puntosAplicados || 0
             this.venta.totalCart = this.totalCart || 0
+            this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.axios.post(this.API + 'ventas', this.venta)
@@ -1027,6 +1056,7 @@ export default {
     components: {
         ProductosCarrito,
         ClientesForm,
+        Movimiento,
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
