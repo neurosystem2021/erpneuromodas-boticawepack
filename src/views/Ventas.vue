@@ -8,12 +8,12 @@
         <b-container class="bv-example-row" fluid>
             <div>
                 <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" >
                         <pago-deuda></pago-deuda>
                     </b-button-group>
-                    <b-button-group size="sm">
+                    <!-- <b-button-group size="sm">
                         <movimiento></movimiento>
-                    </b-button-group>
+                    </b-button-group> -->
                     <b-button-group size="sm">
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
                     </b-button-group>
@@ -400,7 +400,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-import Movimiento from '@/components/Movimiento'
+// import Movimiento from '@/components/Movimiento'
 
 export default {
     beforeMount () {
@@ -1058,7 +1058,7 @@ export default {
     components: {
         ProductosCarrito,
         ClientesForm,
-        Movimiento,
+        //Movimiento,
         ConfigVenta,
         PagoDeuda,
         PreOrdenLista,
