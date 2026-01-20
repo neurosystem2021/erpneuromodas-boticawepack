@@ -4,7 +4,7 @@
     <b-container class="bv-example-row">
       <div>
           <div class="no-print">
-              <div class="float-left"  v-if="!this.$route.params.id">
+              <!-- <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <b-form-select
                       v-model="empresa"
@@ -15,10 +15,10 @@
                       @change="cambiarEmpresa"
                     ></b-form-select>
                   </b-button-group>
-              </div>
+              </div> -->
               <b-row align-h="end" class=" no-print">
-                    <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
-                <b-col cols="3" v-if="!this.$route.params.id">
+                    <label v-if="!this.$route.params.id" >Vendedor:</label>
+                <b-col cols="2" v-if="!this.$route.params.id">
                     <b-form-group size="sm" >
                         <autocomplete
                             required="required"
@@ -31,7 +31,7 @@
                             :classes="{input: 'form-control'}">
                         </autocomplete>
                     </b-form-group>
-                </b-col>-->
+                </b-col>
                 <b-col cols="9">
                     <b-button-group size="sm" v-if="!this.$route.params.id">
                         <b-form-select v-model="turno" :options="turnos" />
@@ -789,11 +789,11 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
           // this.$refs.inputVendedor.$refs.input.disabled = true
 
           if (response.data.IdUsuarioPerfil !== 1) {
-            //this.$refs.inputVendedor.$refs.input.disabled = true
+            this.$refs.inputVendedor.$refs.input.disabled = true
           }
         })
         .catch(error => {
