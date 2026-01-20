@@ -370,6 +370,7 @@ export default {
   mounted() {
     // this.getNumeroVenta()
     this.getVendedor();
+    this.getClienteVarios();
     //setInterval(this.updateTime, 1000)
   },
   data() {
@@ -458,6 +459,14 @@ export default {
       obtenerStok: "obtenerStock",
       add: "agregarProducto"
     }),
+    async getClienteVarios() {
+      let cliente = {
+        Cliente: "CLIENTE VARIOS",
+        IdCliente: 6678,
+        ClienteDniRuc: "00000000 - CLIENTE VARIOS"
+      };
+      this.$refs.inputCliente.setValue(cliente.Cliente);
+    },
     loadFirstAlmacen() {
       this.axios.get(this.API + "almacenes/primero").then(res => {
         this.$refs.inputAlmacen.setValue(res.data.Almacen);

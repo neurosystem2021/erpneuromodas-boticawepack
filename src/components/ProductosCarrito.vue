@@ -15,13 +15,16 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
+          <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -265,6 +268,40 @@
       <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalCalcularM2.hide()}">Cerrar</b-btn>
     </b-modal>
 
+      <b-modal v-model="touchModal" size="sm" hide-footer class="ingDesc" title="Codigo Barra" hide-header-close>
+        <input readonly type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
+        <table class="calc__numbers calc__numbers2">
+              <tbody>
+                  <tr>
+                      <td class="botones" @click="addNumber('7');">7</td>
+                      <td class="botones" @click="addNumber('8');">8</td>
+                      <td class="botones" @click="addNumber('9');">9</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('4');">4</td>
+                      <td class="botones" @click="addNumber('5');">5</td>
+                      <td class="botones" @click="addNumber('6');">6</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber('1');">1</td>
+                      <td class="botones" @click="addNumber('2');">2</td>
+                      <td class="botones" @click="addNumber('3');">3</td>
+                  </tr>
+                  <tr>
+                      <td class="botones" @click="addNumber(0);">0</td>
+                      <!-- <td class="botones" @click="addPoint('.');">.</td> -->
+                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <b-button variant="success" @click="buscarCodigoBarra()">Buscar</b-button>
+                        <b-button variant="danger" @click="touchModal=!touchModal">Cerrar</b-button>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+      </b-modal>
+
   </b-row>
 </template>
 
@@ -279,6 +316,7 @@ export default {
   },
   data() {
     return {
+      touchModal: false,
       API: config.API,
       loadCode: "",
       pasteCode: false,
@@ -300,7 +338,8 @@ export default {
       pie2corte: 0,
       mostrarInputs: false,
       indexFactor: null,
-      precioCorte: 0
+      precioCorte: 0,
+      cantidadInput: ""
     };
   },
   watch: {
@@ -792,6 +831,73 @@ export default {
       this.eliminar(index);
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
+    },
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      // console.log("Búsqueda:", this.query);
+      const inputElement = this.$refs["autocompleteProducto"].$el.querySelector(
+        "input"
+      );
+      inputElement.focus();
+      setTimeout(() => {
+        inputElement.value = this.query;
+        inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+      }, 1000);
+    },
+    abrirModal() {
+      this.touchModal = true;
+    },
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
+    },
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    buscarCodigoBarra() {
+      this.loadCode = this.cantidadInput;
+      this.loadBarcode();
+      this.$nextTick(() => {
+        this.cantidadInput = "";
+      });
     }
   },
   components: {
@@ -806,4 +912,121 @@ export default {
   padding: 5px 0 0 130px;
   justify-items: center;
 }
+
+<style scoped > .contentCard {
+  cursor: pointer;
+}
+.disabledMouse {
+  background: #cecece;
+  cursor: inherit;
+}
+.form-check-input {
+  margin-left: -0.2rem !important;
+}
+.oferta {
+  border: 4px solid #dc3545;
+}
+.ofertanom {
+  color: #dc3545;
+  border-right: 2px solid #dc3545;
+}
+</style>
+<style>
+.popover {
+  max-width: 420px !important;
+}
+.nomCart {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  border-right: 2px solid black;
+}
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers .botones {
+  /* border: 1px solid #000000; */
+  cursor: pointer;
+  text-align: center;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+  border: 1px;
+}
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+.tblProductos {
+  width: 830px;
+}
+@media only screen and (max-width: 1440px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 50vw !important;
+    max-height: 50vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
+  }
+  .cameraBarra {
+    height: 50vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .tblProductos {
+    width: 400px !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .tblProductos {
+    width: 400px !important;
+  }
+}
+
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+</style>
+
 </style>
