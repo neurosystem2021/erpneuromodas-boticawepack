@@ -3,30 +3,43 @@
     <b-col md="12">
       <b-form-group>
         <label>Agregar Productos:</label>
-        <b-input-group>
-          <autocomplete
-            ref="autocompleteProducto"
-            :url="APIProductos"
-            :customParams="{ limit: '25' }"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
-          </autocomplete>
-          <input v-model="loadCode"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  class="form-control"
-                  ref="barcodeInput"
-                  placeholder="Codigo de Barra" />
-          <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
-            <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
-          </b-input-group-append>
-        </b-input-group>
+        <b-row no-gutters>
+          <b-col cols="12" md="6" class="mx-0 pdr">
+              <b-input-group>
+              <autocomplete
+                id="autocompleteProducto"
+                ref="autocompleteProducto"
+                :url="APIProductos"
+                :customParams="{ limit: '25' }"
+                :onShouldRenderChild="renderChild"
+                anchor="Producto"
+                label="writer"
+                placeholder="Agregar Producto"
+                :on-select="setProducto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                :classes="{input: 'form-control txtAutoComplete',}">
+              </autocomplete>
+                  <b-button variant="primary" @click="startRecognition">
+                    <i class="fas fa-microphone"></i>
+                  </b-button>
+              </b-input-group>
+          </b-col>
+          <b-col cols="12" md="6" class="mx-0 pdl">
+              <b-input-group>
+                <input v-model="loadCode"
+                    @keydown.enter.prevent="loadBarcode"
+                    type="text"
+                    class="form-control"
+                    ref="barcodeInput"
+                    placeholder="C. Barra" />
+                <b-input-group-append>
+                  <!--<proveedores-tabla></proveedores-tabla>-->
+                  <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+                  <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+                </b-input-group-append>
+              </b-input-group>
+          </b-col>
+        </b-row>  
         <b-badge v-if="isVentas && false" variant="danger">Productos sin stock</b-badge>
       </b-form-group>
 
@@ -48,7 +61,7 @@
                   <h5 class="text-uppercase">{{medicionPro}}</h5>
                 </b-col>
                 <b-col md="5" class="text-left">
-                  <b>Precio: </b><br>S/ {{ precioCont }}
+                  <b>Precio: </b><br>S/ {{ precioCont ? precioCont : 0 }}
                 </b-col>
               </b-row>
             </b-card>
@@ -305,7 +318,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr class="ocularMovil">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -475,6 +488,59 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true
+      });
+      let inputElement = `autocompleteProducto`;
+      let autocompleteInput = document.getElementById(inputElement);
+      setTimeout(() => {
+        document.getElementById(inputElement).value = this.query;
+        autocompleteInput.dispatchEvent(inputEvent);
+      }, 200);
+    },
 
     changeCant (val, prod) {
       if (val) {
@@ -713,23 +779,61 @@ export default {
       }
     },
     renderChild(data) {
-      /*
       if (this.idAlmacen) {
-        let style = 'ss'
-        if(parseFloat(data.stock) <= 0) {
-          style = 'danger'
+        let styleStock = "";
+        if (data.stock <= 0) {
+          styleStock = "table-danger";
+        } else {
+          styleStock = "table-success";
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (parseFloat(data.stock) > 0) {
-          style = 'success'
+        return `
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 250px;
+            heigth: 250px;
+          }
+        </style>
+        <div>
+          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
+            <tbody>
+              <tr>
+                <td style="width: 300px"><b>${data.Producto} 
+        </b></td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td class="ocultarMovil" style="width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td  style="width: 65px" class="table-primary"><b>${
+                  data.PrecioContado
+                }</b></td>
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `;
       }
       return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${data.stock? Number.isInteger(data.stock)?data.stock:data.stock.toFixed(2):data.stock}</b> / <b>${data.Producto} - ${data.CodigoBarra}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoMedicion} / <b> S/ ${data.PrecioContado>0?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
-      }*/
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} - <b> S/ ${data.PrecioContado?data.PrecioContado.toFixed(2):data.PrecioContado} </b>
-      `
+         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
+        data.ProductoMarca
+      } / ${data.ProductoModelo}
+      `;
     },
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
@@ -847,5 +951,11 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+  @media only screen and (max-width: 700px) {
+  /* For desktop: */
+    .ocularMovil{
+        display: none;
+    }
   }
 </style>
