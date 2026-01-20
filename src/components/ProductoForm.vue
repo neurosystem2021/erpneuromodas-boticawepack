@@ -89,7 +89,14 @@
               </autocomplete>
           </b-form-group>-->
 
-          
+          <b-form-group>
+            <label>Imagen:</label>
+            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+            <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <b-form-text id="input-formatter-help">
+              <b style="color: red;">*La imagen debe ser en formato PNG y 500 x 500 pixeles</b>
+            </b-form-text>
+          </b-form-group>
           
         </b-col>
         <b-col md="6">
@@ -284,70 +291,70 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CategoriaForm from '@/components/CategoriaForm'
-import MarcaForm from '@/components/MarcaForm'
-import ProductoFormDet from '@/components/ProductoFormDet'
+import config from "@/store/config.js";
+import CategoriaForm from "@/components/CategoriaForm";
+import MarcaForm from "@/components/MarcaForm";
+import ProductoFormDet from "@/components/ProductoFormDet";
 // import ModeloForm from '@/components/ModeloForm'
 
 export default {
-  data () {
+  data() {
     return {
       showProductoDet: true,
       cantidadCodigoBarra: 1,
-      title: 'Nuevo Producto',
+      title: "Nuevo Producto",
       API: config.API,
-      show: false, 
+      show: false,
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
       productosDet: [],
-      pie2total:0,
-      pie:900,
-      preciototal:0
-    }
+      pie2total: 0,
+      pie: 900,
+      preciototal: 0
+    };
   },
-  beforeMount () {
-    this.initForm()
+  beforeMount() {
+    this.initForm();
   },
-  props: ['showButton', 'productoUpdate', 'cbGuardar'],
+  props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
-    show (val) {
-      let newVal = this.productoUpdate  || {}
+    show(val) {
+      let newVal = this.productoUpdate || {};
       if (newVal.IdProducto) {
-        this.title = 'Editar Producto << ' + newVal.CodigoBarra + ' >>'
+        this.title = "Editar Producto << " + newVal.CodigoBarra + " >>";
         this.producto.categoria = {
           IdProductoCategoria: newVal.IdProductoCategoria,
           ProductoCategoria: newVal.ProductoCategoria
-        }
+        };
         this.producto.marca = {
           IdProductoMarca: newVal.IdProductoMarca,
           ProductoMarca: newVal.ProductoMarca
-        }
+        };
         this.producto.medicion = {
           IdProductoMedicion: newVal.IdProductoMedicion,
           ProductoMedicion: newVal.ProductoMedicion
-        }
-       
-       // this.$refs.inputCategoria.setValue('')
-        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria)
-       
-       // this.$refs.inputMarca.setValue('')
-        this.$refs.inputMarca.setValue(newVal.ProductoMarca)
+        };
 
-       // this.$refs.inputMedicion.setValue('')
-        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion)
-        
+        // this.$refs.inputCategoria.setValue('')
+        this.$refs.inputCategoria.setValue(newVal.ProductoCategoria);
+
+        // this.$refs.inputMarca.setValue('')
+        this.$refs.inputMarca.setValue(newVal.ProductoMarca);
+
+        // this.$refs.inputMedicion.setValue('')
+        this.$refs.inputMedicion.setValue(newVal.ProductoMedicion);
+
         // this.$refs.inputModelo.setValue('')
         // this.$refs.inputModelo.setValue(newVal.ProductoModelo)
         // this.$refs.inputPresentacion.setValue(newVal.ProductoPresentacion)
 
         // this.$refs.inputTalla.setValue(newVal.ProductoTalla)
         // this.$refs.inputProducto.$el.disabled = true
-        this.$refs.inputCodigoBarra.$el.disabled = true
+        this.$refs.inputCodigoBarra.$el.disabled = true;
 
         // this.$refs.inputColor.setValue(newVal.Color)
         // this.$refs.inputBotapie.setValue(newVal.Botapie)
-        
+
         /* this.producto.modelo = {
           IdProductoModelo: newVal.IdProductoModelo,
           ProductoModelo: newVal.ProductoModelo
@@ -357,103 +364,172 @@ export default {
           ProductoTalla: newVal.ProductoTalla
         }*/
         //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
-        this.producto.Producto = newVal.Producto
-        this.producto.IdProducto = newVal.IdProducto
+        this.producto.Producto = newVal.Producto;
+        this.producto.IdProducto = newVal.IdProducto;
 
-        this.producto.EsPadre = newVal.EsPadre
-        this.producto.SoloLargo = newVal.SoloLargo
-        this.producto.TienePerdida = newVal.TienePerdida
+        this.producto.EsPadre = newVal.EsPadre;
+        this.producto.SoloLargo = newVal.SoloLargo;
+        this.producto.TienePerdida = newVal.TienePerdida;
+        this.producto.Imagen = newVal.Imagen;
         Vue.nextTick(() => {
-           if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(newVal.EsPadre)
-        })
+          if (this.$refs.productoDet)
+            this.$refs.productoDet.show = parseInt(newVal.EsPadre);
+        });
         // this.producto.Genero = newVal.Genero
         // this.producto.Botapie = newVal.Botapie
         // this.producto.Color = newVal.Color
-        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad
-        this.producto.StockMinimo = newVal.StockMinimo
-        this.producto.CodigoBarra = newVal.CodigoBarra
+        this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
+        this.producto.StockMinimo = newVal.StockMinimo;
+        this.producto.CodigoBarra = newVal.CodigoBarra;
         //this.producto.ProductoModelo = newVal.ProductoModelo
         // this.producto.ProductoPresentacion = newVal.ProductoPresentacion
-        this.producto.PrecioCosto = newVal.PrecioCosto
-        this.producto.PrecioContado = newVal.PrecioContado
-        this.producto.Rendimiento = newVal.Rendimiento
-        this.producto.Ancho = newVal.Ancho
-        this.producto.Largo = newVal.Largo
-
+        this.producto.PrecioCosto = newVal.PrecioCosto;
+        this.producto.PrecioContado = newVal.PrecioContado;
+        this.producto.Rendimiento = newVal.Rendimiento;
+        this.producto.Ancho = newVal.Ancho;
+        this.producto.Largo = newVal.Largo;
       } else {
+        this.title = "Nuevo Producto";
+        this.clearForm();
 
-        this.title = 'Nuevo Producto'
-        this.clearForm()
-
-        this.$refs.inputCodigoBarra.$el.disabled = false
+        this.$refs.inputCodigoBarra.$el.disabled = false;
       }
     }
   },
   methods: {
-    calcularm2(){
-      this.pie2total = Math.round((this.producto.Ancho*this.producto.Largo/this.pie)*10)/10
-      this.preciototal = this.pie2total*this.precioContado
+    calcularm2() {
+      this.pie2total =
+        Math.round(
+          ((this.producto.Ancho * this.producto.Largo) / this.pie) * 10
+        ) / 10;
+      this.preciototal = this.pie2total * this.precioContado;
     },
-    calcularPreciosPaquete (prodDetalles) {
-      let sumatoriaCosto = 0
-      let sumatoriaContado = 0
-      prodDetalles.forEach(prod => {
-        if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad
-        }
-      });
-      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto)
-      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado)
-      
-      Vue.set(this.producto, 'PrecioCosto', sumatoriaCosto)
-      Vue.set(this.producto, 'PrecioContado', sumatoriaContado)
-      this.actualizarPorcentajeUtilidad()
-    },
-    eliminarProducto (producto) {
-      // NO eliminar porque no distinque movimientos ni ventas
-      let r = confirm('¿Esta seguro de Anular este producto?')
-      if (r) {
-        this.axios.post(this.API + 'productos/delete', {
-          id: producto.IdProducto
-        }).then(res => {
-          if (res.data.updated) {
-            this.$toasted.success('El producto con código ' + res.data.IdProducto + ' ha sido anulado')
-            if (this.cbGuardar) {
-              this.cbGuardar()
+    handleFileUpload() {
+      const file = this.$refs.file.files[0];
+      this.file = "";
+      if (!file) {
+        this.$refs.file.value = null;
+        this.$toasted.error("Sin imagen, no se guardará", { duration: 4000 });
+        return;
+      }
+
+      if (file.type != "image/png") {
+        this.$toasted.error(
+          "La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará",
+          { duration: 5000 }
+        );
+        this.$refs.file.value = null;
+        this.file = "";
+        return;
+      }
+
+      try {
+        this.getBase64(file).then(base64 => {
+          const img = new Image();
+          img.src = base64.toString();
+          img.onload = () => {
+            if (img.width == 500 && img.height == 500) {
+              this.file = file;
+              console.log(this.file);
+              this.$toasted.info(
+                "La imagen se cargo correctamente, presione GUARDAR para registrarla en el producto.",
+                { duration: 6000 }
+              );
+            } else {
+              this.file = "";
+              this.$refs.file.value = null;
+              this.$toasted.error(
+                "La imagen debe ser en formato PNG de 500 x 500 pixeles, no se guardará.",
+                { duration: 5000 }
+              );
             }
-            this.$refs.productoForm.hide()
-          }
-        })
+          };
+        });
+      } catch (error) {
+        console.error(error);
+        this.file = "";
+        this.$refs.file.value = null;
+        this.$toasted.show("Ha ocurrido un error", { duration: 4000 });
       }
     },
-    actualizarPrecioContado () {
-      var precioCosto = this.producto.PrecioCosto
-      var utilidad = this.producto.PorcentajeUtilidad
+    getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    },
+    calcularPreciosPaquete(prodDetalles) {
+      let sumatoriaCosto = 0;
+      let sumatoriaContado = 0;
+      prodDetalles.forEach(prod => {
+        if (prod.Cantidad) {
+          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad;
+          sumatoriaContado += prod.PrecioContado * prod.Cantidad;
+        }
+      });
+      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto);
+      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado);
+
+      Vue.set(this.producto, "PrecioCosto", sumatoriaCosto);
+      Vue.set(this.producto, "PrecioContado", sumatoriaContado);
+      this.actualizarPorcentajeUtilidad();
+    },
+    eliminarProducto(producto) {
+      // NO eliminar porque no distinque movimientos ni ventas
+      let r = confirm("¿Esta seguro de Anular este producto?");
+      if (r) {
+        this.axios
+          .post(this.API + "productos/delete", {
+            id: producto.IdProducto
+          })
+          .then(res => {
+            if (res.data.updated) {
+              this.$toasted.success(
+                "El producto con código " +
+                  res.data.IdProducto +
+                  " ha sido anulado"
+              );
+              if (this.cbGuardar) {
+                this.cbGuardar();
+              }
+              this.$refs.productoForm.hide();
+            }
+          });
+      }
+    },
+    actualizarPrecioContado() {
+      var precioCosto = this.producto.PrecioCosto;
+      var utilidad = this.producto.PorcentajeUtilidad;
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - (utilidad / 100))
+      var nuevoPrecioContado = precioCosto / (1 - utilidad / 100);
 
-      this.producto.precioContadoNormal = nuevoPrecioContado
+      this.producto.precioContadoNormal = nuevoPrecioContado;
       //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
-      this.producto.PrecioContado = this.$options.filters.redondear(nuevoPrecioContado, 1)
+      this.producto.PrecioContado = this.$options.filters.redondear(
+        nuevoPrecioContado,
+        1
+      );
+    },
+    actualizarPorcentajeUtilidad() {
+      var precioContado = this.producto.PrecioContado;
+      var precioCosto = this.producto.PrecioCosto;
 
+      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(
+        (1 - precioCosto / precioContado) * 100
+      );
     },
-    actualizarPorcentajeUtilidad () {
-      var precioContado = this.producto.PrecioContado
-      var precioCosto = this.producto.PrecioCosto
-
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear((1 - (precioCosto / precioContado)) * 100)
+    setCategoria(obj) {
+      this.producto.categoria = obj;
+      this.$refs.inputCategoria.setValue(obj.ProductoCategoria);
     },
-    setCategoria (obj) {
-      this.producto.categoria = obj
-      this.$refs.inputCategoria.setValue(obj.ProductoCategoria)
+    setMedicion(obj) {
+      this.producto.medicion = obj;
     },
-    setMedicion (obj) {
-      this.producto.medicion = obj
-    },
-    setMarca (obj) {
-      this.producto.marca = obj
-      this.$refs.inputMarca.setValue(obj.ProductoMarca)
+    setMarca(obj) {
+      this.producto.marca = obj;
+      this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
     /* setModelo (obj) {
       this.producto.modelo = obj
@@ -463,23 +539,23 @@ export default {
       this.producto.talla = obj
       this.$refs.inputTalla.setValue(obj.ProductoTalla)
     },*/
-    clearForm () {
-      this.$refs.inputCategoria.setValue('')
-      this.$refs.inputMarca.setValue('')
-      this.$refs.inputMedicion.setValue('UNIDAD')
+    clearForm() {
+      this.$refs.inputCategoria.setValue("");
+      this.$refs.inputMarca.setValue("");
+      this.$refs.inputMedicion.setValue("UNIDAD");
       // this.$refs.inputTalla.setValue('')
       //this.$refs.inputModelo.setValue('')
       // this.$refs.inputPresentacion.setValue('')
       // this.$refs.inputColor.setValue('')
       // this.$refs.inputBotapie.setValue('')
 
-      this.initForm()
+      this.initForm();
     },
-    initForm () {
+    initForm() {
       this.producto = {
         EsPadre: 0,
         SoloLargo: 0,
-        TienePerdida:0,
+        TienePerdida: 0,
         Anulado: 0,
         IdProductoMarca: null,
         IdProductoMedicion: null,
@@ -487,155 +563,180 @@ export default {
         // IdProductoModelo: null,
         // IdProductoBotapie: null,
         // IdProductoTalla: '',
-        Producto: '',
-        CodigoBarra: '',
+        Producto: "",
+        CodigoBarra: "",
         // Color: '',
-        PorcentajeUtilidad: '',
-        Rendimiento: '',
-        Ancho: '',
-        Largo: '',
+        PorcentajeUtilidad: "",
+        Rendimiento: "",
+        Ancho: "",
+        Largo: "",
         StockMinimo: 0,
-        PrecioContado: '',
+        PrecioContado: "",
         // Botapie: '',
         // Genero: '',
         categoria: {},
+        Imagen: null,
         marca: {},
         // modelo: {},
         //talla: {},
         medicion: {
-          IdProductoMedicion:6,
-          ProductoMedicion:"UNIDAD"
+          IdProductoMedicion: 6,
+          ProductoMedicion: "UNIDAD"
         }
-      }
+      };
     },
     guardarProducto(e) {
       e.preventDefault();
 
       // Agregar producto DET
       if (this.showProductoDet) {
-        this.producto.productosDet = this.$refs.productoDet.productos
+        this.producto.productosDet = this.$refs.productoDet.productos;
       }
       // console.log(JSON.stringify(this.producto))
-      if(this.producto.SoloLargo==1){
-        this.producto.Ancho = 0
+      if (this.producto.SoloLargo == 1) {
+        this.producto.Ancho = 0;
       }
-      this.producto.CodigoBarra=(''+this.producto.CodigoBarra).trim();
-      this.axios.post(this.API + 'productos', this.producto)
-      .then((response) => {
-        if (this.cbGuardar) {
-          this.cbGuardar(response.data.insertId)
-        }
-        if (response.data.error) {
-          this.$toasted.show(response.data.error + ' - ' + response.data.codigoBarra)
-          return
-        } else {
-          this.$toasted.show('Producto guardado correctamente')
-        }
-
-        // this.initForm()
-        // this.producto.talla = {}
-        // this.$refs.inputTalla.setValue('')
-
-        this.$refs.productoForm.hide()
-      })
-      .catch((error) => {
-        console.log(error)
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
-    },
-    focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
-    },
-    crearCategoria () {
-      if (this.$refs.inputCategoria.type) {
-        let categoria = {}
-        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase()
-
-        this.axios.post(this.API + 'categorias', categoria)
-        .then((response) => {
-          this.$toasted.show('Categoría guardada correctamente')
-          this.setCategoria({
-            IdProductoCategoria: response.data.insertId,
-            ProductoCategoria: response.data.ProductoCategoria
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-      
-    },
-    crearMarca () {
-      if (this.$refs.inputMarca.type) {
-        let marca = {}
-        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase()
-  
-        this.axios.post(this.API + 'marcas', marca)
-        .then((response) => {
-          this.$toasted.show('Marca guardada correctamente')
-          this.setMarca({
-            IdProductoMarca: response.data.insertId,
-            ProductoMarca: response.data.ProductoMarca
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-    },
-    crearTalla () {
-      if (this.$refs.inputTalla.type) {
-        let talla = {}
-        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase()
-  
-        this.axios.post(this.API + 'tallas', talla)
-        .then((response) => {
-          this.$toasted.show('Talla guardada correctamente')
-          this.setTalla({
-            IdProductoTalla: response.data.insertId,
-            ProductoTalla: response.data.ProductoTalla
-          })
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
-      }
-    },
-    checkIsHijo (val) {
-      if (val && this.producto.IdProducto) {
-        this.axios.get(this.API + 'productos/eshijo', {params: {
-          idProducto: this.producto.IdProducto
-        }})
-        .then(res => {
-          let esHijo = res.data.esHijo
-          if(esHijo) {
-            this.$toasted.show('Este producto no puede contener productos ya que es un producto hijo')
-            this.producto.EsPadre = false      
-          }else {
-            this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+      this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      this.axios
+        .post(this.API + "productos", this.producto)
+        .then(response => {
+          if (this.cbGuardar) {
+            this.cbGuardar(response.data.insertId);
           }
+          if (response.data.error) {
+            this.$toasted.show(
+              response.data.error + " - " + response.data.codigoBarra
+            );
+            return;
+          } else {
+            this.$toasted.show("Producto guardado correctamente");
+          }
+
+          let formData = new FormData();
+          formData.append("imagen", this.file);
+
+          this.axios({
+            method: "post",
+            url: this.API + "producto/imagen/" + response.data.insertId,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" }
+          }).then(res => {
+            // console.log(res);
+            this.file = "";
+            this.$refs.file.value = null;
+          });
+
+          // this.initForm()
+          // this.producto.talla = {}
+          // this.$refs.inputTalla.setValue('')
+
+          this.$refs.productoForm.hide();
         })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
+    },
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
+    },
+    crearCategoria() {
+      if (this.$refs.inputCategoria.type) {
+        let categoria = {};
+        categoria.ProductoCategoria = this.$refs.inputCategoria.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "categorias", categoria)
+          .then(response => {
+            this.$toasted.show("Categoría guardada correctamente");
+            this.setCategoria({
+              IdProductoCategoria: response.data.insertId,
+              ProductoCategoria: response.data.ProductoCategoria
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearMarca() {
+      if (this.$refs.inputMarca.type) {
+        let marca = {};
+        marca.ProductoMarca = this.$refs.inputMarca.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "marcas", marca)
+          .then(response => {
+            this.$toasted.show("Marca guardada correctamente");
+            this.setMarca({
+              IdProductoMarca: response.data.insertId,
+              ProductoMarca: response.data.ProductoMarca
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    crearTalla() {
+      if (this.$refs.inputTalla.type) {
+        let talla = {};
+        talla.ProductoTalla = this.$refs.inputTalla.type.toUpperCase();
+
+        this.axios
+          .post(this.API + "tallas", talla)
+          .then(response => {
+            this.$toasted.show("Talla guardada correctamente");
+            this.setTalla({
+              IdProductoTalla: response.data.insertId,
+              ProductoTalla: response.data.ProductoTalla
+            });
+          })
+          .catch(error => {
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          });
+      }
+    },
+    checkIsHijo(val) {
+      if (val && this.producto.IdProducto) {
+        this.axios
+          .get(this.API + "productos/eshijo", {
+            params: {
+              idProducto: this.producto.IdProducto
+            }
+          })
+          .then(res => {
+            let esHijo = res.data.esHijo;
+            if (esHijo) {
+              this.$toasted.show(
+                "Este producto no puede contener productos ya que es un producto hijo"
+              );
+              this.producto.EsPadre = false;
+            } else {
+              this.$refs.productoDet.show = parseInt(this.producto.EsPadre);
+            }
+          });
       } else {
-        if (this.$refs.productoDet) this.$refs.productoDet.show = parseInt(this.producto.EsPadre)
+        if (this.$refs.productoDet)
+          this.$refs.productoDet.show = parseInt(this.producto.EsPadre);
       }
     }
   },
-  computed : {
-  },
+  computed: {},
   components: {
-    CategoriaForm, MarcaForm, ProductoFormDet
+    CategoriaForm,
+    MarcaForm,
+    ProductoFormDet
   }
-}
+};
 </script>
 <style scoped>
-
 .rendimiento {
   background-color: #e1f7d5;
   padding: 5px;
 }
-
 </style>
