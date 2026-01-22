@@ -80,11 +80,11 @@
             </tr>
             <tr>
               <td>Yape/ Plin S/.</td>
-              <td>{{ totalVentasMastercard | moneda }} </td>
+              <td>{{ totalOtro | moneda }} </td>
             </tr>
             <tr>
               <td>Transferencia S/.</td>
-              <td>{{ totalOtro | moneda }} </td>
+              <td>{{  totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
               <td>Pagos de Creditos S/.</td>
@@ -342,6 +342,7 @@ export default {
         this.totalVentasEfectivo +
         this.totalVentasVisa +
         this.totalVentasMastercard +
+        this.totalOtro +
         this.totalIngresos -
         this.totalSalidas
       );
@@ -350,6 +351,7 @@ export default {
       return (
         this.totalVentasEfectivo +
         this.totalVentasVisa +
+        this.totalOtro +
         this.totalVentasMastercard -
         this.totalSalidas
       );

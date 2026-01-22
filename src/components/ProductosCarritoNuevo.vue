@@ -260,7 +260,7 @@ export default {
   watch: {
     sumatoriaTotal(sum) {
       this.asignarVuelto();
-    },
+    }
     // productos(){
     //   console.log(this.productos)
     // }
@@ -372,7 +372,7 @@ export default {
       actualizarTotal: "actualizarTotalCart",
       obtenercant: "obtenercantidad"
     }),
-  
+
     controlarBusqueda(query) {
       if (query === "") {
         // Si está vacío, dispara la búsqueda inmediatamente
@@ -741,7 +741,9 @@ export default {
                 <td style="width: 200px"><b>${data.Producto}</b></td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 150px">${data.ProductoFormaFarmaceutica}</td>
-                <td style="width: 200px" style="font-size:10px">${data.CompuestosProducto}</td>
+                <td style="width: 200px" style="font-size:10px">${
+                  data.CompuestosProducto
+                }</td>
                 <td style="width: 90px" style="font-size:12px"><b>${
                   data.FechaVen == null ? "Sin Fecha" : data.FechaVen
                 }</b></td>
@@ -750,7 +752,9 @@ export default {
                     ? "Sin Lote"
                     : data.IdLote
                 }</b></td>
-                <td style="width: 65px" class="table-success"><b>${data.PrecioContado}</b></td>
+                <td style="width: 65px" class="table-success"><b>${
+                  data.PrecioContado
+                }</b></td>
                 <td><b>${
                   data.VentaEstrategica == 1
                     ? '<i class="fas fa-star text-warning"></i>'
@@ -836,8 +840,9 @@ export default {
       this.buscar(value);
     },
     quitarProducto(index) {
-      this.eliminar(index);
-      this.$emit("onRemoveProducto", index);
+      this.productos.splice(index, 1);
+      // this.eliminar(index);
+      // this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
     }
   },
