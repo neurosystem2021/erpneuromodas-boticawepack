@@ -1289,13 +1289,13 @@ export default {
     totalVentasEfectivo() {
       let total = 0;
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
+        if (!venta.Anulado) total += venta.Efectivo;
       });
       return total;
     },
     ventasEfectivo() {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito;
+        return venta.Efectivo != 0 && !venta.EsCredito;
       });
     },
     totalVentasVisa() {
@@ -1307,7 +1307,7 @@ export default {
     },
     ventasVisa() {
       return this.ventas.filter(venta => {
-        return venta.Visa > 0 && !venta.EsCredito;
+        return venta.Visa != 0 && !venta.EsCredito;
       });
     },
     totalVentasMastercard() {
@@ -1319,7 +1319,7 @@ export default {
     },
     ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0 && !venta.EsCredito;
+        return venta.Mastercard != 0 && !venta.EsCredito;
       });
     },
     totalVentasTransferencia() {
@@ -1331,7 +1331,7 @@ export default {
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Yape > 0 && !venta.EsCredito;
+        return venta.Yape != 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
@@ -1453,7 +1453,7 @@ export default {
           .post(this.API + "cierrecaja", {
             idTurno: this.turno,
             // user: sessionStorage.getItem("User"),
-            user:         this.vendedor.Usuario,
+            user: this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
@@ -1551,7 +1551,7 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    }, 
+    },
     getAdelantos() {
       this.axios
         .post(this.API + "cierrecaja/ingresos/adelantos", {
