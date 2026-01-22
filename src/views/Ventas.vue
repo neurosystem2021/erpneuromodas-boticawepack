@@ -2201,14 +2201,18 @@ export default {
               IdOfertasString,
             "_blank"
           );
+          setTimeout(() => {
+            this.inProgress = false;
+            this.eliminarVentana();
+          }, 1000);
         })
+
         .catch(error => {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
+          console.error("Error del servidor:", error.response.data);
         });
       // window.location.reload();
-      this.inProgress = false;
-      this.eliminarVentana();
     },
     async obtenerSeriePorProducto(id) {
       let productoSerie = [];
