@@ -1328,7 +1328,8 @@ export default {
       this.axios
         .get(this.API + "config/stock")
         .then(res => {
-          this.ventaSinStock = res.data;
+          //this.ventaSinStock = res.data;
+          this.ventaSinStock = parseInt(res.data.VENTASINSTOCK); // CORREGIDO
         })
         .catch(err => {
           this.ventaSinStock = 0;
@@ -1984,6 +1985,26 @@ export default {
       ) {
         this.$toasted.show("Complete el nombre de organizacion");
         this.$refs.inputNombreOrganizacion.focus();
+        this.inProgress = false;
+        return;
+      }
+      if (
+        productos.some(
+          v =>
+            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+            v.stock
+        ) &&
+        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
+      ) {
+        this.$toasted.show("No se puede vender un producto sin stock");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         this.inProgress = false;
         return;
       }
