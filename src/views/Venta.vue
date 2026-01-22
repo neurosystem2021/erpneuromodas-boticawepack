@@ -377,7 +377,7 @@
                                   </td>
                                   <td>
                                     <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"/>
+                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.delivery.monto - $event.target.value)"/>
                                   </td>
                                   </tr>
                                   <tr>
@@ -388,7 +388,7 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal()  - venta.pago.delivery.monto -  venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                   <tr>
@@ -400,7 +400,7 @@
                                     <td>
                                       <input
                                         class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto  - venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                 </tbody>
@@ -1932,12 +1932,13 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
-
+          let producto = [];
           response.data.forEach(element => {
-            this.setProducto(element);
+            console.log(element);
+            producto.push({ ...element, Descripcion: element.Presentacion });
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
+          this.ventas[this.ventaActiva].productos = producto;
           this.$forceUpdate();
         });
     },

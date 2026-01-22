@@ -1,280 +1,223 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col cols="12" lg="4" xl="4"> 
-            Almacén
-            <b-form-select v-model="idAlmacen" 
-                 value-field="IdAlmacen"
-                 text-field="Almacen"
-                 disabled
-                :options="lstAlmances"></b-form-select>
-        </b-col>
-        <b-col cols="12" lg="4" xl="4"> 
-            Fecha:
-            <input type="date" v-model="fecha" class="form-control" disabled>
-        </b-col>
-        <b-col>
-            <b-button @click="guardar()"  variant="success" :disabled="distabledBtnGuardar" class="mt-4 btnGuardar">Guardar</b-button>
-        </b-col>
-        <b-col cols="12" class="mt-2"> 
-            <autocomplete
-                required="required"
-                ref="inputCliente"
-                :url="API + 'clientes'"
-                anchor="ClienteDniRuc"
-                label="writer"
-                placeholder="Cliente"
-                class="font-weight-bold"
-                :onInput="(val) => newDniRuc = val"
-                :on-select="setCliente" 
-                :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                :classes="{input: 'form-control'}">
-            </autocomplete>
-        </b-col>
-        <b-col cols="12" lg="7" xl="7" v-if="idAlmacen" class="mt-2 mx-0"> 
-          <b-input-group class="mt-2 mb-2">
-            <autocomplete
-                ref="autocompleteProducto"
-                :url="APIProductos"
-                :customParams="{ limit: '25' }"
-                :onShouldRenderChild="renderChild"
-                anchor="Producto"
-                label="writer"
-                placeholder="Agregar Producto"
-                :on-select="setProducto"
-                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-                :classes="{input: 'form-control'}">
-            </autocomplete>
-            <b-input-group-append>
-                <b-button variant="info" @click="startRecognition">
-                  <i class="fas fa-microphone"></i>
-                </b-button
-                >
-            </b-input-group-append>
-          </b-input-group>
-        </b-col>
-        <b-col cols="12" lg="5" xl="5" v-if="idAlmacen" class="mt-2 mx-0">
-          <b-input-group class="mt-2 mb-2">
+      <b-col cols="12" lg="4" xl="4">
+        Almacén
+        <b-form-select v-model="idAlmacen" value-field="IdAlmacen" text-field="Almacen" disabled
+          :options="lstAlmances"></b-form-select>
+      </b-col>
+      <b-col cols="12" lg="4" xl="4">
+        Fecha:
+        <input type="date" v-model="fecha" class="form-control" disabled>
+      </b-col>
+      <b-col>
+        <b-button @click="guardar()" variant="success" :disabled="distabledBtnGuardar"
+          class="mt-4 btnGuardar">Guardar</b-button>
+      </b-col>
+      <b-col cols="12" class="mt-2">
+        <b-input-group class="mt-2">
+          <autocomplete required="required" ref="inputCliente" :url="API + 'clientes'" anchor="ClienteDniRuc"
+            label="writer" placeholder="Cliente" class="font-weight-bold" :onInput="(val) => newDniRuc = val"
+            :on-select="setCliente" :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+            :classes="{ input: 'form-control' }">
+          </autocomplete>
+          <b-input-group-append>
+            <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+          </b-input-group-append>
+        </b-input-group>
+      </b-col>
+      <b-col cols="12" lg="7" xl="7" v-if="idAlmacen" class="mt-2 mx-0">
+        <b-input-group class="mt-2 mb-2">
+          <autocomplete ref="autocompleteProducto" :url="APIProductos" :customParams="{ limit: '25' }"
+            :onShouldRenderChild="renderChild" anchor="Producto" label="writer" placeholder="Agregar Producto"
+            :on-select="setProducto" :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :classes="{ input: 'form-control' }">
+          </autocomplete>
+          <b-input-group-append>
+            <b-button variant="info" @click="startRecognition">
+              <i class="fas fa-microphone"></i>
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-col>
+      <b-col cols="12" lg="5" xl="5" v-if="idAlmacen" class="mt-2 mx-0">
+        <b-input-group class="mt-2 mb-2">
 
-            <input v-model="loadCode"
-            @keydown.enter.prevent="loadBarcode"
-            ref="barcodeInput"
-            type="text"
-            class="form-control"
-            placeholder="Codigo de Barra" />
-            <b-input-group-append>
-                <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-              </b-input-group-append>
-          </b-input-group>
-        </b-col>
-        <b-col cols="12">
-          <div class="clsTblProductos mt-3">
+          <input v-model="loadCode" @keydown.enter.prevent="loadBarcode" ref="barcodeInput" type="text"
+            class="form-control" placeholder="Codigo de Barra" />
+          <b-input-group-append>
+            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-col>
+      <b-col cols="12">
+        <div class="clsTblProductos mt-3">
 
-          
-          <b-table striped hover responsive="false" :fields="headerTable" class="tblPRoductos" :items="productos"> 
-                  <template slot="stock" slot-scope="data">
-                    <span style="font-weight: bold; font-size: 0.75rem">
-                      {{ data.item.stock }}
-                    </span>
-                  </template>
-                  <template slot="Producto" slot-scope="data">
-                    <span style="font-weight: bold; font-size: 0.75rem">
-                      {{ data.item.Producto }}
-                    </span>
-                  </template>
-                  <template slot="pres" slot-scope="data">
-                    <b-button   
-                      v-if="data.item.tienePresentacion"
-                      size="sm"
-                      variant="info"
-                      @click="showPresentacion(data.item,data.index)" 
-                      style="margin-top:2px;font-size: 0.75rem"
-                      >
-                      <i class="fas fa-list"></i>
-                    </b-button>
-      
-                     
-                     
-                  </template>
-                  <template slot="img" slot-scope="data">
-                    <b-img
-                  style="border-radius: 10px"
-                  fluid
-                  :src="'/resources/images/productos/' + data.item.Imagen"
-                  @error="setAltImg"
-                  alt=""
-                ></b-img>
-                </template>
-                  <template slot="presentacion" slot-scope="data">
-                    <b-form-input
-                      v-model="data.item.Descripcion"
-                      type="text"
-                      style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem"
-                      autocomplete="false"
-                      disabled
-                      ></b-form-input>
-                     
-                     
-                  </template>
-                  <template slot="cantidad" slot-scope="data">
-                    <input
-                      v-model="data.item.Cantidad"
-                      type="number"
-                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
-                      autocomplete="false"
-                      :id="`Cantidad${data.index}`"
-                      class="form-control"
-                      />
-                      <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;" 
-                      v-if="data.item.CantidadPresentacion">
-                        {{ data.item.CantidadPresentacion }} unid.
-                      </p>
-                  </template>
-                  <template slot="precio" slot-scope="data">
-                    <input
-                      :disabled="data.item.bloquearInputPrecio"
-                      v-model="data.item.precio"
-                      min="0"
-                      step="0.00001"
-                      type="number"
-                      @focus="abrirModalTouch(data.index,2)"
-                      style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem"
-                      autocomplete="false"  @input="metodoPagoCambio(1)"
-                      class="form-control"
-                      />
-                     
-                  </template>
-                  <template slot="descuento" slot-scope="data">
-                    <input
-                      v-model="data.item.descuento"
-                      type="number"
-                      style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
-                      autocomplete="false"
-                      @focus="abrirModalTouch(data.index,3)"
-                      class="form-control"
-                      />
-                     
-                  </template>
-                  <template slot="subtotal" slot-scope="data">
-                    <span style="font-size: 0.8rem">
-                      {{ parseFloat(getSubTotalDetalle(data.item)).toFixed(2) }}
 
-                    </span>
-                     
-                  </template>
-                  <template slot="total" slot-scope="data">
-                 <span style="font-size: 0.8rem">
-                   {{ parseFloat( getTotalDetalle(data.item)).toFixed(2) }}
+          <b-table striped hover responsive="false" :fields="headerTable" class="tblPRoductos" :items="productos">
+            <template slot="stock" slot-scope="data">
+              <span style="font-weight: bold; font-size: 0.75rem">
+                {{ data.item.stock }}
+              </span>
+            </template>
+            <template slot="Producto" slot-scope="data">
+              <span style="font-weight: bold; font-size: 0.75rem">
+                {{ data.item.Producto }}
+              </span>
+            </template>
+            <template slot="pres" slot-scope="data">
+              <b-button v-if="data.item.tienePresentacion" size="sm" variant="info"
+                @click="showPresentacion(data.item, data.index)" style="margin-top:2px;font-size: 0.75rem">
+                <i class="fas fa-list"></i>
+              </b-button>
 
-                 </span>
-                     
-                  </template>
-                  <template slot="acciones" slot-scope="data">
-                    <b-button 
-                      class="mx-auto mt-1"
-                      variant="danger"
-                      size="sm" 
-                      @click="quitarProducto(data.index)">
-                     <i class="fas fa-times fa-lg"></i>
-                    </b-button>
 
-                  
-                    <b-button 
-                    class="mx-auto mt-1"
-                      variant="info"
-                      size="sm"
-                      v-if="mostrarEditarProducto()"
-                      @click="editarProducto(data.item,data.index)"
-                      >
-                     <i class="fas fa-pencil-alt fa-sm"></i>
-                    </b-button>
-          
-                     
-                  </template>
+
+            </template>
+            <template slot="img" slot-scope="data">
+              <b-img style="border-radius: 10px" fluid :src="'/resources/images/productos/' + data.item.Imagen"
+                @error="setAltImg" alt=""></b-img>
+            </template>
+            <template slot="presentacion" slot-scope="data">
+              <b-form-input v-model="data.item.Descripcion" type="text"
+                style="text-align:center; font-weight:bold; width: 80px;font-size: 0.8rem" autocomplete="false"
+                disabled></b-form-input>
+
+
+            </template>
+            <template slot="cantidad" slot-scope="data">
+              <input v-model="data.item.Cantidad" type="number"
+                style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem" autocomplete="false"
+                :id="`Cantidad${data.index}`" class="form-control" />
+              <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;"
+                v-if="data.item.CantidadPresentacion">
+                {{ data.item.CantidadPresentacion }} unid.
+              </p>
+            </template>
+            <template slot="precio" slot-scope="data">
+              <input :disabled="data.item.bloquearInputPrecio" v-model="data.item.precio" min="0" step="0.00001"
+                type="number" @focus="abrirModalTouch(data.index, 2)"
+                style="text-align:center; font-weight:bold; width: 85px;font-size: 0.8rem" autocomplete="false"
+                @input="metodoPagoCambio(1)" class="form-control" />
+
+            </template>
+            <template slot="descuento" slot-scope="data">
+              <input v-model="data.item.descuento" type="number"
+                style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem" autocomplete="false"
+                @focus="abrirModalTouch(data.index, 3)" class="form-control" />
+
+            </template>
+            <template slot="subtotal" slot-scope="data">
+              <span style="font-size: 0.8rem">
+                {{ parseFloat(getSubTotalDetalle(data.item)).toFixed(2) }}
+
+              </span>
+
+            </template>
+            <template slot="total" slot-scope="data">
+              <span style="font-size: 0.8rem">
+                {{ parseFloat(getTotalDetalle(data.item)).toFixed(2) }}
+
+              </span>
+
+            </template>
+            <template slot="acciones" slot-scope="data">
+              <b-button class="mx-auto mt-1" variant="danger" size="sm" @click="quitarProducto(data.index)">
+                <i class="fas fa-times fa-lg"></i>
+              </b-button>
+
+
+              <b-button class="mx-auto mt-1" variant="info" size="sm" v-if="mostrarEditarProducto()"
+                @click="editarProducto(data.item, data.index)">
+                <i class="fas fa-pencil-alt fa-sm"></i>
+              </b-button>
+
+
+            </template>
 
           </b-table>
         </div>
-        </b-col>
-        <b-col cols="12" lg="4" xl="4" class="mt-5">
-            <table class="table">
-                <tr>
-                    <td style="background: #1A237E; color: white; font-weight: bold;">Total</td>
-                    <td style="background: #C5CAE9;  font-weight: bold;">{{ totalCarrito }}</td>
-                </tr>
-            </table>
-        </b-col>
+      </b-col>
+      <b-col cols="12" lg="4" xl="4" class="mt-5">
+        <table class="table">
+          <tr>
+            <td style="background: #1A237E; color: white; font-weight: bold;">Total</td>
+            <td style="background: #C5CAE9;  font-weight: bold;">{{ totalCarrito }}</td>
+          </tr>
+        </table>
+      </b-col>
     </b-row>
     <b-modal v-model="modalPresentacion" size="lg" hide-footer no-close-on-esc>
       <center>
-        <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
+        <h3 style="text-decoration: underline;">{{ producto.Producto }}</h3>
       </center>
       <b-row>
-          <b-col cols="6">
-                <b-card
-                align="center"
-                class="mb-3 contentCard"
-                @click="cambiarPresentacion(
-                  producto,
-                  false
-                )"
-                >
-                <b-row>
-                    <b-col md="6" class="nomCart">
-                      <div>
-                          <b-row class="nomCart2">
-                            <center> <h6 class="text-uppercase"> {{producto.ProductoPresentacion}} </h6> </center>
-                            </b-row>
-                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ producto.stock }} </span>
-                      </div>
-                      </b-col>
-                      <b-col md="6" class="text-left">
-                      <h5>x1</h5>
-                      <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
-                      <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
-                    </b-col>
-                </b-row>
-                </b-card>
-            </b-col>
+        <b-col cols="6">
+          <b-card align="center" class="mb-3 contentCard" @click="cambiarPresentacion(
+            producto,
+            false
+          )">
+            <b-row>
+              <b-col md="6" class="nomCart">
+                <div>
+                  <b-row class="nomCart2">
+                    <center>
+                      <h6 class="text-uppercase"> {{ producto.ProductoPresentacion }} </h6>
+                    </center>
+                  </b-row>
+                  Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{
+                    producto.stock }} </span>
+                </div>
+              </b-col>
+              <b-col md="6" class="text-left">
+                <h5>x1</h5>
+                <span><b>Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
 
-            
-          <b-col cols="6"  v-for="(pres,index) in producto.PreciosPorProducto" :key="index">
-                <b-card
-                align="center"
-                class="mb-3 contentCard"
-                @click="cambiarPresentacion(
-                  pres,
-                  true
-                )"
-                >
-                <b-row>
-                    <b-col md="6" class="nomCart">
-                      <div>
-                          <b-row class="nomCart2">
-                            <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
-                            </b-row>
-                            Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff">
-                            {{  parseFloat(producto.stock/pres.cantidad).toFixed(2) }}
-                            </span>
-                      </div>
-                      </b-col>
-                      <b-col md="6" class="text-left">
-                      <h5>x{{ pres.Cantidad }}</h5>
-                      <span><b >Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
-                      <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
-                    </b-col>
-                </b-row>
-                </b-card>
-            </b-col>
+
+        <b-col cols="6" v-for="(pres, index) in producto.PreciosPorProducto" :key="index">
+          <b-card align="center" class="mb-3 contentCard" @click="cambiarPresentacion(
+            pres,
+            true
+          )">
+            <b-row>
+              <b-col md="6" class="nomCart">
+                <div>
+                  <b-row class="nomCart2">
+                    <center>
+                      <h6 class="text-uppercase"> {{ pres.nombre }} </h6>
+                    </center>
+                  </b-row>
+                  Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff">
+                    {{ parseFloat(producto.stock / pres.cantidad).toFixed(2) }}
+                  </span>
+                </div>
+              </b-col>
+              <b-col md="6" class="text-left">
+                <h5>x{{ pres.Cantidad }}</h5>
+                <span><b>Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
       </b-row>
     </b-modal>
   </b-container>
 </template>
 
 <script>
+import ClientesForm from "@/components/ClientesForm";
 import config from "@/store/config.js";
 export default {
+  components: { ClientesForm },
   data() {
     return {
+      newDniRuc: "",
       API: config.API,
       idAlmacen: "",
       modalPresentacion: false,
@@ -335,7 +278,6 @@ export default {
         alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
         return;
       }
-
       this.recognition = new webkitSpeechRecognition();
       this.recognition.lang = "es-ES";
       this.recognition.continuous = false;
@@ -398,6 +340,7 @@ export default {
     setCliente(obj) {
       console.log(obj);
       this.cliente = obj;
+      this.$refs.inputCliente.setValue(obj.Cliente);
     },
     async setProducto(obj) {
       if (this.productos.some(v => v.IdProducto == obj.IdProducto)) {
