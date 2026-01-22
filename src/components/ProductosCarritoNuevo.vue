@@ -71,7 +71,7 @@
             class="form-control"
             style="width: 95px"
             min="0"
-            step="0.01"
+            step="1"
             @input="(val) => {
               if(isVentas){
               $emit('onInputCantidad', val.target.value)
