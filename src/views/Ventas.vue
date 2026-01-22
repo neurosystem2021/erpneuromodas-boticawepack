@@ -81,7 +81,7 @@
                                     placeholder="Codigo de Barra" />
                                 <b-input-group-append>
                                     <!--<proveedores-tabla></proveedores-tabla>-->
-                                    <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                    <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                                 </b-input-group-append>
                             </b-input-group>
                              <b-form-select v-if="tab.cliente.IdCliente" v-model="tab.CampoDireccion" class="mb-3">
@@ -688,6 +688,7 @@ export default {
     },
     focusAutocomplete(ref) {
       let comp = this.$refs[ref][0];
+      comp.setValue("");
       comp.handleDoubleClick();
     },
     initForm() {
