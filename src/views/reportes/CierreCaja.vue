@@ -390,11 +390,12 @@
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in ingresos" :key="index">
+                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
                       <td>{{ item.Concepto }}</td>
@@ -403,7 +404,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="2"></td>
+                      <td colspan="3"></td>
                       <td class="total"><b>Total Ingresos</b></td>
                       <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
                     </tr>
@@ -416,11 +417,12 @@
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in salidas" :key="index">
+                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
                       <td>{{ item.Concepto }}</td>
@@ -429,7 +431,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="2"></td>
+                      <td colspan="3"></td>
                       <td class="total-salida"><b>Total Salidas</b></td>
                       <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
                     </tr>
@@ -1155,11 +1157,12 @@
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
                 <td>{{ item.Concepto }}</td>
@@ -1317,7 +1320,9 @@ export default {
     } else {
       this.IdVendedor = sessionStorage.getItem("User").toLocaleLowerCase();
       let usuario = sessionStorage.getItem("User");
-      this.bloquearVendedor = usuario !== "admin";
+      let IdPerfil = sessionStorage.getItem("IdPerfil");
+      let Perfil = ["1", "16", 1, 16];
+      this.bloquearVendedor = !Perfil.includes(IdPerfil);
       await this.getVendedor();
     }
   },
@@ -1542,10 +1547,12 @@ export default {
       });
     },
     async loadData() {
-      await this.getVentas();
-      await this.getIngresos();
-      await this.getSalidas();
-      await this.generarReporte();
+      await Promise.all([
+        this.getVentas(),
+        this.getIngresos(),
+        this.getSalidas(),
+        this.generarReporte()
+      ]);
       // console.log(this.ventas);
     },
     generarReporte() {
@@ -1593,6 +1600,13 @@ export default {
       this.loadData();
     },
     async cerrarCaja() {
+      let IdPerfil = sessionStorage.getItem("IdPerfil");
+
+      if (IdPerfil != 16) {
+        this.$toasted.show("Solo Caja puede cerrar.");
+        return;
+      }
+
       if (!this.turno) {
         this.$toasted.show("Seleccione un Turno");
         return;
