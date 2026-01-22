@@ -1643,6 +1643,9 @@ export default {
           : "APLICADO";
     },
     async loadDetalles() {
+      if (this.ventas.length == 0) {
+        return;
+      }
       await this.axios
         .get(this.API + "ventas/detalle", {
           params: {
