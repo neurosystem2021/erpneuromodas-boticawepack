@@ -648,6 +648,7 @@
                 autocomplete="off"
                 v-model="busqueda"
                 @input="getProductosSearch"
+                @focus.prevent=""
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -1217,8 +1218,8 @@ export default {
   methods: {
     abrirLotes() {},
     changeMovimiento(hash, idProducto, index) {
-      console.log('movimientoLotes',this.movimientoLotes);
-      console.log('hash',hash);
+      console.log("movimientoLotes", this.movimientoLotes);
+      console.log("hash", hash);
       if (hash) {
         // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
