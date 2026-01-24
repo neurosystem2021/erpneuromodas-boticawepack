@@ -177,7 +177,15 @@ export default {
       this.dialogDetalle = true;
     },
     eliminarReg(item) {
-      console.log(item.idDocVenta);
+      if (item.ExisteNota == 1) {
+        this.$swal({
+          icon: "error",
+          title: "Restricción de eliminación",
+          text: "Existe una Nota de Crédito vinculada a este registro. "
+        });
+        return;
+      }
+
       this.$swal({
         icon: "question",
         title: "",
