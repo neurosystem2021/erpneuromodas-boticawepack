@@ -61,7 +61,7 @@
                                         :url="API + 'ventas/tipos'"
                                         :customParams="{idAlmacen: venta.almacen.IdAlmacen, pv: 1}"
                                         anchor="TipoDoc"
-                                        initValue="BOLETA ELEC."
+                                        initValue="NOTA DE VENTA"
                                         label="writer"
                                         placeholder=""
                                         :on-select="setTipoVenta" 
@@ -381,7 +381,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Mastercard</td>
+                                            <td>Yape/Plin</td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -716,10 +716,10 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
-                    TipoDoc: 'BOLETA ELEC.',
+                    IdTipoDoc: 3,
+                    TipoDoc: 'NOTA DE VENTA',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 },
                 almacen: {
                     //IdAlmacen: 1,
@@ -890,12 +890,12 @@ export default {
                 }
             }else{
                 console.log("HOLA BOLETA");
-                this.$refs.inputTipoVenta.setValue('BOLETA ELEC.')
+                this.$refs.inputTipoVenta.setValue('NOTA DE VENTA')
                 this.venta.tipoVenta = {
-                    IdTipoDoc: 7,
+                    IdTipoDoc: 3,
                     TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
-                    CodSunat: '03'
+                    CodSunat: '12'
                 }
             }
             let usuario = sessionStorage.getItem('User')
