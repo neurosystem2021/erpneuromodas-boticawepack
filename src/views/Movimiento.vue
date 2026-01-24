@@ -250,8 +250,8 @@ export default {
           { key: "Producto" },
           // { key: "ProductoPresentacion", label: "Rack" },
           { key: "Descripcion", label: "Descripción" },
-           { key: "eventPres", label: "" },
-           { key: "cantxPrecio", variant: "warning" },
+          { key: "eventPres", label: "" },
+          { key: "cantxPrecio", variant: "warning" },
           // { key: 'FechaAlquiler', label: 'Fecha Inicio' },
           // { key: 'FechaAlquilerFin', label: 'Fecha Fin'},
           { key: "cantidad" },
@@ -291,6 +291,7 @@ export default {
       obtenerStok: "obtenerStock"
     }),
     onAddProducto(obj) {
+      console.log("dddd", obj);
       if (this.isSalida) {
         this.obtenerStok({
           IdAlmacen:

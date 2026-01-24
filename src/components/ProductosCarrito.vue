@@ -120,7 +120,6 @@
       </div>
       <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
     </b-modal>
-
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px" v-if="tableProductos">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false"
@@ -927,11 +926,11 @@ export default {
     },
     irTextCantidad(val) {
       if (val) {
-       this.$nextTick(()=>{
-        document.getElementById("txtCantidad0").focus();
-        document.getElementById("txtCantidad0").select();
-        // console.log("s");
-       })
+        this.$nextTick(() => {
+          document.getElementById("txtCantidad0").focus();
+          document.getElementById("txtCantidad0").select();
+          // console.log("s");
+        });
       }
     },
     calcVuelto() {
@@ -1571,14 +1570,17 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      const index = this.$store.state.cart.productos
-        .map((producto, index) => ({ producto, index }))
-        .filter(v => v.producto.IdProducto == id)
-        .map(v => v.index)[0];
-
-      console.log(obj);
-
-      let prod = this.$store.state.cart.productos[index];
+      const index = this.$store.state.cart.productos.findIndex(
+        p => p && p.IdProducto == id
+      );
+      const existe = index !== -1;
+      console.log(existe, index, "index");
+      let prod = {
+        ...(index !== undefined
+          ? this.$store.state.cart.productos[index]
+          : obj),
+        tienepresentacionflag: false // Valor por defecto
+      };
       prod.tienepresentacionflag = !pxp.some(v => v.cantidad > 0);
       prod.estadoPxP = !pxp.some(v => v.cantidad > 0);
       prod.PrecioContado = obj.PrecioContado;
@@ -1603,7 +1605,19 @@ export default {
       prod.total =
         prod.cantidad *
         (this.$store.state.esOrdenCompra ? obj.PrecioCosto : obj.PrecioContado);
-      this.$store.state.cart.productos[index] = prod;
+      if (existe) {
+        this.$set(this.productos, index, prod);
+      } else {
+        this.productos.push({
+          ...prod,
+          cantidad: 1,
+          stock: 0,
+          subtotal: obj.PrecioContado
+        });
+      }
+
+      console.log("prod", prod);
+      console.log("productos", this.productos);
       this.tableProductos = false;
       this.tableProductos = true;
       // this.add([id, false, false, false, false, true, this.isVentas]);
