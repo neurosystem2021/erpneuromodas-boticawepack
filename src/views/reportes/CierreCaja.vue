@@ -1164,12 +1164,10 @@
             <thead>
               <tr class="thDetalle">
                 <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
-                <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
-                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -1328,9 +1326,6 @@ export default {
     } else {
       this.IdVendedor = sessionStorage.getItem("User").toLocaleLowerCase();
       let usuario = sessionStorage.getItem("User");
-      let IdPerfil = sessionStorage.getItem("IdPerfil");
-      let Perfil = ["1", "16", 1, 16];
-      this.bloquearVendedor = !Perfil.includes(IdPerfil);
       let IdPerfil = sessionStorage.getItem("IdPerfil");
       let Perfil = ["1", "16", 1, 16];
       this.bloquearVendedor = !Perfil.includes(IdPerfil);
@@ -1558,12 +1553,10 @@ export default {
       });
     },
     async loadData() {
-      await Promise.all([
-        this.getVentas(),
-        this.getIngresos(),
-        this.getSalidas(),
-        this.generarReporte()
-      ]);
+      await this.getVentas();
+      await this.getIngresos();
+      await this.getSalidas();
+      await this.generarReporte();
       // console.log(this.ventas);
     },
     generarReporte() {
@@ -1619,13 +1612,6 @@ export default {
         return;
       }
 
-      let IdPerfil = sessionStorage.getItem("IdPerfil");
-
-      if (IdPerfil != 16) {
-        this.$toasted.show("Solo Caja puede cerrar.");
-        return;
-      }
-
       if (!this.turno) {
         this.$toasted.show("Seleccione un Turno");
         return;
@@ -1662,9 +1648,6 @@ export default {
           : "APLICADO";
     },
     async loadDetalles() {
-      if (this.ventas.length == 0) {
-        return;
-      }
       if (this.ventas.length == 0) {
         return;
       }
