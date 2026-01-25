@@ -643,10 +643,10 @@
             <tr>
               <td colspan="2"></td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Total  S/.</td>
               <td>{{ totalV | redondear }}</td>
-            </tr>
+            </tr> -->
             <tr>
               <td colspan="2"></td>
             </tr>
@@ -719,10 +719,10 @@
                 <tr>
                   <td colspan="2"></td>
                 </tr>
-                <tr>
+                <!-- <tr>
                   <td>Total  S/.</td>
                   <td>{{ totalV | redondear }}</td>
-                </tr>
+                </tr> -->
                 <tr>
                   <td colspan="2"></td>
                 </tr>
@@ -1550,13 +1550,16 @@ export default {
       await Promise.all([
         this.getVentas(),
         this.getIngresos(),
-        this.getSalidas(),
-        this.generarReporte()
+        this.getSalidas()
       ]);
+      setTimeout(() => {
+        this.generarReporte();
+      }, 1000);
       // console.log(this.ventas);
     },
     generarReporte() {
       let productos = [];
+
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
         venta.productos.forEach(producto => {
           productos.push(producto);

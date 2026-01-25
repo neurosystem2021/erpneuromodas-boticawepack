@@ -19,6 +19,7 @@
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <div class="table-responsive ">
                       <b-table 
+                          :key="tableKey"
                           v-if="show"
                           id="table-proformas" 
                           ref="tableProformas"
@@ -151,6 +152,7 @@ export default {
   },
   data() {
     return {
+      tableKey: 0,
       API: config.API,
       show: false,
       search: "",
@@ -161,7 +163,7 @@ export default {
       fields: [
         { key: "EsFavoritoFlag", label: "Favorito" },
         { key: "IdProforma", label: "Id" },
-        { key: "Descripcion",label:"Desc." },
+        { key: "Descripcion", label: "Desc." },
         { key: "Anio", label: "Año" },
         "Numero",
         "Cliente",
@@ -311,7 +313,7 @@ export default {
             .then(res => {
               if (res.data) {
                 this.$toasted.info("¡PROFORMA ANULADA!");
-                this.$refs.tableProformas.refresh();
+                this.tableKey++;
               }
             })
             .catch(err => {
@@ -370,7 +372,7 @@ export default {
     /* -webkit-overflow-scrolling: touch; */
   }
 }
-.mdlProforma{
+.mdlProforma {
   width: 80%;
 }
 </style>
