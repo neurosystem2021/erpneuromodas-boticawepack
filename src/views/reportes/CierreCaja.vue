@@ -391,10 +391,12 @@
                   <thead>
                     <tr class="thDetalle">
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in ingresos" :key="index">
+                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -404,6 +406,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
+                      <td colspan="3"></td>
                       <td colspan="3"></td>
                       <td class="total"><b>Total Ingresos</b></td>
                       <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
@@ -418,10 +421,12 @@
                   <thead>
                     <tr class="thDetalle">
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in salidas" :key="index">
+                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -431,6 +436,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
+                      <td colspan="3"></td>
                       <td colspan="3"></td>
                       <td class="total-salida"><b>Total Salidas</b></td>
                       <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
@@ -643,10 +649,10 @@
             <tr>
               <td colspan="2"></td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Total  S/.</td>
               <td>{{ totalV | redondear }}</td>
-            </tr>
+            </tr> -->
             <tr>
               <td colspan="2"></td>
             </tr>
@@ -719,10 +725,10 @@
                 <tr>
                   <td colspan="2"></td>
                 </tr>
-                <tr>
+                <!-- <tr>
                   <td>Total  S/.</td>
                   <td>{{ totalV | redondear }}</td>
-                </tr>
+                </tr> -->
                 <tr>
                   <td colspan="2"></td>
                 </tr>
@@ -1158,10 +1164,12 @@
             <thead>
               <tr class="thDetalle">
                 <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidas" :key="index">
+                <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.UsuarioReg }}</td>
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -1320,6 +1328,9 @@ export default {
     } else {
       this.IdVendedor = sessionStorage.getItem("User").toLocaleLowerCase();
       let usuario = sessionStorage.getItem("User");
+      let IdPerfil = sessionStorage.getItem("IdPerfil");
+      let Perfil = ["1", "16", 1, 16];
+      this.bloquearVendedor = !Perfil.includes(IdPerfil);
       let IdPerfil = sessionStorage.getItem("IdPerfil");
       let Perfil = ["1", "16", 1, 16];
       this.bloquearVendedor = !Perfil.includes(IdPerfil);
@@ -1557,6 +1568,7 @@ export default {
     },
     generarReporte() {
       let productos = [];
+
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
         venta.productos.forEach(producto => {
           productos.push(producto);
@@ -1607,6 +1619,13 @@ export default {
         return;
       }
 
+      let IdPerfil = sessionStorage.getItem("IdPerfil");
+
+      if (IdPerfil != 16) {
+        this.$toasted.show("Solo Caja puede cerrar.");
+        return;
+      }
+
       if (!this.turno) {
         this.$toasted.show("Seleccione un Turno");
         return;
@@ -1643,6 +1662,9 @@ export default {
           : "APLICADO";
     },
     async loadDetalles() {
+      if (this.ventas.length == 0) {
+        return;
+      }
       if (this.ventas.length == 0) {
         return;
       }
