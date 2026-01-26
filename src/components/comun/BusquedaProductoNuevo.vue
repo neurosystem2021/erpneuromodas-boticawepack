@@ -101,7 +101,6 @@ export default {
       }
     },
     abrirModalSelect(item) {
-      console.log("bbbbrrrr");
       let prod = { ...item };
       if (this.productos.some(v => v.IdProducto == prod.IdProducto)) {
         this.$toasted.error("El producto ya se encuentra en la lista");

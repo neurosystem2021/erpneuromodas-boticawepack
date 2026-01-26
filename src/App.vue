@@ -19,5 +19,7 @@ export default {
   box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
   font-size: 1.2rem;
   font-weight: bold;
+  text-transform: uppercase;
+  min-width: 300px;
 }
 </style>

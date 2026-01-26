@@ -34,93 +34,200 @@
                 </b-col> -->
       </b-row>
       <b-card no-body>
-        <b-tabs card v-model="index">
-          <b-tab title="Tab 1" v-for="(venta, i) in ventas" :key="i">
+        <b-tabs card v-model="index" pills>
+          <b-tab
+            :title="`Ventana ${i + 1}`"
+            v-for="(venta, i) in ventas"
+            :key="i"
+          >
             <div>
-              <b-row style="margin-bottom:-10px">
+              <b-row style="margin-bottom: -10px">
                 <b-col md="8">
                   <b-row>
                     <b-col md="12">
                       <b-form-group>
                         <b-input-group prepend="Tipo" class="mt-2">
-                          <b-form-radio-group style="margin-left: 12px; margin-top: 7px;" id="radio-group-1"
-                            v-model="venta.selectedtv" :options="optionstv" v-on:change="cambioTipoVenta($event)"
-                            name="radio-options"></b-form-radio-group>
+                          <b-form-radio-group
+                            style="margin-left: 12px; margin-top: 7px"
+                            id="radio-group-1"
+                            v-model="venta.selectedtv"
+                            :options="optionstv"
+                            v-on:change="cambioTipoVenta($event)"
+                            name="radio-options"
+                          ></b-form-radio-group>
                         </b-input-group>
                       </b-form-group>
                     </b-col>
-                    <b-col md="4" style="margin-top:-15px">
+                    <b-col md="4" style="margin-top: -15px">
                       <b-form-group>
                         <b-input-group prepend="Doc." class="mt-2">
-                          <input type="text" disabled v-model="venta.tipoVenta.TipoDoc" class="form-control">
+                          <autocomplete
+                            required="required"
+                            :ref="`inputTipoVenta${i}`"
+                            :url="API + 'ventas/tipos'"
+                            anchor="TipoDoc"
+                            initValue="BOLETA ELEC."
+                            label="writer"
+                            placeholder=""
+                            :on-select="setTipoVenta"
+                            :onFocus="
+                              focusAutocomplete.bind(null, 'inputTipoVenta')
+                            "
+                            :classes="{ input: 'form-control' }"
+                          >
+                          </autocomplete>
                         </b-input-group>
                       </b-form-group>
                       <b-form-group v-if="isNota">
                         <label>Doc. Referencia:</label>
                         <!-- FALTA -->
-                        <autocomplete required="required" ref="inputDocRef"
-                          :url="API + 'ventas/lista/' + venta.puntoVenta.IdDocVentaPuntoVenta" anchor="NroComprobante"
-                          initValue="" label="writer" placeholder="" :on-select="setDocRef"
-                          :onFocus="focusAutocomplete.bind(null, 'inputDocRef')" :classes="{ input: 'form-control' }">
+                        <autocomplete
+                          required="required"
+                          ref="inputDocRef"
+                          :url="
+                            API +
+                            'ventas/lista/' +
+                            venta.puntoVenta.IdDocVentaPuntoVenta
+                          "
+                          anchor="NroComprobante"
+                          initValue=""
+                          label="writer"
+                          placeholder=""
+                          :on-select="setDocRef"
+                          :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                          :classes="{ input: 'form-control' }"
+                        >
                         </autocomplete>
                       </b-form-group>
                     </b-col>
-                    <b-col md="4" style="margin-top:-15px">
+                    <b-col md="4" style="margin-top: -15px">
                       <b-form-group>
                         <b-input-group prepend="Alm." class="mt-2">
-                          <input type="text" disabled v-model="venta.almacen.Almacen" class="form-control">
-                          
+                          <input
+                            type="text"
+                            disabled
+                            v-model="venta.almacen.Almacen"
+                            class="form-control"
+                          />
                         </b-input-group>
                       </b-form-group>
                       <b-form-group v-if="isNota">
                         <label>Motivo :</label>
-                        <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota"
-                          v-on:change="setMotivo($event)" class="mb-3" size="md" required />
+                        <b-form-select
+                          v-model="venta.NotaIdMotivo"
+                          :options="itemsMotivoNota"
+                          v-on:change="setMotivo($event)"
+                          class="mb-3"
+                          size="md"
+                          required
+                        />
                       </b-form-group>
                     </b-col>
-                    <b-col md="4" style="margin-top:-15px">
+                    <b-col md="4" style="margin-top: -15px">
                       <b-form-group>
                         <b-input-group prepend="P.V." class="mt-2">
-                          <input type="text" disabled v-model="venta.puntoVenta.PuntoVenta" class="form-control">
+                          <input
+                            type="text"
+                            disabled
+                            v-model="venta.puntoVenta.PuntoVenta"
+                            class="form-control"
+                          />
                         </b-input-group>
                       </b-form-group>
                     </b-col>
-                    <b-col md="12" style="margin-top:-10px">
+                    <b-col md="12" style="margin-top: -10px">
                       <b-form-group>
                         <b-input-group prepend="Cliente ">
-                          <clientes-form txtButton="Editar"
-                            v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente"
-                            @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
-                          <autocomplete style="width:40%" required="required" ref="inputCliente" :url="API + 'clientes'"
-                            anchor="ClienteDniRuc" label="writer" placeholder="" :onInput="(val) => newDniRuc = val"
-                            :on-select="setCliente" :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                            :classes="{ input: 'form-control' }">
+                          <clientes-form
+                            txtButton="Editar"
+                            v-if="
+                              venta.cliente.IdCliente &&
+                              venta.cliente.DniRuc != '00000000'
+                            "
+                            idModal="editCliente"
+                            @onAddCliente="setCliente"
+                            :editCliente="venta.cliente"
+                          ></clientes-form>
+                          <autocomplete
+                            style="width: 40%"
+                            required="required"
+                            :ref="`inputCliente${i}`"
+                            :url="API + 'clientes'"
+                            anchor="ClienteDniRuc"
+                            label="writer"
+                            placeholder=""
+                            :onInput="(val) => (newDniRuc = val)"
+                            :on-select="setCliente"
+                            :onFocus="
+                              focusAutocomplete.bind(null, 'inputCliente')
+                            "
+                            :classes="{ input: 'form-control' }"
+                          >
                           </autocomplete>
-                          <input v-model="dni" @keydown.enter.prevent="loadClienteBarcode" type="text"
-                            class="form-control" placeholder="Cod. Barra" />
+                          <input
+                            v-model="dni"
+                            @keydown.enter.prevent="loadClienteBarcode"
+                            type="text"
+                            class="form-control"
+                            placeholder="Cod. Barra"
+                          />
                           <b-input-group-append>
                             <!--<proveedores-tabla></proveedores-tabla>-->
-                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-
+                            <clientes-form
+                              :ruc="newDniRuc"
+                              @onAddCliente="setCliente"
+                            ></clientes-form>
                           </b-input-group-append>
                         </b-input-group>
-                        <b-form-select v-if="venta.cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
-                          <option :value="venta.cliente.Direccion">{{ venta.cliente.Direccion }}</option>
-                          <option :value="venta.cliente.Direccion2">{{ venta.cliente.Direccion2 }}</option>
-                          <option :value="venta.cliente.Direccion3">{{ venta.cliente.Direccion3 }}</option>
+                        <b-form-select
+                          v-if="venta.cliente.IdCliente"
+                          v-model="venta.CampoDireccion"
+                          class="mb-3"
+                        >
+                          <option :value="venta.cliente.Direccion">
+                            {{ venta.cliente.Direccion }}
+                          </option>
+                          <option :value="venta.cliente.Direccion2">
+                            {{ venta.cliente.Direccion2 }}
+                          </option>
+                          <option :value="venta.cliente.Direccion3">
+                            {{ venta.cliente.Direccion3 }}
+                          </option>
                         </b-form-select>
 
                         <b-input-group>
-                          <b-form-checkbox :disabled="bloquearInput ? true : false" v-model="venta.EsGuia" :value="1"
-                            :unchecked-value="0">
+                          <b-form-checkbox
+                            :disabled="bloquearInput ? true : false"
+                            v-model="venta.EsGuia"
+                            :value="1"
+                            :unchecked-value="0"
+                          >
                             Es Guia
                           </b-form-checkbox>
-                          <input v-model="venta.NombreGuia" type="text" style="text-transform:uppercase;"
-                            class="form-control" placeholder="Guía" v-if="venta.EsGuia" />
-                          <input v-model="venta.OrdenGuia" type="text" style="text-transform:uppercase;"
-                            class="form-control mx-1" placeholder="O. C." v-if="venta.EsGuia" />
-                          <b-form-textarea v-model="venta.ObservacionGuia" type="text" style="text-transform:uppercase;"
-                            class="form-control mx-1" placeholder="Observación(es)" v-if="venta.EsGuia" />
+                          <input
+                            v-model="venta.NombreGuia"
+                            type="text"
+                            style="text-transform: uppercase"
+                            class="form-control"
+                            placeholder="Guía"
+                            v-if="venta.EsGuia"
+                          />
+                          <input
+                            v-model="venta.OrdenGuia"
+                            type="text"
+                            style="text-transform: uppercase"
+                            class="form-control mx-1"
+                            placeholder="O. C."
+                            v-if="venta.EsGuia"
+                          />
+                          <b-form-textarea
+                            v-model="venta.ObservacionGuia"
+                            type="text"
+                            style="text-transform: uppercase"
+                            class="form-control mx-1"
+                            placeholder="Observación(es)"
+                            v-if="venta.EsGuia"
+                          />
                         </b-input-group>
 
                         <!-- <b-row v-if="this.$route.query.idPedido">
@@ -163,14 +270,31 @@
                         <b-form-text v-if="venta.cliente.EsVIP">
                            Cliente VIP con Precio Convenio
                         </b-form-text>-->
-                  <br>
-                  <div v-if="venta.idVentaPedido != null" style="border: 0.5px dashed #dc3545; padding:10px">
-                    <h5 style="text-align:center">Facturacion de la Venta a Pedido</h5>
-                    <h5 style="text-align:center; color:#dc3545">{{ venta.correlativoVentaPedido }}</h5>
-                    <b-badge variant="info" style="font-size:0.8rem" v-if="adelanto">Adelanto de: S/ {{
-                      $options.filters.redondear(adelanto) }} </b-badge>
-                    <b-badge variant="success" style="font-size:0.8rem" v-if="adelanto">Total a pagar: S/ {{
-                      $options.filters.redondear(totalCart - adelanto) }} </b-badge>
+                  <br />
+                  <div
+                    v-if="venta.idVentaPedido != null"
+                    style="border: 0.5px dashed #dc3545; padding: 10px"
+                  >
+                    <h5 style="text-align: center">
+                      Facturacion de la Venta a Pedido
+                    </h5>
+                    <h5 style="text-align: center; color: #dc3545">
+                      {{ venta.correlativoVentaPedido }}
+                    </h5>
+                    <b-badge
+                      variant="info"
+                      style="font-size: 0.8rem"
+                      v-if="adelanto"
+                      >Adelanto de: S/
+                      {{ $options.filters.redondear(adelanto) }}
+                    </b-badge>
+                    <b-badge
+                      variant="success"
+                      style="font-size: 0.8rem"
+                      v-if="adelanto"
+                      >Total a pagar: S/
+                      {{ $options.filters.redondear(totalCart - adelanto) }}
+                    </b-badge>
                   </div>
                 </b-col>
                 <b-col md="2">
@@ -182,15 +306,29 @@
                   </b-form-group>
                   <b-form-group>
                     <label>Vendedor:</label>
-                    <input type="text" disabled v-model="venta.vendedor.Usuario" class="form-control">
-                         
+                    <input
+                      type="text"
+                      disabled
+                      v-model="venta.vendedor.Usuario"
+                      class="form-control"
+                    />
                   </b-form-group>
                   <b-form-group v-if="false">
                     <label>Comisionista</label>
-                    <autocomplete ref="inputComisionista" required="required" :url="API + 'comisionistas'"
-                      anchor="ClienteDniRuc" label="writer" placeholder="Comisionista"
-                      :onInput="(val) => newDniRuc = val" :on-select="setComisionista"
-                      :onFocus="focusAutocomplete.bind(null, 'inputComisionista')" :classes="{ input: 'form-control' }">
+                    <autocomplete
+                      ref="inputComisionista"
+                      required="required"
+                      :url="API + 'comisionistas'"
+                      anchor="ClienteDniRuc"
+                      label="writer"
+                      placeholder="Comisionista"
+                      :onInput="(val) => (newDniRuc = val)"
+                      :on-select="setComisionista"
+                      :onFocus="
+                        focusAutocomplete.bind(null, 'inputComisionista')
+                      "
+                      :classes="{ input: 'form-control' }"
+                    >
                     </autocomplete>
                   </b-form-group>
                   <!--<b-badge variant="info" v-if="adelanto">Adelanto de: S/ {{ adelanto }} </b-badge>
@@ -198,178 +336,392 @@
                 </b-col>
               </b-row>
               <b-row>
-                <b-col>
-                  <productos-carrito 
+                <b-col cols="12">
+                  <productos-carrito
                     :id="`productos${i}`"
-                    @onInputCantidad="actualizarDescuento" @onAddProducto="onAddProducto"
-                    @onRemoveProducto="actualizarDescuento" :igvTotal="tieneIgv" :setPrecio="true" ref="carrito"
-                    :showButton="false" :bloquearInput="bloquearInput" :fields="carrito.fields" :isVentas="true"
-                    :idAlmacen="venta.almacen.IdAlmacen" :onSetProducto="onSetProducto" :tipoVenta="selectedtv"
-                    :esDelivery="venta.EsDelivery" :tipoDocSunat="venta.tipoVenta.CodSunat"
-                    :descCorporativoProp="descCorporativoProp" :descInstitucionalProp="descInstitucionalProp"
+                    :i="i"
+                    @onInputCantidad="actualizarDescuento"
+                    @onAddProducto="onAddProducto"
+                    @onRemoveProducto="actualizarDescuento"
+                    :igvTotal="tieneIgv"
+                    :setPrecio="true"
+                    ref="carrito"
+                    :showButton="false"
+                    :bloquearInput="bloquearInput"
+                    :fields="carrito.fields"
+                    :isVentas="true"
+                    :idAlmacen="venta.almacen.IdAlmacen"
+                    :onSetProducto="onSetProducto"
+                    :tipoVenta="selectedtv"
+                    :esDelivery="venta.EsDelivery"
+                    :tipoDocSunat="venta.tipoVenta.CodSunat"
+                    :descCorporativoProp="descCorporativoProp"
+                    :descInstitucionalProp="descInstitucionalProp"
                     :productos="venta.productos"
-                    >
-
-                    <template slot="operaciones">
-                      <table class="table b-table border table-footer">
-                        <tbody>
-                          <tr>
-                            <td class="text-center">Opciones</td>
-                          </tr>
-                          <tr v-if="puntosAplicados == 0">
-                            <td>
-                              <b-input-group prepend="S/" append="Descuento">
-                                <input v-model="descuentoGeneral" min="0" value="0" step="0.01"
-                                  :disabled="bloquearInput ? true : false || idPerfil != 1"
-                                  @input="(val) => { aplicarDescuentoGeneral(val.target.value) }" type="number"
-                                  class="form-control" />
-                              </b-input-group>
-                              <b-form-text>
-                                Descuento general a toda la venta.
-                              </b-form-text>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <b-form-checkbox :disabled="bloquearInput ? true : false || isNota || venta.EsDelivery"
-                                v-model="venta.EsCredito" :value="1" :unchecked-value="0">
-                                Venta a credito
-                              </b-form-checkbox>
-
-                              <b-form-input type="number" placeholder="Cantidad Días" v-model="cantidaDias"
-                                v-if="venta.EsCredito" />
-
-
-                              <b-form-input :disabled="bloquearInput ? true : false || isNota || venta.EsDelivery"
-                                v-if="venta.EsCredito" v-model="venta.FechaCredito" readonly class="mt-2" type="date">
-                              </b-form-input>
-                              <b-form-textarea v-model="venta.Observacion" type="text"
-                                class="form-control mt-2 textArea" placeholder="Observación(es)"
-                                v-if="venta.EsCredito" />
-
-
-                              <b-form-checkbox :disabled="bloquearInput ? true : false || venta.EsDelivery"
-                                v-model="venta.PorEntregar" :value="1" :unchecked-value="0">
-                                Por entregar
-                              </b-form-checkbox>
-
-                              <b-form-input type="number" placeholder="Cantidad Días" v-model="PorEntregarDias"
-                                v-if="venta.PorEntregar == 1" />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <b-input-group prepend="Proforma válido por:" append="días">
-                                <b-form-input :disabled="bloquearInput ? true : false" v-model="diasValidosProf" min="0"
-                                  value="0" type="number"></b-form-input>
-                              </b-input-group>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </template>
-                    <template slot="metodopago" v-if="!venta.EsCredito">
-                      <table class="table b-table border table-footer table-sm">
-                        <tbody>
-                          <tr>
-                            <td colspan="3" class="text-center">Metodo de Pago</td>
-                          </tr>
-                          <tr>
-                            <td style="vertical-align: middle !important;">Efectivo</td>
-                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1"
-                                @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
-                            <td>
-                              <b-form-input v-model="venta.pago.efectivo.descripcion" type="text"
-                                :disabled="bloquearInput ? true : false" placeholder="Descripcion"></b-form-input>
-                            </td>
-                            <td>
-                              <input v-model="venta.pago.efectivo.monto" min="0" :disabled="bloquearInput ? true : false"
-                                step="0.01" type="number" class="form-control" placeholder="S/." />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="vertical-align: middle !important;">Tarjeta</td>
-                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1"
-                                @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
-                            <td>
-                              <b-form-input v-model="venta.pago.visa.descripcion" type="text"
-                                :disabled="bloquearInput ? true : false" placeholder="Descripcion"></b-form-input>
-                            </td>
-                            <td>
-                              <input class="form-control" :disabled="bloquearInput ? true : false"
-                                v-model="venta.pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)" />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="vertical-align: middle !important;">Yape / Plin</td>
-                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1"
-                                @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
-                            <td>
-                              <b-form-input v-model="venta.pago.mastercard.descripcion"
-                                :disabled="bloquearInput ? true : false" type="text"
-                                placeholder="Descripcion"></b-form-input>
-                            </td>
-                            <td>
-                              <input class="form-control" v-model="venta.pago.mastercard.monto"
-                                :disabled="bloquearInput ? true : false" min="0" step="0.01" type="number" placeholder="S/."
-                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)" />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="vertical-align: middle !important;">Tranferencia</td>
-                            <td><b-button :disabled="isNota" variant="info" size="sm" class="mt-1"
-                                @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
-                            <td>
-                              <b-form-input v-model="venta.pago.transferencia.descripcion"
-                                :disabled="bloquearInput ? true : false" type="text"
-                                placeholder="Descripcion"></b-form-input>
-                            </td>
-                            <td>
-                              <input class="form-control" v-model="venta.pago.transferencia.monto"
-                                :disabled="bloquearInput ? true : false" min="0" step="0.01" type="number" placeholder="S/."
-                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)" />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </template>
-                    <template slot="adicional" v-if="!venta.EsCredito">
-                      <table class="table b-table border table-footer table-sm text-center" v-if="false">
-                        <tbody>
-                          <tr>
-                            <td>Mano de obra bruta</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <h3>{{ manoDeObraBruta | redondear }}</h3>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Mano de obra neta</td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <h3 :class="{ 'text-danger': manoDeObraNeta <= 0 }">{{ manoDeObraNeta | redondear }}</h3>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </template>
+                    @recalcularMetoPago="metodoPagoCambio(1)"
+                  >
                   </productos-carrito>
+                </b-col>
+                <b-col cols="3">
+                  <table class="table b-table border table-footer">
+                    <tbody>
+                      <tr>
+                        <td class="text-center">Opciones</td>
+                      </tr>
+                      <tr v-if="puntosAplicados == 0">
+                        <td>
+                          <b-input-group prepend="S/" append="Descuento">
+                            <input
+                              v-model="descuentoGeneral"
+                              min="0"
+                              value="0"
+                              step="0.01"
+                              :disabled="
+                                bloquearInput ? true : false || idPerfil != 1
+                              "
+                              @input="
+                                (val) => {
+                                  aplicarDescuentoGeneral(val.target.value);
+                                }
+                              "
+                              type="number"
+                              class="form-control"
+                            />
+                          </b-input-group>
+                          <b-form-text>
+                            Descuento general a toda la venta.
+                          </b-form-text>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b-form-checkbox
+                            :disabled="
+                              bloquearInput
+                                ? true
+                                : false || isNota || venta.EsDelivery
+                            "
+                            v-model="venta.EsCredito"
+                            :value="1"
+                            :unchecked-value="0"
+                          >
+                            Venta a credito
+                          </b-form-checkbox>
+
+                          <b-form-input
+                            type="number"
+                            placeholder="Cantidad Días"
+                            v-model="cantidaDias"
+                            v-if="venta.EsCredito"
+                          />
+
+                          <b-form-input
+                            :disabled="
+                              bloquearInput
+                                ? true
+                                : false || isNota || venta.EsDelivery
+                            "
+                            v-if="venta.EsCredito"
+                            v-model="venta.FechaCredito"
+                            readonly
+                            class="mt-2"
+                            type="date"
+                          >
+                          </b-form-input>
+                          <b-form-textarea
+                            v-model="venta.Observacion"
+                            type="text"
+                            class="form-control mt-2 textArea"
+                            placeholder="Observación(es)"
+                            v-if="venta.EsCredito"
+                          />
+
+                          <b-form-checkbox
+                            :disabled="
+                              bloquearInput ? true : false || venta.EsDelivery
+                            "
+                            v-model="venta.PorEntregar"
+                            :value="1"
+                            :unchecked-value="0"
+                          >
+                            Por entregar
+                          </b-form-checkbox>
+
+                          <b-form-input
+                            type="number"
+                            placeholder="Cantidad Días"
+                            v-model="PorEntregarDias"
+                            v-if="venta.PorEntregar == 1"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b-input-group
+                            prepend="Proforma válido por:"
+                            append="días"
+                          >
+                            <b-form-input
+                              :disabled="bloquearInput ? true : false"
+                              v-model="diasValidosProf"
+                              min="0"
+                              value="0"
+                              type="number"
+                            ></b-form-input>
+                          </b-input-group>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-col>
+                <b-col cols="3">
+                  <table class="table b-table border table-footer table-sm">
+                    <tbody>
+                      <tr>
+                        <td colspan="3" class="text-center">Metodo de Pago</td>
+                      </tr>
+                      <tr>
+                        <td style="vertical-align: middle !important">
+                          Efectivo
+                        </td>
+                        <td>
+                          <b-button
+                            :disabled="isNota"
+                            variant="info"
+                            size="sm"
+                            class="mt-1"
+                            @click="metodoPagoCambio(1)"
+                            ><i class="fas fa-check"></i
+                          ></b-button>
+                        </td>
+                        <td>
+                          <b-form-input
+                            v-model="venta.pago.efectivo.descripcion"
+                            type="text"
+                            :disabled="bloquearInput ? true : false"
+                            placeholder="Descripcion"
+                          ></b-form-input>
+                        </td>
+                        <td>
+                          <input
+                            v-model="venta.pago.efectivo.monto"
+                            min="0"
+                            :disabled="bloquearInput ? true : false"
+                            step="0.01"
+                            type="number"
+                            class="form-control"
+                            placeholder="S/."
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="vertical-align: middle !important">
+                          Tarjeta
+                        </td>
+                        <td>
+                          <b-button
+                            :disabled="isNota"
+                            variant="info"
+                            size="sm"
+                            class="mt-1"
+                            @click="metodoPagoCambio(2)"
+                            ><i class="fas fa-check"></i
+                          ></b-button>
+                        </td>
+                        <td>
+                          <b-form-input
+                            v-model="venta.pago.visa.descripcion"
+                            type="text"
+                            :disabled="bloquearInput ? true : false"
+                            placeholder="Descripcion"
+                          ></b-form-input>
+                        </td>
+                        <td>
+                          <input
+                            class="form-control"
+                            :disabled="bloquearInput ? true : false"
+                            v-model="venta.pago.visa.monto"
+                            min="0"
+                            step="0.01"
+                            type="number"
+                            placeholder="S/."
+                            @input="
+                              venta.pago.efectivo.monto =
+                                $options.filters.redondear(
+                                  totalCart -
+                                    venta.pago.mastercard.monto -
+                                    $event.target.value
+                                )
+                            "
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="vertical-align: middle !important">
+                          Yape / Plin
+                        </td>
+                        <td>
+                          <b-button
+                            :disabled="isNota"
+                            variant="info"
+                            size="sm"
+                            class="mt-1"
+                            @click="metodoPagoCambio(3)"
+                            ><i class="fas fa-check"></i
+                          ></b-button>
+                        </td>
+                        <td>
+                          <b-form-input
+                            v-model="venta.pago.mastercard.descripcion"
+                            :disabled="bloquearInput ? true : false"
+                            type="text"
+                            placeholder="Descripcion"
+                          ></b-form-input>
+                        </td>
+                        <td>
+                          <input
+                            class="form-control"
+                            v-model="venta.pago.mastercard.monto"
+                            :disabled="bloquearInput ? true : false"
+                            min="0"
+                            step="0.01"
+                            type="number"
+                            placeholder="S/."
+                            @input="
+                              venta.pago.efectivo.monto =
+                                $options.filters.redondear(
+                                  totalCart -
+                                    venta.pago.visa.monto -
+                                    $event.target.value
+                                )
+                            "
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="vertical-align: middle !important">
+                          Tranferencia
+                        </td>
+                        <td>
+                          <b-button
+                            :disabled="isNota"
+                            variant="info"
+                            size="sm"
+                            class="mt-1"
+                            @click="metodoPagoCambio(4)"
+                            ><i class="fas fa-check"></i
+                          ></b-button>
+                        </td>
+                        <td>
+                          <b-form-input
+                            v-model="venta.pago.transferencia.descripcion"
+                            :disabled="bloquearInput ? true : false"
+                            type="text"
+                            placeholder="Descripcion"
+                          ></b-form-input>
+                        </td>
+                        <td>
+                          <input
+                            class="form-control"
+                            v-model="venta.pago.transferencia.monto"
+                            :disabled="bloquearInput ? true : false"
+                            min="0"
+                            step="0.01"
+                            type="number"
+                            placeholder="S/."
+                            @input="
+                              venta.pago.efectivo.monto =
+                                $options.filters.redondear(
+                                  totalCart -
+                                    venta.pago.mastercard.monto -
+                                    $event.target.value
+                                )
+                            "
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-col>
+                <b-col cols="3"></b-col>
+                <b-col cols="3">
+                  <table class="table b-table border table-footer">
+                    <tbody>
+                      <tr v-if="sumatoriaDescuento > 0">
+                        <td class="table-success">SubTotal</td>
+                        <td class="table-success">
+                          {{
+                            (parseFloat(sumatoriaSubTotal()) +
+                              parseFloat(sumatoriaDescuento))
+                              | redondear
+                          }}
+                        </td>
+                      </tr>
+                      <tr v-if="sumatoriaDescuento > 0">
+                        <td class="table-danger">Descuento</td>
+                        <td class="table-danger">- {{ sumatoriaDescuento }}</td>
+                      </tr>
+                      <tr>
+                        <td><b>SubTotal</b></td>
+                        <td class="table-danger">{{ sumatoriaSubTotal() }}</td>
+                      </tr>
+                      <tr>
+                        <td><b>TOTAL</b></td>
+                        <td class="table-danger">{{ sumatoriaTotal() }}</td>
+                      </tr>
+                      <!-- <tr>
+                <td  colspan="2">
+                  <label>pagó con:</label>
+                  <b-form-input
+                    type="text"
+                    :disabled="bloquearInput?true:false"
+                    placeholder="Pagó con"
+                    v-model="pagocon"
+                    @input="asignarVuelto"></b-form-input><br>
+                  <label>Vuelto:</label>
+                </td>
+              </tr> -->
+                    </tbody>
+                  </table>
                 </b-col>
               </b-row>
               <b-row align-h="center" class="text-center">
                 <b-col cols="8">
                   <br />
                   <!-- <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button> -->
-                  <b-button class="btnAction" type="button" @click="anularPagoVentaPedido" variant="danger"
-                    v-if="venta.idVentaPedido != null">Cancelar Facturacion VP</b-button>
+                  <b-button
+                    class="btnAction"
+                    type="button"
+                    @click="anularPagoVentaPedido"
+                    variant="danger"
+                    v-if="venta.idVentaPedido != null"
+                    >Cancelar Facturacion VP</b-button
+                  >
                   <!-- <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido && venta.tipoVenta.CodSunat != '99' && venta.idVentaPedido == null"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Cotizacion</b-button> -->
-                  <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success">Efectuar
-                    Venta</b-button>
-                  <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info"
-                    :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
+                  <b-button
+                    class="btnAction"
+                    :disabled="inProgress"
+                    variant="success"
+                    @click="guardarVenta"
+                    >
+                    Pagar 
+                    </b-button>
+                  <b-button
+                    class="btnAction"
+                    @click="anadirVentan()"
+                    variant="success"
+                    style="background: rgb(183, 28, 28)"
+                  >
+                    NUEVA VENTANA</b-button
+                  >
+                  <b-button
+                    class="btnAction"
+                    v-if="ultimaVenta"
+                    target="_blank"
+                    variant="info"
+                    :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
+                    >Imprimir última Venta</b-button
+                  >
                   <br />
                   <br />
                 </b-col>
@@ -410,8 +762,9 @@ export default {
   },
   data() {
     return {
+      totalCart: 0,
       preVenta: {},
-      index: 0,
+      index: 1,
       ventas: [],
       cantidaDias: 0,
       PorEntregarDias: 0,
@@ -502,19 +855,13 @@ export default {
       let fechaFormateada = nuevaFecha.format("YYYY-MM-DD");
       this.ventas[this.index].FechaCredito = fechaFormateada;
     },
-    totalCart(newVal) {
-      this.ventas[this.index].pago.efectivo.monto = parseFloat(
-        newVal -
-          (parseFloat(this.ventas[this.index].pago.visa.monto) +
-            parseFloat(this.ventas[this.index].pago.mastercard.monto) +
-            parseFloat(this.ventas[this.index].pago.transferencia.monto))
-      ).toFixed(2);
+    index(){
+      this.metodoPagoCambio(1)
     }
   },
   computed: {
     ...mapState({
-      productos: state => state.cart.productos,
-      totalCart: state => state.cart.totalCart
+      productos: state => state.cart.productos
     }),
     manoDeObraBruta() {
       let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
@@ -527,6 +874,23 @@ export default {
       let precio = pManoObra ? pManoObra.precio : 0;
 
       return precio;
+    },
+
+    sumatoriaDescuento() {
+      if (!this.ventas[this.index]) {
+        return 0;
+      }
+      let prod = [...this.ventas[this.index].productos];
+      let total = prod.reduce((sum, producto) => {
+        return (
+          sum +
+          parseFloat(
+            (producto.PorcentajeDesc * producto.cantidad * producto.precio) /
+              100
+          )
+        );
+      }, 0);
+      return total;
     }
   },
   methods: {
@@ -537,7 +901,41 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    sumatoriaSubTotal() {
+      if (!this.ventas[this.index]) {
+        return 0;
+      }
+      let prod = [...this.ventas[this.index].productos];
+      let total = prod.reduce((sum, producto) => {
+        return sum + parseFloat(producto.cantidad * producto.precio);
+      }, 0);
+      return total;
+    },
+    sumatoriaTotal() {
+      if (!this.ventas[this.index]) {
+        return 0;
+      }
+      let prod = [...this.ventas[this.index].productos];
+      let total = prod.reduce((sum, producto) => {
+        return (
+          sum +
+          parseFloat(
+            producto.cantidad * producto.precio -
+              (producto.cantidad * producto.precio * producto.PorcentajeDesc) /
+                100
+          )
+        );
+      }, 0);
 
+      return total;
+    },
+    anadirVentan() {
+      this.ventas.push({ ...this.preVenta, productos: [] });
+      this.$nextTick(() => {
+        this.index++;
+        Promise.all([this.getVendedor(), this.loadClienteVarios()]);
+      });
+    },
     facturarVentaPedido(data) {
       //this.ventas[this.index].IdPreOrden.push(orden)
       // obtener total adelantos
@@ -625,8 +1023,11 @@ export default {
       }
     },
     focusAutocomplete(ref) {
+      let newRef = `${ref}${this.index}`;
+      console.log(newRef);
+      this.$refs[newRef][0].handleDoubleClick();
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick();
+      // this.$refs[ref].handleDoubleClick();
     },
     initForm() {
       this.preVenta = {
@@ -689,6 +1090,8 @@ export default {
       this.ventas.push({ ...this.preVenta, productos: [] });
     },
     metodoPagoCambio(opc) {
+      this.recalcularTotalCart();
+      console.log("opc", opc);
       switch (opc) {
         case 1:
           this.ventas[this.index].pago.visa.monto = 0;
@@ -722,8 +1125,8 @@ export default {
     },
     setTipoVenta(obj) {
       this.isNota = false;
-      (this.bloquearInput = false),
-        (this.ventas[this.index].NroComprobanteModifica = "");
+      this.bloquearInput = false;
+      this.ventas[this.index].NroComprobanteModifica = "";
       this.ventas[this.index].CodSunatModifica = "";
       this.ventas[this.index].NotaIdMotivo = "";
       this.ventas[this.index].NotaDescMotivo = "";
@@ -1361,7 +1764,7 @@ export default {
       this.inProgress = false;
       // return false;
       await this.axios
-        .post(this.API + "ventas", this.ventas[this.index])
+        .post(this.API + "ventass", this.ventas[this.index])
         .then(response => {
           if (response.data.errorUser) {
             this.$swal({
@@ -1428,6 +1831,7 @@ export default {
         window.location.reload();
       }, 100);
     },
+
     emitirauto(idDocVenta) {
       this.axios
         .post(this.API + "emitirauto", { IdDocVenta: idDocVenta })
@@ -1444,6 +1848,28 @@ export default {
           this.$toasted.show("Ha ocurrido un error, en la emision a sunat");
         });
     },
+    async recalcularTotalCart() {
+      this.totalCart = 0;
+      if (!this.ventas[this.index]) {
+        return;
+      }
+      let prod = [...this.ventas[this.index].productos];
+      this.totalCart = prod.reduce((sum, producto) => {
+        console.log(producto);
+        return (
+          sum +
+          parseFloat(
+            producto.cantidad * producto.precio -
+              (producto.cantidad * producto.precio * producto.PorcentajeDesc) /
+                100
+          )
+        );
+      }, 0);
+      // this.totalCart = total;
+
+      console.log("post", this.totalCart);
+    },
+
     eliminarCliente() {
       //this.$refs.inputCliente.setValue('')
       //this.ventas[this.index].cliente = {}
@@ -1644,4 +2070,6 @@ export default {
     width: calc(100% - 300px);
   }
 }
+</style>
+<style>
 </style>
