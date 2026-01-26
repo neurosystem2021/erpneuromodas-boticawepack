@@ -1199,28 +1199,27 @@ export default {
       this.touchModal = false;
     },
     async cargarDetalleProforma(det) {
-      let detalle = det.map(item => ({
-        ...item,
-        setPrecio: true,
-        cantidad: item.Cantidad,
-        precio: item.Precio,
-        EsManoDeObra: item.EsManoDeObra
-      }));
+      console.log(this.ventas[this.index].almacen.IdAlmacen);
+      this.$nextTick(async () => {
+        let detalle = det.map(item => ({
+          ...item,
+          setPrecio: true,
+          cantidad: item.Cantidad,
+          precio: item.Precio,
+          EsManoDeObra: item.EsManoDeObra
+        }));
+        let IdAlmacen = this.ventas[this.index].almacen.IdAlmacen;
+        for (let i = 0; i < detalle.length; i++) {
+          const res = await this.axios(
+            `${this.API}/productos/stock/${IdAlmacen}`,
+            {
+              params: { idProductos: [detalle[i].IdProducto] }
+            }
+          );
 
-      for (let i = 0; i < detalle.length; i++) {
-        const res = await this.axios(
-          `${this.API}/productos/stock/${
-            this.ventas[this.index].almacen.IdAlmacen
-          }`,
-          {
-            params: { idProductos: [detalle[i].IdProducto] }
-          }
-        );
+          detalle[i].stock = res.data[0].stock ? res.data[0].stock : 0;
+        }
 
-        detalle[i].stock = res.data[0].stock ? res.data[0].stock : 0;
-      }
-
-      this.$nextTick(() => {
         this.ventas[this.index].productos = detalle;
         this.cargarMonto("efectivo");
       });
@@ -1266,6 +1265,7 @@ export default {
       }
     },
     async setProforma(e) {
+      console.log("aaaa");
       let productos = e.productos.map(v => {
         return { ...v, cantidadPres: 1 };
       });
@@ -1712,6 +1712,7 @@ export default {
       });
     },
     setAlmacen(obj) {
+      console.log(obj);
       this.ventas[this.index].almacen = obj;
       // this.$refs.inputAlmacen.setValue(obj.Almacen);
       this.obtenerStok({

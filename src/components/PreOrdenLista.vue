@@ -105,8 +105,10 @@ export default {
           if (this.EsVenta) {
             res = res.filter(r => r.Pagado == 0);
           }
-          this.$emit("onPreOrden", item);
-          this.$emit("cargarDetalleProforma", res);
+          setTimeout(() => {
+            this.$emit("onPreOrden", item);
+            this.$emit("cargarDetalleProforma", res);
+          }, 500);
         });
       //this.add([item.IdPreOrden, false, { setPrecio: true, cantidad:  }])
     },
