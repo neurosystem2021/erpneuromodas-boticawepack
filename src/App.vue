@@ -11,15 +11,42 @@ export default {
 </script>
 
 <style>
+.modal .modal-xl {
+  min-width: 80%;
+  width: 80%;
+}
+/* #modalProformas___BV_modal_body_ {
+  min-width: 80%;
+  width: 80%;
+} */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f5f7fa; /* tu color */
+  margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.container,
+.container-fluid {
+  background-color: transparent; /* deja ver el fondo del body */
+}
 .btnAction {
   margin: 2px 0;
   border-radius: 25px !important;
-  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  font-size: 1.2rem;
-  font-weight: bold;
+  border: 0px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  display: block;
+  width: 100%;
+  margin: 1.5% 0px;
   text-transform: uppercase;
-  min-width: 300px;
+  /* margin: 20px 0 0; */
 }
 </style>

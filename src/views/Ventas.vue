@@ -9,9 +9,9 @@
             <ventas-pedido :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"
               @onFacturar="facturarVentaPedido"></ventas-pedido>
           </b-button-group>
-          <b-button-group size="sm" class="ocularMovil">
+          <b-buttonx-group size="sm" class="ocularMovil">
             <pago-deuda></pago-deuda>
-          </b-button-group>
+          </b-buttonx-group>
           <b-button-group size="sm">
             <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
           </b-button-group>
@@ -643,7 +643,71 @@
                     </tbody>
                   </table>
                 </b-col>
-                <b-col cols="3"></b-col>
+                <b-col cols="3">
+                  <b-button
+                    class="btnAction"
+                    type="button"
+                    @click="anularPagoVentaPedido"
+                    variant="danger"
+                    v-if="venta.idVentaPedido != null"
+                    >Cancelar Facturacion VP</b-button
+                  >
+                  <!-- <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido && venta.tipoVenta.CodSunat != '99' && venta.idVentaPedido == null"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Cotizacion</b-button> -->
+                  <b-button
+                    class="btnAction"
+                    :disabled="inProgress"
+                    variant="success"
+                    @click="guardarVenta"
+                  >
+                    Pagar
+                  </b-button>
+                  <b-button
+                    class="btnAction"
+                    @click="anadirVentan()"
+                    variant="success"
+                    style="background: rgb(183, 28, 28)"
+                  >
+                    NUEVA VENTANA</b-button
+                  >
+                  <b-button
+                    class="btnAction"
+                    v-if="ultimaVenta"
+                    target="_blank"
+                    variant="info"
+                    :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
+                    >Imprimir última Venta</b-button
+                  >
+                  <b-button-group class="ocularMovil">
+                    <ventas-pedido
+                      :idAlmacen="venta.almacen.IdAlmacen"
+                      @onSelectProforma="setCliente"
+                      @onFacturar="facturarVentaPedido"
+                    ></ventas-pedido>
+                  </b-button-group>
+                  <b-button-group  class="ocularMovil">
+                    <pago-deuda></pago-deuda>
+                  </b-button-group>
+                  <b-button-group >
+                    <proformas
+                      :idAlmacen="venta.almacen.IdAlmacen"
+                      @onSelectProforma="setCliente"
+                    ></proformas>
+                  </b-button-group>
+                  <b-button-group  class="ocularMovil" v-if="false">
+                    <pre-orden-lista
+                      v-show="!this.$route.query.idPreOrden"
+                      :idAlmacen="venta.almacen.IdAlmacen"
+                      @onSelectPreOrden="setCliente"
+                      @onPreOrden="selectPreOrden"
+                    ></pre-orden-lista>
+                  </b-button-group>
+                  <b-button-group  class="ocularMovil">
+                    <config-venta
+                      @onUpdateConfig="eliminarCliente"
+                      @onUpdateConfigComision="eliminarComisionista"
+                    ></config-venta>
+                  </b-button-group>
+                </b-col>
                 <b-col cols="3">
                   <table class="table b-table border table-footer">
                     <tbody>
@@ -689,39 +753,7 @@
                 <b-col cols="8">
                   <br />
                   <!-- <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button> -->
-                  <b-button
-                    class="btnAction"
-                    type="button"
-                    @click="anularPagoVentaPedido"
-                    variant="danger"
-                    v-if="venta.idVentaPedido != null"
-                    >Cancelar Facturacion VP</b-button
-                  >
-                  <!-- <b-button class="btnAction" type="button" v-if="!this.$route.query.idPedido && venta.tipoVenta.CodSunat != '99' && venta.idVentaPedido == null"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Cotizacion</b-button> -->
-                  <b-button
-                    class="btnAction"
-                    :disabled="inProgress"
-                    variant="success"
-                    @click="guardarVenta"
-                    >
-                    Pagar 
-                    </b-button>
-                  <b-button
-                    class="btnAction"
-                    @click="anadirVentan()"
-                    variant="success"
-                    style="background: rgb(183, 28, 28)"
-                  >
-                    NUEVA VENTANA</b-button
-                  >
-                  <b-button
-                    class="btnAction"
-                    v-if="ultimaVenta"
-                    target="_blank"
-                    variant="info"
-                    :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
-                    >Imprimir última Venta</b-button
-                  >
+
                   <br />
                   <br />
                 </b-col>
@@ -855,8 +887,8 @@ export default {
       let fechaFormateada = nuevaFecha.format("YYYY-MM-DD");
       this.ventas[this.index].FechaCredito = fechaFormateada;
     },
-    index(){
-      this.metodoPagoCambio(1)
+    index() {
+      this.metodoPagoCambio(1);
     }
   },
   computed: {
@@ -936,9 +968,25 @@ export default {
         Promise.all([this.getVendedor(), this.loadClienteVarios()]);
       });
     },
-    facturarVentaPedido(data) {
+    async facturarVentaPedido(data) {
       //this.ventas[this.index].IdPreOrden.push(orden)
       // obtener total adelantos
+      for (let i = 0; i < data.productos.length; i++) {
+        let producto = await this.axios
+          .get(
+            `${this.API}/productos/puntoventa/stock/1?q=${
+              data.productos[i].IdProducto
+            }&sortBy=stock&sortDesc=1&limit=1`
+          )
+          .then(res => {
+            this.ventas[this.index].productos.push({
+              ...data.productos[i],
+              stock: res.data[0].stock
+            });
+          });
+        console.log(producto);
+      }
+      // this.ventas[this.index].productos = data.productos;
       this.ventas[this.index].idVentaPedido = data.idDocVenta;
       this.ventas[this.index].correlativoVentaPedido = data.Correlativo;
       this.axios

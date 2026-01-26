@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button class="btnAction"  @click="show=true" variant="success" size="md">Ventas a Pedido</b-button>
+        <b-button class="btnAction"  block @click="show=true" variant="success" >Ventas a Pedido</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalVentaPedido" 
@@ -93,7 +93,6 @@ import { mapActions } from "vuex";
 export default {
   mounted() {
     this.$emit("mounted", this.$refs.formProformaModal);
-    
   },
   watch: {
     items() {
