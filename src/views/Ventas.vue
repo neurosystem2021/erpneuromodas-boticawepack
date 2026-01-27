@@ -352,7 +352,7 @@
                     :isVentas="true"
                     :idAlmacen="venta.almacen.IdAlmacen"
                     :onSetProducto="onSetProducto"
-                    :tipoVenta="selectedtv"
+                    :tipoVenta="venta.selectedtv"
                     :esDelivery="venta.EsDelivery"
                     :tipoDocSunat="venta.tipoVenta.CodSunat"
                     :descCorporativoProp="descCorporativoProp"
@@ -411,7 +411,7 @@
                           <b-form-input
                             type="number"
                             placeholder="Cantidad Días"
-                            v-model="cantidaDias"
+                            v-model="venta.cantidaDias"
                             v-if="venta.EsCredito"
                           />
 
@@ -450,7 +450,7 @@
                           <b-form-input
                             type="number"
                             placeholder="Cantidad Días"
-                            v-model="PorEntregarDias"
+                            v-model="venta.PorEntregarDias"
                             v-if="venta.PorEntregar == 1"
                           />
                         </td>
@@ -463,7 +463,7 @@
                           >
                             <b-form-input
                               :disabled="bloquearInput ? true : false"
-                              v-model="diasValidosProf"
+                              v-model="venta.diasValidosProf"
                               min="0"
                               value="0"
                               type="number"
@@ -665,7 +665,7 @@
                     class="btnAction"
                     @click="anadirVentan()"
                     variant="success"
-                    style="background: #FFD600;color: #000000"
+                    style="background: #ffd600; color: #000000"
                   >
                     <i class="fa fa-plus" aria-hidden="true"></i>
                     NUEVA VENTANA
@@ -674,7 +674,7 @@
                     class="btnAction"
                     @click="eliminarVentana()"
                     variant="success"
-                    style="background: #D50000;"
+                    style="background: #d50000"
                     v-if="index > 0"
                   >
                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -744,18 +744,19 @@
                         <td><b>TOTAL</b></td>
                         <td class="table-danger">{{ sumatoriaTotal() }}</td>
                       </tr>
-                      <!-- <tr>
-                <td  colspan="2">
-                  <label>pagó con:</label>
-                  <b-form-input
-                    type="text"
-                    :disabled="bloquearInput?true:false"
-                    placeholder="Pagó con"
-                    v-model="pagocon"
-                    @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                </td>
-              </tr> -->
+                      <tr>
+                        <td colspan="2">
+                          <label>pagó con:</label>
+                          <b-form-input
+                            type="text"
+                            :disabled="bloquearInput ? true : false"
+                            placeholder="Pagó con"
+                            v-model="venta.PagoCon"
+                          ></b-form-input
+                          ><br />
+                          <label>Vuelto: {{ vueltoGet() }}</label>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </b-col>
@@ -985,6 +986,17 @@ export default {
         Promise.all([this.getVendedor(), this.loadClienteVarios()]);
       });
     },
+    vueltoGet() {
+      if (!this.ventas[this.index]) {
+        return 0;
+      }
+      let PagoCon = this.ventas[this.index].PagoCon;
+      let vuelto = 0;
+      if (PagoCon > 0) {
+        vuelto = PagoCon - this.totalCart;
+      }
+      return parseFloat(vuelto).toFixed(2);
+    },
     async facturarVentaPedido(data) {
       //this.ventas[this.index].IdPreOrden.push(orden)
       // obtener total adelantos
@@ -1148,7 +1160,12 @@ export default {
         adelanto: 0,
         infoDelivery: {},
         descuentoGeneral: 0,
-        puntosAplicados: 0
+        puntosAplicados: 0,
+        PagoCon: 0,
+        cantidaDias: 0,
+        PorEntregarDias: 0,
+        diasValidosProf:0,
+        isNota:false
       };
 
       this.ventas.push({ ...this.preVenta, productos: [] });
@@ -1328,7 +1345,7 @@ export default {
           stock: infoStock ? infoStock.stock : 0
         };
       });
-      this.ventas[this.index].productos = productosConStock
+      this.ventas[this.index].productos = productosConStock;
       // console.log("productosStock", productosConStock);
       // productos = productosConStock;
     },
@@ -1818,7 +1835,7 @@ export default {
       this.ventas[this.index].PorEntregarDias = this.PorEntregarDias;
       this.ventas[this.index].puntosAplicados = this.puntosAplicados || 0;
       this.ventas[this.index].totalCart = this.totalCart || 0;
-      this.ventas[this.index].PagoCon = this.$refs.carrito.pagocon;
+
       this.ventas[this.index].NombreGuia = (
         "" + this.ventas[this.index].NombreGuia
       )
