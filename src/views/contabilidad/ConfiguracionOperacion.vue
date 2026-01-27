@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row" id="conten">
+      <b-container class="" id="conten">
         <div class="contenido" v-if="libroIdSelec!=null">
           <b-row>
             <b-col md="2" class="text-center">

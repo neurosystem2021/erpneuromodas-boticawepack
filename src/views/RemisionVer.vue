@@ -9,7 +9,7 @@
       validated
       id="remision-form"
     >
-      <b-container fluid class="bv-example-row">
+      <b-container fluid class="">
         <b-row>
           <b-col md="6">
             <fieldset class="scheduler-border">

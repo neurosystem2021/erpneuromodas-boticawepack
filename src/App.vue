@@ -25,7 +25,7 @@ body {
 }
 
 body {
-  background-color: #f5f7fa; /* tu color */
+  background-color: transparent !important;
   margin: 0;
   font-family: Roboto, Arial, sans-serif;
 }
@@ -48,5 +48,15 @@ body {
   margin: 1.5% 0px;
   text-transform: uppercase;
   /* margin: 20px 0 0; */
+}
+.container,
+.container-fluid,
+. {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+.card {
+  background-color: #e3f2fd !important;
 }
 </style>

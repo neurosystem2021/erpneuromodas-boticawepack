@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="bv-example-row">
+  <b-container fluid class="">
     <b-row>
         <b-col cols="12">
             <h2>Listado De Guía de Remisión</h2>

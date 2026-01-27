@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="">
 
         <b-row>
           <b-col md="12" class="my-1">

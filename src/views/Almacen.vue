@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container fluid class="bv-example-row">
+      <b-container fluid class="">
         <b-row>
           <b-col md="12"  class="my-1">
             <b-row>

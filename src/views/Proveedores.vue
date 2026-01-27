@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="">
         <b-row>
           <b-col class="text-center">
             <h1>LISTA DE PROVEEDORES</h1>

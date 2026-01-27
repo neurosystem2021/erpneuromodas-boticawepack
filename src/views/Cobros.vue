@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row" id="conten">
+      <b-container class="" id="conten">
         <b-row class="text-left" style="margin-bottom: -15px">
           <b-col md="6"><h1>COBROS</h1></b-col>
           <b-col md="3">

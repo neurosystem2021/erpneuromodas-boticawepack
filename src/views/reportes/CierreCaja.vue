@@ -1,7 +1,7 @@
 <template>
   <div>
     <br>
-    <b-container class="bv-example-row">
+    <b-container class="">
       <div>
           <div class="no-print">
               <b-row align-h="end" class=" no-print">
@@ -491,331 +491,383 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
-import CierresCaja from '@/components/CierresCaja.vue'
+import config from "@/store/config.js";
+import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
-  mounted () {
+  mounted() {
     if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id)
-      this.loadData()
+      this.getCierre(this.$route.params.id);
+      this.loadData();
     } else {
-        this.getVendedor()
+      this.getVendedor();
     }
   },
-  data () {
+  data() {
     return {
       API: config.API,
       ventas: [],
       ingresos: [],
       ingresosTarjeta: [],
       salidas: [],
-	  adelantos: [],
+      adelantos: [],
       turno: null,
       turnos: [
-        { value: null, text: 'Seleccione un Turno' },
-        { value: 1, text: 'Mañana' },
-        { value: 2, text: 'Tarde' },
-        { value: 3, text: 'Noche' }
+        { value: null, text: "Seleccione un Turno" },
+        { value: 1, text: "Mañana" },
+        { value: 2, text: "Tarde" },
+        { value: 3, text: "Noche" }
       ],
       cierre: {},
       vendedor: {},
-      almacen: {},
-    }
+      almacen: {}
+    };
   },
   computed: {
-    getFechaCierre () {
-      //return this.$route.params.id ? 
+    getFechaCierre() {
+      //return this.$route.params.id ?
     },
-    granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos + this.totalIngresosTarjeta
+    granTotal() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia +
+        this.totalIngresos -
+        this.totalSalidas -
+        this.totalAdelantosActivos +
+        this.totalIngresosTarjeta
+      );
     },
-    granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia - this.totalSalidas
+    granTotalSinPagoCliente() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia -
+        this.totalSalidas
+      );
     },
-    totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia
+    totalVentas() {
+      return (
+        this.totalVentasEfectivo +
+        this.totalVentasVisa +
+        this.totalVentasMastercard +
+        this.totalVentasTransferencia
+      );
     },
-    totalSalidas () {
-      let total = 0
+    totalSalidas() {
+      let total = 0;
       this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe
+        if (!salida.Anulado) total += salida.Importe;
       });
-      return total 
+      return total;
     },
-    totalIngresosTarjeta () {
-      let total = 0
+    totalIngresosTarjeta() {
+      let total = 0;
       this.ingresosTarjeta.forEach(ingresoTar => {
-        if (!ingresoTar.Anulado) total += ingresoTar.Importe
+        if (!ingresoTar.Anulado) total += ingresoTar.Importe;
       });
-      return total 
+      return total;
     },
-    totalIngresos () {
-      let total = 0
+    totalIngresos() {
+      let total = 0;
       this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe
+        if (!ingreso.Anulado) total += ingreso.Importe;
       });
-      return total 
+      return total;
     },
-  	totalAdelantos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado) total += ade.Importe
-  		})
-  		return total
-  	},
-    totalAdelantosActivos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado  &&  !ade.AnuladoVenta && !ade.EsCreditoVenta) total += ade.Importe
-  		})
-  		return total
-  	},
-    totalVentasEfectivo () {
-      let total = 0
+    totalAdelantos() {
+      let total = 0;
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado) total += ade.Importe;
+      });
+      return total;
+    },
+    totalAdelantosActivos() {
+      let total = 0;
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado && !ade.AnuladoVenta && !ade.EsCreditoVenta)
+          total += ade.Importe;
+      });
+      return total;
+    },
+    totalVentasEfectivo() {
+      let total = 0;
       this.ventasEfectivo.forEach(venta => {
-        if (!venta.Anulado && venta.CodSunat!='07') total += venta.Efectivo
+        if (!venta.Anulado && venta.CodSunat != "07") total += venta.Efectivo;
       });
-      return total
+      return total;
     },
-    ventasEfectivo () {
+    ventasEfectivo() {
       return this.ventas.filter(venta => {
-        return venta.Efectivo > 0 && !venta.EsCredito
-      })
+        return venta.Efectivo > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasVisa () {
-      let total = 0
+    totalVentasVisa() {
+      let total = 0;
       this.ventasVisa.forEach(venta => {
-        if (!venta.Anulado) total += venta.Visa
+        if (!venta.Anulado) total += venta.Visa;
       });
-      return total
+      return total;
     },
-    ventasVisa () {
+    ventasVisa() {
       return this.ventas.filter(venta => {
-        return venta.Visa > 0  && !venta.EsCredito
-      })
+        return venta.Visa > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasMastercard () {
-      let total = 0
+    totalVentasMastercard() {
+      let total = 0;
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard
+        if (!venta.Anulado) total += venta.Mastercard;
       });
-      return total
+      return total;
     },
-    totalVentasTransferencia () {
-      let total = 0
+    totalVentasTransferencia() {
+      let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Transferencia
+        if (!venta.Anulado) total += venta.Transferencia;
       });
-      return total
+      return total;
     },
-    ventasMastercard () {
+    ventasMastercard() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0  && !venta.EsCredito
-      })
+        return venta.Mastercard > 0 && !venta.EsCredito;
+      });
     },
-    ventasTransferencia () {
+    ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Transferencia > 0  && !venta.EsCredito
-      })
+        return venta.Transferencia > 0 && !venta.EsCredito;
+      });
     },
-    totalVentasCredito () {
-      let total = 0
+    totalVentasCredito() {
+      let total = 0;
       this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total
+        if (!venta.Anulado) total += venta.Total;
       });
-      return total
+      return total;
     },
-    ventasCredito () {
+    ventasCredito() {
       return this.ventas.filter(venta => {
-        return venta.EsCredito
-      })
+        return venta.EsCredito;
+      });
     }
   },
   methods: {
-    getDetalles (idDocVenta) {
-      let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
+    getDetalles(idDocVenta) {
+      let detalles = this.itemsDetalle.filter(
+        item => item.IdDocVenta == idDocVenta
+      );
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
       //this.items[index].productos = detalles
-      return detalles
+      return detalles;
     },
-    getVendedor () {
-        let usuario = sessionStorage.getItem('User')
-        this.axios.get(this.API + 'usuarios/' + usuario)
-        .then((response) => {
-            //this.setVendedor(response.data)
-            //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-            // this.$refs.inputVendedor.$refs.input.disabled = true
+    getVendedor() {
+      let usuario = sessionStorage.getItem("User");
+      this.axios
+        .get(this.API + "usuarios/" + usuario)
+        .then(response => {
+          //this.setVendedor(response.data)
+          //this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+          // this.$refs.inputVendedor.$refs.input.disabled = true
 
-            //if(response.data.IdUsuarioPerfil !== 1) {
-            //  this.$refs.inputVendedor.$refs.input.disabled = true
-            //}
-            this.axios.get(this.API + 'almacenes/id/' + response.data.IdAlmacen)
+          //if(response.data.IdUsuarioPerfil !== 1) {
+          //  this.$refs.inputVendedor.$refs.input.disabled = true
+          //}
+          this.axios
+            .get(this.API + "almacenes/id/" + response.data.IdAlmacen)
             .then(res => {
-              this.setAlmacen(res.data)
-              this.$refs.inputAlmacen.setValue(res.data.Almacen)
-              if(response.data.IdUsuarioPerfil !== 1) {
-                this.$refs.inputAlmacen.$refs.input.disabled = true
+              this.setAlmacen(res.data);
+              this.$refs.inputAlmacen.setValue(res.data.Almacen);
+              if (response.data.IdUsuarioPerfil !== 1) {
+                this.$refs.inputAlmacen.$refs.input.disabled = true;
               }
-            }).catch((err)=>{
-              this.$toasted.show('Ha ocurrido un error, actualice la pagina y vuelva a intentarlo')
             })
+            .catch(err => {
+              this.$toasted.show(
+                "Ha ocurrido un error, actualice la pagina y vuelva a intentarlo"
+              );
+            });
         })
-        .catch((error) => {
-            console.log(error)
-            this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-        })
+        .catch(error => {
+          console.log(error);
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     },
-    imprimir () {
+    imprimir() {
       window.print();
     },
-    setAlmacen (obj) {
+    setAlmacen(obj) {
       this.almacen = obj;
-      this.loadData()
+      this.loadData();
     },
-    loadData () {
-      this.getVentas()
-      this.getIngresos()
-      this.getSalidas()
+    loadData() {
+      this.getVentas();
+      this.getIngresos();
+      this.getSalidas();
     },
-    setVendedor (obj) {
-        this.vendedor = obj
-        this.loadData()
+    setVendedor(obj) {
+      this.vendedor = obj;
+      this.loadData();
     },
-    cerrarCaja () {
+    cerrarCaja() {
       if (!this.turno) {
-        this.$toasted.show('Seleccione un Turno')
-        return
+        this.$toasted.show("Seleccione un Turno");
+        return;
       }
-      let r = confirm('¿Está seguro de cerrar la caja del almacen '+this.almacen.Almacen+" - Turno: "+this.turnos[this.turno].text+'?')
+      let r = confirm(
+        "¿Está seguro de cerrar la caja del almacen " +
+          this.almacen.Almacen +
+          " - Turno: " +
+          this.turnos[this.turno].text +
+          "?"
+      );
       if (r) {
-        this.axios.post(this.API + 'cierrecaja', {
-          idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
-          idAlmacen: this.almacen.IdAlmacen,
-          ingresos:     parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
-          salidas:      this.totalSalidas,
-          total:        this.granTotal,
-          totalVentas:  this.totalVentas
-        }).then(res => {
-          this.loadData()
-          this.$toasted.show('¡Caja cerrada!')
-          // console.log(res)
-        })
+        this.axios
+          .post(this.API + "cierrecaja", {
+            idTurno: this.turno,
+            user: sessionStorage.getItem("User"),
+            //user:         this.vendedor.Usuario,
+            idAlmacen: this.almacen.IdAlmacen,
+            ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
+            salidas: this.totalSalidas,
+            total: this.granTotal,
+            totalVentas: this.totalVentas
+          })
+          .then(res => {
+            this.loadData();
+            this.$toasted.show("¡Caja cerrada!");
+            // console.log(res)
+          });
       }
     },
-    focusAutocomplete (ref) {
-        // this.$refs[ref].type = ""
-        this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      // this.$refs[ref].type = ""
+      this.$refs[ref].handleDoubleClick();
     },
-    estadoVenta (venta) {
-        return venta.Anulado ? 'ANULADO' : (venta.EsCredito ? 'CREDITO' : 'APLICADO')
+    estadoVenta(venta) {
+      return venta.Anulado
+        ? "ANULADO"
+        : venta.EsCredito
+          ? "CREDITO"
+          : "APLICADO";
     },
-    loadDetalles () {
-      this.axios.get(this.API + 'ventas/detalle', {
+    loadDetalles() {
+      this.axios
+        .get(this.API + "ventas/detalle", {
           params: {
-            idDocVentas: this.ventas.map((item) => item.idDocVenta),
+            idDocVentas: this.ventas.map(item => item.idDocVenta)
           }
-        }).then((response) => {
-            this.itemsDetalle = response.data
-            this.ventas = this.ventas.map((item) => {
-              item.productos = this.getDetalles(item.idDocVenta)
-              return item
-            })
         })
-        .catch((error) => {
-          console.log(error)
+        .then(response => {
+          this.itemsDetalle = response.data;
+          this.ventas = this.ventas.map(item => {
+            item.productos = this.getDetalles(item.idDocVenta);
+            return item;
+          });
         })
+        .catch(error => {
+          console.log(error);
+        });
     },
-    getVentas () {
+    getVentas() {
       let params = {
         idCierre: this.$route.params.id
-      }
+      };
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
       }
       if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
+        params.IdAlmacen = this.almacen.IdAlmacen;
       }
       // cierre de caja enviar el vendedor
-      this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: params
-      })
-      .then(res => {
-        this.ventas = res.data
-        this.loadDetalles()
-		this.getAdelantos()
-      }).catch(err => {
-        console.log(err)
-      })
-    },
-    getIngresos () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-       //params.usuario = this.vendedor.Usuario
-      }
-      if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
-      }
-      this.axios.get(this.API + 'cierrecaja/ingresos',{
-        params: params
-      })
-      .then(res => {
-        this.ingresos = res.data.filter((ing)=> ing.EsTarjeta==0)
-        this.ingresosTarjeta = res.data.filter((ing)=> ing.EsTarjeta==1)
-      }).catch(err => {
-        console.log(err)
-      }) 
-    },
-    getSalidas () {
-      let params = {
-        idCierre: this.$route.params.id
-      }
-      if (this.vendedor.Usuario) {
-        //params.usuario = this.vendedor.Usuario
-      }
-      if (this.almacen.IdAlmacen) {
-        params.IdAlmacen = this.almacen.IdAlmacen
-      }
-      this.axios.get(this.API + 'cierrecaja/salidas', {
-        params: params
-      })
-      .then(res => {
-        this.salidas = res.data
-      }).catch(err => {
-        console.log(err)
-      }) 
-    },
-    getAdelantos() {
-        let params = {
-          idDocVentas: this.ventas.map(v => v.idDocVenta)
-        }
-        this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
+      this.axios
+        .get(this.API + "cierrecaja/ventas", {
           params: params
         })
         .then(res => {
-          this.adelantos = res.data
-        }).catch(err => {
-          console.log(err)
+          this.ventas = res.data;
+          this.loadDetalles();
+          this.getAdelantos();
         })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getIngresos() {
+      let params = {
+        idCierre: this.$route.params.id
+      };
+      if (this.vendedor.Usuario) {
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen;
+      }
+      this.axios
+        .get(this.API + "cierrecaja/ingresos", {
+          params: params
+        })
+        .then(res => {
+          this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
+          this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getSalidas() {
+      let params = {
+        idCierre: this.$route.params.id
+      };
+      if (this.vendedor.Usuario) {
+        //params.usuario = this.vendedor.Usuario
+      }
+      if (this.almacen.IdAlmacen) {
+        params.IdAlmacen = this.almacen.IdAlmacen;
+      }
+      this.axios
+        .get(this.API + "cierrecaja/salidas", {
+          params: params
+        })
+        .then(res => {
+          this.salidas = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    getAdelantos() {
+      let params = {
+        idDocVentas: this.ventas.map(v => v.idDocVenta)
+      };
+      this.axios
+        .get(this.API + "cierrecaja/ingresos/adelantos", {
+          params: params
+        })
+        .then(res => {
+          this.adelantos = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     getCierre(id) {
-      this.axios.get(this.API + 'cierrecaja', {
-        params: {
-          idCierre: id
-        }
-      }).then(res =>{
-        this.cierre = res.data[0]
-      })
+      this.axios
+        .get(this.API + "cierrecaja", {
+          params: {
+            idCierre: id
+          }
+        })
+        .then(res => {
+          this.cierre = res.data[0];
+        });
     }
   },
   components: {
     CierresCaja
   }
-}
+};
 </script>
 <style scoped>
 /*th {
@@ -837,8 +889,9 @@ export default {
 .si-print {
   display: none;
 }*/
-th, td {
-  font-size: .9em;
+th,
+td {
+  font-size: 0.9em;
   vertical-align: middle;
 }
 th {
@@ -846,11 +899,12 @@ th {
 }
 .total {
   background-color: #e4ff95;
+  color: #000;
 }
 .total-salida {
-  background-color: #ffd4d3;  
+  background-color: #ffd4d3;
 }
-.anulado td{
+.anulado td {
   /*font-style: italic;*/
   text-decoration: line-through;
 }
@@ -864,8 +918,9 @@ th {
   background-color: #ffffff;
   font-weight: normal;
 }
-.tabla-detalle th, .tabla-detalle td {
-  font-size: .9em;
+.tabla-detalle th,
+.tabla-detalle td {
+  font-size: 0.9em;
 }
 .detalle-producto {
   width: 270px;

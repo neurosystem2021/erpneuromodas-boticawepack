@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 align-h="center" class="text-center" >Reporte Ranking de Clientes</h2>
-      <b-container class="bv-example-row">
+      <b-container class="">
         <b-row>
           <b-col md="4" class="my-1">
             <b-form-group>

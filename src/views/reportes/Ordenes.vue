@@ -1,7 +1,7 @@
 <template>
     <div>
       <br>
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="">
           <b-row class="text-center">
             <b-col>
               <h3>Registro de Ordenes de Compra</h3>

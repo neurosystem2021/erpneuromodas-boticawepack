@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
-      <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row">
+      <b-container fluid style="width: calc(100% - 50px)" class="">
         <b-row>
           <b-col md="4">
             <b-form-group>

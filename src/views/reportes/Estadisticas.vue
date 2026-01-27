@@ -4,7 +4,7 @@
       <b-card no-body>
         <b-tabs v-model="tabActive"  pills card>
           <b-tab title="Ventas Por Dia" @click="cambioOpcion(0)" active>
-            <b-container class="bv-example-row" id="conten">
+            <b-container class="" id="conten">
               <b-row>
                 <b-col md="4">
                   <b-form-group>
@@ -34,7 +34,7 @@
             </b-container>
           </b-tab>
           <b-tab title="Ventas Por Mes" @click="cambioOpcion(1)">
-            <b-container class="bv-example-row" id="conten">
+            <b-container class="" id="conten">
               <b-row>
                 <b-col md="6">
                   <b-form-group>
@@ -58,7 +58,7 @@
             </b-container>
           </b-tab>
           <b-tab title="Ventas Por Rango" @click="cambioOpcion(3)">
-              <b-container class="bv-example-row" id="conten">
+              <b-container class="" id="conten">
                 <b-row>
                   <b-col md="3">
                     <b-form-group>

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container fluid class="bv-example-row" id="conten">
+      <b-container fluid class="" id="conten">
         <div class="contenido" v-if="libroIdSelec!=null">
            <compras v-if="libroIdSelec==8" :libroIdSelec="libroIdSelec" @cambioLibro="cargarLibros" ></compras>
            <caja-banco v-if="libroIdSelec==1" :libroIdSelec="libroIdSelec" @cambioLibro="cargarLibros" ></caja-banco>

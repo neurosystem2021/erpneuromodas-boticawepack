@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-container class="bv-example-row">
+      <b-container class="">
         <b-row>
           <b-col md="12" class="text-center">
             <h4><b style="text-decoration: underline;">PLAN CONTABLE GENERAL PARA EMPRESAS</b></h4>

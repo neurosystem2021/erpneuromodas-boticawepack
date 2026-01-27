@@ -11,7 +11,7 @@
             centered 
             ok-only no-close-on-backdrop
             no-close-on-esc ok-title="Cerrar">           
-            <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row" id="conten">
+            <b-container fluid style="width: calc(100% - 50px)" class="" id="conten">
                 <div>
                 <b-row>
                     <b-col md="7">

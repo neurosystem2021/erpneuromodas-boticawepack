@@ -1,6 +1,6 @@
 <template>
   
-            <b-container class="bv-example-row px-5" id="conten">
+            <b-container class=" px-5" id="conten">
                
               <h1> REPORTES  </h1>
                

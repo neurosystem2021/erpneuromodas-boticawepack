@@ -2,7 +2,7 @@
     <div>
     <h2 align-h="center" class="text-center" >Reporte de Cierre de Caja</h2>
       <br>
-        <b-container class="bv-example-row">
+        <b-container class="">
           <b-row>
             <b-col md="3" class="my-1">
               <b-form-group>

@@ -1,7 +1,7 @@
 <template>
     <div>
       <br>
-        <b-container fluid style="width:calc(100% - 5%)" class="bv-example-row">
+        <b-container fluid style="width:calc(100% - 5%)" class="">
           <b-row>
             <b-col class="text-center">
                 <h2>RESUMEN POR ARTICULO</h2>

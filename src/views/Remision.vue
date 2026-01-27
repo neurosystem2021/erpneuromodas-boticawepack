@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarRemision" @reset="onReset" @keyup="afe" validated id="remision-form">
-        <b-container fluid class="bv-example-row">
+        <b-container fluid class="">
 
         <b-row>
           <b-col md="6">

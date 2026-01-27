@@ -1,7 +1,7 @@
 <template>
     <div>
       <br>
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
+        <b-container fluid style="width: calc(100% - 200px)" class="">
           <b-row>
             <b-col md="2" class="my-1">
               <b-form-group>

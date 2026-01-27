@@ -1,6 +1,6 @@
 <template>
     <div>
-      <b-container class="bv-example-row">
+      <b-container class="">
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>

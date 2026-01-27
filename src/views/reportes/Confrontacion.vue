@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated Target="_blank">
-        <b-container fluid class="bv-example-row">
+        <b-container fluid class="">
           <b-row>
               <b-col md="4">
                     <b-form-group>
