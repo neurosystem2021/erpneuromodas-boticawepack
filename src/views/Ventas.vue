@@ -2,7 +2,7 @@
   <div>
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
-    <b-container fluid class="ancho" id="conten">
+    <b-container fluid class="px-5" id="conten" fluiid>
       <!-- <div>
         <div class="float-right">
           <b-button-group size="sm" class="ocularMovil">
@@ -25,7 +25,7 @@
           </b-button-group>
         </div>
       </div> -->
-      <br /><br />
+
       <b-row>
         <!-- <b-col md="12" v-if="this.$route.query.idPedido">
                     <div class="form-inline">
@@ -83,7 +83,7 @@
                         <!-- FALTA -->
                         <autocomplete
                           required="required"
-                          ref="inputDocRef"
+                          :ref="`inputDocRef${i}`"
                           :url="
                             API +
                             'ventas/lista/' +
@@ -659,16 +659,27 @@
                     variant="success"
                     @click="guardarVenta"
                   >
-                    Pagar
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar
                   </b-button>
                   <b-button
                     class="btnAction"
                     @click="anadirVentan()"
                     variant="success"
-                    style="background: rgb(183, 28, 28)"
+                    style="background: #FFD600;color: #000000"
                   >
-                    NUEVA VENTANA</b-button
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    NUEVA VENTANA
+                  </b-button>
+                  <b-button
+                    class="btnAction"
+                    @click="eliminarVentana()"
+                    variant="success"
+                    style="background: #D50000;"
+                    v-if="index > 0"
                   >
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                    ELIMINAR VENTANA
+                  </b-button>
                   <b-button
                     class="btnAction"
                     v-if="ultimaVenta"
@@ -677,36 +688,36 @@
                     :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
                     >Imprimir última Venta</b-button
                   >
-                  <b-button-group class="ocularMovil">
+                  <div class="ocularMovil">
                     <ventas-pedido
                       :idAlmacen="venta.almacen.IdAlmacen"
-                      @onSelectProforma="setCliente"
-                      @onFacturar="facturarVentaPedido"
+                      @onSelectProforma="anadirProforma"
                     ></ventas-pedido>
-                  </b-button-group>
-                  <b-button-group  class="ocularMovil">
+                    <!-- @onFacturar="facturarVentaPedido" -->
+                  </div>
+                  <div class="ocularMovil">
                     <pago-deuda></pago-deuda>
-                  </b-button-group>
-                  <b-button-group >
+                  </div>
+                  <div>
                     <proformas
                       :idAlmacen="venta.almacen.IdAlmacen"
-                      @onSelectProforma="setCliente"
+                      @onSelectProforma="anadirProforma"
                     ></proformas>
-                  </b-button-group>
-                  <b-button-group  class="ocularMovil" v-if="false">
+                  </div>
+                  <div class="ocularMovil" v-if="false">
                     <pre-orden-lista
                       v-show="!this.$route.query.idPreOrden"
                       :idAlmacen="venta.almacen.IdAlmacen"
                       @onSelectPreOrden="setCliente"
                       @onPreOrden="selectPreOrden"
                     ></pre-orden-lista>
-                  </b-button-group>
-                  <b-button-group  class="ocularMovil">
+                  </div>
+                  <div class="ocularMovil">
                     <config-venta
                       @onUpdateConfig="eliminarCliente"
                       @onUpdateConfigComision="eliminarComisionista"
                     ></config-venta>
-                  </b-button-group>
+                  </div>
                 </b-col>
                 <b-col cols="3">
                   <table class="table b-table border table-footer">
@@ -922,17 +933,23 @@ export default {
           )
         );
       }, 0);
-      return total;
+      return parseFloat(total).toFixed(2);
     }
   },
   methods: {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
-      limpiarCart: "limpiarCarrito",
+      // limpiarCart: "limpiarCarrito",
       obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    limpiarCart() {
+      this.ventas[this.index].productos.splice(
+        0,
+        this.ventas[this.index].productos.length
+      );
+    },
     sumatoriaSubTotal() {
       if (!this.ventas[this.index]) {
         return 0;
@@ -959,7 +976,7 @@ export default {
         );
       }, 0);
 
-      return total;
+      return parseFloat(total).toFixed(2);
     },
     anadirVentan() {
       this.ventas.push({ ...this.preVenta, productos: [] });
@@ -971,38 +988,38 @@ export default {
     async facturarVentaPedido(data) {
       //this.ventas[this.index].IdPreOrden.push(orden)
       // obtener total adelantos
-      for (let i = 0; i < data.productos.length; i++) {
-        let producto = await this.axios
-          .get(
-            `${this.API}/productos/puntoventa/stock/1?q=${
-              data.productos[i].IdProducto
-            }&sortBy=stock&sortDesc=1&limit=1`
-          )
-          .then(res => {
-            this.ventas[this.index].productos.push({
-              ...data.productos[i],
-              stock: res.data[0].stock
-            });
-          });
-        console.log(producto);
-      }
-      // this.ventas[this.index].productos = data.productos;
-      this.ventas[this.index].idVentaPedido = data.idDocVenta;
-      this.ventas[this.index].correlativoVentaPedido = data.Correlativo;
-      this.axios
-        .get(this.API + "ventas/pedido/adelantos", {
-          params: {
-            IdDocVenta: data.idDocVenta
-          }
-        })
-        .then(res => {
-          this.adelantosVentaPedido = res.data;
-          let suma = 0;
-          res.data.map(ad => {
-            suma += ad.Importe;
-          });
-          this.adelanto = suma;
-        });
+      // for (let i = 0; i < data.productos.length; i++) {
+      //   let producto = await this.axios
+      //     .get(
+      //       `${this.API}/productos/puntoventa/stock/1?q=${
+      //         data.productos[i].IdProducto
+      //       }&sortBy=stock&sortDesc=1&limit=1`
+      //     )
+      //     .then(res => {
+      //       this.ventas[this.index].productos.push({
+      //         ...data.productos[i],
+      //         stock: res.data[0].stock
+      //       });
+      //     });
+      //   console.log(producto);
+      // }
+      // // this.ventas[this.index].productos = data.productos;
+      // this.ventas[this.index].idVentaPedido = data.idDocVenta;
+      // this.ventas[this.index].correlativoVentaPedido = data.Correlativo;
+      // this.axios
+      //   .get(this.API + "ventas/pedido/adelantos", {
+      //     params: {
+      //       IdDocVenta: data.idDocVenta
+      //     }
+      //   })
+      //   .then(res => {
+      //     this.adelantosVentaPedido = res.data;
+      //     let suma = 0;
+      //     res.data.map(ad => {
+      //       suma += ad.Importe;
+      //     });
+      //     this.adelanto = suma;
+      //   });
     },
     obtenerDescuentoVenta() {
       this.axios
@@ -1072,7 +1089,6 @@ export default {
     },
     focusAutocomplete(ref) {
       let newRef = `${ref}${this.index}`;
-      console.log(newRef);
       this.$refs[newRef][0].handleDoubleClick();
       // this.$refs[ref].type = ""
       // this.$refs[ref].handleDoubleClick();
@@ -1139,7 +1155,6 @@ export default {
     },
     metodoPagoCambio(opc) {
       this.recalcularTotalCart();
-      console.log("opc", opc);
       switch (opc) {
         case 1:
           this.ventas[this.index].pago.visa.monto = 0;
@@ -1249,7 +1264,7 @@ export default {
             .then(response => {
               if (response.data) {
                 // this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.ventas[this.index].cliente = response.data;
+                this.setCliente(response.data);
                 // this.ventas[this.index].CampoDireccion = this.ventas[this.index].cliente.Direccion;
               } else {
                 this.$toasted.show("No se encontro al cliente");
@@ -1259,7 +1274,6 @@ export default {
               console.log(error);
             });
           this.limpiarCart();
-          console.log(response.data);
           response.data.map(item => {
             let prod = { ...item };
             if (item.presentacion) {
@@ -1272,6 +1286,7 @@ export default {
             }
             item.subtotal = prod.cantidad * item.precio;
             item.total = prod.cantidad * item.precio;
+            // item.PorcentajeDesc = 0;
             let preciosProd = [];
             item.precioCont = item.PrecioContado;
 
@@ -1281,14 +1296,41 @@ export default {
             if (!item.PreciosPorProducto || fPP.length === 4) {
               item.estadoPxP = true;
             }
-            this.add([item, () => {}, false]);
+            this.ventas[this.index].productos.push(item);
           });
           this.ventas[this.index].NotaIdMotivo = null;
           this.bloquearInput = true;
+          this.metodoPagoCambio(1);
+          this.stockProductos();
           this.obtenerStok({
             IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
           });
         });
+    },
+    async stockProductos() {
+      let productos = this.ventas[this.index].productos;
+      const productosStock = await this.axios
+        .get(this.API + "productos/stock", {
+          params: {
+            idProductos: productos.map(prod => prod.IdProducto),
+            idAlmacen: this.ventas[this.index].almacen.IdAlmacen
+          }
+        })
+        .then(res => {
+          return res.data;
+        });
+      const productosConStock = productos.map(prod => {
+        const infoStock = productosStock.find(
+          s => s.IdProducto === prod.IdProducto
+        );
+        return {
+          ...prod,
+          stock: infoStock ? infoStock.stock : 0
+        };
+      });
+      this.ventas[this.index].productos = productosConStock
+      // console.log("productosStock", productosConStock);
+      // productos = productosConStock;
     },
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
@@ -1378,6 +1420,8 @@ export default {
 
       if (typeof obj === "object") {
         // this.$refs.inputCliente.setValue(obj.Cliente);
+        let ref = `inputCliente${this.index}`;
+        this.$refs[ref][0].setValue(obj.Cliente);
         this.ventas[this.index].cliente = obj;
         this.ventas[this.index].CampoDireccion = this.ventas[
           this.index
@@ -1527,15 +1571,14 @@ export default {
       //     // element.cantidad = element.cantxPrecio;
       //   }
       // });
-      this.ventas[this.index].productos = prods;
       this.ventas[this.index].diasValidosProf = this.diasValidosProf;
       this.ventas[this.index].PorEntregarDias = this.PorEntregarDias;
       this.axios
         .post(this.API + "proformas", this.ventas[this.index])
         .then(response => {
           this.$toasted.info("Proforma Guardada con exito");
-          this.limpiarDespuesVenta();
-          this.loadClienteVarios();
+          // this.limpiarDespuesVenta();
+          // this.loadClienteVarios();
           this.diasValidosProf = 1;
           this.cantidaDias = 0;
           this.inProgress = false;
@@ -1549,6 +1592,7 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
+      this.eliminarVentana();
     },
 
     async guardarVenta(evt) {
@@ -1697,36 +1741,22 @@ export default {
         )[0].text;
       }
 
-      if (!this.productos.length) {
+      if (!this.ventas[this.index].productos.length) {
         this.$toasted.show("No hay productos para vender");
         this.inProgress = false;
         return;
       }
 
       // NO PERMITE CANTIDAD Y PRECIOS 0
-      let sinStock = 0;
+      // let sinStock = 0;
       let totalCero = 0;
       let descuentoTotal = 0;
-      this.productos.forEach(pro => {
-        if (
-          pro.CodigoBarra !== "COSTODELIVERY" &&
-          pro.CodigoBarra !== "MANODEOBRA" &&
-          (pro.stock <= 0 ||
-            parseFloat(pro.cantidad) > pro.stock ||
-            pro.stock == undefined)
-        ) {
-          sinStock += 1;
-        }
-
-        if (parseFloat(pro.total) <= 0) {
-          totalCero += 1;
-        }
-
-        descuentoTotal += pro.descuento || 0;
-      });
+      let sinStock = this.ventas[this.index].productos.some(
+        v => v.stock < v.cantidad
+      );
 
       if (
-        sinStock >= 1 &&
+        sinStock &&
         this.ventas[this.index].tipoVenta.CodSunat != "07" &&
         this.ventas[this.index].tipoVenta.CodSunat != "99"
       ) {
@@ -1784,7 +1814,7 @@ export default {
       // console.log(prods);
       // this.inProgress = false;
       // return true;
-      this.ventas[this.index].productos = prods;
+      // this.ventas[this.index].productos = prods;
       this.ventas[this.index].PorEntregarDias = this.PorEntregarDias;
       this.ventas[this.index].puntosAplicados = this.puntosAplicados || 0;
       this.ventas[this.index].totalCart = this.totalCart || 0;
@@ -1812,7 +1842,7 @@ export default {
       this.inProgress = false;
       // return false;
       await this.axios
-        .post(this.API + "ventass", this.ventas[this.index])
+        .post(this.API + "ventas", this.ventas[this.index])
         .then(response => {
           if (response.data.errorUser) {
             this.$swal({
@@ -1838,11 +1868,7 @@ export default {
           this.inProgress = false;
           this.tieneIgv = false;
           this.ultimaVenta = response.data.insertId;
-          this.initForm();
-          this.limpiarCart();
-          this.getVendedor();
-          this.getNumeroVenta();
-          this.loadClienteVarios();
+
           // this.$refs.inputTipoVenta.setValue("BOLETA ELEC.");
           // this.$refs.inputAlmacen.setValue("VENTA");
           // this.$refs.inputPuntoVenta.setValue("CAJA1");
@@ -1869,6 +1895,7 @@ export default {
             allowEscapeKey: false
           });
           this.emitirauto(response.data.insertId);
+          this.eliminarVentana();
         })
         .catch(error => {
           console.log(error);
@@ -1903,7 +1930,6 @@ export default {
       }
       let prod = [...this.ventas[this.index].productos];
       this.totalCart = prod.reduce((sum, producto) => {
-        console.log(producto);
         return (
           sum +
           parseFloat(
@@ -1913,9 +1939,6 @@ export default {
           )
         );
       }, 0);
-      // this.totalCart = total;
-
-      console.log("post", this.totalCart);
     },
 
     eliminarCliente() {
@@ -1930,7 +1953,6 @@ export default {
     onPagarDelivery(obj) {
       this.$route.query.idPedido = obj.IdPedido;
       if (this.$route.query.idPedido) {
-        console.log(obj);
         this.infoDelivery = obj;
         this.ventas[this.index].EsDelivery = true;
         this.$refs.carrito.pagocon = parseFloat(obj.Cambio).toFixed(2);
@@ -2071,8 +2093,52 @@ export default {
           });
         }
       });
-    }
+    },
+    async anadirProforma(e) {
+      let productosStock = await this.obtenerStock(e.productos);
+
+      const productosConStock = e.productos.map(prod => {
+        const infoStock = productosStock.find(
+          s => s.IdProducto === prod.IdProducto
+        );
+        return {
+          ...prod,
+          stock: infoStock ? infoStock.stock : 0
+        };
+      });
+      this.ventas.push({ ...this.preVenta, productos: productosConStock });
+
+      this.$nextTick(() => {
+        this.index = this.ventas.length - 1;
+        this.setCliente(e);
+        this.facturarVentaPedido(e);
+        this.getVendedor();
+      });
+    },
+    async obtenerStock(productos) {
+      try {
+        const response = await this.axios.get(this.API + "productos/stock", {
+          params: {
+            idProductos: productos.map(prod => prod.IdProducto),
+            idAlmacen: this.ventas[this.index].almacen.IdAlmacen
+          }
+        });
+
+        return response.data;
+      } catch (error) {
+        console.error("Error obteniendo stock:", error);
+        return null;
+      }
+    },
     //Fin Sockets
+    eliminarVentana() {
+      if (this.ventas.length == 0) {
+        window.location.reload();
+      } else {
+        this.ventas.splice(this.index, 1);
+        this.index = 0;
+      }
+    }
   },
   components: {
     ProductosCarrito,

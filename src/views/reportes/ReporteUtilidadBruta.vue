@@ -42,7 +42,7 @@
                     <tr v-for="(reporte,index) in lstReporte" :key="index">
                         <td style="text-align: center;">{{reporte.IdProducto}}</td>
                         <td>{{reporte.Producto}}</td>
-                        <td style="text-align: center;">{{reporte.Cantidad}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.Cantidad).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>

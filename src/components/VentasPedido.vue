@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button class="btnAction"  block @click="show=true" variant="success" >Ventas a Pedido</b-button>
+        <b-button class="btnAction"  block @click="show=true" variant="success" style="background: #004D40;">Ventas a Pedido</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalVentaPedido" 

@@ -273,7 +273,7 @@ section {
 }
 .lstProducto {
   position: relative;
-  z-index: 1;
+  z-index: 99999999999;
   padding: 0;
 }
 .search {

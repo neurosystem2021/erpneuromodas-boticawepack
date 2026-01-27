@@ -1,6 +1,5 @@
 <template>
   <b-row>
-    {{ i }}
     <b-col md="12">
       <b-form-group>
         <b-input-group>
@@ -166,6 +165,7 @@
           >Agregar</b-btn
         >
       </b-modal>
+      <div class="clsProductos">
       <b-table
         small
         responsive
@@ -174,7 +174,6 @@
         :items="productos"
         :fields="fields"
         ref="tablaCarrito"
-        style="margin-top: -12px"
         v-if="tableProductos"
       >
         <template slot="eventPres" slot-scope="data">
@@ -483,7 +482,7 @@
               }}</b
             >
             <br />
-            <b>Desc: S/{{ productos[data.index].descuento }}</b>
+            <b v-if="productos[data.index].descuento>0">Desc: S/{{ productos[data.index].descuento }}</b>
           </b-form-text>
         </template>
 
@@ -581,6 +580,7 @@
           </div>
         </template>
       </b-table>
+      </div>
     </b-col>
     <b-col md="3">
       <slot name="operaciones"></slot>
@@ -2270,5 +2270,12 @@ export default {
 
 .modalLstProductos .modal-dialog {
   max-width: 70%;
+}
+
+.clsProductos {
+  /* padding-top: 20px; */
+  height: 320px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 </style>
