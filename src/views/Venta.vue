@@ -2264,26 +2264,26 @@ export default {
         return;
       }
 
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
-        this.$toasted.show("No se puede vender un producto sin stock");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-        this.inProgress = false;
-        return;
-      }
+      // if (
+      //   productos.some(
+      //     v =>
+      //       v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
+      //       v.stock
+      //   ) &&
+      //   this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
+      // ) {
+      //   this.$toasted.show("No se puede vender un producto sin stock");
+      //   // this.$swal({
+      //   //   position: "center",
+      //   //   icon: "info",
+      //   //   showConfirmButton: true,
+      //   //   confirmButtonText: "Entiendo",
+      //   //   target: document.getElementById("conten"),
+      //   //   confirmButtonColor: "#0275d8"
+      //   // });
+      //   this.inProgress = false;
+      //   return;
+      // }
       if (
         parseFloat(this.getTotal()).toFixed(2) !=
         parseFloat(totalPagos).toFixed(2)
