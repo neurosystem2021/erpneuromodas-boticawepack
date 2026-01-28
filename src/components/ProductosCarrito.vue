@@ -1219,7 +1219,7 @@ export default {
       //this.actualizarProd(obj)
     },
     setProductoCant(prod) {
-      this.objProd.cantxPrecio = 1;
+      this.objProd.cantxPrecio = 0;
       this.cant = prod.cantidad;
       let obj = this.objProd;
       //this.$refs.autocompleteProducto.setValue('')
