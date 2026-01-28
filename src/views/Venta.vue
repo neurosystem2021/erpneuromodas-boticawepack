@@ -2284,6 +2284,20 @@ export default {
       //   this.inProgress = false;
       //   return;
       // }
+      console.log('estado stock:',this.ventaSinStock);
+      if (
+        this.ventaSinStock === 1 &&
+        productos.some(
+          v =>
+            v.cantidad * (v.CantidadPresentacion || 1) > v.stock
+        ) &&
+        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
+      ) {
+        this.$toasted.show("No se puede vender un producto sin stock");
+        this.inProgress = false;
+        return;
+      }
+     
       if (
         parseFloat(this.getTotal()).toFixed(2) !=
         parseFloat(totalPagos).toFixed(2)
