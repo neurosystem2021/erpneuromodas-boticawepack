@@ -1,61 +1,90 @@
 <template>
   <div>
-      <b-container class="px-5" fluid>
-        <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" id="btnBuscar" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
-          </b-col>
-          <b-col md="6" class="my-1">
-            <b-row>
+    <b-container class="px-3" fluid>
+      <b-row>
+        <b-col md="3" class="my-1">
+          <b-input-group prepend="Buscar" >
+              <b-form-input
+                v-model="filter"
+                id="btnBuscar"
+                placeholder="Buscar"
+                @input="currentPage = 1"
+              />
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+              </b-input-group-append>
+          </b-input-group>
+          <br />
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-input-group prepend="Tipo Cambio" >
+            <input type="number" class="form-control" v-model="monedaDolar.TipoCambio">
+              <b-input-group-append>
+                <b-btn variant="info"  @click="guardaTipoCambio">Guardar</b-btn>
+              </b-input-group-append>
+          </b-input-group>
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-row>
             <b-col md="8">
-
               <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                <b-form-select
+                  :options="pageOptions"
+                  v-model="perPage"
+                  @input="currentPage = 1"
+                />
               </b-form-group>
             </b-col>
             <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
+              <p style="margin-top: 6px">
+                de <b class="text-success">{{ this.totalRows }}</b> Artículos
+              </p>
             </b-col>
-            </b-row>
-          </b-col>
+          </b-row>
+        </b-col>
 
-          <b-table small
-            ref="tablaProductos"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage"></b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
+        <b-table
+          small
+          ref="tablaProductos"
+          :filter="filter"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          striped
+          hover
+          @row-clicked="rowClick"
+          id="my-table"
+          :busy.sync="isBusy"
+          :items="myProvider"
+          :fields="fields"
+          :per-page="perPage"
+          :current-page="currentPage"
+        ></b-table>
+        <b-row>
+          <b-col md="6" class="my-1">
+            <b-pagination
+              :total-rows="totalRows"
+              :per-page="perPage"
+              v-model="currentPage"
+              class="my-0"
+            />
+          </b-col>
         </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
-        <br />
-        <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
-            </b-col>
-        </b-row>
-        <br /><br />
-      </b-container>
+      </b-row>
+      <producto-form
+        ref="productoForm"
+        :producto-update="productoSelect"
+        :cbGuardar="actualizarTabla"
+      ></producto-form>
+      <br />
+      <b-row align-h="center" class="text-center">
+        <b-col cols="4">
+          <b-button variant="success" size="lg" @click="nuevoProducto"
+            >Nuevo</b-button
+          >
+        </b-col>
+      </b-row>
+      <br /><br />
+    </b-container>
   </div>
 </template>
 
@@ -65,9 +94,12 @@ import ProductoForm from "@/components/ProductoForm";
 
 export default {
   mounted() {
-    this.axios.get(this.API + "productos/count").then(response => {
-      this.totalRows = response.data.total;
-    });
+    Promise.all(
+      this.obtenerMonedaDolar(),
+      this.axios.get(this.API + "productos/count").then(response => {
+        this.totalRows = response.data.total;
+      })
+    );
     this.$nextTick(() => {
       let input = document.getElementById("btnBuscar");
       input.focus();
@@ -89,11 +121,19 @@ export default {
         { key: "ProductoCategoria", label: "Categoría", sortable: true },
         { key: "ProductoMarca", label: "Marca", sortable: true },
         { key: "ProductoMedicion", label: "Medición", sortable: true },
-        { key: "ProductoPresentacion", label: "Presentación", sortable: true }
+        { key: "ProductoPresentacion", label: "Presentación", sortable: true },
+        { key: "PorcentajeUtilidad", label: "% Util" },
+        { key: "Flete", label: "Flete" },
+        { key: "PrecioCosto", label: "Precio Costo" },
+        { key: "PrecioContado", label: "Precio Venta" },
+        { key: "TipoCambio", label: "Tipo Cambio" },
+        { key: "PrecioCostoDolar", label: "Precio Costo Dolar" },
+        { key: "PrecioContadoDolar", label: "Precio Venta Dolar" },
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      monedaDolar: {}
     };
   },
   methods: {
@@ -105,6 +145,14 @@ export default {
     },
     actualizarTabla() {
       this.$refs.tablaProductos.refresh();
+    },
+    obtenerMonedaDolar() {
+      this.axios(`${this.API}/tipocambio`).then(res => {
+        this.monedaDolar = res.data;
+      });
+    },
+    guardaTipoCambio() {
+      this.axios.post(`${this.API}/tipocambio`, this.monedaDolar);
     },
     nuevoProducto() {
       this.productoSelect = {};

@@ -322,6 +322,28 @@
               </b-form-text>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio de Costo (USD):</label>
+            <input
+              v-model="producto.PrecioCostoDolar"
+              step="0.00001"
+              type="number"
+              class="form-control"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Público (USD):</label>
+            <input v-model="producto.PrecioContadoDolar"
+              type="number"
+              step="0.01"
+              class="form-control"
+             
+              />
+          </b-form-group>
+        </b-col>
         <b-col md="6"  v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
@@ -586,6 +608,8 @@ export default {
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
             this.producto.PrecioContado = newVal.PrecioContado;
+            this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
+            this.producto.PrecioContadoDolar = newVal.PrecioContadoDolar;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
             this.producto.EsHabitacion = newVal.EsHabitacion;
