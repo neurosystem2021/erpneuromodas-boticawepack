@@ -1,72 +1,103 @@
 <template>
   <div>
-    
-    <b-container class="bv-example-row">
-    <div class="piso" v-for="(pi, i) in pisos" :key="i">
-    <div v-if="getMostrarPiso(pi)">
-      <br>
-        <b-alert show class="text-center"><b>{{ pi === 1 ? 'SERVICIOS HÚANUCO' : 'SERVICIOS PUCALLPA' }}</b></b-alert>
-      <br>
-      <b-button variant="success" size="sm"
-        id="nuevoProyecto"
-        >
-        <!-- @click="showNuevoProyecto=!showNuevoProyecto" -->
-      Agregar Proyecto
-      </b-button>
-      <!-- <b-modal title="Empezar Proyecto" v-model="mdlNuevoProyecto" v-if="mdlNuevoProyecto" hide-footer
-      no-close-on-backdrop> -->
-      <b-popover  v-if="showNuevoProyecto" target="nuevoProyecto" title="Empezar Proyecto">
-      <label>Seleccione un cliente:</label>
-      <b-input-group>
-        <autocomplete
-          required="required"
-          :url="API + 'clientes'"
-          anchor="ClienteDniRuc"
-          label="writer"
-          placeholder=""
-          :onInput="(val) => newDniRuc = val"
-          :on-select="setCliente" 
-          :classes="{input: 'form-control'}"
-          id="cboCliente"
+    <b-container class="px-2" fluid>
+      <div class="piso" v-for="(pi, i) in pisos" :key="i">
+        <div v-if="getMostrarPiso(pi)">
+          <br />
+          <b-alert show class="text-center"
+            ><b>{{
+              pi === 1 ? "SERVICIOS HÚANUCO" : "SERVICIOS PUCALLPA"
+            }}</b></b-alert
           >
-        </autocomplete>
-        <b-input-group-append>
-          <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
-      
-      
-      <!-- <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form> -->
-                                      
-      <!-- <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form> -->
-        </b-input-group-append>
-      </b-input-group>
-      <br>
-    <label>Descripcion:</label>
-      <textarea 
-        class="form-control"
-        placeholder="Descripción"
-        cols="12" rows="3"
-        style="width: 100%"
-        v-model="selectCliente.Descripcion">
-      </textarea>
-        <br>
-      <label>Fecha Inicio:</label>
-      <b-input-group>
-      <b-form-input v-model="selectCliente.FechaAlquilerInicio"
-        type="date"
-        placeholder="Fecha Inicio" />
-      </b-input-group>
-      <br>
-      <label>Fecha Fin:</label>
-      <b-input-group>
-      <b-form-input v-model="selectCliente.FechaAlquilerFin"
-      type="date"
-      placeholder="Fecha Fin"></b-form-input>
-      </b-input-group>
-      <br>
-      <b-button variant="success" size="sm" @click="nuevoProyecto()">Empezar Proyecto</b-button>	
-    </b-popover>				
-      <!-- </b-modal> -->
-      <!-- <b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
+          <br />
+          <b-button variant="success" size="sm" id="nuevoProyecto">
+            <!-- @click="showNuevoProyecto=!showNuevoProyecto" -->
+            Agregar Proyecto
+          </b-button>
+          <b-popover
+            v-if="showNuevoProyecto"
+            target="nuevoProyecto"
+            title="Empezar Proyecto"
+          >
+            <label>Seleccione un cliente:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'clientes'"
+                anchor="ClienteDniRuc"
+                label="writer"
+                placeholder=""
+                :onInput="(val) => (newDniRuc = val)"
+                :on-select="setCliente"
+                :classes="{ input: 'form-control' }"
+                id="cboCliente"
+              >
+              </autocomplete>
+              <b-input-group-append>
+                <clientes-form
+                  :ruc="newDniRuc"
+                  @onAddCliente="setCliente"
+                ></clientes-form>
+              </b-input-group-append>
+            </b-input-group>
+            <label>Seleccione un Personal Servcio:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'empleado'"
+                anchor="EmpleadoDniRuc"
+                label="writer"
+                placeholder=""
+                :onInput="(val) => (newDniRucEmpleado = val)"
+                :on-select="setEmpleado"
+                :classes="{ input: 'form-control' }"
+                id="cboEmpleado"
+                ref="cboEmpleado"
+              >
+              </autocomplete>
+              <b-input-group-append>
+                <empleado-form
+                  :newDniRuc="newDniRucEmpleado"
+                  @onAddEmpleado="setEmpleado"
+                ></empleado-form>
+              </b-input-group-append>
+            </b-input-group>
+            <br />
+            <label>Descripcion:</label>
+            <textarea
+              class="form-control"
+              placeholder="Descripción"
+              cols="12"
+              rows="3"
+              style="width: 100%"
+              v-model="selectCliente.Descripcion"
+            >
+            </textarea>
+            <br />
+            <label>Fecha Inicio:</label>
+            <b-input-group>
+              <b-form-input
+                v-model="selectCliente.FechaAlquilerInicio"
+                type="date"
+                placeholder="Fecha Inicio"
+              />
+            </b-input-group>
+            <br />
+            <label>Fecha Fin:</label>
+            <b-input-group>
+              <b-form-input
+                v-model="selectCliente.FechaAlquilerFin"
+                type="date"
+                placeholder="Fecha Fin"
+              ></b-form-input>
+            </b-input-group>
+            <br />
+            <b-button variant="success" size="sm" @click="nuevoProyecto()"
+              >Empezar Proyecto</b-button
+            >
+          </b-popover>
+          <!-- </b-modal> -->
+          <!-- <b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
               <b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
                 <label>Seleccione un cliente:</label>
                 <b-input-group>
@@ -114,32 +145,64 @@
 
                 <b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
               </b-popover> -->
-      
-    </div>
+        </div>
         <b-row class="mt-3">
-      <b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
-        <b-card :bg-variant="getVariant(hab)" :class="hab.EstadoHabitacion==3?getClaseTexto(hab):'text-center text-light'">
-                
-            <h5>{{ hab.Producto }}</h5>
-            <h5>{{ hab.Cliente }}</h5>
-            <h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
-            <i><h6 v-if="hab.IdProforma"><b>Prof.: </b>S/ {{ hab.TotalProf | moneda }}</h6></i>
+          <b-col
+            class="habitacion"
+            md="2"
+            v-for="(hab, index) in getHabitacionesPiso(pi)"
+            :key="index"
+          >
+            <b-card
+              :bg-variant="getVariant(hab)"
+              :class="
+                hab.EstadoHabitacion == 3
+                  ? getClaseTexto(hab)
+                  : 'text-center text-light'
+              "
+            >
+              <h5>{{ hab.Producto }}</h5>
+              <h5>{{ hab.Cliente }}</h5>
+              <h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
+              <i
+                ><h6 v-if="hab.IdProforma">
+                  <b>Prof.: </b>S/ {{ hab.TotalProf | moneda }}
+                </h6></i
+              >
 
-            <ul class="detalle" v-if="hab.EstadoHabitacion == 2">
-              <li><b>{{ hab.Cliente }}</b> </li>
-              <li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
-              <li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
-            </ul>
-            <ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-              <li class="text-center text-dark bg-white">
-                <b><u>FECHA</u></b><br>
-                <b>{{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b>
-              </li>
-            </ul>
-            <div slot="footer">
-              <b-btn v-show="hab.EstadoHabitacion !== 1" @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
-              <!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
-              <!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
+              <ul class="detalle" v-if="hab.EstadoHabitacion == 2">
+                <li>
+                  <b>{{ hab.Cliente }}</b>
+                </li>
+                <li class="text-warning">
+                  <b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b>
+                </li>
+                <li v-if="hab.vuelo"><br />Vuelo: {{ hab.Vuelo }}</li>
+              </ul>
+              <ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+                <li class="text-center text-dark bg-white">
+                  <b><u>FECHA</u></b
+                  ><br />
+                  <b>{{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b>
+                </li>
+              </ul>
+              <ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+                <li class="text-center">
+                  <b><u>Personal Servicio</u></b
+                  ><br />
+                  <b>{{ hab.Empleado }}</b>
+                </li>
+              </ul>
+              <div slot="footer">
+                <b-btn
+                  v-show="hab.EstadoHabitacion !== 1"
+                  @click="liberarHab(hab)"
+                  variant="success"
+                  size="sm"
+                  >Liberar</b-btn
+                >
+                <!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
+                <!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
                 <label>Seleccione un cliente:</label>
                 <autocomplete
                     required="required"
@@ -161,37 +224,56 @@
                 <br />
                 <b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
               </b-popover>-->
-              <b-btn v-show="hab.EstadoHabitacion !== 3" :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
-              <b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
-                <label>Seleccione un cliente:</label>
-                <b-input-group>
-                  <autocomplete
+                <b-btn
+                  v-show="hab.EstadoHabitacion !== 3"
+                  :id="i + 'popover-alquilar' + index"
+                  variant="danger"
+                  size="sm"
+                  >Empezar</b-btn
+                >
+                <b-popover
+                  v-if="showPopover"
+                  :target="i + 'popover-alquilar' + index"
+                  title="Empezar Proyecto"
+                >
+                  <label>Seleccione un cliente:</label>
+                  <b-input-group>
+                    <autocomplete
                       required="required"
                       :ref="'inputCliente2' + index"
                       :url="API + 'clientes'"
                       anchor="ClienteDniRuc"
                       label="writer"
                       placeholder=""
-                      :onInput="(val) => newDniRuc = val"
-                      :on-select="setCliente" 
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
-                  <b-input-group-append>
-                    <!--<proveedores-tabla></proveedores-tabla>-->
-                    <clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
-                  </b-input-group-append>
-                </b-input-group>
-                <br>
-                <label>Descripcion:</label>
-                <textarea 
-                  class="form-control"
-                  placeholder="Descripción"
-                  cols="12" rows="3"
-                  style="width: 100%"
-                  v-model="selectCliente.Descripcion">
-                </textarea>
+                      :onInput="(val) => (newDniRuc = val)"
+                      :on-select="setCliente"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
+                    <b-input-group-append>
+                      <!--<proveedores-tabla></proveedores-tabla>-->
+                      <clientes-form
+                        @onAddCliente="
+                          (obj) => {
+                            setCliente(obj, index);
+                          }
+                        "
+                      ></clientes-form>
+                    </b-input-group-append>
+                  </b-input-group>
+                  <br />
+                  <label>Descripcion:</label>
+                  <textarea
+                    class="form-control"
+                    placeholder="Descripción"
+                    cols="12"
+                    rows="3"
+                    style="width: 100%"
+                    v-model="selectCliente.Descripcion"
+                  >
+                  </textarea>
 
-                <!--<br />
+                  <!--<br />
                 <label>Lugar Procedencia:</label>
                 <b-input-group>
                   <b-form-input v-model="selectCliente.LugarProcedencia"
@@ -212,254 +294,427 @@
                     type="text"
                     placeholder="Próximo destino"></b-form-input>
                 </b-input-group>-->
-                <br>
-                <label>Fecha Inicio:</label>
-                <b-input-group>
-                  <b-form-input v-model="selectCliente.FechaAlquilerInicio"
-                    type="date"
-                    placeholder="Fecha Inicio"></b-form-input>
-                </b-input-group>
-                <br>
-                <label>Fecha Fin:</label>
-                <b-input-group>
-                  <b-form-input v-model="selectCliente.FechaAlquilerFin"
-                    type="date"
-                    placeholder="Fecha Fin"></b-form-input>
-                </b-input-group>
-                <br>
-
-                <b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
-              </b-popover>
-              <b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
-            </div>
-        </b-card>
-      </b-col>
-    </b-row>
-    </div>
-    </b-container>
-
-  <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent="()=>{}"  >
-    <b-modal v-model="show" class="modalProyecto" id="carrito" size="lg" no-close-on-backdrop :title="'Cesta de compras - Proyecto ' + selectProducto.Producto " ref="modalCarrito">
-     <!-- <div id="IdLogo">ssss</div> -->
-      <div id="contentModal" >
-          <div class="row">
-          <div id="headerCamiones" class="col-md-12">
-            <div class="text-left">
-              <h4>
-                Código : {{ selectProducto.IdProducto }}
-              </h4>
-            </div>
-            <div class="text-right horaFechaImpreso"> Fecha y Hora del impreso: <span id="fechaHoraImp" style="font-weight:bold"></span></div>
-            <div class="text-left" style="margin-bottom: 20px;">Fecha del Proyecto: <b> Inicio: {{ selectProducto.FechaAlquiler }} - Fin: {{ selectProducto.FechaAlquilerFin }}</b></div>
-            <div class="text-center" style="margin-bottom: 20px;"><b>{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b></div>
-            <div style="margin-bottom: 20px;">
-              <label>Descripción de Proyecto:</label>
-              <b-row>
-                <b-col cols="12">
-                  <b-button variant="info" class="mb-3" v-if="editarDescripcion" @click="startRecognition($event)"> <i class="fa fa-microphone" aria-hidden="true"></i> Dictado Por Voz</b-button>
-                </b-col>
-                <b-col md="9">
-                  <textarea
-                  :disabled="!editarDescripcion"
-                  class="form-control"
-                  placeholder="Descripción"
-                  cols="12" rows="3"
-                  style="width: 100%" 
-                  id="txtDescripcion"
-                  v-model="selectProducto.Descripcion"/>								
-                </b-col>
-                <b-col md="3">
-                  <b-button v-if="!editarDescripcion" style="margin-top:5px" variant="primary" size="sm" @click="editarDescripcionFun()"><i class="fas fa-pencil-alt fa-sm"></i> Editar Descripcion</b-button>
-                  <b-button v-else style="margin-top:5px" variant="success" size="sm" @click="guardarDescripcion()"><i class="fas fa-save fa-sm"></i> Guardar Descripcion </b-button>
-                  <br> <b-button v-if="!editarDescripcion" @click="imprimirReciboServicio(selectProducto)"  style="margin-top:5px" variant="info" size="sm"><i class="fas fa-print fa-sm"></i> Imprimir Recibo Servicios </b-button>
-                </b-col>
-                <b-col md="3"  class="mt-2">
+                  <br />
+                  <label>Fecha Inicio:</label>
                   <b-input-group>
                     <b-form-input
-                      v-model="cantidadCodigoBarra"
-                      type="number"
-                      style="width:80px;"
+                      v-model="selectCliente.FechaAlquilerInicio"
+                      type="date"
+                      placeholder="Fecha Inicio"
                     ></b-form-input>
-                    <b-input-group-append>
-                      <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + selectProducto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
-                    </b-input-group-append>
                   </b-input-group>
-                </b-col>
-              </b-row>
-            </div>
-            <div class="text-left" v-if="proformaTotal">
-              <b style="padding: 4px; background: #ebf0ff;">
-                <b>PROFORMA:</b> {{ codProforma }} <br> S/ {{ proformaTotal }}
-              </b>
-            </div>
-            <br>
-            
-            <b-row>
-              <b-col md="8" id="productosProduccion">
-                <pre-orden-form-det v-if="show"
-                :id-preorden="selectProducto.IdPreOrden"
-                :id-producto="selectProducto.IdProducto"
-                :esProyecto="true"
-                ref="preOrdenProductos"
-                 @onUpdateProductos="calcularManoObra"
-                ></pre-orden-form-det>
+                  <br />
+                  <label>Fecha Fin:</label>
+                  <b-input-group>
+                    <b-form-input
+                      v-model="selectCliente.FechaAlquilerFin"
+                      type="date"
+                      placeholder="Fecha Fin"
+                    ></b-form-input>
+                  </b-input-group>
+                  <br />
 
+                  <b-button
+                    variant="success"
+                    size="sm"
+                    @click="alquilarHab(hab)"
+                    >Empezar Proyecto</b-button
+                  >
+                </b-popover>
+                <b-button
+                  v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3"
+                  @click="openCarrito(hab)"
+                  variant="primary"
+                  size="sm"
+                  >+</b-button
+                >
+              </div>
+            </b-card>
+          </b-col>
+        </b-row>
+      </div>
+    </b-container>
+
+    <b-form
+      @submit.prevent="guardarProductos"
+      @keydown.enter.prevent="() => {}"
+    >
+      <b-modal
+        v-model="show"
+        class="modalProyecto"
+        id="carrito"
+        size="lg"
+        no-close-on-backdrop
+        :title="'Cesta de compras - Proyecto ' + selectProducto.Producto"
+        ref="modalCarrito"
+      >
+        <!-- <div id="IdLogo">ssss</div> -->
+        <div id="contentModal">
+          <div class="row">
+            <div id="headerCamiones" class="col-md-12">
+              <div class="text-left">
+                <h4>Código : {{ selectProducto.IdProducto }}</h4>
+              </div>
+              <div class="text-right horaFechaImpreso">
+                Fecha y Hora del impreso:
+                <span id="fechaHoraImp" style="font-weight: bold"></span>
+              </div>
+              <div class="text-left my-1" >
+                Fecha del Proyecto:
+                <b>
+                  Inicio: {{ selectProducto.FechaAlquiler }} - Fin:
+                  {{ selectProducto.FechaAlquilerFin }}</b
+                >
+              </div>
+              <div class="text-left my-1" >
+                Personal Servicio
+                <b>
+                  {{ selectProducto.Empleado }}
+                </b>
+              </div>
+              <div class="text-center" style="margin-bottom: 20px">
+                <b
+                  >{{ selectProducto.DniRuc }} - {{ selectProducto.Cliente }}</b
+                >
+              </div>
+              <div style="margin-bottom: 20px">
+                <label>Descripción de Proyecto:</label>
                 <b-row>
-                  <b-col md="4">
-                    <table class="table b-table border table-footer table-sm text-center" >
-                    <tbody>
-                      <tr><td>Mano de obra bruta</td></tr>
-                      <tr><td><h3>{{ totalManoObraBruta | redondear }}</h3></td></tr>
-                      <tr><td>Mano de obra - Materiales</td></tr>
-                      <tr><td><h3 :class="{'text-danger': totalManoObraMenoMat <= 0}">{{ totalManoObraMenoMat | redondear }}</h3></td></tr>
-                    </tbody>
-                    </table>
+                  <b-col cols="12">
+                    <b-button
+                      variant="info"
+                      class="mb-3"
+                      v-if="editarDescripcion"
+                      @click="startRecognition($event)"
+                    >
+                      <i class="fa fa-microphone" aria-hidden="true"></i>
+                      Dictado Por Voz</b-button
+                    >
                   </b-col>
-                  <b-col md="4">
-                    <table class="table b-table border table-footer table-sm text-center" >
-                    <tbody>
-                      <tr><td>Total de Gastos</td></tr>
-                      <tr><td><h3>{{ totalGastos | redondear }}</h3></td></tr>
-                      <tr><td>Mano de obra neta + Operativos</td></tr>
-                      <tr><td><h3 :class="{'text-danger': totalManoObraNeta <= 0}">{{ totalManoObraNeta | redondear }}</h3></td></tr>
-                    </tbody>
-                    </table>
+                  <b-col md="9">
+                    <textarea
+                      :disabled="!editarDescripcion"
+                      class="form-control"
+                      placeholder="Descripción"
+                      cols="12"
+                      rows="3"
+                      style="width: 100%"
+                      id="txtDescripcion"
+                      v-model="selectProducto.Descripcion"
+                    />
                   </b-col>
-                   <b-col md="4">
-                    <table class="table b-table border table-footer table-sm text-center" >
-                    <tbody>
-                        <tr>
-                          <td>Total Productos</td>
-                        </tr>
-                         <tr>
-                            <td>
-                                <h3>{{ totalGeneral | redondear }}</h3>
-                            </td>
-                          </tr>
-                        <tr>
-                          <td>Total Adelantos</td>
-                        </tr>
-                         <tr>
-                            <td>
-                                <h3>{{ totalAdelantos | redondear }}</h3>
-                            </td>
-                          </tr>
-                    </tbody>
-                    </table>
+                  <b-col md="3">
+                    <b-button
+                      v-if="!editarDescripcion"
+                      style="margin-top: 5px"
+                      variant="primary"
+                      size="sm"
+                      @click="editarDescripcionFun()"
+                      ><i class="fas fa-pencil-alt fa-sm"></i> Editar
+                      Descripcion</b-button
+                    >
+                    <b-button
+                      v-else
+                      style="margin-top: 5px"
+                      variant="success"
+                      size="sm"
+                      @click="guardarDescripcion()"
+                      ><i class="fas fa-save fa-sm"></i> Guardar Descripcion
+                    </b-button>
+                    <br />
+                    <b-button
+                      v-if="!editarDescripcion"
+                      @click="imprimirReciboServicio(selectProducto)"
+                      style="margin-top: 5px"
+                      variant="info"
+                      size="sm"
+                      ><i class="fas fa-print fa-sm"></i> Imprimir Recibo
+                      Servicios
+                    </b-button>
+                  </b-col>
+                  <b-col md="3" class="mt-2">
+                    <b-input-group>
+                      <b-form-input
+                        v-model="cantidadCodigoBarra"
+                        type="number"
+                        style="width: 80px"
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <b-btn
+                          variant="info"
+                          target="_blank"
+                          :href="
+                            '/views/codigoBarra.php?idProducto=' +
+                            selectProducto.IdProducto +
+                            '&cantidad=' +
+                            cantidadCodigoBarra
+                          "
+                          >Código de barra</b-btn
+                        >
+                      </b-input-group-append>
+                    </b-input-group>
                   </b-col>
                 </b-row>
+              </div>
+              <div class="text-left" v-if="proformaTotal">
+                <b style="padding: 4px; background: #ebf0ff">
+                  <b>PROFORMA:</b> {{ codProforma }} <br />
+                  S/ {{ proformaTotal }}
+                </b>
+              </div>
+              <br />
 
-              </b-col> 
-              <b-col md="4">
+              <b-row>
+                <b-col md="8" id="productosProduccion">
+                  <pre-orden-form-det
+                    v-if="show"
+                    :id-preorden="selectProducto.IdPreOrden"
+                    :id-producto="selectProducto.IdProducto"
+                    :esProyecto="true"
+                    ref="preOrdenProductos"
+                    @onUpdateProductos="calcularManoObra"
+                  ></pre-orden-form-det>
 
-                <label><b>Gastos</b></label>
-                <input v-model="selectProducto.Gasto"
+                  <b-row>
+                    <b-col md="4">
+                      <table
+                        class="table b-table border table-footer table-sm text-center"
+                      >
+                        <tbody>
+                          <tr>
+                            <td>Mano de obra bruta</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3>{{ totalManoObraBruta | redondear }}</h3>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Mano de obra - Materiales</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3
+                                :class="{
+                                  'text-danger': totalManoObraMenoMat <= 0,
+                                }"
+                              >
+                                {{ totalManoObraMenoMat | redondear }}
+                              </h3>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </b-col>
+                    <b-col md="4">
+                      <table
+                        class="table b-table border table-footer table-sm text-center"
+                      >
+                        <tbody>
+                          <tr>
+                            <td>Total de Gastos</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3>{{ totalGastos | redondear }}</h3>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Mano de obra neta + Operativos</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3
+                                :class="{
+                                  'text-danger': totalManoObraNeta <= 0,
+                                }"
+                              >
+                                {{ totalManoObraNeta | redondear }}
+                              </h3>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </b-col>
+                    <b-col md="4">
+                      <table
+                        class="table b-table border table-footer table-sm text-center"
+                      >
+                        <tbody>
+                          <tr>
+                            <td>Total Productos</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3>{{ totalGeneral | redondear }}</h3>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Total Adelantos</td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <h3>{{ totalAdelantos | redondear }}</h3>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </b-col>
+                  </b-row>
+                </b-col>
+                <b-col md="4">
+                  <label><b>Gastos</b></label>
+                  <input
+                    v-model="selectProducto.Gasto"
                     size="sm"
                     type="number"
                     class="form-control"
                     step="0.01"
-                    placeholder="Gasto S/."/>
-                <b-input-group>
-                  <b-form-input v-model="selectProducto.GastoDesc"
-                    size="sm"
-                    type="text"
-                    placeholder="Descripción"></b-form-input>
-                  <b-button @click="insertarGasto" variant="primary" size="sm">+</b-button>
-                  <b-form-text id="inputLiveHelp">Los gastos se reflejará en Caja y Banco.</b-form-text>
-                </b-input-group>
-                <br>
-                <table class="table b-table table-sm">
-                  <thead>
-                    <tr>
-                    <th>Fecha</th>
-                    <th>Concepto</th>
-                    <th>Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(ade, index) in gastos" :key="index">
-                      <td>{{ ade.FechaDoc }}</td>
-                      <td>{{ ade.Concepto.split(" - ").pop() }}</td>
-                      <td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
-                    </tr>
-                    <tr class="bg-info text-white">
-                      <td colspan="2">TOTAL</td>
-                      <td>{{ totalGastos }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                    placeholder="Gasto S/."
+                  />
+                  <b-input-group>
+                    <b-form-input
+                      v-model="selectProducto.GastoDesc"
+                      size="sm"
+                      type="text"
+                      placeholder="Descripción"
+                    ></b-form-input>
+                    <b-button @click="insertarGasto" variant="primary" size="sm"
+                      >+</b-button
+                    >
+                    <b-form-text id="inputLiveHelp"
+                      >Los gastos se reflejará en Caja y Banco.</b-form-text
+                    >
+                  </b-input-group>
+                  <br />
+                  <table class="table b-table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Cantidad</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(ade, index) in gastos" :key="index">
+                        <td>{{ ade.FechaDoc }}</td>
+                        <td>{{ ade.Concepto.split(" - ").pop() }}</td>
+                        <td>
+                          {{ ade.Tipo ? "-" + ade.Importe : ade.Importe }}
+                        </td>
+                         <td>
+                          <b-button variant="danger" size="sm" @click="eliminarGasto(ade)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </b-button>
+                         </td>
+                      </tr>
+                      <tr class="bg-info text-white">
+                        <td colspan="3">TOTAL</td>
+                        <td>{{ totalGastos }}</td>
+                       
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <hr />
+                  <hr />
 
-                <label><b>Adelantos</b></label>
-                <input v-model="selectProducto.Adelanto"
+                  <label><b>Adelantos</b></label>
+                  <input
+                    v-model="selectProducto.Adelanto"
                     size="sm"
                     type="number"
                     class="form-control"
                     step="0.01"
-                    placeholder="Adelanto S/."/>
-                <b-input-group>
-                  <b-form-input v-model="selectProducto.AdelantoDesc"
-                    size="sm"
-                    type="text"
-                    placeholder="Descripción"></b-form-input>
-                  <b-button @click="insertarAdelanto" variant="primary" size="sm">+</b-button>
-                  <b-form-text id="inputLiveHelp">Adelanto se reflejará en Caja y Banco.</b-form-text>
-                </b-input-group>
+                    placeholder="Adelanto S/."
+                  />
+                  <b-input-group>
+                    <b-form-input
+                      v-model="selectProducto.AdelantoDesc"
+                      size="sm"
+                      type="text"
+                      placeholder="Descripción"
+                    ></b-form-input>
+                    <b-button
+                      @click="insertarAdelanto"
+                      variant="primary"
+                      size="sm"
+                      >+</b-button
+                    >
+                    <b-form-text id="inputLiveHelp"
+                      >Adelanto se reflejará en Caja y Banco.</b-form-text
+                    >
+                  </b-input-group>
 
-                <br />
-                <table class="table b-table table-sm">
-                  <thead>
-                    <tr>
-                    <th>Fecha</th>
-                    <th>Concepto</th>
-                    <th>Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(ade, index) in adelantos" :key="index">
-                      <td>{{ ade.FechaDoc }}</td>
-                      <td>{{ ade.Concepto.split(" - ").pop() }}</td>
-                      <td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
-                    </tr>
-                    <tr class="bg-info text-white">
-                      <td colspan="2">TOTAL</td>
-                      <td>{{ totalAdelantos }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-col>
-            </b-row>
-            
-            <div class="text-center">
-              <h4>Gran total: {{ totalSumaProductos }}</h4> 
+                  <br />
+                  <table class="table b-table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Cantidad</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(ade, index) in adelantos" :key="index">
+                        <td>{{ ade.FechaDoc }}</td>
+                        <td>{{ ade.Concepto.split(" - ").pop() }}</td>
+                        <td>
+                          {{ ade.Tipo ? "-" + ade.Importe : ade.Importe }}
+                        </td>
+                         <td>
+                          <b-button variant="danger" size="sm" @click="eliminarGasto(ade)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </b-button>
+                         </td>
+                      </tr>
+                      <tr class="bg-info text-white">
+                        <td colspan="3">TOTAL</td>
+                        <td>{{ totalAdelantos }}</td>
+                       
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-col>
+              </b-row>
+
+              <div class="text-center">
+                <h4>Gran total: {{ totalSumaProductos }}</h4>
+              </div>
             </div>
-          
-          </div>
-          </div>
-      </div>
-
-      <div slot="modal-footer" >
-        <div style="left: 1rem;position: absolute;">
-          <b-btn  variant="info" type="submit" target="_blank" :href="'/views/V_VentaForm.php?idPreOrden=' + selectProducto.IdPreOrden + '&idCliente=' + selectProducto.IdClienteReserva">
-          Pagar Ahora
-          </b-btn>
-          <b-btn  variant="" @click="imprimir">
-            Imprimir
-          </b-btn>
-          <div style="float: right; margin-left: 10px;">
-            <proformas @onSelectProforma="selectProforma" @mounted="mountedProforma"></proformas>
           </div>
         </div>
-        <b-btn  variant="success" type="submit">
-        Guardar
-        </b-btn>
-        <b-btn  variant="secondary" @click="show=false">
-        Cerrar
-        </b-btn>
-      </div>
-    </b-modal>
-  </b-form>
+
+        <div slot="modal-footer">
+          <div style="left: 1rem; position: absolute">
+            <b-btn
+              class="btnAction2" 
+              variant="info"
+              type="submit"
+              target="_blank"
+              :href="
+                '/views/V_VentaForm.php?idPreOrden=' +
+                selectProducto.IdPreOrden +
+                '&idCliente=' +
+                selectProducto.IdClienteReserva
+              "
+            >
+              Pagar Ahora
+            </b-btn>
+            <b-btn class="btnAction2"  variant="" @click="imprimir"> Imprimir </b-btn>
+            <div style="float: right; margin-left: 10px">
+              <proformas
+                @onSelectProforma="selectProforma"
+                @mounted="mountedProforma"
+              ></proformas>
+            </div>
+          </div>
+          <b-btn class="btnAction2" variant="success" type="submit"> Guardar </b-btn>
+          <b-btn class="btnAction2" variant="secondary" @click="show = false"> Cerrar </b-btn>
+        </div>
+      </b-modal>
+    </b-form>
   </div>
 </template>
 <script>
@@ -467,6 +722,7 @@ import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import PreOrdenFormDet from "@/components/PreOrdenFormDet";
 import ClientesForm from "@/components/ClientesForm";
+import EmpleadoForm from "@/components/EmpleadoForm";
 import Proformas from "@/components/ProformaLista.vue";
 
 export default {
@@ -482,6 +738,7 @@ export default {
       showNuevoProyecto: true,
       habitaciones: [],
       selectCliente: {},
+      selectEmpleado: {},
       selectProducto: {},
       vuelo: "",
       fechaReserva: this.$moment().format("YYYY-MM-DD"),
@@ -506,6 +763,7 @@ export default {
       totalAdelantos: 0,
       editarDescripcion: false,
       newDniRuc: "",
+      newDniRucEmpleado: "",
       cantidadCodigoBarra: 1
     };
   },
@@ -789,11 +1047,15 @@ export default {
       if (!this.selectCliente.Cliente) {
         this.$toasted.error("Seleccione un cliente.");
       }
+      if (!this.selectEmpleado.Empleado) {
+        this.$toasted.error("Seleccione un empleado.");
+      }
 
       this.axios
         .post(this.API + "habitaciones/reservar", {
           IdProducto: hab.IdProducto,
           IdCliente: this.selectCliente.IdCliente,
+          IdEmpleado: this.selectEmpleado.IdEmpleado,
           FechaReserva: this.fechaReserva,
           Vuelo: this.vuelo,
           pisoAlm: this.$route.query.id
@@ -843,6 +1105,7 @@ export default {
       let data = {
         // IdProducto: hab.IdProducto,
         IdCliente: this.selectCliente.IdCliente,
+        IdEmpleado: this.selectEmpleado.IdEmpleado,
         FechaReserva: this.fechaReserva,
         Vuelo: this.vuelo,
         Descripcion: this.selectCliente.Descripcion,
@@ -859,6 +1122,7 @@ export default {
           this.$toasted.success("La Habitación: ha sido reservada");
           this.showPopover = false;
           this.selectCliente = {};
+          this.selectEmpleado = {};
           this.mdlNuevoProyecto = false;
         });
       window.location.reload();
@@ -876,7 +1140,9 @@ export default {
           .post(this.API + "habitaciones/alquilar", {
             IdProducto: hab.IdProducto,
             IdCliente: this.selectCliente.IdCliente,
+            IdEmpleado: this.selectEmpleado.IdEmpleado,
             cliente: this.selectCliente,
+            empleado: this.selectEmpleado,
             usuario: sessionStorage.getItem("User")
           })
           .then(res => {
@@ -900,6 +1166,11 @@ export default {
       }
       this.selectCliente = obj;
     },
+    setEmpleado(obj, index) {
+      let ref = `cboEmpleado`;
+      this.$refs[ref][0].setValue(obj.Empleado);
+      this.selectEmpleado = obj;
+    },
     /*focusAutocomplete (ref) {
     this.$refs[ref][0].handleDoubleClick()
   },*/
@@ -909,6 +1180,7 @@ export default {
     },
     limpiarDespues() {
       this.selectCliente = {};
+      this.selectEmpleado = {};
       this.selectProducto = {};
     },
     formatFecha(fecha) {
@@ -971,6 +1243,24 @@ export default {
       }
       return Math.abs(total).toFixed(2);
     },
+    eliminarGasto(ade) {
+      console.log(ade);
+      this.$swal({
+        icon: "question",
+        title: "Eliminar",
+        text: `Desea Eliminar : ${ade.Concepto}`,
+        confirmButtonText: "Si, Eliminar",
+        cancelButtonText: "Cancelar",
+        showCancelButton: true,
+        showCloseButton: true
+      }).then(async res => {
+        if (res.isConfirmed) {
+          await this.axios.put(this.API + "cajabanco/eliminar", ade);
+          this.cargarGastos();
+          this.cargarAdelantos();
+        }
+      });
+    },
     /* 		totManoObraBruta() {
     let total = 0
     if (this.$refs.preOrdenProductos) {
@@ -993,7 +1283,7 @@ export default {
     return total?total.toFixed(2):0
   }, */
     calcularManoObra(e) {
-      console.log(e)
+      console.log(e);
       let pManoObra = e.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.Precio : 0;
       let cantidad = pManoObra
@@ -1072,7 +1362,8 @@ export default {
   components: {
     PreOrdenFormDet,
     ClientesForm,
-    Proformas
+    Proformas,
+    EmpleadoForm
   }
 };
 </script>
