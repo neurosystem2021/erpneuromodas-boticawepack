@@ -208,9 +208,17 @@
                     </b-form-group>
                     <b-form-group class="ocultarMovil">
                         <label>Vendedor:</label>
-                        <input type="text" disabled class="form-control" v-model="tab.vendedor.NombreUsuario">
-                    </b-form-group>
-                    
+                        <autocomplete
+                                required="required"
+                                :ref="`inputVendedor${i}`"
+                                :url="API + 'lstusuarios'"
+                                anchor="NombreUsuario"
+                                label="writer"
+                                :on-select="setVendedor" 
+                                :onFocus="focusAutocomplete.bind(null, `inputVendedor${i}`)"
+                                :classes="{input: 'form-control'}">
+                            </autocomplete>
+                        </b-form-group>
                     <b-badge variant="info" v-if="ventas[index].adelanto">Adelanto de: S/ {{ ventas[index].adelanto }} </b-badge>
                     <b-badge variant="success" v-if="ventas[index].adelanto">Total a pagar: S/ {{ $options.filters.redondear(ventas[index].totalCart -  ventas[index].adelanto) }} </b-badge>
                 </b-col>
@@ -960,7 +968,7 @@ export default {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
-      obtenerStok: "obtenerStock",
+      // obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto",
       actualizarTotal: "actualizarTotalCart"
@@ -1715,9 +1723,9 @@ export default {
       console.log(obj);
       this.ventas[this.index].almacen = obj;
       // this.$refs.inputAlmacen.setValue(obj.Almacen);
-      this.obtenerStok({
-        IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
-      });
+      // this.obtenerStok({
+      //   IdAlmacen: this.ventas[this.index].almacen.IdAlmacen
+      // });
     },
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
@@ -1739,6 +1747,8 @@ export default {
       this.axios
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
+          let ref = `inputVendedor${this.index}`;
+          this.$refs[ref][0].setValue(response.data.NombreUsuario);
           this.setVendedor(response.data);
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
@@ -1822,9 +1832,9 @@ export default {
     },
     onAddProducto(obj) {
       this.actualizarDescuento();
-      this.obtenerStok({
-        IdAlmacen: this.venta.almacen.IdAlmacen
-      });
+      // this.obtenerStok({
+      //   IdAlmacen: this.venta.almacen.IdAlmacen
+      // });
     },
     actualizarDescuento() {
       if (this.puntosAplicados > 0) {
