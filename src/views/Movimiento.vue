@@ -1,228 +1,289 @@
 <template>
-  <div style="padding: 0 12%;">
+  <div style="padding: 0 12%">
     <Menu v-if="false"></Menu>
     <br />
-    <div style="text-align: end;">
-      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+    <div style="text-align: end">
+      <b-button variant="info" @click="abrirModalOrdenCompra"
+        >Orden de Compra</b-button
+      >
     </div>
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
-       <b-container class="bv-example-row" fluid>
-          <b-row>
-              <b-col md="8">
-
-                <b-row>
-                  <b-col md="4">
-                    <b-form-group>
-                      <label>Tipo de Movimiento:</label>
-                      <autocomplete
-                        required="required"
-                        ref="inputMovimiento"
-                        :url="API + 'movimientos/tipos'"
-                        anchor="TipoMovimiento"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setTipoMovimiento"
-                        :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="8">
-                    <b-form-group>
-                      <label>Proveedor:</label>
-                      <b-input-group>
-                        <autocomplete
-                          required="required"
-                          ref="inputProveedor"
-                          :url="API + 'proveedores'"
-                          anchor="ProveedorRuc"
-                          label="writer"
-                          placeholder=""
-                          :onInput="(val) => newRuc = val"                          
-                          :on-select="setProveedor"
-                          :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
-                          :classes="{input: 'form-control'}">
-                        </autocomplete>
-
-                        <b-input-group-append>
-                          <!--<proveedores-tabla></proveedores-tabla>-->
-                          <proveedores-form :ruc="newRuc"></proveedores-form>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-
-                <b-row>
-                  <b-col md="3">
-                    <b-form-group>
-                      <label>Periodo Tributario:</label>
-                      <b-form-input v-model="movimiento.FechaPeriodoTributario"
-                        type="text"
-                        readonly="readonly"
-                        placeholder="Periodo Tributario"></b-form-input>
-                    </b-form-group>
-                    
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group
-                      v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
-                      <label>Almacen Origen:</label>
-                      <autocomplete
-                        ref="inputAlmacenOrigen"
-                        required="required"
-                        initValue="PRINCIPAL"
-                        :url="API + 'almacenes'"
-                        anchor="Almacen"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setAlmacenOrigen"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group
-                      v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
-                      <label>Almacen Destino:</label>
-                      <autocomplete
-                        ref="inputAlmacenDestino"
-                        required="required"
-                        initValue="PRINCIPAL"
-                        :url="API + 'almacenes'"
-                        anchor="Almacen"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setAlmacenDestino"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group label="Credito: ">
-                      <b-form-checkbox 
-                        v-model="movimiento.EsCredito"
-                        :value="1"
-                        :unchecked-value="0">
-                        Pago pendiente
-                      </b-form-checkbox>
-                      <b-form-input v-model="movimiento.FechaVenCredito"
-                        v-if="movimiento.EsCredito"
-                        type="date"
-                        placeholder="Fecha Vencimiento"></b-form-input>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-
-                <b-row>
-                  <b-col md="6">
-                    <b-form-group>
-                      <b-form-checkbox id="alterar-productos"
-                        v-model="movimiento.alterarProductos"
-                        :value="1"
-                        :unchecked-value="0">
-                        Alterar precio productos
-                      </b-form-checkbox>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-            
-              </b-col>
+    <b-form
+      @submit="guardarMovimiento"
+      @reset="onReset"
+      @keyup="afe"
+      validated
+      @keydown.enter="prevent"
+    >
+      <b-container class="bv-example-row" fluid>
+        <b-row>
+          <b-col md="8">
+            <b-row>
               <b-col md="4">
-                <b-row>
-                  <b-col md="4">
-                    <b-form-group>
-                      <label>Serie:</label>                    
-                      <b-form-input v-model="movimiento.Serie"
-                        required="required"
-                        @input="cargarNumero"
-                        type="text"
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Número:</label>                    
-                      <b-form-input v-model="movimiento.Numero"
-                        required="required"
-                        type="text"
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Moneda:</label>
-                      <autocomplete
-                        :url="API + 'monedas'"
-                        initValue="PEN"
-                        anchor="Moneda"
-                        label="writer"
-                        placeholder="Moneda"
-                        :on-select="setMoneda"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="8">
-                    <b-form-group>
-                      <label>Fecha Contable:</label>
-                      <b-form-input
-                        v-model="movimiento.MovimientoFecha"
-                        type="datetime-local"
-                        step="1"
-                        placeholder="Fecha Contable"
-                        ></b-form-input>
-
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Fecha Stock:</label>
-                      <b-form-input
-                        v-model="movimiento.FechaStock"
-                        type="date"
-                        placeholder="Fecha Stock"
-                        ></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Tipo de cambio:</label>
-                      <input v-model.number="movimiento.TipoCambio"
-                        type="number"
-                        class="form-control"
-                        step="0.0001"
-                        placeholder="Tipo de cambio"/>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
+                <b-form-group>
+                  <label>Tipo de Movimiento:</label>
+                  <autocomplete
+                    required="required"
+                    ref="inputMovimiento"
+                    :url="API + 'movimientos/tipos'"
+                    anchor="TipoMovimiento"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setTipoMovimiento"
+                    :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
               </b-col>
-          </b-row>
-          <b-row>
-            <b-col>
-              <productos-carrito 
-                ref="carrito"
-                :fields="carrito.fields"
-                @onAddProducto="onAddProducto" 
-                :onSetProducto="onSetProducto"
-                :tipoCambio="movimiento.TipoCambio"
-                :movTipo = "movimiento.movimientoTipo.Tipo"
-                :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
-                :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
-                tipo="mov" padre="compra" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
-            </b-col>
-          </b-row>
-          <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-              <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <br><br>
-    </b-form>
-    
+              <b-col md="8">
+                <b-form-group>
+                  <label>Proveedor:</label>
+                  <b-input-group>
+                    <autocomplete
+                      required="required"
+                      ref="inputProveedor"
+                      :url="API + 'proveedores'"
+                      anchor="ProveedorRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => (newRuc = val)"
+                      :on-select="setProveedor"
+                      :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                      :classes="{ input: 'form-control' }"
+                    >
+                    </autocomplete>
 
-     <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
-          <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
-            <template slot="action" slot-scope="data">
-              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
-            </template>
-          </b-table>
+                    <b-input-group-append>
+                      <!--<proveedores-tabla></proveedores-tabla>-->
+                      <proveedores-form :ruc="newRuc"></proveedores-form>
+                    </b-input-group-append>
+                  </b-input-group>
+                </b-form-group>
+              </b-col>
+            </b-row>
+
+            <b-row>
+              <b-col md="3">
+                <b-form-group>
+                  <label>Periodo Tributario:</label>
+                  <b-form-input
+                    v-model="movimiento.FechaPeriodoTributario"
+                    type="text"
+                    readonly="readonly"
+                    placeholder="Periodo Tributario"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group
+                  v-if="
+                    movimiento.movimientoTipo.Tipo == 1 ||
+                    movimiento.movimientoTipo.Tipo == 2
+                  "
+                >
+                  <label>Almacen Origen:</label>
+                  <autocomplete
+                    ref="inputAlmacenOrigen"
+                    required="required"
+                    initValue="PRINCIPAL"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacenOrigen"
+                    :onFocus="
+                      focusAutocomplete.bind(null, 'inputAlmacenOrigen')
+                    "
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group
+                  v-if="
+                    movimiento.movimientoTipo.Tipo == 0 ||
+                    movimiento.movimientoTipo.Tipo == 2
+                  "
+                >
+                  <label>Almacen Destino:</label>
+                  <autocomplete
+                    ref="inputAlmacenDestino"
+                    required="required"
+                    initValue="PRINCIPAL"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacenDestino"
+                    :onFocus="
+                      focusAutocomplete.bind(null, 'inputAlmacenDestino')
+                    "
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="3">
+                <b-form-group label="Credito: ">
+                  <b-form-checkbox
+                    v-model="movimiento.EsCredito"
+                    :value="1"
+                    :unchecked-value="0"
+                  >
+                    Pago pendiente
+                  </b-form-checkbox>
+                  <b-form-input
+                    v-model="movimiento.FechaVenCredito"
+                    v-if="movimiento.EsCredito"
+                    type="date"
+                    placeholder="Fecha Vencimiento"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+
+            <b-row>
+              <b-col md="6">
+                <b-form-group>
+                  <b-form-checkbox
+                    id="alterar-productos"
+                    v-model="movimiento.alterarProductos"
+                    :value="1"
+                    :unchecked-value="0"
+                  >
+                    Alterar precio productos
+                  </b-form-checkbox>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col md="4">
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <label>Serie:</label>
+                  <b-form-input
+                    v-model="movimiento.Serie"
+                    required="required"
+                    @input="cargarNumero"
+                    type="text"
+                    placeholder=""
+                  ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Número:</label>
+                  <b-form-input
+                    v-model="movimiento.Numero"
+                    required="required"
+                    type="text"
+                    placeholder=""
+                  ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Moneda:</label>
+                  <autocomplete
+                    :url="API + 'monedas'"
+                    initValue="PEN"
+                    anchor="Moneda"
+                    label="writer"
+                    placeholder="Moneda"
+                    :on-select="setMoneda"
+                    :classes="{ input: 'form-control' }"
+                  >
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="8">
+                <b-form-group>
+                  <label>Fecha Contable:</label>
+                  <b-form-input
+                    v-model="movimiento.MovimientoFecha"
+                    type="datetime-local"
+                    step="1"
+                    placeholder="Fecha Contable"
+                  ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Fecha Stock:</label>
+                  <b-form-input
+                    v-model="movimiento.FechaStock"
+                    type="date"
+                    placeholder="Fecha Stock"
+                  ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Tipo de cambio:</label>
+                  <input
+                    v-model.number="movimiento.TipoCambio"
+                    type="number"
+                    class="form-control"
+                    step="0.0001"
+                    placeholder="Tipo de cambio"
+                  />
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <productos-carrito
+              ref="carrito"
+              :fields="carrito.fields"
+              @onAddProducto="onAddProducto"
+              :onSetProducto="onSetProducto"
+              :tipoCambio="movimiento.TipoCambio"
+              :movTipo="movimiento.movimientoTipo.Tipo"
+              :almacenDestino="movimiento.almacenDestino.IdAlmacen"
+              :almacenOrigen="movimiento.almacenOrigen.IdAlmacen"
+              :idAlmacen="
+                this.movimiento.almacenDestino.IdAlmacen > 0
+                  ? this.movimiento.almacenDestino.IdAlmacen
+                  : this.movimiento.almacenOrigen.IdAlmacen
+              "
+              tipo="mov"
+              padre="compra"
+              :tipoMov="this.movimiento.movimientoTipo.Tipo"
+            ></productos-carrito>
+          </b-col>
+        </b-row>
+        <b-row align-h="center" class="text-center">
+          <b-col cols="4">
+            <b-button
+              variant="success"
+              size="lg"
+              type="submit"
+              :disabled="inProgress"
+              >Guardar</b-button
+            >
+            <b-button
+              v-if="ultimoMovimiento"
+              target="_blank"
+              variant="info"
+              size="lg"
+              :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento"
+              >Código de Barra</b-button
+            >
+          </b-col>
+        </b-row>
+      </b-container>
+      <br /><br />
+    </b-form>
+
+    <b-modal
+      v-model="modalMovimientos"
+      id="modalOrdenCompra"
+      no-close-on-backdrop
+      no-close-on-esc
+    >
+      <b-table :items="productosInf" :fields="fieldsOrdenCompra">
+        <template slot="action" slot-scope="data">
+          <b-button variant="info" @click="addPreOrdenCompra(data.item)"
+            ><i class="fa fa-plus" aria-hidden="true"></i
+          ></b-button>
+        </template>
+      </b-table>
     </b-modal>
   </div>
 </template>
@@ -248,7 +309,7 @@ export default {
         { key: "Total" },
         { key: "FechaReg", label: "Fecha" },
         { key: "Proveedor" },
-        { key: "action", label: "" }
+        { key: "action", label: "" },
       ],
       inProgress: false,
       newRuc: "",
@@ -262,7 +323,7 @@ export default {
             key: "stock",
             label: "Stock",
             variant: "info",
-            class: "text-center"
+            class: "text-center",
           },
           //{ key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
           { key: "Producto", label: "Artículo" },
@@ -272,7 +333,7 @@ export default {
           {
             key: "Presentacion",
             label: "Presentación",
-            class: "text-center centrarTd"
+            class: "text-center centrarTd",
           },
           { key: "cantidad" },
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
@@ -282,7 +343,7 @@ export default {
             key: "subtotal",
             label: "SubTotal",
             variant: "success",
-            class: "text-center"
+            class: "text-center",
           },
           { key: "igv", label: "IGV" },
           { key: "precioVenta", label: "Precio venta" },
@@ -290,22 +351,22 @@ export default {
             key: "total",
             label: "Total",
             variant: "danger",
-            class: "text-center"
+            class: "text-center",
           },
-          { key: "acciones", label: "" }
-        ]
+          { key: "acciones", label: "" },
+        ],
       },
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
-      isSalida: false
+      isSalida: false,
     };
   },
   computed: {
     ...mapState({
-      proveedoresFiltrados: state => state.proveedoresFiltrados,
-      almacenes: state => state.almacenesFiltrados,
-      productos: state => state.cart.productos
-    })
+      proveedoresFiltrados: (state) => state.proveedoresFiltrados,
+      almacenes: (state) => state.almacenesFiltrados,
+      productos: (state) => state.cart.productos,
+    }),
   },
   methods: {
     ...mapActions({
@@ -313,7 +374,7 @@ export default {
       buscarAlmacenes: "buscarAlmacenes",
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock",
-      limpiarCart: "limpiarCarrito"
+      limpiarCart: "limpiarCarrito",
     }),
     abrirModalImprimir() {
       this.imprimirCodigoBarra = true;
@@ -322,7 +383,7 @@ export default {
       console.log(item);
       let proveedor = {
         IdProveedor: item.IdProveedor,
-        Proveedor: item.Proveedor
+        Proveedor: item.Proveedor,
       };
       this.ordenCompra = item;
       console.log(this.ordenCompra);
@@ -342,10 +403,10 @@ export default {
           params: {
             // fechaDesde: "1990-01-01",
             fechaHasta: this.$moment().format("YYYY-MM-DD"),
-            estado: 1
-          }
+            estado: 1,
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.productosInf = response.data;
         });
     },
@@ -355,12 +416,12 @@ export default {
         .get(this.API + "ordencompra/detalle", {
           params: {
             IdOrdenCompra: data.IdOrdenCompra,
-            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
-          }
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen,
+          },
         })
-        .then(response => {
+        .then((response) => {
           let detalle = response.data;
-          detalle.forEach(element => {
+          detalle.forEach((element) => {
             element.Presentacion = "UNIDAD";
             element.CantidadPresentacion = 1;
             element.EsPresentacion = 0;
@@ -369,7 +430,7 @@ export default {
           });
           console.log(detalle);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
       this.obtenerStok({
@@ -378,8 +439,8 @@ export default {
             ? this.movimiento.almacenDestino.IdAlmacen
             : 1
           : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1
+          ? this.movimiento.almacenOrigen.IdAlmacen
+          : 1,
       });
     },
 
@@ -394,7 +455,7 @@ export default {
           IdAlmacen:
             this.movimiento.almacenOrigen.IdAlmacen > 0
               ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1
+              : 1,
         });
         console.log(this.movimiento.almacenOrigen.IdAlmacen);
       } else {
@@ -404,8 +465,8 @@ export default {
               ? this.movimiento.almacenDestino.IdAlmacen
               : 1
             : this.movimiento.almacenOrigen.IdAlmacen > 0
-              ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1,
         });
       }
     },
@@ -417,17 +478,17 @@ export default {
         .get(this.API + "movimientos/numero", {
           params: {
             serie: this.movimiento.Serie,
-            idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo
-          }
+            idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo,
+          },
         })
-        .then(response => {
+        .then((response) => {
           Vue.set(
             this.movimiento,
             "Numero",
             response.data.NuevoNumero || "0001"
           );
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         });
@@ -452,7 +513,7 @@ export default {
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
-        user: sessionStorage.getItem("User")
+        user: sessionStorage.getItem("User"),
       };
     },
     onReset(evt) {
@@ -511,7 +572,7 @@ export default {
           IdAlmacen:
             this.movimiento.almacenOrigen.IdAlmacen > 0
               ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1
+              : 1,
         });
       } else {
         this.obtenerStok({
@@ -520,8 +581,8 @@ export default {
               ? this.movimiento.almacenDestino.IdAlmacen
               : 1
             : this.movimiento.almacenOrigen.IdAlmacen > 0
-              ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1,
         });
       }
     },
@@ -533,8 +594,8 @@ export default {
             ? this.movimiento.almacenDestino.IdAlmacen
             : 1
           : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1
+          ? this.movimiento.almacenOrigen.IdAlmacen
+          : 1,
       });
     },
     setMoneda(obj) {
@@ -601,21 +662,21 @@ export default {
         }*/
 
         let pro = this.productos.filter(
-          p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
+          (p) => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
         ).length;
         if (pro > 1) {
           this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000
+            duration: 4000,
           });
           igualProducto = true;
         }
 
         let proObs = this.productos.filter(
-          p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1
+          (p) => p.IdProducto == prod.IdProducto && p.EsObsequio == 1
         ).length;
         if (proObs > 1) {
           this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000
+            duration: 4000,
           });
           igualProducto = true;
         }
@@ -682,9 +743,9 @@ export default {
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
             productos: this.productos,
-            ordenCompra: this.ordenCompra
+            ordenCompra: this.ordenCompra,
           })
-          .then(response => {
+          .then((response) => {
             if (response.data.error) {
               this.$toasted.show(response.data.error);
             } else {
@@ -697,7 +758,7 @@ export default {
             }
             this.inProgress = false;
           })
-          .catch(error => {
+          .catch((error) => {
             this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
             this.inProgress = false;
           });
@@ -708,13 +769,13 @@ export default {
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
-    }
+    },
   },
   components: {
     Menu,
     ProductosCarrito,
-    ProveedoresForm
-  }
+    ProveedoresForm,
+  },
 };
 </script>
 <style>
