@@ -10,6 +10,19 @@
                         <b-form-group  class="my-0">
                           <span class="ocultarMovil">Tipo de Venta</span>
                             <label class="lblSerie"><b style="display:none" class="mostrarSerie">{{ tab.Serie }} - {{ tab.Numero }}</b></label>
+                            <b-form-group  class="ocultarWeb">
+                                <label>Vendedor:</label>
+                                <autocomplete
+                                        required="required"
+                                        :ref="`inputVendedor${i}`"
+                                        :url="API + 'lstusuarios'"
+                                        anchor="NombreUsuario"
+                                        label="writer"
+                                        :on-select="setVendedor" 
+                                        :onFocus="focusAutocomplete.bind(null, `inputVendedor${i}`)"
+                                        :classes="{input: 'form-control'}">
+                                    </autocomplete>
+                                </b-form-group>
                             <b-input-group>
                               <autocomplete
                                   required="required"
