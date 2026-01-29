@@ -41,6 +41,9 @@
           <b-input-group-append>
             <b-button variant="success" @click="abrirCodigoBarra"
               ><i class="fas fa-barcode"></i
+            ></b-button> 
+            <b-button variant="primary" @click="loadBarcode"
+              ><i class="fas fa-search"></i
             ></b-button>
             <producto-form
               :showButton="showButton"
@@ -669,6 +672,9 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
+import VueQuagga from "vue-quaggajs";
+import sound from "../../static/beep.mp3";
+Vue.use(VueQuagga);
 
 export default {
   mounted() {
