@@ -20,6 +20,7 @@
     "socket.io-client": "^4.8.1",
     "vue": "^2.5.2",
     "vue-axios": "^2.1.1",
+    "vue-barcode-scanner": "^0.8.1",
     "vue-chartjs": "^3.4.0",
     "vue-moment": "^4.0.0-0",
     "vue-quaggajs": "^1.0.12",

@@ -58,7 +58,9 @@
                         <td style="text-align: center;">{{ parseFloat(footer.TotalVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(footer.TotalCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(footer.UtilidadBruta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{ parseFloat(footer.PorcentajeUti).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{ parseFloat(
+                          100*(footer.TotalVenta - footer.TotalCosto)/footer.TotalCosto
+                        ).toFixed(2)}}</td>
                     </tr>
                 </tfoot>
             </table>

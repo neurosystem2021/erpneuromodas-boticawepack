@@ -425,6 +425,8 @@
             @input="(val) => ActualizarDesc(data.index, val.target.value)"
             value="0"
             class="form-control"
+            :tabindex="`${data.index}8`"
+            @keydown.enter="irAProducto"
           />
           <b-form-text> </b-form-text>
         </template>
@@ -963,6 +965,9 @@ export default {
           prod.cantidad * prod.precio * (prod.TieneIgv == 1 ? 0.18 : 0);
         return total + parseFloat(monto);
       }, 0);
+      this.$store.state.cart.totalCart = this.$options.filters.redondear(
+        subTotal
+      );
       return this.$options.filters.redondear(subTotal);
     },
     recalcularIGV() {
