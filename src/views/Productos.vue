@@ -94,12 +94,11 @@ import ProductoForm from "@/components/ProductoForm";
 
 export default {
   mounted() {
-    Promise.all(
-      this.obtenerMonedaDolar(),
-      this.axios.get(this.API + "productos/count").then(response => {
-        this.totalRows = response.data.total;
-      })
-    );
+    this.obtenerMonedaDolar();
+    this.axios.get(this.API + "productos/count").then(response => {
+      this.totalRows = response.data.total;
+    });
+
     this.$nextTick(() => {
       let input = document.getElementById("btnBuscar");
       input.focus();
@@ -128,7 +127,7 @@ export default {
         { key: "PrecioContado", label: "Precio Venta" },
         { key: "TipoCambio", label: "Tipo Cambio" },
         { key: "PrecioCostoDolar", label: "Precio Costo Dolar" },
-        { key: "PrecioContadoDolar", label: "Precio Venta Dolar" },
+        { key: "PrecioContadoDolar", label: "Precio Venta Dolar" }
       ],
       totalRows: 50,
       perPage: 10,

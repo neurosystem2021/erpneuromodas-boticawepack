@@ -1,86 +1,118 @@
 <template>
   <div>
-    <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn
+      v-if="showButton"
+      @click="() => (nuevo = true)"
+      v-b-modal.modalProducto
+      variant="primary"
+      >Nuevo</b-btn
+    >
     <!-- Modal Component -->
-    <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
-    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
-      <b-row>
-        <b-col md="6">
-          <b-form-group>
-            <label>Código barra:</label>
-            <b-form-input 
-              ref="inputCodigoBarra"
-              v-model="producto.CodigoBarra"
-              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
-              type="text"
-              class="form-control upper"
+    <b-form @submit="guardarProducto" @keydown.enter="keyDownInput">
+      <b-modal
+        :no-close-on-esc="true"
+        no-close-on-backdrop
+        id="modalProducto"
+        :title="title"
+        size="lg"
+        ref="productoForm"
+        v-model="show"
+      >
+        <b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label>Código barra:</label>
+              <b-form-input
+                ref="inputCodigoBarra"
+                v-model="producto.CodigoBarra"
+                @input="
+                  (val) => (producto.CodigoBarra = val && val.toUpperCase())
+                "
+                type="text"
+                class="form-control upper"
               ></b-form-input>
-              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
-          </b-form-group>
-          <b-form-group>
-            <label>Categoría:</label>
-            <b-input-group>
-              <autocomplete
-                required="required"
-                :url="API + 'categorias'"
-                ref="inputCategoria"
-                anchor="ProductoCategoria"
-                label="writer"
-                :placeholder="producto.categoria.ProductoCategoria"
-                :on-select="setCategoria"
-                :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-              <b-input-group-append>
-                <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
-                <!--<categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>-->
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
+              <b-form-text
+                >Dejar en blanco para generar el codigo de barra</b-form-text
+              >
+            </b-form-group>
+            <b-form-group>
+              <label>Categoría:</label>
+              <b-input-group>
+                <autocomplete
+                  required="required"
+                  :url="API + 'categorias'"
+                  ref="inputCategoria"
+                  anchor="ProductoCategoria"
+                  label="writer"
+                  :placeholder="producto.categoria.ProductoCategoria"
+                  :on-select="setCategoria"
+                  :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"
+                  :classes="{ input: 'form-control upper' }"
+                >
+                </autocomplete>
+                <b-input-group-append>
+                  <b-btn variant="primary" @click="crearCategoria"
+                    ><b>Guardar</b></b-btn
+                  >
+                  <!--<categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>-->
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
 
-           <b-form-group>
-            <label>Marca:</label>
-            <b-input-group>
-              <autocomplete
-                required="required"
-                :url="API + 'marcas'"
-                ref="inputMarca"
-                anchor="ProductoMarca"
-                label="writer"
-                :placeholder.sync="producto.marca.ProductoMarca"
-                :on-select="setMarca"
-                :onFocus="focusAutocomplete.bind(null, 'inputMarca')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-              <b-input-group-append>
-                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
-                <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
+            <b-form-group>
+              <label>Marca:</label>
+              <b-input-group>
+                <autocomplete
+                  required="required"
+                  :url="API + 'marcas'"
+                  ref="inputMarca"
+                  anchor="ProductoMarca"
+                  label="writer"
+                  :placeholder.sync="producto.marca.ProductoMarca"
+                  :on-select="setMarca"
+                  :onFocus="focusAutocomplete.bind(null, 'inputMarca')"
+                  :classes="{ input: 'form-control upper' }"
+                >
+                </autocomplete>
+                <b-input-group-append>
+                  <b-btn variant="primary" @click="crearMarca"
+                    ><b>Guardar</b></b-btn
+                  >
+                  <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
 
-          <b-form-group v-if="false">
-            <label>Modelo/Color:</label>
-            <b-input-group>
-              <autocomplete
-                :url="API + 'productos/modelos'"
-                ref="inputModelo"
-                anchor="ProductoModelo"
-                label="writer"
-                :placeholder.sync="producto.ProductoModelo"
-                :on-select="val => producto.ProductoModelo = val.ProductoModelo && val.ProductoModelo.toUpperCase()"
-                :onInput="val => producto.ProductoModelo = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputModelo')"                
-                :classes="{input: 'form-control upper'}">
-              </autocomplete>
-            </b-input-group>
-            <!--<b-form-input v-model="producto.ProductoModelo"
+            <b-form-group v-if="false">
+              <label>Modelo/Color:</label>
+              <b-input-group>
+                <autocomplete
+                  :url="API + 'productos/modelos'"
+                  ref="inputModelo"
+                  anchor="ProductoModelo"
+                  label="writer"
+                  :placeholder.sync="producto.ProductoModelo"
+                  :on-select="
+                    (val) =>
+                      (producto.ProductoModelo =
+                        val.ProductoModelo && val.ProductoModelo.toUpperCase())
+                  "
+                  :onInput="
+                    (val) =>
+                      (producto.ProductoModelo = val && val.toUpperCase())
+                  "
+                  :onFocus="focusAutocomplete.bind(null, 'inputModelo')"
+                  :classes="{ input: 'form-control upper' }"
+                >
+                </autocomplete>
+              </b-input-group>
+              <!--<b-form-input v-model="producto.ProductoModelo"
               required="required"
               class="upper"
               type="text"
               @input="(val) => producto.ProductoModelo = val && val.toUpperCase()"              
               ></b-form-input>-->
-            <!-- <b-input-group>
+              <!-- <b-input-group>
               <autocomplete
                 :url="API + 'modelos'"
                 ref="inputModelo"
@@ -95,348 +127,415 @@
                 <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
               </b-input-group-append>
             </b-input-group> -->
-          </b-form-group>
-          
-          <b-form-group>
-            <label>Artículo:</label>
-            <b-form-input v-model="producto.Producto"
-              ref="inputProducto"
-              required="required"
-              type="text"
-              @input="(val) => producto.Producto = val && val.toUpperCase()"
-              :value="producto.Producto"
-              ></b-form-input>
-          </b-form-group>
+            </b-form-group>
 
-         
-          <b-form-group>
-            <label>Presentación:</label>
-            <autocomplete
+            <b-form-group>
+              <label>Artículo:</label>
+              <b-form-input
+                v-model="producto.Producto"
+                ref="inputProducto"
+                required="required"
+                type="text"
+                @input="(val) => (producto.Producto = val && val.toUpperCase())"
+                :value="producto.Producto"
+              ></b-form-input>
+            </b-form-group>
+
+            <b-form-group>
+              <label>Presentación:</label>
+              <autocomplete
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
                 anchor="ProductoPresentacion"
                 label="writer"
                 :placeholder.sync="producto.ProductoPresentacion"
-                :on-select="val => producto.ProductoPresentacion = val.ProductoPresentacion && val.ProductoPresentacion.toUpperCase()"
-                :onInput="val => producto.ProductoPresentacion = val && val.toUpperCase()"
-                :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"                
-                :classes="{input: 'form-control upper'}">
+                :on-select="
+                  (val) =>
+                    (producto.ProductoPresentacion =
+                      val.ProductoPresentacion &&
+                      val.ProductoPresentacion.toUpperCase())
+                "
+                :onInput="
+                  (val) =>
+                    (producto.ProductoPresentacion = val && val.toUpperCase())
+                "
+                :onFocus="focusAutocomplete.bind(null, 'inputPresentacion')"
+                :classes="{ input: 'form-control upper' }"
+              >
               </autocomplete>
-          </b-form-group>
-
-          <b-form-group v-if="true">
-            <label>Imagen:</label>
-            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-            <input style="font-weight: bold;" type="file" id="file" ref="file" @change="handleFileUpload()"/>
-            <b-form-text id="input-formatter-help">
-              <b style="color: red;">*La imagen debe ser en formato PNG y 400 x 400 pixeles</b>
-            </b-form-text>
-          </b-form-group>
-
-          <b-form-group v-if="false">
-            <label>1ra Descripción:</label>
-            <b-form-textarea 
-              ref="inputProductoDesc"
-              rows="6"
-              v-model="producto._ProductoDesc"
-              @input="(val) => producto.ProductoDesc = val"
-              />
-          </b-form-group>
-
-          <b-form-group v-if="false">
-            <label>3ra Descripción:</label>
-            <b-form-textarea 
-              ref="inputProductoDesc3"
-              rows="6"
-              v-model="producto._ProductoDesc3"
-              @input="(val) => producto.ProductoDesc3 = val"
-              />
-          </b-form-group>
-
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Medición:</label>
-            <autocomplete
-              required="required"
-              :url="API + 'mediciones'"
-              ref="inputMedicion"
-              initValue="UNIDAD"
-              anchor="ProductoMedicion"
-              label="writer"
-              :placeholder.sync="producto.medicion.ProductoMedicion"
-              :on-select="setMedicion"
-              :onFocus="focusAutocomplete.bind(null, 'inputMedicion')" 
-              :classes="{input: 'form-control'}">
-            </autocomplete>
-          </b-form-group>
-          <b-form-group>
-            <label>Porcentaje Utilidad:</label>
-            <input 
-              required="required"
-              v-model="producto.PorcentajeUtilidad"
-              @input="actualizarPrecioContado"
-              type="number"
-              min="0"
-              step="0.0001"
-              class="form-control"
-              />
-          </b-form-group>
-          <b-form-group v-if="false">
-            <label>Precio X Mayor:</label>
-            <input 
-              v-model="producto.PrecioPorMayor"
-              type="number"
-              min="0"
-              step="0.0001"
-              class="form-control"
-              />
-          </b-form-group>
-          <b-form-group v-if="false">
-            <label>Stock X Mayor:</label>
-            <input 
-              v-model="producto.StockPorMayor"
-              type="number"
-              min="0"
-              class="form-control"
-              step="0.001"
-              />
-          </b-form-group>
-          <b-form-group>
-            <b-form-checkbox
-                     v-model="producto.ControlaStockMinimo"
-                     :value="1"
-                     :unchecked-value="0"
-                     >
-              Activar stock minimo
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group v-if="!producto.EsPadre">
-            <label>Stock Minimo:</label>
-            <input   
-              required="required"
-              v-model="producto.StockMinimo"
-              type="number"
-              class="form-control"
-              step="0.001"
-              />
-          </b-form-group>
-          <b-form-group>
-            <b-form-checkbox
-                   v-model="producto.MasMovido"
-                   :value="1"
-                   :unchecked-value="0">
-              Producto con más movimiento
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group>
-            <b-form-checkbox
-                   v-model="producto.ControlaStock"
-                   :value="1"
-                   :unchecked-value="0">
-              Controla Stock
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group>
-            <label>Activar SubProductos:</label>
-            <b-form-checkbox
-                     v-model="producto.EsPadre"
-                     :value="1"
-                     :unchecked-value="0"
-                     @input="checkIsHijo">
-              Seleccione esta opción si el producto contiene mas productos
-            </b-form-checkbox>
-          </b-form-group>
-          <hr>
-          <b-form-group>
-            <b-form-checkbox
-                   v-model="producto.TienePresentacion"
-                   :value="1"
-                   :unchecked-value="0">
-              Tiene Presentacion
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group  v-if="false">
-            <label>Activar Proyecto:</label>
-            <b-form-checkbox
-                     v-model="producto.EsHabitacion"
-                     :value="1"
-                     :unchecked-value="0"
-                     >
-              Seleccione esta opción si es un proyecto
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group v-if="producto.EsHabitacion">
-            <label>Lugar:</label>
-            <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
-          </b-form-group>
-
-          <b-form-group v-if="false">
-            <label>2da Descripción:</label>
-            <b-form-textarea 
-              ref="inputProductoDesc2"
-              rows="6"
-              v-model="producto._ProductoDesc2"
-              @input="(val) => producto.ProductoDesc2 = val"
-              />
-          </b-form-group>
-          
-        </b-col>
-      </b-row>
-
-      <hr/>
-      <b-row>
-        <b-col md="6">
-          <b-form-group>
-            <label>Precio de Costo:</label>
-            <input
-              v-model="producto.PrecioCosto"
-              step="0.00001"
-              type="number"
-              class="form-control"
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6"  v-if="false">
-          <b-form-group>
-            <label>Precio Especial:</label>
-            <input
-              v-model="producto.PrecioEspecial"
-              type="number"
-              class="form-control"
-              step="0.001"
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Precio Público:</label>
-            <input v-model="producto.PrecioContado"
-              type="number"
-              step="0.01"
-              class="form-control"
-              @input="actualizarPorcentajeUtilidad"
-              />
-              <b-form-text v-if="producto.precioContadoNormal">
-                Original - {{ producto.precioContadoNormal | redondear }}
-              </b-form-text>
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Precio de Costo (USD):</label>
-            <input
-              v-model="producto.PrecioCostoDolar"
-              step="0.00001"
-              type="number"
-              class="form-control"
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Precio Público (USD):</label>
-            <input v-model="producto.PrecioContadoDolar"
-              type="number"
-              step="0.01"
-              class="form-control"
-             
-              />
-          </b-form-group>
-        </b-col>
-        <b-col md="6"  v-if="false">
-          <b-form-group>
-            <label>Precio Distribuidor:</label>
-            <input v-model="producto.precioConvenio"
-              type="number"
-              step="0.001"
-              class="form-control"
-              />
-          </b-form-group>
-        </b-col>
-      </b-row>
-
-      <b-form-group v-if="producto.TienePresentacion">
-      <hr>
-      <b-row>
-        <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card :header="'Presentacion '+i" class="text-center">
-            <b-form-group>
-              <b-form-input
-                v-model="producto.precios[i-1].nombre"
-                type="text"
-                style="text-transform:uppercase; font-weight: bold;"
-                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
-                ></b-form-input>
             </b-form-group>
 
-            <b-form-group class="text-left">
-              <label>Cantidad:</label>
+            <b-form-group v-if="true">
+              <label>Imagen:</label>
+              <b-img
+                :src="'/resources/images/productos/' + producto.Imagen"
+                fluid
+                alt=""
+              ></b-img>
               <input
-                v-model="producto.precios[i-1].cantidad"
+                style="font-weight: bold"
+                type="file"
+                id="file"
+                ref="file"
+                @change="handleFileUpload()"
+              />
+              <b-form-text id="input-formatter-help">
+                <b style="color: red"
+                  >*La imagen debe ser en formato PNG y 400 x 400 pixeles</b
+                >
+              </b-form-text>
+            </b-form-group>
+
+            <b-form-group v-if="false">
+              <label>1ra Descripción:</label>
+              <b-form-textarea
+                ref="inputProductoDesc"
+                rows="6"
+                v-model="producto._ProductoDesc"
+                @input="(val) => (producto.ProductoDesc = val)"
+              />
+            </b-form-group>
+
+            <b-form-group v-if="false">
+              <label>3ra Descripción:</label>
+              <b-form-textarea
+                ref="inputProductoDesc3"
+                rows="6"
+                v-model="producto._ProductoDesc3"
+                @input="(val) => (producto.ProductoDesc3 = val)"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label>Medición:</label>
+              <autocomplete
+                required="required"
+                :url="API + 'mediciones'"
+                ref="inputMedicion"
+                initValue="UNIDAD"
+                anchor="ProductoMedicion"
+                label="writer"
+                :placeholder.sync="producto.medicion.ProductoMedicion"
+                :on-select="setMedicion"
+                :onFocus="focusAutocomplete.bind(null, 'inputMedicion')"
+                :classes="{ input: 'form-control' }"
+              >
+              </autocomplete>
+            </b-form-group>
+
+            <b-form-group v-if="false">
+              <label>Precio X Mayor:</label>
+              <input
+                v-model="producto.PrecioPorMayor"
+                type="number"
+                min="0"
+                step="0.0001"
+                class="form-control"
+              />
+            </b-form-group>
+            <b-form-group v-if="false">
+              <label>Stock X Mayor:</label>
+              <input
+                v-model="producto.StockPorMayor"
+                type="number"
+                min="0"
+                class="form-control"
+                step="0.001"
+              />
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="producto.ControlaStockMinimo"
+                :value="1"
+                :unchecked-value="0"
+              >
+                Activar stock minimo
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="!producto.EsPadre">
+              <label>Stock Minimo:</label>
+              <input
+                required="required"
+                v-model="producto.StockMinimo"
                 type="number"
                 class="form-control"
+                step="0.001"
+              />
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="producto.MasMovido"
+                :value="1"
+                :unchecked-value="0"
+              >
+                Producto con más movimiento
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <b-form-checkbox
+                v-model="producto.ControlaStock"
+                :value="1"
+                :unchecked-value="0"
+              >
+                Controla Stock
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group>
+              <label>Activar SubProductos:</label>
+              <b-form-checkbox
+                v-model="producto.EsPadre"
+                :value="1"
+                :unchecked-value="0"
+                @input="checkIsHijo"
+              >
+                Seleccione esta opción si el producto contiene mas productos
+              </b-form-checkbox>
+            </b-form-group>
+            <hr />
+            <b-form-group>
+              <b-form-checkbox
+                v-model="producto.TienePresentacion"
+                :value="1"
+                :unchecked-value="0"
+              >
+                Tiene Presentacion
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="false">
+              <label>Activar Proyecto:</label>
+              <b-form-checkbox
+                v-model="producto.EsHabitacion"
+                :value="1"
+                :unchecked-value="0"
+              >
+                Seleccione esta opción si es un proyecto
+              </b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="producto.EsHabitacion">
+              <label>Lugar:</label>
+              <b-form-select
+                required="required"
+                v-model="producto.Piso"
+                :options="[
+                  { value: 1, text: 'Huánuco' },
+                  { value: 2, text: 'Pucallpa' },
+                ]"
+                class="mb-3"
+              />
+            </b-form-group>
+
+            <b-form-group v-if="false">
+              <label>2da Descripción:</label>
+              <b-form-textarea
+                ref="inputProductoDesc2"
+                rows="6"
+                v-model="producto._ProductoDesc2"
+                @input="(val) => (producto.ProductoDesc2 = val)"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+
+        <hr />
+        <b-row>
+          <b-col md="6">
+            <b-form-group>
+              <label>Precio de Costo:</label>
+              <input
+                v-model="producto.PrecioCosto"
+                step="0.00001"
+                type="number"
+                class="form-control"
+              />
+            </b-form-group>
+          </b-col>
+          <!-- <b-col md="6">
+            <b-form-group>
+              <label>Precio Especial:</label>
+              <input
+                v-model="producto.PrecioEspecial"
+                type="number"
+                class="form-control"
+                step="0.001"
+              />
+            </b-form-group>
+          </b-col> -->
+          <b-col md="6">
+            <b-form-group>
+              <label>Precio Público:</label>
+              <input
+                v-model="producto.PrecioContado"
+                type="number"
                 step="0.01"
-                />
+                class="form-control"
+                @input="actualizarPorcentajeUtilidad"
+              />
+              <!-- <b-form-text v-if="producto.precioContadoNormal">
+                Original - {{ producto.precioContadoNormal | redondear }}
+              </b-form-text> -->
             </b-form-group>
-
-            <b-form-group class="text-left">
-              <label>Precio Costo:</label>
-              <input 
-                v-model="producto.precios[i-1].precioc"
+          </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label>Porcentaje Utilidad:</label>
+              <input
+                required="required"
+                v-model="producto.PorcentajeUtilidad"
+                @input="actualizarPrecioContado"
+                type="number"
+                min="0"
+                step="0.0001"
+                class="form-control"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label>Flete:</label>
+              <input
+                required="required"
+                v-model="producto.Flete"
+                @input="actualizarPrecioContado"
+                type="number"
+                min="0"
+                step="0.0001"
+                class="form-control"
+              /> </b-form-group
+          ></b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Tipo Cambio:</label>
+              <input
+                v-model="producto.TipoCambio"
+                step="0.00001"
                 type="number"
                 class="form-control"
-                step="0.00001"
-                />
+                 @input="recalcularMontosDolar"
+              />
             </b-form-group>
-
-            <b-form-group class="text-left">
-              <label>Precio Venta:</label>
-              <input 
-                v-model="producto.precios[i-1].precio"
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Precio de Costo (USD):</label>
+              <input
+                v-model="producto.PrecioCostoDolar"
+                step="0.00001"
                 type="number"
                 class="form-control"
-                step="0.00001"
-                />
+              />
             </b-form-group>
-          </b-card>
-        </b-col>
-      </b-row>
-      </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <b-form-group>
+              <label>Precio Público (USD):</label>
+              <input
+                v-model="producto.PrecioContadoDolar"
+                type="number"
+                step="0.01"
+                class="form-control"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6" v-if="false">
+            <b-form-group>
+              <label>Precio Distribuidor:</label>
+              <input
+                v-model="producto.precioConvenio"
+                type="number"
+                step="0.001"
+                class="form-control"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
 
-      <hr />
-      <b-row>
-        <b-col>
-          <producto-form-det 
-            @onUpdateProductos="calcularPreciosPaquete"
-            :id-producto="producto.IdProducto" 
-            v-if="showProductoDet && show" 
-            ref="productoDet"
+        <b-form-group v-if="producto.TienePresentacion">
+          <hr />
+          <b-row>
+            <b-col md="3" v-for="i in 4" :key="i.id">
+              <b-card :header="'Presentacion ' + i" class="text-center">
+                <b-form-group>
+                  <b-form-input
+                    v-model="producto.precios[i - 1].nombre"
+                    type="text"
+                    style="text-transform: uppercase; font-weight: bold"
+                    @input="
+                      (val) =>
+                        (producto.precios[i - 1].nombre =
+                          val && val.toUpperCase())
+                    "
+                  ></b-form-input>
+                </b-form-group>
+
+                <b-form-group class="text-left">
+                  <label>Cantidad:</label>
+                  <input
+                    v-model="producto.precios[i - 1].cantidad"
+                    type="number"
+                    class="form-control"
+                    step="0.01"
+                  />
+                </b-form-group>
+
+                <b-form-group class="text-left">
+                  <label>Precio Costo:</label>
+                  <input
+                    v-model="producto.precios[i - 1].precioc"
+                    type="number"
+                    class="form-control"
+                    step="0.00001"
+                  />
+                </b-form-group>
+
+                <b-form-group class="text-left">
+                  <label>Precio Venta:</label>
+                  <input
+                    v-model="producto.precios[i - 1].precio"
+                    type="number"
+                    class="form-control"
+                    step="0.00001"
+                  />
+                </b-form-group>
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-form-group>
+
+        <hr />
+        <b-row>
+          <b-col>
+            <producto-form-det
+              @onUpdateProductos="calcularPreciosPaquete"
+              :id-producto="producto.IdProducto"
+              v-if="showProductoDet && show"
+              ref="productoDet"
             ></producto-form-det>
-        </b-col>
-      </b-row>
-      <b-row v-if="producto.IdProducto">
-        <b-col md="12" v-show="false">
-          <label>Impresión de Codigo Barras</label>
-        </b-col>
-        <b-col md="3" v-show="false">
-          <b-form-group>
+          </b-col>
+        </b-row>
+        <b-row v-if="producto.IdProducto">
+          <b-col md="12" v-show="false">
+            <label>Impresión de Codigo Barras</label>
+          </b-col>
+          <b-col md="3" v-show="false">
+            <b-form-group>
               <label>Almacen:</label>
               <autocomplete
-                  required="required"
-                  ref="inputAlmacen"
-                  :url="API + 'almacenes'"
-                  anchor="Almacen"
-                  initValue="HUANUCO"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setAlmacen" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                  :classes="{input: 'form-control'}">
+                required="required"
+                ref="inputAlmacen"
+                :url="API + 'almacenes'"
+                anchor="Almacen"
+                initValue="HUANUCO"
+                label="writer"
+                placeholder=""
+                :on-select="setAlmacen"
+                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                :classes="{ input: 'form-control' }"
+              >
               </autocomplete>
-          </b-form-group>
-        </b-col>
-        <b-col md="2" v-if="false">
+            </b-form-group>
+          </b-col>
+          <b-col md="2" v-if="false">
             <!--<b-form-group>
               <label>Lote: <span style="font-weight:bold">{{serieNumero}}</span></label>
               <br>
@@ -446,44 +545,56 @@
               v-model="hashMovimiento" :options="movimientoLotes">
               </b-form-select>
             </b-form-group>-->
-        </b-col>
-        <b-col md="3" v-if="false">
+          </b-col>
+          <b-col md="3" v-if="false">
             <!--<b-form-group style="text-align: center;">
               <label>Fecha Vencimiento:</label>
               <br>
               <div style=" margin-top:7px" v-html="fechaVenMovimiento"></div>
             </b-form-group>-->
-        </b-col>
-        <b-col md="4">
-        </b-col>
-      </b-row>
-      <div slot="modal-footer" >
-        <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
-          <b-input-group>
-            <b-form-input
-              v-model="cantidadCodigoBarra"
-              type="number"
-              style="width:80px;"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
-            </b-input-group-append>
-          </b-input-group>
-        </div>
-        <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+          </b-col>
+          <b-col md="4"> </b-col>
+        </b-row>
+        <div slot="modal-footer">
+          <div
+            style="left: 1rem; position: absolute"
+            v-if="producto.IdProducto"
+          >
+            <b-input-group>
+              <b-form-input
+                v-model="cantidadCodigoBarra"
+                type="number"
+                style="width: 80px"
+              ></b-form-input>
+              <b-input-group-append>
+                <b-btn
+                  variant="info"
+                  target="_blank"
+                  :href="
+                    '/views/codigoBarra.php?idProducto=' +
+                    producto.IdProducto +
+                    '&cantidad=' +
+                    cantidadCodigoBarra
+                  "
+                  >Código de barra</b-btn
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </div>
+          <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
         </b-btn>-->
-        <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
-          Limpiar
-        </b-btn>
-        <b-btn  variant="primary" type="submit">
-           Guardar
-         </b-btn>
-         <b-btn  variant="secondary" @click="show=false">
-           Close
-         </b-btn>
-       </div>
-    </b-modal>
+          <b-btn
+            variant="warning"
+            @click="clearForm"
+            v-if="!producto.IdProducto"
+          >
+            Limpiar
+          </b-btn>
+          <b-btn variant="primary" type="submit"> Guardar </b-btn>
+          <b-btn variant="secondary" @click="show = false"> Close </b-btn>
+        </div>
+      </b-modal>
     </b-form>
   </div>
 </template>
@@ -610,6 +721,8 @@ export default {
             this.producto.PrecioContado = newVal.PrecioContado;
             this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
             this.producto.PrecioContadoDolar = newVal.PrecioContadoDolar;
+            this.producto.Flete = newVal.Flete;
+            this.producto.TipoCambio = newVal.TipoCambio;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
             this.producto.EsHabitacion = newVal.EsHabitacion;
@@ -823,22 +936,41 @@ export default {
     actualizarPrecioContado() {
       var precioCosto = this.producto.PrecioCosto;
       var utilidad = this.producto.PorcentajeUtilidad;
+      var flete = this.producto.Flete;
       // var nuevoPrecioContado = precioCosto + (precioCosto * (utilidad / 100))
-      var nuevoPrecioContado = precioCosto / (1 - utilidad / 100);
-
-      this.producto.precioContadoNormal = nuevoPrecioContado;
-      //this.producto.PrecioContado = this.$options.filters.redondeoMayor(nuevoPrecioContado)
-      this.producto.PrecioContado = this.$options.filters.redondear(
-        nuevoPrecioContado,
-        1
-      );
+      var nuevoPrecioContado =
+        parseFloat(flete ? flete : 0) +
+        parseFloat((precioCosto ? precioCosto : 0) / ((100 - utilidad) / 100));
+      this.producto.PrecioContado = parseFloat(nuevoPrecioContado).toFixed(2);
+      this.producto.PrecioContadoDolar = parseFloat(
+        nuevoPrecioContado / this.producto.TipoCambio
+      ).toFixed(2);
     },
+    recalcularMontosDolar() {
+      let PrecioCosto = this.producto.PrecioCosto;
+      let PrecioContado = this.producto.PrecioContado;
+      let TipoCambio = this.producto.TipoCambio;
+      let PrecioCostoDolar = PrecioCosto / TipoCambio;
+      let PrecioContadoDolar = PrecioContado / TipoCambio;
+      this.producto.PrecioCostoDolar = parseFloat(PrecioCostoDolar).toFixed(2);
+      this.producto.PrecioContadoDolar = parseFloat(PrecioContadoDolar).toFixed(
+        2
+      );
+      this.$forceUpdate();
+    },
+
     actualizarPorcentajeUtilidad() {
       var precioContado = this.producto.PrecioContado;
       var precioCosto = this.producto.PrecioCosto;
-
-      this.producto.PorcentajeUtilidad = this.$options.filters.redondear(
-        (1 - precioCosto / precioContado) * 100
+      var flete = this.producto.Flete;
+      /**
+       * $$PorcentajeUtilidad = 100 \times (1 - \frac{PrecioCosto}{PrecioContado - Flete})$$
+       *
+       */
+      let PorcentajeUtilidad =
+        100 * (1 - precioCosto / (precioContado - flete));
+      this.producto.PorcentajeUtilidad = parseFloat(PorcentajeUtilidad).toFixed(
+        2
       );
     },
     setCategoria(obj) {
@@ -926,6 +1058,16 @@ export default {
     },
     guardarProducto(e) {
       e.preventDefault();
+
+      if (
+        parseFloat(this.producto.PrecioCosto) >=
+        parseFloat(this.producto.PrecioContado)
+      ) {
+        this.$toasted.error(
+          "El precio Contado no puede ser igual o menor Precio Costo"
+        );
+        return;
+      }
 
       // Agregar producto DET
       if (this.showProductoDet) {
