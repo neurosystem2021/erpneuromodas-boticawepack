@@ -14,6 +14,7 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
+            id="autocompleteProducto"
             :url="APIProductos"
             :customParams="{ limit: '25','sortBy':'stock' ,'sortDesc':'DESC'}"
             :onShouldRenderChild="renderChild"
@@ -25,6 +26,9 @@
             :classes="{ input: 'form-control' }"
           >
           </autocomplete>
+           <b-button @click="abrirMicrofono()">
+            <i class="fas fa-microphone"></i>
+          </b-button>
           <input
             v-model="loadCode"
             :disabled="isNota"
@@ -35,7 +39,9 @@
             placeholder="Codigo de Barra"
           />
           <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
+            <b-button variant="success" @click="abrirCodigoBarra"
+              ><i class="fas fa-barcode"></i
+            ></b-button>
             <producto-form
               :showButton="showButton"
               :cbGuardar="(id, pxp) => agregarObj(id, pxp)"
@@ -633,7 +639,29 @@
         </tbody>
       </table>
     </b-col>
-    <br /><br />
+    
+    <b-modal
+      id="modalCodigoBarra"
+      size="lg"
+      ref="modalCodigoBarra"
+      hide-footer
+      hide-header
+    >
+      <div class="d-block text-center">
+        ESCANEE EL CODIGO DE BARRA
+        <br />
+        <br />
+        <div id="codigoBarraStyle">
+          <v-quagga
+            :onDetected="onBarcodeScanned"
+            :readerSize="readerSize"
+            :readerTypes="detecteds"
+            :patchSize="'medium'"
+            class="cameraBarra"
+          ></v-quagga>
+        </div>
+      </div>
+    </b-modal>
   </b-row>
 </template>
 
@@ -646,8 +674,33 @@ export default {
   mounted() {
     // this.alterarBuscadorProductos()
   },
+  created() {
+    // Add barcode scan listener and pass the callback function
+    this.$barcodeScanner.init(this.onBarcodeScanned);
+  },
+  destroyed() {
+    // Remove listener when component is destroyed
+    this.$barcodeScanner.destroy();
+  },
   data() {
     return {
+      readerSize: {
+        width: 640,
+        height: 480
+      },
+      detecteds: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "code_39_reader",
+        "code_39_vin_reader",
+        "codabar_reader",
+        "upc_reader",
+        "upc_e_reader",
+        "i2of5_reader",
+        "2of5_reader",
+        "code_93_reader"
+      ],
       igvFlag: 0,
       gravadaFlag: 0,
       API: config.API,
@@ -1439,6 +1492,79 @@ export default {
       } else {
         return "";
       }
+    },
+    abrirMicrofono() {
+      this.busqueda = "";
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.busqueda = event.results[0][0].transcript;
+          document.getElementById("autocompleteProducto").focus();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        this.handleError(event.error);
+      };
+
+      this.recognition.onend = async () => {
+        const inputEvent = new Event("input", {
+          bubbles: true,
+          cancelable: true
+        });
+        let autocompleteInput = document.getElementById("autocompleteProducto");
+        setTimeout(() => {
+          document.getElementById("autocompleteProducto").value = this.busqueda;
+          autocompleteInput.dispatchEvent(inputEvent);
+        }, 200);
+      };
+      this.recognition.start();
+    },
+    handleError(error) {
+      let errorMessage = "";
+      if (error === "no-speech") {
+        errorMessage =
+          "No se detectó ningún discurso. Por favor, inténtalo de nuevo.";
+      } else if (error === "audio-capture") {
+        errorMessage =
+          "No se pudo acceder al micrófono. Asegúrate de que esté correctamente conectado y de que el navegador tenga permisos para usarlo.";
+      } else if (error === "not-allowed") {
+        errorMessage =
+          "Permiso para usar el micrófono denegado. Por favor, habilita el acceso en la configuración de tu navegador.";
+      } else {
+        errorMessage =
+          "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+      }
+      alert(errorMessage);
+    },
+    abrirCodigoBarra() {
+      this.$refs["modalCodigoBarra"].show();
+      this.modalAbiertCode = true;
+      this.result = "";
+    },
+    onBarcodeScanned(barcode) {
+      if (this.modalAbiertCode) {
+        this.result = barcode.codeResult.code;
+        this.format = barcode.codeResult.format;
+        const audio = new Audio(sound);
+        audio.play();
+        if (this.result.length > 0) {
+          this.loadCode = this.result;
+          this.loadBarcode();
+          this.$refs["modalCodigoBarra"].hide();
+          this.modalAbiertCode = false;
+        }
+      }
+
+      // do something...
     }
   },
   components: {
@@ -1479,5 +1605,61 @@ export default {
   display: flex;
   justify-content: center;
   justify-items: center;
+}
+
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 20em;
+  width: auto;
+  margin: 0 auto;
+}
+.cboAgregar {
+  border: 1px solid blue;
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: block;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 700px) {
+  .ocularMovil {
+    display: none;
+  }
 }
 </style>
