@@ -6,53 +6,85 @@
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
-            :url="API + 'productos'"
+            :url="API + 'productos/stock/1'"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
             placeholder="Agregar Producto"
             :on-select="abrirCalcularM2"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
+            :classes="{ input: 'form-control' }"
+          >
           </autocomplete>
-          <b-button @click="startRecognition" variant="info"><i class="fas fa-microphone"></i> </b-button>
-          <input v-model="loadCode"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  class="form-control"
-                  placeholder="Codigo de Barra" />
+          <b-button @click="startRecognition" variant="info"
+            ><i class="fas fa-microphone"></i>
+          </b-button>
+          <input
+            v-model="loadCode"
+            @keydown.enter.prevent="loadBarcode"
+            type="text"
+            class="form-control"
+            placeholder="Codigo de Barra"
+          />
           <b-input-group-append>
-            <b-button @click="abrirModal()"><i class="fa fa-hand-pointer" aria-hidden="true"></i></b-button>
+            <b-button @click="abrirModal()"
+              ><i class="fa fa-hand-pointer" aria-hidden="true"></i
+            ></b-button>
             <!--<proveedores-tabla></proveedores-tabla>-->
-            <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-            <producto-form :showButton="showButton" :cbGuardar="(id) => add([id])"></producto-form>
+            <b-button variant="primary" @click="loadBarcode"
+              ><i class="fas fa-search"></i
+            ></b-button>
+            <producto-form
+              :showButton="showButton"
+              :cbGuardar="(id) => add([id])"
+            ></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table
+        small
+        responsive
+        striped
+        hover
+        :items="productos"
+        :fields="fields"
+        ref="tablaCarrito"
+      >
         <template slot="cantidad" slot-scope="data">
           <input
             v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             type="number"
             style="width: 85px"
             min="0"
             step="0.01"
-            @input="(val) => {$emit('onInputCantidad', val);  getSubtotal(data.index)}"
+            @input="
+              (val) => {
+                $emit('onInputCantidad', val);
+                getSubtotal(data.index);
+              }
+            "
             class="form-control"
-            placeholder="Cantidad"/>
+            placeholder="Cantidad"
+          />
         </template>
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             type="number"
             style="width: 90px"
             min="0"
             step="0.00001"
             placeholder="Precio"
-            @input="()=>{setNuevoPrecioContado(data.index); getSubtotal(data.index)}"
-            class="form-control"/>
+            @input="
+              () => {
+                setNuevoPrecioContado(data.index);
+                getSubtotal(data.index);
+              }
+            "
+            class="form-control"
+          />
         </template>
         <template slot="subtotal" slot-scope="data">
           {{ getSubtotal(data.index) }}
@@ -60,10 +92,11 @@
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             :value="1"
             @input="setNuevoPrecioContado(data.index)"
-            :unchecked-value="0">
+            :unchecked-value="0"
+          >
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
@@ -74,7 +107,7 @@
             min="0"
             placeholder="Flete"></b-form-input>
         </template>-->
-        
+
         <!--<template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
@@ -84,58 +117,77 @@
         </template>-->
         <template slot="Descripcion" slot-scope="data">
           <textarea
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             class="form-control"
             placeholder="Descripción"
-            cols="15" rows="3"
-            v-model="productos[data.index].Descripcion"></textarea>
+            cols="15"
+            rows="3"
+            v-model="productos[data.index].Descripcion"
+          ></textarea>
         </template>
         <template slot="precioVenta" slot-scope="data">
           <input
-            style="width:95px"
+            style="width: 95px"
             v-model="productos[data.index].nuevoPrecioContado"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             type="number"
             min="0"
             step="0.01"
             class="form-control"
-            placeholder="Precio Venta"/>
-            <b-form-text>
-              <strike> {{ productos[data.index].normalPrecioContado }} </strike>
-            </b-form-text>
+            placeholder="Precio Venta"
+          />
+          <b-form-text>
+            <strike> {{ productos[data.index].normalPrecioContado }} </strike>
+          </b-form-text>
         </template>
 
         <template slot="descuento" slot-scope="data">
           <input
             v-model="productos[data.index].descuento"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput ? true : false"
             type="number"
             min="0"
             step="0.01"
-            style="width:95px"
+            style="width: 95px"
             class="form-control"
-            value="0"/>
-            <b-form-text>
-            </b-form-text>
+            value="0"
+          />
+          <b-form-text> </b-form-text>
         </template>
 
         <template slot="total" slot-scope="data">
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <b-button
+            variant="danger"
+            size="sm"
+            :disabled="bloquearInput ? true : false"
+            @click="quitarProducto(data.index)"
+            >X</b-button
+          >
         </template>
 
         <template slot="show_details" slot-scope="row">
-           <b-button size="sm" variant="info" :disabled="bloquearInput?true:false" @click.stop="row.toggleDetails">></b-button>
+          <b-button
+            size="sm"
+            variant="info"
+            :disabled="bloquearInput ? true : false"
+            @click.stop="row.toggleDetails"
+            >></b-button
+          >
         </template>
-        <template slot="row-details" slot-scope="row">
-
-        </template>
+        <template slot="row-details" slot-scope="row"> </template>
 
         <template slot="stock" slot-scope="data">
-          <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
-          <div v-if="!data.item.EsPadre">{{ data.item.stock?data.item.stock.toFixed(2):data.item.stock }}</div>
+          <img
+            v-if="data.item.EsPadre"
+            src="static/box.png"
+            style="width: 24px"
+          />
+          <div v-if="!data.item.EsPadre">
+            {{ data.item.stock ? data.item.stock.toFixed(2) : data.item.stock }}
+          </div>
         </template>
       </b-table>
     </b-col>
@@ -146,67 +198,98 @@
       <slot name="metodopago"></slot>
     </b-col>
     <b-col md="3" offset-md="2">
-          <table class="table b-table border table-footer" v-if="!noSubtotal">
-            <tbody>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-success">SubTotal</td>
-                <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
-              </tr>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-danger">Descuento</td>
-                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
-              </tr>
-              <tr>
-                <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
-              </tr>
-              <tr v-if="sumatoriaIgv > 0">
-                <td><b>IGV</b></td>
-                <td class="table-danger">{{ sumatoriaIgv }}</td>
-              </tr>
-              <tr>
-                <td><b>TOTAL</b></td>
-                <td class="table-danger">{{ sumatoriaTotal }}</td>
-              </tr>
-              <tr>
-                <td  colspan="2">
-                  <label>pagó con:</label>
-                  <b-form-input
-                    type="text"
-                    placeholder="Pagó con"
-                    v-model="pagocon"
-                    :disabled="bloquearInput?true:false"
-                    @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <table class="table b-table border table-footer" v-if="!noSubtotal">
+        <tbody>
+          <tr v-if="sumatoriaDescuento > 0">
+            <td class="table-success">SubTotal</td>
+            <td class="table-success">
+              {{
+                (parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento))
+                  | redondear
+              }}
+            </td>
+          </tr>
+          <tr v-if="sumatoriaDescuento > 0">
+            <td class="table-danger">Descuento</td>
+            <td class="table-danger">- {{ sumatoriaDescuento }}</td>
+          </tr>
+          <tr>
+            <td><b>SubTotal</b></td>
+            <td class="table-danger">{{ sumatoriaSubTotal }}</td>
+          </tr>
+          <tr v-if="sumatoriaIgv > 0">
+            <td><b>IGV</b></td>
+            <td class="table-danger">{{ sumatoriaIgv }}</td>
+          </tr>
+          <tr>
+            <td><b>TOTAL</b></td>
+            <td class="table-danger">{{ sumatoriaTotal }}</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label>pagó con:</label>
+              <b-form-input
+                type="text"
+                placeholder="Pagó con"
+                v-model="pagocon"
+                :disabled="bloquearInput ? true : false"
+                @input="asignarVuelto"
+              ></b-form-input
+              ><br />
+              <label>Vuelto:</label>
+              <b>S/ {{ vuelto | redondear }}</b>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </b-col>
-    <br><br>
-    
-      <b-modal size="md" ref="modalCalcularM2" hide-footer title="Calcular Precio" no-close-on-esc no-close-on-backdrop>
-      <div class="d-block ">
+    <br /><br />
+
+    <b-modal
+      size="md"
+      ref="modalCalcularM2"
+      hide-footer
+      title="Calcular Precio"
+      no-close-on-esc
+      no-close-on-backdrop
+    >
+      <div class="d-block">
         <b>{{ productoSelect.Producto }}</b>
-        <br/>
-        <br/>
-          <b-col md="12" style="text-align:center" v-show="!productoSelect.SoloLargo">
-              <b-button @click="accionFactor(0)" :variant="indexFactor == 0 ? 'primary' : 'outline-primary'">Público</b-button>
-              <b-button @click="accionFactor(1)" :variant="indexFactor == 1 ? 'primary' : 'outline-primary'">Vidriero</b-button>
-          </b-col><br/>
+        <br />
+        <br />
+        <b-col
+          md="12"
+          style="text-align: center"
+          v-show="!productoSelect.SoloLargo"
+        >
+          <b-button
+            @click="accionFactor(0)"
+            :variant="indexFactor == 0 ? 'primary' : 'outline-primary'"
+            >Público</b-button
+          >
+          <b-button
+            @click="accionFactor(1)"
+            :variant="indexFactor == 1 ? 'primary' : 'outline-primary'"
+            >Vidriero</b-button
+          > </b-col
+        ><br />
         <div v-if="mostrarInputs">
           <b-col md="12">
             <b-form-group label="Pulgadas:">
-              <b-form-radio-group id="Pulgadas"
-              button-variant="outline-primary" 
-              v-model="esPulgadas"
-              @input="() => esPulgadas ? accionFactor(2) : accionFactor(indexFactor) "
-              buttons
-              :options="[
-              { text: 'Pulgada', value: 1 },
-              { text: 'Centimetro', value: 0 }
-              ]"/>
+              <b-form-radio-group
+                id="Pulgadas"
+                button-variant="outline-primary"
+                v-model="esPulgadas"
+                @input="
+                  () =>
+                    esPulgadas ? accionFactor(2) : accionFactor(indexFactor)
+                "
+                buttons
+                :options="[
+                  { text: 'Pulgada', value: 1 },
+                  { text: 'Centimetro', value: 0 },
+                ]"
+              />
             </b-form-group>
           </b-col>
           <hr />
@@ -216,24 +299,28 @@
             ref="inputCantidadPro"
             v-model="productoSelect.cantidad"
             class="form-control"
-            placeholder="Cantidad"/>
-          <br>
-          <label>Medida de corte en (
+            placeholder="Cantidad"
+          />
+          <br />
+          <label
+            >Medida de corte en (
             <span v-if="esPulgadas">Pulgadas</span>
             <span v-else>Centímetros</span>
-            ):</label>
+            ):</label
+          >
           <br />
           <div v-show="!productoSelect.SoloLargo">
-          <label>Ancho:</label>
-          <input
-            type="number"
-            ref="inputAncho"
-            v-model="ancho"
-            placeholder="Ancho"
-            class="form-control"
-            step="0.0001"
-            @input="val => calcularm2()"/>
-          <br />
+            <label>Ancho:</label>
+            <input
+              type="number"
+              ref="inputAncho"
+              v-model="ancho"
+              placeholder="Ancho"
+              class="form-control"
+              step="0.0001"
+              @input="(val) => calcularm2()"
+            />
+            <br />
           </div>
           <label>Largo:</label>
           <input
@@ -243,65 +330,116 @@
             placeholder="Largo"
             class="form-control"
             step="0.0001"
-            @input="val => calcularm2()"/>
-          <br>
+            @input="(val) => calcularm2()"
+          />
+          <br />
           <div v-show="!productoSelect.SoloLargo">
-          <label>Factor ({{factorNombre}}):</label>  
-          <input
-            type="number"
-            ref="inputFactor"
-            v-model="factor"
-            placeholder="factor"
-            class="form-control"
-            step="0.0001"
-            @input="val => calcularm2()"/>
-          <br>
-          <label>Pie<sup>2</sup> del corte ({{factorNombre}}): {{ pie2corte.toFixed(2) }}</label>
+            <label>Factor ({{ factorNombre }}):</label>
+            <input
+              type="number"
+              ref="inputFactor"
+              v-model="factor"
+              placeholder="factor"
+              class="form-control"
+              step="0.0001"
+              @input="(val) => calcularm2()"
+            />
+            <br />
+            <label
+              >Pie<sup>2</sup> del corte ({{ factorNombre }}):
+              {{ pie2corte.toFixed(2) }}</label
+            >
           </div>
 
-          <br>
+          <br />
         </div>
         <hr />
         <p v-html="mensajeM2"></p>
       </div>
-      <b-btn class="mt-3" variant="outline-success" block @click="seleccionarCalcularM2">Agregar</b-btn>
-      <b-btn class="mt-3" variant="outline-danger" block @click="()=>{$refs.modalCalcularM2.hide()}">Cerrar</b-btn>
+      <b-btn
+        class="mt-3"
+        variant="outline-success"
+        block
+        @click="seleccionarCalcularM2"
+        >Agregar</b-btn
+      >
+      <b-btn
+        class="mt-3"
+        variant="outline-danger"
+        block
+        @click="
+          () => {
+            $refs.modalCalcularM2.hide();
+          }
+        "
+        >Cerrar</b-btn
+      >
     </b-modal>
 
-      <b-modal v-model="touchModal" size="sm" hide-footer class="ingDesc" title="Codigo Barra" hide-header-close>
-        <input readonly type="text" inputmode="none" @keypress="(e)=>{ verificar(e)}" v-model="cantidadInput" style="font-size:20px; width:100%; text-align:center; font-weight:bold; color:#1266F1" class="form-control"/>
-        <table class="calc__numbers calc__numbers2">
-              <tbody>
-                  <tr>
-                      <td class="botones" @click="addNumber('7');">7</td>
-                      <td class="botones" @click="addNumber('8');">8</td>
-                      <td class="botones" @click="addNumber('9');">9</td>
-                  </tr>
-                  <tr>
-                      <td class="botones" @click="addNumber('4');">4</td>
-                      <td class="botones" @click="addNumber('5');">5</td>
-                      <td class="botones" @click="addNumber('6');">6</td>
-                  </tr>
-                  <tr>
-                      <td class="botones" @click="addNumber('1');">1</td>
-                      <td class="botones" @click="addNumber('2');">2</td>
-                      <td class="botones" @click="addNumber('3');">3</td>
-                  </tr>
-                  <tr>
-                      <td class="botones" @click="addNumber(0);">0</td>
-                      <!-- <td class="botones" @click="addPoint('.');">.</td> -->
-                      <td class="botones" @click="deleteNumber();"><i class="fas fa-backspace"></i></td>
-                  </tr>
-                  <tr>
-                    <td colspan="3" style="text-align: center;">
-                        <b-button variant="success" @click="buscarCodigoBarra()">Buscar</b-button>
-                        <b-button variant="danger" @click="touchModal=!touchModal">Cerrar</b-button>
-                    </td>
-                  </tr>
-              </tbody>
-            </table>
-      </b-modal>
-
+    <b-modal
+      v-model="touchModal"
+      size="sm"
+      hide-footer
+      class="ingDesc"
+      title="Codigo Barra"
+      hide-header-close
+    >
+      <input
+        readonly
+        type="text"
+        inputmode="none"
+        @keypress="
+          (e) => {
+            verificar(e);
+          }
+        "
+        v-model="cantidadInput"
+        style="
+          font-size: 20px;
+          width: 100%;
+          text-align: center;
+          font-weight: bold;
+          color: #1266f1;
+        "
+        class="form-control"
+      />
+      <table class="calc__numbers calc__numbers2">
+        <tbody>
+          <tr>
+            <td class="botones" @click="addNumber('7')">7</td>
+            <td class="botones" @click="addNumber('8')">8</td>
+            <td class="botones" @click="addNumber('9')">9</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber('4')">4</td>
+            <td class="botones" @click="addNumber('5')">5</td>
+            <td class="botones" @click="addNumber('6')">6</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber('1')">1</td>
+            <td class="botones" @click="addNumber('2')">2</td>
+            <td class="botones" @click="addNumber('3')">3</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber(0)">0</td>
+            <!-- <td class="botones" @click="addPoint('.');">.</td> -->
+            <td class="botones" @click="deleteNumber()">
+              <i class="fas fa-backspace"></i>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="text-align: center">
+              <b-button variant="success" @click="buscarCodigoBarra()"
+                >Buscar</b-button
+              >
+              <b-button variant="danger" @click="touchModal = !touchModal"
+                >Cerrar</b-button
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </b-modal>
   </b-row>
 </template>
 
@@ -485,7 +623,9 @@ export default {
       }
     },
     loadBarcode(e) {
-      e.preventDefault();
+      if (e) {
+        e.preventDefault();
+      }
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -732,16 +872,17 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
+          <table id="table-render" style="width: 830px;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
-                <td style="width: 200px"><b>${data.Producto} - ${
-          data.CodigoBarra
-        }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 80px">${data.ProductoMarca}</td>
-                <td style="width: 80px">${data.ProductoMedicion}</td>
-                <td style="width: 65px" class="table-primary"><b>${
+                <td style="width: 20px;text-align: center;">${data.stock}</td>
+                <td style="padding-left:20px;width: 200px"><b>${data.Producto} - ${
+                      data.CodigoBarra
+                    }</b></td>
+                <td style="padding-left:20px;width: 100px">${data.ProductoCategoria}</td>
+                <td style="padding-left:20px;width: 80px">${data.ProductoMarca}</td>
+                <td style="padding-left:20px;width: 80px">${data.ProductoMedicion}</td>
+                <td style="width: 65px; text-align: center;" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
                 <td style="width: 5%">
