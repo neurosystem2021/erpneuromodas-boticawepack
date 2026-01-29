@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0 12%">
+  <div>
     <Menu v-if="false"></Menu>
     <br />
     <div style="text-align: end">
@@ -14,7 +14,7 @@
       validated
       @keydown.enter="prevent"
     >
-      <b-container class="bv-example-row" fluid>
+      <b-container class="bv-example-row px-5" fluid>
         <b-row>
           <b-col md="8">
             <b-row>
@@ -297,7 +297,9 @@ import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
 
 export default {
-  mounted() {},
+  mounted() {
+    this.obtenerTipoCambio();
+  },
   data() {
     return {
       ordenCompra: {},
@@ -309,7 +311,7 @@ export default {
         { key: "Total" },
         { key: "FechaReg", label: "Fecha" },
         { key: "Proveedor" },
-        { key: "action", label: "" },
+        { key: "action", label: "" }
       ],
       inProgress: false,
       newRuc: "",
@@ -323,7 +325,7 @@ export default {
             key: "stock",
             label: "Stock",
             variant: "info",
-            class: "text-center",
+            class: "text-center"
           },
           //{ key: 'movimiento', label: 'Lote', variant: 'info', class:'text-center'  },
           { key: "Producto", label: "Artículo" },
@@ -333,7 +335,7 @@ export default {
           {
             key: "Presentacion",
             label: "Presentación",
-            class: "text-center centrarTd",
+            class: "text-center centrarTd"
           },
           { key: "cantidad" },
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
@@ -343,30 +345,32 @@ export default {
             key: "subtotal",
             label: "SubTotal",
             variant: "success",
-            class: "text-center",
+            class: "text-center"
           },
           { key: "igv", label: "IGV" },
+          { key: "flete", label: "FLETE" },
           { key: "precioVenta", label: "Precio venta" },
           {
             key: "total",
             label: "Total",
             variant: "danger",
-            class: "text-center",
+            class: "text-center"
           },
-          { key: "acciones", label: "" },
-        ],
+          { key: "acciones", label: "" }
+        ]
       },
       idPerfil: sessionStorage.getItem("IdPerfil"),
       isTraslado: true,
       isSalida: false,
+      moneda: {}
     };
   },
   computed: {
     ...mapState({
-      proveedoresFiltrados: (state) => state.proveedoresFiltrados,
-      almacenes: (state) => state.almacenesFiltrados,
-      productos: (state) => state.cart.productos,
-    }),
+      proveedoresFiltrados: state => state.proveedoresFiltrados,
+      almacenes: state => state.almacenesFiltrados,
+      productos: state => state.cart.productos
+    })
   },
   methods: {
     ...mapActions({
@@ -374,8 +378,13 @@ export default {
       buscarAlmacenes: "buscarAlmacenes",
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock",
-      limpiarCart: "limpiarCarrito",
+      limpiarCart: "limpiarCarrito"
     }),
+    obtenerTipoCambio() {
+      this.axios(`${this.API}tipocambio`).then(res => {
+        this.moneda = res.data;
+      });
+    },
     abrirModalImprimir() {
       this.imprimirCodigoBarra = true;
     },
@@ -383,7 +392,7 @@ export default {
       console.log(item);
       let proveedor = {
         IdProveedor: item.IdProveedor,
-        Proveedor: item.Proveedor,
+        Proveedor: item.Proveedor
       };
       this.ordenCompra = item;
       console.log(this.ordenCompra);
@@ -403,10 +412,10 @@ export default {
           params: {
             // fechaDesde: "1990-01-01",
             fechaHasta: this.$moment().format("YYYY-MM-DD"),
-            estado: 1,
-          },
+            estado: 1
+          }
         })
-        .then((response) => {
+        .then(response => {
           this.productosInf = response.data;
         });
     },
@@ -416,12 +425,12 @@ export default {
         .get(this.API + "ordencompra/detalle", {
           params: {
             IdOrdenCompra: data.IdOrdenCompra,
-            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen,
-          },
+            IdAlmacen: this.movimiento.almacenDestino.IdAlmacen
+          }
         })
-        .then((response) => {
+        .then(response => {
           let detalle = response.data;
-          detalle.forEach((element) => {
+          detalle.forEach(element => {
             element.Presentacion = "UNIDAD";
             element.CantidadPresentacion = 1;
             element.EsPresentacion = 0;
@@ -430,7 +439,7 @@ export default {
           });
           console.log(detalle);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
       this.obtenerStok({
@@ -439,8 +448,8 @@ export default {
             ? this.movimiento.almacenDestino.IdAlmacen
             : 1
           : this.movimiento.almacenOrigen.IdAlmacen > 0
-          ? this.movimiento.almacenOrigen.IdAlmacen
-          : 1,
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1
       });
     },
 
@@ -455,7 +464,7 @@ export default {
           IdAlmacen:
             this.movimiento.almacenOrigen.IdAlmacen > 0
               ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1,
+              : 1
         });
         console.log(this.movimiento.almacenOrigen.IdAlmacen);
       } else {
@@ -465,8 +474,8 @@ export default {
               ? this.movimiento.almacenDestino.IdAlmacen
               : 1
             : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1,
+              ? this.movimiento.almacenOrigen.IdAlmacen
+              : 1
         });
       }
     },
@@ -478,17 +487,17 @@ export default {
         .get(this.API + "movimientos/numero", {
           params: {
             serie: this.movimiento.Serie,
-            idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo,
-          },
+            idMovimientoTipo: this.movimiento.movimientoTipo.IdMovimientoTipo
+          }
         })
-        .then((response) => {
+        .then(response => {
           Vue.set(
             this.movimiento,
             "Numero",
             response.data.NuevoNumero || "0001"
           );
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         });
@@ -513,7 +522,7 @@ export default {
         movimientoTipo: {},
         almacenOrigen: { IdAlmacen: -1 },
         almacenDestino: { IdAlmacen: -1 },
-        user: sessionStorage.getItem("User"),
+        user: sessionStorage.getItem("User")
       };
     },
     onReset(evt) {
@@ -572,7 +581,7 @@ export default {
           IdAlmacen:
             this.movimiento.almacenOrigen.IdAlmacen > 0
               ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1,
+              : 1
         });
       } else {
         this.obtenerStok({
@@ -581,8 +590,8 @@ export default {
               ? this.movimiento.almacenDestino.IdAlmacen
               : 1
             : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1,
+              ? this.movimiento.almacenOrigen.IdAlmacen
+              : 1
         });
       }
     },
@@ -594,14 +603,14 @@ export default {
             ? this.movimiento.almacenDestino.IdAlmacen
             : 1
           : this.movimiento.almacenOrigen.IdAlmacen > 0
-          ? this.movimiento.almacenOrigen.IdAlmacen
-          : 1,
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1
       });
     },
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
       if (obj.Moneda === "USD") {
-        this.movimiento.TipoCambio = 3.7;
+        this.movimiento.TipoCambio = this.moneda.TipoCambio;
       } else {
         this.movimiento.TipoCambio = 1;
       }
@@ -662,21 +671,21 @@ export default {
         }*/
 
         let pro = this.productos.filter(
-          (p) => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
+          p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
         ).length;
         if (pro > 1) {
           this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000,
+            duration: 4000
           });
           igualProducto = true;
         }
 
         let proObs = this.productos.filter(
-          (p) => p.IdProducto == prod.IdProducto && p.EsObsequio == 1
+          p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1
         ).length;
         if (proObs > 1) {
           this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000,
+            duration: 4000
           });
           igualProducto = true;
         }
@@ -743,9 +752,9 @@ export default {
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
             productos: this.productos,
-            ordenCompra: this.ordenCompra,
+            ordenCompra: this.ordenCompra
           })
-          .then((response) => {
+          .then(response => {
             if (response.data.error) {
               this.$toasted.show(response.data.error);
             } else {
@@ -758,7 +767,7 @@ export default {
             }
             this.inProgress = false;
           })
-          .catch((error) => {
+          .catch(error => {
             this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
             this.inProgress = false;
           });
@@ -769,13 +778,13 @@ export default {
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
-    },
+    }
   },
   components: {
     Menu,
     ProductosCarrito,
-    ProveedoresForm,
-  },
+    ProveedoresForm
+  }
 };
 </script>
 <style>
