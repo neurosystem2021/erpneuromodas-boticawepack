@@ -561,6 +561,7 @@
               :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
               >Imprimir última Venta</b-button
             >
+              <!-- <movimiento></movimiento> -->
             <br />
             <br />
           </b-col>
@@ -578,6 +579,7 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
+import Movimiento from "@/components/Movimiento";
 
 export default {
   beforeMount() {
@@ -1405,7 +1407,8 @@ export default {
     ConfigVenta,
     PagoDeuda,
     PreOrdenLista,
-    Proformas
+    Proformas,
+    Movimiento
   }
 };
 </script>
