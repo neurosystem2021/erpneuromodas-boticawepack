@@ -7,13 +7,7 @@
         >Orden de Compra</b-button
       >
     </div>
-    <b-form
-      @submit="guardarMovimiento"
-      @reset="onReset"
-      @keyup="afe"
-      validated
-      @keydown.enter="prevent"
-    >
+    <div>
       <b-container class="bv-example-row px-5" fluid>
         <b-row>
           <b-col md="8">
@@ -23,6 +17,7 @@
                   <label>Tipo de Movimiento:</label>
                   <autocomplete
                     required="required"
+                    id="inputMovimiento"
                     ref="inputMovimiento"
                     :url="API + 'movimientos/tipos'"
                     anchor="TipoMovimiento"
@@ -253,7 +248,7 @@
             <b-button
               variant="success"
               size="lg"
-              type="submit"
+              @click="guardarMovimiento"
               :disabled="inProgress"
               >Guardar</b-button
             >
@@ -269,7 +264,7 @@
         </b-row>
       </b-container>
       <br /><br />
-    </b-form>
+    </div>
 
     <b-modal
       v-model="modalMovimientos"
@@ -299,6 +294,8 @@ import config from "@/store/config.js";
 export default {
   mounted() {
     this.obtenerTipoCambio();
+    
+     document.getElementById("inputMovimiento").focus();
   },
   data() {
     return {

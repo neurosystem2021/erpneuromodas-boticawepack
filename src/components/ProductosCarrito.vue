@@ -16,7 +16,7 @@
             ref="autocompleteProducto"
             id="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25','sortBy':'stock' ,'sortDesc':'DESC'}"
+            :customParams="{ limit: '25', sortBy: 'stock', sortDesc: 'DESC' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -24,9 +24,10 @@
             :on-select="setProducto"
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{ input: 'form-control' }"
+            tabindex="1"
           >
           </autocomplete>
-           <b-button @click="abrirMicrofono()">
+          <b-button @click="abrirMicrofono()">
             <i class="fas fa-microphone"></i>
           </b-button>
           <input
@@ -37,11 +38,15 @@
             type="text"
             class="form-control"
             placeholder="Codigo de Barra"
+            tabindex="2"
           />
           <b-input-group-append>
+            <b-button @click="abrirModal()"
+              ><i class="fa fa-hand-pointer" aria-hidden="true"></i
+            ></b-button>
             <b-button variant="success" @click="abrirCodigoBarra"
               ><i class="fas fa-barcode"></i
-            ></b-button> 
+            ></b-button>
             <b-button variant="primary" @click="loadBarcode"
               ><i class="fas fa-search"></i
             ></b-button>
@@ -248,6 +253,9 @@
             @input="recalcular(data.index)"
             placeholder="Cantidad"
             class="form-control"
+            :ref="`cantidad${data.index}`"
+            :tabindex="`${data.index}3`"
+            @keydown.enter="irAProducto"
           />
           <b-form-text
             style="padding: 0 !important; margin-bottom: -15px; margin-top: 0"
@@ -280,7 +288,9 @@
             step="0.00001"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
+           :tabindex="`${data.index}4`"
             class="form-control"
+            @keydown.enter="irAProducto"
           />
         </template>
 
@@ -294,6 +304,8 @@
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
             class="form-control"
+           :tabindex="`${data.index}6`"
+            @keydown.enter="irAProducto"
           />
         </template>
         <template slot="subtotal" slot-scope="data">
@@ -309,6 +321,8 @@
               placeholder="Subtotal"
               class="form-control"
               v-model="productos[data.index].subtotal"
+              :tabindex="`${data.index}5`"
+              @keydown.enter="irAProducto"
               @input="
                 (val) =>
                   setSubtotal(
@@ -372,6 +386,8 @@
             step="0.001"
             placeholder="Precio Venta"
             class="form-control"
+           :tabindex="`${data.index}7`"
+           @keydown.enter="irAProducto"
           />
           <b-form-text>
             <strike> {{ productos[data.index].normalPrecioContado }} </strike>
@@ -642,7 +658,7 @@
         </tbody>
       </table>
     </b-col>
-    
+
     <b-modal
       id="modalCodigoBarra"
       size="lg"
@@ -665,6 +681,71 @@
         </div>
       </div>
     </b-modal>
+
+    <b-modal
+      v-model="touchModal"
+      size="sm"
+      hide-footer
+      class="ingDesc"
+      title="Codigo Barra"
+      hide-header-close
+    >
+      <input
+        readonly
+        type="text"
+        inputmode="none"
+        @keypress="
+          (e) => {
+            verificar(e);
+          }
+        "
+        v-model="cantidadInput"
+        style="
+          font-size: 20px;
+          width: 100%;
+          text-align: center;
+          font-weight: bold;
+          color: #1266f1;
+        "
+        class="form-control"
+      />
+      <table class="calc__numbers calc__numbers2">
+        <tbody>
+          <tr>
+            <td class="botones" @click="addNumber('7')">7</td>
+            <td class="botones" @click="addNumber('8')">8</td>
+            <td class="botones" @click="addNumber('9')">9</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber('4')">4</td>
+            <td class="botones" @click="addNumber('5')">5</td>
+            <td class="botones" @click="addNumber('6')">6</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber('1')">1</td>
+            <td class="botones" @click="addNumber('2')">2</td>
+            <td class="botones" @click="addNumber('3')">3</td>
+          </tr>
+          <tr>
+            <td class="botones" @click="addNumber(0)">0</td>
+            <!-- <td class="botones" @click="addPoint('.');">.</td> -->
+            <td class="botones" @click="deleteNumber()">
+              <i class="fas fa-backspace"></i>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="text-align: center">
+              <b-button variant="success" @click="buscarCodigoBarra()"
+                >Buscar</b-button
+              >
+              <b-button variant="danger" @click="touchModal = !touchModal"
+                >Cerrar</b-button
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </b-modal>
   </b-row>
 </template>
 
@@ -672,12 +753,16 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
-import VueQuagga from "vue-quaggajs";
 import sound from "../../static/beep.mp3";
+import Vue from "vue";
+import VueQuagga from "vue-quaggajs";
 Vue.use(VueQuagga);
 
 export default {
   mounted() {
+    if (this.isVentas) {
+      this.irAProducto();
+    }
     // this.alterarBuscadorProductos()
   },
   created() {
@@ -690,6 +775,8 @@ export default {
   },
   data() {
     return {
+      touchModal: false,
+      cantidadInput: "",
       readerSize: {
         width: 640,
         height: 480
@@ -1285,13 +1372,19 @@ export default {
           { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false }
         ]);
         this.$refs["modalCant"].hide();
-        this.$refs.barcodeInput.focus();
+        this.$nextTick(() => {
+          this.$refs["cantidad0"].focus();
+          this.$refs["cantidad0"].select();
+        });
         return;
       }
 
       Vue.set(this.productos, index, obj);
       this.$refs["modalCant"].hide();
-      this.$refs.barcodeInput.focus();
+      this.$nextTick(() => {
+        this.$refs[`cantidad${index}`].focus();
+        this.$refs[`cantidad${index}`].select();
+      });
     },
     setProductoCant(prod) {
       let obj = { ...this.objProd };
@@ -1321,12 +1414,20 @@ export default {
         ]);
         this.$refs["modalCant"].hide();
         this.$refs.barcodeInput.focus();
+        this.$nextTick(() => {
+          this.$refs["cantidad0"].focus();
+          this.$refs["cantidad0"].select();
+        });
         return;
       }
 
       Vue.set(this.productos, index, obj);
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
+      this.$nextTick(() => {
+        this.$refs[`cantidad${index}`].focus();
+        this.$refs[`cantidad${index}`].select();
+      });
     },
     showPresentacion(obj, index = null) {
       if (obj.PreciosPorProducto !== "" && obj.PreciosPorProducto !== null) {
@@ -1571,6 +1672,25 @@ export default {
       }
 
       // do something...
+    },
+    abrirModal() {
+      this.touchModal = true;
+    },
+    addNumber(number) {
+      this.cantidadInput = this.cantidadInput + number;
+    },
+    deleteNumber() {
+      this.cantidadInput = this.cantidadInput.toString().slice(0, -1);
+    },
+    buscarCodigoBarra() {
+      this.loadCode = this.cantidadInput;
+      this.loadBarcode();
+      this.$nextTick(() => {
+        this.cantidadInput = "";
+      });
+    },
+    irAProducto() {
+      document.getElementById("autocompleteProducto").focus();
     }
   },
   components: {
@@ -1667,5 +1787,33 @@ canvas {
   .ocularMovil {
     display: none;
   }
+}
+.calc__numbers .botones {
+  /* border: 1px solid #000000; */
+  cursor: pointer;
+  text-align: center;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+  border: 1px;
+}
+.calc__numbers {
+  width: 15vw;
+  height: 15vw;
+}
+.calc__numbers2 {
+  width: 100%;
+  height: 20vh;
+}
+.calc__numbers .botones {
+  /* border: 1px solid #000000; */
+  cursor: pointer;
+  text-align: center;
+}
+.calc__numbers .botones:hover {
+  color: #fff;
+  background: #65ba9b;
+  border: 1px;
 }
 </style>
