@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <b-col md="12">
+    <b-col md="12" v-if="!isVentas">
       <b-form-checkbox v-model="gravadaFlag" value="1" unchecked-value="0">
         GRAVADA
       </b-form-checkbox>
@@ -15,7 +15,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ limit: '25' }"
+            :customParams="{ limit: '25','sortBy':'stock' ,'sortDesc':'DESC'}"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -605,7 +605,7 @@
           </tr>
           <tr>
             <td><b>SubTotal</b></td>
-            <td class="table-danger">{{ sumatoriaSubTotal }}</td>
+            <td class="table-danger">{{ sumatoriaSubTotal() }}</td>
           </tr>
           <tr v-if="sumatoriaIgv > 0">
             <td><b>IGV</b></td>
@@ -613,7 +613,7 @@
           </tr>
           <tr>
             <td><b>TOTAL</b></td>
-            <td class="table-danger">{{ sumatoriaTotal }}</td>
+            <td class="table-danger">{{ sumatoriaTotal() }}</td>
           </tr>
           <tr v-if="isVentas">
             <td colspan="2">
@@ -675,9 +675,6 @@ export default {
     };
   },
   watch: {
-    sumatoriaTotal(sum) {
-      this.asignarVuelto();
-    },
     productos(prods) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
 
@@ -770,39 +767,13 @@ export default {
     }),
 
     APIProductos() {
-      if (this.idAlmacen) {
-        return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
-      } else {
-        return this.API + "productos";
-      }
+      // if (this.idAlmacen) {
+      return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
+      // } else {
+      //   return this.API + "productos";
+      // }
     },
-    sumatoriaSubTotal() {
-      let sumatoria = 0;
-      if (this.igvTotal) {
-        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.18;
-      } else {
-        this.productos.map(value => {
-          sumatoria += parseFloat(value.subtotal);
-          if (value.descuento) {
-            sumatoria -= value.descuento;
-          }
-        });
-      }
-      return this.$options.filters.redondear(sumatoria);
-    },
-    sumatoriaTotal() {
-      let sumatoria = 0;
-      this.productos.map(value => {
-        sumatoria += parseFloat(
-          value.precio * value.cantidad +
-            (this.gravadaFlag == 0 ? value.igv : 0)
-        );
-      });
 
-      this.actualizarTotal(sumatoria);
-      return this.$options.filters.redondear(sumatoria);
-    },
     sumatoriaIgv() {
       let sumatoria = 0;
       if (this.igvTotal) {
@@ -833,6 +804,21 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+    sumatoriaSubTotal() {
+      let subTotal = this.productos.reduce((total, prod) => {
+        return total + parseFloat(parseFloat(prod.cantidad * prod.precio));
+      }, 0);
+      return this.$options.filters.redondear(subTotal);
+    },
+    sumatoriaTotal() {
+      let subTotal = this.productos.reduce((total, prod) => {
+        let monto =
+          prod.cantidad * prod.precio +
+          prod.cantidad * prod.precio * (prod.TieneIgv == 1 ? 0.18 : 0);
+        return total + parseFloat(monto);
+      }, 0);
+      return this.$options.filters.redondear(subTotal);
+    },
     recalcularIGV() {
       this.productos.forEach((prod, index) => {
         prod.TieneIgv = this.igvFlag;
@@ -1177,6 +1163,16 @@ export default {
       }
     },
     setProducto(obj) {
+      let index = this.productos.findIndex(v => v.IdProducto == obj.IdProducto);
+      console.log(index);
+      if (index >= 0) {
+        this.productos[index].cantidad += 1;
+        this.productos[index].subtotal =
+          this.productos[index].cantidad * this.productos[index].precio;
+        this.$forceUpdate();
+        return;
+      }
+
       this.precioCont = obj.PrecioContado;
       this.medicionPro = obj.ProductoMedicion;
       this.loadCode = "";
@@ -1217,17 +1213,24 @@ export default {
       obj.subtotal = obj.PrecioCosto * 1;
       obj = this.onSetProducto(obj);
 
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
-        false,
-        this.cliente.EsVIP
-      ]);
+      let index = this.productos.findIndex(v => v.IdProducto == obj.IdProducto);
 
+      if (index == -1) {
+        console.log("aaa");
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            //this.actualizarProd(obj)
+          },
+          { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false }
+        ]);
+        this.$refs["modalCant"].hide();
+        this.$refs.barcodeInput.focus();
+        return;
+      }
+
+      Vue.set(this.productos, index, obj);
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
     },
@@ -1245,14 +1248,24 @@ export default {
       obj.nuevoPrecioContado = 0;
       obj.subtotal = prod.precioc * 1;
       obj = this.onSetProducto(obj, prod.precio, prod.precioc);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          //this.actualizarProd(obj)
-        },
-        { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false }
-      ]);
+      let index = this.productos.findIndex(v => v.IdProducto == obj.IdProducto);
+
+      if (index == -1) {
+        console.log("aaa");
+        this.add([
+          obj,
+          () => {
+            this.$emit("onAddProducto", obj);
+            //this.actualizarProd(obj)
+          },
+          { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false }
+        ]);
+        this.$refs["modalCant"].hide();
+        this.$refs.barcodeInput.focus();
+        return;
+      }
+
+      Vue.set(this.productos, index, obj);
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
     },
@@ -1267,35 +1280,88 @@ export default {
       }
     },
     renderChild(data) {
-      if (this.idAlmacen) {
-        let style = "ss";
-        if (data.stock <= 0) {
-          style = "danger";
-        }
-        // cambiar color los que faltan 4 meses por vencer
-        if (data.stock > 0) {
-          style = "success";
-        }
-        return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
-          data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
-        }</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${
-          data.PrecioContado
-            ? data.PrecioContado.toFixed(2)
-            : data.PrecioContado
-        }</b> 
-      `;
+      let styleStock = "";
+      if (data.stock <= 0) {
+        styleStock = "table-danger";
+      } else {
+        styleStock = "table-success";
       }
+
+      if (data.EsPadre == 1) {
+        styleStock = "";
+      }
+
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
-        data.ProductoMarca
-      }
-      `;
+        <style>
+          #table-render {
+            font-size: 13px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+          }
+          #table-render td, #table-render th {
+            border: 1px solid #eaeaea;
+          }
+          #table-render td, #table-render th {
+            color: #000000 !important;
+          }
+          .imagen{
+            width: 100%;
+            heigth: 100%;
+          }
+          .imagen:hover{
+            width: 200px;
+            heigth: 200px;
+          }
+        </style>
+        <div>
+          <table id="table-render" style="width: 830px;padding:0; margin:0">
+            <tbody>
+              <tr style="padding:0; margin:0">
+                <td style=" text-align: center;
+  align-content: center;
+  align-items: center;width: 60px" class="${styleStock}"><b>${
+        data.stock
+      }</b> </td>
+                <td style="text-align: center;
+  align-content: center;
+  align-items: center;width: 60px"><b>${
+    data.EsPadre == 1
+      ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+      : data.CodigoBarra
+  }</b></td>
+                <td style="padding: 0 0 0 15px; width: 200px"><b>${
+                  data.Producto
+                }</b></td>
+                <td style="padding: 0 0 0 15px; width: 100px">${
+                  data.ProductoCategoria
+                }</td>
+                <td style="padding: 0 0 0 15px; width: 100px">${
+                  data.ProductoMarca
+                }</td>
+                <td style=" text-align: center;
+  align-content: center;
+  align-items: center;padding: 0 15px; width: 65px" class="table-primary"><b>${
+    data.PrecioContado
+  }</b></td>
+                <td style="width: 5%">
+                  <img src="${
+                    data.Imagen == null || data.Imagen == ""
+                      ? "static/no-photo.png"
+                      : "/resources/images/productos/" + data.Imagen
+                  }" class="imagen">
+                </td>
+                <!--<td style="width: 20px" class="text-center"><b>${
+                  data.VentaEstrategica == 1
+                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
+                    : ""
+                }</b></td>-->
+              </tr>
+            </tbody>
+          </table>   
+        </div>
+        `;
     },
+
     // setCantidad (index, val) {
     //   this.$emit('onInputCantidad', val)
     // },
@@ -1305,6 +1371,8 @@ export default {
       let nuevoPrecioContado =
         prod.precio / ((100 - prod.PorcentajeUtilidad) / 100) +
         parseFloat(prod.flete);
+      prod.subtotal = prod.cantidad * prod.precio;
+      prod.igv = prod.TieneIgv == 1 ? prod.precio * prod.cantidad * 0.18 : 0;
       prod.nuevoPrecioContado = parseFloat(nuevoPrecioContado).toFixed(2);
       console.log(prod);
       this.$forceUpdate();
@@ -1334,7 +1402,7 @@ export default {
         );
       }
 
-      Vue.set(this.productos[index], "igv", igv);
+      Vue.set(this.productos[index], "igv", parseFloat(igv).toFixed(2));
       // this.productos[index].igv = igv
       return igv;
     },
