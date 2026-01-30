@@ -430,6 +430,16 @@
                           type="number"
                           placeholder="S/."
                           class="form-control"
+                          @input="
+                            venta.pago.efectivo.monto =
+                              $options.filters.redondear(
+                                totalCart -
+                                  venta.pago.mastercard.monto -
+                                  venta.pago.visa.monto -
+                                  $event.target.value
+                              )
+                          "
+                          
                         />
                       </td>
                     </tr>
@@ -460,9 +470,11 @@
                               $options.filters.redondear(
                                 totalCart -
                                   venta.pago.mastercard.monto -
+                                  venta.pago.yape.monto -
                                   $event.target.value
                               )
                           "
+                          
                         />
                       </td>
                     </tr>
@@ -493,6 +505,7 @@
                               $options.filters.redondear(
                                 totalCart -
                                   venta.pago.visa.monto -
+                                  venta.pago.yape.monto -
                                   $event.target.value
                               )
                           "
@@ -561,7 +574,7 @@
               :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta"
               >Imprimir última Venta</b-button
             >
-              <!-- <movimiento></movimiento> -->
+              <movimiento></movimiento>
             <br />
             <br />
           </b-col>
@@ -1187,6 +1200,9 @@ export default {
       totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
         ? 0
         : parseFloat(this.venta.pago.mastercard.monto);
+      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
+        ? 0
+        : parseFloat(this.venta.pago.yape.monto);
 
       if (
         (isNaN(parseFloat(this.venta.pago.efectivo.monto))

@@ -1,84 +1,95 @@
 <template>
-  
-            <b-container class="bv-example-row" id="conten">
-               
-              <h1> REPORTES  </h1>
-               
-              <b-row>
-                  <b-col cols="6">
-                    Desde:
-                     <input type="date" class="form-control" v-model="fechaInicio" @input="recargarReportes()">
-                  </b-col>
-                  <b-col cols="6">
-                      Hasta:
-                     <input type="date" class="form-control" v-model="fechaFin" @input="recargarReportes()">
-                  </b-col>
-              </b-row>
-              <b-row class="d-flex align-items-stretch mt-5">
-                <b-col cols="12" class="my-3 ">
-                  <div class="cards h-100">
-                    <b-input-group prepend="Monto Total:" >
-                        <input type="number" disabled v-model="totalDia" class="form-control">
-                     </b-input-group>
-                    <bar-chart ref="chartGraficaDias"></bar-chart>
-                  </div>
-                </b-col>
-                <b-col cols="12" class="my-3 ">
-                  <div class="cards h-100">
-                    <b-row>
-                      <b-col cols="12"> <h3>Ranking de Ventas por Vendedor </h3></b-col>
-                      <b-col cols="12">
-                        <DoughnutVendedor ref="chartGrafica"></DoughnutVendedor>
-                      </b-col>
-                    </b-row>
-                  </div>
-                </b-col>
-               <b-col cols="12" class="my-3 ">
-                  <div class="cards h-100">
-                  <b-row>
-                    <b-col cols="12">
-                      <h3>Ranking de Productos Más Vendidos </h3>
-                    </b-col>
-                   
-                    <b-col cols="12">
+  <b-container class="bv-example-row" id="conten" fluid>
+    <h1>REPORTES</h1>
 
-                      <BarChartProductos ref="barChartGrafica"></BarChartProductos>
-                    </b-col>
-                  </b-row>
-                  </div>
-                  </b-col>
-               
-               <b-col cols="12" class="my-3 ">
-                  <div class="cards h-100">
-                  <b-row>
-                    <b-col cols="12">
-                      <h3>Reporte de Utilidad Bruta (10 > Rentabilidad) </h3>
-                    </b-col>
-                   
-                    <b-col cols="12">
-                        
-                      <BarChartUtilidadBruta ref="barChartUtilidadBruta"></BarChartUtilidadBruta>
-                    </b-col>
-                  </b-row>
-                  </div>
-                  </b-col>
+    <b-row>
+      <b-col cols="6">
+        Desde:
+        <input
+          type="date"
+          class="form-control"
+          v-model="fechaInicio"
+          @input="recargarReportes()"
+        />
+      </b-col>
+      <b-col cols="6">
+        Hasta:
+        <input
+          type="date"
+          class="form-control"
+          v-model="fechaFin"
+          @input="recargarReportes()"
+        />
+      </b-col>
+    </b-row>
+    <b-row class="d-flex align-items-stretch mt-5">
+      <b-col cols="4" class="my-3">
+        <div class="cards h-100">
+          <b-input-group prepend="Monto Total:">
+            <input
+              type="number"
+              disabled
+              v-model="totalDia"
+              class="form-control"
+            />
+          </b-input-group>
+          <bar-chart ref="chartGraficaDias"></bar-chart>
+        </div>
+      </b-col>
+      <b-col cols="4" class="my-3">
+        <div class="cards h-100">
+          <b-row>
+            <b-col cols="12"> <h3>Ranking de Ventas por Vendedor</h3></b-col>
+            <b-col cols="12">
+              <DoughnutVendedor ref="chartGrafica"></DoughnutVendedor>
+            </b-col>
+          </b-row>
+        </div>
+      </b-col>
+      <b-col cols="4" class="my-3">
+        <div class="cards h-100">
+          <b-row>
+            <b-col cols="12">
+              <h3>Ranking de Productos Más Vendidos</h3>
+            </b-col>
 
-                  <b-col cols="12" class="my-3 ">
-                  <div class="cards h-100">
-                  <b-row>
-                    <b-col cols="12">
-                      <h3>Compras </h3>
-                    </b-col>
-                    <b-col cols="12">
-                      <BarChartCompras ref="barChartCompras"></BarChartCompras>
-                    </b-col>
-                  </b-row>
-                  </div>
-                  </b-col>
-              </b-row>
-            </b-container>
+            <b-col cols="12">
+              <BarChartProductos ref="barChartGrafica"></BarChartProductos>
+            </b-col>
+          </b-row>
+        </div>
+      </b-col>
 
-     
+      <b-col cols="4" class="my-3">
+        <div class="cards h-100">
+          <b-row>
+            <b-col cols="12">
+              <h3>Reporte de Utilidad Bruta (10 > Rentabilidad)</h3>
+            </b-col>
+
+            <b-col cols="12">
+              <BarChartUtilidadBruta
+                ref="barChartUtilidadBruta"
+              ></BarChartUtilidadBruta>
+            </b-col>
+          </b-row>
+        </div>
+      </b-col>
+
+      <b-col cols="8" class="my-3">
+        <div class="cards h-100">
+          <b-row>
+            <b-col cols="12">
+              <h3>Compras</h3>
+            </b-col>
+            <b-col cols="12">
+              <BarChartCompras ref="barChartCompras"></BarChartCompras>
+            </b-col>
+          </b-row>
+        </div>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 <script>
 import DoughnutVendedor from "@/components/Dashboard/DoughnutVendedor";
@@ -90,9 +101,7 @@ import LineChart from "@/components/LineChart";
 import config from "@/store/config.js";
 export default {
   mounted() {
-    this.fechaInicio = this.$moment()
-      .startOf("month")
-      .format("YYYY-MM-DD");
+    this.fechaInicio = this.$moment().startOf("month").format("YYYY-MM-DD");
     this.fechaFin = this.$moment().format("YYYY-MM-DD");
     // this.fechaInicio = "2024-03-01";
     // this.fechaFin = "2025-03-03";
@@ -104,7 +113,7 @@ export default {
       API: config.API,
       fechaInicio: "",
       fechaFin: "",
-      totalDia: 0
+      totalDia: 0,
     };
   },
   methods: {
@@ -114,7 +123,7 @@ export default {
         this.getProdcutosMasVendidos(),
         this.getUtilidadBruta(),
         this.getMovimientos(),
-        this.getDataDias()
+        this.getDataDias(),
       ]);
     },
     getDataDias(anio, mes, dias, idAlmacen) {
@@ -124,15 +133,15 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            idAlmacen: idAlmacen || this.idAlmacen
-          }
+            idAlmacen: idAlmacen || this.idAlmacen,
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.lstDia = response.data;
           this.$refs.chartGraficaDias.GraficarDiasRango(response.data);
           this.calcularTotalDia();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -149,14 +158,14 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            almacen: 0
-          }
+            almacen: 0,
+          },
         })
-        .then(response => {
+        .then((response) => {
           // console.log(response.data);
           this.$refs.chartGrafica.GraficarVentas(response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -166,14 +175,14 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            almacen: 0
-          }
+            almacen: 0,
+          },
         })
-        .then(response => {
+        .then((response) => {
           // console.log(response.data);
           this.$refs.barChartGrafica.GraficarProductoVendidos(response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -183,14 +192,14 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            almacen: 0
-          }
+            almacen: 0,
+          },
         })
-        .then(response => {
+        .then((response) => {
           // console.log(response.data);
           this.$refs.barChartUtilidadBruta.GraficarUtilidadBruta(response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -200,24 +209,24 @@ export default {
           params: {
             fechaInicio: this.fechaInicio,
             fechaFin: this.fechaFin,
-            almacen: 1
-          }
+            almacen: 1,
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.$refs.barChartCompras.GraficarCompras(response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
-    }
+    },
   },
   components: {
     DoughnutVendedor,
     BarChartCompras,
     BarChartUtilidadBruta,
     BarChartProductos,
-    BarChart
-  }
+    BarChart,
+  },
 };
 </script>
 
