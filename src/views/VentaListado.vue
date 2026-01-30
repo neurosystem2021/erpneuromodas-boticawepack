@@ -1786,7 +1786,6 @@ export default {
         block: "start"
       });
       this.$toasted.info("Opción de venta cerrada.");
-     
     },
     setTipoVenta(obj) {
       this.isNota[this.ventaActiva] = false;
@@ -2499,64 +2498,62 @@ export default {
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
-      await this.axios
-        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
-        .then(response => {
-          if (response.data) {
-            venta.UsuarioProforma = response.data.Usuario;
-          }
-        });
+
+      // 1. Obtener datos del usuario
+      try {
+        const response = await this.axios.get(
+          this.API + "/usuarios/" + proforma.UsuarioReg
+        );
+        if (response.data) {
+          venta.UsuarioProforma = response.data.Usuario;
+        }
+      } catch (error) {
+        console.error("Error cargando usuario:", error);
+      }
+
       venta.cliente = proforma;
       venta.vendedor = { Usuario: proforma.UsuarioReg };
       venta.mostrarOp = {};
-      // console.log("proforma", proforma);
-      let productos = [];
-      proforma.productos.forEach(async producto => {
+
+      // 2. MAP en lugar de forEach para manejar promesas
+      const promesasProductos = proforma.productos.map(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
         let pres = [];
         if (prod.PreciosPorProducto) {
           let newPres = JSON.parse(prod.PreciosPorProducto);
           pres = newPres.filter(v => v.cantidad > 0);
         }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
+
+        // Retornamos el objeto procesado
+        return {
+          ...prod,
+          PreciosPorProducto: pres,
+          tienePresentacion: pres.length > 0,
+          bloquearInputPrecio: false,
+          CantidadPresentacion: null,
+          ProductoPresentacion: producto.Descripcion,
+          Descripcion: producto.Descripcion,
+          cantidad: producto.Cantidad,
+          precio: producto.Precio,
+          descuento: producto.Descuento || 0
+        };
       });
 
-      venta.productos = productos;
+      // 3. ESPERAR a que todos los productos se carguen
+      venta.productos = await Promise.all(promesasProductos);
+
+      // 4. Agregar a la lista y actualizar estado
       this.ventas.push(venta);
+
+      // 5. Acciones finales una vez que el DOM y los datos están listos
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        // this.ventas[this.ventaActiva].mostrarMetodo.push(false);
-        // this.ventas[this.ventaActiva].mostrarOp.push(false);
-        // this.loadClienteVarios();
-      });
-      this.ventas[this.ventaActiva].cliente = proforma;
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.metodoPagoCambio(1);
-        }, 100);
+
+        // Ahora sí, el método de pago se ejecuta con datos reales
+        this.metodoPagoCambio(1);
       });
     },
     // cargarProforma(proforma) {

@@ -1228,13 +1228,13 @@ export default {
     },
     granTotal() {
       return (
-        this.totalVentasEfectivo +
-        this.totalVentasVisa +
-        this.totalVentasMastercard +
-        this.totalVentasTransferencia +
-        this.totalIngresos -
-        this.totalSalidas -
-        this.totalAdelantosActivos
+        (this.totalVentasEfectivo ? this.totalVentasEfectivo : 0) +
+        (this.totalVentasVisa ? this.totalVentasVisa : 0) +
+        (this.totalVentasMastercard ? this.totalVentasMastercard : 0) +
+        (this.totalVentasTransferencia ? this.totalVentasTransferencia : 0) +
+        (this.totalIngresos ? this.totalIngresos : 0) -
+        (this.totalSalidas ? this.totalSalidas : 0) -
+        (this.totalAdelantosActivos ? this.totalAdelantosActivos : 0)
       );
     },
     granTotalSinPagoCliente() {
