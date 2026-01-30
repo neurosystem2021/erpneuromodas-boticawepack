@@ -93,7 +93,7 @@
             <!--<th></th>-->
             <th width="40%" class="desc">DESCRIPCIÓN</th>
             <th width="20%" class="de">PRESENTACIÓN</th>
-            <th width="8%" class="um">U.M.</th>
+            <th width="8%" class="um">CantxPres</th>
             <th width="10%" class="qty">CANT.</th>
             <th width="10%" class="unit">PRECIO U.</th>
             <th width="10%"class="total">TOTAL</th>
@@ -105,15 +105,17 @@
             <!--<td></td>-->
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
             <td width="40%" class="desc"><h3 style="color:black !important;">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }} <br><!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
-            <td width="20%" class="de" style="text-align:center">{{ prod.Descripcion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
-            <td width="8%" class="um" style="text-align:center">{{ prod.ProductoMedicion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
+            <td width="20%" class="de" style="text-align:center; font-weight:bold">
+              {{ prod.Presentacion }} {{ (prod.Presentacion && prod.Presentacion.toUpperCase() !== 'UNIDAD') ? '(x ' + prod.CantidadxPresentacion + ' und.)' : '' }}
+            </td>            
+            <td width="8%" class="um" style="text-align:center">{{ prod.CantidadxPresentacion }}<!--<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}--></td>
             <!--<td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>-->
              <!--<td class="desc"><h3>{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br>{{ prod.ProductoDesc2 }}<br>{{ prod.ProductoDesc3 }}</td>-->
             <td width="10%" class="qty">{{ prod.Cantidad }}</td>
             <td width="10%" class="unit">S/. {{ prod.Precio | moneda }}</td>
             <td width="10%" class="total">
               <div v-if="prod.DisabledTotal === 0">
-                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
+                S/. {{ ((prod.Precio * prod.Cantidad)*prod.CantidadxPresentacion) - prod.Descuento | redondear }}<br>
                 <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
               </div>
             </td>
@@ -206,7 +208,7 @@ export default {
     subTotal() {
       let sumatoria = 0;
       this.proforma.productos.forEach(prod => {
-        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+        sumatoria += ((prod.Cantidad * prod.Precio)*prod.CantidadxPresentacion) - prod.Descuento;
       });
       return sumatoria;
     }
