@@ -497,6 +497,7 @@ export default {
     };
   },
   async beforeMount() {
+    console.log('prdoct? ')
     this.empresa = sessionStorage.getItem("empresa") || "modasm";
 
     await this.initForm();

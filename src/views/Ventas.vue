@@ -1073,9 +1073,11 @@ export default {
     }
 
     // setInterval(this.updateTime, 1000)
-    this.loadClienteVarios();
-    this.escucharPedidos();
-    this.configStock();
+    await Promise.all(
+      this.loadClienteVarios(),
+      this.escucharPedidos(),
+      this.configStock()
+    );
 
     setTimeout(() => {
       this.recalcularTotalesPorEmpresa();
@@ -1700,7 +1702,7 @@ export default {
         if (obj.IdProforma > 0) {
           this.venta.idProforma = obj.IdProforma;
           this.venta.anioNumeroProforma = obj.Anio + "-" + obj.Numero;
-          this.getVendedor(obj.UsuarioReg);
+          // this.getVendedor(obj.UsuarioReg);
           delete obj.productos;
           this.axios
             .post(
@@ -1835,19 +1837,7 @@ export default {
     updateTime() {
       this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
     },
-    //limpiarDespuesVenta () {
-    //    this.inProgress = false
-    //    this.tieneIgv = false
-    //    this.initForm()
-    //    this.limpiarCart()
-    //    this.getVendedor()
-    //    this.$refs.inputCliente.setValue('')
-    // this.getNumeroVenta()
-    // this.$refs.inputTipoVenta.setValue('TICKET')
-    // this.$refs.inputAlmacen.setValue('VENTA')
-    // this.$refs.inputPuntoVenta.setValue('CAJA1')
-    // this.$refs.inputVendedor.setValue('')
-    //},
+
     guardarProforma() {
       this.inProgress = true;
 
