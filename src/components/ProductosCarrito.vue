@@ -1534,10 +1534,10 @@ export default {
       if (!obj.stockMax) {
         obj.stockMax = obj.stock;
       }
-      console.log(obj);
+
       let empresa = sessionStorage.getItem("empresa")
         ? sessionStorage.getItem("empresa")
-        : "modasm";
+        : "1";
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
@@ -1559,10 +1559,11 @@ export default {
       );
       console.log(obj);
       if (!obj.PreciosPorProducto || fPP.length === 5) {
+        console.log("llegó a");
         obj.estadoPxP = true;
-        this.setProductoUni(obj);
-        return;
       }
+      this.setProductoUni(obj);
+      console.log("llegó b");
 
       this.$refs["modalCant"].show();
       // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
