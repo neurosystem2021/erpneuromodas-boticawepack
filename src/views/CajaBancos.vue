@@ -40,11 +40,11 @@
               <div class="clsCaja">
               <table class="table table-hover">
                   <thead>
-                    <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                    <tr class="headerTable">
                       <th style="border: 1px solid #ffffff;">Cuenta</th>
                       <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
                     </tr>
-                    <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
+                    <tr class="headerSubTitle">
                       <th style="border: 1px solid #ffffff;">ID</th>
                       <th style="border: 1px solid #ffffff;">Usuario</th>
                       <th style="border: 1px solid #ffffff;">Concepto</th>
@@ -312,7 +312,7 @@
                 <div class="card-body">
                 <table class="table">
                     <thead>
-                      <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                      <tr class="headerTable">
                         <th style="border: 1px solid #ffffff;">Id</th>
                         <th style="border: 1px solid #ffffff;">Fecha</th>
                         <th style="border: 1px solid #ffffff;">FechaVen</th>

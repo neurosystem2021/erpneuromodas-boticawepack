@@ -947,9 +947,13 @@ export default {
       ).toFixed(2);
     },
     recalcularMontosDolar() {
-      let PrecioCosto = this.producto.PrecioCosto;
-      let PrecioContado = this.producto.PrecioContado;
-      let TipoCambio = this.producto.TipoCambio;
+      let PrecioCosto = this.producto.PrecioCosto
+        ? this.producto.PrecioCosto
+        : 0;
+      let PrecioContado = this.producto.PrecioContado
+        ? this.producto.PrecioContado
+        : 0;
+      let TipoCambio = this.producto.TipoCambio ? this.producto.TipoCambio : 0;
       let PrecioCostoDolar = PrecioCosto / TipoCambio;
       let PrecioContadoDolar = PrecioContado / TipoCambio;
       this.producto.PrecioCostoDolar = parseFloat(PrecioCostoDolar).toFixed(2);
@@ -960,9 +964,13 @@ export default {
     },
 
     actualizarPorcentajeUtilidad() {
-      var precioContado = this.producto.PrecioContado;
-      var precioCosto = this.producto.PrecioCosto;
-      var flete = this.producto.Flete;
+      var precioContado = this.producto.PrecioContado
+        ? this.producto.PrecioContado
+        : 0;
+      var precioCosto = this.producto.PrecioCosto
+        ? this.producto.PrecioCosto
+        : 0;
+      var flete = this.producto.Flete ? this.producto.Flete : 0;
       /**
        * $$PorcentajeUtilidad = 100 \times (1 - \frac{PrecioCosto}{PrecioContado - Flete})$$
        *

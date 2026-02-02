@@ -331,7 +331,8 @@ tfoot td {
 
 thead th {
   top: 0;
-  background: #f8f9fa; /* color del encabezado */
+  background: #1a237e; /* color del encabezado */
+  color: #ffffff;
   z-index: 2;
 }
 

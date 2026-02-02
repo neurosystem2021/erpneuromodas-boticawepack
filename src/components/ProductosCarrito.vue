@@ -684,70 +684,7 @@
       </div>
     </b-modal>
 
-    <b-modal
-      v-model="touchModal"
-      size="sm"
-      hide-footer
-      class="ingDesc"
-      title="Codigo Barra"
-      hide-header-close
-    >
-      <input
-        readonly
-        type="text"
-        inputmode="none"
-        @keypress="
-          (e) => {
-            verificar(e);
-          }
-        "
-        v-model="cantidadInput"
-        style="
-          font-size: 20px;
-          width: 100%;
-          text-align: center;
-          font-weight: bold;
-          color: #1266f1;
-        "
-        class="form-control"
-      />
-      <table class="calc__numbers calc__numbers2">
-        <tbody>
-          <tr>
-            <td class="botones" @click="addNumber('7')">7</td>
-            <td class="botones" @click="addNumber('8')">8</td>
-            <td class="botones" @click="addNumber('9')">9</td>
-          </tr>
-          <tr>
-            <td class="botones" @click="addNumber('4')">4</td>
-            <td class="botones" @click="addNumber('5')">5</td>
-            <td class="botones" @click="addNumber('6')">6</td>
-          </tr>
-          <tr>
-            <td class="botones" @click="addNumber('1')">1</td>
-            <td class="botones" @click="addNumber('2')">2</td>
-            <td class="botones" @click="addNumber('3')">3</td>
-          </tr>
-          <tr>
-            <td class="botones" @click="addNumber(0)">0</td>
-            <!-- <td class="botones" @click="addPoint('.');">.</td> -->
-            <td class="botones" @click="deleteNumber()">
-              <i class="fas fa-backspace"></i>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="3" style="text-align: center">
-              <b-button variant="success" @click="buscarCodigoBarra()"
-                >Buscar</b-button
-              >
-              <b-button variant="danger" @click="touchModal = !touchModal"
-                >Cerrar</b-button
-              >
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </b-modal>
+    
   </b-row>
 </template>
 
@@ -1738,87 +1675,16 @@ export default {
   justify-items: center;
 }
 
-#modalCodigoBarra {
-  padding: 0 !important;
-}
-#modalCodigoBarra .modal-dialog {
-  max-width: 50vw !important;
-  max-height: 50vh !important;
-}
-#modalCodigoBarra .modal-body {
-  padding-bottom: 1px !important;
-  margin-bottom: 1px !important;
-}
-#codigoBarraStyle video,
-canvas {
-  width: 100%;
-  height: 100%;
-}
-.cameraBarra {
-  height: 20em;
-  width: auto;
-  margin: 0 auto;
-}
+
+
 .cboAgregar {
   border: 1px solid blue;
 }
-@media only screen and (max-width: 750px) {
-  #modalCodigoBarra .modal-dialog {
-    max-width: 100vw !important;
-    max-height: 80vh !important;
-  }
-  .cameraBarra {
-    height: 80vh;
-    width: auto;
-  }
-  .ocultarMovil {
-    display: none;
-  }
-  .mostrarMovil {
-    display: block;
-  }
-}
-@media only screen and (max-width: 375px) {
-  #modalCodigoBarra .modal-dialog {
-    max-width: 100vw !important;
-    max-height: 80vh !important;
-  }
-  .cameraBarra {
-    height: 80vh;
-    width: auto;
-  }
-}
+
 @media only screen and (max-width: 700px) {
   .ocularMovil {
     display: none;
   }
 }
-.calc__numbers .botones {
-  /* border: 1px solid #000000; */
-  cursor: pointer;
-  text-align: center;
-}
-.calc__numbers .botones:hover {
-  color: #fff;
-  background: #65ba9b;
-  border: 1px;
-}
-.calc__numbers {
-  width: 15vw;
-  height: 15vw;
-}
-.calc__numbers2 {
-  width: 100%;
-  height: 20vh;
-}
-.calc__numbers .botones {
-  /* border: 1px solid #000000; */
-  cursor: pointer;
-  text-align: center;
-}
-.calc__numbers .botones:hover {
-  color: #fff;
-  background: #65ba9b;
-  border: 1px;
-}
+
 </style>

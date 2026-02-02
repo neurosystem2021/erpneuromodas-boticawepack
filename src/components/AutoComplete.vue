@@ -5,7 +5,8 @@
         class="form-control" 
         v-model="text"  
         @input="buscar"
-        @focus="buscar"
+        @focus="buscar(); inCliente()"
+        id="Cliente"
       />
       <div>
         <div v-for="(list,index) in listado" :key="index" @click="guardarCliente(list)" class="trDetails">
@@ -76,6 +77,9 @@ export default {
         this.listado = res.data;
       });
     },
+    inCliente() {
+      document.getElementById("Cliente").select();
+    },
     handleKeyDown(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         this.listado = [];
@@ -126,9 +130,9 @@ export default {
 }
 @media (max-width: 1250px) {
   .txtText {
-  position: relative; /* Define un contenedor relativo */
-  min-width: 100%;
-  max-width: 100%;  
-}
+    position: relative; /* Define un contenedor relativo */
+    min-width: 100%;
+    max-width: 100%;
+  }
 }
 </style>

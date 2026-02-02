@@ -16,7 +16,8 @@
                   anchor="Cuenta"
                   label="writer"
                   placeholder=""
-                  :on-select="setCuenta" 
+                   :on-select="setCuenta" 
+                  initValue="Caja Principal"
                   :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
                   :onInput="(val) => newDniRuc = val"
                   :classes="{input: 'form-control'}"
@@ -54,7 +55,8 @@
                   anchor="Cuenta"
                   label="writer"
                   placeholder=""
-                  :on-select="setCuenta" 
+                   :on-select="setCuenta" 
+                  initValue="Caja Principal"
                   :onFocus="focusAutocomplete.bind(null, 'inputCaja2')"
                   :onInput="(val) => newDniRuc = val"
                   :classes="{input: 'form-control'}"
@@ -91,7 +93,8 @@
                   anchor="Cuenta"
                   label="writer"
                   placeholder=""
-                  :on-select="setCuenta" 
+                   :on-select="setCuenta" 
+                  initValue="Caja Principal"
                   :onFocus="focusAutocomplete.bind(null, 'inputCaja3')"
                   :onInput="(val) => newDniRuc = val"
                   :classes="{input: 'form-control'}"
@@ -128,7 +131,8 @@
                   anchor="Cuenta"
                   label="writer"
                   placeholder=""
-                  :on-select="setCuenta" 
+                   :on-select="setCuenta" 
+                  initValue="Caja Principal"
                   :onFocus="focusAutocomplete.bind(null, 'inputCaja4')"
                   :onInput="(val) => newDniRuc = val"
                   :classes="{input: 'form-control'}"
@@ -181,6 +185,11 @@ export default {
         SalidaDesc: "",
         Deposito: "",
         DepositoDesc: ""
+      },
+      Cuenta: {
+        IdCuenta: 1,
+        Cuenta: "Caja Principal",
+        Anulado: 0
       }
       // Otros datos...
     };
@@ -282,8 +291,8 @@ export default {
       //     console.log(e);
       //   });
     },
-    focusAutocomplete (ref) {
-                this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(ref) {
+      this.$refs[ref].handleDoubleClick();
     },
     insertarGasto() {
       let usuario = sessionStorage.getItem("User");
@@ -295,8 +304,7 @@ export default {
         this.axios
           .post(this.API + "cajaybanco/gasto", {
             producto: this.selectProducto,
-            concepto:
-              "Gasto " + " - " + this.selectProducto.GastoDesc,
+            concepto: "Gasto " + " - " + this.selectProducto.GastoDesc,
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
@@ -305,7 +313,7 @@ export default {
           })
           .then(res => {
             // this.adelantos.push(res.data)
-            this.$refs.inputCaja.setValue('');
+            // this.$refs.inputCaja.setValue("");
             // this.cargarGastos();
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Gasto = "";
@@ -314,8 +322,8 @@ export default {
           });
       }
     },
-    setCuenta (obj) {
-        this.Cuenta = obj
+    setCuenta(obj) {
+      this.Cuenta = obj;
     },
     insertarIngreso() {
       let usuario = sessionStorage.getItem("User");
@@ -338,7 +346,7 @@ export default {
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja2.setValue('');
+            // this.$refs.inputCaja2.setValue("");
             this.selectProducto.Ingreso = "";
             this.selectProducto.Gasto = "";
             this.selectProducto.Producto = "";
@@ -367,7 +375,7 @@ export default {
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja3.setValue('');
+            // this.$refs.inputCaja3.setValue("");
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Salida = "";
             this.selectProducto.Producto = "";
@@ -395,7 +403,7 @@ export default {
           .then(res => {
             // this.adelantos.push(res.data)
             //this.cargarGastos();
-            this.$refs.inputCaja4.setValue('');
+            // this.$refs.inputCaja4.setValue("");
             this.selectProducto.IdCuenta = "";
             this.selectProducto.Deposito = "";
             this.selectProducto.Producto = "";
@@ -455,5 +463,4 @@ h6 {
   text-align: left;
   font-size: 1rem;
 }
-
 </style>

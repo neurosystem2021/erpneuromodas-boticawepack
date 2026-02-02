@@ -387,7 +387,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .modalRegVentaDetalle .modal-dialog {
   max-width: 90% !important;
   width: 90% !important;
@@ -417,7 +417,8 @@ tfoot td {
 
 thead th {
   top: 0;
-  background: #f8f9fa; /* color del encabezado */
+  background: #1a237e; /* color del encabezado */
+  color: #ffffff;
   z-index: 2;
 }
 

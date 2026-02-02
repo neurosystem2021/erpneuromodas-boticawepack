@@ -151,7 +151,20 @@ export default {
       });
     },
     guardaTipoCambio() {
-      this.axios.post(`${this.API}/tipocambio`, this.monedaDolar);
+      this.$swal({
+        icon: "question",
+        title: "Tipo Cambio",
+        text:
+          "Se actualizarán los precios dolares de todos los prodoctos. ¿Desea Continuar?",
+        confirmButtonText: "Si, continuar",
+        showCancelButton: true,
+        cancelButtonText: `Cancelar`
+      }).then(async res => {
+        if (res.isConfirmed) {
+          await this.axios.post(`${this.API}/tipocambio`, this.monedaDolar);
+          this.actualizarTabla();
+        }
+      });
     },
     nuevoProducto() {
       this.productoSelect = {};
