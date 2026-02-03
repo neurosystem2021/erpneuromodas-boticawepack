@@ -790,10 +790,16 @@ export default {
         .then(response => {
           this.setVendedor(response.data);
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-          // this.$refs.inputVendedor.$refs.input.disabled = true
+          // Definimos quiénes SÍ pueden editar (SuperAdmin, Admin, etc.)
+          const perfilesConPermiso = [1, 65, 66];
+          const perfilActual = response.data.IdUsuarioPerfil;
 
-          if (response.data.IdUsuarioPerfil !== 1) {
-            this.$refs.inputVendedor.$refs.input.disabled = true
+          // Si el perfil actual NO está en nuestra lista, bloqueamos el input
+          if (!perfilesConPermiso.includes(perfilActual)) {
+            this.$refs.inputVendedor.$refs.input.disabled = true;
+          } else {
+            // Opcional: Aseguramos que esté habilitado si es uno de los permitidos
+            this.$refs.inputVendedor.$refs.input.disabled = false;
           }
         })
         .catch(error => {
