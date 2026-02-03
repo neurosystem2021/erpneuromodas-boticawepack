@@ -25,9 +25,9 @@
                 <td>{{ prod.Detalle }} - {{ prod.Serie }} - {{ prod.Numero }}</td>
                 <td>{{ prod.Nombres }}</td>
                 <td :class="{'table-warning': prod.IngresoCantidad > 0}">{{ prod.IngresoCantidad }}</td>
-                <td :class="{'table-warning': prod.IngresoPrecio > 0}"><b>{{ prod.IngresoPrecio > 0 ? prod.Moneda : '' }}</b> {{ prod.IngresoPrecio | redondear }}</td>
+                <td :class="{'table-warning': prod.IngresoPrecio > 0}"><b>{{ prod.IngresoPrecio > 0 ? 'S/. ' : '' }}</b> {{ prod.IngresoPrecio | redondear }}</td>
                 <td :class="{'table-warning': prod.SalidaCantidad > 0}">{{ prod.SalidaCantidad }}</td>
-                <td :class="{'table-warning': prod.SalidaPrecio > 0}"><b>{{ prod.SalidaPrecio > 0 ? prod.Moneda : '' }}</b> {{ prod.SalidaPrecio | redondear }}</td>
+                <td :class="{'table-warning': prod.SalidaPrecio > 0}"><b>{{ prod.SalidaPrecio > 0 ? 'S/. ' : '' }}</b> {{ prod.SalidaPrecio | redondear }}</td>
                 <td class="table-danger">{{ prod.saldo }}</td>
             </tr>
         </tbody>
