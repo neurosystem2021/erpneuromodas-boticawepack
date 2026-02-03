@@ -1156,6 +1156,20 @@ export default {
       }
     },
     setProducto(obj) {
+
+      //PRIMERO: verificar si ya existe en carrito
+      let existente = this.productos.find(p => p.IdProducto === obj.IdProducto);
+
+      if (existente) {
+        existente.cantidad += 1;
+        existente.subt = existente.cantidad * existente.precio;
+
+        this.loadCode = "";
+        this.$refs.barcodeInput.focus();
+        return; //MUY IMPORTANTE: cortar aquí
+      }
+
+      // ---------- SOLO SI ES NUEVO ----------
       this.precioCont = obj.PrecioContado;
       obj.estadoPxP = false;
       this.loadCode = "";
@@ -1178,6 +1192,8 @@ export default {
         return;
         */
       }
+
+      // SOLO aquí crear producto nuevo
       this.setProductoUni(obj);
       obj.cantxPrecio = 1;
       this.indexProdSelect = null;
