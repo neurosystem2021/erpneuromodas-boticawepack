@@ -1064,7 +1064,10 @@ export default {
           PuntoVenta: "PRINCIPAL"
         },
         vendedor: {},
-        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        //FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        FechaCredito: this.$moment()
+                .add(1, "day")
+                .format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
@@ -1118,7 +1121,10 @@ export default {
             PuntoVenta: "PRINCIPAL"
           },
           vendedor: {},
-          FechaCredito: this.$moment().format("YYYY-MM-DD"),
+          //FechaCredito: this.$moment().format("YYYY-MM-DD"),
+          FechaCredito: this.$moment()
+                .add(1, "day")
+                .format("YYYY-MM-DD"),
           FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
           pago: {
             efectivo: { IdMetodoPago: 1, monto: 0 },
