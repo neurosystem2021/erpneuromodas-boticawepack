@@ -31,6 +31,8 @@ import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+
 Vue.use(Router)
 
 export default new Router({
@@ -120,6 +122,11 @@ export default new Router({
       path: '/reportes/deudaproveedores',
       name: 'DeudaProveedores',
       component: DeudaProveedores
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
     },
     {
       path: '/reportes/rankingclientes',
