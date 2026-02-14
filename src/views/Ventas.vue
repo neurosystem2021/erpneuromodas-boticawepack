@@ -141,6 +141,12 @@
                      
                       
                   </b-col>
+                  <b-col md="12" class="mb-1">
+                          <b-form-group horizontal label="Descripción:">
+                              <input v-model="venta.Descripcion" type="text" class="form-control"
+                                  style="text-transform:uppercase" placeholder="Descripcion" />
+                          </b-form-group>
+                  </b-col>
                   <b-col lg="6" xl="6"  cols="12">
                     <b-form-checkbox
                       :id="`checkbox-${index}`"
