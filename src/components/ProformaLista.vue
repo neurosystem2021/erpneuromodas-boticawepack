@@ -134,6 +134,7 @@ export default {
         .then(response => {
           this.limpiarCarrito();
           response.data.map(item => {
+            item.precioMin = item.precioMin ? item.precioMin : item.Precio;
             this.add([
               item,
               () => {},
