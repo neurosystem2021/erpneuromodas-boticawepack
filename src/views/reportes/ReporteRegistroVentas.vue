@@ -287,7 +287,7 @@ export default {
       let total = 0;
       if (this.lstReporte.length > 0) {
         total = this.lstReporte.reduce((sum, reporte) => {
-          return sum + reporte.Total;
+          return sum + parseFloat(reporte.TotalSumable || 0);
         }, 0);
       }
       return parseFloat(total).toFixed(2);
