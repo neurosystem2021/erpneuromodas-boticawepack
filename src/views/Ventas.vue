@@ -969,6 +969,12 @@ export default {
                 }
             }
 
+            if(parseFloat(totalPagos) > 600 && this.venta.tipoVenta.CodSunat == '03' && this.venta.cliente.DniRuc == '00000000' ){
+                this.$toasted.error('Venta con boleta mayor a 600 soles, no puede ser emitida con cliente varios');
+                this.inProgress = false
+                return;
+            }
+
             if (!this.venta.cliente.DniRuc) {
                 this.$toasted.show('Debe seleccionar un cliente.')
                 this.inProgress = false
