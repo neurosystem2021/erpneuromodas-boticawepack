@@ -227,6 +227,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
+              @input="actualizarPorcentajeUtilidad"
               type="number"
               class="form-control"
               step="0.0001"
@@ -392,9 +393,7 @@ export default {
           IdProductoTalla: newVal.IdProductoTalla,
           ProductoTalla: newVal.ProductoTalla
         };
-        this.producto.Producto = newVal.Producto.split("-")
-          .slice(0, -1)
-          .join();
+        this.producto.Producto = newVal.Producto;
         this.producto.IdProducto = newVal.IdProducto;
         this.producto.Genero = newVal.Genero;
         //this.producto.Botapie = newVal.Botapie
@@ -465,17 +464,22 @@ export default {
             10
         ) /
           10;
+      this.actualizarPorcentajeUtilidad();
     },
     actualizarPorcentajeUtilidad() {
-      this.producto.PorcentajeUtilidad =
-        100 *
-        ((this.producto.PrecioContado - this.producto.PrecioCosto) /
-          this.producto.PrecioCosto);
+      const costo = parseFloat(this.producto.PrecioCosto) || 0;
+      const venta = parseFloat(this.producto.PrecioContado) || 0;
+
+      if (venta > 0) {
+        this.producto.PorcentajeUtilidad = Number(((venta - costo) / costo * 100).toFixed(2));
+      } else {
+        this.producto.PorcentajeUtilidad = 0;
+      }
     },
     actualizarPrecioContado() {
       var precioCosto = this.producto.PrecioCosto;
-      var utilidad = this.producto.PorcentajeUtilidad;
-      var nuevoPrecioContado = precioCosto + precioCosto * (utilidad / 100);
+      var utilidad = this.producto.PorcentajeUtilidad / 100;
+      var nuevoPrecioContado = parseFloat(precioCosto) + parseFloat(precioCosto * utilidad);
 
       this.producto.precioContadoNormal = nuevoPrecioContado;
       this.producto.PrecioContado = this.$options.filters.redondeoMayor(
