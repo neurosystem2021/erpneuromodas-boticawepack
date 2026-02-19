@@ -49,11 +49,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -78,11 +79,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -108,11 +110,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -136,11 +139,12 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
+              <th>Vendedor</th><th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Pagado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -227,9 +231,11 @@ export default {
   mounted () {
     this.loadData()
     if (this.$route.params.id) {
-      this.getCierre(this.$route.params.id)
+      this.getCierre(this.$route.params.id);
+      this.loadData();
     } else {
-        this.getVendedor()
+        this.getVendedor();
+        this.loadData();
     }
   },
   data () {
@@ -358,7 +364,7 @@ export default {
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno: this.turno,
-          //user: sessionStorage.getItem("User")
+          user: sessionStorage.getItem("User"),
           user: this.vendedor.Usuario
         }).then(res => {
           this.loadData()
@@ -376,19 +382,13 @@ export default {
     },
     getVentas () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        usuario: this.vendedor.Usuario
       }
-      if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
-      }
-      // cierre de caja enviar el vendedor
-      this.axios.get(this.API + 'cierrecaja/ventas', {
-        params: params
-      })
+
+      this.axios.get(this.API + 'cierrecaja/ventas', { params })
       .then(res => {
         this.ventas = res.data
-      }).catch(err => {
-        console.log(err)
       })
     },
     getIngresos () {
@@ -397,7 +397,7 @@ export default {
         idCuenta: 1
       }
       if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
+         params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/ingresos',{
         params: params
@@ -414,7 +414,7 @@ export default {
         idCuenta: 1
       }
       if (this.vendedor.Usuario) {
-        // params.usuario = this.vendedor.Usuario
+         params.usuario = this.vendedor.Usuario
       }
       this.axios.get(this.API + 'cierrecaja/salidas', {
         params: params
