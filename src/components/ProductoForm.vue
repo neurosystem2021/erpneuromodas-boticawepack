@@ -128,6 +128,25 @@
               @input="(val) => producto.Color = val && val.toUpperCase()"              
               ></b-form-input>-->
           </b-form-group>
+          <b-form-group>
+            <label>Tienda:</label>
+            <autocomplete
+                required="required"
+                :url="API + 'productos/tienda'"
+                ref="inputTienda"
+                anchor="Tienda"
+                label="writer"
+                :placeholder.sync="producto.Tienda"
+                :on-select="val => producto.Tienda = val.Tienda && val.Tienda.toUpperCase()"
+                :onInput="val => producto.Tienda = val && val.toUpperCase()"
+                :onFocus="focusAutocomplete.bind(null, 'inputTienda')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            <!--<b-form-input v-model="producto.Color"
+              type="text"
+              @input="(val) => producto.Color = val && val.toUpperCase()"              
+              ></b-form-input>-->
+          </b-form-group>
         </b-col>
 
         <b-col md="6">
@@ -383,6 +402,8 @@ export default {
         this.$refs.inputTalla.setValue(newVal.ProductoTalla);
 
         this.$refs.inputColor.setValue(newVal.Color);
+
+        this.$refs.inputTienda.setValue(newVal.Tienda);
         //this.$refs.inputBotapie.setValue(newVal.Botapie)
 
         /* this.producto.modelo = {
@@ -512,6 +533,7 @@ export default {
       this.$refs.inputTalla.setValue("");
       this.$refs.inputModelo.setValue("");
       this.$refs.inputColor.setValue("");
+      this.$refs.inputTienda.setValue("");
       //this.$refs.inputBotapie.setValue('')
 
       this.initForm();
@@ -528,6 +550,7 @@ export default {
         Producto: "",
         CodigoBarra: "",
         Color: "",
+        Tienda: "",
         PorcentajeUtilidad: "",
         StockMinimo: 0,
         PrecioContado: "",
