@@ -30,7 +30,7 @@
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="cantidad" slot-scope="data">
           <input
-            v-model="productos[data.index].cantidad"
+            v-model.number="productos[data.index].cantidad"
             type="number"
             style="width: 85px"
             min="0"
@@ -403,7 +403,7 @@ export default {
       this.$refs.autocompleteProducto.setValue(this.$refs.autocompleteProducto.$el.children[0].value)
       //obj.FLETE = 0
       obj.precio = obj.PrecioCosto
-      obj.cantidad = 1
+      obj.cantidad = Number(obj.cantidad || 1)
       //obj.IdLote = 0
       //obj.TieneIgv = 0
       obj.descuento = 0
