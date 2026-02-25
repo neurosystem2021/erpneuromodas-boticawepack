@@ -442,7 +442,7 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="3"></td>
                 <td class="total-salida"><b>Total Salidas</b></td>
                 <td colspan="2" class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
@@ -451,6 +451,34 @@
         </b-col>
       </b-row>
       
+      <b-row>
+        <b-col v-if="totalSalidasTarjeta">
+          <h5>Salidas de Cuentas Bancarias </h5><br>
+          <table class="table b-table table-sm">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                <td>{{ item.IdCajaBanco }}</td>
+                <td>{{ item.Cuenta }}</td>
+                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3"></td>
+                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+              </tr>
+            </tfoot>
+          </table>
+        </b-col>
+      </b-row>
 
       <b-row>
         <b-col v-if="totalIngresosTarjeta">
@@ -472,7 +500,7 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
+                <td colspan="3"></td>
                 <td class="total"><b>Total Ingresos Tarjetas</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
@@ -562,16 +590,22 @@ export default {
       return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia
     },
     totalSalidas () {
-      let total = 0
-      this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe
-      });
-      return total 
+      return this.salidas.reduce((total, salida) => {
+        const esValido = !salida.Anulado && salida.IdTipoCajaBanco !== 22;
+        return esValido ? total + salida.Importe : total;
+      }, 0);
     },
     totalIngresosTarjeta () {
       let total = 0
       this.ingresosTarjeta.forEach(ingresoTar => {
         if (!ingresoTar.Anulado) total += ingresoTar.Importe
+      });
+      return total 
+    },
+    totalSalidasTarjeta () {
+      let total = 0
+      this.salidasTarjeta.forEach(salidasTar => {
+        if (!salidasTar.Anulado) total += salidasTar.Importe
       });
       return total 
     },
@@ -808,7 +842,8 @@ export default {
         params: params
       })
       .then(res => {
-        this.salidas = res.data
+        this.salidas = res.data.filter((sal)=> sal.EsTarjeta==0)
+        this.salidasTarjeta = res.data.filter((sal)=> sal.EsTarjeta==1)
       }).catch(err => {
         console.log(err)
       }) 

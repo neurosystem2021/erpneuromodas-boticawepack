@@ -9,7 +9,7 @@
     >
       <b-tabs content-class="mt-3" @click.stop>
         <b-tab title="Compra de chatarra">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <b-form @submit.prevent @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
                 <b-col md="6">
@@ -69,7 +69,7 @@
         </b-tab>
         
         <b-tab title="Ingreso">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <b-form @submit.prevent @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
                 <b-col md="4">
@@ -92,7 +92,7 @@
         </b-tab>
 
         <b-tab title="Salida">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <b-form @submit.prevent @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
                 <b-col md="4">
@@ -115,7 +115,7 @@
         </b-tab>
 
         <b-tab title="Dep. Cuenta Bancaria">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <b-form @submit.prevent @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
                 <b-col md="4">
@@ -136,6 +136,29 @@
             </template>
           </b-form>
         </b-tab>
+
+        <b-tab title="Gastos Digitales">
+            <b-form @submit.prevent @keydown.enter.prevent>
+              <div class="my-3">
+                <b-row>
+                  <b-col md="4">
+                    <label>Monto:</label>
+                    <b-form-group>
+                      <input v-model="selectProducto.Yape" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                    </b-form-group>
+                    <label>N° Operación - Descripción:</label>
+                    <b-form-group>
+                      <b-form-input v-model="selectProducto.YapeDesc" required placeholder="Descripción"></b-form-input>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+              </div>
+              <template #modal-footer>
+                <b-btn variant="success" type="submit" @click="insertarYape">Guardar</b-btn>
+                <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+              </template>
+            </b-form>
+          </b-tab>
       </b-tabs>
     </b-modal>
   </div>
@@ -166,6 +189,8 @@ export default {
         SalidaDesc: "",
         Deposito: "",
         DepositoDesc: "",
+        Yape: "",
+        YapeDesc: "",
         TotalGasto: 0,
         IdProducto: "",
         Cantidad: 1
@@ -247,7 +272,7 @@ export default {
                   icon: "error",
                   title: "Aviso",
                   text:
-                    "EL usuario no cuenta con los privilegios de administrador."
+                    "El usuario no cuenta con los privilegios de administrador."
                 });
               }
             } else {
@@ -324,6 +349,8 @@ export default {
               SalidaDesc: "",
               Deposito: "",
               DepositoDesc: "",
+              Yape: "",
+              YapeDesc: "",
               TotalGasto: 0,
               IdProducto: "",
               Cantidad: 1
@@ -416,6 +443,39 @@ export default {
             this.selectProducto.Deposito = "";
             this.selectProducto.Producto = "";
             this.selectProducto.DepositoDesc = "";
+          });
+      }
+    },
+
+    insertarYape() {
+      let usuario = sessionStorage.getItem("User");
+
+      if (!this.selectProducto.Yape || this.selectProducto.Yape <= 0) {
+        this.$toasted.error("Ingrese un monto válido para Yape/Plin");
+        return;
+      }
+
+      let r = confirm("¿Desea Insertar un yape/plin?");
+
+      if (r) {
+        this.axios
+          .post(this.API + "cajaybanco/yape", {
+            producto: this.selectProducto,
+            concepto: "Yape/Plin " + " - " + this.selectProducto.YapeDesc,
+            IdPreOrden: this.selectProducto.IdPreOrden,
+            IdHabitacion: this.selectProducto.IdProducto,
+            Monto: this.selectProducto.Yape, 
+            Usuario: usuario
+          })
+          .then(res => {
+            this.$toasted.success("Gasto digital registrado");
+            this.selectProducto.Yape = "";
+            this.selectProducto.YapeDesc = "";
+            this.selectProducto.Producto = "";
+          })
+          .catch(err => {
+            console.error(err);
+            this.$toasted.error("Error al registrar");
           });
       }
     },
