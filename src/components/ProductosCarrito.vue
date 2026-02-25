@@ -205,13 +205,43 @@
             placeholder="Flete"></b-form-input>
         </template>-->
         
-        <!--<template slot="lote" slot-scope="data">
+        <template slot="lote" slot-scope="data">
           <b-form-input
             v-model="productos[data.index].IdLote"
             type="text"
             min="0"
             placeholder="Lote"></b-form-input>
-        </template>-->
+        </template>
+
+         <template slot="Lote" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Lote"
+            type="text"
+            required
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Registro" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Registro"
+            type="text"
+            required
+            v-bind:class="{ ventasAncho: isVentas }"
+            autocomplete="false"
+            ></b-form-input>
+        </template>
+
+        <template slot="Presentacion" slot-scope="data" >
+          <b-form-input
+            v-model="productos[data.index].Presentacion"
+            type="text"
+            style="text-align:center; font-weight:bold; font-size: 0.8rem; width: 140px;"
+            autocomplete="false"
+            readonly
+            ></b-form-input>
+        </template>
         
         <template slot="manoobra" slot-scope="data" v-if="false">
           <input  :disabled="bloquearInput?true:false"
@@ -315,13 +345,42 @@
           </div>
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
-
+          
           <div style="display: flex; justify-content: space-evenly; align-items: center;">
+            <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+            <b-popover  placement="right" :target="'popover-lote' + data.index" :title="productos[data.index].Producto" triggers="focus">
+              <div style="text-align:center">
+                <b-form-select v-if="!isNota"
+                  style="width: 100%; text-align: left !important;"
+                  :disabled="bloquearInput?true:false"
+                  @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                  v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
+                </b-form-select>
+                <br>
+                <div class="text-left">
+                  Stock de Lote: <b>{{ ((productos[data.index].stockMovimiento || 0 )/(productos[data.index].cantidadPress || 1)).toFixed(2) }}</b> 
+                </div>
+                <div class="text-left">
+                  Nro. Factura: <b>{{ productos[data.index].SerieNumero }}</b>
+                </div>
+                <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
+                <div class="text-left">
+                  Registro Sanitario: <b>{{ productos[data.index].Registro }}</b> 
+                </div>
+                  
+                <!--<div style="text-align:center;" v-if="!isNota">
+                      <small style="font-size:14px;">Stock de lote: <span style="font-weight:bold;"></span> -  D: <span style="font-weight:bold; text-transform:uppercase"></span></small><br />
+                </div>-->
+                
+              </div>
+            </b-popover>
           <b-form-select v-if="!isNota"
             style="width: 135px;"
             :disabled="bloquearInput?true:false"
             @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
             v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]"></b-form-select>
+
+            
             <div style="width: 135px;">
               <div v-if="!isNota">
               <small>Doc: <span style="font-weight:bold;">{{ productos[data.index].SerieNumero }}</span></small>
@@ -455,6 +514,7 @@ export default {
       indexProdSelect: null,
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoSelect: {},
+      movimientoLotes: {},
       productoNombre: "",
       productoUrl: "",
       indexPos: null
@@ -531,7 +591,7 @@ export default {
           { key: "subtotal", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
           // { key: 'flete', label: 'FLETE' },
-          // { key: 'lote', label: 'Lote' },
+          { key: "lote", label: "Lote" },
           { key: "precioVenta", label: "Precio venta" },
           { key: "total", label: "Total", variant: "danger" },
           { key: "fechavencimiento", label: "Vencimiento" },
@@ -722,6 +782,15 @@ export default {
         let serieNumero = this.movimientoLotes[idProducto].find(
           m => m.value === hash
         ).SerieNumero;
+        let IdLote = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).IdLote;
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Lote;
+        let Registro = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).Registro;
+        console.log(Registro);
         if (stock) {
           // this.productos[index].stockMovimiento = stock
           this.$nextTick(() => {
@@ -740,14 +809,14 @@ export default {
         ).FechaVen;
         let hoy = this.$moment().unix();
         let fechaVenUnix = this.$moment(fechaVen).unix();
-        let en5dias = this.$moment()
-          .add(5, "days")
+        let en4meses = this.$moment()
+          .add(4, "months")
           .unix();
         let style = "bg-success";
         if (fechaVenUnix && fechaVenUnix < hoy) {
-          style = "bg-danger";
+          style = "bg-danger text-white";
         }
-        if (fechaVenUnix >= hoy && fechaVenUnix <= en5dias) {
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
           style = "bg-warning";
         }
         if (fechaVen) {
@@ -757,19 +826,25 @@ export default {
                 this.productos[index].FechaVen = this.$moment(fechaVen).format(
                   "YYYY-MM-DD"
                 );
+                this.productos[index].IdLote = IdLote;
+                this.productos[index].Lote = Lote;
+                this.productos[index].Registro = Registro;
                 //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
                 //Vue.set(this.productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
-                this.actualizarProd({
-                  Producto: this.productos[index],
-                  Pos: index
-                });
               }
+            } else {
+              this.productos[index].Lote = Lote;
+              this.productos[index].Registro = Registro;
+              try {
+                this.productos[index].FechaVen = this.$moment(fechaVen).format(
+                  "YYYY-MM-DD"
+                );
+              } catch (error) {}
             }
-
             Vue.set(
               this.productos[index],
               "fechaVenMovimiento",
-              `<small style="font-weight:bold" class='venci ${style}'>F. Venci: ${this.$moment(
+              `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${this.$moment(
                 fechaVen
               ).format("DD-MM-YYYY")}</small>`
             );
@@ -831,6 +906,9 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+    abrirLotes(target) {
+      //this.$refs.popover.$emit('open')
     },
     loadBarcode(e) {
       if (e) {
@@ -975,6 +1053,7 @@ export default {
         obj,
         () => {
           this.$emit("onAddProducto", obj);
+          this.loadMovimientoLotes(obj.IdProducto);
           this.$toasted.success("Producto añadido correctamente");
         },
         { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
@@ -985,6 +1064,67 @@ export default {
       this.$refs["modalCant"].hide();
       this.$refs.barcodeInput.focus();
     },
+    loadMovimientoLotes($idProducto) {
+      this.movimientoLotes[$idProducto] = [];
+      this.axios
+        .get(
+          this.API +
+            "movimientolotes/" +
+            $idProducto +
+            "/" +
+            (this.isVentas
+              ? this.idAlmacen
+              : this.movTipo == 0
+                ? this.almacenDestino
+                : this.almacenOrigen)
+        )
+        .then(response => {
+          if (response.data.length > 0) {
+            let indexProducto = this.productos.findIndex(
+              p => p.IdProducto === $idProducto
+            );
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a, b) => {
+              return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
+                ? a
+                : b;
+            });
+
+            this.$nextTick(() => {
+              Vue.set(
+                this.productos[indexProducto],
+                "hashMovimiento",
+                primeroVencer.hashMovimiento
+              );
+              this.changeMovimiento(
+                primeroVencer.hashMovimiento,
+                $idProducto,
+                indexProducto
+              );
+            });
+
+            this.movimientoLotes[$idProducto] = response.data.map(
+              l => (
+                console.log(l),
+                {
+                  value: l.hashMovimiento,
+                  text: l.Lote,
+                  Stock: l.Stock,
+                  IdLote: l.IdLote,
+                  Lote: l.Lote,
+                  FechaVen: l.FechaVen,
+                  SerieNumero: l.Serie + "-" + l.Numero,
+                  Registro: l.Registro
+                }
+              )
+            );
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     setProductoCant(prod) {
       let obj = { ...this.objProd };
       obj.Presentacion = prod.nombre;

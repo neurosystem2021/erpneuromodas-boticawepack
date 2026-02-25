@@ -126,7 +126,7 @@
               
               <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
               <b-row style="position: relative;max-height: 40vh;">
-                <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
+                <b-table striped hover :fields="headerTable" :items="venta.productos" width="100%"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
                       {{ data.item.stock }}
@@ -163,6 +163,35 @@
                       ></b-form-input>
                      
                      
+                  </template>
+                  <template slot="movimiento" slot-scope="data">
+                      <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+                      <b-popover  placement="right" :target="'popover-lote' + data.index" :title="data.item.Producto" triggers="focus">
+                        <div style="text-align:center">
+                          <b-form-select v-if="!isNota[index]"
+                            style="width: 100%; text-align: left !important;"
+                            :disabled="bloquearInput?true:false"
+                            @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                            v-model="data.item.hashMovimiento"
+                            :options="movimientoLotes[data.item.IdProducto]"
+                             text-field="Lote"
+                          >
+                           
+                          </b-form-select>
+                          <br>
+                          <div class="text-left">
+                            Stock de Lote: <b>{{ ((data.item.stockMovimiento || 0 )/(data.item.cantidadPress || 1)).toFixed(2) }}</b> 
+                          </div>
+                          <div class="text-left">
+                            Nro. Factura: <b>{{ data.item.SerieNumero }}</b>
+                          </div>
+                          <!-- Fecha de vencimiento formateada en changeMovimiento segun el lote seleccionado -->
+                          <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota[index]" v-html="data.item.fechaVenMovimiento"></div>
+                          <div class="text-left">
+                            Registro Sanitario: <b>{{ data.item.Registro }}</b> 
+                          </div>
+                        </div>
+                      </b-popover>
                   </template>
                   <template slot="cantidad" slot-scope="data">
                     <input
@@ -620,6 +649,7 @@
                 autocomplete="off"
                 v-model="busqueda"
                 @input="getProductosSearch"
+                @focus.prevent=""
               ></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
@@ -963,6 +993,11 @@ export default {
   },
   data() {
     return {
+      listeners: {
+        nuevoPedido: null,
+        connect: null,
+        disconnect: null
+      },
       productoSelect: {},
       indexPos: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -998,7 +1033,8 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "Producto", thStyle: { width: "40%" } },
+        { key: "movimiento", label: "" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
@@ -1146,6 +1182,7 @@ export default {
       index: 0,
       mostrar: {},
       mostrarOp: {},
+      movimientoLotes: {},
       cantidadInput: "",
       objProd: {},
       capturaIndex: null
@@ -1171,8 +1208,473 @@ export default {
     this.$nextTick(() => {
       this.irTxtLoadBarcode();
     });
+    this.conectarSocket();
+    this.setupSocketListeners();
+    this.getEstadoSistema();
+  },
+  beforeDestroy() {
+    this.removeSocketListeners();
+    this.$socket.disconnect();
   },
   methods: {
+    abrirLotes() {},
+    // Pinta la fila con variantes Bootstrap segun la fecha de vencimiento del lote seleccionado.
+    getVentaProductoRowVariant(fechaRaw) {
+      if (!fechaRaw) {
+        return null;
+      }
+      const fechaVen = this.$moment(fechaRaw);
+      if (!fechaVen.isValid()) {
+        return null;
+      }
+
+      const hoy = this.$moment().startOf("day");
+      const vencimiento = fechaVen.clone().startOf("day");
+      const limiteAlerta = hoy.clone().add(6, "months").endOf("day");
+
+      if (vencimiento.isBefore(hoy)) {
+        return "danger";
+      }
+
+      if (vencimiento.isSameOrBefore(limiteAlerta)) {
+        return "warning";
+      }
+
+      return "success";
+    },
+    // Redondeo unico para evitar diferencias por decimales al repartir cantidades entre lotes.
+    roundVentaQty(value, decimals = 5) {
+      const n = parseFloat(value);
+      if (isNaN(n)) {
+        return 0;
+      }
+      const factor = Math.pow(10, decimals);
+      return Math.round(n * factor) / factor;
+    },
+    // Construye el detalle por lotes de una linea de venta.
+    // Usa como prioridad el lote seleccionado y luego completa con los siguientes lotes disponibles.
+    buildVentaProductoLotesDetalle(producto, codSunat) {
+      if (!producto || !producto.hashMovimiento || codSunat === "07") {
+        return { lotesDetalle: null };
+      }
+
+      const lotesProducto = (this.movimientoLotes[producto.IdProducto] || []).filter(
+        lote => lote && (parseFloat(lote.Stock) || 0) > 0
+      );
+
+      if (!lotesProducto.length) {
+        return { lotesDetalle: null };
+      }
+
+      const cantidadLinea = this.roundVentaQty(producto.cantidad);
+      if (cantidadLinea <= 0) {
+        return { lotesDetalle: null };
+      }
+
+      const cantidadPresentacion =
+        parseFloat(producto.CantidadPresentacion) > 0
+          ? parseFloat(producto.CantidadPresentacion)
+          : 1;
+
+      let restanteUnidades = this.roundVentaQty(
+        cantidadLinea * cantidadPresentacion
+      );
+
+      const hashSeleccionado = String(producto.hashMovimiento);
+      const idxSeleccionado = lotesProducto.findIndex(
+        lote => String(lote.value) === hashSeleccionado
+      );
+
+      const lotesOrdenados =
+        idxSeleccionado >= 0
+          // Se intenta consumir primero el lote que el usuario selecciono en el popup.
+          ? [lotesProducto[idxSeleccionado]].concat(
+              lotesProducto.filter((_, idx) => idx !== idxSeleccionado)
+            )
+          : lotesProducto.slice();
+
+      const lotesDetalle = [];
+      for (let i = 0; i < lotesOrdenados.length && restanteUnidades > 0; i++) {
+        const lote = lotesOrdenados[i];
+        const disponibleUnidades = this.roundVentaQty(lote.Stock);
+        if (disponibleUnidades <= 0) {
+          continue;
+        }
+
+        const usarUnidades = this.roundVentaQty(
+          Math.min(restanteUnidades, disponibleUnidades)
+        );
+        if (usarUnidades <= 0) {
+          continue;
+        }
+
+        const cantidad = this.roundVentaQty(usarUnidades / cantidadPresentacion);
+        if (cantidad <= 0) {
+          continue;
+        }
+
+        lotesDetalle.push({
+          hashMovimiento: lote.value,
+          IdLote: lote.IdLote,
+          Lote: lote.Lote,
+          FechaVen: lote.FechaVen,
+          Registro: lote.Registro,
+          cantidad
+        });
+
+        restanteUnidades = this.roundVentaQty(restanteUnidades - usarUnidades);
+      }
+
+      if (!lotesDetalle.length) {
+        return { lotesDetalle: null };
+      }
+
+      if (restanteUnidades > 0.00001) {
+        return {
+          error:
+            "No hay stock suficiente por lotes para " +
+            (producto.Producto || "el producto")
+        };
+      }
+
+      // Ajuste final para absorber diferencias minimas por redondeo.
+      const sumaCantidad = this.roundVentaQty(
+        lotesDetalle.reduce((acc, lote) => acc + (parseFloat(lote.cantidad) || 0), 0)
+      );
+      const diferencia = this.roundVentaQty(cantidadLinea - sumaCantidad);
+      if (Math.abs(diferencia) > 0 && lotesDetalle.length) {
+        const last = lotesDetalle[lotesDetalle.length - 1];
+        last.cantidad = this.roundVentaQty(
+          (parseFloat(last.cantidad) || 0) + diferencia
+        );
+      }
+
+      return { lotesDetalle };
+    },
+    // Prepara el payload de venta agregando LotesDetalle por item para que backend inserte varias lineas si hace falta.
+    buildVentaProductosPayload(productos, codSunat) {
+      const errores = [];
+      const productosPayload = productos.map(producto => {
+        const resultado = this.buildVentaProductoLotesDetalle(producto, codSunat);
+        if (resultado.error) {
+          errores.push(resultado.error);
+          return producto;
+        }
+
+        if (resultado.lotesDetalle && resultado.lotesDetalle.length) {
+          return Object.assign({}, producto, {
+            LotesDetalle: resultado.lotesDetalle
+          });
+        }
+
+        return producto;
+      });
+
+      return { productosPayload, errores };
+    },
+    changeMovimiento(hash, idProducto, index) {
+      console.log("movimientoLotes", this.movimientoLotes);
+      console.log("hash", hash);
+      if (hash) {
+        // Stock
+        let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Stock;
+        let serieNumero = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).SerieNumero;
+        let IdLote = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).IdLote;
+        let Lote = this.movimientoLotes[idProducto].find(m => m.value === hash)
+          .Lote;
+        let Registro = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).Registro;
+        console.log(Registro);
+        if (stock) {
+          // this.ventas[this.ventaActiva].productos[index].stockMovimiento = stock
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "stockMovimiento",
+              stock
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "SerieNumero",
+              serieNumero
+            );
+          });
+        } else {
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "stockMovimiento",
+              0
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "SerieNumero",
+              "----"
+            );
+          });
+        }
+        // Fecha de vencimiento
+        var fechaVen = this.movimientoLotes[idProducto].find(
+          m => m.value === hash
+        ).FechaVen;
+        let hoy = this.$moment().unix();
+        let fechaVenUnix = this.$moment(fechaVen).unix();
+        let en4meses = this.$moment()
+          .add(4, "months")
+          .unix();
+        let style = "bg-success";
+        if (fechaVenUnix && fechaVenUnix < hoy) {
+          style = "bg-danger text-white";
+        }
+        if (fechaVenUnix >= hoy && fechaVenUnix <= en4meses) {
+          style = "bg-warning";
+        }
+        if (fechaVen) {
+          this.$nextTick(() => {
+            if (!this.isVentas) {
+              if (this.movTipo != 0 && this.movTipo != undefined) {
+                Vue.set(
+                  this.ventas[this.ventaActiva].productos[index],
+                  "FechaVen",
+                  this.$moment(fechaVen).format("YYYY-MM-DD")
+                );
+                this.ventas[this.ventaActiva].productos[index].IdLote = IdLote;
+                this.ventas[this.ventaActiva].productos[index].Lote = Lote;
+                this.ventas[this.ventaActiva].productos[
+                  index
+                ].Registro = Registro;
+                //console.log(this.$moment(fechaVen).format("YYYY-MM-DD"));
+                //Vue.set(this.ventas[this.ventaActiva].productos[index], 'fechaVen', this.$moment(fechaVen).format("YYYY-MM-DD"))
+              }
+            } else {
+              this.ventas[this.ventaActiva].productos[index].Lote = Lote;
+              this.ventas[this.ventaActiva].productos[
+                index
+              ].Registro = Registro;
+              try {
+                Vue.set(
+                  this.ventas[this.ventaActiva].productos[index],
+                  "FechaVen",
+                  this.$moment(fechaVen).format("YYYY-MM-DD")
+                );
+              } catch (error) {}
+            }
+            // Sincroniza el color de la fila y el texto del popup con el lote/fecha seleccionados.
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "_rowVariant",
+              this.getVentaProductoRowVariant(fechaVen)
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "fechaVenMovimiento",
+              `<span style="font-size:14.5px !important">Fecha Vencimiento: </span> <small style="font-weight:bold; font-size: 14px" class='venci ${style}'>${this.$moment(
+                fechaVen
+              ).format("DD-MM-YYYY")}</small>`
+            );
+          });
+        } else {
+          this.$nextTick(() => {
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "_rowVariant",
+              null
+            );
+            Vue.set(
+              this.ventas[this.ventaActiva].productos[index],
+              "fechaVenMovimiento",
+              ""
+            );
+          });
+        }
+        // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
+      }
+    },
+
+    loadMovimientoLotes($idProducto) {
+      this.movimientoLotes[$idProducto] = [];
+      this.axios
+        .get(
+          this.API +
+            "movimientolotes/" +
+            $idProducto +
+            "/" +
+            this.ventas[this.ventaActiva].almacen.IdAlmacen
+        )
+        .then(response => {
+          if (response.data.length > 0) {
+            let indexProducto = this.ventas[
+              this.ventaActiva
+            ].productos.findIndex(p => p.IdProducto === $idProducto);
+            // Cargar por defecto lote próximo a vencer.
+            let primeroVencer = response.data.reduce((a, b) => {
+              return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
+                ? a
+                : b;
+            });
+
+            this.$nextTick(() => {
+              Vue.set(
+                this.ventas[this.ventaActiva].productos[indexProducto],
+                "hashMovimiento",
+                primeroVencer.hashMovimiento
+              );
+              this.changeMovimiento(
+                primeroVencer.hashMovimiento,
+                $idProducto,
+                indexProducto
+              );
+            });
+
+            this.movimientoLotes[$idProducto] = response.data.map(l => ({
+              value: l.hashMovimiento,
+              text: l.Lote,
+              Stock: l.Stock,
+              IdLote: l.IdLote,
+              Lote: l.Lote,
+              FechaVen: l.FechaVen,
+              SerieNumero: l.Serie + "-" + l.Numero,
+              Registro: l.Registro
+            }));
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    conectarSocket() {
+      if (!this.$socket.connected) {
+        console.log("🔗 Conectando socket...");
+        this.$socket.connect();
+      }
+    },
+
+    /**
+     * ✅ NUEVO: Configurar todos los listeners
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado en VentasForm");
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado en VentasForm");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Nuevo pedido
+      this.listeners.nuevoPedido = data => {
+        if (this.$refs.deliveryModal && this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de " + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          if (this.$refs.deliveryModal) {
+            this.$refs.deliveryModal.getPedidos();
+          }
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            if (result.isConfirmed) {
+              if (this.$refs.deliveryModal) {
+                this.$refs.deliveryModal.show = true;
+              }
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      };
+      this.$socket.on("nuevo-pedido", this.listeners.nuevoPedido);
+    },
+
+    /**
+     * ✅ NUEVO: Remover todos los listeners
+     */
+    removeSocketListeners() {
+      this.$socket.off("connect", this.listeners.connect);
+      this.$socket.off("disconnect", this.listeners.disconnect);
+      this.$socket.off("nuevo-pedido", this.listeners.nuevoPedido);
+    },
+    escucharPedidos() {
+      this.sockets.subscribe("nuevo-pedido", data => {
+        if (this.$refs.deliveryModal.show) {
+          this.$toasted.success(
+            "Nuevo Pedido de" + "<strong>" + data.nombre + "</strong>"
+          );
+          this.$refs.deliveryModal.getPedidos();
+        } else {
+          this.$refs.deliveryModal.getPedidos();
+          this.$swal({
+            position: "top-end",
+            icon: "info",
+            target: document.getElementById("conten"),
+            title:
+              "Pedido de Delivery de: <br> " +
+              "<strong>" +
+              data.nombre +
+              "</strong>",
+            showConfirmButton: true,
+            confirmButtonText: "Mostrar Pedidos",
+            confirmButtonColor: "#3880ff"
+          }).then(result => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              this.$refs.deliveryModal.show = true;
+            } else if (result.isDenied) {
+              console.log("Denegado");
+            }
+          });
+        }
+      });
+    },
+    getEstadoSistema() {
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      if (hostUrl != null) {
+        this.axios
+          .get(this.APIADMIN + "/api/sistema", {
+            params: { Url: hostUrl }
+          })
+          .then(res => {
+            if (res.data.success == true) {
+              let info = res.data.data;
+              this.pagosPendientes = info.length;
+              this.fechaUltPago =
+                info.slice(-1)[0].FechaVencimientoFormat || "";
+            } else {
+              this.pagosPendientes = 0;
+              console.log(res.data.msg);
+            }
+          })
+          .catch(err => {
+            this.pagosPendientes = 0;
+            console.log("Error de conexión al admin");
+          });
+      } else {
+        this.pagosPendientes = 0;
+      }
+    },
+
     mostrarEditarProducto() {
       if (this.idPerfil != 1) {
         return false;
@@ -1445,7 +1947,6 @@ export default {
       console.log(d);
     },
     getProductosCategoria(idProductoCategoria) {
-      console.log(idProductoCategoria);
       if (this.venta.almacen.IdAlmacen) {
         this.productosCategoria = [];
         this.cargandoProductos = true;
@@ -1654,6 +2155,7 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
+      this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
@@ -1897,15 +2399,15 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-      this.$swal({
-        title: "Procesando...",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
+      // this.$swal({
+      //   title: "Procesando...",
+      //   text: "Por favor espera",
+      //   allowOutsideClick: false,
+      //   showConfirmButton: false,
+      //   didOpen: () => {
+      //     this.$swal.showLoading();
+      //   }
+      // });
 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
@@ -1944,60 +2446,62 @@ export default {
       }
 
       if (!venta.cliente.DniRuc) {
-        //this.$toasted.show('Debe seleccionar un cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Debe seleccionar un cliente",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Debe seleccionar un cliente.");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "Debe seleccionar un cliente",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
-        //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "El RUC debe ser numérico, editar cliente.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "El RUC debe ser numérico, editar cliente.",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title:
-            "Una factura debe ser emitida para una empresa, no a un usuario común",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show(
+          "Una factura debe ser emitida para una empresa, no un usuario común."
+        );
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title:
+        //     "Una factura debe ser emitida para una empresa, no a un usuario común",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "Una boleta no debe ser emitida para una empresa",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "Una boleta no debe ser emitida para una empresa",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
@@ -2006,30 +2510,30 @@ export default {
         venta.tipoVenta.CodSunat == "08"
       ) {
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Documento de Referencia...",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Documento de Referencia...",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
         if (!venta.NotaIdMotivo) {
-          //this.$toasted.show('Debe seleccionar un Motivo')
-          this.$swal({
-            position: "center",
-            icon: "info",
-            title: "Debe seleccionar un Motivo",
-            showConfirmButton: true,
-            confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
-            confirmButtonColor: "#0275d8"
-          });
+          this.$toasted.show("Debe seleccionar un Motivo");
+          // this.$swal({
+          //   position: "center",
+          //   icon: "info",
+          //   title: "Debe seleccionar un Motivo",
+          //   showConfirmButton: true,
+          //   confirmButtonText: "Entiendo",
+          //   target: document.getElementById("conten"),
+          //   confirmButtonColor: "#0275d8"
+          // });
 
           return;
         }
@@ -2044,15 +2548,16 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No hay productos para vender",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No hay productos para vender");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   title: "No hay productos para vender",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
 
         return;
       }
@@ -2065,20 +2570,20 @@ export default {
         ) &&
         this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
       ) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
+        this.$toasted.show("No se puede vender un producto sin stock");
+        // this.$swal({
+        //   position: "center",
+        //   icon: "info",
+        //   showConfirmButton: true,
+        //   confirmButtonText: "Entiendo",
+        //   target: document.getElementById("conten"),
+        //   confirmButtonColor: "#0275d8"
+        // });
         return;
       }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.productos;
+      // venta.productos = this.ventas[this.ventaActiva].productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
@@ -2094,6 +2599,15 @@ export default {
       venta.totalCart = this.getTotal();
       venta.Observacion = (venta.Observacion + "").toUpperCase();
       venta.idProductos = productos.map(prod => prod.IdProducto);
+      // Adjunta el reparto por lotes antes de enviar la venta al backend.
+      const {
+        productosPayload,
+        errores: erroresLotes
+      } = this.buildVentaProductosPayload(productos, venta.tipoVenta.CodSunat);
+      if (erroresLotes.length) {
+        this.$toasted.show(erroresLotes[0]);
+        return;
+      }
       if (venta.cliente.DniRuc != "00000000") {
         venta.EsOrganizacion = 0;
         venta.NombreOrganizacion = "";
@@ -2104,7 +2618,12 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      // Se envia una copia para no mutar la estructura reactiva original de la vista.
+      const ventaPayload = Object.assign({}, venta, {
+        productos: productosPayload,
+        idProductos: productosPayload.map(prod => prod.IdProducto)
+      });
+      await this.axios.post(this.API + "ventas", ventaPayload).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
@@ -2295,7 +2814,7 @@ export default {
       // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.productos;
+      // venta.productos = this.ventas[this.ventaActiva].productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
@@ -2331,6 +2850,12 @@ export default {
           );
         }
 
+        if (this.ventas.length == 1) {
+          window.location.reload();
+        } else {
+          this.eliminarVentana();
+          this.getVendedorInfo();
+        }
         // setTimeout(() => {
         //   if (this.ventas.length == 1) {
         //     window.location.reload();

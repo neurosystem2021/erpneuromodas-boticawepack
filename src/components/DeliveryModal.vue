@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" class="btnAction" variant="danger" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -178,30 +178,30 @@ import config from "@/store/config.js";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import sound from "../../static/nuevassoli.mp3";
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
+
 export default {
   mounted() {
-    this.escucharCanceladoPedidos();
-    this.escucharMotorizadoOnline();
-    this.escucharCoordsMotorizado();
-    this.escucharEstadoPedido();
+    // ✅ Cambio: Configurar listeners ANTES de conectar
+    this.setupSocketListeners();
     this.getEmpresaDatos();
   },
+
   beforeDestroy() {
-    this.sockets.unsubscribe("lista-on-motorizado");
-    this.sockets.unsubscribe("cancelado-pedido");
-    this.sockets.unsubscribe("coordenadas-motorizado-nueva");
-    this.sockets.unsubscribe("estado-pedido-actualizado-plataforma");
+    // ✅ Cambio: Remover listeners al destruir
+    this.removeSocketListeners();
     this.$socket.disconnect();
-    if (this.map) {
-      this.map.remove();
+    if (this.mymap) {
+      this.mymap.remove();
     }
   },
+
   data() {
     return {
       API: config.API,
@@ -246,12 +246,23 @@ export default {
       usuario: sessionStorage.getItem("User"),
       showPopover: false,
       title: "Punto de Venta",
-      audio: new Audio(sound)
+      audio: new Audio(sound),
+
+      // ✅ Guardar referencias de listeners
+      listeners: {
+        connect: null,
+        disconnect: null,
+        canceladoPedido: null,
+        motorizadoOnline: null,
+        coordsMotorizado: null,
+        estadoPedido: null
+      }
     };
   },
+
   watch: {
     show(val) {
-      if (val == true) {
+      if (val === true) {
         this.mostrarMotorizados = true;
         this.mostrarCliente = "";
         this.pedidoMotorizadoId = null;
@@ -268,201 +279,62 @@ export default {
       window.parent.document.title = val;
     }
   },
-  sockets: {
-    test: function(data) {
-      console.log("test triggered", data);
-    },
-    connect() {
-      console.log("connected"),
-        this.$socket.emit(
-          "conectar",
-          {
-            tipo: "PLATAFORMA",
-            objeto: {
-              iddb: this.empresa.IdEmpresa,
-              urlplat: this.empresa.FacturaUrl,
-              idalmacen: this.empresa.IdAlmacen
-            }
-          },
-          resp => {}
-        );
-    },
-    disconnect() {
-      console.log("server disconnected");
-    }
-  },
+
   methods: {
-    loadMapa() {
-      if (this.idEmpresa != null) {
-        this.mymap = new L.map("mapid", {
-          touchZoom: false,
-          attributionControl: false,
-          scrollWheelZoom: false,
-          doubleClickZoom: false,
-          closePopupOnClick: false
-        }).setView([this.empresa.Latitud, this.empresa.Longitud], 13);
-        L.tileLayer(
-          "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g",
-          {
-            maxZoom: 22,
-            id: "mapbox/streets-v11",
-            accessToken:
-              "sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g"
+    /**
+     * ✅ CONFIGURAR TODOS LOS LISTENERS
+     */
+    setupSocketListeners() {
+      // Evento: Conectado
+      this.listeners.connect = () => {
+        console.log("✅ Socket conectado");
+        this.$socket.emit("conectar", {
+          tipo: "PLATAFORMA",
+          objeto: {
+            iddb: this.empresa.IdEmpresa,
+            urlplat: this.empresa.FacturaUrl,
+            idalmacen: this.empresa.IdAlmacen
           }
-        ).addTo(this.mymap);
-        this.clienteLayer = L.layerGroup().addTo(this.mymap);
-        this.empresaLayer = L.layerGroup().addTo(this.mymap);
-        this.mymap.closePopup();
-        this.getPedidos();
-      } else {
-        this.$toasted.show(
-          "Servicio de delivery no disponible, porfavor actualice la pagina"
-        );
-      }
-    },
-    getEmpresaDatos() {
-      let hostUrl = sessionStorage.getItem("HostUrl");
-      let idAlmacen = sessionStorage.getItem("IdAlmacen");
-      if (hostUrl != null && idAlmacen != null) {
-        this.axios
-          .get(this.APINODE + "/api/plataforma/empresa", {
-            params: {
-              HostUrl: hostUrl,
-              IdAlmacen: idAlmacen
-            }
-          })
-          .then(res => {
-            if (res.data.success == true) {
-              this.idEmpresa = res.data.data.IdEmpresa;
-              this.empresa = res.data.data;
-              this.$socket.connect();
-              this.getPedidos();
-            }
-          })
-          .catch(err => {
-            this.idEmpresa = null;
-            this.empresa = {};
-            this.$swal({
-              icon: "error",
-              title: "Sin servicio de delivery",
-              text: "No hay conexión con el servidor de delivery",
-              //target: document.getElementById('conten'),
-              footer: "Por favor cierre sesion e ingrese nuevamente"
-            });
-          });
-      } else {
-        this.idEmpresa = null;
-        this.empresa = {};
-        this.$swal({
-          icon: "error",
-          title: "Error en la autentificación de delivery",
-          text: "No hay conexión con el servidor de delivery",
-          target: document.getElementById("conten"),
-          footer: "Por favor cierre sesion e ingrese nuevamente"
         });
-      }
-    },
-    getPedidos() {
-      if (this.idEmpresa != null) {
-        this.pedidos = [];
-        this.audio.loop = true;
-        this.axios
-          .get(this.APINODE + "/api/plataforma/pedidos", {
-            params: {
-              IdEmpresa: this.idEmpresa
-            }
-          })
-          .then(res => {
-            if (res.data.success == true) {
-              this.pedidos = res.data.data;
-              if (this.pedidos.filter(p => p.Estado == "E").length > 0) {
-                this.audio.play();
-              } else {
-                this.audio.pause();
-              }
-              this.title = "(" + this.pedidos.length + ") Pedidos de Delivery";
-              this.pedidos.map(p => {
-                p.showPopover = false;
-              });
-              if (this.pedidoIdMapa != null) {
-                let existe = this.pedidos.some(
-                  p => p.IdPedido == this.pedidoIdMapa
-                );
-                if (!existe) {
-                  if (this.mymap) {
-                    this.emitirConsultaMotorizado();
-                  }
-                }
-              } else {
-                if (this.mymap) {
-                  this.emitirConsultaMotorizado();
-                }
-              }
-            } else if (res.data.success == false) {
-              this.audio.pause();
-              this.pedidos = [];
-              this.title = "Punto de Venta";
-              if (this.mymap) {
-                this.emitirConsultaMotorizado();
-              }
-            } else {
-              this.audio.pause();
-              this.pedidos = [];
-              if (this.mymap) {
-                this.emitirConsultaMotorizado();
-              }
-            }
-          })
-          .catch(err => {
-            this.pedidos = [];
-            this.audio.pause();
-            console.log(err);
-            this.title = "Sin Delivery, Actualice";
-          });
-      } else {
-        this.audio.pause();
-        this.title = "Sin Delivery, Actualice";
-        this.$toasted.show(
-          "Servicio de delivery no disponible, porfavor actualice la pagina"
-        );
-      }
-    },
-    escucharCanceladoPedidos() {
-      this.sockets.subscribe("cancelado-pedido", data => {
+      };
+      this.$socket.on("connect", this.listeners.connect);
+
+      // Evento: Desconectado
+      this.listeners.disconnect = () => {
+        console.log("❌ Socket desconectado");
+      };
+      this.$socket.on("disconnect", this.listeners.disconnect);
+
+      // Evento: Pedido cancelado
+      this.listeners.canceladoPedido = data => {
         this.$toasted.show("Ha sido cancelado el pedido de " + data.nombre);
-        if (this.pedidoIdMapa == data.idPedido) {
+        if (this.pedidoIdMapa === data.idPedido) {
           this.emitirConsultaMotorizado();
         }
         this.getPedidos();
-      });
-    },
-    escucharMotorizadoOnline() {
-      this.sockets.subscribe("lista-on-motorizado", data => {
+      };
+      this.$socket.on("cancelado-pedido", this.listeners.canceladoPedido);
+
+      // Evento: Motorizado online
+      this.listeners.motorizadoOnline = data => {
         let motorizadosIdLista = data.map(a => a.iddb);
         let motoOnline = this.motorizadosOnline.map(a => a.iddb);
-        //En linea
+
         this.motorizados.map(m => {
-          let existe = motorizadosIdLista.some(ml => ml == m.IdMotorizado);
-          if (existe) {
-            m.online = true;
-          } else {
-            m.online = false;
-          }
+          let existe = motorizadosIdLista.some(ml => ml === m.IdMotorizado);
+          m.online = existe;
         });
+
         let motorizadosFinal = [...this.motorizados];
         this.$nextTick(() => {
           this.motorizados = motorizadosFinal;
         });
-        //Coordenadas
+
         motoOnline.map(m => {
-          let existe = motorizadosIdLista.some(ml => ml == m);
-          console.log(existe);
+          let existe = motorizadosIdLista.some(ml => ml === m);
           if (!existe) {
-            console.log("entra existe");
-            let indexmoto = this.motorizadosOnline.findIndex(a => a.iddb == m);
-            console.log(indexmoto);
+            let indexmoto = this.motorizadosOnline.findIndex(a => a.iddb === m);
             if (indexmoto !== -1) {
-              console.log("borra");
               if (this.motorizadosOnline[indexmoto].marker != null) {
                 this.mymap.removeLayer(
                   this.motorizadosOnline[indexmoto].marker
@@ -472,16 +344,17 @@ export default {
             }
           }
         });
-      });
-    },
-    escucharCoordsMotorizado() {
-      this.sockets.subscribe("coordenadas-motorizado-nueva", data => {
+      };
+      this.$socket.on("lista-on-motorizado", this.listeners.motorizadoOnline);
+
+      // Evento: Coordenadas del motorizado
+      this.listeners.coordsMotorizado = data => {
         if (this.mymap != null) {
           if (this.mostrarMotorizados) {
             let motorizadoIndex = this.motorizadosOnline.findIndex(
-              m => m.iddb == data.iddb
+              m => m.iddb === data.iddb
             );
-            if (motorizadoIndex == -1) {
+            if (motorizadoIndex === -1) {
               data.marker = new L.marker([data.lat, data.lon], {
                 icon: this.iconMoto
               })
@@ -510,9 +383,9 @@ export default {
           } else {
             if (this.pedidoMotorizadoId != null) {
               let motorizadoIndex = this.motorizadosOnline.findIndex(
-                m => m.iddb == this.pedidoMotorizadoId
+                m => m.iddb === this.pedidoMotorizadoId
               );
-              if (motorizadoIndex == -1) {
+              if (motorizadoIndex === -1) {
                 data.marker = new L.marker([data.lat, data.lon], {
                   icon: this.iconMoto
                 })
@@ -545,29 +418,197 @@ export default {
             }
           }
         }
-      });
-    },
-    escucharEstadoPedido() {
-      this.sockets.subscribe("estado-pedido-actualizado-plataforma", data => {
+      };
+      this.$socket.on(
+        "coordenadas-motorizado-nueva",
+        this.listeners.coordsMotorizado
+      );
+
+      // Evento: Estado del pedido actualizado
+      this.listeners.estadoPedido = data => {
         let indexPedido = this.pedidos.findIndex(
-          p => p.IdPedido == data.idpedido
+          p => p.IdPedido === data.idpedido
         );
         if (indexPedido !== -1) {
           this.pedidos[indexPedido].Estado = data.estado;
-          if (data.estado == "F") {
+          if (data.estado === "F") {
             this.$toasted.success(
               "El pedido de " +
                 this.pedidos[indexPedido].Cliente +
                 " ha finalizado.!!"
             );
-            if (this.pedidoIdMapa == data.idpedido) {
+            if (this.pedidoIdMapa === data.idpedido) {
               this.emitirConsultaMotorizado();
             }
             this.getPedidos();
           }
         }
-      });
+      };
+      this.$socket.on(
+        "estado-pedido-actualizado-plataforma",
+        this.listeners.estadoPedido
+      );
     },
+
+    /**
+     * ✅ REMOVER TODOS LOS LISTENERS
+     */
+    removeSocketListeners() {
+      this.$socket.off("connect", this.listeners.connect);
+      this.$socket.off("disconnect", this.listeners.disconnect);
+      this.$socket.off("cancelado-pedido", this.listeners.canceladoPedido);
+      this.$socket.off("lista-on-motorizado", this.listeners.motorizadoOnline);
+      this.$socket.off(
+        "coordenadas-motorizado-nueva",
+        this.listeners.coordsMotorizado
+      );
+      this.$socket.off(
+        "estado-pedido-actualizado-plataforma",
+        this.listeners.estadoPedido
+      );
+    },
+
+    loadMapa() {
+      if (this.idEmpresa != null) {
+        this.mymap = new L.map("mapid", {
+          touchZoom: false,
+          attributionControl: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false,
+          closePopupOnClick: false
+        }).setView([this.empresa.Latitud, this.empresa.Longitud], 13);
+
+        L.tileLayer(
+          "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g",
+          {
+            maxZoom: 22,
+            id: "mapbox/streets-v11",
+            accessToken:
+              "sk.eyJ1IjoiamhvbndqIiwiYSI6ImNsaDBycHN6NzB3NWQzZnA3bm93bnJqdTIifQ.lu3qfaK4lH69UW9uLuGx4g"
+          }
+        ).addTo(this.mymap);
+
+        this.clienteLayer = L.layerGroup().addTo(this.mymap);
+        this.empresaLayer = L.layerGroup().addTo(this.mymap);
+        this.mymap.closePopup();
+        this.getPedidos();
+      } else {
+        this.$toasted.show(
+          "Servicio de delivery no disponible, por favor actualice la página"
+        );
+      }
+    },
+
+    getEmpresaDatos() {
+      let hostUrl = sessionStorage.getItem("HostUrl");
+      let idAlmacen = sessionStorage.getItem("IdAlmacen");
+
+      if (hostUrl != null && idAlmacen != null) {
+        this.axios
+          .get(this.APINODE + "/api/plataforma/empresa", {
+            params: {
+              HostUrl: hostUrl,
+              IdAlmacen: idAlmacen
+            }
+          })
+          .then(res => {
+            if (res.data.success === true) {
+              this.idEmpresa = res.data.data.IdEmpresa;
+              this.empresa = res.data.data;
+              this.$socket.connect();
+              this.getPedidos();
+            }
+          })
+          .catch(err => {
+            this.idEmpresa = null;
+            this.empresa = {};
+            this.$swal({
+              icon: "error",
+              title: "Sin servicio de delivery",
+              text: "No hay conexión con el servidor de delivery",
+              footer: "Por favor cierre sesión e ingrese nuevamente"
+            });
+          });
+      } else {
+        this.idEmpresa = null;
+        this.empresa = {};
+        this.$swal({
+          icon: "error",
+          title: "Error en la autentificación de delivery",
+          text: "No hay conexión con el servidor de delivery",
+          target: document.getElementById("conten"),
+          footer: "Por favor cierre sesión e ingrese nuevamente"
+        });
+      }
+    },
+
+    getPedidos() {
+      if (this.idEmpresa != null) {
+        this.pedidos = [];
+        this.audio.loop = true;
+
+        this.axios
+          .get(this.APINODE + "/api/plataforma/pedidos", {
+            params: {
+              IdEmpresa: this.idEmpresa
+            }
+          })
+          .then(res => {
+            if (res.data.success === true) {
+              this.pedidos = res.data.data;
+              if (this.pedidos.filter(p => p.Estado === "E").length > 0) {
+                this.audio.play();
+              } else {
+                this.audio.pause();
+              }
+              this.title = "(" + this.pedidos.length + ") Pedidos de Delivery";
+              this.pedidos.map(p => {
+                p.showPopover = false;
+              });
+              if (this.pedidoIdMapa != null) {
+                let existe = this.pedidos.some(
+                  p => p.IdPedido === this.pedidoIdMapa
+                );
+                if (!existe) {
+                  if (this.mymap) {
+                    this.emitirConsultaMotorizado();
+                  }
+                }
+              } else {
+                if (this.mymap) {
+                  this.emitirConsultaMotorizado();
+                }
+              }
+            } else if (res.data.success === false) {
+              this.audio.pause();
+              this.pedidos = [];
+              this.title = "Punto de Venta";
+              if (this.mymap) {
+                this.emitirConsultaMotorizado();
+              }
+            } else {
+              this.audio.pause();
+              this.pedidos = [];
+              if (this.mymap) {
+                this.emitirConsultaMotorizado();
+              }
+            }
+          })
+          .catch(err => {
+            this.pedidos = [];
+            this.audio.pause();
+            console.log(err);
+            this.title = "Sin Delivery, Actualice";
+          });
+      } else {
+        this.audio.pause();
+        this.title = "Sin Delivery, Actualice";
+        this.$toasted.show(
+          "Servicio de delivery no disponible, por favor actualice la página"
+        );
+      }
+    },
+
     aceptarPedido(idPedido, idCliente) {
       this.axios
         .post(this.APINODE + "/api/plataforma/pedidos/aceptar", {
@@ -575,7 +616,7 @@ export default {
           Usuario: this.usuario || "admin"
         })
         .then(res => {
-          if (res.data.success == true) {
+          if (res.data.success === true) {
             this.emitirEstado(idPedido, idCliente, "PE");
             let pedidoIndex = this.pedidos.findIndex(
               p => p.IdPedido === idPedido
@@ -586,21 +627,20 @@ export default {
                 this.pedidos[pedidoIndex].UsuarioReg = res.data.usuario;
               });
               setTimeout(() => {
-                //this.imprimirPedido(idPedido)
                 this.emitirConsultaMotorizado();
               }, 400);
-              let pedido = this.pedidos.find(p => p.IdPedido == idPedido);
+              let pedido = this.pedidos.find(p => p.IdPedido === idPedido);
               if (pedido != undefined) {
                 this.$emit("onPagarDelivery", pedido);
                 this.show = false;
               }
               setTimeout(() => {
-                if (this.pedidos.filter(p => p.Estado == "E").length == 0) {
+                if (this.pedidos.filter(p => p.Estado === "E").length === 0) {
                   this.audio.pause();
                 }
               }, 1000);
             }
-          } else if (res.data.success == false) {
+          } else if (res.data.success === false) {
             this.getPedidos();
           }
         })
@@ -608,6 +648,7 @@ export default {
           console.log(err);
         });
     },
+
     cancelarPedido(idPedido, idCliente) {
       let pedido = this.pedidos[
         this.pedidos.findIndex(p => p.IdPedido === idPedido)
@@ -615,7 +656,7 @@ export default {
       this.$swal({
         target: document.getElementById("conten"),
         title:
-          "Se cancelará el pedido de: " + pedido.Cliente + " esta seguro? ",
+          "Se cancelará el pedido de: " + pedido.Cliente + " ¿está seguro?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -629,22 +670,22 @@ export default {
               IdPedido: idPedido
             })
             .then(res => {
-              if (res.data.success == true) {
+              if (res.data.success === true) {
                 this.emitirEstado(
                   idPedido,
                   idCliente,
                   "C",
                   pedido.IdMotorizado
                 );
-                if (this.pedidoIdMapa == idPedido) {
+                if (this.pedidoIdMapa === idPedido) {
                   this.emitirConsultaMotorizado();
                 }
                 this.$toasted.success("Pedido cancelado!");
                 this.getPedidos();
-              } else if (res.data.success == false) {
+              } else if (res.data.success === false) {
                 this.getPedidos();
                 this.$toasted.success(
-                  "El tiene otro estado, se actualizarán los pedidos!"
+                  "El pedido tiene otro estado, se actualizarán los pedidos!"
                 );
               }
             })
@@ -654,12 +695,13 @@ export default {
         }
       });
     },
+
     rechazarPedido(idpedido) {
       let pedido = this.pedidos[
         this.pedidos.findIndex(p => p.IdPedido === idpedido)
       ];
       let r = confirm(
-        "¿Esta seguro de rechazar la solicitud de " + pedido.Cliente + "?"
+        "¿Está seguro de rechazar la solicitud de " + pedido.Cliente + "?"
       );
       if (r) {
         this.axios
@@ -667,7 +709,7 @@ export default {
             IdPedido: pedido.IdPedido
           })
           .then(res => {
-            if (res.data.success == true) {
+            if (res.data.success === true) {
               this.emitirEstado(
                 pedido.IdPedido,
                 pedido.IdCliente,
@@ -676,7 +718,7 @@ export default {
               );
               this.$toasted.success("¡Pedido rechazado!");
               this.getPedidos();
-            } else if (res.data.success == false) {
+            } else if (res.data.success === false) {
               this.$toasted.success(res.data.msg);
               this.getPedidos();
             }
@@ -684,11 +726,11 @@ export default {
           .catch(err => {
             console.log(err);
           });
-      } else {
       }
     },
+
     volverRealizarVenta(idpedido) {
-      let pedido = this.pedidos.find(p => p.IdPedido == idpedido);
+      let pedido = this.pedidos.find(p => p.IdPedido === idpedido);
       if (pedido != undefined) {
         this.axios
           .get(this.API + "venta/pedido/existe", {
@@ -705,16 +747,13 @@ export default {
                 html:
                   "Tipo: <strong>" +
                   response.data.TipoDoc +
-                  "</strong> " +
-                  "<br> Comprobante: <strong>" +
+                  "</strong><br>Comprobante: <strong>" +
                   response.data.Serie +
                   "-" +
                   response.data.Numero +
-                  "</strong>" +
-                  "<br> Fecha y Hora <strong>" +
+                  "</strong><br>Fecha y Hora: <strong>" +
                   response.data.FechaDoc +
-                  "</strong>" +
-                  "<br> Realizado por: <strong>" +
+                  "</strong><br>Realizado por: <strong>" +
                   response.data.UsuarioReg +
                   "</strong>",
                 showConfirmButton: true,
@@ -725,7 +764,6 @@ export default {
                 footer:
                   "Puede anular la venta en el registro de ventas e intentarlo nuevamente."
               }).then(result => {
-                /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
                   window.open("/views/ve_reimpresionDocumentos.php", "_blank");
                 } else if (result.isDenied) {
@@ -738,10 +776,11 @@ export default {
             }
           })
           .catch(error => {
-            this.$toasted.show("Hubo un error, no hay conexion");
+            this.$toasted.show("Hubo un error, no hay conexión");
           });
       }
     },
+
     emitirEstado(idPedido, idCliente, estado, idmotorizado = null) {
       this.$socket.emit("estado-pedido-emitir-plataforma", {
         IdCliente: idCliente,
@@ -750,6 +789,7 @@ export default {
         IdMotorizado: idmotorizado
       });
     },
+
     emitirNuevoViaje(IdMotorizado, IdCliente, Cliente) {
       this.$socket.emit("nuevo-viaje-solicitado", {
         idmotorizado: IdMotorizado,
@@ -757,6 +797,7 @@ export default {
         cliente: Cliente
       });
     },
+
     emitirConsultaMotorizado() {
       this.mostrarMotorizados = true;
       this.mostrarCliente = "";
@@ -773,6 +814,7 @@ export default {
         idalmacen: this.empresa.IdAlmacen
       });
     },
+
     mostrarClienteMapa(idPedido) {
       this.mostrarMotorizados = false;
       this.pedidoIdMapa = idPedido;
@@ -789,7 +831,9 @@ export default {
         this.empresaLayer.clearLayers();
         L.marker(
           [Number(pedido.EmpresaLatitud), Number(pedido.EmpresaLongitud)],
-          { icon: this.iconCasa }
+          {
+            icon: this.iconCasa
+          }
         )
           .addTo(this.empresaLayer)
           .bindPopup("<b>" + pedido.RazonSocial + "</b>")
@@ -807,9 +851,10 @@ export default {
       }
       this.mostrarCliente = "MOSTRANDO PEDIDO DE: " + pedido.Cliente;
     },
+
     getMotorizados(idpedido) {
       this.pedidos.map(p => (p.showPopover = false));
-      let indexPedido = this.pedidos.findIndex(p => p.IdPedido == idpedido);
+      let indexPedido = this.pedidos.findIndex(p => p.IdPedido === idpedido);
       if (indexPedido !== -1) {
         this.pedidos[indexPedido].showPopover = true;
       }
@@ -821,13 +866,13 @@ export default {
             }
           })
           .then(res => {
-            if (res.data.success == true) {
+            if (res.data.success === true) {
               this.motorizados = res.data.motorizados;
               this.$socket.emit("motorizado-on-consulta", {
                 facturaurl: this.empresa.FacturaUrl,
                 idalmacen: this.empresa.IdAlmacen
               });
-            } else if (res.data.success == false) {
+            } else if (res.data.success === false) {
               this.motorizados = [];
             }
           })
@@ -836,10 +881,11 @@ export default {
           });
       } else {
         this.$toasted.show(
-          "Servicio de delivery no disponible, porfavor actualice la pagina"
+          "Servicio de delivery no disponible, por favor actualice la página"
         );
       }
     },
+
     asignarMotorizado(idpedido, idcliente, cliente, idmotorizado, motorizado) {
       this.axios
         .post(this.APINODE + "/api/plataforma/pedido/motorizado/asignar", {
@@ -848,15 +894,15 @@ export default {
           Motorizado: motorizado
         })
         .then(res => {
-          if (res.data.success == 1) {
+          if (res.data.success === 1) {
             this.$toasted.show(res.data.msg);
-            this.getMotorizados();
+            this.getMotorizados(idpedido);
             this.getPedidos();
-          } else if (res.data.success == 2) {
+          } else if (res.data.success === 2) {
             this.$toasted.success("¡Motorizado Asignado!");
             this.emitirNuevoViaje(idmotorizado, idcliente, cliente);
             this.getPedidos();
-          } else if (res.data.success == 3) {
+          } else if (res.data.success === 3) {
             this.getPedidos();
           }
         })
@@ -864,6 +910,7 @@ export default {
           console.log(err);
         });
     },
+
     cambiarMotorizado(
       idpedido,
       idcliente,
@@ -882,16 +929,15 @@ export default {
           MotorizadoNuevoAnterior: motorizadoanterior
         })
         .then(res => {
-          if (res.data.success == 1) {
+          if (res.data.success === 1) {
             this.$toasted.show(res.data.msg);
-            this.getMotorizados();
+            this.getMotorizados(idpedido);
             this.getPedidos();
-          } else if (res.data.success == 2) {
+          } else if (res.data.success === 2) {
             this.$toasted.success("¡Motorizado Cambiado!");
             this.emitirNuevoViaje(idmotorizadonuevo, idcliente, cliente);
-            //this.emitirNuevoViaje(idmotorizadoanterior,idcliente,cliente)
             this.getPedidos();
-          } else if (res.data.success == 3) {
+          } else if (res.data.success === 3) {
             this.getPedidos();
           }
         })
@@ -899,13 +945,14 @@ export default {
           console.log(err);
         });
     },
+
     enviarPreparar() {
       this.axios
         .post(this.APINODE + "/api/pedido/preparar", {
           IdPedido: this.idPedidoSelect
         })
         .then(res => {
-          if (res.data.success == 1) {
+          if (res.data.success === 1) {
             this.axios
               .post(this.API + "preorden/plataforma", {
                 InfoPedido: this.infoPedido
@@ -921,11 +968,11 @@ export default {
                 }
               })
               .catch(error => {});
-          } else if (res.data.success == 3) {
+          } else if (res.data.success === 3) {
             this.$refs.modalPedido.hide();
             this.$toasted.show(res.data.msg);
             this.getPedidos();
-          } else if (res.data.success == 2) {
+          } else if (res.data.success === 2) {
             this.$toasted.show(res.data.msg);
           }
         })
@@ -933,10 +980,12 @@ export default {
           console.log(err);
         });
     },
+
     cerrarModal() {
       this.$refs.modalPedidos.hide();
     }
   },
+
   components: {}
 };
 </script>

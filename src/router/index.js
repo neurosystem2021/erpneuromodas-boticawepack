@@ -35,6 +35,7 @@ import RegistroHuespedes from "@/views/reportes/RegistroHuespedes.vue";
 import Articulosmovimientos from "@/views/reportes/Articulosmovimientos.vue";
 import PorEntregar from "@/views/reportes/PorEntregar.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
+import MetodoPago from "@/views/reportes/MetodoPago.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
@@ -45,8 +46,11 @@ import CargarComprasXml from "@/views/CargarComprasXml.vue";
 import RemisionVer from "@/views/RemisionVer.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ReporteMoviminetoPorProveedor from "@/views/reportes/ReporteMoviminetoPorProveedor.vue";
-import RemisionListado from '@/views/reportes/RemisionListado.vue'
-import ReporteUtilidadBrutaPorUsuario from '@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue'
+import RemisionListado from "@/views/reportes/RemisionListado.vue";
+import ReporteUtilidadBrutaPorUsuario from "@/views/reportes/ReporteUtilidadBrutaPorUsuario.vue";
+import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
+import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
+import ReporteProductoVencer from "@/views/reportes/ReporteProductoVencer.vue";
 
 Vue.use(Router);
 
@@ -199,6 +203,11 @@ export default new Router({
       component: Estadisticas
     },
     {
+      path: "/reportes/metodo-pago",
+      name: "MetodoPago",
+      component: MetodoPago
+    },
+    {
       path: "/venta",
       name: "Venta",
       component: Venta
@@ -282,6 +291,21 @@ export default new Router({
       path: "/reportes/reporte_utilidad_bruta",
       name: "ReporteUtilidadBrutaPorUsuario",
       component: ReporteUtilidadBrutaPorUsuario
+    },
+    {
+      path: "/reportes/ReporteSireMovimiento",
+      name: "ReporteSireMovimiento",
+      component: ReporteSireMovimiento
+    },
+    {
+      path: "/reportes/ReporteSireVentas",
+      name: "ReporteSireVentas",
+      component: ReporteSireVentas
+    },
+    {
+      path: "/reportes/ReporteProductoVencer",
+      name: "ReporteProductoVencer",
+      component: ReporteProductoVencer
     }
   ]
 });
