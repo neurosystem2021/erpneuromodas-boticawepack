@@ -1,6 +1,6 @@
 <template>
   
-            <b-container class="bv-example-row" id="conten">
+            <b-container class="bv-example-row px-5" id="conten" fluid>
                
               <h1> REPORTES  </h1>
                
@@ -15,7 +15,7 @@
                   </b-col>
               </b-row>
               <b-row class="d-flex align-items-stretch mt-5">
-                <b-col cols="12" class="my-3 ">
+                <b-col cols="4" class="my-3 ">
                   <div class="cards h-100">
                     <b-input-group prepend="Monto Total:" >
                         <input type="number" disabled v-model="totalDia" class="form-control">
@@ -23,7 +23,7 @@
                     <bar-chart ref="chartGraficaDias"></bar-chart>
                   </div>
                 </b-col>
-                <b-col cols="12" class="my-3 ">
+                <b-col cols="4" class="my-3 ">
                   <div class="cards h-100">
                     <b-row>
                       <b-col cols="12"> <h3>Ranking de Ventas por Vendedor </h3></b-col>
@@ -33,7 +33,7 @@
                     </b-row>
                   </div>
                 </b-col>
-               <b-col cols="12" class="my-3 ">
+               <b-col cols="4" class="my-3 ">
                   <div class="cards h-100">
                   <b-row>
                     <b-col cols="12">
@@ -48,7 +48,7 @@
                   </div>
                   </b-col>
                
-               <b-col cols="12" class="my-3 ">
+               <b-col cols="4" class="my-3 ">
                   <div class="cards h-100">
                   <b-row>
                     <b-col cols="12">
@@ -63,7 +63,7 @@
                   </div>
                   </b-col>
 
-                  <b-col cols="12" class="my-3 ">
+                  <b-col cols="8" class="my-3 ">
                   <div class="cards h-100">
                   <b-row>
                     <b-col cols="12">
@@ -222,9 +222,6 @@ export default {
 </script>
 
 <style>
-#conten {
-  padding: 0 5% !important;
-}
 .cards {
   /* border: 1px solid red; */
   padding: 5%;
