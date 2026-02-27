@@ -2,15 +2,15 @@
   <b-container fluid>
     <h1 class="my-2"> UTILIDAD BRUTA VENTAS</h1>
     <b-row>
-        <b-col cols="3">
+        <b-col cols="2">
             Desde:
             <input type="date" v-model="fechaInicio" class="form-control">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Hasta:
             <input type="date" v-model="fechaFin" class="form-control">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Usuario: 
             <b-select 
                 :options="lstUsuario" 
@@ -18,6 +18,18 @@
                 text-field="NombreUsuario"
                 v-model="usuarioReg"
             />
+        </b-col>
+        <b-col cols="2">
+            Marca: 
+            <b-select 
+                :options="lstMarca" 
+                value-field="IdProductoMarca"  text-field="ProductoMarca" 
+                v-model="marcaReg"
+            >
+                <template #first>
+                    <b-form-select-option :value="''">-- Todas --</b-form-select-option>
+                </template>
+            </b-select>
         </b-col>
         <b-col cols="3"> 
             <b-button variant="success" @click="getReporteUtilidadPorUsuario()">Generar</b-button>
@@ -84,11 +96,14 @@ export default {
       fechaInicio: "",
       fechaFin: "",
       usuarioReg: "",
-      lstUsuario: []
+      marcaReg: "",
+      lstUsuario: [],
+      lstMarca: []
     };
   },
   mounted() {
     this.cargarUsuarios();
+    this.cargarMarcas();
   },
   methods: {
     async cargarUsuarios() {
@@ -98,12 +113,21 @@ export default {
         }
       });
     },
+    async cargarMarcas() {
+      await this.axios.get(`${this.API}marcas`).then(response => {
+        if (response.data) {
+          console.log(response.data[0]); // Esto te mostrará cómo se llaman los campos de la marca
+          this.lstMarca = response.data;
+        }
+      });
+    },
     async getReporteUtilidadPorUsuario() {
       let filtro = {
         params: {
           fechaInicio: this.fechaInicio,
           fechaFin: this.fechaFin,
-          usuarioReg: this.usuarioReg
+          usuarioReg: this.usuarioReg,
+          marcaReg: this.marcaReg
         }
       };
       await this.axios
