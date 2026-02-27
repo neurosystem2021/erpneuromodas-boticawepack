@@ -551,7 +551,7 @@ export default {
           // PuntoVenta: 'CAJA1'
         },
         vendedor: this.venta.vendedor || {},
-        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        FechaCredito: this.$moment().add(1, 'day').format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
