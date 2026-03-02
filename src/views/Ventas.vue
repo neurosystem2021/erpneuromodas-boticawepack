@@ -989,8 +989,9 @@ export default {
               parseFloat(this.$refs.carrito.sumatoriaDescuento);
             var porcentaje = (response.data.descuento * 100) / subTotal;
             this.descuentoPuntos = response.data;
+            const montoEnSoles = parseFloat(response.data.descuento);
             //this.aplicarDescuento(response.data.descuento)
-            this.aplicarDescuento(porcentaje);
+            this.distribuirDescuentoPorMonto(montoEnSoles);
           });
         })
         .catch(error => {
@@ -1001,6 +1002,22 @@ export default {
     aplicarDescuentoGeneral(val) {
       this.puntosAplicados = 0;
       this.aplicarDescuento(val);
+    },
+
+    distribuirDescuentoPorMonto(montoEfectivo) {
+      const productos = this.ventas[this.index].productos;
+      if (productos.length === 0) return;
+
+      const sumaSubTotales = productos.reduce((acc, p) => acc + (parseFloat(p.cantidad) * parseFloat(p.precio)), 0);
+      if (sumaSubTotales <= 0) return;
+
+      productos.forEach((prod, i) => {
+        let subtotalItem = parseFloat(prod.cantidad) * parseFloat(prod.precio);
+        // Proporción del monto total en soles
+        let descuentoItem = (subtotalItem / sumaSubTotales) * montoEfectivo;
+        
+        this.$set(this.ventas[this.index].productos[i], "descuento", descuentoItem.toFixed(2));
+      });
     },
     getNumeroVenta() {
       this.axios
