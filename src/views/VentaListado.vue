@@ -1139,7 +1139,7 @@ export default {
 
   methods: {
     mostrarVentaFlag() {
-      let IdPerfil = [1, 25, "1", "25"];
+      let IdPerfil = [1, 25, 3, "1", "25", "3"];
       let val = sessionStorage.getItem("IdPerfil");
       return IdPerfil.includes(val);
     },
