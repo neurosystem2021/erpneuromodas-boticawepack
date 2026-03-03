@@ -1940,6 +1940,11 @@ export default {
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.ventas[this.ventaActiva].productos = producto;
           this.$forceUpdate();
+
+          this.$nextTick(() => {
+            let total = this.getTotal();
+            this.ventas[this.ventaActiva].pago.efectivo.monto = total;
+          });
         });
     },
     someMethod(text) {
