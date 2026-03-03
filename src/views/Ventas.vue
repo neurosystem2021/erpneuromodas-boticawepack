@@ -584,7 +584,7 @@ export default {
                 cliente: {},
                 comisionista: {},
                 tipoVenta: {
-                    IdTipoDoc: 7,
+                    IdTipoDoc: 10,
                     TipoDoc: 'BOLETA ELEC.',
                     LimitItems: 0,
                     CodSunat: '03'
