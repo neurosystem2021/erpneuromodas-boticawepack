@@ -307,8 +307,7 @@
       <b-row v-if="producto.IdProducto || producto.EsPadre || manterproducto">
         <b-col md="6">
           <b-form-group>
-            <label>Precio de Costo:</label> 
-            <label>Precio de Costo:</label> 
+            <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
                :disabled="(idPerfil != 1 || producto.EsPadre ==1) ? true : false"
