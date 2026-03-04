@@ -619,6 +619,7 @@
           <b-col md="4">
             <b-input-group prepend="Alm." class="mt-2">
               <autocomplete
+                            :style="bloquearInput ? '' : 'pointer-events:none; opacity:0.7;'"
                             required="required"
                             :id="`inputAlmacen${index}`"
                             :url="API + 'almacenes'"
@@ -638,6 +639,7 @@
           <b-col md="3">
             <b-input-group prepend="P.V. " class="mt-2">
               <autocomplete
+                :style="bloquearInput ? '' : 'pointer-events:none; opacity:0.7;'"
                 required="required"
                 ref="inputPuntoVenta"
                 :url="API + 'ventas/puntos'"
