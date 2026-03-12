@@ -4,59 +4,70 @@
 		  <div class="piso" v-for="(pi, i) in pisos" :key="i">
 			<div v-if="getHabitacionesPiso(pi).length">
 			  <br>
-			  	<b-alert show class="text-center"><b>{{ pi === 1 ? 'PROYECTOS HUÁNUCO' : 'PROYECTOS PUCALLPA' }}</b></b-alert>
+			  	<b-alert show class="text-center"><b>PROYECTOS CADEMEZA</b></b-alert>
 			  <br>
 			</div>
         	<b-row>
 				<b-col class="habitacion" md="3" v-for="(hab, index) in getHabitacionesPiso(pi)" :key="index">
-					<b-card :bg-variant="getVariant(hab)"
-									class="text-center">
-									
-							<h5>{{ hab.Producto }}</h5>
-							<h5>{{ hab.Cliente }}</h5>
-							<h5>S/ {{ hab.granTotalCalculado | moneda }}</h5>
-							<i><h6 v-if="hab.IdProforma"><b>Prof.: </b>S/ {{ hab.TotalProf | moneda }}</h6></i>
-
-							<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
-								<li><b>{{ hab.Cliente }}</b> </li>
-								<li class="text-warning"><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
-								<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
-							</ul>
-							<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
-								<li class="text-warning"><b>FECHA: {{ hab.FechaAlquiler }} - {{ hab.FechaAlquilerFin }}</b></li>
-							</ul>
-							<div slot="footer">
-								<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
-								<!--<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>-->
-								<!--<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
-									<label>Seleccione un cliente:</label>
-									<autocomplete
-											required="required"
-											:ref="'inputCliente1' + index"
-											:url="API + 'clientes'"
-											anchor="ClienteDniRuc"
-											label="writer"
-											placeholder=""
-											:on-select="setCliente" 
-											:classes="{input: 'form-control'}">
-									</autocomplete>
-									<label for="inputLive">Fecha Reserva:</label>
-									<b-form-input v-model="fechaReserva"
-										type="date"></b-form-input>
-	
-									<label for="inputLive">Vuelo:</label>
-									<b-form-input v-model="vuelo"
-										type="text"></b-form-input>
-									<br />
-									<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
-								</b-popover>-->
-								<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Empezar</b-btn>	
-								<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Empezar Proyecto">
-									<label>Seleccione un cliente:</label>
-									<b-input-group>
+						<b-card :bg-variant="getVariant(hab)"  :header-bg-variant="hab.EstaSucio==1?'secondary':'none'" text-variant="white"
+										class="text-center">
+								<div slot="header">
+									<b-row v-if="hab.EstaSucio==1">
+										<b-col md="2">
+											<b-button variant="info" size="sm" @click="limpiarHabitacion(hab.IdProducto,hab.Producto)"><i class="fas fa-broom"></i></b-button>
+										</b-col>
+										<b-col md="10">
+											<label>{{ hab.Producto }}</label>
+										</b-col>
+									</b-row>
+									<b-row v-else>
+										<b-col md="12">
+											<label>{{ hab.Producto }}</label>
+										</b-col>
+									</b-row>
+								</div>			
+								
+								<h5>S/. {{ (hab.granTotalCalculado || 0) | moneda }}</h5>
+								<ul class="detalle" v-if="hab.EstadoHabitacion == 2">
+									<li><b style="color:white">{{ hab.Cliente }}</b></li>
+									<li><b>FECHA: {{ formatFecha(hab.FechaReserva) }}</b></li>
+									<li v-if="hab.vuelo"><br>Vuelo: {{ hab.Vuelo }}</li>
+								</ul>
+								<ul class="detalle" v-if="hab.EstadoHabitacion == 3">
+									<li><b style="color:white; font-size:15px">{{ hab.Cliente }}</b></li>
+									<li><b style="color:white">INICIO: {{ hab.FechaAlquiler }}</b></li>
+									<li><b style="color:white">FIN: {{ hab.FechaAlquilerFin }}</b></li>
+									<b-popover  v-if="showPopover" :target="i + 'popover-agregar' + index" title="Agregar Huesped a la Habitación" triggers="click">
+										<label>Seleccione un cliente:</label>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente3' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													 :onInput="(val) => newDniRuc2 = val"
+													:on-select="setHuesped" 
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form :ruc="newDniRuc2" idModal="modal2" @onAddCliente="(obj) => { setHuesped(obj, index) }"></clientes-form>
+											</b-input-group-append>
+										</b-input-group>
+										<br>
+										<b-button variant="success" size="sm" @click="agregarHuesped(hab,index)">Agregar Huesped</b-button>	
+									</b-popover>
+								</ul>
+								<div slot="footer">
+									<b-btn @click="liberarHab(hab)" variant="success" size="sm">Liberar</b-btn>	
+									<b-btn :id="i + 'popover-reservar' + index" variant="warning" size="sm">Reservar</b-btn>	
+									<b-popover v-if="showPopover"  :target="i + 'popover-reservar' + index" title="Reservar Habitación">
+										<label>Seleccione un cliente:</label>
 										<autocomplete
 												required="required"
-												:ref="'inputCliente2' + index"
+												:ref="'inputCliente1' + index"
 												:url="API + 'clientes'"
 												anchor="ClienteDniRuc"
 												label="writer"
@@ -64,54 +75,115 @@
 												:on-select="setCliente" 
 												:classes="{input: 'form-control'}">
 										</autocomplete>
-										<b-input-group-append>
-											<!--<proveedores-tabla></proveedores-tabla>-->
-											<clientes-form @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
-										</b-input-group-append>
-									</b-input-group>
-									<!--<br />
-									<label>Lugar Procedencia:</label>
-									<b-input-group>
-										<b-form-input v-model="selectCliente.LugarProcedencia"
-											type="text"
-											placeholder="Lugar Procedencia"></b-form-input>
-									</b-input-group>
-									<br>
-									<label>Medio de transporte:</label>
-									<b-input-group>
-										<b-form-input v-model="selectCliente.MedioTransporte"
-											type="text"
-											placeholder="Medio de transporte"></b-form-input>
-									</b-input-group>
-									<br>
-									<label>Próximo destino:</label>
-									<b-input-group>
-										<b-form-input v-model="selectCliente.ProximoDestino"
-											type="text"
-											placeholder="Próximo destino"></b-form-input>
-									</b-input-group>-->
-									<br>
-									<label>Fecha Inicio:</label>
-									<b-input-group>
-										<b-form-input v-model="selectCliente.FechaAlquilerInicio"
-											type="date"
-											placeholder="Fecha Inicio"></b-form-input>
-									</b-input-group>
-									<br>
-									<label>Fecha Fin:</label>
-									<b-input-group>
-										<b-form-input v-model="selectCliente.FechaAlquilerFin"
-											type="date"
-											placeholder="Fecha Fin"></b-form-input>
-									</b-input-group>
-									<br>
+										<label for="inputLive">Fecha Reserva:</label>
+										<b-form-input v-model="fechaReserva"
+											type="date"></b-form-input>
+		
+										<label for="inputLive">Vuelo:</label>
+										<b-form-input v-model="vuelo"
+											type="text"></b-form-input>
+										<br />
+										<b-button variant="success" size="sm" @click="reservarHab(hab)">Reservar Habitación</b-button>	
+									</b-popover>
+									<b-btn :id="i + 'popover-alquilar' + index" variant="danger" size="sm">Vender</b-btn>	
+									<b-popover  v-if="showPopover" :target="i + 'popover-alquilar' + index" title="Crear Proyecto" triggers="click">
+										<label>Seleccione un cliente <b>Titular</b>:</label>
+										<b-input-group>
+											<autocomplete
+													required="required"
+													:ref="'inputCliente2' + index"
+													:url="API + 'clientes'"
+													anchor="ClienteDniRuc"
+													label="writer"
+													placeholder=""
+													 :onInput="(val) => newDniRuc = val"
+													:on-select="setCliente" 
+													:classes="{input: 'form-control'}">
+											</autocomplete>
+											<b-input-group-append>
+												<!--<proveedores-tabla></proveedores-tabla>-->
+												<clientes-form :ruc="newDniRuc" @onAddCliente="(obj) => { setCliente(obj, index) }"></clientes-form>
+											</b-input-group-append>
+										</b-input-group>
+										<br />
+										<label>Lugar Procedencia:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.LugarProcedencia"
+												type="text"
+												placeholder="Lugar Procedencia"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Medio de transporte:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.MedioTransporte"
+												type="text"
+												placeholder="Medio de transporte"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Próximo destino:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.ProximoDestino"
+												type="text"
+												placeholder="Próximo destino"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Fecha Inicio:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.FechaAlquilerInicio"
+												type="datetime-local"
+												placeholder="Fecha Inicio"></b-form-input>
+										</b-input-group>
+										<br>
+										<label>Fecha Fin:</label>
+										<b-input-group>
+											<b-form-input v-model="selectCliente.FechaAlquilerFin"
+												type="datetime-local"
+												placeholder="Fecha Fin"></b-form-input>
+										</b-input-group>
+										<br>
 
-									<b-button variant="success" size="sm" @click="alquilarHab(hab)">Empezar Proyecto</b-button>	
-								</b-popover>
-								<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
-							</div>
-					</b-card>
-				</b-col>
+										<b-button variant="success" size="sm" @click="alquilarHab(hab,index)">Crear Proyecto</b-button>	
+									</b-popover>
+									<b-button v-if="hab.IdPreOrden && hab.EstadoHabitacion == 3" @click="openCarrito(hab)" variant="primary" size="sm">+</b-button>
+									<div style="margin-top:10px">
+										<b-btn v-if="!hab.DocVenta && hab.EstadoHabitacion == 3" variant="dark" size="sm" @click="liberarForzado(hab)">Liberar Forzado</b-btn>
+										<span v-if="hab.EstadoHabitacion == 3">
+											<b-btn :id="i + 'popover-cambiar' + index" variant="light" size="sm" @click="selectDefectoCambio" >Cambiar Proy.</b-btn>
+											<b-popover :target="i + 'popover-cambiar' + index"  v-if="showPopover" title="Cambiar Habitación" triggers="click">
+												<label>Proyecto Disponibles:</label>
+												<b-form-text text-variant="info" style="margin-top:-10px">(Los proyecto ocupados y reservadas no se mostrarán.)</b-form-text>
+												<b-input-group style="margin-top:-10px">
+													<b-form-select style="font-weight:bold; font-size:12px" v-model="selectHabCambio" :options="options" size="sm" class="mt-3"></b-form-select>
+												</b-input-group>
+												<br>
+												<b-button variant="success" size="sm" @click="cambiarHab(hab,index)">Cambiar Proyecto</b-button>	
+											</b-popover>
+										</span>
+
+									</div>
+									<div style="margin-top:10px" v-if="hab.DocVenta && hab.EstadoHabitacion == 3">
+										<b-btn :id="i + 'popover-renovar' + index" variant="info" size="sm">Renovar</b-btn>	
+										<b-popover  v-if="showPopover" :target="i + 'popover-renovar' + index" title="Renovar Alquiler Habitación" triggers="click">
+											<label>Nueva Fecha Inicio:</label>
+											<b-input-group>
+												<b-form-input v-model="selectCliente.FechaAlquilerInicioRe"
+													type="datetime-local"
+													placeholder="Fecha Inicio"></b-form-input>
+											</b-input-group>
+											<br>
+											<label>Nueva Fecha Fin:</label>
+											<b-input-group>
+												<b-form-input v-model="selectCliente.FechaAlquilerFinRe"
+													type="datetime-local"
+													placeholder="Fecha Fin"></b-form-input>
+											</b-input-group>
+											<br>
+											<b-button variant="success" size="sm" @click="renovarHabitacion(hab,index)">Renovar Alquiler</b-button>	
+										</b-popover>
+									</div>
+								</div>
+						</b-card>
+					</b-col>
 			</b-row>
 		  </div>
       </b-container>
@@ -141,7 +213,7 @@
 									 @onUpdateProductos="calcularManoObra"
 									></pre-orden-form-det>
 
-									<b-row>
+									<!-- <b-row>
 										<b-col md="6">
 											<table class="table b-table border table-footer table-sm text-center" >
 											<tbody>
@@ -162,51 +234,15 @@
 											</tbody>
 											</table>
 										</b-col>
-									</b-row>
+									</b-row> -->
 
 								</b-col> 
 								<b-col md="4">
 
-									<label><b>Gastos</b></label>
-									<input v-model="selectProducto.Gasto"
-											size="sm"
-											type="number"
-											class="form-control"
-											step="0.01"
-											placeholder="Gasto S/."/>
-									<b-input-group>
-										<b-form-input v-model="selectProducto.GastoDesc"
-											size="sm"
-											type="text"
-											placeholder="Descripción"></b-form-input>
-										<b-button @click="insertarGasto" variant="primary" size="sm">+</b-button>
-										<b-form-text id="inputLiveHelp">Los gastos se reflejará en Caja y Banco.</b-form-text>
-									</b-input-group>
-									<br>
-									<table class="table b-table table-sm">
-										<thead>
-											<tr>
-											<th>Fecha</th>
-											<th>Concepto</th>
-											<th>Cantidad</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr v-for="(ade, index) in gastos" :key="index">
-												<td>{{ ade.FechaDoc }}</td>
-												<td>{{ ade.Concepto.split(" - ").pop() }}</td>
-												<td>{{ ade.Tipo ? '-' + ade.Importe : ade.Importe }}</td>
-											</tr>
-											<tr class="bg-info text-white">
-												<td colspan="2">TOTAL</td>
-												<td>{{ totalGastos }}</td>
-											</tr>
-										</tbody>
-									</table>
-
 									<hr />
 
 									<label><b>Adelantos</b></label>
+									<b-form-select v-model="idMetodoPago" :options="metodosPago" size="md"/>
 									<input v-model="selectProducto.Adelanto"
 											size="sm"
 											type="number"
@@ -247,7 +283,7 @@
 							</b-row>
 							
 							<div class="text-center">
-								<h4>Gran total: {{ totalSumaProductos }}</h4> 
+								<h2>Gran total: {{ totalSumaProductos }}</h2> 
 							</div>
 						
 						</div>
@@ -306,16 +342,22 @@ export default {
 			proformaTotal: null,
 			codProforma: null,
 			profTotHab: 0,
+			metodosPago:[{ value: null, text: '-- SELECCIONE --' }, { value: 1, text: 'EFECTIVO' }, { value: 2, text: 'DEPOSITO' }],
 			// proformaTotalCard: null,
 			// habitacionesPiso: []
 
 			//nuevas funciones
+			idMetodoPago: null,
+			newDniRuc: '',
+			newDniRuc2: '',
 			totalManoObraBruta:0,
 			totalManoObraMenoMat:0,
 			totalManoObraNeta:0,
 			totalSumaProductos:0,
 			totalGastos:0,
-			totalAdelantos:0
+			totalAdelantos: 0,
+			options: [{ value: null, text: 'SELECCIONE LA NUEVA HABITACIÓN' }],
+			selectHabCambio:null
 			}
 	},
 	computed: {
@@ -376,30 +418,50 @@ export default {
 			})
 		},
 		insertarAdelanto() {
-			let usuario = sessionStorage.getItem('User')
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: this.selectProducto.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta == null){
+						let usuario = sessionStorage.getItem('User')
 
-			if(this.selectProducto.Adelanto <= 0) {
-				return;
-			}
+						if(this.selectProducto.Adelanto <= 0 || this.selectProducto.Adelanto == undefined) {
+							this.$toasted.show('Debe insertar un monto')
+							return;
+						}
 
-			let r = confirm("¿Desea Insertar un adelanto?")
+						if(this.idMetodoPago==null) {
+							this.$toasted.show('Seleccione un metodo de pago')
+							return;
+						}
 
-			if (r) {
-				this.axios.post(this.API + 'preorden/cajaybanco', {
-					producto: this.selectProducto,
-                    concepto: 'Adelanto Proyecto ' + this.selectProducto.Producto + ' - ' + this.selectProducto.AdelantoDesc,
-					IdPreOrden: this.selectProducto.IdPreOrden,
-					IdHabitacion: this.selectProducto.IdProducto,
-					Adelanto: this.selectProducto.Adelanto,
-					Usuario: usuario
-				}).then(res => {
-					// this.adelantos.push(res.data)
-					this.cargarAdelantos();
-					this.selectProducto.Adelanto 		= '' 
-					this.selectProducto.Producto 		= '' 
-					this.selectProducto.AdelantoDesc	= ''
-				})
-			}
+						let r = confirm("¿Desea Insertar un adelanto?")
+
+						if (r) {
+							this.axios.post(this.API + 'preorden/cajaybanco', {
+								producto: this.selectProducto,
+								concepto: 'Adelanto Habitación ' + this.selectProducto.Producto + ' - ' + (this.selectProducto.AdelantoDesc || ''),
+								IdPreOrden: this.selectProducto.IdPreOrden,
+								IdHabitacion: this.selectProducto.IdProducto,
+								Adelanto: this.selectProducto.Adelanto,
+								Usuario: usuario,
+								MetodoPago: this.idMetodoPago
+							}).then(res => {
+								// this.adelantos.push(res.data)
+								this.cargarAdelantos();
+								this.selectProducto.Adelanto = 0
+								this.selectProducto.AdelantoDesc = ''
+								this.idMetodoPago = null
+							})
+						}
+					}else{
+						this.$toasted.show("No puede ingresar adelantos, el proyecto ya fue pagada, puede renovarla si se trata del mismo cliente")
+						this.getHabitaciones()
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ha ocurrido un error")
+			})
 		},
 
 		insertarGasto() {
@@ -443,6 +505,7 @@ export default {
 			}).then(res => {
 				this.$toasted.success('Guardado correctamente')
 				this.show = false
+				this.getHabitaciones()
 			})
 
 			
@@ -450,10 +513,19 @@ export default {
 		openCarrito(hab) {
 			this.proformaTotal = null
 			this.selectProducto = hab
+			this.show = true; // Asegúrate de que 'show' sea true para que el v-if del componente hijo se active
+			
 			this.$refs.modalCarrito.show()
 			this.cargarAdelantos()
 			this.cargarGastos()
 			this.cargarProformaTotal(this.selectProducto.IdProforma)
+
+			// ESTO ES LO NUEVO:
+			// Esperamos a que el componente hijo (preOrdenProductos) cargue
+			this.$nextTick(() => {
+				// Forzamos el cálculo inicial apenas se abre el modal
+				this.calcularManoObra();
+			})
 		},
 		cargarProformaTotal(idProforma) {
 			if (idProforma) {
@@ -465,11 +537,116 @@ export default {
 			}
 		},
 		getHabitaciones() {
-			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.IdProducto&pisoAlm='+this.$route.query.id).then(res => {
+			this.axios.get(this.API + 'habitaciones?sortBy=Gen_Producto.Producto').then(res => {
+				this.arregloInfo = []
+				this.LibresTotal = 0
+				this.ReservadasTotal = 0
+				this.OcupadasTotal = 0
+				this.PagadasTotal = 0
+				this.SuciasTotal = 0
 				this.habitaciones = res.data
-				/* this.pisos.forEach(piso => {
-					this.habitacionesPiso[piso] = this.getHabitacionesPiso(piso)
-				}) */
+				this.options = []
+				this.options.push({ value: null, text: 'SELECCIONE EL NUEVO PROYECTO' })
+				this.habitaciones.map(hab=>{
+					if(hab.EstadoHabitacion == 1 && hab.EstaSucio == 0){
+						this.options.push({ value: hab.IdProducto, text: hab.Producto })
+					}
+				})
+				this.pisos.map(p=>{
+					let HabitacionesPiso = this.habitaciones.filter(hab => {
+						return hab.Piso === p
+					})
+					if(HabitacionesPiso.length != 0){
+						let libres = 0
+						let ocupadas = 0
+						let reservadas = 0
+						let sucias = 0
+						let pagadas = 0
+
+						HabitacionesPiso.map(hab=>{
+							if(hab.EstadoHabitacion == 1 && hab.EstaSucio==0 ){
+								libres++
+							}else if(hab.EstadoHabitacion==2){
+								reservadas++
+							}
+							
+							if(hab.EstadoHabitacion==3 && hab.DocVenta != null){
+								pagadas++
+							}
+							
+							if(hab.EstadoHabitacion==3){
+								ocupadas++
+							}
+
+							if(hab.EstadoHabitacion==3 && hab.EstaSucio==1){
+								sucias++
+							}
+							
+							if(hab.EstadoHabitacion==1 && hab.EstaSucio==1){
+								sucias++
+							}
+						})
+						this.arregloInfo.push({Piso:p,Libres:libres,Reservadas:reservadas,Pagadas:pagadas,Ocupadas:ocupadas,Sucias:sucias})
+					}
+				})
+
+				this.arregloInfo.map((arr)=>{
+					this.LibresTotal += arr.Libres
+					this.ReservadasTotal += arr.Reservadas
+					this.PagadasTotal += arr.Pagadas
+					this.OcupadasTotal += arr.Ocupadas
+					this.SuciasTotal += arr.Sucias
+				})
+	
+			}).catch(err=>{
+				this.habitaciones = []
+				this.arregloInfo = []
+				this.$toasted.show("Ocurrio un error")
+			})
+		},
+		liberarForzado(hab){
+			this.axios.get(this.API + 'preorden/venta', { params: {
+				IdPreOrden: hab.IdPreOrden
+			} }).then(res => {
+				if(res.data){
+					if(res.data.IdDocVenta != null){
+						this.$toasted.show("El proyecto  ya tiene venta asociada, puede usar el boton verde para liberar")
+						this.getHabitaciones()
+					}else{
+						this.$swal({
+						target: document.getElementById('conten'),
+						title: 'Liberación forzada',
+						html: 'Se liberará la habitación: <strong> '+hab.Producto+'</strong> ¿Está seguro? <br>'+
+						' <div style="text-align:left"><strong>Solo use esta opción en los siguientes casos: </strong> <br> '+
+						' <ul><li>Confusión de habitación.</li><li>Cliente erroneo</li><li>Fechas inicio / fin ingresadas erroneas.</li><li>No debe tener adelantos, y si los tiene eliminarlos desde <strong>caja y banco</strong> antes de proceder.</li></ul> '+
+						' <strong>Adicional: </strong> <ul><li>Esta opción solo se mostrará cuando no haya ventas asociadas a la habitación.</li> '+
+						' <li>Por favor libere el proyecto (botón verde) solo <strong>cuando el cliente abandone el establecimiento y este deacuerdo con su comprobante.</strong></li> </ul> </div>',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#3085d6',
+						cancelButtonColor: '#d33',
+						confirmButtonText: 'Sí, liberar forzadamente',
+						cancelButtonText: 'No, atrás'
+						}).then((result) => {
+							if (result.isConfirmed) {
+								this.axios.post(this.API + 'habitaciones/liberar', {
+									IdProducto: hab.IdProducto,
+									EstaSucio: 0
+								}).then(res => {
+									this.getHabitaciones()
+									this.limpiarPopover()
+									this.$toasted.success('La Habitación: ' + hab.Producto + ' está ahora disponible');
+									this.showPopover = false
+									this.$nextTick(() => {
+										this.showPopover = true
+									})
+								})
+							}
+						}) 
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ah ocurrido un error")
 			})
 		},
 		getVariant(hab) {
@@ -542,7 +719,11 @@ export default {
 		},
 		setCliente(obj, index) {
 			if (index >= 0) {
+				console.log(this.$refs)
+				console.log(index)
+				console.log('inputCliente2' + index)
 				this.$refs['inputCliente2' + index][0].setValue(obj.Cliente)
+				this.newDniRuc=''
 			}
 			this.selectCliente = obj
 		},
@@ -617,6 +798,87 @@ export default {
 			}
 			return total?total.toFixed(2):0
 		}, */
+		setHuesped(obj,index){
+			if (index >= 0) {
+				console.log('inputCliente3' + index)
+				this.$refs['inputCliente3' + index][0].setValue(obj.Cliente)
+				this.newDniRuc2=''
+			}
+			this.selectHuesped = obj
+		},
+		selectDefectoCambio(){
+			this.selectHabCambio = null
+		},
+				cambiarHab(hab){
+			console.log(hab);
+			let habCambio = this.selectHabCambio;
+			if(habCambio == null){
+				this.$toasted.show('Seleccione la habitacion nueva a cambiar')
+				return
+			}
+
+			this.showPopover = false
+			this.$nextTick(() => {
+				this.showPopover = true
+			})
+
+			this.axios.get(this.API + 'preorden/estadohab', { params: {
+				IdProducto: hab.IdProducto,
+			} }).then(res => {
+				if(res.data){
+					if(res.data.EstadoHabitacion == 3 && res.data.IdPreOrden != null){
+						this.$swal({
+						target: document.getElementById('conten'),
+						title: '<div style="text-align:left; font-size:18.5px; text-align:center">El Cliente <strong>'+ hab.Cliente+'</strong> se cambiará a: <br> <strong>'+ this.options.find((opc)=>opc.value == habCambio).text+'</strong>, está seguro?</div>',
+						html: ' <div style="text-align:left"><strong>Información: </strong> <br> '+
+						' <ul><li>Sí tiene una venta, se cambiará el detalle <strong>(Nombre de la habitación)</strong>. El <strong>precio</strong> se mantendrá.</li><li>Sí el precio de la nueva habitación es mayor a la que estaba y tiene una venta se tiene que <strong>anular la venta</strong>. Posteriormente agregar la diferencia y realizar una nueva venta.</li><li>Toda la información pasará a la nueva habitación.</li></ul></div>',
+						icon: 'question',
+						showCancelButton: true,
+						confirmButtonColor: '#28a745',
+						cancelButtonColor: '#d33',
+						confirmButtonText: 'Sí, cambiar habitación',
+						cancelButtonText: 'No, atrás'
+						}).then((result) => {
+							if (result.isConfirmed) {
+								this.axios.post(this.API + 'habitaciones/cambiar', {
+									IdCliente:hab.IdCliente,
+									IdPreOrden:hab.IdPreOrden,
+									IdProductoAnterior:hab.IdProducto,
+									IdProductoNuevo:habCambio,
+									FechaAlquiler:hab.FechaAlquiler,
+									FechaAlquilerFin:hab.FechaAlquilerFin
+								}).then(res => {
+									if(res.data.updated==true){
+										this.getHabitaciones()
+										this.limpiarPopover()
+										this.$toasted.info('El cliente '+hab.Cliente+' se cambió a: ' + res.data.Producto);
+										this.showPopover = false
+										this.$nextTick(() => {
+											this.showPopover = true
+										})
+									}else{
+										if(res.data.msg){
+											this.$toasted.show(res.data.msg)
+											this.getHabitaciones()
+											this.limpiarPopover()
+											this.showPopover = false
+											this.$nextTick(() => {
+												this.showPopover = true
+											})
+										}
+									}
+								})
+							}
+						})
+					}else{
+						this.$toasted.info("La habitacion ya no está disponible se actualizará la lista")
+						this.getHabitaciones()
+					}
+				}
+			}).catch(err=>{
+				this.$toasted.show("Ah ocurrido un error")
+			})
+		},
 		calcularManoObra(e){
 			let pManoObra = e.find(p => p.CodigoBarra === 'MANODEOBRA');
       		let precio = pManoObra ? pManoObra.Precio : 0;

@@ -19,7 +19,6 @@
     <table class="table b-table table-sm">
       <thead>
         <tr>
-          <th>Mano de Obra</th>
           <th>Id</th>
           <th>Producto</th>
           <th>Precio</th>
@@ -29,13 +28,6 @@
       </thead>
       <tbody>
         <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled}">
-          <td>
-            <input 
-            @change="(e) => addManoDeObra(index, e)"
-            v-if="prod.CodigoBarra != 'MANODEOBRA' " 
-            v-model="prod.EsManoDeObra"
-            class="form-check-input" type="checkbox" />
-          </td>
           <td>{{ prod.IdProducto }}</td>
           <td>{{ prod.Producto }}</td>
           <td>
@@ -143,7 +135,7 @@ export default {
         this.$toasted.show('No puede ingresar este producto')
         return
       }
-      
+      data.Cantidad = 1;
       data.Precio = data.PrecioContado
       
       this.productos.push(data)
