@@ -526,6 +526,7 @@ export default {
   },
   data() {
     return {
+      FechaDocAnt: null, 
       isNota: false,
       dni: "",
       adelanto: 0,
@@ -870,6 +871,7 @@ export default {
     setDocRef(obj) {
       this.venta.CodSunatModifica = obj.CodSunat;
       this.venta.NroComprobanteModifica = obj.NroComprobante;
+      this.venta.FechaDocAnt = obj.FechaDocAnt;
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
         this.venta.tipoVenta.CodSunat == "08"
@@ -1379,6 +1381,7 @@ export default {
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
+      this.venta.FechaDocAnt = this.venta.FechaDocAnt || null;  
       this.axios
         .post(this.API + "ventas", this.venta)
         .then(response => {
