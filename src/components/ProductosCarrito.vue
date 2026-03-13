@@ -736,9 +736,9 @@ export default {
       productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
-    bloquearDescuento() {
-      return Number(this.idPerfil) !== 1 || this.esDelivery;
-    },
+    // bloquearDescuento() {
+    //   return Number(this.idPerfil) !== 1 || this.esDelivery;
+    // },
     APIProductos() {
       if (this.idAlmacen) {
         return this.API + "productos/puntoventa/stock/" + this.idAlmacen;
