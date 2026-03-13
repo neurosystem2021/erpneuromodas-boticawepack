@@ -924,7 +924,20 @@ export default {
                 this.inProgress = false
                 return
             }
-
+            if (this.totalCart >= 700 && this.venta.tipoVenta.CodSunat == '03') {
+              //this.$toasted.show('Debe seleccionar un cliente.')
+              this.$swal({
+                position: "center",
+                icon: "info",
+                title: "El monto es mayor a 700 soles, realice una factura", 
+                showConfirmButton: true,
+                confirmButtonText: "Entiendo",
+                target: document.getElementById("conten"),
+                confirmButtonColor: "#0275d8"
+              });
+              this.inProgress = false;
+              return;
+            }
             var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc))
             if (!esNumerico) {
                 this.$toasted.show('El RUC debe ser numérico, editar cliente.')
