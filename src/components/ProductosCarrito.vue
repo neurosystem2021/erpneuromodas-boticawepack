@@ -407,7 +407,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-if="isVentas">
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
@@ -881,6 +881,13 @@ export default {
       this.objProd = obj
     },  
     setProductoUni (obj) {
+      let conteo = this.productos.filter(p => p.IdProducto === obj.IdProducto).length;
+      if (conteo >= 2) {
+        this.$toasted.error('No puede agregar más de 2 veces el mismo producto.');
+        this.$refs.autocompleteProducto.setValue('');
+        return;
+      }
+
       this.$refs.autocompleteProducto.setValue('')
       obj.subt = ''
       obj.precio = obj.PrecioCosto
@@ -902,6 +909,14 @@ export default {
     },
     setProductoCant (prod) {
       let obj = {...this.objProd}
+
+      let conteo = this.productos.filter(p => p.IdProducto === obj.IdProducto).length;
+      if (conteo >= 2) {
+        this.$toasted.error('No puede agregar más de 2 veces el mismo producto.');
+        this.$refs['modalCant'].hide();
+        return;
+      }
+
       obj.Presentacion = prod.nombre
       obj.CantidadPresentacion = prod.cantidad
       obj.precio = 0

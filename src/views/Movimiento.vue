@@ -439,11 +439,27 @@ return false
       }
 
       let faltaLlenar = false
-      //let faltaFechaVen = false
-      let igualProducto = false
+      // //let faltaFechaVen = false
+      // let igualProducto = false
       let faltaStock = false
       let faltaCantidad = false
-      this.productos.forEach((prod, index) => {
+      
+      // --- NUEVA LÓGICA PARA PRODUCTOS REPETIDOS ---
+      let productosInvalidos = [];
+      const mapeoProductos = {};
+
+      this.productos.forEach((prod) => {
+        const id = prod.IdProducto;
+        if (!mapeoProductos[id]) {
+          mapeoProductos[id] = { nombre: prod.Producto, filas: 0, tieneObsequio: false };
+        }
+        mapeoProductos[id].filas += 1;
+        // Consideramos obsequio si EsObsequio es 1 o si el precio es 0
+        if (prod.EsObsequio == 1 || parseFloat(prod.precio) === 0) {
+          mapeoProductos[id].tieneObsequio = true;
+        }
+
+        // Validaciones originales
         if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true
         }
@@ -459,10 +475,10 @@ return false
           faltaFechaVen = true
         }*/
 
-        let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
-        if(pro > 1){
-        igualProducto = true
-        }
+        // let pro = this.productos.filter(p => p.IdProducto == prod.IdProducto).length
+        // if(pro > 1){
+        // igualProducto = true
+        // }
 
         if(this.movimiento.movimientoTipo.Tipo!=0){
           if( (prod.stock <= 0) ||parseFloat(prod.cantidad) > prod.stockMovimiento){
@@ -475,6 +491,21 @@ return false
         }
         
       })
+
+      // Validar si hay repetidos sin obsequio
+      for (const key in mapeoProductos) {
+        const p = mapeoProductos[key];
+        if (p.filas > 1 && !p.tieneObsequio) {
+          productosInvalidos.push(p.nombre);
+        }
+      }
+
+      if (productosInvalidos.length > 0) {
+        this.$toasted.error(`Error: Los productos [${productosInvalidos.join(', ')}] están repetidos. Debe marcar al menos uno como Obsequio para continuar.`);
+        this.inProgress = false;
+        return;
+      }
+      // --- FIN DE NUEVA LÓGICA ---
 
       if (faltaCantidad) {
         this.$toasted.show('Complete la cantidad de los productos ingresados')
