@@ -8,6 +8,7 @@
               <autocomplete
                 ref="autocompleteProducto"
                 :url="APIProductos"
+                :debounce="500"
                 :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
                 :onShouldRenderChild="renderChild"
                 anchor="Producto"
@@ -248,7 +249,6 @@
             placeholder="Precio"
             @input="() => { setNuevoPrecioContado(data.index);}"
             />
-            <small>G: {{ (data.item.precio - data.item.PrecioCosto) * data.item.cantidad | redondear }}</small>
         </template>
         <template slot="subtotal" slot-scope="data">
           <div v-if="isVentas">
@@ -393,7 +393,8 @@
         <template slot="acciones" slot-scope="data">
           <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="$emit('eliminarProducto',data.index)"><i class="fas fa-times fa-lg"></i></b-button>
           <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false" v-if="(idPerfil == 1 && index==0) ? true : false"  variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
-        </template>
+        <br>
+            <small>G: {{ (data.item.precio - data.item.PrecioCosto) * data.item.cantidad | redondear }}</small></template>
 
         <template slot="show_details" slot-scope="row">
            <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
@@ -499,6 +500,7 @@ import config from "@/store/config.js";
 import sound from "../../static/beep.mp3";
 import Vue from "vue";
 import VueQuagga from "vue-quaggajs";
+import debounce from 'lodash';
 
 Vue.use(VueQuagga);
 

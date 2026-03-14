@@ -22,6 +22,7 @@
             <label>Seleccione un cliente:</label>
             <b-input-group>
               <autocomplete
+				        ref="cboClientePrincipal"  
                 required="required"
                 :url="API + 'clientes'"
                 anchor="ClienteDniRuc"
@@ -35,12 +36,13 @@
               </autocomplete>
               <b-input-group-append>
                 <clientes-form
-                  :ruc="newDniRuc"
-                  @onAddCliente="setCliente"
+				        :idModal="'modalProyectoPiso_' + i"
+				        :newDniRuc="newDniRuc"
+				        @onAddCliente="(obj) => { setCliente(obj); pegarTextoBuscador('cboClientePrincipal', obj); }"
                 ></clientes-form>
               </b-input-group-append>
             </b-input-group>
-            <label>Seleccione un Personal Servcio:</label>
+            <label>Seleccione un Personal Servicio:</label>
             <b-input-group>
               <autocomplete
                 required="required"
@@ -253,11 +255,9 @@
                     <b-input-group-append>
                       <!--<proveedores-tabla></proveedores-tabla>-->
                       <clientes-form
-                        @onAddCliente="
-                          (obj) => {
-                            setCliente(obj, index);
-                          }
-                        "
+                      :idModal="'modalHab_' + i + '_' + index"
+                      :newDniRuc="newDniRuc" 
+                      @onAddCliente="(obj) => { setCliente(obj); pegarTextoBuscador('inputCliente2' + index, obj); }"
                       ></clientes-form>
                     </b-input-group-append>
                   </b-input-group>
@@ -794,6 +794,29 @@ export default {
   }, */
   },
   methods: {
+    pegarTextoBuscador(nombreRef, clienteObj) {
+      // 1. Armamos el texto tal como quieres que se vea
+      let textoMostrar = clienteObj.DniRuc + ' - ' + clienteObj.Cliente;
+
+      // 2. Esperamos a que la vista se actualice
+      this.$nextTick(() => {
+      // Obtenemos el componente buscador correcto
+      let componente = Array.isArray(this.$refs[nombreRef]) 
+              ? this.$refs[nombreRef][0] 
+              : this.$refs[nombreRef];
+
+      if (componente && componente.$el) {
+        // Buscamos la etiqueta <input> HTML nativa y le forzamos el texto
+        let inputDOM = componente.$el.querySelector('input');
+        if (inputDOM) {
+        inputDOM.value = textoMostrar;
+        }
+        
+        // (Opcional) Le avisamos al componente interno por si usa esta propiedad
+        if (componente.type !== undefined) componente.type = textoMostrar;
+      }
+      });
+    },
     abrirMdlNuevoProyecto() {
       this.mdlNuevoProyecto = true;
     },
@@ -1368,6 +1391,15 @@ export default {
 };
 </script>
 <style>
+.popover {
+  max-width: 500px!important;
+  width: 500px !important;
+}
+
+.popover-body {
+  width: 100% !important;
+}
+
 .modalProyecto .modal-dialog {
   width: 90% !important; /* Cambia el 80% al ancho que necesitas */
   max-width: 90% !important;
@@ -1397,7 +1429,9 @@ export default {
     display: block;
   }
 }
-</ > <style scoped > h5 {
+</style>
+<style scoped > 
+h5 {
   font-size: 1.2rem;
 }
 h6 {
