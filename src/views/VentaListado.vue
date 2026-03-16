@@ -1414,12 +1414,13 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
-
+          let producto = [];
           response.data.forEach(element => {
-            this.setProducto(element, true);
+            console.log(element);
+            producto.push({ ...element, Descripcion: element.Presentacion });
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
+          this.ventas[this.ventaActiva].productos = producto;
           this.$forceUpdate();
         });
     },
