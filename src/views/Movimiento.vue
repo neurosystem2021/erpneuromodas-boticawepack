@@ -507,6 +507,8 @@ export default {
         alterarProductos: 1,
         FechaVenCredito: "",
         Moneda: "PEN",
+        serie: "",          
+        numero: "",          
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
@@ -633,6 +635,13 @@ export default {
     guardarMovimiento(evt) {
       evt.preventDefault();
       this.inProgress = true;
+
+      if (!this.movimiento.serie || !this.movimiento.numero) {
+        this.$toasted.show("Ingrese serie y número del movimiento");
+        this.inProgress = false;
+        return;
+      }
+      console.log(this.movimiento.serie);
 
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show("Por favor seleccione un proveedor");
