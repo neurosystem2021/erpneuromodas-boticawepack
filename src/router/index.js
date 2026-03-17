@@ -31,6 +31,8 @@ import RemisionLista from '@/views/RemisionLista.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ArticulosResumen from '@/views/reportes/ArticulosResumen.vue'
 
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue"
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue"
 Vue.use(Router)
 
 export default new Router({
@@ -150,6 +152,16 @@ export default new Router({
       path: '/remision',
       name: 'Remision',
       component: Remision
+    },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
     },
     {
       path: '/remision-lista',
