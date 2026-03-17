@@ -394,7 +394,6 @@
             <b-form-group>
               <label>Flete:</label>
               <input
-                required="required"
                 v-model="producto.Flete"
                 @input="actualizarPrecioContado"
                 type="number"
