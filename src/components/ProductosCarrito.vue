@@ -785,7 +785,7 @@
                 <b-col cols="6" class="borderIzquierdo">
                   <b>
                     Precio: <br>
-                    {{itemProducto.PrecioContado}}
+                    {{ isVentas ? itemProducto.PrecioContado : itemProducto.PrecioCosto }}
                   </b>
 
                   </b-col>
@@ -1388,6 +1388,11 @@ export default {
       });
     },
     cambiarPrecioConvenioBloque(index, item) {
+      // si no es venta, no modificar precio
+      if (!this.isVentas) {
+        return;
+      }
+
       if (item.precioBloque > 0 && item.cantidad >= item.PrecioPorBloque) {
         this.productos[index].precio = item.precioBloque;
       } else if (
@@ -2012,7 +2017,15 @@ export default {
       } else {
         this.itemProducto.tipo = "UNIDAD";
         this.itemProducto.estadoPxP = true;
-        this.itemProducto.precio = this.itemProducto.PrecioContado;
+        if (this.isVentas) {
+          // venta
+          this.itemProducto.precio = this.itemProducto.PrecioContado;
+          this.itemProducto.nuevoPrecioContado = this.itemProducto.PrecioContado;
+        } else {
+          // compra
+          this.itemProducto.precio = this.itemProducto.PrecioCosto;
+          this.itemProducto.nuevoPrecioContado = this.itemProducto.PrecioContado;
+        }
         this.itemProducto.total = 0;
         this.itemProducto.cantxPrecio = 0;
         this.itemProducto.cantidad = 1;
@@ -2046,8 +2059,13 @@ export default {
       prod.Presentacion = JSON.stringify(presentacion);
 
       if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * presentacion.precio;
-        prod.precio = presentacion.precio;
+        if (this.isVentas) {
+          prod.total = this.monto * presentacion.precio;
+          prod.precio = presentacion.precio;
+        } else {
+          prod.precio = prod.PrecioCosto;
+          prod.total = prod.cantidad * prod.PrecioCosto;
+        }
         prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
       }
@@ -2074,7 +2092,7 @@ export default {
       prod.disabled = false;
       prod.Presentacion = null;
       prod.total = 0;
-      prod.precio = prod.PrecioContado;
+      prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
       prod.cantidadPres = 0;
       prod.bloquearInput = false;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
@@ -2105,8 +2123,13 @@ export default {
       prod.cantidad = this.monto;
 
       if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * presentacion.precio;
-        prod.precio = presentacion.precio;
+        if (this.isVentas) {
+            prod.total = this.monto * presentacion.precio;
+            prod.precio = presentacion.precio;
+          } else {
+            prod.precio = prod.PrecioCosto;
+            prod.total = prod.cantidad * prod.PrecioCosto;
+          }
         prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
       }
@@ -2129,13 +2152,14 @@ export default {
       }
       let prod = this.itemProducto;
       prod.tipo = "UNIDAD";
-      prod.precio = prod.PrecioContado;
+      prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
       // prod.cantidadPres = 0;
       // prod.bloquearInput = false;
       prod.cantxPrecio = this.monto;
       prod.cantidad = this.monto;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
-        prod.total = this.monto * prod.PrecioContado;
+         prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
+          prod.total = this.monto * prod.precio;
 
         // prod.estadoPxP = false;
       }

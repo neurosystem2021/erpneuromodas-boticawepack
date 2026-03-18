@@ -700,7 +700,7 @@
               style="background: #28A745;"
               size="lg"
               class="btnAction"
-              v-if="idPerfil == 1 || idPerfil == 14"
+              
               > 
                 <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
             </b-button>
@@ -1520,96 +1520,154 @@ export default {
       this.venta.tipoVenta = obj;
       this.getNumeroVenta();
     },
-    setDocRef(obj) {
-      this.venta.CodSunatModifica = obj.CodSunat;
-      this.venta.NroComprobanteModifica = obj.NroComprobante;
 
-      if (
-        this.venta.tipoVenta.CodSunat == "07" ||
-        this.venta.tipoVenta.CodSunat == "08"
-      ) {
-        this.venta.Serie = this.venta.Serie.replace(
-          /^./,
-          obj.NroComprobante[0]
-        );
-      }
-      this.axios
-        .get(this.API + "ventas/solonumero", {
-          params: {
-            serie: this.venta.Serie,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-            id_empresa: this.empresa
-          }
-        })
-        .then(response => {
-          this.venta.Numero = response.data.numero;
-        })
-        .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-        });
-      //Cargar producto del documento afectado nota credito
-      this.axios
-        .get(this.API + "venta/detalle/comprobante", {
-          params: {
-            NroComprobante: obj.NroComprobante,
-            idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            id_empresa: this.empresa
-          }
-        })
-        .then(response => {
-          this.axios
-            .get(this.API + "cliente", {
-              params: {
-                idCliente: response.data[0].IdCliente,
-                id_empresa: this.empresa
-              }
-            })
-            .then(response => {
-              if (response.data) {
-                this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
-                this.venta.CampoDireccion = this.venta.cliente.Direccion;
-              } else {
-                this.$toasted.show("No se encontro al cliente");
-              }
-            })
-            .catch(error => {
-              console.log(error);
-            });
-          this.limpiarCart();
-          let empresa = this.$store.state.empresas.filter(
-            v => v.value == this.empresa
-          )[0];
+    async setDocRef(obj) {
+      try {
+        // 1. Set documento base
+        this.venta.CodSunatModifica = obj.CodSunat;
+        this.venta.NroComprobanteModifica = obj.NroComprobante;
 
-          if (
-            this.venta.tipoVenta.CodSunat == "07" ||
-            this.venta.tipoVenta.CodSunat == "08"
-          ) {
-            response.data.map(item => {
-              item.Empresa = empresa.value;
-              item.NombreEmpresa = empresa.text;
-              // item.IdEm
-            });
-          }
-          response.data.map(item => {
-            item.estadoPxP = false;
-            let preciosProd = [];
-            item.precioCont = item.PrecioContado;
-            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
-            let fPP = preciosProd.filter(p => p.cantidad === 0);
+        // 2. Ajustar serie (nota crédito / débito)
+        if (
+          this.venta.tipoVenta.CodSunat == "07" ||
+          this.venta.tipoVenta.CodSunat == "08"
+        ) {
+          this.venta.Serie = this.venta.Serie.replace(
+            /^./,
+            obj.NroComprobante[0]
+          );
+        }
 
-            if (!item.PreciosPorProducto || fPP.length === 4) {
-              item.estadoPxP = true;
+        // 3. Obtener correlativo (empresa actual)
+        const resNumero = await this.axios.get(
+          this.API + "ventas/solonumero",
+          {
+            params: {
+              serie: this.venta.Serie,
+              idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+              id_empresa: this.empresa
             }
-            this.add([item, () => {}, false]);
-          });
-          this.venta.NotaIdMotivo = null;
-          this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          }
+        );
+
+        this.venta.Numero = resNumero.data.numero;
+
+        // 4. Obtener detalle (SIN FILTRAR EMPRESA)
+        const resDetalle = await this.axios.get(
+          this.API + "venta/detalle/comprobante",
+          {
+            params: {
+              NroComprobante: obj.NroComprobante,
+              idDocVenta: obj.IdDocVenta,
+              IdDocVentaPuntoVenta:
+                this.venta.puntoVenta.IdDocVentaPuntoVenta
+            }
+          }
+        );
+
+        const data = resDetalle.data;
+
+        if (!data || data.length === 0) {
+          this.$toasted.show("No se encontró el comprobante");
+          return;
+        }
+
+        // 5. Cliente (SIN FILTRAR EMPRESA)
+        const resCliente = await this.axios.get(this.API + "cliente", {
+          params: {
+            idCliente: data[0].IdCliente
+          }
         });
+
+        if (resCliente.data) {
+          this.$refs.inputCliente.setValue(resCliente.data.Cliente);
+          this.venta.cliente = resCliente.data;
+          this.venta.CampoDireccion = resCliente.data.Direccion;
+        } else {
+          this.$toasted.show("No se encontró el cliente");
+        }
+
+        // 6. Limpiar carrito
+        this.limpiarCart();
+
+        // 7. Detectar empresas (IMPORTANTE)
+        const empresasSet = new Set();
+
+        data.forEach(item => {
+          empresasSet.add(item.IdEmpresa);
+        });
+
+        if (empresasSet.size > 1) {
+          this.$toasted.show(
+            "Venta multempresa detectada. Se generarán múltiples notas de crédito."
+          );
+        }
+
+        // 8. Procesar productos (SIN alterar empresa)
+        data.forEach(item => {
+          item.estadoPxP = false;
+
+          let preciosProd = JSON.parse(
+            item.PreciosPorProducto || "[]"
+          );
+
+          item.precioCont = item.PrecioContado;
+
+          let fPP = preciosProd.filter(p => p.cantidad === 0);
+
+          if (!item.PreciosPorProducto || fPP.length === 4) {
+            item.estadoPxP = true;
+          }
+
+          // IMPORTANTE: NO TOCAR EMPRESA
+          // item.Empresa =  NO HACER 
+          item.Empresa = item.IdEmpresa;
+          item.NombreEmpresa = item.NombreEmpresa || item.NombreEmpresa;
+          this.add([item, () => {}, false]);
+        });
+
+        // 9. Configuración final
+        this.venta.NotaIdMotivo = null;
+        this.bloquearInput = true;
+
+        // 10. Stock (empresa actual)
+        this.obtenerStok({
+          IdAlmacen: this.venta.almacen.IdAlmacen
+        });
+
+      } catch (error) {
+        console.log(error);
+        this.$toasted.show("Error al cargar la nota de crédito");
+      }
     },
+
+     obtenerStok(data) {
+        this.axios
+          .get(this.API + "productos/puntoventa/stock", {
+            params: {
+              idAlmacen: data.IdAlmacen,
+              idProductos: this.productos.map(p => p.IdProducto),
+              id_empresa: this.empresa
+            }
+          })
+          .then(res => {
+
+            res.data.forEach(stockItem => {
+
+              let prod = this.productos.find(
+                p => p.IdProducto == stockItem.IdProducto
+              )
+
+              if (prod) {
+                prod.stock = stockItem.stock
+              }
+
+            })
+
+            this.$forceUpdate()
+
+          })
+      }, 
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
         this.bloquearInput = true;

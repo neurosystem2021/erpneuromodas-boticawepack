@@ -121,7 +121,7 @@
                     :url="API + 'productos'"
                     ref="inputProducto"
                     anchor="Producto"
-                    label="writer"
+                    label="Producto"
                     :on-select="val => generateFilter('producto', val.Producto)"                    
                     :onInput="val => generateFilter('producto', val)"
                     :classes="{input: 'form-control upper'}">
