@@ -95,6 +95,7 @@ import { mapActions } from 'vuex'
                 items: [],
                 isBusy: false,
                 Usuario: sessionStorage.getItem('User'),
+                IdUsuarioPerfil: parseInt(sessionStorage.getItem('IdPerfil')),
                 fields: [ 
                     { key: 'IdProforma', label: 'Id' }, 
                     { key: 'Anio', label: 'Año' } , 'Numero', 'Cliente', 
@@ -154,7 +155,7 @@ import { mapActions } from 'vuex'
                 })
             },
             eliminarProf(data){
-                if (this.Usuario !== "admin" && this.Usuario !== "tienda1") {
+                if (this.IdUsuarioPerfil !== 1 && this.IdUsuarioPerfil !== 7) {
                     this.$toasted.error("Solo el usuario admin puede eliminar esta proforma.");
                     return;
                 }
