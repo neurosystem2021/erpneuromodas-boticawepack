@@ -722,6 +722,7 @@ export default {
                 <td style="width: 100px" >${data.ProductoMarca}</td>
                 <td style="width: 100px" >${data.ProductoModelo}</td>
                 <td style="width: 100px" >${data.Color}</td>
+                <td style="width: 100px" >${data.ProductoTalla}</td>
                 </td>
                 <td class="table-primary"  style="width: 65px"><b>${
                   data.PrecioContado
