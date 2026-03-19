@@ -201,11 +201,22 @@
                       </b-col>
                       <b-col md="3" cols="12" style="text-align: center; align-items: center; align-content: center;">
 
-                        <b-col cols="12">
-                          Vendedor
-                          <b-input-group prepend="" class="mt-2">
-                            <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario"
-                              disabled style="max-width: 150px; text-transform: uppercase;text-align: center;">
+                        <b-col md="12">
+                          <label>Vendedor</label>
+                          <b-input-group>
+                            <autocomplete
+                              required="required"
+                              :id="`inputVendedor${ventaActiva}`" 
+                              :ref="`inputVendedor${ventaActiva}`"
+                              :url="API + 'usuarios'"
+                              anchor="NombreUsuario"
+                              label="writer"
+                              :initValue="UsuarioLogin"
+                              :on-select="setVendedor"
+                              :onFocus="focusAutocomplete.bind(null, `inputVendedor${ventaActiva}`)"
+                              :classes="{ input: 'form-control text-center text-uppercase custom-vendor-input' }"
+                            >
+                            </autocomplete>
                           </b-input-group>
                         </b-col>
 
@@ -956,6 +967,8 @@ export default {
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
       newDniRuc: "",
+      UsuarioLogin: sessionStorage.getItem("User") || sessionStorage.getItem("NombreUsuario") || "",
+      touchModal: false,
       API: config.API,
       categorias: [],
       productosCategoria: [],
@@ -1131,6 +1144,7 @@ export default {
     this.conectarSocket();
     this.setupSocketListeners();
     this.getEstadoSistema();
+    this.getVendedorInfo();
   },
   beforeDestroy() {
     this.removeSocketListeners();
@@ -1356,9 +1370,8 @@ export default {
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "07" ||
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "08"
       ) {
-        this.ventas[this.ventaActiva].Serie = this.ventas[
-          this.ventaActiva
-        ].Serie.replace(/^./, obj.NroComprobante[0]);
+        this.ventas[this.ventaActiva].Serie = this.ventas[this.ventaActiva]
+          .Serie.replace(/^./, obj.NroComprobante[0]);
       }
       this.axios
         .get(this.API + "ventas/solonumero", {
@@ -1371,8 +1384,8 @@ export default {
           this.ventas[this.ventaActiva].Numero = response.data.numero;
         })
         .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          console.error(error);
+          this.$toasted.show("Error al obtener número correlativo");
         });
       //Cargar producto del documento afectado nota credito
       this.axios
@@ -1380,48 +1393,53 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-              .IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta.IdDocVentaPuntoVenta
           }
         })
         .then(response => {
-          this.axios
-            .get(this.API + "cliente", {
-              params: {
-                idCliente: response.data[0].IdCliente
-              }
-            })
-            .then(response => {
-              if (response.data) {
-                this.setCliente(response.data.IdCliente);
-
-                this.ventas[this.ventaActiva].CampoDireccion =
-                  response.data.Direccion;
-                this.ventas[this.ventaActiva].cliente = response.data;
-
-                // let txtCliente = `inputCliente${this.ventaActiva}`;
+          if (response.data && response.data.length > 0) {
+            
+            // A. Cargar datos del Cliente basado en el primer producto del detalle
+            this.axios
+              .get(this.API + "cliente", {
+                params: { idCliente: response.data[0].IdCliente }
+              })
+              .then(resCli => {
+              if (resCli.data) {
+                this.setCliente(resCli.data.IdCliente);
+                this.ventas[this.ventaActiva].CampoDireccion = resCli.data.Direccion;
+                this.ventas[this.ventaActiva].cliente = resCli.data;
+                
                 this.ventas[this.ventaActiva].verCliente = false;
-                this.initValueCliente = this.ventas[
-                  this.ventaActiva
-                ].cliente.Cliente;
+                this.initValueCliente = this.ventas[this.ventaActiva].cliente.Cliente;
                 this.ventas[this.ventaActiva].verCliente = true;
                 this.$forceUpdate();
               } else {
-                this.$toasted.show("No se encontro al cliente");
+                this.$toasted.show("No se encontró al cliente");
               }
             })
-            .catch(error => {
-              console.log(error);
-            });
+            .catch(errCli => console.error("Error al cargar cliente:", errCli));
 
-          let producto = [];
+          // B. LIMPIAR PRODUCTOS DE LA VENTA ACTIVA (CORREGIDO)
+          // Antes tenías this.ventas.productos = [], lo cual era incorrecto
+          this.ventas[this.ventaActiva].productos = [];
+
+          // C. CARGAR LOS PRODUCTOS AL DETALLE
           response.data.forEach(element => {
-            console.log(element);
-            producto.push({ ...element, Descripcion: element.Presentacion });
-          });
-          this.ventas[this.ventaActiva].NotaIdMotivo = null;
-          this.ventas[this.ventaActiva].productos = producto;
-          this.$forceUpdate();
+      // Pasamos el producto y el segundo parámetro como 'true'
+      this.setProducto(element, true); 
+    });
+
+            this.ventas[this.ventaActiva].NotaIdMotivo = null;
+            this.$forceUpdate();
+
+          } else {
+            this.$toasted.show("El comprobante de referencia no tiene productos");
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this.$toasted.show("Error al cargar el detalle del comprobante");
         });
     },
     setMotivo(ev) {
@@ -1587,54 +1605,112 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     getVendedorInfo() {
-      let usuario = sessionStorage.getItem("User");
+      // 1. Obtenemos el usuario de la sesión (intentamos ambos nombres comunes)
+      let usuario = sessionStorage.getItem("User") || sessionStorage.getItem("NombreUsuario");
+
+      if (!usuario) {
+        console.warn("No se encontró usuario en el sessionStorage");
+        return;
+      }
+    
       this.axios
         .get(this.API + "/usuarios/" + usuario)
         .then(response => {
-          this.setVendedor(response.data);
-          let almacen = {
-            IdAlmacen: response.data.IdAlmacen,
-            Almacen: response.data.Almacen,
-            DescuentoActivo: response.data.DescuentoActivo
+          const data = response.data;
+          const vActiva = this.ventaActiva; // Referencia a la pestaña actual
+        
+          // 2. Actualizamos la variable reactiva para evitar el error de "not defined"
+          this.UsuarioLogin = data.NombreUsuario;
+        
+          // 3. Seteamos el vendedor en el objeto de la venta activa
+          this.setVendedor(data);
+        
+          // 4. Cargamos Almacén y Punto de Venta específicos del usuario en el array de ventas
+          this.ventas[vActiva].almacen = {
+            IdAlmacen: data.IdAlmacen,
+            Almacen: data.Almacen,
+            DescuentoActivo: data.DescuentoActivo
           };
-          let puntoVenta = {
-            IdDocVentaPuntoVenta: response.data.IdDocVentaPuntoVenta,
-            PuntoVenta: response.data.PuntoVenta
+        
+          this.ventas[vActiva].puntoVenta = {
+            IdDocVentaPuntoVenta: data.IdDocVentaPuntoVenta,
+            PuntoVenta: data.PuntoVenta
           };
-          this.APPTOKEN = response.data.APPTOKEN;
-          this.setAlmacen(almacen);
-          this.setPuntoVenta(puntoVenta);
+        
+          this.APPTOKEN = data.APPTOKEN;
+        
+          // 5. Sincronizamos los componentes visuales
+          this.$nextTick(() => {
+            // A. Ponemos el nombre en el Autocomplete (usando el ref dinámico)
+            let refName = `inputVendedor${vActiva}`;
+            if (this.$refs[refName]) {
+              // Intentamos setValue, si falla usamos el valor directo del input
+              if (typeof this.$refs[refName].setValue === "function") {
+                this.$refs[refName].setValue(data.NombreUsuario);
+              } else {
+                const el = document.getElementById(refName);
+                if (el) el.value = data.NombreUsuario;
+              }
+            }
+          
+            // B. Bloqueamos Almacén y Punto de Venta por sus IDs dinámicos
+            let idAlm = `inputAlmacen${vActiva}`;
+            let idPun = `inputPuntoVenta${vActiva}`;
 
-          let e = `inputAlmacen${this.ventaActiva}`;
-          document.getElementById(e).disabled = true;
-          let p = `inputPuntoVenta${this.ventaActiva}`;
-          document.getElementById(p).disabled = true;
-          // this.$refs.inputVendedor.$refs.input.disabled = true;
+            let elAlm = document.getElementById(idAlm);
+            let elPun = document.getElementById(idPun);
+
+            if (elAlm) elAlm.disabled = true;
+            if (elPun) elPun.disabled = true;
+          });
         })
         .catch(error => {
-          console.log("error", error);
-          this.$toasted.show(
-            "Ha ocurrido un error, vuelva a intentarlo # vendedor"
-          );
+          console.error("Error en getVendedorInfo:", error);
+          this.$toasted.show("Ha ocurrido un error al cargar la info del vendedor", {
+            theme: "bubble",
+            position: "top-right",
+            duration: 2000
+          });
         });
     },
-    focusAutocomplete(ref) {
-      let prod = "autocompleteProducto";
-      let val = ref.includes(prod);
+    focusAutocomplete(refName) {
+      // 1. Intentamos buscar por ID, si no, buscamos el input dentro del REF de Vue
+      let element = document.getElementById(refName);
+      
+      // Si no se encuentra por ID, lo buscamos a través de la referencia de Vue ($refs)
+      if (!element && this.$refs[refName]) {
+        // Buscamos el input real dentro del componente autocomplete
+        element = this.$refs[refName].$el.querySelector('input');
+      }
 
-      let element = document.getElementById(ref);
+      // 2. Seguridad: Si después de buscar sigue siendo null, salimos de la función
+      if (!element) {
+        console.warn("No se encontró el elemento para el foco:", refName);
+        return;
+      }
+
+      // 3. Tu lógica original de limpieza
+      let prod = "autocompleteProducto";
+      let val = refName.includes(prod);
+
       if (val) {
         element.value = "";
         element.dispatchEvent(new Event("input", { bubbles: true }));
       }
 
-      const event = new MouseEvent("dblclick");
+      // 4. Disparar el doble click para abrir la lista
+      const event = new MouseEvent("dblclick", {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
       element.dispatchEvent(event);
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
-      this.ventas[0].vendedor = obj;
+      this.ventas[this.ventaActiva].vendedor = obj;
+      this.UsuarioLogin = obj.NombreUsuario;
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
@@ -1875,51 +1951,76 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto) {
-      let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
-        this.$nextTick(() => {
-          this.metodoPagoCambio(1);
-          // this.irTxtLoadBarcode();
-        });
+    async setProducto(producto, esReferencia = false) {
+  let productos = this.ventas[this.ventaActiva].productos;
 
-        return false;
-      }
-      // console.log("producto", producto);
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod.PreciosPorProducto);
-      let pres = [];
-      if (prod.PreciosPorProducto) {
-        let newPres = JSON.parse(prod.PreciosPorProducto);
-        pres = newPres.filter(v => v.cantidad > 0);
-      }
-      prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
-      prod.descuento = 0;
-      prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
-      productos.unshift(prod);
-
-      this.$nextTick(() => {
-        this.$refs["cantidad0"][0].focus();
-        this.$refs["cantidad0"][0].select();
-      });
+  // Si NO es referencia, buscamos si ya existe para sumar +1
+  // Si ES referencia (Nota de Crédito), permitimos que se agregue el ítem con su cantidad original
+  if (!esReferencia && productos.some(v => v.IdProducto == producto.IdProducto)) {
+    productos.filter(
+      v => v.IdProducto == producto.IdProducto
+    )[0].cantidad += parseFloat(1);
+    
+    this.$nextTick(() => {
       this.metodoPagoCambio(1);
-    },
+    });
+
+    return false;
+  }
+
+  // Obtenemos el stock y datos maestros del producto
+  let prod = await this.obtenerStockBuscador(producto.IdProducto);
+  
+  let pres = [];
+  if (prod.PreciosPorProducto) {
+    let newPres = JSON.parse(prod.PreciosPorProducto);
+    pres = newPres.filter(v => v.cantidad > 0);
+  }
+  
+  prod.PreciosPorProducto = pres;
+  prod.Descripcion = prod.ProductoPresentacion
+    ? prod.ProductoPresentacion
+    : "UNIDAD";
+  prod.ProductoPresentacion = prod.ProductoPresentacion
+    ? prod.ProductoPresentacion
+    : "UNIDAD";
+
+  // --- LÓGICA DE ASIGNACIÓN SEGÚN EL ORIGEN ---
+  if (esReferencia) {
+    // Si viene de una Nota de Crédito/Débito, usamos los valores del documento original
+    // Usamos || para asegurar que atrape tanto 'Cantidad' como 'cantidad'
+    prod.cantidad = parseFloat(producto.Cantidad || producto.cantidad || 1);
+    prod.precio = parseFloat(producto.Precio || producto.precio || prod.PrecioContado);
+    prod.descuento = parseFloat(producto.Descuento || producto.descuento || 0);
+    prod.presentacion = producto.Presentacion || null;
+    prod.CantidadPresentacion = producto.CantidadPresentacion || null;
+  } else {
+    // Si es una venta manual nueva
+    prod.cantidad = 1;
+    prod.precio = prod.PrecioContado;
+    prod.descuento = 0;
+    prod.presentacion = null;
+    prod.CantidadPresentacion = null;
+  }
+
+  prod.tienePresentacion = prod.PreciosPorProducto.some(
+    v => v.cantidad > 0
+  );
+  prod.bloquearInputPrecio = false;
+  
+  // Agregamos al inicio de la lista
+  productos.unshift(prod);
+
+  this.$nextTick(() => {
+    // Enfocamos el primer input de cantidad disponible
+    if (this.$refs["cantidad0"] && this.$refs["cantidad0"][0]) {
+      this.$refs["cantidad0"][0].focus();
+      this.$refs["cantidad0"][0].select();
+    }
+  });
+
+  this.metodoPagoCambio(1);
+},
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
     },
