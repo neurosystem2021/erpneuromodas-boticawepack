@@ -636,11 +636,11 @@ export default {
       evt.preventDefault();
       this.inProgress = true;
 
-      if (!this.movimiento.serie || !this.movimiento.numero) {
-        this.$toasted.show("Ingrese serie y número del movimiento");
-        this.inProgress = false;
-        return;
-      }
+      // if (!this.movimiento.serie || !this.movimiento.numero) {
+      //   this.$toasted.show("Ingrese serie y número del movimiento");
+      //   this.inProgress = false;
+      //   return;
+      // }s
       console.log(this.movimiento.serie);
 
       if (!this.movimiento.proveedor.IdProveedor) {

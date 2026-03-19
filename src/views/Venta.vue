@@ -596,7 +596,19 @@
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
-             <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario" disabled style="max-width: 150px;">
+             <autocomplete
+                required="required"
+                :ref="`inputVendedor${ventaActiva}`"
+                :url="API + 'usuarios'"
+                anchor="NombreUsuario"
+                class="font-weight-bold"
+                label="writer"
+                :initValue="UsuarioLogin"
+                :on-select="setVendedor"
+                :onFocus="focusAutocomplete.bind(null, `inputVendedor${ventaActiva}`)"
+                :classes="{ input: 'form-control' }"
+              >
+              </autocomplete>
 
             </b-input-group>
           </b-col>
@@ -1003,6 +1015,8 @@ export default {
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
       newDniRuc: "",
+      UsuarioLogin: sessionStorage.getItem("User") || sessionStorage.getItem("NombreUsuario") || "",
+      touchModal: false,
       API: config.API,
       categorias: [],
       productosCategoria: [],
@@ -1208,6 +1222,7 @@ export default {
     this.conectarSocket();
     this.setupSocketListeners();
     this.getEstadoSistema();
+    this.getVendedorInfo();
   },
   beforeDestroy() {
     this.removeSocketListeners();
@@ -1479,43 +1494,109 @@ export default {
       });
     },
     getVendedorInfo() {
-      let usuario = sessionStorage.getItem("User");
+      // 1. Obtenemos el usuario de la sesión (intentamos ambos nombres comunes)
+      let usuario = sessionStorage.getItem("User") || sessionStorage.getItem("NombreUsuario");
+
+      if (!usuario) {
+        console.warn("No se encontró usuario en el sessionStorage");
+        return;
+      }
       this.axios
         .get(this.API + "usuarios/info/" + usuario)
         .then(response => {
-          this.setVendedor(response.data);
-          let almacen = {
-            IdAlmacen: response.data.IdAlmacen,
-            Almacen: response.data.Almacen,
-            DescuentoActivo: response.data.DescuentoActivo
+          const data = response.data;
+          const vActiva = this.ventaActiva; // Referencia a la pestaña actual
+        
+          // 2. Actualizamos la variable reactiva para evitar el error de "not defined"
+          this.UsuarioLogin = data.NombreUsuario;
+        
+          // 3. Seteamos el vendedor en el objeto de la venta activa
+          this.setVendedor(data);
+        
+          // 4. Cargamos Almacén y Punto de Venta específicos del usuario en el array de ventas
+          this.ventas[vActiva].almacen = {
+            IdAlmacen: data.IdAlmacen,
+            Almacen: data.Almacen,
+            DescuentoActivo: data.DescuentoActivo
           };
-          let puntoVenta = {
-            IdDocVentaPuntoVenta: response.data.IdDocVentaPuntoVenta,
-            PuntoVenta: response.data.PuntoVenta
+          this.ventas[vActiva].puntoVenta = {
+            IdDocVentaPuntoVenta: data.IdDocVentaPuntoVenta,
+            PuntoVenta: data.PuntoVenta
           };
-          this.APPTOKEN = response.data.APPTOKEN;
-          this.setAlmacen(almacen);
-          this.setPuntoVenta(puntoVenta);
-          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-          // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
-          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          // this.$refs.inputVendedor.$refs.input.disabled = true;
+          this.APPTOKEN = data.APPTOKEN;
+        
+          // 5. Sincronizamos los componentes visuales
+          this.$nextTick(() => {
+            // A. Ponemos el nombre en el Autocomplete (usando el ref dinámico)
+            let refName = `inputVendedor${vActiva}`;
+            if (this.$refs[refName]) {
+              // Intentamos setValue, si falla usamos el valor directo del input
+              if (typeof this.$refs[refName].setValue === "function") {
+                this.$refs[refName].setValue(data.NombreUsuario);
+              } else {
+                const el = document.getElementById(refName);
+                if (el) el.value = data.NombreUsuario;
+              }
+            }
+          
+            // B. Bloqueamos Almacén y Punto de Venta por sus IDs dinámicos
+            let idAlm = `inputAlmacen${vActiva}`;
+            let idPun = `inputPuntoVenta${vActiva}`;
+
+            let elAlm = document.getElementById(idAlm);
+            let elPun = document.getElementById(idPun);
+
+            if (elAlm) elAlm.disabled = true;
+            if (elPun) elPun.disabled = true;
+          });
         })
         .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          console.error("Error en getVendedorInfo:", error);
+          this.$toasted.show("Ha ocurrido un error al cargar la info del vendedor", {
+            theme: "bubble",
+            position: "top-right",
+            duration: 2000
+          });
         });
     },
-    focusAutocomplete(ref) {
-      let element = document.getElementById(ref);
-      const event = new MouseEvent("dblclick");
+    focusAutocomplete(refName) {
+      // 1. Intentamos buscar por ID, si no, buscamos el input dentro del REF de Vue
+      let element = document.getElementById(refName);
+      
+      // Si no se encuentra por ID, lo buscamos a través de la referencia de Vue ($refs)
+      if (!element && this.$refs[refName]) {
+        // Buscamos el input real dentro del componente autocomplete
+        element = this.$refs[refName].$el.querySelector('input');
+      }
+
+      // 2. Seguridad: Si después de buscar sigue siendo null, salimos de la función
+      if (!element) {
+        console.warn("No se encontró el elemento para el foco:", refName);
+        return;
+      }
+
+      // 3. Tu lógica original de limpieza
+      let prod = "autocompleteProducto";
+      let val = refName.includes(prod);
+
+      if (val) {
+        element.value = "";
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      // 4. Disparar el doble click para abrir la lista
+      const event = new MouseEvent("dblclick", {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
       element.dispatchEvent(event);
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
-      this.ventas[0].vendedor = obj;
+      this.ventas[this.ventaActiva].vendedor = obj;
+      this.UsuarioLogin = obj.NombreUsuario;
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
