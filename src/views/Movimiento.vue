@@ -636,12 +636,16 @@ export default {
       evt.preventDefault();
       this.inProgress = true;
 
-      if (!this.movimiento.serie || !this.movimiento.numero) {
-        this.$toasted.show("Ingrese serie y número del movimiento");
-        this.inProgress = false;
-        return;
-      }
-      console.log(this.movimiento.serie);
+      // const serie = String(this.movimiento.serie || '').trim();
+      // const numero = String(this.movimiento.numero || '').trim();
+
+      // if (!serie || !numero) {
+      //   this.$toasted.show("Ingrese serie y número del movimiento");
+      //   this.inProgress = false;
+      //   return;
+      // }
+      console.log("serie:", this.movimiento.serie);
+      console.log("numero:", this.movimiento.numero);
 
       if (!this.movimiento.proveedor.IdProveedor) {
         this.$toasted.show("Por favor seleccione un proveedor");
