@@ -89,6 +89,10 @@
               <td>{{ totalVentasMastercard | moneda }} </td>
             </tr>
             <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | moneda }} </td>
+            </tr>
+            <tr>
               <td>Ingresos S/.</td>
               <td>{{ totalIngresos | moneda }} </td>
             </tr>
@@ -637,6 +641,68 @@
         </table>
       </b-row>
 
+            <b-row class="">
+        <h5>Ventas Transferencia</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+             
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>
+                <table class="table table-sm" style="font-size: 0.75rem;">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.detalle" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Transferencia</b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
       <b-row class="credito no-print" >
         <h5>Ventas a Credito</h5><br>
         <table class="table b-table table-sm">
@@ -814,7 +880,8 @@ export default {
       return (
         this.totalVentasEfectivo +
         this.totalVentasVisa +
-        this.totalVentasMastercard
+        this.totalVentasMastercard +
+        this.totalVentasDelivery
       );
     },
     totalSalidas() {
@@ -865,6 +932,18 @@ export default {
     ventasMastercard() {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0 && !venta.EsCredito;
+      });
+    },
+    totalVentasTransferencia() {
+      let total = 0;
+      this.ventasTransferencia.forEach(venta => {
+        if (!venta.Anulado) total += venta.Transferencia;
+      });
+      return total;
+    },
+    ventasTransferencia() {
+      return this.ventas.filter(venta => {
+        return venta.Transferencia > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {

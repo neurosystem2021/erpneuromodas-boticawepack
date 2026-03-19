@@ -381,7 +381,7 @@
                                   </td>
                                   <td>
                                     <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"/>
+                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.delivery.monto  - $event.target.value)"/>
                                   </td>
                                   </tr>
                                   <tr>
@@ -392,7 +392,7 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - venta.pago.delivery.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                   <tr>
@@ -404,7 +404,7 @@
                                     <td>
                                       <input
                                         class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                 </tbody>
