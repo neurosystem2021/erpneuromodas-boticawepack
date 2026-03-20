@@ -820,7 +820,7 @@
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                              @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                              @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.transferencia.monto - venta.pago.deposito.monto - $event.target.value)"
                             />
                         </td>
                       </tr>
@@ -832,7 +832,7 @@
                         </td>
                         <td>
                           <input class="form-control" v-model="venta.pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                            @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)" 
+                            @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.transferencia.monto - venta.pago.deposito.monto - $event.target.value)" 
                           />
                          
                         </td>
@@ -846,7 +846,7 @@
                         <td>
                           <input
                             class="form-control" v-model="venta.pago.transferencia.monto" min="0" step="0.01" type="number" placeholder="S/."
-                             @input="venta.pago.transferencia.monto = $options.filters.redondear(totalCart - venta.transferencia.visa.monto - $event.target.value)" 
+                             @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - venta.pago.deposito.monto - $event.target.value)" 
                             />
                         </td>
                       </tr>
@@ -859,7 +859,7 @@
                         <td>
                           <input
                             class="form-control" v-model="venta.pago.deposito.monto" min="0" step="0.01" type="number" placeholder="S/."
-                             @input="venta.pago.deposito.monto = $options.filters.redondear(totalCart - venta.deposito.visa.monto - $event.target.value)" 
+                             @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)" 
                             />
                         </td>
                       </tr>
@@ -1352,6 +1352,7 @@ export default {
           this.venta.pago.efectivo.monto = 0;
           this.venta.pago.visa.monto = 0;
           this.venta.pago.transferencia.monto = 0;
+          this.venta.pago.mastercard.monto = 0;
           this.venta.pago.deposito.monto = this.totalCart;
           break;
         default:
@@ -1376,7 +1377,7 @@ export default {
       }, 50);
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/10000010").then(res => {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
         console.log("res", res.data);
         if (res.data.IdCliente) {
           this.setCliente(res.data);
@@ -2154,15 +2155,24 @@ export default {
         return;
       }
 
-      let count = 0;
-      for (const k in this.venta.pago) {
-        if (this.venta.pago[k].monto > 0) {
-          count = count + 1;
-        }
-      }
+      // let count = 0;
+      // for (const k in this.venta.pago) {
+      //   if (this.venta.pago[k].monto > 0) {
+      //     count = count + 1;
+      //   }
+      // }
 
-      if (count > 1) {
-        this.$toasted.show("Solo se permite un tipo de pago.");
+      // if (count > 1) {
+      //   this.$toasted.show("Solo se permite un tipo de pago.");
+      //   this.inProgress = false;
+      //   return;
+      // }
+
+      const empresas = [...new Set(this.productos.map(p => p.Empresa))];
+      const esMultiempresa = empresas.length > 1;
+
+      if (esMultiempresa && count > 1) {
+        this.$toasted.show("Solo se permite un tipo de pago en ventas multiempresa.");
         this.inProgress = false;
         return;
       }
@@ -2252,18 +2262,21 @@ export default {
             return parseFloat(total) + parseFloat(pr.total);
           }, 0);
 
+          // data.productos = productos;
+          // data.totalCart = totalCarr;
+          // data.IdProformaDets = IdProformaDets;
+          // if (data.pago.efectivo.monto != 0) {
+          //   data.pago.efectivo.monto = totalCarr;
+          // } else if (data.pago.mastercard.monto != 0) {
+          //   data.pago.mastercard.monto = totalCarr;
+          // } else if (data.pago.transferencia.monto != 0) {
+          //   data.pago.transferencia.monto = totalCarr;
+          // } else if (data.pago.visa.monto != 0) {
+          //   data.pago.visa.monto = totalCarr;
+          // }
+
           data.productos = productos;
-          data.totalCart = totalCarr;
-          data.IdProformaDets = IdProformaDets;
-          if (data.pago.efectivo.monto != 0) {
-            data.pago.efectivo.monto = totalCarr;
-          } else if (data.pago.mastercard.monto != 0) {
-            data.pago.mastercard.monto = totalCarr;
-          } else if (data.pago.transferencia.monto != 0) {
-            data.pago.transferencia.monto = totalCarr;
-          } else if (data.pago.visa.monto != 0) {
-            data.pago.visa.monto = totalCarr;
-          }
+          data.totalCart = totalCarr; 
           // data.pago.forEach((element) => {
           //   if (element.monto != 0) {
           //     element.monto = totalCarr;

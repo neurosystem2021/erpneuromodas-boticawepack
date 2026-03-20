@@ -328,7 +328,7 @@
             </tr>
           </tfoot>
         </table>
-      </b-row>3
+      </b-row>
 
       <b-row class="">
         <h5>Deposito.</h5><br>
@@ -540,6 +540,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
+              <th width="10%">Vendedor</th>
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -550,6 +551,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasEfectivo" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -602,6 +604,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
+              <th width="10%">Vendedor</th>
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -612,6 +615,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -658,13 +662,13 @@
           </tfoot>
         </table>
       </b-row>
- 
+  <!-- david -->
       <b-row class="no-print">
-        <h5>Ventas Yape, Plin o Transf.</h5><br>
+        <h5>Ventas Yape, Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
-             
+              <th width="10%">Vendedor</th>
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -676,6 +680,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -716,8 +721,73 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Yape, Plin o Transf.</b></td>
+              <td class="total"><b>Total Yape, Plin.</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+      
+      <b-row class="no-print">
+        <h5>Ventas Transferencia</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th width="10%">Vendedor</th>
+              <th width="10%">Recibo</th>
+              <th width="10%">Fecha</th>
+              <th width="20%">Cliente</th>
+              <th width="30%">Detalle</th>
+              <th width="5%">Estado</th>
+              <th width="5%">Pagado</th>
+           
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>
+                <b-button variant="info" v-if="!item.mostrar" @click="item.mostrar=!item.mostrar" ><i class="fa fa-eye" aria-hidden="true"></i></b-button>
+                <b-button variant="warning" v-else @click="item.mostrar=!item.mostrar"><i class="fa fa-eye-slash" aria-hidden="true"></i></b-button>
+                <table class="table table-sm" style="font-size: 0.75rem;" v-if="item.mostrar">
+                  <thead>
+                    <tr>
+                      <td>Producto</td>
+                      <td>Cantidad</td>
+                      <td>Precio</td>
+                      <td>Descuento</td>
+                      <td>Total</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod,index) in item.productos" :key="index">
+                      <td>{{ prod.Producto }}</td>
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td>
+                          {{ 
+                              parseFloat(
+                                parseFloat(prod.Cantidad) * parseFloat(prod.Precio) - parseFloat(prod.Descuento)
+                              ).toFixed(2)
+                          }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Transferencia</b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia| redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -728,7 +798,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-             
+              <th width="10%">Vendedor</th>
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -740,6 +810,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasDeposito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -780,7 +851,7 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Yape, Plin o Transf.</b></td>
+              <td class="total"><b>Total deposito</b></td>
               <td class="total"><b>S/. {{ totalVentasDeposito | redondear }}</b></td>
             </tr>
           </tfoot>
@@ -792,7 +863,7 @@
         <table class="table b-table table-sm">
           <thead>
             <tr>
-             
+              <th width="10%">Vendedor</th>
               <th width="10%">Recibo</th>
               <th width="10%">Fecha</th>
               <th width="20%">Cliente</th>
@@ -804,6 +875,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in ventasCredito" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.UsuarioReg }}</td>
               <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
               <td>{{ item.FechaDoc }}</td>
               <td>{{ item.Cliente }}</td>
@@ -1102,13 +1174,13 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard;
+        if (!venta.Anulado) total += venta.Transferencia;
       });
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Mastercard > 0 && !venta.EsCredito;
+        return venta.Transferencia > 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
@@ -1153,7 +1225,7 @@ export default {
         .get(this.API + "usuarios/" + usuario)
         .then(response => {
           this.setVendedor(response.data);
-          // this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
+           this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
           // this.$refs.inputVendedor.$refs.input.disabled = true
 
           if (response.data.IdUsuarioPerfil !== 1) {
@@ -1250,8 +1322,8 @@ export default {
         await this.axios
           .post(this.API + "cierrecaja?id_empresa=" + this.empresa, {
             idTurno: this.turno,
-            user: sessionStorage.getItem("User"),
-            // user:         this.vendedor.Usuario,
+            //user: sessionStorage.getItem("User"),
+            user:         this.vendedor.Usuario,
             ingresos: parseFloat(this.granTotal + this.totalSalidas).toFixed(2),
             salidas: this.totalSalidas,
             total: this.granTotal,
