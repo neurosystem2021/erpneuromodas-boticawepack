@@ -1776,13 +1776,13 @@ export default {
       console.log(producto.precio);
       let productos = this.ventas[this.ventaActiva].productos;
       if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
-        this.$nextTick(() => {
+        // Si ya existe, avisamos y no hacemos nada más
+        this.$toasted.info("Este producto ya ha sido seleccionado", { 
+          duration: 2000,
+          position: "top-center"
+        });
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
-        });
 
         return false;
       }
