@@ -1753,10 +1753,7 @@ export default {
       });
     },
     getSubtotal(index) {
-      let subtotal =
-        (this.productos[index].tipo == "PRESENTACION"
-          ? this.productos[index].cantxPrecio
-          : this.productos[index].cantidad) * this.productos[index].precio;
+      let subtotal = this.productos[index].cantidad * this.productos[index].precio;
       // let subtotal = this.$options.filters.redondear(
       //   this.productos[index].cantidad * this.productos[index].precio
       // );
@@ -2034,6 +2031,8 @@ export default {
         prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
       }
+      prod.nuevoPrecioContado = prod.PrecioContado;
+      prod.normalPrecioContado = prod.PrecioContado;
       delete prod._rowVariant;
       this.$store.state.cart.productos.unshift(prod);
       this.modalPresentaciones = false;
@@ -2058,6 +2057,8 @@ export default {
       prod.Presentacion = null;
       prod.total = 0;
       prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
+       prod.nuevoPrecioContado = prod.PrecioContado;
+        prod.normalPrecioContado = prod.PrecioContado;
       prod.cantidadPres = 0;
       prod.bloquearInput = false;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
@@ -2098,6 +2099,9 @@ export default {
         prod.cantidadPres = presentacion.cantidad;
         prod.estadoPxP = false;
       }
+
+      prod.nuevoPrecioContado = prod.PrecioContado;
+      prod.normalPrecioContado = prod.PrecioContado;
 
       this.$store.state.cart.productos[this.index] = prod;
       setTimeout(() => {
