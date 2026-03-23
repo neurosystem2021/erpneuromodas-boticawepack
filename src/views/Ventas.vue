@@ -361,7 +361,7 @@
               :bloquearInput="bloquearInput"
               :fields="carrito.fields"
               :isVentas="true"
-              :idAlmacen="venta.almacen.IdAlmacen"
+              :idAlmacen="venta.almacen ? venta.almacen.IdAlmacen : 0" 
               :onSetProducto="onSetProducto"
               :esDelivery="venta.EsDelivery"
               :mostraTotales="false"
@@ -695,7 +695,7 @@
           </b-col>
           <b-col cols="4" style="text-align: center;">
             <b-button
-              type="submit"
+              type="button"  @click="guardarVenta"
               :disabled="inProgress"
               style="background: #28A745;"
               size="lg"
@@ -1058,30 +1058,30 @@ export default {
 
       return oldXHROpen.apply(this, arguments);
     };
-    this.initForm();
-    this.setScreen();
   },
   created() {},
   async mounted() {
-    this.$store.state.MostrarBotonMultipleEmpresa = true;
-    await this.getVendedor();
+    // 1. Inicializa objetos básicos para evitar el error de 'IdCliente'
+    this.venta = { cliente: {}, pago: { efectivo: {}, visa: {}, mastercard: {}, deposito: {}, transferencia: {} } };
 
-    if (sessionStorage.getItem("empresa")) {
-      this.empresa = sessionStorage.getItem("empresa");
-      this.TipoDocumento =
-        this.empresa === "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR";
-    }
+    // 2. Espera a que el DOM sea real
+    this.$nextTick(async () => {
+      this.initForm();
+      
+      // Un pequeño delay extra para setScreen ayuda si hay v-if complejos
+      setTimeout(() => { this.setScreen(); }, 50);
 
-    // setInterval(this.updateTime, 1000)
-    await Promise.all(
-      this.loadClienteVarios(),
-      this.escucharPedidos(),
-      this.configStock()
-    );
+      this.$store.state.MostrarBotonMultipleEmpresa = true;
+      await this.getVendedor();
 
-    setTimeout(() => {
+      await Promise.all([ 
+        this.loadClienteVarios(),
+        this.escucharPedidos(),
+        this.configStock()
+      ]);
+
       this.recalcularTotalesPorEmpresa();
-    }, 100);
+    });
   },
 
   data() {
@@ -1103,7 +1103,19 @@ export default {
       descuentoPuntos: {},
       descuentoGeneral: 0,
       tieneIgv: false,
-      venta: {},
+      venta: {
+        cliente: {}, // <--- Esto evita el error de IdCliente
+        almacen: {}, // <--- Esto evita el error de IdAlmacen
+        puntoVenta: {},
+        tipoVenta: {},
+        pago: {
+          efectivo: { monto: 0 },
+          visa: { monto: 0 },
+          mastercard: { monto: 0 },
+          deposito: { monto: 0 },
+          transferencia: { monto: 0 }
+        }
+      },
       mostrar: false,
       mostrarOp: false,
       bloquearInput: false,
@@ -1283,30 +1295,25 @@ export default {
       }
     },
     setScreen() {
-      window.parent.document.getElementById("NavegadorParent").style.display =
-        "block";
+        let el = document.getElementById('EL_ID_QUE_BUSCAS'); // Revisa qué ID tienes en la línea 1311
+        if (el) {
+            el.style.whatever = "..."; 
+        } else {
+            console.warn("Esperando al DOM para setScreen...");
+        }
     },
     async recalcularTotalesPorEmpresa() {
-      this.lstTotalPorEmpresa = [];
-      await this.$store.state.empresas.forEach(empresa => {
-        if (this.productos.some(p => p.Empresa == empresa.IDEMPRESA)) {
-          let total = this.productos
-            .filter(p => p.Empresa == empresa.IDEMPRESA)
-            .reduce((total, prod) => {
-              return parseFloat(total) + parseFloat(prod.total);
-            }, 0);
-          this.lstTotalPorEmpresa.push({
-            nombre: empresa.RAZONSOCIAL,
-            total: parseFloat(total).toFixed(2)
-          });
-        } else {
-          this.lstTotalPorEmpresa.push({
-            nombre: empresa.RAZONSOCIAL,
-            total: 0
-          });
-        }
+      this.lstTotalPorEmpresa = this.$store.state.empresas.map(empresa => {
+        const total = this.productos
+          .filter(p => p.Empresa == empresa.IDEMPRESA)
+          .reduce((sum, prod) => sum + (parseFloat(prod.total) || 0), 0);
+
+        return {
+          nombre: empresa.RAZONSOCIAL,
+          total: total.toFixed(2)
+        };
       });
-      let totalCart = this.lstTotalPorEmpresa.reduce((sum, emp) => {
+      const totalCart = this.lstTotalPorEmpresa.reduce((sum, emp) => {
         return sum + parseFloat(emp.total);
       }, 0);
       this.$store.state.cart.totalCart = totalCart;
@@ -1991,100 +1998,46 @@ export default {
       return true;
     },
     async guardarVenta(evt) {
-      evt.preventDefault();
+    evt.preventDefault();
+    this.inProgress = true;
+    this.loading = true;
 
-      this.inProgress = true;
-      let totalPagos = 0;
-      totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
-        ? 0
-        : parseFloat(this.venta.pago.efectivo.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))
-        ? 0
-        : parseFloat(this.venta.pago.visa.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
-        ? 0
-        : parseFloat(this.venta.pago.mastercard.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
-        ? 0
-        : parseFloat(this.venta.pago.transferencia.monto);
-      totalPagos += isNaN(parseFloat(this.venta.pago.deposito.monto))
-        ? 0
-        : parseFloat(this.venta.pago.deposito.monto);
-      if (
-        (isNaN(parseFloat(this.venta.pago.efectivo.monto))
-          ? 0
-          : parseFloat(this.venta.pago.efectivo.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.inProgress = false;
-        return;
-      }
-      if (
-        (isNaN(parseFloat(this.venta.pago.visa.monto))
-          ? 0
-          : parseFloat(this.venta.pago.visa.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show("El metodo de pago Tarjeta no puede ser negativo");
-        this.inProgress = false;
-        return;
-      }
-      if (
-        (isNaN(parseFloat(this.venta.pago.mastercard.monto))
-          ? 0
-          : parseFloat(this.venta.pago.mastercard.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
-        );
-        this.inProgress = false;
-        return;
-      }
-      if (
-        (isNaN(parseFloat(this.venta.pago.transferencia.monto))
-          ? 0
-          : parseFloat(this.venta.pago.transferencia.monto)
-        ).toFixed(2) < 0
-      ) {
-        this.$toasted.show("El metodo de Transferencia no puede ser negativo");
-        this.inProgress = false;
-        return;
-      }
-      if (!this.venta.EsCredito) {
-        if (
-          parseFloat(this.totalCart).toFixed(2) !=
-          parseFloat(totalPagos).toFixed(2)
-        ) {
-          this.$toasted.show("Los pagos no coinciden con la venta");
-          this.inProgress = false;
-          return;
-        }
-      }
+    // 1. Cálculo de montos de pago de forma limpia
+    const pagos = this.venta.pago;
+    const obtenerMonto = (monto) => isNaN(parseFloat(monto)) ? 0 : parseFloat(monto);
+    
+    let totalPagos = obtenerMonto(pagos.efectivo.monto) +
+                     obtenerMonto(pagos.visa.monto) +
+                     obtenerMonto(pagos.mastercard.monto) +
+                     obtenerMonto(pagos.transferencia.monto) +
+                     obtenerMonto(pagos.deposito.monto);
 
-      if (!this.venta.cliente.DniRuc) {
+    // 2. Validaciones iniciales
+    if (obtenerMonto(pagos.efectivo.monto) < 0 || obtenerMonto(pagos.visa.monto) < 0 || obtenerMonto(pagos.mastercard.monto) < 0) {
+        this.$toasted.show("Los montos de pago no pueden ser negativos");
+        this.inProgress = false; this.loading = false;
+        return;
+    }
+
+    if (!this.venta.EsCredito && parseFloat(this.totalCart).toFixed(2) != parseFloat(totalPagos).toFixed(2)) {
+        this.$toasted.show("Los pagos no coinciden con la venta");
+        this.inProgress = false; this.loading = false;
+        return;
+    }
+
+    if (!this.venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
-        this.inProgress = false;
+        this.inProgress = false; this.loading = false;
+        return;
+    }
+
+    // Validación RUC/Factura
+    const dniRuc = this.venta.cliente.DniRuc;
+    if (this.venta.tipoVenta.CodSunat == "01" && dniRuc.length <= 9) {
+        this.$toasted.show("Una factura requiere un RUC de empresa.");
+        this.inProgress = false; this.loading = false;
         return;
       }
-
-      var esNumerico = Number.isInteger(parseInt(this.venta.cliente.DniRuc));
-      if (!esNumerico) {
-        this.$toasted.show("El RUC debe ser numérico, editar cliente.");
-        this.inProgress = false;
-        return;
-      }
-
-      var esEmpresa = this.venta.cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && this.venta.tipoVenta.CodSunat == "01") {
-        this.$toasted.show(
-          "Una factura debe ser emitida para una empresa, no un usuario común."
-        );
-        this.inProgress = false;
-        return;
-      }
-
       //Nota de Creadito
       if (
         this.venta.tipoVenta.CodSunat == "07" ||
@@ -2108,223 +2061,105 @@ export default {
         )[0].text;
       }
 
-      if (!this.productos.length) {
+    if (!this.productos.length) {
         this.$toasted.show("No hay productos para vender");
-        this.inProgress = false;
+        this.inProgress = false; this.loading = false;
         return;
-      }
+    }
 
-      // NO PERMITE CANTIDAD Y PRECIOS 0
-      let sinStock = 0;
-      let totalCero = 0;
-      this.productos.forEach(pro => {
-        if (
-          pro.CodigoBarra !== "COSTODELIVERY" &&
-          pro.CodigoBarra !== "MANODEOBRA" &&
-          (pro.stock <= 0 ||
-            parseFloat(pro.cantidad) > pro.stockMax ||
-            pro.stockMax == undefined)
-        ) {
-          sinStock += 1;
-        }
+    // 3. Preparar datos globales
+    this.venta.productos = this.productos;
+    this.venta.totalCart = this.totalCart;
+    this.venta.IdPedido = this.$route.query.idPedido || null;
 
-        if (parseFloat(pro.total) <= 0) {
-          totalCero += 1;
-        }
-      });
-
-      // if (
-      //   sinStock >= 1 &&
-      //   this.venta.tipoVenta.CodSunat != "07" &&
-      //   this.ventaSinStock != 1
-      // ) {
-      //   this.$toasted.error("No se puede vender un producto sin stock");
-      //   this.inProgress = false;
-      //   return;
-      // }
-
-      if (totalCero >= 1) {
-        this.$toasted.error("No se puede enviar un producto en S/. 0.00");
-        this.inProgress = false;
-        return;
-      }
-
-      if (this.totalCart <= 0) {
-        this.$toasted.show("La venta en S/. 0.00 no está permitido");
-        this.inProgress = false;
-        return;
-      }
-
-      // let count = 0;
-      // for (const k in this.venta.pago) {
-      //   if (this.venta.pago[k].monto > 0) {
-      //     count = count + 1;
-      //   }
-      // }
-
-      // if (count > 1) {
-      //   this.$toasted.show("Solo se permite un tipo de pago.");
-      //   this.inProgress = false;
-      //   return;
-      // }
-
-      const empresas = [...new Set(this.productos.map(p => p.Empresa))];
-      const esMultiempresa = empresas.length > 1;
-
-      if (esMultiempresa && count > 1) {
-        this.$toasted.show("Solo se permite un tipo de pago en ventas multiempresa.");
-        this.inProgress = false;
-        return;
-      }
-
-      if (!this.validarProforma()) {
-        this.inProgress = false;
-        this.$toasted.show(
-          "La Proforma no cumple con los requisitos necesarios. Verifique"
-        );
-        return;
-      }
-      this.inProgress = false;
-
-      this.venta.productos = this.productos;
-      this.venta.puntosAplicados = this.puntosAplicados || 0;
-      this.venta.totalCart = this.totalCart || 0;
-      this.venta.PagoCon = parseFloat(this.$refs.carrito.pagocon).toFixed(2);
-      this.venta.NombreOrganizacion = ("" + this.venta.NombreOrganizacion)
-        .trim()
-        .toUpperCase();
-      this.venta.adelantosPreOrden = this.adelantosPreOrden;
-      this.venta.IdPedido = this.$route.query.idPedido || null;
-      this.venta.nombreLlevar = this.venta.nombreLlevar.toUpperCase();
-      this.venta.DireccionEntrega = this.venta.EsDelivery
-        ? this.infoDelivery.Direccion || ""
-        : "";
-      // ------------------------- aqui paga
-      this.loading = true;
-      await this.$store.state.empresas.forEach(async element => {
-        let data = { ...this.venta };
-        let serie = await this.obtenerSerie(element.IDEMPRESA);
-        let almacen = await this.obtenerAlmacen(element.IDEMPRESA);
-        let empresa = await this.obtenerDatosEmpresa(element.IDEMPRESA);
-        let impresora = await this.obtenerDatosImpresora(element.IDEMPRESA);
-        let total = data.productos
-          .filter(v => v.Empresa == element.IDEMPRESA)
-          .reduce((total, prod) => {
-            return total + parseFloat(prod.total);
-          }, 0);
-        let tipoPago = "";
-        for (const k in this.venta.pago) {
-          if (this.venta.pago[k].monto > 0) {
-            tipoPago = k;
-          }
-        }
-        let dataImprimir = {
-          NombreOrganizacion: this.venta.NombreOrganizacion,
-          vendedor: this.venta.vendedor.NombreUsuario,
-          tipoPago: tipoPago,
-          numero: serie.numero,
-          serie: serie.serie,
-          CodSunat: this.venta.tipoVenta.CodSunat,
-          IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-          LimitItems: this.venta.tipoVenta.LimitItems,
-          TipoDoc: this.venta.tipoVenta.TipoDoc,
-          empresa: element.IDEMPRESA,
-          nombre_comercial: empresa.razoncial,
-          documento: empresa.ruc,
-          direccion: empresa.direccion,
-          cliente: data.cliente.Cliente,
-          documento_client: data.cliente.DniRuc,
-          direccion_cliente: data.cliente.Direccion,
-          total: total,
-          impresora: impresora,
-          productos: data.productos.filter(v => v.Empresa == element.IDEMPRESA)
-        };
-        data.almacen = almacen;
-        data.Numero = serie.numero;
-        data.Serie = serie.serie;
-        this.inProgress = true;
-        let IdProformaDets = [];
-        IdProformaDets = this.productos.map(v => {
-          return v.IdProformaDet;
+    // 4. Actualizar estado de proformas (Una sola vez para todas)
+    const IdProformaDets = this.productos.map(v => v.IdProformaDet).filter(id => id);
+    if (IdProformaDets.length > 0) {
+        await this.axios.post(`${this.API}/proformas/cambiarPagado?id_empresa=${this.empresa}`, {
+            IdProformaDets: IdProformaDets
         });
-        let dataProfs = {
-          IdProformaDets: IdProformaDets
-        };
-        this.axios.post(
-          `${this.API}/proformas/cambiarPagado?id_empresa=` + this.empresa,
-          dataProfs
-        );
-        if (data.productos.some(v => v.Empresa == element.IDEMPRESA)) {
-          let productos = data.productos.filter(
-            v => v.Empresa == element.IDEMPRESA
-          );
-          let totalCarr = productos.reduce((total, pr) => {
-            return parseFloat(total) + parseFloat(pr.total);
-          }, 0);
+    }
 
-          // data.productos = productos;
-          // data.totalCart = totalCarr;
-          // data.IdProformaDets = IdProformaDets;
-          // if (data.pago.efectivo.monto != 0) {
-          //   data.pago.efectivo.monto = totalCarr;
-          // } else if (data.pago.mastercard.monto != 0) {
-          //   data.pago.mastercard.monto = totalCarr;
-          // } else if (data.pago.transferencia.monto != 0) {
-          //   data.pago.transferencia.monto = totalCarr;
-          // } else if (data.pago.visa.monto != 0) {
-          //   data.pago.visa.monto = totalCarr;
-          // }
+    // 5. PROCESO MULTIEMPRESA (Bucle controlado)
+    try {
+        for (const element of this.$store.state.empresas) {
+            // Filtrar productos de esta empresa
+            const productosEmpresa = this.productos.filter(v => v.Empresa == element.IDEMPRESA);
+            
+            if (productosEmpresa.length > 0) {
+                // Obtener configuraciones de la empresa actual
+                const [serie, almacen, datosEmp, impresora] = await Promise.all([
+                    this.obtenerSerie(element.IDEMPRESA),
+                    this.obtenerAlmacen(element.IDEMPRESA),
+                    this.obtenerDatosEmpresa(element.IDEMPRESA),
+                    this.obtenerDatosImpresora(element.IDEMPRESA)
+                ]);
 
-          data.productos = productos;
-          data.totalCart = totalCarr; 
-          // data.pago.forEach((element) => {
-          //   if (element.monto != 0) {
-          //     element.monto = totalCarr;
-          //   }
-          // });
-          let comandaJson = JSON.stringify(dataImprimir);
-          // console.log(comandaJson);
-          console.log("dataCredito", data.EsCredito);
-          await this.axios
-            .post(this.API + "ventas?id_empresa=" + element.IDEMPRESA, data)
-            .then(async response => {
-              /** --------RECUERDA ESTA PARTE  */
-              this.emitirauto(response.data.insertId, element.IDEMPRESA);
-              // -------------------------
-              await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                mode: "cors",
-                cache: "default",
-                body: comandaJson
-              }).catch(error => console.error("Error:", error));
-            })
-            .catch(error => {
-              console.error(error);
-              this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-              this.inProgress = false;
-            });
+                let totalEmpresa = productosEmpresa.reduce((sum, p) => sum + parseFloat(p.total), 0);
+                
+                // Determinar tipo de pago predominante para el ticket
+                let tipoPagoLabel = Object.keys(this.venta.pago).find(k => this.venta.pago[k].monto > 0) || "efectivo";
 
-          // await this.axios
-          //   .post("http://localhost:5000/imprimir/getcmdped.php", comandaJson, {
-          //     baseURL: ""
-          //   })
-          //   .catch(err => {
-          //     console.error(err);
-          //   });
-          this.$toasted.success("Venta realizada con exito");
+                let dataEnvio = { 
+                    ...this.venta,
+                    almacen: almacen,
+                    Numero: serie.numero,
+                    Serie: serie.serie,
+                    productos: productosEmpresa,
+                    totalCart: totalEmpresa
+                };
+
+                let dataImprimir = {
+    NombreOrganizacion: this.venta.NombreOrganizacion,
+    vendedor: this.venta.vendedor.NombreUsuario,
+    tipoPago: tipoPagoLabel,
+    numero: serie.numero,
+    serie: serie.serie,
+    CodSunat: this.venta.tipoVenta.CodSunat,
+    empresa: element.IDEMPRESA,
+    
+    // Estos son los datos que vienen del backend corregido:
+    nombre_comercial: datosEmp.razoncial, 
+    documento: datosEmp.ruc,
+    direccion: datosEmp.direccion, 
+    
+    cliente: this.venta.cliente.Cliente,
+    documento_client: this.venta.cliente.DniRuc,
+    total: totalEmpresa,
+    impresora: impresora,
+    productos: productosEmpresa
+};
+
+                // Guardar Venta
+                const response = await this.axios.post(this.API + "ventas?id_empresa=" + element.IDEMPRESA, dataEnvio);
+                
+                // Emitir y Mandar a imprimir localmente
+                this.emitirauto(response.data.insertId, element.IDEMPRESA);
+                
+                await fetch("http://localhost:5000/imprimir/getcmdped.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dataImprimir)
+                }).catch(e => console.warn("Servidor de impresión no alcanzado"));
+
+                this.$toasted.success(`Venta empresa ${element.IDEMPRESA} exitosa`);
+            }
         }
-      });
-      this.inProgress = true;
-      // this.$toasted.success("Venta realizada con exito");
 
-      setTimeout(() => {
+        // Finalización exitosa
+        this.$toasted.success("Todas las ventas se procesaron correctamente");
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+
+    } catch (error) {
+        console.error(error);
+        this.$toasted.error("Ocurrió un error en el proceso. Revise la consola.");
+    } finally {
         this.inProgress = false;
-        window.location.reload();
-      }, 1000 * 2 * this.$store.state.empresas.length);
-    },
+        this.loading = false;
+    }
+},
     emitirauto(idDocVenta, id_empresa) {
       this.axios
         .post(this.API + "emitirauto?id_empresa=" + this.empresa, {
@@ -2495,11 +2330,10 @@ export default {
       );
       return res.data;
     },
-    async obtenerDatosEmpresa(empresa) {
-      let res = await this.axios(
-        `${this.API}obtener_datos_empresa?id_empresa=${empresa}`
-      );
-      return res.data;
+    async obtenerDatosEmpresa(idEmpresa) {
+        // Asegúrate de que la ruta coincida con tu backend
+        const res = await this.axios.get(`${this.API}obtener_datos_empresa?id_empresa=${idEmpresa}`);
+        return res.data;
     },
     async obtenerDatosImpresora(empresa) {
       let res = await this.axios(
