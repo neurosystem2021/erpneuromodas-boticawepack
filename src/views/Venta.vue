@@ -1519,7 +1519,7 @@ export default {
             Almacen: data.Almacen,
             DescuentoActivo: data.DescuentoActivo
           };
-        
+          this.getCategorias();
           this.ventas[vActiva].puntoVenta = {
             IdDocVentaPuntoVenta: data.IdDocVentaPuntoVenta,
             PuntoVenta: data.PuntoVenta
