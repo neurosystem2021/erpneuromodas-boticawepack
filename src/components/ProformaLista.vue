@@ -74,7 +74,6 @@
                     <b-form-group>
                     </b-form-group>
                      <b-table 
-                        v-if="show"
                         id="table-proformas" 
                         ref="tableProformas"
                        :filter="filter"

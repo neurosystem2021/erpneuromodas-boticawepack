@@ -1356,9 +1356,8 @@ export default {
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "07" ||
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "08"
       ) {
-        this.ventas[this.ventaActiva].Serie = this.ventas[
-          this.ventaActiva
-        ].Serie.replace(/^./, obj.NroComprobante[0]);
+        this.ventas[this.ventaActiva].Serie = this.ventas[this.ventaActiva]
+          .Serie.replace(/^./, obj.NroComprobante[0]);
       }
       this.axios
         .get(this.API + "ventas/solonumero", {
@@ -1371,8 +1370,8 @@ export default {
           this.ventas[this.ventaActiva].Numero = response.data.numero;
         })
         .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          console.error(error);
+          this.$toasted.show("Error al obtener número correlativo");
         });
       //Cargar producto del documento afectado nota credito
       this.axios
@@ -1380,48 +1379,53 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-              .IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta.IdDocVentaPuntoVenta
           }
         })
         .then(response => {
-          this.axios
-            .get(this.API + "cliente", {
-              params: {
-                idCliente: response.data[0].IdCliente
-              }
-            })
-            .then(response => {
-              if (response.data) {
-                this.setCliente(response.data.IdCliente);
-
-                this.ventas[this.ventaActiva].CampoDireccion =
-                  response.data.Direccion;
-                this.ventas[this.ventaActiva].cliente = response.data;
-
-                // let txtCliente = `inputCliente${this.ventaActiva}`;
+          if (response.data && response.data.length > 0) {
+            
+            // A. Cargar datos del Cliente basado en el primer producto del detalle
+            this.axios
+              .get(this.API + "cliente", {
+                params: { idCliente: response.data[0].IdCliente }
+              })
+              .then(resCli => {
+              if (resCli.data) {
+                this.setCliente(resCli.data.IdCliente);
+                this.ventas[this.ventaActiva].CampoDireccion = resCli.data.Direccion;
+                this.ventas[this.ventaActiva].cliente = resCli.data;
+                
                 this.ventas[this.ventaActiva].verCliente = false;
-                this.initValueCliente = this.ventas[
-                  this.ventaActiva
-                ].cliente.Cliente;
+                this.initValueCliente = this.ventas[this.ventaActiva].cliente.Cliente;
                 this.ventas[this.ventaActiva].verCliente = true;
                 this.$forceUpdate();
               } else {
-                this.$toasted.show("No se encontro al cliente");
+                this.$toasted.show("No se encontró al cliente");
               }
             })
-            .catch(error => {
-              console.log(error);
-            });
+            .catch(errCli => console.error("Error al cargar cliente:", errCli));
 
-          let producto = [];
+          // B. LIMPIAR PRODUCTOS DE LA VENTA ACTIVA (CORREGIDO)
+          // Antes tenías this.ventas.productos = [], lo cual era incorrecto
+          this.ventas[this.ventaActiva].productos = [];
+
+          // C. CARGAR LOS PRODUCTOS AL DETALLE
           response.data.forEach(element => {
-            console.log(element);
-            producto.push({ ...element, Descripcion: element.Presentacion });
-          });
-          this.ventas[this.ventaActiva].NotaIdMotivo = null;
-          this.ventas[this.ventaActiva].productos = producto;
-          this.$forceUpdate();
+      // Pasamos el producto y el segundo parámetro como 'true'
+      this.setProducto(element, true); 
+    });
+
+            this.ventas[this.ventaActiva].NotaIdMotivo = null;
+            this.$forceUpdate();
+
+          } else {
+            this.$toasted.show("El comprobante de referencia no tiene productos");
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this.$toasted.show("Error al cargar el detalle del comprobante");
         });
     },
     setMotivo(ev) {
@@ -1875,9 +1879,9 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto) {
+    async setProducto(producto, esReferencia = false) {
       let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
+      if (!esReferencia && productos.some(v => v.IdProducto == producto.IdProducto)) {
         productos.filter(
           v => v.IdProducto == producto.IdProducto
         )[0].cantidad += parseFloat(1);
@@ -1903,20 +1907,39 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
-      prod.descuento = 0;
-      prod.presentacion = null;
+
+      // --- LÓGICA DE ASIGNACIÓN SEGÚN EL ORIGEN ---
+      if (esReferencia) {
+        // Si viene de una Nota de Crédito/Débito, usamos los valores del documento original
+        // Usamos || para asegurar que atrape tanto 'Cantidad' como 'cantidad'
+        prod.cantidad = parseFloat(producto.Cantidad || producto.cantidad || 1);
+        prod.precio = parseFloat(producto.Precio || producto.precio || prod.PrecioContado);
+        prod.descuento = parseFloat(producto.Descuento || producto.descuento || 0);
+        prod.presentacion = producto.Presentacion || null;
+        prod.CantidadPresentacion = producto.CantidadPresentacion || null;
+      } else {
+        // Si es una venta manual nueva
+        prod.cantidad = 1;
+        prod.precio = prod.PrecioContado;
+        prod.descuento = 0;
+        prod.presentacion = null;
+        prod.CantidadPresentacion = null;
+      }
+
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
       prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
+      
+      // Agregamos al inicio de la lista
       productos.unshift(prod);
 
       this.$nextTick(() => {
-        this.$refs["cantidad0"][0].focus();
-        this.$refs["cantidad0"][0].select();
+        // Enfocamos el primer input de cantidad disponible
+        if (this.$refs["cantidad0"] && this.$refs["cantidad0"][0]) {
+          this.$refs["cantidad0"][0].focus();
+          this.$refs["cantidad0"][0].select();
+        }
       });
       this.metodoPagoCambio(1);
     },
