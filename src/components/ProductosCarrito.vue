@@ -278,6 +278,13 @@
         <template slot="precio" slot-scope="data">
           <!-- disabled -->
           <input
+          :disabled="
+              bloquearInput
+                ? true
+                : false || idPerfil == 1
+                ? false
+                : true || esDelivery
+            "
             v-model="productos[data.index].precio"
             type="number"
             style="width: 95px"

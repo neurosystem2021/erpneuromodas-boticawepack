@@ -1089,7 +1089,7 @@ export default {
       vuelto: 0,
       // TipoDocumento:
       //   this.empresa == "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR",
-      TipoDocumento: "NOTA DE VENTA",
+      TipoDocumento: "BOLETA ELEC.",
       pagocon: 0,
       isNota: false,
       dni: "",
@@ -1459,10 +1459,10 @@ export default {
         cliente: {},
         comisionista: {},
         tipoVenta: {
-          IdTipoDoc: 3,
-          TipoDoc: "NOTA DE VENTA",
+          IdTipoDoc: 7,
+          TipoDoc: "BOLETA ELEC.",
           LimitItems: 0,
-          CodSunat: "12"
+          CodSunat: "03"
         },
         almacen: {
           //IdAlmacen: 1,
@@ -1474,7 +1474,7 @@ export default {
         },
         vendedor: {},
         adelantosPreOrden: [],
-        FechaCredito: this.$moment().format("YYYY-MM-DD"),
+        FechaCredito: this.$moment().add(1, "days").format("YYYY-MM-DD"),
         FechaDoc: this.$moment().format("YYYY-MM-DDTH:mm:ss"),
         pago: {
           efectivo: { descripcion: "", IdMetodoPago: 1, monto: 0 },
@@ -2012,6 +2012,41 @@ export default {
                      obtenerMonto(pagos.transferencia.monto) +
                      obtenerMonto(pagos.deposito.monto);
 
+    // VALIDAR TOTAL VENTA
+    const totalVenta = parseFloat(this.total) || 0;
+
+    for (let producto of this.productos) {
+        const precio = parseFloat(producto.precio) || 0;
+
+        if (precio <= 0) {
+            this.$toasted.show(`El producto "${producto.Producto}" tiene precio inválido (0 o negativo)`);
+            this.inProgress = false;
+            this.loading = false;
+            return;
+        }
+    }
+
+    //RESTRICCION DE STOCK (VENTAS EN 0 O NEGATIVO)
+
+    // for (let producto of this.productos) {
+    //     const stock = parseFloat(producto.Stock) || 0;
+    //     const cantidad = parseFloat(producto.cantidad) || 0;
+
+    //     if (stock <= 0) {
+    //         this.$toasted.show(`El producto "${producto.Producto}" no tiene stock disponible`);
+    //         this.inProgress = false;
+    //         this.loading = false;
+    //         return;
+    //     }
+
+    //     if (cantidad > stock) {
+    //         this.$toasted.show(`Stock insuficiente para "${producto.Producto}". Disponible: ${stock}`);
+    //         this.inProgress = false;
+    //         this.loading = false;
+    //         return;
+    //     }
+    // }
+
     // 2. Validaciones iniciales
     if (obtenerMonto(pagos.efectivo.monto) < 0 || obtenerMonto(pagos.visa.monto) < 0 || obtenerMonto(pagos.mastercard.monto) < 0) {
         this.$toasted.show("Los montos de pago no pueden ser negativos");
@@ -2081,24 +2116,20 @@ export default {
     }
 
     // 5. PROCESO MULTIEMPRESA (Bucle controlado)
+    let idsGenerados = [];
     try {
+        // 2. PROCESO MULTIEMPRESA
         for (const element of this.$store.state.empresas) {
-            // Filtrar productos de esta empresa
             const productosEmpresa = this.productos.filter(v => v.Empresa == element.IDEMPRESA);
             
             if (productosEmpresa.length > 0) {
-                // Obtener configuraciones de la empresa actual
-                const [serie, almacen, datosEmp, impresora] = await Promise.all([
+                // Obtener configuraciones (Serie, Almacen, etc.)
+                const [serie, almacen] = await Promise.all([
                     this.obtenerSerie(element.IDEMPRESA),
-                    this.obtenerAlmacen(element.IDEMPRESA),
-                    this.obtenerDatosEmpresa(element.IDEMPRESA),
-                    this.obtenerDatosImpresora(element.IDEMPRESA)
+                    this.obtenerAlmacen(element.IDEMPRESA)
                 ]);
 
                 let totalEmpresa = productosEmpresa.reduce((sum, p) => sum + parseFloat(p.total), 0);
-                
-                // Determinar tipo de pago predominante para el ticket
-                let tipoPagoLabel = Object.keys(this.venta.pago).find(k => this.venta.pago[k].monto > 0) || "efectivo";
 
                 let dataEnvio = { 
                     ...this.venta,
@@ -2109,52 +2140,57 @@ export default {
                     totalCart: totalEmpresa
                 };
 
-                let dataImprimir = {
-    NombreOrganizacion: this.venta.NombreOrganizacion,
-    vendedor: this.venta.vendedor.NombreUsuario,
-    tipoPago: tipoPagoLabel,
-    numero: serie.numero,
-    serie: serie.serie,
-    CodSunat: this.venta.tipoVenta.CodSunat,
-    empresa: element.IDEMPRESA,
-    
-    // Estos son los datos que vienen del backend corregido:
-    nombre_comercial: datosEmp.razoncial, 
-    documento: datosEmp.ruc,
-    direccion: datosEmp.direccion, 
-    
-    cliente: this.venta.cliente.Cliente,
-    documento_client: this.venta.cliente.DniRuc,
-    total: totalEmpresa,
-    impresora: impresora,
-    productos: productosEmpresa
-};
-
-                // Guardar Venta
+                // Guardar Venta en la base de datos
                 const response = await this.axios.post(this.API + "ventas?id_empresa=" + element.IDEMPRESA, dataEnvio);
                 
-                // Emitir y Mandar a imprimir localmente
-                this.emitirauto(response.data.insertId, element.IDEMPRESA);
-                
-                await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dataImprimir)
-                }).catch(e => console.warn("Servidor de impresión no alcanzado"));
-
-                this.$toasted.success(`Venta empresa ${element.IDEMPRESA} exitosa`);
+                if (response.data.insertId) {
+                    // 3. GUARDAMOS EL ID GENERADO
+                    idsGenerados.push(response.data.insertId);
+                    
+                    // Ejecutar procesos secundarios (como envío a SUNAT si es automático)
+                    this.emitirauto(response.data.insertId, element.IDEMPRESA);
+                    
+                    this.$toasted.success(`Venta empresa ${element.IDEMPRESA} registrada`);
+                }
             }
         }
 
-        // Finalización exitosa
-        this.$toasted.success("Todas las ventas se procesaron correctamente");
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
+        // 4. ABRIR VENTANA DE IMPRESIÓN MULTITICKET
+        if (idsGenerados.length > 0) {
+            const listaIds = idsGenerados.join(',');
+
+            // Configuramos el ancho del ticket (450px es ideal para que no se vea pegado)
+            const ancho = 450;
+            const alto = window.screen.height * 0.8; // 80% de la altura de la pantalla
+            
+            // Calculamos la posición horizontal centrada
+            const left = (window.screen.width / 2) - (ancho / 2);
+            const top = 50; // Un poco de margen superior
+
+            const winPrint = window.open(
+                "/imprimir/index2.php?IdDocVenta=" + listaIds,
+                "ImpresionPOS",
+                `width=${ancho},height=${alto},left=${left},top=${top},noopener,scrollbars=yes`
+            );
+
+            // USO 1: Verificar si los Pop-ups están bloqueados
+            if (!winPrint || winPrint.closed || typeof winPrint.closed == 'undefined') {
+                this.$toasted.error("¡Atención! El navegador bloqueó la ventana de impresión.");
+            } else {
+                this.$toasted.success("Enviando a impresión...");
+                
+                // USO 2: Forzar el foco (traer al frente)
+                winPrint.focus();
+            }
+            
+            setTimeout(() => {
+                window.location.reload(); 
+            }, 3000);
+        }
 
     } catch (error) {
         console.error(error);
-        this.$toasted.error("Ocurrió un error en el proceso. Revise la consola.");
+        this.$toasted.error("Error en el proceso multiempresa");
     } finally {
         this.inProgress = false;
         this.loading = false;
