@@ -318,7 +318,7 @@
                       <template slot="cantidad" slot-scope="data">
                         <input v-model="data.item.cantidad" type="number"
                           style="text-align:center; font-weight:bold; width: 90px;" autocomplete="false"
-                          :ref="`cantidad${data.index}`" :disabled="data.item.esPresentacion"
+                          :ref="`cantidad${data.index}`" :disabled="bloquearInput?true:false"
                           @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 1)" class="form-control"
                           @keydown.enter="irBusquedaProducto"
                           :tabindex="`${data.index}3`"
@@ -330,14 +330,14 @@
                         </p>
                       </template>
                       <template slot="precio" slot-scope="data">
-                        <input :disabled="data.item.bloquearInputPrecio" v-model="data.item.precio" min="0"
+                        <input :disabled="bloquearInput?true:false" v-model="data.item.precio" min="0"
                           step="0.00001" type="text" style="text-align:center; font-weight:bold; width: 105px;"
                           autocomplete="false" @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 2)"
                           class="form-control" :tabindex="`${data.index}4`" @keydown.enter="irBusquedaProducto">
 
                       </template>
                       <template slot="descuento" slot-scope="data">
-                        <input v-model="data.item.descuento" type="text"
+                        <input v-model="data.item.descuento" type="text" :disabled="bloquearInput?true:false"
                           style="text-align:center; font-weight:bold; width: 100px;" autocomplete="false"
                           @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 3)" class="form-control" 
                           :tabindex="`${data.index}5`"
@@ -1133,6 +1133,7 @@ export default {
     };
   },
   mounted() {
+    this.configStock();
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1224,6 +1225,18 @@ export default {
       } else {
         this.pagosPendientes = 0;
       }
+    },
+    configStock() {
+      this.axios
+        .get(this.API + "config/stock")
+        .then(res => {
+          this.ventaSinStock = parseInt(res.data); 
+          console.log("Configuración stock cargada:", this.ventaSinStock);
+        })
+        .catch(err => {
+          console.error("Error API stock:", err);
+          this.ventaSinStock = 0;
+        });
     },
     conectarSocket() {
       if (!this.$socket.connected) {
@@ -2290,6 +2303,28 @@ export default {
         this.inProgress = false;
         return;
       }
+
+      const hayProductosSinStock = productos.some(v => {
+      let stockActual = parseFloat(v.stock);
+      let cantPedida = parseFloat(v.cantidad || 0);
+      let factor = parseFloat(v.CantidadPresentacion || 1);
+      
+      let totalAVender = cantPedida * factor;
+
+      if (isNaN(stockActual)) stockActual = 0;
+
+      return totalAVender > stockActual;
+      });
+
+      console.log("¿Falta stock?:", hayProductosSinStock);
+      console.log("Permite venta sin stock (DB):", this.ventaSinStock);
+
+      if (hayProductosSinStock && (this.ventaSinStock == 0 || this.ventaSinStock == "0") && venta.almacen.IdAlmacen != 2) {
+          this.$toasted.show("No hay stock suficiente.");
+          this.inProgress = false;
+          return;
+      }  
+
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
         //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
         this.$swal({

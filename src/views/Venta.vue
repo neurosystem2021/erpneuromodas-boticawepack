@@ -166,6 +166,7 @@
                   </template>
                   <template slot="cantidad" slot-scope="data">
                     <input
+                      :disabled="bloquearInput?true:false"
                       v-model="data.item.cantidad"
                       type="number"
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
@@ -184,7 +185,7 @@
                   </template>
                   <template slot="precio" slot-scope="data">
                     <input
-                      :disabled="data.item.bloquearInputPrecio"
+                      :disabled="bloquearInput?true:false"
                       v-model="data.item.precio"
                       min="0"
                       step="0.00001"
@@ -198,6 +199,7 @@
                   </template>
                   <template slot="descuento" slot-scope="data">
                     <input
+                      :disabled="bloquearInput?true:false"
                       v-model="data.item.descuento"
                       type="number"
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
@@ -1364,11 +1366,12 @@ export default {
       this.axios
         .get(this.API + "config/stock")
         .then(res => {
-          //this.ventaSinStock = parseInt(res.data); // por si devuelve string
-          this.ventaSinStock = parseInt(res.data.VENTASINSTOCK); // CORREGIDO
+          this.ventaSinStock = parseInt(res.data); 
+          console.log("Configuración stock cargada:", this.ventaSinStock);
         })
         .catch(err => {
-          this.ventaSinStock = 0; // fallback: sí permite la venta si hay error
+          console.error("Error API stock:", err);
+          this.ventaSinStock = 0;
         });
     },
     mostrarEditarProducto() {
@@ -2013,15 +2016,34 @@ export default {
               console.log(error);
             });
 
-          let producto = [];
-          response.data.forEach(element => {
-            console.log(element);
-            producto.push({ ...element, Descripcion: element.Presentacion });
+          this.ventas.productos = [];
+
+          response.data.forEach(async element => {
+            console.log("Presentacion", element.Presentacion);
+            element.Descripcion = element.Presentacion;
+            let productoStock = await this.obtenerStockBuscador(
+              element.IdProducto
+            );
+            element.stock =
+              Object.keys(productoStock).length > 0 ? productoStock.stock : 0;
+            this.ventas[this.ventaActiva].productos.push(element);
+            // this.setProducto(element);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
-          this.ventas[this.ventaActiva].productos = producto;
           this.$forceUpdate();
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.metodoPagoCambio(1);
+            }, 1000);
+          });
         });
+    },
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
     },
     someMethod(text) {
       this.someMethod = text;
@@ -2253,6 +2275,26 @@ export default {
         return;
       }
 
+      const hayProductosSinStock = productos.some(v => {
+          let stockActual = parseFloat(v.stock);
+          let cantPedida = parseFloat(v.cantidad || 0);
+          let factor = parseFloat(v.CantidadPresentacion || 1);
+          
+          let totalAVender = cantPedida * factor;
+
+          if (isNaN(stockActual)) stockActual = 0;
+
+          return totalAVender > stockActual;
+      });
+
+      console.log("¿Falta stock?:", hayProductosSinStock);
+      console.log("Permite venta sin stock (DB):", this.ventaSinStock);
+
+      if (hayProductosSinStock && (this.ventaSinStock == 0 || this.ventaSinStock == "0") && venta.almacen.IdAlmacen != 2) {
+          this.$toasted.show("No hay stock suficiente.");
+          this.inProgress = false;
+          return;
+      }  
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
         this.$toasted.show(
@@ -2347,26 +2389,6 @@ export default {
         return;
       }
 
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
-        this.$toasted.show("No se puede vender un producto sin stock");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-        this.inProgress = false;
-        return;
-      }
       if (
         parseFloat(this.getTotal()).toFixed(2) !=
         parseFloat(totalPagos).toFixed(2)
