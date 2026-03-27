@@ -1995,6 +1995,28 @@ export default {
 
         return;
       }
+
+      // 1. RESTRICCIÓN: Suma real de productos vs Total mostrado
+      const sumaRealProductos = productos.reduce((total, prod) => {
+          return total + (parseFloat(prod.cantidad) * parseFloat(prod.precio) - parseFloat(prod.descuento || 0));
+      }, 0);
+
+      const totalCalculado = parseFloat(sumaRealProductos).toFixed(2);
+      const totalExhibido = parseFloat(this.getTotal()).toFixed(2);
+
+      if (totalCalculado !== totalExhibido) {
+          this.$toasted.show("¡ERROR!: El total no coincide con la suma de productos. Recargue la página.");
+          return;
+      }
+
+      // 2. RESTRICCIÓN EXTRA: Suma de pagos vs Total de la venta
+      const totalPagado = parseFloat(totalPagos).toFixed(2);
+
+      if (totalPagado !== totalExhibido) {
+          this.$toasted.show(`¡ERROR!: El monto pagado (S/ ${totalPagado}) debe ser igual al total (S/ ${totalExhibido})`);
+          return;
+      }
+
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
