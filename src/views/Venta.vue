@@ -656,6 +656,11 @@
                   <i class="fas fa-microphone"></i>
                 </b-button
                 >
+                <b-button variant="primary" @click="abrirFormulario">
+                  <i>Nuevo</i>
+                </b-button>
+
+                <ProductoForm ref="formProducto" :showButton="false" />
               </b-input-group-append>
               <!-- <b-input-group-append>
                 <b-button variant="secondary" @click="limpiarFiltro"
@@ -1844,6 +1849,10 @@ export default {
         this.cargarPreOrden();
         this.setCliente(this.$route.query.idCliente);
       }
+    },
+    abrirFormulario() {
+      this.$refs.formProducto.show = true;
+      this.$refs.formProducto.nuevo = true; 
     },
     getCategorias() {
       this.axios
