@@ -2115,91 +2115,224 @@ export default {
         });
     }
 
-    // 5. PROCESO MULTIEMPRESA (Bucle controlado)
-    let idsGenerados = [];
+    // 5. PROCESO MULTIEMPRESA
+    let ventasGeneradas = [];
+    let errores = [];
+
     try {
-        // 2. PROCESO MULTIEMPRESA
         for (const element of this.$store.state.empresas) {
-            const productosEmpresa = this.productos.filter(v => v.Empresa == element.IDEMPRESA);
-            
-            if (productosEmpresa.length > 0) {
-                // Obtener configuraciones (Serie, Almacen, etc.)
-                const [serie, almacen] = await Promise.all([
-                    this.obtenerSerie(element.IDEMPRESA),
-                    this.obtenerAlmacen(element.IDEMPRESA)
-                ]);
+            try {
+                // Filtramos productos de esta empresa
+                const productosEmpresa = this.productos.filter(v => v.Empresa == element.IDEMPRESA);
 
-                let totalEmpresa = productosEmpresa.reduce((sum, p) => sum + parseFloat(p.total), 0);
+                if (productosEmpresa.length > 0) {
+                    // Obtener configuraciones en paralelo
+                    const [serie, almacen] = await Promise.all([
+                        this.obtenerSerie(element.IDEMPRESA),
+                        this.obtenerAlmacen(element.IDEMPRESA)
+                    ]);
 
-                let dataEnvio = { 
-                    ...this.venta,
-                    almacen: almacen,
-                    Numero: serie.numero,
-                    Serie: serie.serie,
-                    productos: productosEmpresa,
-                    totalCart: totalEmpresa
-                };
+                    // CLONAMOS el objeto venta para cada empresa
+                    let objetoVenta = JSON.parse(JSON.stringify(this.venta));
 
-                // Guardar Venta en la base de datos
-                const response = await this.axios.post(this.API + "ventas?id_empresa=" + element.IDEMPRESA, dataEnvio);
-                
-                if (response.data.insertId) {
-                    // 3. GUARDAMOS EL ID GENERADO
-                    idsGenerados.push(response.data.insertId);
-                    
-                    // Ejecutar procesos secundarios (como envío a SUNAT si es automático)
-                    this.emitirauto(response.data.insertId, element.IDEMPRESA);
-                    
-                    this.$toasted.success(`Venta empresa ${element.IDEMPRESA} registrada`);
+                    // LIMPIEZA DE PRODUCTOS
+                    objetoVenta.productos = productosEmpresa.map(pro => {
+                        let p = { ...pro };
+
+                        delete p.nuevoPrecioContado; delete p.Descripcion; delete p.disabledProf;
+                        delete p.normalPrecioContado; delete p.Anulado; delete p.Botapie;
+                        delete p.Codigo; delete p.CodigoBarra; delete p.Color;
+                        delete p.ControlaStock; delete p.Dosis; delete p.EsPadre;
+                        delete p.FechaMod; delete p.FechaReg; delete p.Genero;
+                        delete p.Hash; delete p.IdBloque;
+                        delete p.IdProductoCategoria; delete p.IdProductoFormaFarmaceutica;
+                        delete p.IdProductoMarca; delete p.IdProductoMedicion;
+                        delete p.IdProductoTalla; delete p.PorcentajeUtilidad;
+                        delete p.PrecioContado; delete p.PrecioCosto; delete p.PrecioPorMayor;
+                        delete p.ProductoCategoria; delete p.ProductoDesc;
+                        delete p.ProductoDescCorto; delete p.ProductoMarca;
+                        delete p.ProductoMedicion; delete p.ProductoModelo;
+                        delete p.ProductoTalla; delete p.StockMinimo;
+                        delete p.StockPorMayor; delete p.UsuarioMod; delete p.UsuarioReg;
+                        delete p.VentaEstrategica; delete p.stock;
+
+                        return p;
+                    });
+
+                    // Limpieza del Cliente
+                    if (objetoVenta.cliente) {
+                        delete objetoVenta.cliente.Anulado; delete objetoVenta.cliente.FechaReg;
+                        delete objetoVenta.cliente.UsuarioReg; delete objetoVenta.cliente.FechaMod;
+                        delete objetoVenta.cliente.UsuarioMod; delete objetoVenta.cliente.FechaNacimiento;
+                        delete objetoVenta.cliente.Nacionalidad; delete objetoVenta.cliente.Direccion3;
+                        delete objetoVenta.cliente.Telefono; delete objetoVenta.cliente.Email;
+                        delete objetoVenta.cliente.Puntos; delete objetoVenta.cliente.EsVIP;
+                        delete objetoVenta.cliente.Direccion2; delete objetoVenta.cliente.Sexo;
+                        delete objetoVenta.cliente.Ocupacion; delete objetoVenta.cliente.NombreComercial;
+                        delete objetoVenta.cliente.esComisionista;
+                    }
+
+                    // Limpieza Vendedor y otros
+                    if (objetoVenta.vendedor) {
+                        delete objetoVenta.vendedor.APPTOKEN; delete objetoVenta.vendedor.APPURL;
+                        delete objetoVenta.vendedor.Anulado; delete objetoVenta.vendedor.Password;
+                    }
+
+                    delete objetoVenta.idProductos;
+                    delete objetoVenta.puntoVenta;
+
+                    // DATOS ESPECÍFICOS DE LA EMPRESA
+                    objetoVenta.almacen = almacen;
+                    objetoVenta.totalCart = productosEmpresa.reduce((sum, p) => sum + parseFloat(p.total || 0), 0);
+
+                    // EMPRESA
+                    objetoVenta.empresa_id = element.IDEMPRESA;
+                    objetoVenta.empresa_nombre = element.RAZONSOCIAL || element.RazonSocial || element.NOMBRE || element.Empresa || '';
+                    objetoVenta.empresa_ruc = element.RUC || element.Documento || element.NRO_DOCUMENTO || '';
+                    objetoVenta.empresa_direccion = element.Direccion || element.DIRECCION || '';
+                    objetoVenta.empresa_departamento = element.Departamento || element.DEPARTAMENTO || '';
+                    objetoVenta.empresa_provincia = element.Provincia || element.PROVINCIA || '';
+                    objetoVenta.empresa_distrito = element.Distrito || element.DISTRITO || '';
+                    objetoVenta.empresa_telefonos = element.Telefonos || element.TELEFONOS || '';
+                    objetoVenta.empresa_web_consulta = element.WebConsulta || 'http://emision.factura.vip';
+
+                    // DOCUMENTO / FECHAS
+                    objetoVenta.FechaDoc = objetoVenta.FechaDoc || new Date().toISOString().slice(0, 19).replace("T", " ");
+                    objetoVenta.FechaCredito = objetoVenta.FechaCredito || '';
+
+                    // PAGO / TOTALES
+                    objetoVenta.EsCredito = objetoVenta.EsCredito || 0;
+                    objetoVenta.PagoCon = this.venta.PagoCon || objetoVenta.PagoCon || 0;
+                    objetoVenta.Efectivo = this.venta.Efectivo || 0;
+                    objetoVenta.Visa = this.venta.Visa || 0;
+                    objetoVenta.Mastercard = this.venta.Mastercard || 0;
+                    objetoVenta.Transferencia = this.venta.Transferencia || 0;
+                    objetoVenta.Deposito = this.venta.Deposito || 0;
+                    objetoVenta.TieneIgv = this.venta.TieneIgv || objetoVenta.TieneIgv || 0;
+
+                    // EXTRA
+                    objetoVenta.Puntos = this.venta.Puntos || 0;
+                    objetoVenta.UsuarioReg = (this.venta.vendedor && this.venta.vendedor.Usuario)
+                        ? this.venta.vendedor.Usuario
+                        : 'ADMIN';
+
+                    // Guardar en DB
+                    const response = await this.axios.post(
+                        this.API + "ventas?id_empresa=" + element.IDEMPRESA,
+                        objetoVenta
+                    );
+
+                    if (response.data && response.data.insertId) {
+                        objetoVenta.IdDocVenta = response.data.insertId;
+
+                        objetoVenta.Serie = (
+                            response.data.serie ||
+                            response.data.Serie ||
+                            ''
+                        ).toString().trim();
+
+                        objetoVenta.Numero = (
+                            response.data.numero ||
+                            response.data.Numero ||
+                            ''
+                        ).toString().trim();
+
+                        // IMPORTANTE: guardar directo la venta
+                        ventasGeneradas.push(objetoVenta);
+
+                        this.$toasted.success(
+                            `Empresa ${element.IDEMPRESA}: Venta ${objetoVenta.Serie}-${objetoVenta.Numero}`
+                        );
+                    } else {
+                        errores.push(`Empresa ${element.IDEMPRESA}: no devolvió insertId`);
+                    }
                 }
+
+            } catch (errEmpresa) {
+                console.error("Error empresa:", element.IDEMPRESA, errEmpresa);
+                errores.push(`Empresa ${element.IDEMPRESA}`);
             }
         }
 
-        // 4. ABRIR VENTANA DE IMPRESIÓN MULTITICKET
-        if (idsGenerados.length > 0) {
-            const listaIds = idsGenerados.join(',');
 
-            // Configuramos el ancho del ticket (450px es ideal para que no se vea pegado)
-            const ancho = 450;
-            const alto = window.screen.height * 0.8; // 80% de la altura de la pantalla
-            
-            // Calculamos la posición horizontal centrada
-            const left = (window.screen.width / 2) - (ancho / 2);
-            const top = 50; // Un poco de margen superior
+        // SI HAY ERRORES NO IMPRIMIR
 
-            const winPrint = window.open(
-                "/imprimir/index2.php?IdDocVenta=" + listaIds,
-                "ImpresionPOS",
-                `width=${ancho},height=${alto},left=${left},top=${top},noopener,scrollbars=yes`
+        if (errores.length > 0) {
+            console.error("Errores detectados:", errores);
+            this.$toasted.error(`Fallaron ${errores.length} empresas. No se imprimió.`);
+            this.inProgress = false;
+            this.loading = false;
+            return;
+        }
+
+        // DISPARAR IMPRESIÓN
+        if (ventasGeneradas.length > 0) {
+            let left = (screen.width / 2) - (400 / 2);
+            let top = (screen.height / 2) - (400 / 2);
+            let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=350,height=350,top=${top},left=${left}`;
+
+            const basePrintUrl = "http://localhost:5000";
+
+            const respImpresion = await this.axios.post(
+                `${basePrintUrl}/imprimir/guardar_impresion.php`,
+                {
+                    ventas: ventasGeneradas
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    timeout: 15000
+                }
             );
 
-            // USO 1: Verificar si los Pop-ups están bloqueados
-            if (!winPrint || winPrint.closed || typeof winPrint.closed == 'undefined') {
-                this.$toasted.error("¡Atención! El navegador bloqueó la ventana de impresión.");
-            } else {
-                this.$toasted.success("Enviando a impresión...");
-                
-                // USO 2: Forzar el foco (traer al frente)
-                winPrint.focus();
+            if (!respImpresion.data || !respImpresion.data.archivo) {
+                this.$toasted.error("No se pudo preparar la impresión");
+                this.inProgress = false;
+                this.loading = false;
+                return;
             }
-            
+
+            const archivo = respImpresion.data.archivo;
+
+            const ventanaImpresion = window.open(
+                `${basePrintUrl}/imprimir/getdata.php?archivo=${encodeURIComponent(archivo)}`,
+                "ImpresionDirecta",
+                params
+            );
+
+            if (!ventanaImpresion) {
+                this.$toasted.show("El navegador bloqueó la ventana de impresión");
+                this.inProgress = false;
+                this.loading = false;
+                return;
+            }
+
+            this.limpiarCart();
+
             setTimeout(() => {
-                window.location.reload(); 
-            }, 3000);
+                window.location.reload();
+            }, 2500);
         }
 
     } catch (error) {
-        console.error(error);
-        this.$toasted.error("Error en el proceso multiempresa");
+        console.error("Error Multiempresa:", error);
+        this.$toasted.error("Error al procesar una de las ventas");
     } finally {
         this.inProgress = false;
         this.loading = false;
     }
-},
+
+    if (errores.length > 0) {
+    this.$toasted.error(`Fallaron ${errores.length} empresas. No se imprimió.`);
+    return;
+    }
+  },
     emitirauto(idDocVenta, id_empresa) {
       this.axios
-        .post(this.API + "emitirauto?id_empresa=" + this.empresa, {
-          IdDocVenta: idDocVenta
+        .post(this.API + "emitirauto?id_empresa=" + id_empresa, {
+          IdDocVenta: idDocVenta,
+          IdEmpresa: id_empresa
         })
         .then(response => {
           if (response.data.success) {
