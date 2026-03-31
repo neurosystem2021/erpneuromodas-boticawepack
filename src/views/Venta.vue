@@ -14,7 +14,7 @@
                     :id="`inputTipoVenta${index}`"
                     :url="API + 'ventas/tipos'"
                     anchor="TipoDoc"
-                    initValue="BOLETA ELEC."
+                    initValue="NOTA DE VENTA"
                     class="font-weight-bold"
                     label="writer"
                     placeholder=""
@@ -404,8 +404,7 @@
                                     <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                   </td>
                                   <td>
-                                    <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - $event.target.value)"/>
+                                    <input class="form-control" v-model.number="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="recalcularEfectivo()" />
                                   </td>
                                   </tr>
                                   <tr>
@@ -415,8 +414,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model.number="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="recalcularEfectivo()" />
                                     </td>
                                   </tr>
                                   <tr>
@@ -426,9 +424,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input
-                                        class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                         @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.visa.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model.number="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="recalcularEfectivo()" />
                                     </td>
                                   </tr>
                                 </tbody>
@@ -2074,12 +2070,32 @@ export default {
 
           this.ventas.productos = [];
 
-          response.data.forEach(element => {
-            this.setProducto(element);
+          response.data.forEach(async element => {
+            console.log("Presentacion", element.Presentacion);
+            element.Descripcion = element.Presentacion;
+            let productoStock = await this.obtenerStockBuscador(
+              element.IdProducto
+            );
+            element.stock =
+              Object.keys(productoStock).length > 0 ? productoStock.stock : 0;
+            this.ventas[this.ventaActiva].productos.push(element);
+            // this.setProducto(element);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.metodoPagoCambio(1);
+            }, 1000);
+          });
         });
+    },
+    setMotivo(ev) {
+      if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
+        this.bloquearInput = true;
+      } else {
+        this.bloquearInput = false;
+      }
     },
     someMethod(text) {
       this.someMethod = text;
@@ -2196,19 +2212,41 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
+
+    recalcularEfectivo() {
+        this.$nextTick(() => {
+            const venta = this.ventas[this.ventaActiva];
+            const totalVenta = parseFloat(this.getTotal());
+            
+            // Sumamos todos los montos que NO son efectivo
+            const otrosPagos = 
+                parseFloat(venta.pago.visa.monto || 0) + 
+                parseFloat(venta.pago.mastercard.monto || 0) + 
+                parseFloat(venta.pago.delivery.monto || 0);
+
+            // El efectivo es la diferencia (redondeado a 2 decimales)
+            const nuevoEfectivo = totalVenta - otrosPagos;
+            venta.pago.efectivo.monto = parseFloat(nuevoEfectivo).toFixed(2);
+        });
+    },
+
     metodoPagoCambio(tipo = null) {
-      console.log("top", tipo);
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
+        const pagoActual = this.ventas[this.ventaActiva].pago;
+        const total = this.getTotal();
+          metodos.forEach(metodo => {
+              pagoActual[metodo].monto = 0;
+          });
+
+            // 2. Asignamos el ID de método de pago principal a la venta
+            this.ventas[this.ventaActiva].idMetodoPago = tipo;
+
+            // 3. Si se seleccionó uno, le asignamos el total completo
+            if (tipo && metodos[tipo - 1]) {
+                pagoActual[metodos[tipo - 1]].monto = parseFloat(total).toFixed(2);
+            }
         });
-        if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
-        }
-      });
     },
     // recalcularMontos(tipo, monto) {
     //   const metodos = ["efectivo", "visa", "mastercard", "delivery"];
@@ -2391,8 +2429,10 @@ export default {
 
         return;
       }
+      const esNotaCredito = venta.tipoVenta.CodSunat == "07";
       console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
       if (
+        !esNotaCredito &&
         productos.some(
           v =>
             v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
@@ -2687,7 +2727,8 @@ export default {
       });
     },
     obtenerMonto(valor) {
-      return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
+        let n = parseFloat(valor);
+        return isNaN(n) ? 0 : n;
     },
     cargarProforma(proforma) {
       console.log(proforma);
