@@ -2210,6 +2210,9 @@ export default {
                     objetoVenta.Deposito = this.venta.Deposito || 0;
                     objetoVenta.TieneIgv = this.venta.TieneIgv || objetoVenta.TieneIgv || 0;
 
+                    const cantidadEmpresasConVenta = this.lstTotalPorEmpresa.filter(emp => parseFloat(emp.total) > 0).length;
+                    objetoVenta.TotalGeneral = cantidadEmpresasConVenta > 1 ? this.sumatoriaTotal : null;
+
                     // EXTRA
                     objetoVenta.Puntos = this.venta.Puntos || 0;
                     objetoVenta.UsuarioReg = (this.venta.vendedor && this.venta.vendedor.Usuario)
