@@ -53,7 +53,7 @@
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proformaticket/' + data.item.IdProforma + '&empresa=' + empresaselec" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proformaticket/' + data.item.IdProforma + '?empresa=' + empresaselec" variant="primary" target="_blank">Ver Ticket</b-button>
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">

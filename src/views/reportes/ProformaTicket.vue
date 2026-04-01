@@ -1,9 +1,9 @@
 <template>
   <b-row>
     <b-container class="ticket">
-        <center><img src="/resources/images/logo-ticket.png" style="max-width:100%; width: 40mm" alt="img-logo-ticket-empresa"></center>
-        <center><p style="font-weight: bold;">COMERCIALIZADORA MIGUELITO S.A.C.</p></center>
-        <center><p style="font-weight: bold;">RUC: 20486408422</p></center>
+        <center><img src="/resources/images/logoventa.png" style="max-width:100%; width: 40mm" alt="img-logo-ticket-empresa"></center>
+        <center><p style="font-weight: bold;">{{ empresa.RAZONSOCIAL }}</p></center>
+        <center><p style="font-weight: bold;">RUC: {{ empresa.RUC }}</p></center>
         <p><b>PROFORMA NRO:</b> {{ proforma.Numero }}</p>
         <p><b>FECHA:</b> {{ proforma.FechaReg }}</p>
         <p><b>VALIDEZ POR:</b> {{ proforma.DiasValidos }}  DIAS</p>
@@ -52,8 +52,8 @@
          <center>
 
            <p>
-             JR. MIGUEL GRAU NRO. SN (FRENTE AL HOTEL PARAISO) PASCO - OXAPAMPA - CONSTITUCION
-             PASCO - OXAPAMPA - CONSTITUCION
+             JR. INDEPENDENCIA NRO. 1047 (A 1 CDRA COLEGIO PEDRO PORTILLO)
+             UCAYALI - CORONEL PORTILLO - CALLERIA
             </p>
             <p>
               GRACIAS POR SU PREFERENCIA
@@ -92,14 +92,11 @@ export default {
     }
   },
   async mounted() {
-    console.log("Componente mondato");
-    let r = "";
 
     const hash = location.hash;
-
     const params = new URLSearchParams(hash.split("?")[1]);
 
-    const id_empresa = params.get("id_empresa");
+    const id_empresa = params.get("empresa") || 1;
 
     this.id_empresa = id_empresa;
 
@@ -224,13 +221,13 @@ export default {
     },
     getEmpresa() {
       this.axios
-        .get(API + "empresa/id/" + 1, {
-          params: {
-            id_empresa: this.id_empresa
-          }
-        })
+      .get(API + "empresa/id/" + this.id_empresa)
         .then(res => {
-          this.empresa = res.data;
+          this.empresa = {
+            RAZONSOCIAL: res.data.RAZONSOCIAL,
+            RUC: res.data.RUC,
+            ACRONYM: res.data.ACRONYM
+          };
         });
     },
     imprimir() {
