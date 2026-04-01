@@ -942,7 +942,7 @@ export default {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
-      obtenerStok: "obtenerStock",
+      // obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
@@ -1244,7 +1244,7 @@ export default {
           });
           this.venta.NotaIdMotivo = null;
           this.bloquearInput = true;
-          this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+          // this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
         });
     },
     setDocRefConsumo(obj) {
@@ -1310,7 +1310,7 @@ export default {
     loadPuntoVenta(id) {
       this.axios.get(this.API + "puntoventa/id/" + id).then(res => {
         this.setPuntoVenta(res.data);
-        this.getNumeroVenta();
+        // this.getNumeroVenta();
       });
     },
     getTipoDoc(id) {
@@ -1457,9 +1457,9 @@ export default {
       this.venta.pago.mastercard.monto = 0;
       this.venta.pago.transferencia.monto = 0;
       this.actualizarDescuento();
-      this.obtenerStok({
-        IdAlmacen: this.venta.almacen.IdAlmacen
-      });
+      // this.obtenerStok({
+      //   IdAlmacen: this.venta.almacen.IdAlmacen
+      // });
     },
     actualizarDescuento() {
       this.venta.pago.visa.monto = 0;
@@ -1494,6 +1494,14 @@ export default {
       this.aplicarDescuento(val);
     },
     getNumeroVenta() {
+      if (
+          !this.venta.puntoVenta || 
+          !this.venta.puntoVenta.IdDocVentaPuntoVenta || 
+          !this.venta.tipoVenta || 
+          !this.venta.tipoVenta.IdTipoDoc
+        ) {
+          return;
+        }
       this.axios
         .get(this.API + "ventas/numero", {
           params: {
