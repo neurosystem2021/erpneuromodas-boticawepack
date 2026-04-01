@@ -2,8 +2,8 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img :src="`/resources/images/banner-proforma.jpg`">
-			</div>
+        <img :src="bannerEmpresa">
+      </div>
 			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
@@ -123,7 +123,7 @@
         </tfoot>
       </table>
       <div id="accounts" style="margin-top:-10px; font-weight:bold;">
-        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
+        <img style="max-width: 100%" :src="cuentasEmpresa" />
       </div>
       <br>
       <div id="notices">
@@ -187,7 +187,7 @@ export default {
 
     const params = new URLSearchParams(hash.split("?")[1]);
 
-    const id_empresa = params.get("id_empresa");
+    const id_empresa = params.get("empresa");
 
     this.id_empresa = id_empresa;
 
@@ -213,6 +213,20 @@ export default {
         sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
       });
       return sumatoria;
+    },
+    bannerEmpresa() {
+    const acronym = this.empresa && this.empresa.ACRONYM
+      ? this.empresa.ACRONYM.trim().toUpperCase()
+      : "MODASM";
+    return `/resources/images/empresas/${acronym}/banner-proforma.jpg`;
+    },
+
+    cuentasEmpresa() {
+    const acronym = this.empresa && this.empresa.ACRONYM
+      ? this.empresa.ACRONYM.trim().toUpperCase()
+      : "MODASM";
+
+    return `/resources/images/empresas/${acronym}/cuentas.png`;
     }
   },
   methods: {
@@ -256,15 +270,13 @@ export default {
       date.setDate(date.getDate() + (dias - 1));
       return date;
     },
+
     getEmpresa() {
       this.axios
-        .get(API + "empresa/id/" + 1, {
-          params: {
-            id_empresa: this.id_empresa
-          }
-        })
+        .get(API + "empresa/id/" + this.id_empresa)
         .then(res => {
           this.empresa = res.data;
+          console.log("EMPRESA CARGADA:", this.empresa);
         });
     },
     imprimir() {
