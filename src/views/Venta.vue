@@ -2123,11 +2123,12 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
-      let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+      let productosVenta = this.ventas[this.ventaActiva].productos;
+      let cantidadASumar = parseFloat(producto.CantidadVenta || 1);
+      let itemExistente = productosVenta.find(v => v.IdProducto == producto.IdProducto);
+
+      if (itemExistente) {
+        itemExistente.cantidad = parseFloat(itemExistente.cantidad) + cantidadASumar;
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
@@ -2150,7 +2151,7 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.cantidad = 1;
+      prod.cantidad = cantidadASumar; 
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
@@ -2159,13 +2160,14 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      productos.unshift(prod);
+      productosVenta.unshift(prod);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
       this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
+      this.irTxtLoadBarcode();
     },
     irAlPrimerProducto(event) {
       if (event) {

@@ -3,20 +3,59 @@
     <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
-    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" modal-class="modal-fullscreen-custom" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="6">
-          <b-form-group>
-            <label>Código barra:</label>
-            <b-form-input 
-              ref="inputCodigoBarra"
-              v-model="producto.CodigoBarra"
-              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
-              type="text"
-              class="form-control upper"
-              ></b-form-input>
-              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
-          </b-form-group>
+           <b-form-group>
+              <label>Código barra principal:</label>
+              <b-input-group>
+                <b-form-input ref="inputCodigoBarra"
+                  v-model="producto.CodigoBarra"
+                  @input="(val) => producto.CodigoBarra = val && val.toUpperCase()" type="text"
+                  class="form-control upper"></b-form-input>
+                <b-input-group-append>
+                  <b-btn variant="outline-primary" @click="agregarFilaCodigo">
+                    <b>+</b>
+                  </b-btn>
+                </b-input-group-append>
+              </b-input-group>
+              <b-form-text>Código principal de la tabla Gen_Producto</b-form-text>
+            </b-form-group>
+
+            <div v-if="listaExtras.length > 0" class="mb-2 p-2 border rounded bg-light">
+              <b-row class="small font-weight-bold text-center mb-1">
+                <b-col md="5">Código adicional</b-col>
+                <b-col md="4">Peso</b-col>
+                <b-col md="2">Imp.</b-col>
+                <b-col md="2"></b-col>
+              </b-row>
+
+              <div v-for="(item, index) in listaExtras" :key="'extra-' + index" class="mb-1">
+                <b-row no-gutters align-v="center">
+                  <b-col md="6" class="pr-1">
+                    <b-form-input v-model="item.codigo" size="sm" placeholder="Codigo" class="upper"></b-form-input>
+                  </b-col>
+
+                  <b-col md="3" class="pr-1">
+                    <b-form-input v-model="item.cantidad" size="sm" type="number" step="0.01"></b-form-input>
+                  </b-col>
+
+                  <b-col md="1" class="text-center">
+                    <b-btn v-if="producto.IdProducto" variant="info" size="sm" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto +
+                      '&cantidad=' + (item.cantidad || 1) +
+                      '&codigoExtra=' + producto.CodigoBarra + item.codigo">
+                      <i class="fa fa-print"></i>
+                    </b-btn>
+                  </b-col>
+
+                  <b-col md="1" class="text-right">
+                    <b-btn variant="danger" size="sm" @click="listaExtras.splice(index, 1)">
+                      <i class="fa fa-trash"></i>
+                    </b-btn>
+                  </b-col>
+                </b-row>
+              </div>
+            </div>
           <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
@@ -492,6 +531,7 @@ export default {
       show: false,
       // generos: ['VARON', 'DAMA', 'NIÑO', 'NIÑA', 'UNISEX', 'JUNIOR'],
       producto: {},
+      listaExtras: [],
       productosDet: [],
       file: "",
       manterproducto: {
@@ -594,6 +634,16 @@ export default {
             this.producto.MasMovido = newVal.MasMovido;
             this.producto.TienePresentacion = newVal.TienePresentacion;
             this.producto.Imagen = newVal.Imagen;
+            if (newVal.CodigosExtras) {
+            let extrasRaw = Array.isArray(newVal.CodigosExtras) 
+                            ? newVal.CodigosExtras 
+                            : JSON.parse(newVal.CodigosExtras || "[]");
+
+            this.listaExtras = extrasRaw.map(c => ({
+                codigo: (typeof c.CodigoBarra === 'object') ? '' : (c.CodigoBarra || c.codigo || ""), 
+                cantidad: c.Cantidad || c.cantidad || 0
+            }));
+        }
             if (newVal.PreciosPorProducto) {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
             } else {
@@ -618,6 +668,7 @@ export default {
         this.$refs.file.value = null;
         this.file = "";
         this.title = "Nuevo Producto";
+        this.listaExtras = [];
         this.clearForm();
         this.$refs.file.value = null;
         this.$refs.inputCodigoBarra.$el.disabled = false;
@@ -828,6 +879,52 @@ export default {
       this.producto.marca = obj;
       this.$refs.inputMarca.setValue(obj.ProductoMarca);
     },
+    editarProducto(id) {
+      this.axios.get(this.API + 'productos/id/' + id)
+        .then(res => {
+          this.producto = res.data;
+          
+          if (res.data.CodigosExtras && Array.isArray(res.data.CodigosExtras)) {
+            this.listaExtras = res.data.CodigosExtras.map(c => ({
+              codigo: c.CodigoBarra || "", 
+              cantidad: c.Cantidad || 0
+            }));
+          } else {
+            this.listaExtras = [];
+          }
+          
+          this.show = true;
+        });
+    },
+
+    agregarFilaCodigo() {
+      if (!this.producto.CodigoBarra || this.producto.CodigoBarra.trim() === "") {
+        this.$toasted.error("Ingrese primero el código de barra principal");
+        this.$refs.inputCodigoBarra.focus();
+        return;
+      }
+
+      let letraSufijo = String.fromCharCode(65 + this.listaExtras.length);
+      
+      let codigoAutomatico = this.producto.CodigoBarra.trim().toUpperCase() + letraSufijo;
+
+      this.listaExtras.push({ 
+        codigo: codigoAutomatico, 
+        cantidad: 0 
+      });
+    },
+
+    removerFilaCodigo(index) {
+      this.producto.CodigosExtras.splice(index, 1);
+    },
+
+    setProductoParaEditar(item) {
+      this.producto = { ...item };
+      if (!this.producto.CodigosExtras) {
+        this.$set(this.producto, 'CodigosExtras', []);
+      }
+      this.show = true;
+    },
     /* setModelo (obj) {
       this.producto.modelo = obj
       this.$refs.inputModelo.setValue(obj.ProductoModelo)
@@ -865,6 +962,7 @@ export default {
         ProductoDesc2: "",
         ProductoDesc3: "",
         CodigoBarra: "",
+        CodigosExtras: [],
         // Color: '',
         PorcentajeUtilidad: 0,
         ControlaStockMinimo: 0,
@@ -903,66 +1001,52 @@ export default {
     guardarProducto(e) {
       e.preventDefault();
 
-      // Agregar producto DET
-      if (this.showProductoDet) {
-        this.producto.productosDet = this.$refs.productoDet.productos;
+      let productoParaEnviar = JSON.parse(JSON.stringify(this.producto));
+      productoParaEnviar.CodigosExtras = this.listaExtras
+        .filter(item => item.codigo && item.codigo.trim() !== "") // Solo los que tienen un código escrito
+        .map(item => ({
+          codigo: item.codigo.trim().toUpperCase(),
+          cantidad: parseFloat(item.cantidad) || 0
+        }));
+      if (productoParaEnviar.precios) {
+        productoParaEnviar.precios.forEach(pre => {
+          pre.cantidad = (pre.cantidad === "" || pre.cantidad == null) ? 0 : pre.cantidad;
+        });
       }
-      // console.log(JSON.stringify(this.producto))
-      this.producto.precios.map(pre => {
-        if (pre.cantidad == "") {
-          pre.cantidad = 0;
-        }
-        if (pre.precio == "") {
-          pre.precio = 0;
-        }
-      });
-      this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
+      productoParaEnviar.CodigoBarra = ("" + (productoParaEnviar.CodigoBarra || "")).trim();
+
       this.axios
         .post(this.API + "productos", {
-          ...this.producto,
-          PreciosPorProducto: this.producto.precios
+          ...productoParaEnviar,
+          PreciosPorProducto: productoParaEnviar.precios
         })
         .then(response => {
-          if (this.cbGuardar) {
-            this.cbGuardar(
-              this.producto.IdProducto ? this.producto : response.data.insertId,
-              this.producto.precios
-            );
-          }
           if (response.data.error) {
-            this.$toasted.show(
-              response.data.error + " - " + response.data.codigoBarra
-            );
+            this.$toasted.show(response.data.error);
             return;
-          } else {
-            this.$toasted.info("Producto guardado correctamente");
           }
 
-          // this.initForm()
-          // this.producto.talla = {}
-          // this.$refs.inputTalla.setValue('')
+          this.$toasted.info("Producto guardado correctamente");
 
-          //INSERTANDO IMAGEN
-          let formData = new FormData();
-          formData.append("imagen", this.file);
+          this.listaExtras = [];
 
-          this.axios({
-            method: "post",
-            url: this.API + "producto/imagen/" + response.data.insertId,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" }
-          }).then(res => {
-            // console.log(res);
-            this.$refs.file.value = null;
-            this.file = "";
-          });
+          if (this.file) {
+            let formData = new FormData();
+            formData.append("imagen", this.file);
+            this.axios({
+              method: "post",
+              url: this.API + "producto/imagen/" + (response.data.insertId || productoParaEnviar.IdProducto),
+              data: formData,
+              headers: { "Content-Type": "multipart/form-data" }
+            });
+          }
 
           this.$refs.productoForm.hide();
           this.$emit("productoactualizado");
         })
         .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          console.error(error);
+          this.$toasted.show("Error al guardar");
         });
     },
     focusAutocomplete(ref) {
@@ -1063,4 +1147,17 @@ export default {
 };
 </script>
 <style>
+@media (min-width: 1200px) {
+  .modal-fullscreen-custom .modal-dialog {
+    max-width: 75% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .modal-fullscreen-custom .modal-dialog {
+    max-width: 55% !important;
+  }
+}
 </style>
