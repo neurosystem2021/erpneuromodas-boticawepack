@@ -37,7 +37,12 @@
                   </b-col>
 
                   <b-col md="3" class="pr-1">
-                    <b-form-input v-model="item.cantidad" size="sm" type="number" step="0.01"></b-form-input>
+                    <b-form-input 
+                      v-model="item.cantidad" 
+                      size="sm" 
+                      type="text" 
+                      @keypress="soloNumerosYDecimales"
+                    ></b-form-input>
                   </b-col>
 
                   <b-col md="1" class="text-center">
@@ -685,6 +690,16 @@ export default {
     }
   },
   methods: {
+    soloNumerosYDecimales(evt) {
+      const charCode = (evt.which) ? evt.which : evt.keyCode;
+      if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+        evt.preventDefault();
+      } else {
+        if (charCode === 46 && this.item.cantidad.includes('.')) {
+          evt.preventDefault();
+        }
+      }
+    },
     handleFileUpload() {
       const file = this.$refs.file.files[0];
       this.file = "";

@@ -2319,49 +2319,48 @@ export default {
       });
       return res;
     },
+    redondear(valor) {
+      return Math.ceil(valor * 10) / 10;
+    },
     getSubTotalDetalle(prod) {
       let subtotal = prod.cantidad * prod.precio;
-      return subtotal;
+      return this.redondear(subtotal);
     },
+
     getTotalDetalle(prod) {
-      let total = prod.cantidad * prod.precio - prod.descuento;
-      return total;
+      let total = (prod.cantidad * prod.precio) - prod.descuento;
+      return this.redondear(total);
     },
     getSubTotal() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          return total + parseFloat(prod.cantidad * prod.precio);
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+      let productos = [...this.ventas[this.ventaActiva].productos];
+      if (productos.length === 0) return "0.0";
+
+      let sumatoria = productos.reduce((acc, p) => {
+        return acc + (p.cantidad * p.precio);
+      }, 0);
+
+      return this.redondear(sumatoria).toFixed(1);
     },
     getDescuento() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          return total + parseFloat(prod.descuento);
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+      let productos = [...this.ventas[this.ventaActiva].productos];
+      if (productos.length === 0) return "0.0";
+
+      let totalDescuento = productos.reduce((acc, p) => {
+        return acc + parseFloat(p.descuento || 0);
+      }, 0);
+
+      return this.redondear(totalDescuento).toFixed(1);
     },
+
     getTotal() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          // console.log(prod);
-          return (
-            total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
-          );
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+      let productos = [...this.ventas[this.ventaActiva].productos];
+      if (productos.length === 0) return "0.0";
+
+      let totalVenta = productos.reduce((acc, p) => {
+        return acc + (p.cantidad * p.precio - p.descuento);
+      }, 0);
+
+      return this.redondear(totalVenta).toFixed(1);
     },
     setOpcionVenta(opc) {
       this.ventas[this.ventaActiva].nombreLlevar = "";
