@@ -1707,7 +1707,7 @@ export default {
     setPuntoVenta(obj) {
       this.venta.puntoVenta = obj;
       this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
-      this.getNumeroVenta();
+      //this.getNumeroVenta();
     },
     getVendedor(user) {
       let usuario = sessionStorage.getItem("User");
@@ -1883,22 +1883,28 @@ export default {
       this.aplicarDescuento(val);
     },
     getNumeroVenta() {
-      this.axios
-        .get(this.API + "ventas/numero", {
-          params: {
-            idPuntoVenta: this.venta.puntoVenta.IdDocVentaPuntoVenta,
-            idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-            id_empresa: this.empresa
-          }
-        })
-        .then(response => {
-          this.venta.Serie = response.data.serie;
-          this.venta.Numero = response.data.numero;
-        })
-        .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-        });
+      this.usuario = sessionStorage.getItem("User");
+
+      if (!this.usuario) {
+        console.error("Usuario no definido");
+        return;
+      }
+
+      this.axios.get(this.API + "ventas/numero", {
+        params: {
+          usuario: this.usuario,
+          idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+          id_empresa: this.empresa
+        }
+      })
+      .then(response => {
+        this.venta.Serie = response.data.serie;
+        this.venta.Numero = response.data.numero;
+        this.setPuntoVenta(response.data.puntoVenta);
+      })
+      .catch(error => {
+        console.log(error);
+      });
     },
     updateTime() {
       this.venta.FechaDoc = this.$moment().format("YYYY-MM-DDTH:mm:ss");
@@ -2270,6 +2276,7 @@ export default {
 
         // DISPARAR IMPRESIÓN
         if (ventasGeneradas.length > 0) {
+           this.limpiarCart();
             let left = (screen.width / 2) - (400 / 2);
             let top = (screen.height / 2) - (400 / 2);
             let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=350,height=350,top=${top},left=${left}`;
@@ -2311,7 +2318,7 @@ export default {
                 return;
             }
 
-            this.limpiarCart();
+            
 
             setTimeout(() => {
                 window.location.reload();
@@ -2489,11 +2496,16 @@ export default {
     },
     //Fin Sockets
     async obtenerSerie(empresa) {
-      let res = await this.axios(
-        `${this.API}/ventas/numero?idPuntoVenta=${
-          this.venta.puntoVenta.IdDocVentaPuntoVenta
-        }&idTipoDoc=${this.venta.tipoVenta.IdTipoDoc}&id_empresa=${empresa}`
-      );
+      this.usuario = sessionStorage.getItem("User");
+
+      let res = await this.axios.get(`${this.API}/ventas/numero`, {
+        params: {
+          usuario: this.usuario,
+          idTipoDoc: this.venta.tipoVenta.IdTipoDoc,
+          id_empresa: empresa
+        }
+      });
+
       return res.data;
     },
     async obtenerAlmacen(empresa) {
