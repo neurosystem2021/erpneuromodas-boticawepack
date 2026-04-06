@@ -2141,6 +2141,20 @@ export default {
         return;
       }
 
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        errores.forEach(p => {
+          this.$toasted.show(`El producto "${p.Producto}" tiene precio inválido`);
+        });
+
+        this.inProgress = false;
+        return;
+      }  
+
       if (!venta.cliente.DniRuc) {
         //this.$toasted.show('Debe seleccionar un cliente.')
         this.$swal({
