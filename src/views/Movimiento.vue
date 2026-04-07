@@ -477,7 +477,7 @@ export default {
         EsCredito: 0,
         alterarProductos: 1,
         FechaVenCredito: "",
-        Moneda: "USD",
+        Moneda: "PEN",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
         // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
