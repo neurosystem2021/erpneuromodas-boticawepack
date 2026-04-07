@@ -300,6 +300,14 @@
               Tiene Presentacion
             </b-form-checkbox>
           </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
+                   v-model="producto.Kilage"
+                   :value="1"
+                   :unchecked-value="0">
+              Es Kilage
+            </b-form-checkbox>
+          </b-form-group>
           <b-form-group  v-if="false">
             <label>Activar Proyecto:</label>
             <b-form-checkbox
@@ -638,6 +646,7 @@ export default {
             this.producto.ControlaStock = newVal.ControlaStock;
             this.producto.MasMovido = newVal.MasMovido;
             this.producto.TienePresentacion = newVal.TienePresentacion;
+            this.producto.Kilage = newVal.Kilage;
             this.producto.Imagen = newVal.Imagen;
             if (newVal.CodigosExtras) {
             let extrasRaw = Array.isArray(newVal.CodigosExtras) 
@@ -984,6 +993,7 @@ export default {
         MasMovido: 0,
         StockMinimo: 0,
         TienePresentacion: 0,
+        Kilage: 0,
         StockPorMayor: 0,
         PrecioContado: 0,
         PrecioPorMayor: 0,

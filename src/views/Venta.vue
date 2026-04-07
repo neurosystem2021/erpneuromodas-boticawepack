@@ -1886,21 +1886,44 @@ export default {
     },
 
     async loadBarcode(e) {
-      if (e) {
-        e.preventDefault();
-      }
-      let idProducto = this.loadCode;
+      if (e) e.preventDefault();
+      
+      let rawCode = this.loadCode.trim();
+      let idBusqueda = rawCode;
+      let pesoExtraido = null;
 
-      let prod = await this.axios.get(this.API + "productos/id/" + idProducto, {
-        params: {
-          codigoBarra: this.loadCode
-        }
-      });
-      if (prod.data) {
-        this.setProducto(prod.data);
-      } else {
-        this.$toasted.show("No se encontró ningun producto");
+      // Lógica de Balanza: Prefijo 2 y longitud de 13 dígitos
+      if (rawCode.startsWith('2') && rawCode.length === 13) {
+        // 2 000063 00295 7
+        // Los dígitos del 1 al 7 son el código del producto (000063)
+        idBusqueda = rawCode.substring(1, 7);
+        
+        // Los dígitos del 7 al 12 son el peso (00295) -> 0.295
+        let pesoString = rawCode.substring(7, 12); 
+        pesoExtraido = parseFloat(pesoString) / 1000;
+        
+        console.log("Detectado código de balanza:", { idBusqueda, pesoExtraido });
       }
+
+      try {
+        let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
+          params: { codigoBarra: idBusqueda }
+        });
+
+        if (prod.data) {
+          // Si extrajimos un peso de la balanza, se lo inyectamos al objeto
+          // para que setProducto sepa que esa es la cantidad
+          if (pesoExtraido !== null) {
+            prod.data.CantidadVenta = pesoExtraido;
+          }
+          this.setProducto(prod.data);
+        } else {
+          this.$toasted.show("No se encontró ningún producto");
+        }
+      } catch (error) {
+        this.$toasted.show("Error al buscar producto");
+      }
+
       this.loadCode = "";
     },
     startRecognition() {
