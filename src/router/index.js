@@ -21,6 +21,14 @@ import Proforma from "@/views/reportes/Proforma.vue";
 import Kardex from "@/views/reportes/Kardex.vue";
 import ClientesVip from "@/views/reportes/ClientesVip.vue";
 
+//REPORTES NUEVOS
+import Vencimiento from "@/views/reportes/Vencimiento.vue";
+import Estadisticas from "@/views/reportes/Estadisticas.vue";
+import Dashboard from "@/views/reportes/Dashboard.vue";
+import DeudaClientes from "@/views/reportes/DeudaClientes.vue";
+import StockMinimo from "@/views/reportes/StockMinimo.vue";
+import ProductoVencido from "@/views/reportes/ProductoVencido";
+
 import Remision from "@/views/Remision.vue";
 import RemisionLista from "@/views/RemisionLista.vue";
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -139,6 +147,36 @@ export default new Router({
       path: "/reporte/confrontacion",
       name: "Confrontacion",
       component: Confrontacion
+    },
+    {
+      path: "/reportes/vencimiento",
+      name: "Vencimiento",
+      component: Vencimiento
+    },
+    {
+      path: "/reportes/estadisticas",
+      name: "Estadisticas",
+      component: Estadisticas
+    },
+    {
+      path: "/reportes/dashboard",
+      name: "Dashboard",
+      component: Dashboard
+    },
+    {
+      path: "/reportes/stockminimo",
+      name: "StockMinimo",
+      component: StockMinimo
+    },
+        {
+      path: "/reportes/deudaclientes",
+      name: "DeudaClientes",
+      component: DeudaClientes
+    },
+    {
+      path: "/ProductoVencido",
+      name: "ProductoVencido",
+      component: ProductoVencido
     }
   ]
 });
