@@ -2746,6 +2746,9 @@ export default {
       }
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
+      this.$nextTick(() => {
+        this.irTxtLoadBarcode();
+      });
     },
     probarImpresora() {
       if (

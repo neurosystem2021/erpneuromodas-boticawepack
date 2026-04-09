@@ -1211,6 +1211,7 @@ export default {
       let autocompleteInput = document.getElementById(inputElement);
       autocompleteInput.focus();
     });
+    this.irTxtLoadBarcode();
   },
   methods: {
     toggleMetodoPago(index) {
@@ -1836,6 +1837,7 @@ export default {
       if (pres.length == 0) {
         productos.unshift(prod);
         this.bloquearVenta = false;
+        this.irTxtLoadBarcode();
         return;
       }
       this.showPresentacion(prod, null);
@@ -1844,6 +1846,17 @@ export default {
       //   this.irTxtLoadBarcode();
       // });
       this.metodoPagoCambio(1);
+    },
+    irTxtLoadBarcode() {
+      this.$nextTick(() => {
+        // Usamos el ID exacto que tienes en tu template
+        const inputId = `txtCodeBar${this.ventaActiva}`;
+        const element = document.getElementById(inputId);
+        if (element) {
+          element.focus();
+          element.select(); // Opcional: selecciona el texto si hubiera algo
+        }
+      });
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
@@ -2645,6 +2658,7 @@ export default {
 
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
+      this.irTxtLoadBarcode();
     },
     probarImpresora() {
       if (
