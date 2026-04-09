@@ -377,7 +377,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(deuda,index) in lstAplicado" :key="index">
+                      <tr v-for="(deuda,index) in documentosAplicadosVista" :key="index">
                         <td>{{deuda.Id}}</td>
                         <td>{{deuda.FechaDoc}}</td>
                         <td>{{deuda.FechaCredito}}</td>
@@ -392,10 +392,10 @@
                         </td>
                         <td style="border: 1px solid #ffffff;">
                           {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Aplicado)
-                          },0)
-                          ).toFixed(2) }}
+                              lstAplicado.reduce((sum,deuda)=>{
+                              return sum + parseFloat(deuda.Saldo)
+                            },0)
+                            ).toFixed(2) }}
                         </td>
                         <td>
                           {{  parseFloat(
@@ -555,6 +555,7 @@ export default {
       TipoCajaBanco: "",
       lstDeudas: [],
       lstAplicado: [],
+      lstPagados: [],
       aplicarLetra: false
     };
   },
@@ -566,6 +567,30 @@ export default {
   methods: {
     abrirModalNuevaOperacion() {
       this.modalRegistro = true;
+    },
+    async getClientePagos() {
+      if (!this.Cliente || !this.Cliente.IdCliente) {
+        this.lstPagados = [];
+        return;
+      }
+
+      await this.axios(
+        `${this.API}clientes/pagos2?idCliente=${this.Cliente.IdCliente}`
+      ).then(res => {
+        if (res.data) {
+          this.lstPagados = res.data.map(d => {
+            return {
+              Id: d.IdDocVenta,
+              FechaDoc: d.FechaDoc,
+              FechaCredito: d.FechaCredito,
+              Correlativo: d.Correlativo,
+              Total: d.TotalVenta,
+              Aplicado: d.TotalPagado,
+              Saldo: d.Saldo
+            };
+          });
+        }
+      });
     },
     addLetra() {
       this.nroLetras += 1;
@@ -639,6 +664,7 @@ export default {
     setCliente(obj) {
       this.Cliente = obj;
       this.getClienteDeudas();
+      this.getClientePagos(); 
     },
     setProveedor(obj) {
       this.Proveedor = obj;
@@ -1020,6 +1046,9 @@ export default {
       }
 
       return true;
+    },
+    documentosAplicadosVista() {
+      return [...this.lstAplicado, ...this.lstPagados];
     }
   }
 };
