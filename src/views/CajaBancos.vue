@@ -388,22 +388,22 @@
                       </tr>
                       <tr style="background: #BBDEFB; font-weight: bold;">
                         <td colspan="5" style="text-align: center; border: 1px solid #ffffff;">
-                          Sumatoria
+                          Sumatoria Aplicados
                         </td>
                         <td style="border: 1px solid #ffffff;">
-                          {{  parseFloat(
-                              lstAplicado.reduce((sum,deuda)=>{
-                              return sum + parseFloat(deuda.Saldo)
-                            },0)
-                            ).toFixed(2) }}
-                        </td>
-                        <td>
-                          {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Saldo)
+                        {{  parseFloat(
+                          documentosAplicadosVista.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Aplicado || 0)
                           },0)
-                          ).toFixed(2) }}
-                        </td>
+                        ).toFixed(2) }}
+                      </td>
+                      <td>
+                        {{  parseFloat(
+                          documentosAplicadosVista.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Saldo || 0)
+                          },0)
+                        ).toFixed(2) }}
+                      </td>
                       </tr>
                     </tbody>
                     </table>
@@ -592,6 +592,31 @@ export default {
         }
       });
     },
+
+    async getProveedorPagos() {
+    if (!this.Proveedor || !this.Proveedor.IdProveedor) {
+      this.lstPagados = [];
+      return;
+    }
+
+    await this.axios(
+      `${this.API}proveedores/pagos2?idProveedor=${this.Proveedor.IdProveedor}`
+    ).then(res => {
+      if (res.data) {
+        this.lstPagados = res.data.map(d => {
+          return {
+            Id: d.IdDocCompra,
+            FechaDoc: d.FechaDoc,
+            FechaCredito: d.FechaCredito,
+            Correlativo: d.Correlativo,
+            Total: d.TotalCompra,
+            Aplicado: d.TotalPagado,
+            Saldo: d.Saldo
+          };
+        });
+      }
+    });
+  },
     addLetra() {
       this.nroLetras += 1;
       this.generLetrasPorCantidadLetras();
@@ -669,6 +694,7 @@ export default {
     setProveedor(obj) {
       this.Proveedor = obj;
       this.getProveedorDeudas();
+      this.getProveedorPagos();
     },
     async getProveedorDeudas() {
       await this.axios(
@@ -731,8 +757,12 @@ export default {
       this.nroLetras = 0;
       this.aplicarLetra = true;
     },
-    guardarLetras() {
+    
+    async guardarLetras() {
       let val = true;
+      this.errorLetras = "";
+
+      // VALIDAR FECHAS
       this.letras.forEach(letra => {
         if (!letra.FechaLetra) {
           letra.errorFecha = "Fecha requerida";
@@ -742,26 +772,37 @@ export default {
         }
       });
 
+      // VALIDAR MONTOS
       let sumTotal = this.letras.reduce((sum, letra) => {
-        return sum + parseFloat(letra.MontoLetra);
+        return sum + parseFloat(letra.MontoLetra || 0);
       }, 0);
 
-      if (parseFloat(this.Saldo).toFixed(2) < parseFloat(sumTotal).toFixed(2)) {
+      if (parseFloat(this.deuda.Saldo).toFixed(2) < parseFloat(sumTotal).toFixed(2)) {
         val = false;
         this.errorLetras = "Defina correctamente el monto en cada Letra.";
       }
 
-      this.$forceUpdate();
-    },
-    async guardarLetras() {
+      if (!val) {
+        this.$forceUpdate();
+        return;
+      }
+
+      // GUARDAR
       let data = {
         Letras: this.letras,
         Tipo: this.Tipo
       };
+
       await this.axios.post(`${this.API}letras/generar`, data).then(res => {
         if (res.data) {
           this.aplicarLetra = false;
-          this.getProveedorDeudas();
+
+          // SEGÚN TIPO
+          if (this.Tipo == 0) {
+            this.getClienteDeudas();
+          } else {
+            this.getProveedorDeudas();
+          }
         }
       });
     },
