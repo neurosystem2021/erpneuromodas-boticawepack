@@ -4,14 +4,14 @@
     <b-container class="bv-example-row">
       <div>
           <div class="no-print">
-              <div class="float-left"  v-if="!this.$route.params.id">
+              <!-- <div class="float-left"  v-if="!this.$route.params.id">
                   <b-button-group size="sm">
                       <select class="form-control" v-model="empresa" @change="cambiarEmpresa" style="font-weight: bold; width: 350px">
                           <option value="imperiop1">FGOMEZ</option>
                           <option value="imperiop2">FGOMEZ</option>
                       </select>
                   </b-button-group>
-              </div>
+              </div> -->
               <b-row align-h="end" class=" no-print">
                     <!--<label v-if="!this.$route.params.id" >Vendedor:</label>
                 <b-col cols="3" v-if="!this.$route.params.id">
@@ -699,11 +699,11 @@ export default {
     }
   },
   methods: {
-    cambiarEmpresa () {
-        sessionStorage.setItem('empresa', this.empresa)
-        window.location.reload();
-        return false;
-    },
+    // cambiarEmpresa () {
+    //     sessionStorage.setItem('empresa', this.empresa)
+    //     window.location.reload();
+    //     return false;
+    // },
     getDetalles (idDocVenta) {
       let detalles = this.itemsDetalle.filter(item => item.IdDocVenta == idDocVenta)
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
