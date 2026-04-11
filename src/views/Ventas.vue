@@ -27,7 +27,7 @@
                       :id="`inputTipoVenta${index}`"
                       :url="API + 'ventas/tipos'"
                       anchor="TipoDoc"
-                      initValue="BOLETA ELEC."
+                      initValue="BOLETA/IGV ELEC."
                       class="font-weight-bold"
                       label="writer"
                       placeholder=""
@@ -941,8 +941,8 @@ export default {
         Observacion: "",
         comisionista: {},
         tipoVenta: {
-          IdTipoDoc: 10,
-          TipoDoc: "BOLETA ELEC.",
+          IdTipoDoc: 7,
+          TipoDoc: "BOLETA/IGV ELEC.",
           LimitItems: 0,
           CodSunat: "03"
         },
@@ -1002,8 +1002,8 @@ export default {
           cliente: {},
           comisionista: {},
           tipoVenta: {
-            IdTipoDoc: 10,
-            TipoDoc: "BOLETA ELEC.",
+            IdTipoDoc: 7,
+            TipoDoc: "BOLETA/IGV ELEC.",
             LimitItems: 0,
             CodSunat: "03"
           },
@@ -2082,21 +2082,21 @@ export default {
         this.loading = false;
         return;
       }
-      if (
-        venta.tipoVenta.IdTipoDoc != 12 &&
-        productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
-        this.$swal({
-          position: "center",
-          icon: "info",
-          title: "No se puede vender un producto sin stock.",
-          showConfirmButton: true,
-          confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
-          confirmButtonColor: "#0275d8"
-        });
-        this.loading = false;
-        return;
-      }
+      // if (
+      //   venta.tipoVenta.IdTipoDoc != 12 &&
+      //   productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
+      //   this.$swal({
+      //     position: "center",
+      //     icon: "info",
+      //     title: "No se puede vender un producto sin stock.",
+      //     showConfirmButton: true,
+      //     confirmButtonText: "Entiendo",
+      //     target: document.getElementById("conten"),
+      //     confirmButtonColor: "#0275d8"
+      //   });
+      //   this.loading = false;
+      //   return;
+      // }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
