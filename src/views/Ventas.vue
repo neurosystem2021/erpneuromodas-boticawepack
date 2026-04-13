@@ -769,7 +769,7 @@ export default {
             this.axios.get(this.API + 'puntoventa/id/' + id)
             .then(res => {
                 this.setPuntoVenta(res.data)
-                this.getNumeroVenta()
+                // this.getNumeroVenta()
             })
         },
         getTipoDoc (id) {
