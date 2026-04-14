@@ -1842,6 +1842,7 @@ export default {
       obj.cantidad = 1;
       obj.precio = obj.PrecioContado || 0;
       return obj;
+      this.loadClienteBarcode();
     },
     onAddProducto(obj) {
       this.actualizarDescuento();

@@ -1079,11 +1079,12 @@ export default {
 
         this.$emit("setProducto", { ...prod, stock: p.stock });
         setTimeout(() => {
-          this.loadCode = null;
+          this.loadCode = "";
           // document.getElementById("txtBarcode").focus();
-          let text = document.getElementById("txtCantidad0");
-          text.focus();
-          text.select();
+          let barCodeInput = document.getElementById("txtBarcode");
+          if (barCodeInput) {
+            barCodeInput.focus();
+          }
         }, 100);
       }
 
@@ -1214,11 +1215,12 @@ export default {
       this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {
-          let text = document.getElementById("txtCantidad0");
-          // let text = document.getElementById("txtCantidad0");
-          text.focus();
-          text.select();
-        }, 100);
+          let barCode = document.getElementById("txtBarcode");
+          if (barCode) {
+            barCode.focus();
+            barCode.select(); 
+          }
+        }, 150);
       });
     },
     setProductoCant(prod) {
@@ -1258,13 +1260,14 @@ export default {
       // this.actualizarProd(obj);
       this.$nextTick(() => {
         setTimeout(() => {
-          let text = document.getElementById("txtCantidadxPrecio0");
-          // let text = document.getElementById("txtCantidadxPrecio0");
-          text.focus();
-          text.select();
-        }, 100);
-      });
-    },
+            let barCode = document.getElementById("txtBarcode");
+            if (barCode) {
+              barCode.focus();
+              barCode.select();
+            }
+          }, 150);
+        });
+      },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
         this.precioCont = obj.PrecioContado;
