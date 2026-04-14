@@ -1,5 +1,5 @@
 <template>
-  <div :class="this.empresa">
+  <div :class="empresaClass">
     <!--<b-alert variant="warning" show class="text-center" v-if="this.$route.query.idPreOrden">Se está pagando la habitación HH</b-alert>-->
 
     <Menu v-if="false"></Menu>
@@ -1221,6 +1221,12 @@ export default {
 
       totalCart: state => state.cart.totalCart
     }),
+    empresaClass() {
+      const emp = this.$store.state.empresas.find(
+        e => e.IDEMPRESA == this.empresa
+      );
+      return emp ? emp.ACRONYM.toLowerCase() : "";
+    },
     empresasConTotal() {
       return this.lstTotalPorEmpresa.filter(e => e.total > 0);
     },
@@ -2564,18 +2570,19 @@ export default {
 }
 
 .modasm {
-  background: #eff9ff;
+  background: #F8FAFB;
 }
 .modasgio {
   background: #c1e7ff;
 }
 .modasjes {
-  background: #cdcdcd;
+  background: #D7F3F4;
 }
 .modasjun {
   background: #c2ffc0;
 }
 .modaspau {
-  background: #ffdaf0;
+  background: #F3F3DC;
 }
+
 </style>
