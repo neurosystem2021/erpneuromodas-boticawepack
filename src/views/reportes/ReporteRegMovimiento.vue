@@ -269,20 +269,44 @@ export default {
       this.$swal({
         icon: "question",
         title: "Eliminar",
-        text: `Desea eliminar el registro ${item.Serie}-${item.Numero} `,
+        text: `¿Desea eliminar el registro ${item.Serie}-${item.Numero}?`,
         allowOutsideClick: false,
         allowEscapeKey: false,
         allowEnterKey: false,
         showCancelButton: true,
         cancelButtonColor: "#d33",
-        confirmButtonText: "Si,Eliminar",
+        confirmButtonText: "Si, Eliminar",
         cancelButtonText: "Cancelar"
-      }).then(async respuesta => {
+      }).then(async (respuesta) => {
         if (respuesta.isConfirmed) {
-          await this.axios.post(`${this.API}movimiento/eliminar`, {
+      try {
+        // Ejecutamos la eliminación
+          const res = await this.axios.post(`${this.API}movimiento/eliminar`, {
             idMov: item.IdMovimiento
           });
+
+            // Verificamos si el servidor respondió con éxito
+            // (Asumiendo que tu API devuelve success: true o similar)
+            
+            this.$swal({
+              icon: "success",
+              title: "¡Eliminado!",
+              text: "El movimiento fue eliminado correctamente",
+              timer: 2500, // Se cierra solo en 2.5 segundos
+              showConfirmButton: false
+            });
+
+            // Refrescamos la tabla para que ya no aparezca el registro
           this.generarReporte();
+
+          } catch (error) {
+            console.error(error);
+            this.$swal({
+              icon: "error",
+              title: "Error",
+              text: "No se pudo eliminar el registro. Intente de nuevo."
+            });
+          }
         }
       });
       // console.log(item);

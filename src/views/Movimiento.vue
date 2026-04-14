@@ -293,9 +293,9 @@ export default {
             variant: "danger",
             class: "text-center"
           },
-          { key: "Lote", label: "C. Lote", class: "stocksize" },
-          { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
-          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
+          // { key: "Lote", label: "C. Lote", class: "stocksize" },
+          // { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
+          // { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
           { key: "acciones", label: "" }
         ]
       },
@@ -426,7 +426,7 @@ export default {
       currentMonth = currentMonth < 10 ? "0" + currentMonth : currentMonth;
       return {
         EsCredito: 0,
-        alterarProductos: 1,
+        alterarProductos: 0,
         FechaVenCredito: "",
         Moneda: "PEN",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,

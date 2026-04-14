@@ -562,6 +562,10 @@ export default {
 
       return Object.values(agrupadas);
     },
+    maxVentas() {
+      if (!this.datosHeatmap.length) return 0;
+      return Math.max(...this.datosHeatmap.map(i => i.TotalVentas));
+    },
     semanasAgrupadas() {
       const agrupadas = [];
 
