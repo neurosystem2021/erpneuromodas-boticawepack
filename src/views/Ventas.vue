@@ -2124,10 +2124,15 @@ export default {
     },
 
     async guardarVenta() {
+      let mostrarError = false;
+       if (this.loading) return; //BLOQUEO REAL
+       this.loading = true;
+
+      try { 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
-      this.loading = true;
+      //this.loading = true;
       totalPagos +=
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
@@ -2135,38 +2140,39 @@ export default {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        this.loading = false;
+        //this.loading = false;
         return;
       }
 
       if (!venta.cliente.DniRuc) {
         //this.$toasted.show('Debe seleccionar un cliente.')
+        mostrarError = true;
         this.$swal({
           position: "center",
           icon: "info",
@@ -2177,12 +2183,13 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (
         venta.tipoVenta.IdTipoDoc != 12 &&
         productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)) {
+        mostrarError = true;
         this.$swal({
           position: "center",
           icon: "info",
@@ -2192,11 +2199,12 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
+        mostrarError = true;
         //this.$toasted.show('El RUC debe ser numérico, editar cliente.')
         this.$swal({
           position: "center",
@@ -2207,12 +2215,13 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.loading = false;
+        //this.loading = false;
         return;
       }
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
+        mostrarError = true;
         //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
         this.$swal({
           position: "center",
@@ -2224,10 +2233,11 @@ export default {
           target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        mostrarError = true;
         //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
         this.$swal({
           position: "center",
@@ -2239,13 +2249,14 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.loading = false;
+        //this.loading = false;
         return;
       }
       if (
         venta.tipoVenta.CodSunat == "07" ||
         venta.tipoVenta.CodSunat == "08"
       ) {
+        mostrarError = true;
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
           //this.$toasted.show('Debe seleccionar un Documento de Referencia...')
           this.$swal({
@@ -2258,10 +2269,11 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.loading = false;
+          //this.loading = false;
           return;
         }
         if (!venta.NotaIdMotivo) {
+          mostrarError = true;
           //this.$toasted.show('Debe seleccionar un Motivo')
           this.$swal({
             position: "center",
@@ -2273,14 +2285,14 @@ export default {
             confirmButtonColor: "#0275d8"
           });
 
-          this.loading = false;
+          //this.loading = false;
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
 
           this.$refs.inputDocRef.focus();
-          this.loading = false;
+          //this.loading = false;
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2288,6 +2300,7 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
+        mostrarError = true;
         this.$swal({
           position: "center",
           icon: "info",
@@ -2298,7 +2311,7 @@ export default {
           confirmButtonColor: "#0275d8"
         });
 
-        this.loading = false;
+        //this.loading = false;
         return;
       }
 
@@ -2329,6 +2342,16 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+
+      this.$swal({
+      title: "Procesando venta...",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        this.$swal.showLoading();
+      }
+    });
+      venta.requestId = Date.now() + '-' + Math.random();
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
@@ -2341,13 +2364,13 @@ export default {
 
         if (this.ventas.length == 1) {
           window.location.reload();
-          this.loading = false;
+          //this.loading = false;
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
           setTimeout(() => {
             this.metodoPagoCambio(1);
-            this.loading = false;
+            //this.loading = false;
           }, 100);
         }
 
@@ -2356,7 +2379,19 @@ export default {
         //   this.loading = false;  return;
         // }
       });
-    },
+      
+    }catch (error) {
+      console.log(error);
+      this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo # Venta");
+      this.loading = false;
+    }finally {
+        this.loading = false;
+
+        if (!mostrarError) {
+          this.$swal.close(); // SOLO SI NO ES ERROR
+        }
+      }
+  },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
