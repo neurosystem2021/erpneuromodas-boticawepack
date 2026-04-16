@@ -1938,10 +1938,8 @@ export default {
     },
     async setProducto(producto, esNota = false) {
       let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+      if (!esNota && productos.some(v => v.IdProducto == producto.IdProducto)) {
+        productos.find(v => v.IdProducto == producto.IdProducto).cantidad += 1;
         this.metodoPagoCambio(1);
         return false;
       }
@@ -1955,35 +1953,34 @@ export default {
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.presentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
-      prod.descuento = 0;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = 1;
-      prod.esPresentacion = false;
+      prod.tienePresentacion = pres.length > 0;
+
+      if (esNota) {
+        prod.precio = parseFloat(producto.Precio || producto.PrecioVenta || producto.precio || 0);
+        prod.cantidad = parseFloat(producto.cantidad || 1);
+        
+        prod.presentacion = producto.Presentacion || "UNIDAD";
+        prod.CantidadxPresentacion = parseFloat(producto.CantidadxPresentacion || 1);
+        prod.esPresentacion = prod.CantidadxPresentacion > 1;
+        prod.bloquearInputPrecio = true;
+      } else {
+        prod.precio = prod.PrecioContado;
+        prod.cantidad = 1;
+        prod.presentacion = prod.ProductoPresentacion || "UNIDAD";
+        prod.CantidadxPresentacion = 1;
+        prod.esPresentacion = false;
+        prod.bloquearInputPrecio = false;
+      }
+
+      prod.descuento = parseFloat(producto.Descuento || 0);
       prod.pres = "";
       productos.unshift(prod);
-      if (esNota) {
-        if (producto.Producto == "TAPAJUNTA") {
-          console.log(prod);
-        }
-        prod.cantidad = producto.cantidad;
-        prod.precio = producto.PrecioContado;
-      }
       this.$nextTick(() => {
         let input = document.getElementById(`input${this.ventaActiva}0`);
-
-        input.focus();
-        input.select();
+        if (input) {
+          input.focus();
+          input.select();
+        }
       });
       this.metodoPagoCambio(1);
     },
@@ -2206,6 +2203,20 @@ export default {
       if (!venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
 
+        return;
+      }
+      if (this.venta.cliente.DniRuc == "00000000" && this.totalCart >= 700) {
+        //this.$toasted.show('Debe seleccionar un cliente.')
+        this.$swal({
+          position: "center",
+          icon: "info",
+          title: "El monto es mayor a 700 soles y para un cliente varios, use otro cliente para la venta", 
+          showConfirmButton: true,
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten"),
+          confirmButtonColor: "#0275d8"
+        });
+        this.inProgress = false;
         return;
       }
       console.log("a");

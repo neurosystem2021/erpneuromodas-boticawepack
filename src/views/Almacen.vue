@@ -282,7 +282,7 @@
         <br />
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="hrefExcel" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" @click="opcionesExportar()">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -307,11 +307,17 @@
           <b-form-group>
             <label>Fecha Fin:</label>
             <b-form-input
-              v-model="kardex.fechaHasta"
-              type="date"
-              step="1"
-              placeholder="Fecha Inicio">
-            </b-form-input>
+                v-model="kardex.fechaHasta"
+                type="date"
+                step="1"
+                placeholder="Fecha Inicio">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col md="2" class="text-center">
+            <b-form-group>
+              <br>
+              <b-button @click="kardexFechaRango" variant="primary" size="lg">Generar</b-button>
           </b-form-group>
         </b-col>
         <b-col md="2" class="text-center">
@@ -329,7 +335,44 @@
       </b-row>
       <br>
     </b-modal>
-
+   <b-modal size="lg" ref="modalExportar" hide-footer hide-header>
+      <div class="d-block text-center">
+        <h3 style="text-decoration: underline;">Opciones de Exportación</h3>
+      </div>
+      <hr>
+      <b-row>
+        <b-col md="8" class="centrarClaseIzq">
+          <h5>Exportar stock hasta la fecha actual:</h5>
+        </b-col>
+        <b-col md="4" class="centrarClase">
+          <b-button block variant="success" size="md"
+            :href="'/api/index.php/reporte/stock?controlaStock=1&idAlmacen=' + almacen.IdAlmacen + filter"
+            target="_blank">Exportar Actual</b-button>
+        </b-col>
+      </b-row>
+      <hr>
+      <h5>Exportar stock según rango de fechas:</h5>
+      <b-row>
+        <b-col md="4">
+          <b-form-group>
+            <label>Fecha Inicio:</label>
+            <b-form-input v-model="exportar.fechaDesde" type="date" step="1" placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+            <label>Fecha Fin:</label>
+            <b-form-input v-model="exportar.fechaHasta" type="date" step="1" placeholder="Fecha Inicio">
+            </b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="4" class="centrarClase">
+          <b-button block variant="success" :href="hrefXlsFechas" size="md" target="_blank">Exportar por
+            Fechas</b-button>
+        </b-col>
+      </b-row>
+    </b-modal>
   </div>
 </template>
 
@@ -493,6 +536,9 @@ export default {
     }
   },
   methods: {
+    opcionesExportar(){
+      this.$refs['modalExportar'].show()
+    },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;

@@ -41,17 +41,16 @@
               <table class="table table-hover">
                   <thead>
                     <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
-                      <th style="border: 1px solid #ffffff;">Cuenta</th>
-                      <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
+                      <th class="color-fondo">Cuenta</th>
+                      <th colspan="6" class="color-fondo">Caja</th>
                     </tr>
-                    <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
-                      <th style="border: 1px solid #ffffff;">ID</th>
-                      <th style="border: 1px solid #ffffff;">Usuario</th>
-                      <th style="border: 1px solid #ffffff;">Concepto</th>
-                      <th style="border: 1px solid #ffffff;">Ingresos</th>
-                      <th style="border: 1px solid #ffffff;">Salida</th>
-                      <!-- <th style="border: 1px solid #ffffff;">Saldo</th> -->
-                      <th style="border: 1px solid #ffffff;"></th>
+                    <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                      <th class="color-subfondo">ID</th>
+                      <th class="color-subfondo">Usuario</th>
+                      <th class="color-subfondo">Concepto</th>
+                      <th class="color-subfondo">Ingresos</th>
+                      <th class="color-subfondo">Salida</th>
+                      <th class="color-subfondo"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -289,7 +288,7 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
+              <b-col cols="6">
                 <b-row>
                   <b-col cols="12">
                     Fecha Operacion: 
@@ -333,7 +332,7 @@
                         <td>{{deuda.Aplicado}}</td>
                         <td>{{deuda.Saldo}}</td>
                         <td>
-                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'|| deuda.Aplicado=='VE'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
                           <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
                           <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
                           <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
@@ -377,7 +376,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(deuda,index) in lstAplicado" :key="index">
+                      <tr v-for="(deuda,index) in documentosAplicadosVista" :key="index">
                         <td>{{deuda.Id}}</td>
                         <td>{{deuda.FechaDoc}}</td>
                         <td>{{deuda.FechaCredito}}</td>
@@ -388,19 +387,19 @@
                       </tr>
                       <tr style="background: #BBDEFB; font-weight: bold;">
                         <td colspan="5" style="text-align: center; border: 1px solid #ffffff;">
-                          Sumatoria
+                          Sumatoria Aplicados
                         </td>
                         <td style="border: 1px solid #ffffff;">
                           {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Aplicado)
+                          documentosAplicadosVista.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Aplicado || 0)
                           },0)
                           ).toFixed(2) }}
                         </td>
                         <td>
                           {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Saldo)
+                            documentosAplicadosVista.reduce((sum,deuda)=>{
+                            return sum + parseFloat(deuda.Saldo || 0)
                           },0)
                           ).toFixed(2) }}
                         </td>
@@ -410,7 +409,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button variant="success" @click="GuardarMovimiento()">Guardar</b-button>
                     <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
@@ -555,6 +554,7 @@ export default {
       TipoCajaBanco: "",
       lstDeudas: [],
       lstAplicado: [],
+      lstPagados: [],
       aplicarLetra: false
     };
   },
@@ -567,6 +567,57 @@ export default {
     abrirModalNuevaOperacion() {
       this.modalRegistro = true;
     },
+
+    async getClientePagos() {
+      if (!this.Cliente || !this.Cliente.IdCliente) {
+        this.lstPagados = [];
+        return;
+      }
+
+      await this.axios(
+        `${this.API}clientes2/pagos2?idCliente=${this.Cliente.IdCliente}`
+      ).then(res => {
+        if (res.data) {
+          this.lstPagados = res.data.map(d => {
+            return {
+              Id: d.IdDocVenta,
+              FechaDoc: d.FechaDoc,
+              FechaCredito: d.FechaCredito,
+              Correlativo: d.Correlativo,
+              Total: d.TotalVenta,
+              Aplicado: d.TotalPagado,
+              Saldo: d.Saldo
+            };
+          });
+        }
+      });
+    },
+
+    async getProveedorPagos() {
+    if (!this.Proveedor || !this.Proveedor.IdProveedor) {
+      this.lstPagados = [];
+      return;
+    }
+
+    await this.axios(
+      `${this.API}proveedores/pagos2?idProveedor=${this.Proveedor.IdProveedor}`
+    ).then(res => {
+      if (res.data) {
+        this.lstPagados = res.data.map(d => {
+          return {
+            Id: d.IdDocCompra,
+            FechaDoc: d.FechaDoc,
+            FechaCredito: d.FechaCredito,
+            Correlativo: d.Correlativo,
+            Total: d.TotalCompra,
+            Aplicado: d.TotalPagado,
+            Saldo: d.Saldo
+          };
+        });
+      }
+    });
+    },
+  
     addLetra() {
       this.nroLetras += 1;
       this.generLetrasPorCantidadLetras();
@@ -639,10 +690,12 @@ export default {
     setCliente(obj) {
       this.Cliente = obj;
       this.getClienteDeudas();
+      this.getClientePagos(); 
     },
     setProveedor(obj) {
       this.Proveedor = obj;
       this.getProveedorDeudas();
+      this.getProveedorPagos();
     },
     async getProveedorDeudas() {
       await this.axios(
@@ -670,7 +723,12 @@ export default {
       });
     },
     aplicarPago(deuda) {
-      if (this.Importe < deuda.Total - deuda.Aplicado) {
+      if (
+        parseFloat(this.Importe).toFixed(2) <=
+        parseFloat(
+          parseFloat(deuda.Total) - parseFloat(deuda.Aplicado)
+        ).toFixed(2)
+      ) {
         deuda.Aplicado = 1;
         this.lstAplicado.push({
           Id: deuda.Id,
@@ -680,7 +738,9 @@ export default {
           Correlativo: deuda.Correlativo,
           Total: deuda.Total,
           Aplicado: this.Importe,
-          Saldo: deuda.Total - this.Importe
+          Saldo: parseFloat(
+            parseFloat(deuda.Total) - parseFloat(this.Importe)
+          ).toFixed(2)
         });
         this.bloquearAplicar = true;
       } else {
@@ -698,8 +758,9 @@ export default {
       this.nroLetras = 0;
       this.aplicarLetra = true;
     },
-    guardarLetras() {
+    async guardarLetras() {
       let val = true;
+      this.errorLetras = "";
       this.letras.forEach(letra => {
         if (!letra.FechaLetra) {
           letra.errorFecha = "Fecha requerida";
@@ -710,17 +771,20 @@ export default {
       });
 
       let sumTotal = this.letras.reduce((sum, letra) => {
-        return sum + parseFloat(letra.MontoLetra);
+        return sum + parseFloat(letra.MontoLetra || 0);
       }, 0);
 
-      if (parseFloat(this.Saldo).toFixed(2) < parseFloat(sumTotal).toFixed(2)) {
+      if (parseFloat(this.deuda.Saldo).toFixed(2) < parseFloat(sumTotal).toFixed(2)) {
         val = false;
         this.errorLetras = "Defina correctamente el monto en cada Letra.";
       }
-      this.guardarNuevaLetras();
-      this.$forceUpdate();
-    },
-    async guardarNuevaLetras() {
+
+      if (!val) {
+        this.$forceUpdate();
+        return;
+      }
+
+      // GUARDAR
       let data = {
         Letras: this.letras,
         Tipo: this.Tipo
@@ -728,10 +792,10 @@ export default {
       await this.axios.post(`${this.API}letras/generar`, data).then(res => {
         if (res.data) {
           this.aplicarLetra = false;
-          if (this.Cliente && Object.keys(this.Cliente).length > 0) {
+          // SEGÚN TIPO
+          if (this.Tipo == 0) {
             this.getClienteDeudas();
-          }
-          if (this.Proveedor && Object.keys(this.Proveedor).length > 0) {
+          } else {
             this.getProveedorDeudas();
           }
         }
@@ -990,7 +1054,7 @@ export default {
   },
   computed: {
     mostrarProveedor() {
-      if (this.IdTipoCajaBanco) {
+      if (this.IdTipoCajaBanco == 1) {
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
         );
@@ -998,7 +1062,7 @@ export default {
       return false;
     },
     mostrarCliente() {
-      if (this.IdTipoCajaBanco) {
+      if (this.IdTipoCajaBanco == 2) {
         return this.lstTipoOpe.some(
           v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
         );
@@ -1018,6 +1082,9 @@ export default {
       }
 
       return true;
+    },
+    documentosAplicadosVista() {
+      return [...this.lstAplicado, ...this.lstPagados];
     }
   }
 };
@@ -1044,6 +1111,18 @@ export default {
   box-shadow: 3px 3px #1a237e;
 }
 
+.color-fondo {
+  background: #1a237e;
+  color: #ffffff;
+  text-align: center;
+  border: 1px solid #ffffff;
+}
+.color-subfondo {
+  background: #7986CB;
+  color: #ffffff;
+  text-align: center;
+  border: 1px solid #ffffff;
+}
 /* .modal-header {
   background: #1b5e20;
   color: #ffffff;
