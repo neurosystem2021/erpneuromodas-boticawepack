@@ -398,8 +398,8 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+                <td class="total-salida" style="color:black"><b>Total Salidas</b></td>
+                <td class="total-salida" style="color:black"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -1345,12 +1345,10 @@ export default {
       window.print();
     },
     async loadData() {
-      await Promise.all(
-        this.getVentas(),
-        this.getIngresos(),
-        this.getSalidas(),
-        this.generarReporte()
-      );
+      await this.getVentas();
+      await this.getIngresos();
+      await this.getSalidas();
+      await this.generarReporte();
       // console.log(this.ventas);
     },
     generarReporte() {
@@ -1432,10 +1430,8 @@ export default {
     },
     async loadDetalles() {
       await this.axios
-        .get(this.API + "ventas/detalle", {
-          params: {
-            idDocVentas: this.ventas.map(item => item.idDocVenta)
-          }
+        .post(this.API + "ventas/detalle", {
+          idDocVentas: this.ventas.map(item => item.idDocVenta)
         })
         .then(response => {
           this.itemsDetalle = response.data;
