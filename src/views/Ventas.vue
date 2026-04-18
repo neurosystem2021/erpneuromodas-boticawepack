@@ -1367,15 +1367,31 @@ export default {
           let impresora = await this.obtenerDatosImpresora();
           datos.impresoraCocina = impresora;
           let comandaJson = JSON.stringify({ comandaJson: datos });
+
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.name = 'print_frame';
+          document.body.appendChild(iframe);
+
           await fetch("http://localhost:5000/imprimir/getshipment.php", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            mode: "cors",
-            cache: "default",
             body: comandaJson
-          }).catch(error => console.error("Error:", error));
+          })
+          .then(res => res.text())
+          .then(html => {
+            // Escribimos el HTML recibido (que ya tiene el script de impresión) en el iframe
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(html);
+            doc.close();
+            
+            // Limpiamos el iframe después de un momento para que dé tiempo a imprimir
+            setTimeout(() => document.body.removeChild(iframe), 2000);
+          })
+          .catch(error => console.error("Error en impresión automática:", error));
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
           this.$toasted.success("Venta realizada con exito");
