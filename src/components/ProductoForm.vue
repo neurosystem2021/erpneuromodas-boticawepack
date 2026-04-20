@@ -390,7 +390,7 @@
               />
             </b-form-group>
           </b-col>
-          <b-col md="6">
+          <!--<b-col md="6">
             <b-form-group>
               <label>Flete:</label>
               <input
@@ -435,7 +435,7 @@
                 class="form-control"
               />
             </b-form-group>
-          </b-col>
+          </b-col>-->
           <b-col md="6" v-if="false">
             <b-form-group>
               <label>Precio Distribuidor:</label>
@@ -718,9 +718,9 @@ export default {
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
             this.producto.PrecioContado = newVal.PrecioContado;
-            this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
-            this.producto.PrecioContadoDolar = newVal.PrecioContadoDolar;
-            this.producto.Flete = newVal.Flete;
+            //this.producto.PrecioCostoDolar = newVal.PrecioCostoDolar;
+            //this.producto.PrecioContadoDolar = newVal.PrecioContadoDolar;
+            //this.producto.Flete = newVal.Flete;
             this.producto.TipoCambio = newVal.TipoCambio;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
