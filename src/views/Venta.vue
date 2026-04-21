@@ -223,6 +223,15 @@
                       class="form-control"
                       />
                      
+                <div v-if="ventas[ventaActiva].almacen.ActivarNocturno == 1 && data.item.PrecioNocturno > 0" class="text-center mt-1">
+                  <small class="text-secondary" style="display: block;">
+                    Base: S/ {{ parseFloat(data.item.base).toFixed(1) }}
+                  </small>
+                  <span class="badge badge-primary" style="font-size: 0.65rem; background-color: #6f42c1;">
+                    🌙 Adicional +{{ data.item.PrecioNocturno }}% 
+                    (S/ {{ (parseFloat(data.item.base) * (parseFloat(data.item.PrecioNocturno) / 100)).toFixed(1) }})
+                  </span>
+                </div>
                   </template>
                   <template slot="descuento" slot-scope="data">
                     <input
@@ -583,7 +592,7 @@
       </b-col>
       <b-col md="5">
         <b-row class="headerInfo" style="background: #f4f4f4">
-          <b-col md="5">
+          <b-col md="4">
             <b-input-group prepend="Vendedor" class="mt-2">
               <autocomplete
                 required="required"
@@ -599,7 +608,7 @@
               </autocomplete>
             </b-input-group>
           </b-col>
-          <b-col md="4">
+          <b-col md="3">
             <b-input-group prepend="Alm." class="mt-2">
               <autocomplete
                 required="required"
@@ -634,6 +643,18 @@
               >
               </autocomplete>
             </b-input-group>
+          </b-col>
+          <b-col md="2">
+            <b-button 
+              :variant="(ventas[ventaActiva] && ventas[ventaActiva].almacen && ventas[ventaActiva].almacen.ActivarNocturno == 1) ? 'success' : 'danger'" 
+              @click="activarNocturno(ventas[ventaActiva] && ventas[ventaActiva].almacen ? ventas[ventaActiva].almacen.IdAlmacen : null)" 
+              class="mt-2" 
+              block
+            >
+              <i>
+                {{ (ventas[ventaActiva] && ventas[ventaActiva].almacen && ventas[ventaActiva].almacen.ActivarNocturno == 1) ? 'ACTIVO' : 'INACTIVO' }}
+              </i>
+            </b-button>
           </b-col>
         </b-row>
         <b-row style="background: #f4f4f4" class="buscador">
@@ -1077,7 +1098,8 @@ export default {
         almacen: {
           IdAlmacen: 1,
           Almacen: "PRINCIPAL",
-          DescuentoActivo: 0
+          DescuentoActivo: 0,
+          ActivarNocturno: 0
         },
         puntoVenta: {
           IdDocVentaPuntoVenta: 1,
@@ -1131,7 +1153,8 @@ export default {
           almacen: {
             IdAlmacen: 1,
             Almacen: "PRINCIPAL",
-            DescuentoActivo: 0
+            DescuentoActivo: 0,
+            ActivarNocturno: 0 
           },
           puntoVenta: {
             IdDocVentaPuntoVenta: 1,
@@ -1632,7 +1655,8 @@ export default {
           let almacen = {
             IdAlmacen: response.data.IdAlmacen,
             Almacen: response.data.Almacen,
-            DescuentoActivo: response.data.DescuentoActivo
+            DescuentoActivo: response.data.DescuentoActivo,
+            ActivarNocturno: response.data.ActivarNocturno || 0
           };
           let puntoVenta = {
             IdDocVentaPuntoVenta: response.data.IdDocVentaPuntoVenta,
@@ -1968,7 +1992,16 @@ export default {
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
+      let baseVal = parseFloat(prod.PrecioContado) || 0;
+      let porcentajeNocturno = parseFloat(prod.PrecioNocturno) || 0;
+      const modoNocturnoActivo = this.ventas[this.ventaActiva].almacen.ActivarNocturno == 1;
+
+      let precioFinal = modoNocturnoActivo 
+          ? (baseVal * (1 + (porcentajeNocturno / 100))) 
+          : baseVal;
+      prod.base = baseVal.toFixed(1); 
+      prod.precio = precioFinal.toFixed(1);
+      prod.PrecioNocturno = porcentajeNocturno;
       prod.descuento = 0;
       prod.presentacion = null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
@@ -1983,6 +2016,94 @@ export default {
       // });
       this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
+    },
+
+    async activarNocturno(id) {
+      if (!id) return;
+    
+      const result = await this.$swal.fire({
+        icon: "info",
+        title: "Autorización de Administrador",
+        html:
+          '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
+          '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Validar",
+        cancelButtonText: "Cancelar",
+        preConfirm: () => {
+          const usuario = document.getElementById("swal-input1").value;
+          const clave = document.getElementById("swal-input2").value;
+          if (!usuario || !clave) {
+            this.$swal.showValidationMessage("Por favor, complete ambos campos");
+          }
+          return { usuario, clave };
+        }
+      });
+    
+      if (!result.isConfirmed) return;
+    
+      try {
+        const loginRes = await this.axios.post(this.API + "login", {
+          user: result.value.usuario,
+          password: result.value.clave
+        });
+    
+        if (loginRes.data && loginRes.data.IdUsuarioPerfil == 1) {
+          
+          const res = await this.axios.put(`${this.API}almacenes/activar-nocturno/${id}`);
+          
+          if (res.data.success) {
+            this.$toasted.success("Modo Nocturno actualizado por Administrador");
+            
+            const nuevoEstado = res.data.ActivarNocturno;
+            this.$set(this.ventas[this.ventaActiva].almacen, 'ActivarNocturno', nuevoEstado);
+            
+            // Actualizar en todas las ventas
+            if (this.ventas && this.ventas.length > 0) {
+              this.$set(this.ventas[this.ventaActiva].almacen, 'ActivarNocturno', nuevoEstado);
+            }
+    
+            console.log("✅ ActivarNocturno actualizado a:", nuevoEstado);
+    
+            // Recalcular precios
+            this.ventas[this.ventaActiva].productos.forEach(p => {
+              let b = parseFloat(p.base) || 0;
+              let porcentaje = parseFloat(p.PrecioNocturno) || 0;
+              let nuevoPrecio = (nuevoEstado == 1) 
+                ? (b * (1 + (porcentaje / 100))) 
+                : b;
+              p.precio = nuevoPrecio.toFixed(2);
+            });
+            
+            this.metodoPagoCambio(1);
+          }
+        } else {
+          this.$swal.fire({
+            icon: "error",
+            title: "Acceso Denegado",
+            text: "El usuario no cuenta con privilegios de administrador o las credenciales son incorrectas."
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        this.$toasted.error("Error en la validación de seguridad");
+      }
+    },
+    cambiarVentaActiva(index) {
+      this.ventaActiva = index;
+      // El almacén ya debería tener el estado correcto de getVendedorInfo()
+      console.log("Venta activa cambiada. ActivarNocturno:", 
+        this.ventas[this.ventaActiva].almacen.ActivarNocturno);
+    },
+    async cargarPrimerAlmacen() {
+      try {
+          const res = await this.axios.get(`${this.API}almacenes/primero`);
+          this.almacen = res.data; 
+          console.log("Almacén cargado:", this.almacen); 
+      } catch (error) {
+        console.error("Error cargando almacén", error);
+      }
     },
     irAlPrimerProducto(event) {
       if (event) {
@@ -2805,20 +2926,32 @@ export default {
     },
     cambiarPresentacion(obj, esPresentacion) {
       let producto = { ...this.producto };
+      const modoNocturnoActivo = this.ventas[this.ventaActiva].almacen.ActivarNocturno == 1;
+      const porcentaje = parseFloat(producto.PrecioNocturno) || 0;
+
       if (esPresentacion) {
         producto.Descripcion = obj.nombre;
         producto.CantidadPresentacion = obj.cantidad;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
-        producto.precio = obj.precio;
         producto.presentacion = JSON.stringify(obj);
+        let precioBasePres = parseFloat(obj.precio) || 0;
+        producto.base = precioBasePres.toFixed(1);
+        producto.precio = (modoNocturnoActivo 
+            ? (precioBasePres * (1 + (porcentaje / 100))) 
+            : precioBasePres).toFixed(1);
       } else {
-        producto.Descripcion = obj.ProductoPresentacion;
+        producto.Descripcion = producto.ProductoPresentacion;
         producto.CantidadPresentacion = null;
         producto.cantidad = 1;
         producto.bloquearInputPrecio = false;
-        producto.precio = producto.PrecioContado;
         producto.presentacion = null;
+        
+        let precioBaseUnidad = parseFloat(producto.PrecioContado) || 0;
+        producto.base = precioBaseUnidad.toFixed(1);
+        producto.precio = (modoNocturnoActivo 
+            ? (precioBaseUnidad * (1 + (porcentaje / 100))) 
+            : precioBaseUnidad).toFixed(1);
       }
 
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);

@@ -32,6 +32,18 @@
                 ></b-form-input>
             </b-form-group>
           </b-col>
+          <b-col md="6">
+            <b-form-group>
+              <label><b>Porcentaje Adicional Nocturno:</b></label>
+              <b-form-input
+                v-model="categoria.PrecioNocturno"
+                type="number"
+                step="0.1"
+                placeholder="0.0"
+              ></b-form-input>
+              <b-form-text>Ingrese el porcentaje(%) para habilitar la tarifa nocturna.</b-form-text>
+            </b-form-group>
+          </b-col>
           <div slot="modal-footer">
           <b-btn variant="primary" type="submit">
              Guardar
@@ -70,6 +82,7 @@
           this.categoria.IdProductoCategoria = newVal.IdProductoCategoria
           //this.categoria.MostrarDelivery = newVal.MostrarDelivery
           this.categoria.MostrarPuntoVenta = newVal.MostrarPuntoVenta
+          this.categoria.PrecioNocturno = newVal.PrecioNocturno
           this.categoria.Orden = newVal.Orden
         } else {
           this.title='Nueva Categoria'
@@ -84,7 +97,15 @@
             //IdImpresora: null,
             //MostrarDelivery: 0,
             MostrarPuntoVenta:0,
+            PrecioNocturno:0,
             Orden:0,
+        }
+      },
+      checkPrecioNocturno() {
+        if (parseFloat(this.categoria.MontoNocturno) > 0) {
+          this.categoria.PrecioNocturno = 1;
+        } else {
+          this.categoria.PrecioNocturno = 0;
         }
       },
       guardarCategoria(e) {
