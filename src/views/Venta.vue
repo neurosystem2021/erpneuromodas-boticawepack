@@ -2351,6 +2351,27 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+        venta.productos = venta.productos.map(item => {
+          return {
+            ...item,
+
+            // ✔ paquetes
+            cantidad: item.cantidad,
+
+            // ✔ equivalencia
+            CantidadPresentacion: item.CantidadPresentacion || 1,
+
+            // ✔ json
+            Presentacion: item.CantidadPresentacion
+              ? JSON.stringify({
+                  nombre: item.Descripcion,
+                  cantidad: item.CantidadPresentacion,
+                  precio: item.precio,
+                  precioc: item.PrecioCosto
+                })
+              : null
+          };
+        });
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
