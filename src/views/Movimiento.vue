@@ -293,9 +293,9 @@ export default {
             variant: "danger",
             class: "text-center"
           },
-          // { key: "Lote", label: "C. Lote", class: "stocksize" },
+          { key: "Lote", label: "C. Lote", class: "stocksize" },
           // { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
-          // { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
+          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
           { key: "acciones", label: "" }
         ]
       },

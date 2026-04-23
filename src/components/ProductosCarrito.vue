@@ -217,7 +217,6 @@
           <b-form-input
             v-model="productos[data.index].Lote"
             type="text"
-            required
             v-bind:class="{ ventasAncho: isVentas }"
             autocomplete="false"
             ></b-form-input>
@@ -394,7 +393,6 @@
 
         <template slot="fechavencimiento" slot-scope="data" >
           <b-form-input
-            required="required"
             v-model="productos[data.index].FechaVen"
             type="date"
             ></b-form-input>

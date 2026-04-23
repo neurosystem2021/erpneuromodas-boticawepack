@@ -844,7 +844,7 @@ export default {
           thStyle: { width: "5%" }
         },
         { key: "Producto", thStyle: { width: "35%" } },
-        // { key: "movimiento", label: "" },
+        { key: "movimiento", label: "" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
