@@ -1992,7 +1992,10 @@ export default {
         ? prod.ProductoPresentacion
         : "UNIDAD";
       prod.cantidad = 1;
-      let baseVal = parseFloat(prod.PrecioContado) || 0;
+      let precioBuscador = this.ventas[this.ventaActiva].almacen.IdAlmacen == 2 
+          ? prod.PrecioContado2 
+          : prod.PrecioContado;
+      let baseVal = parseFloat(precioBuscador) || 0;
       let porcentajeNocturno = parseFloat(prod.PrecioNocturno) || 0;
       const modoNocturnoActivo = this.ventas[this.ventaActiva].almacen.ActivarNocturno == 1;
 
@@ -2600,6 +2603,27 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+      venta.productos = venta.productos.map(item => {
+        return {
+          ...item,
+
+          // ✔ paquetes
+          cantidad: item.cantidad,
+
+          // ✔ equivalencia
+          CantidadPresentacion: item.CantidadPresentacion || 1,
+
+          // ✔ json
+          Presentacion: item.CantidadPresentacion
+            ? JSON.stringify({
+                nombre: item.Descripcion,
+                cantidad: item.CantidadPresentacion,
+                precio: item.precio,
+                precioc: item.PrecioCosto
+              })
+            : null
+        };
+      });
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
@@ -2947,7 +2971,10 @@ export default {
         producto.bloquearInputPrecio = false;
         producto.presentacion = null;
         
-        let precioBaseUnidad = parseFloat(producto.PrecioContado) || 0;
+        let precioBuscador = this.ventas[this.ventaActiva].almacen.IdAlmacen == 2 
+            ? producto.PrecioContado2 
+            : producto.PrecioContado;
+        let precioBaseUnidad = parseFloat(precioBuscador) || 0;
         producto.base = precioBaseUnidad.toFixed(1);
         producto.precio = (modoNocturnoActivo 
             ? (precioBaseUnidad * (1 + (porcentaje / 100))) 

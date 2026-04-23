@@ -322,6 +322,20 @@
               </b-form-text>
           </b-form-group>
         </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio 2:</label>
+            <input v-model="producto.PrecioContado2"
+              type="number"
+              step="0.01"
+              class="form-control"
+              @input="actualizarPorcentajeUtilidad"
+              />
+              <b-form-text v-if="producto.precioContadoNormal">
+                Original - {{ producto.precioContadoNormal | redondear }}
+              </b-form-text>
+          </b-form-group>
+        </b-col>
         <b-col md="6"  v-if="false">
           <b-form-group>
             <label>Precio Distribuidor:</label>
@@ -586,6 +600,7 @@ export default {
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
             this.producto.PrecioContado = newVal.PrecioContado;
+            this.producto.PrecioContado2 = newVal.PrecioContado2;
             this.producto.precioConvenio = newVal.precioConvenio;
             this.producto.PrecioEspecial = newVal.PrecioEspecial;
             this.producto.EsHabitacion = newVal.EsHabitacion;
@@ -873,6 +888,7 @@ export default {
         TienePresentacion: 0,
         StockPorMayor: 0,
         PrecioContado: 0,
+        PrecioContado2: 0,
         PrecioPorMayor: 0,
         precioConvenio: 0,
         PrecioEspecial: 0,
