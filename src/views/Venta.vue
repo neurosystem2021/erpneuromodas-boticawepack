@@ -382,8 +382,8 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-success">SubTotal</td>
-                          <td class="table-success">{{ getSubTotal() }}</td>
+                          <td class="table-success" style="font-size: 17px; font-weight: bold;">SubTotal</td>
+                          <td class="table-success" style="font-size: 17px; font-weight: bold;">{{ getSubTotal() }}</td>
                         </tr>
                         <tr>
                           <td>
@@ -430,13 +430,13 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-danger">Descuento</td>
-                          <td class="table-danger">{{ getDescuento() }}</td>
+                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">Descuento</td>
+                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">{{ getDescuento() }}</td>
                         </tr>
                         <tr>
                           <td></td>
                           <td><b>TOTAL</b></td>
-                          <td class="table-danger">{{ getTotal() }}</td>
+                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">{{ getTotal() }}</td>
                         </tr>
                         <tr>
                           <td colspan="2">
