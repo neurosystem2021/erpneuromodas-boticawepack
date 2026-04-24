@@ -39,9 +39,8 @@ const mutations = {
     })
   },
   ACTUALIZAR_PRODUCTO ({ productos }, obj) {
-    //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
-    //productos.splice(index, 1, prod)
-    productos.splice(obj.Pos, 1, obj.Producto)
+    let index = productos.findIndex( p => p.IdProducto === obj.IdProducto )
+    productos.splice(index, 1, obj)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
