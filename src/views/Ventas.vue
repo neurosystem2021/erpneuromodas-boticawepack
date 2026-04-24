@@ -284,7 +284,7 @@
                       @input="metodoPagoCambio(1)"
                        @focus="abrirModalTouch(data.index, 1)"
                        class="form-control"
-                       @keydown.enter="irBusquedaProducto"
+                       @keydown.enter="irTxtLoadBarcode" 
                         />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
                         v-if="data.item.esPresentacion">
@@ -1073,9 +1073,10 @@ export default {
       this.loadClienteVarios();
       let inputElement = `autocompleteProducto${this.ventaActiva}`;
       let autocompleteInput = document.getElementById(inputElement);
-      autocompleteInput.focus();
+      // autocompleteInput.focus();
       // }, 10000);
     });
+    this.irTxtLoadBarcode();
   },
 
   beforeDestroy() {
@@ -1801,6 +1802,7 @@ export default {
           prod[0].CantidadPresentacion += parseFloat(1);
         }
         this.metodoPagoCambio(1);
+        this.irTxtLoadBarcode();
         return false;
       }
 
@@ -1843,6 +1845,17 @@ export default {
         input.select();
       });
       this.metodoPagoCambio(1);
+    },
+    irTxtLoadBarcode() {
+      this.$nextTick(() => {
+        // Usamos el ID exacto que tienes en tu template
+        const inputId = `txtCodeBar${this.ventaActiva}`;
+        const element = document.getElementById(inputId);
+        if (element) {
+          element.focus();
+          element.select(); // Opcional: selecciona el texto si hubiera algo
+        }
+      });
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
