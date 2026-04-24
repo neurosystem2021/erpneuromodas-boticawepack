@@ -387,51 +387,62 @@
       </b-row>
 
       <b-form-group v-if="producto.TienePresentacion">
-      <hr>
-      <b-row>
-        <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card :header="'Presentacion '+i" class="text-center">
-            <b-form-group>
-              <b-form-input
-                v-model="producto.precios[i-1].nombre"
-                type="text"
-                style="text-transform:uppercase; font-weight: bold;"
-                @input="(val) => producto.precios[i-1].nombre = val && val.toUpperCase()"
-                ></b-form-input>
-            </b-form-group>
+         <hr>
+          <b-row>
+            <b-col md="3" v-for="i in 4" :key="i">
 
-            <b-form-group class="text-left">
-              <label>Cantidad:</label>
-              <input
-                v-model="producto.precios[i-1].cantidad"
-                type="number"
-                class="form-control"
-                step="0.01"
-                />
-            </b-form-group>
+              <b-form-group class="text-left">
+                <label>Código de Barra:</label>
+                <b-input-group>
+                  <b-form-input v-model="producto.precios[i - 1].codigo" type="text" class="form-control"
+                    placeholder="Código único"></b-form-input>
+                    <b-input-group-append>
+                      <b-button 
+                        v-if="producto.IdProducto"
+                        variant="primary" 
+                        style="color:white"
+                        @click="imprimirCodigoPresentacion(producto.precios[i - 1])">
+                        <i class="fas fa-barcode"></i>
+                      </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
 
-            <b-form-group class="text-left">
-              <label>Precio Costo:</label>
-              <input 
-                v-model="producto.precios[i-1].precioc"
-                type="number"
-                class="form-control"
-                step="0.00001"
-                />
-            </b-form-group>
+              <b-card :header="'Presentación ' + i" class="text-center">
+                <b-form-group>
+                  <b-form-input v-model="producto.precios[i - 1].nombre" type="text" placeholder="NOMBRE"
+                    style="text-transform:uppercase; font-weight: bold;"
+                    @input="(val) => producto.precios[i - 1].nombre = val && val.toUpperCase()"></b-form-input>
+                </b-form-group>
 
-            <b-form-group class="text-left">
-              <label>Precio Venta:</label>
-              <input 
-                v-model="producto.precios[i-1].precio"
-                type="number"
-                class="form-control"
-                step="0.00001"
-                />
-            </b-form-group>
-          </b-card>
-        </b-col>
-      </b-row>
+              <b-form-group class="text-left">
+                <label>Cantidad:</label>
+                <input v-model="producto.precios[i-1].cantidad" type="number" class="form-control" step="0.01" />
+              </b-form-group>
+
+              <b-form-group class="text-left">
+                <label>Precio Costo:</label>
+                <input v-model="producto.precios[i-1].precioc" type="number" class="form-control" step="0.00001" />
+              </b-form-group>
+
+              <b-form-group class="text-left">
+                <label>Precio Venta:</label>
+                <input v-model="producto.precios[i-1].precio" type="number" class="form-control" step="0.00001" />
+              </b-form-group>
+            </b-card>
+          </b-col>
+        </b-row>
+
+        <b-modal id="modal-ver-barcode" title="Código de Barras" hide-footer centered>
+          <div class="text-center p-3">
+            <p>Código: <strong>{{ codigoParaMostrar }}</strong></p>
+            <img :src="'https://bwipjs-api.metafloor.com/?bcid=code128&text=' + codigoParaMostrar + '&scale=3&rotate=N&includetext'" 
+                alt="Código de barras" 
+                v-if="codigoParaMostrar"
+                style="max-width: 100%;">
+            <p v-else class="text-muted">No hay código ingresado</p>
+          </div>
+        </b-modal>
       </b-form-group>
 
       <hr />
@@ -531,6 +542,7 @@ export default {
       cantidadCodigoBarra: 1,
       hashMovimiento: "",
       movimientoLotes: [],
+      codigoParaMostrar: '',
       lote: "",
       fechaVenMovimiento: "",
       serieNumero: "",
@@ -699,6 +711,26 @@ export default {
     }
   },
   methods: {
+    verCodigoBarra(codigo) {
+      if (!codigo) {
+        alert("Por favor, ingrese un código primero.");
+        return;
+      }
+      this.codigoParaMostrar = codigo;
+      this.$bvModal.show('modal-ver-barcode');
+    },
+    imprimirCodigoPresentacion(presentacion) {
+      if (!presentacion.codigo) {
+        alert("Ingrese un código para esta presentación");
+        return;
+      }
+      const cantidad = this.cantidadCodigoBarra || 1;
+      const url = '/views/codigoBarra.php?idProducto=' + this.producto.IdProducto +
+                  '&cantidad=' + cantidad +
+                  '&codigoExtra=' + presentacion.codigo;
+
+      window.open(url, '_blank');
+    },
     soloNumerosYDecimales(evt) {
       const charCode = (evt.which) ? evt.which : evt.keyCode;
       if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -1011,10 +1043,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0 }
+          { nombre: "NOMBRE 1", codigo: '', cantidad: 0, precioc: 0, precio: 0},
+          { nombre: "NOMBRE 2", codigo: '', cantidad: 0, precioc: 0, precio: 0},
+          { nombre: "NOMBRE 3", codigo: '', cantidad: 0, precioc: 0, precio: 0},
+          { nombre: "NOMBRE 4", codigo: '', cantidad: 0, precioc: 0, precio: 0}
         ]
       };
     },

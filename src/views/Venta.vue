@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row id="header">
-      <b-col md="7" style="border-right: 3px solid #C0C0C0; background: white">
+      <b-col md="8" style="border-right: 3px solid #C0C0C0; background: white">
         <b-card no-body>
           <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
             <b-tab v-for="(venta, index) in ventas" :key="index" :title="`Venta ${index + 1}`"
@@ -108,7 +108,7 @@
 
                 </b-row>
 
-                <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-2 mx-0">
+                <div style="height: 40vh;overflow-x: scroll;overflow-y: scroll;" class="px-3 mx-0">
                   <b-row style="position: relative;max-height: 40vh;">
                     <b-table striped hover :fields="headerTable" :items="venta.productos" width="100%">
                       <template slot="stock" slot-scope="data">
@@ -195,14 +195,14 @@
 
                       </template>
                       <template slot="subtotal" slot-scope="data">
-                        <span style="font-size: 0.8rem">
+                        <span style="font-size: 0.8rem; font-size: 18px; font-weight: bold;">
                           {{ parseFloat(getSubTotalDetalle(data.item)).toFixed(2) }}
 
                         </span>
 
                       </template>
                       <template slot="total" slot-scope="data">
-                        <span style="font-size: 0.8rem">
+                        <span style="font-size: 0.8rem; font-size: 18px; font-weight: bold;">
                           {{ parseFloat(getTotalDetalle(data.item)).toFixed(2) }}
 
                         </span>
@@ -382,8 +382,8 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-success" style="font-size: 17px; font-weight: bold;">SubTotal</td>
-                          <td class="table-success" style="font-size: 17px; font-weight: bold;">{{ getSubTotal() }}</td>
+                          <td class="table-success" style="font-size: 20px; font-weight: bold;">SubTotal</td>
+                          <td class="table-success" style="font-size: 20px; font-weight: bold;">{{ getSubTotal() }}</td>
                         </tr>
                         <tr>
                           <td>
@@ -430,23 +430,22 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">Descuento</td>
-                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">{{ getDescuento() }}</td>
+                          <td class="table-danger" style="font-size: 20px; font-weight: bold;">Descuento</td>
+                          <td class="table-danger" style="font-size: 20px; font-weight: bold;">{{ getDescuento() }}</td>
                         </tr>
                         <tr>
-                          <td></td>
-                          <td><b>TOTAL</b></td>
-                          <td class="table-danger" style="font-size: 17px; font-weight: bold;">{{ getTotal() }}</td>
+                          <td colspan="1"><b style="font-size: 20px; font-weight: bold; margin-left: 38px;">TOTAL</b></td>
+                          <td colspan="2" class="table-success" style="font-size: 40px; font-weight: bold; text-align: center;">{{ getTotal() }}</td>
                         </tr>
                         <tr>
                           <td colspan="2">
-                            <label>pagó con:</label>
-                            <b-form-input type="text" placeholder="Pagó con"
+                            <label style="font-size: 17px; font-weight: bold;">pagó con:</label>
+                            <b-form-input style="font-size: 17px; font-weight: bold;" type="text" placeholder="Pagó con"
                               v-model="ventas[ventaActiva].pagocon"></b-form-input><br>
                           </td>
                           <td>
-                            <label>Vuelto:</label>
-                            <b>S/ {{ parseFloat(ventas[ventaActiva].pagocon - getTotal()).toFixed(2) }}</b>
+                            <label style="font-size: 14px; font-weight: bold;">Vuelto:</label>
+                            <b style="font-size: 21px; font-weight: bold;">S/ {{ parseFloat(ventas[ventaActiva].pagocon - getTotal()).toFixed(2) }}</b>
                           </td>
                         </tr>
                       </tbody>
@@ -466,7 +465,7 @@
         </b-row> -->
         </b-card>
       </b-col>
-      <b-col md="5">
+      <b-col md="4">
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
@@ -841,11 +840,11 @@ export default {
           label: "Stock",
           variant: "info",
           class: "text-center",
-          thStyle: { width: "5%" }
+          thStyle: { width: "3%" }
         },
-        { key: "Producto", thStyle: { width: "35%" } },
-        { key: "movimiento", label: "" },
-        { key: "pres", label: "", thStyle: { width: "5%" } },
+        { key: "Producto", thStyle: { width: "25%" } },
+        { key: "movimiento", label: "", thStyle: { width: "5%" }},
+        // { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
           label: "Pres.",
@@ -855,7 +854,7 @@ export default {
         { key: "precio", label: "Precio", thStyle: { width: "5%" } },
         {
           key: "subtotal",
-          label: "Sub Total",
+          label: "SubTotal",
           variant: "success",
           class: "text-center",
           thStyle: { width: "5%" }
@@ -868,7 +867,7 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "acciones", label: "", thStyle: { width: "5%" } }
+        { key: "acciones", label: "", thStyle: { width: "8%" } }
       ],
       busqueda: "",
       loadCode: "",
@@ -1707,38 +1706,36 @@ export default {
       if (e) e.preventDefault();
       
       let rawCode = this.loadCode.trim();
+      if (!rawCode) return;
       let idBusqueda = rawCode;
       let pesoExtraido = null;
 
-      // Lógica de Balanza: Prefijo 2 y longitud de 13 dígitos
       if (rawCode.startsWith('2') && rawCode.length === 13) {
-        // 2 000063 00295 7
-        // Los dígitos del 1 al 7 son el código del producto (000063)
         idBusqueda = rawCode.substring(1, 7);
         
-        // Los dígitos del 7 al 12 son el peso (00295) -> 0.295
         let pesoString = rawCode.substring(7, 12); 
         pesoExtraido = parseFloat(pesoString) / 1000;
-        
-        console.log("Detectado código de balanza:", { idBusqueda, pesoExtraido });
       }
 
       try {
         let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
-          params: { codigoBarra: idBusqueda }
+          params: { codigoBarra: rawCode }
         });
 
-        if (prod.data) {
-          // Si extrajimos un peso de la balanza, se lo inyectamos al objeto
-          // para que setProducto sepa que esa es la cantidad
+        if (prod.data && prod.data.IdProducto) {
+          let datosProducto = prod.data;
+          
           if (pesoExtraido !== null) {
-            prod.data.CantidadVenta = pesoExtraido;
+            datosProducto.CantidadVenta = pesoExtraido;
           }
-          this.setProducto(prod.data);
+          datosProducto.codigoEscaneado = rawCode; 
+          
+          this.setProducto(datosProducto);
         } else {
           this.$toasted.show("No se encontró ningún producto");
         }
       } catch (error) {
+        console.error(error);
         this.$toasted.show("Error al buscar producto");
       }
 
@@ -1966,10 +1963,24 @@ export default {
     async setProducto(producto) {
       let productosVenta = this.ventas[this.ventaActiva].productos;
       let cantidadASumar = parseFloat(producto.CantidadVenta || 1);
-      let itemExistente = productosVenta.find(v => v.IdProducto == producto.IdProducto);
+
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      
+      let presentaciones = [];
+      if (prod.PreciosPorProducto) {
+        presentaciones = JSON.parse(prod.PreciosPorProducto);
+      }
+
+      let presElegida = presentaciones.find(p => p.codigo && p.codigo.trim() === producto.codigoEscaneado);
+
+      let itemExistente = productosVenta.find(v => {
+        let mismoId = v.IdProducto == producto.IdProducto;
+        let mismaPres = v.presentacion === (presElegida ? JSON.stringify(presElegida) : null);
+        return mismoId && mismaPres;
+      });
 
       if (itemExistente) {
-        itemExistente.cantidad = parseFloat(itemExistente.cantidad) + cantidadASumar;
+        itemExistente.cantidad = parseFloat(itemExistente.cantidad) + (presElegida ? 1 : cantidadASumar);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
@@ -1977,30 +1988,27 @@ export default {
 
         return false;
       }
-      // console.log("producto", producto);
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod.PreciosPorProducto);
-      let pres = [];
-      if (prod.PreciosPorProducto) {
-        let newPres = JSON.parse(prod.PreciosPorProducto);
-        pres = newPres.filter(v => v.cantidad > 0);
+      if (presElegida) {
+        prod.Descripcion = presElegida.nombre;
+        prod.precio = parseFloat(presElegida.precio);
+        prod.cantidad = 1;
+        prod.presentacion = JSON.stringify(presElegida);
+        prod.bloquearInputPrecio = true;
+        prod.CantidadPresentacion = presElegida.cantidad;
+      } else {
+        prod.Descripcion = prod.ProductoPresentacion || "UNIDAD";
+        prod.precio = parseFloat(prod.PrecioContado);
+        prod.cantidad = cantidadASumar; 
+        prod.presentacion = null;
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = null;
       }
-      prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.cantidad = cantidadASumar; 
-      prod.precio = prod.PrecioContado;
+
+      prod.PreciosPorProducto = presentaciones.filter(v => v.cantidad > 0);
+      prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
       prod.descuento = 0;
-      prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
+      prod.tienePresentacion = prod.PreciosPorProducto.length > 0;
+
       productosVenta.unshift(prod);
 
       // this.$nextTick(() => {
@@ -2200,7 +2208,7 @@ export default {
         return acc + (p.cantidad * p.precio);
       }, 0);
 
-      return this.redondear(sumatoria).toFixed(1);
+      return this.redondear(sumatoria).toFixed(2);
     },
     getDescuento() {
       let productos = [...this.ventas[this.ventaActiva].productos];
@@ -2210,7 +2218,7 @@ export default {
         return acc + parseFloat(p.descuento || 0);
       }, 0);
 
-      return this.redondear(totalDescuento).toFixed(1);
+      return this.redondear(totalDescuento).toFixed(2);
     },
 
     getTotal() {
@@ -2221,7 +2229,7 @@ export default {
         return acc + (p.cantidad * p.precio - p.descuento);
       }, 0);
 
-      return this.redondear(totalVenta).toFixed(1);
+      return this.redondear(totalVenta).toFixed(2);
     },
     setOpcionVenta(opc) {
       this.ventas[this.ventaActiva].nombreLlevar = "";
@@ -2295,7 +2303,11 @@ export default {
       //     this.$swal.showLoading();
       //   }
       // });
+      let mostrarError = false;
+       if (this.loading) return; //BLOQUEO REAL
+       this.loading = true;
 
+      try { 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2334,6 +2346,7 @@ export default {
 
       if (!venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
+        mostrarError = true;
         // this.$swal({
         //   position: "center",
         //   icon: "info",
@@ -2348,6 +2361,7 @@ export default {
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
+        mostrarError = true;
         // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
         // this.$swal({
         //   position: "center",
@@ -2417,6 +2431,7 @@ export default {
         venta.tipoVenta.CodSunat == "07" ||
         venta.tipoVenta.CodSunat == "08"
       ) {
+        mostrarError = true;
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
           this.$toasted.show("Debe seleccionar un Documento de Referencia...");
           // this.$swal({
@@ -2432,6 +2447,7 @@ export default {
           return;
         }
         if (!venta.NotaIdMotivo) {
+          mostrarError = true;
           this.$toasted.show("Debe seleccionar un Motivo");
           // this.$swal({
           //   position: "center",
@@ -2456,6 +2472,7 @@ export default {
         )[0].text;
       }
       if (!productos.length) {
+        mostrarError = true;
         this.$toasted.show("No hay productos para vender");
         // this.$swal({
         //   position: "center",
@@ -2513,6 +2530,16 @@ export default {
         productos: productosPayload,
         idProductos: productosPayload.map(prod => prod.IdProducto)
       });
+
+      this.$swal({
+        title: "Procesando venta...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+      venta.requestId = Date.now() + '-' + Math.random();
       await this.axios.post(this.API + "ventas", ventaPayload).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
@@ -2536,6 +2563,17 @@ export default {
         // }
       });
       this.$swal.close();
+          }catch (error) {
+        console.log(error);
+        this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo # Venta");
+        this.loading = false;
+      }finally {
+          this.loading = false;
+
+          if (!mostrarError) {
+            this.$swal.close(); // SOLO SI NO ES ERROR
+          }
+        }
     },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
@@ -2601,6 +2639,7 @@ export default {
 
       var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
       if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
+        mostrarError = true;
         //this.$toasted.show('Una factura debe ser emitida para una empresa, no un usuario común.')
         this.$swal({
           position: "center",
@@ -2615,6 +2654,7 @@ export default {
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+        mostrarError = true;
         //this.$toasted.show('Una boleta no debe ser emitida para una empresa.')
         this.$swal({
           position: "center",
