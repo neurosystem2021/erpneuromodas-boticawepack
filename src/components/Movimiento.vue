@@ -192,6 +192,7 @@ export default {
   },
   methods: {
     async promptPassword() {
+      this.showMovimientoModal = true;
       // this.$swal.fire("golsss");
       /** await swal
         .fire({
@@ -221,65 +222,65 @@ export default {
             // Aquí puedes manejar los datos ingresados
           }
         }); */
-      await this.$swal.fire({
-        icon: "info",
-        title: "Escriba la contraseña del administrador",
-        html:
-          '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
-          '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
-        focusConfirm: false,
-        showCloseButton: true,
-        preConfirm: () => {
-          const input1 = document.getElementById("swal-input1").value;
-          const input2 = document.getElementById("swal-input2").value;
-          if (!input1 || !input2) {
-            this.$swal.showValidationMessage("Por favor, complete ambos campos");
-          }
-          return { usuario: input1, clave: input2 };
-        }
-      })
-        .then(async result => {
-          try {
-            const response = await this.axios.post(this.API + "login", {
-              user: result.value.usuario,
-              password: result.value.clave
-            });
-            if (response.data) {
-              console.log(response.data);
-              if (response.data.IdUsuarioPerfil == 1) {
-                this.showMovimientoModal = true;
-              } else {
-                this.$swal.fire({
-                  icon: "error",
-                  title: "Aviso",
-                  text:
-                    "EL usuario no cuenta con los privilegios de administrador."
-                });
-              }
-            } else {
-              this.$swal.fire(
-                "Contraseña incorrecta",
-                "La contraseña que ingresó es incorrecta.",
-                "error"
-              );
-            }
-          } catch (error) {
-            return;
-          }
-          // if (result.isConfirmed) {
-          //   let res = await this.validarUsuarioAdmin({
-          //     usuario: result.value.usuario,
-          //     clave: result.value.clave
-          //   });
-          //   console.log(res);
-          //   val = res.estadoflag;
-          //   msg = res.mensaje;
-          //   // Aquí puedes manejar los datos ingresados
-          // }
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      // await this.$swal.fire({
+      //   icon: "info",
+      //   title: "Escriba la contraseña del administrador",
+      //   html:
+      //     '<input id="swal-input1" class="swal2-input" placeholder="Usuario">' +
+      //     '<input id="swal-input2" type="password" class="swal2-input" placeholder="Contraseña">',
+      //   focusConfirm: false,
+      //   showCloseButton: true,
+      //   preConfirm: () => {
+      //     const input1 = document.getElementById("swal-input1").value;
+      //     const input2 = document.getElementById("swal-input2").value;
+      //     if (!input1 || !input2) {
+      //       this.$swal.showValidationMessage("Por favor, complete ambos campos");
+      //     }
+      //     return { usuario: input1, clave: input2 };
+      //   }
+      // })
+      //   .then(async result => {
+      //     try {
+      //       const response = await this.axios.post(this.API + "login", {
+      //         user: result.value.usuario,
+      //         password: result.value.clave
+      //       });
+      //       if (response.data) {
+      //         console.log(response.data);
+      //         if (response.data.IdUsuarioPerfil == 1) {
+      //           this.showMovimientoModal = true;
+      //         } else {
+      //           this.$swal.fire({
+      //             icon: "error",
+      //             title: "Aviso",
+      //             text:
+      //               "EL usuario no cuenta con los privilegios de administrador."
+      //           });
+      //         }
+      //       } else {
+      //         this.$swal.fire(
+      //           "Contraseña incorrecta",
+      //           "La contraseña que ingresó es incorrecta.",
+      //           "error"
+      //         );
+      //       }
+      //     } catch (error) {
+      //       return;
+      //     }
+      //     // if (result.isConfirmed) {
+      //     //   let res = await this.validarUsuarioAdmin({
+      //     //     usuario: result.value.usuario,
+      //     //     clave: result.value.clave
+      //     //   });
+      //     //   console.log(res);
+      //     //   val = res.estadoflag;
+      //     //   msg = res.mensaje;
+      //     //   // Aquí puedes manejar los datos ingresados
+      //     // }
+      //   })
+      //   .catch(e => {
+      //     console.log(e);
+      //   });
     },
     focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
