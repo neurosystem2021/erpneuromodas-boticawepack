@@ -1702,45 +1702,46 @@ export default {
       }
     },
 
-    async loadBarcode(e) {
-      if (e) e.preventDefault();
-      
-      let rawCode = this.loadCode.trim();
-      if (!rawCode) return;
-      let idBusqueda = rawCode;
-      let pesoExtraido = null;
+async loadBarcode(e) {
+  if (e) e.preventDefault();
+  
+  let rawCode = this.loadCode.trim();
+  if (!rawCode) return;
+  let idBusqueda = rawCode;
+  let pesoExtraido = null;
 
-      if (rawCode.startsWith('2') && rawCode.length === 13) {
-        idBusqueda = rawCode.substring(1, 7);
+  if (rawCode.startsWith('2') && rawCode.length === 13) {
+    idBusqueda = rawCode.substring(1, 7);
         
-        let pesoString = rawCode.substring(7, 12); 
-        pesoExtraido = parseFloat(pesoString) / 1000;
+    let pesoString = rawCode.substring(7, 12); 
+    pesoExtraido = parseFloat(pesoString) / 1000;
+  }
+
+  try {
+    let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
+      params: { codigoBarra: idBusqueda }
+    });
+
+    if (prod.data && prod.data.IdProducto) {
+      let datosProducto = prod.data;
+      
+      if (pesoExtraido !== null) {
+        datosProducto.CantidadVenta = pesoExtraido;
+        datosProducto.esBalanza = true; 
       }
+      
+      datosProducto.codigoEscaneado = rawCode; 
+      this.setProducto(datosProducto);
+    } else {
+      this.$toasted.show("No se encontró ningún producto");
+    }
+  } catch (error) {
+    console.error(error);
+    this.$toasted.show("Error al buscar producto");
+  }
 
-      try {
-        let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
-          params: { codigoBarra: rawCode }
-        });
-
-        if (prod.data && prod.data.IdProducto) {
-          let datosProducto = prod.data;
-          
-          if (pesoExtraido !== null) {
-            datosProducto.CantidadVenta = pesoExtraido;
-          }
-          datosProducto.codigoEscaneado = rawCode; 
-          
-          this.setProducto(datosProducto);
-        } else {
-          this.$toasted.show("No se encontró ningún producto");
-        }
-      } catch (error) {
-        console.error(error);
-        this.$toasted.show("Error al buscar producto");
-      }
-
-      this.loadCode = "";
-    },
+  this.loadCode = "";
+},
     startRecognition() {
       this.busqueda = "";
       if (!("webkitSpeechRecognition" in window)) {
@@ -1960,64 +1961,68 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto) {
-      let productosVenta = this.ventas[this.ventaActiva].productos;
-      let cantidadASumar = parseFloat(producto.CantidadVenta || 1);
+async setProducto(producto) {
+  let productosVenta = this.ventas[this.ventaActiva].productos;
+  let cantidadASumar = parseFloat(producto.CantidadVenta || 1);
 
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      
-      let presentaciones = [];
-      if (prod.PreciosPorProducto) {
-        presentaciones = JSON.parse(prod.PreciosPorProducto);
-      }
+  let prod = await this.obtenerStockBuscador(producto.IdProducto);
+  
+  let presentaciones = [];
+  if (prod.PreciosPorProducto) {
+    presentaciones = JSON.parse(prod.PreciosPorProducto);
+  }
 
-      let presElegida = presentaciones.find(p => p.codigo && p.codigo.trim() === producto.codigoEscaneado);
+  let presElegida = null;
+  if (!producto.esBalanza) {
+    presElegida = presentaciones.find(p => p.codigo && p.codigo.trim() === producto.codigoEscaneado);
+  }
 
-      let itemExistente = productosVenta.find(v => {
-        let mismoId = v.IdProducto == producto.IdProducto;
-        let mismaPres = v.presentacion === (presElegida ? JSON.stringify(presElegida) : null);
-        return mismoId && mismaPres;
-      });
+  let itemExistente = productosVenta.find(v => {
+    let mismoId = v.IdProducto == producto.IdProducto;
+    let mismaPres = v.presentacion === (presElegida ? JSON.stringify(presElegida) : null);
+    return mismoId && mismaPres;
+  });
 
-      if (itemExistente) {
-        itemExistente.cantidad = parseFloat(itemExistente.cantidad) + (presElegida ? 1 : cantidadASumar);
-        this.$nextTick(() => {
-          this.metodoPagoCambio(1);
-          this.irTxtLoadBarcode();
-        });
+  if (itemExistente) {
+    itemExistente.cantidad = parseFloat(itemExistente.cantidad) + (presElegida ? 1 : cantidadASumar);
+    this.$nextTick(() => {
+      this.metodoPagoCambio(1);
+      this.irTxtLoadBarcode();
+    });
 
-        return false;
-      }
-      if (presElegida) {
-        prod.Descripcion = presElegida.nombre;
-        prod.precio = parseFloat(presElegida.precio);
-        prod.cantidad = 1;
-        prod.presentacion = JSON.stringify(presElegida);
-        prod.bloquearInputPrecio = true;
-        prod.CantidadPresentacion = presElegida.cantidad;
-      } else {
-        prod.Descripcion = prod.ProductoPresentacion || "UNIDAD";
-        prod.precio = parseFloat(prod.PrecioContado);
-        prod.cantidad = cantidadASumar; 
-        prod.presentacion = null;
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-      }
+    return false;
+  }
+  if (presElegida) {
+    prod.Descripcion = presElegida.nombre;
+    prod.precio = parseFloat(presElegida.precio);
+    prod.cantidad = 1;
+    prod.presentacion = JSON.stringify(presElegida);
+    prod.bloquearInputPrecio = true;
+    prod.CantidadPresentacion = presElegida.cantidad;
+  } else {
+    prod.Descripcion = prod.ProductoPresentacion || "UNIDAD";
+    prod.precio = parseFloat(prod.PrecioContado);
+    prod.cantidad = cantidadASumar; 
+    prod.presentacion = null;
+    prod.bloquearInputPrecio = false;
+    prod.CantidadPresentacion = null;
+  }
 
-      prod.PreciosPorProducto = presentaciones.filter(v => v.cantidad > 0);
-      prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
-      prod.descuento = 0;
-      prod.tienePresentacion = prod.PreciosPorProducto.length > 0;
+  let presFiltradas = presentaciones.filter(v => v.cantidad > 0);
+  prod.PreciosPorProducto = presFiltradas;
+  prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
+  prod.descuento = 0;
+  prod.tienePresentacion = presFiltradas.length > 0;
 
-      productosVenta.unshift(prod);
+  productosVenta.unshift(prod);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      this.loadMovimientoLotes(prod.IdProducto);
-      this.metodoPagoCambio(1);
-      this.irTxtLoadBarcode();
-    },
+  this.loadMovimientoLotes(prod.IdProducto);
+  this.metodoPagoCambio(1);
+  this.irTxtLoadBarcode();
+},
     irAlPrimerProducto(event) {
       if (event) {
         event.preventDefault();
