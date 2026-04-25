@@ -2038,6 +2038,7 @@ async setProducto(producto) {
       this.$nextTick(() => {
         this.metodoPagoCambio(1);
       });
+      this.irTxtLoadBarcode();
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
