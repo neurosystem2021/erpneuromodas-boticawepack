@@ -1363,13 +1363,14 @@ export default {
       this.axios
         .post(this.API + "ventas", this.venta)
         .then(async response => {
-          let datos = { ...this.venta };
-          let impresora = await this.obtenerDatosImpresora();
-          datos.impresoraCocina = impresora;
-          let comandaJson = JSON.stringify({ comandaJson: datos });
+          let datosParaComanda = { ...this.venta };
+          let comandaJson = JSON.stringify({ comandaJson: datosParaComanda });
 
           const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
+          iframe.style.position = 'absolute';
+          iframe.style.width = '0px';
+          iframe.style.height = '0px';
+          iframe.style.border = 'none';
           iframe.name = 'print_frame';
           document.body.appendChild(iframe);
 
@@ -1388,10 +1389,24 @@ export default {
             doc.write(html);
             doc.close();
             
-            // Limpiamos el iframe después de un momento para que dé tiempo a imprimir
-            setTimeout(() => document.body.removeChild(iframe), 2000);
+            setTimeout(() => {
+              iframe.contentWindow.focus();
+              iframe.contentWindow.print(); 
+              setTimeout(() => {
+                if(document.body.contains(iframe)) document.body.removeChild(iframe);
+              }, 2000);
+            }, 500);
           })
-          .catch(error => console.error("Error en impresión automática:", error));
+          .catch(error => console.error("Error en impresión:", error));
+
+          setTimeout(() => {
+            window.open(
+              "/api/index.php/imprimirpdf/" + response.data.insertId,
+              "_blank",
+              "noopener"
+            );
+          }, 1200);
+            
           // limpiar preorden seleccionado
           this.$router.replace("/ventas");
           this.$toasted.success("Venta realizada con exito");
@@ -1410,26 +1425,10 @@ export default {
           this.$refs.inputVendedor.setValue("");
           //this.$refs.inputComisionista.setValue('')
           this.$refs.carrito.pagocon = 0;
-          const url = this.$router.resolve({
-            name: "Shipment",
-            params: { id: response.data.insertId }
-          }).href;
-
-          // window.open(url, "_blank");
-          // window.open(
-          //   "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
-          //   "_blank",
-          //   "noopener"
-          // );
-          window.open(
-            "/api/index.php/imprimirpdf/" + response.data.insertId,
-            "_blank",
-            "noopener"
-          );
           this.emitirauto(response.data.insertId);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
           this.inProgress = false;
         });
