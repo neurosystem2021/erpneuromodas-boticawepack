@@ -1709,18 +1709,27 @@ async loadBarcode(e) {
   if (!rawCode) return;
   let idBusqueda = rawCode;
   let pesoExtraido = null;
+  let esFormatoBalanza = false;
 
   if (rawCode.startsWith('2') && rawCode.length === 13) {
     idBusqueda = rawCode.substring(1, 7);
         
     let pesoString = rawCode.substring(7, 12); 
     pesoExtraido = parseFloat(pesoString) / 1000;
+    esFormatoBalanza = true;
   }
 
   try {
     let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
       params: { codigoBarra: idBusqueda }
     });
+
+    if (!prod.data && esFormatoBalanza) {
+        prod = await this.axios.get(this.API + "productos/id/" + rawCode, {
+            params: { codigoBarra: rawCode }
+        });
+        pesoExtraido = null; 
+    }
 
     if (prod.data && prod.data.IdProducto) {
       let datosProducto = prod.data;
