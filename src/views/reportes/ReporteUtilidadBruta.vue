@@ -29,7 +29,7 @@
                     <tr>
                         <th style="text-align: center;">IdProducto </th>
                         <th>Producto </th>
-                        <th>U. M. </th>
+                        <th>Pres. </th>
                         <th style="text-align: center;">Cantidad </th>
                         <th style="text-align: center;">Precio Costo </th>
                         <th style="text-align: center;">Precio Venta </th>

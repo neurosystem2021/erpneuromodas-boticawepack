@@ -2690,7 +2690,6 @@ export default {
             prod.PreciosPorProducto = pres;
             prod.tienePresentacion = pres.some(v => v.cantidad > 0);
             prod.bloquearInputPrecio = false;
-            prod.CantidadPresentacion = null;
 
             // Asignaciones desde el objeto 'producto' de la proforma
             prod.cantidad = producto.Cantidad;
@@ -2700,8 +2699,22 @@ export default {
 
             // Mapeos específicos que tenías al final de tu código
             prod.ProductoPresentacion = producto.ProductoPresentacion;
-            prod.Descripcion = producto.presentacion;
             prod.ProductoDesc = producto.ProductoDesc;
+
+            let presUsada = pres.find(p => p.nombre === producto.presentacion);
+
+            if (presUsada) {
+              prod.Descripcion = presUsada.nombre;
+              prod.CantidadPresentacion = presUsada.cantidad;
+              prod.bloquearInputPrecio = true;
+              prod.presentacion = JSON.stringify(presUsada);
+              prod.PrecioCosto = parseFloat(presUsada.precioc);
+            } else {
+              prod.Descripcion = producto.ProductoPresentacion || "UNIDAD";
+              prod.CantidadPresentacion = null;
+              prod.bloquearInputPrecio = false;
+              prod.presentacion = null;
+            }
 
             productos.push(prod);
           }
