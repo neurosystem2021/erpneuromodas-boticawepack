@@ -73,6 +73,7 @@
                           required="required"
                           ref="inputTipoVenta"
                           :url="API + 'ventas/tipos/electronicos'"
+                          :customParams="{ id_empresa: empresa }"
                           initValue=""
                           anchor="TipoDoc"
                           label="writer"
@@ -261,6 +262,7 @@ export default {
   },
   data() {
     return {
+      empresa: sessionStorage.getItem("empresa"),
       API: config.API,
       imgCaptcha: true,
       captcha: "",
@@ -667,7 +669,8 @@ export default {
 
       let url =
         this.API +
-        "ventas?estado=" +
+         "ventas?id_empresa=" + this.empresa +
+         "&estado=" +
         this.estadoVenta +
         "&idTipoDoc[]=" +
         this.tipoDoc.IdTipoDoc +
