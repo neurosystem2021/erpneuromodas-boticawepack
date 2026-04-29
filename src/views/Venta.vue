@@ -496,7 +496,7 @@
           <b-col md="8">
             <b-input-group prepend="Buscar Producto" class="mt-2 mb-2">
               <b-form-input placeholder="INGRESE UN PRODUCTO" autocomplete="off" v-model="busqueda"
-                @input="getProductosSearch" @focus.prevent=""></b-form-input>
+                @input="busquedaConRetraso" @focus.prevent=""></b-form-input>
               <b-input-group-append>
                 <b-button variant="info" @click="startRecognition">
                   <i class="fas fa-microphone"></i>
@@ -870,6 +870,7 @@ export default {
         { key: "acciones", label: "", thStyle: { width: "8%" } }
       ],
       busqueda: "",
+      debounceTimer: null,
       loadCode: "",
       tabActive: 0,
       ventaActiva: 0,
@@ -1829,28 +1830,37 @@ async loadBarcode(e) {
       }
     },
 
+    busquedaConRetraso(valor) {
+      clearTimeout(this.debounceTimer);
+
+      this.debounceTimer = setTimeout(() => {
+        console.log("Buscando ahora:", valor);
+        this.getProductosSearch(valor);
+      }, 1200);
+    },
+
     getProductosSearch(idProductoCategoria) {
-      console.log(idProductoCategoria);
-      if (this.venta.almacen.IdAlmacen) {
-        this.productosCategoria = [];
+      let idAlmacen = null;
+      if (this.ventas && this.ventas[this.ventaActiva] && this.ventas[this.ventaActiva].almacen) {
+        idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
+      }
+      if (idAlmacen) {
         this.cargandoProductos = true;
-        this.busqueda = "";
+        this.productosCategoria = [];
         this.axios
           .get(this.API + "productos/categoria", {
             params: {
               q: idProductoCategoria,
-              idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen,
-              MasMovido: idProductoCategoria == 0 ? 1 : 0
+              idAlmacen: idAlmacen,
+              MasMovido: (idProductoCategoria == "" || idProductoCategoria == 0) ? 1 : 0
             }
           })
           .then(response => {
-            this.cargandoProductos = false;
             this.productosCategoria = response.data;
-            //console.log(this.productosCategoria,"izi");
+            this.cargandoProductos = false;
           })
           .catch(error => {
-            this.cargandoProductos = true;
-            this.productosCategoria = [];
+            this.cargandoProductos = false;
             this.$toasted.show("Hubo un error, no hay conexion");
           });
       }
@@ -2318,9 +2328,19 @@ async setProducto(producto) {
       //     this.$swal.showLoading();
       //   }
       // });
-      let mostrarError = false;
        if (this.loading) return; //BLOQUEO REAL
        this.loading = true;
+
+      let mostrarError = false;
+
+      this.$swal({
+        title: "Procesando venta...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
 
       try { 
       let venta = this.ventas[this.ventaActiva];
@@ -2334,59 +2354,39 @@ async setProducto(producto) {
         this.obtenerMonto(venta.pago.delivery.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
-        return;
+        this.loading = false; this.$swal.close(); return;
       }
       if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago tarjeta/transferencia no puede ser negativo"
         );
-        return;
+          this.loading = false; this.$swal.close(); return;
       }
       if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
-        return;
+          this.loading = false; this.$swal.close(); return;
       }
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
-        this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
-        );
-        return;
+        this.$toasted.show("El metodo de pago Yape o Plin no puede ser negativo");
+        this.loading = false; this.$swal.close(); return;
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
-        return;
+        this.loading = false; this.$swal.close(); return;
       }
 
       if (!venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         mostrarError = true;
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   title: "Debe seleccionar un cliente",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-
+        this.loading = false; this.$swal.close();
         return;
       }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         mostrarError = true;
-        // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   title: "El RUC debe ser numérico, editar cliente.",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
+        this.loading = false; this.$swal.close();
         return;
       }
 
@@ -2407,7 +2407,7 @@ async setProducto(producto) {
 
       if (hayProductosSinStock && (this.ventaSinStock == 0 || this.ventaSinStock == "0") && venta.almacen.IdAlmacen != 2) {
           this.$toasted.show("No hay stock suficiente.");
-          this.inProgress = false;
+          this.loading = false; this.$swal.close();
           return;
       }  
 
@@ -2416,70 +2416,32 @@ async setProducto(producto) {
         this.$toasted.show(
           "Una factura debe ser emitida para una empresa, no un usuario común."
         );
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   title:
-        //     "Una factura debe ser emitida para una empresa, no a un usuario común",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
+        this.loading = false; this.$swal.close();
         return;
       }
       if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
         this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   title: "Una boleta no debe ser emitida para una empresa",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-
+        this.loading = false; this.$swal.close();
         return;
       }
       if (
         venta.tipoVenta.CodSunat == "07" ||
         venta.tipoVenta.CodSunat == "08"
       ) {
-        mostrarError = true;
         if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
           this.$toasted.show("Debe seleccionar un Documento de Referencia...");
-          // this.$swal({
-          //   position: "center",
-          //   icon: "info",
-          //   title: "Debe seleccionar un Documento de Referencia...",
-          //   showConfirmButton: true,
-          //   confirmButtonText: "Entiendo",
-          //   target: document.getElementById("conten"),
-          //   confirmButtonColor: "#0275d8"
-          // });
-
+          this.loading = false; this.$swal.close();
           return;
         }
         if (!venta.NotaIdMotivo) {
-          mostrarError = true;
           this.$toasted.show("Debe seleccionar un Motivo");
-          // this.$swal({
-          //   position: "center",
-          //   icon: "info",
-          //   title: "Debe seleccionar un Motivo",
-          //   showConfirmButton: true,
-          //   confirmButtonText: "Entiendo",
-          //   target: document.getElementById("conten"),
-          //   confirmButtonColor: "#0275d8"
-          // });
-
+          this.loading = false; this.$swal.close();
           return;
         }
         if (venta.NroComprobanteModifica == "") {
           this.$toasted.show("Debe seleccionar un Documento de Referencia");
-
           this.$refs.inputDocRef.focus();
+          this.loading = false; this.$swal.close();
           return;
         }
         venta.NotaDescMotivo = this.itemsMotivoNota.filter(
@@ -2487,27 +2449,13 @@ async setProducto(producto) {
         )[0].text;
       }
       if (!productos.length) {
-        mostrarError = true;
         this.$toasted.show("No hay productos para vender");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   title: "No hay productos para vender",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
-
+        this.loading = false; this.$swal.close();
         return;
       }
       const esNotaCredito = venta.tipoVenta.CodSunat == "07";
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.ventas[this.ventaActiva].productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
-      // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
       venta.IdPedido = this.$route.query.idPedido || null;
       venta.IdProyecto = this.$route.query.idProyecto || null;
@@ -2528,6 +2476,7 @@ async setProducto(producto) {
       } = this.buildVentaProductosPayload(productos, venta.tipoVenta.CodSunat);
       if (erroresLotes.length) {
         this.$toasted.show(erroresLotes[0]);
+        this.loading = false; this.$swal.close();
         return;
       }
       if (venta.cliente.DniRuc != "00000000") {
@@ -2546,16 +2495,8 @@ async setProducto(producto) {
         idProductos: productosPayload.map(prod => prod.IdProducto)
       });
 
-      this.$swal({
-        title: "Procesando venta...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
       venta.requestId = Date.now() + '-' + Math.random();
-      await this.axios.post(this.API + "ventas", ventaPayload).then(response => {
+      const response = await this.axios.post(this.API + "ventas", ventaPayload, { timeout: 20000 });
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
           window.open(
@@ -2563,31 +2504,24 @@ async setProducto(producto) {
             "_blank",
             "noopener"
           );
-        }
-
         if (this.ventas.length == 1) {
           window.location.reload();
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
         }
-
-        // if (response.data.actualizar) {
-        //   this.$toasted.show(response.data.msg);
-        //   return;
-        // }
-      });
-      this.$swal.close();
+        }
           }catch (error) {
         console.log(error);
-        this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo # Venta");
-        this.loading = false;
+          if (error.code === 'ECONNABORTED') {
+              this.$toasted.show("El servidor demora mucho, verifique si la venta se grabó.");
+          } else {
+              this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo # Venta");
+          }
       }finally {
           this.loading = false;
 
-          if (!mostrarError) {
             this.$swal.close(); // SOLO SI NO ES ERROR
-          }
         }
     },
     async guardarProforma() {
