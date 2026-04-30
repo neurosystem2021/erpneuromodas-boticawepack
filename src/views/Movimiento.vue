@@ -248,6 +248,7 @@ export default {
     }
   },
   mounted() {
+    this.$store.state.bloquearCarrito = false;
     this.$store.state.MostrarBotonMultipleEmpresa = false;
   },
   data() {

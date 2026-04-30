@@ -1061,6 +1061,7 @@ export default {
   },
   created() {},
   async mounted() {
+    this.$store.state.bloquearCarrito  = true;
     // 1. Inicializa objetos básicos para evitar el error de 'IdCliente'
     this.venta = { cliente: {}, pago: { efectivo: {}, visa: {}, mastercard: {}, deposito: {}, transferencia: {} } };
 

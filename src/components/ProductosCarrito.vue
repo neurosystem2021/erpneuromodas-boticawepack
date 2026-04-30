@@ -279,12 +279,11 @@
           <!-- disabled -->
           <input
           :disabled="
-              bloquearInput
-                ? true
-                : false || idPerfil == 1
-                ? false
-                : true || esDelivery
-            "
+              $store.state.bloquearCarrito ||
+              (bloquearInput ? true : false) ||
+              (idPerfil == 1 ? false : true) ||
+              esDelivery
+          "
             v-model="productos[data.index].precio"
             type="number"
             style="width: 95px"
@@ -397,7 +396,11 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput ? true : false || esDelivery"
+            :disabled="
+                $store.state.bloquearCarrito ||
+                (bloquearInput ? true : false) ||
+                esDelivery
+            "
             v-model="productos[data.index].descuento"
             style="width: 90px"
             type="number"
