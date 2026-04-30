@@ -1044,7 +1044,7 @@ export default {
       // do something with the method, url and etc.
 
       var newUrl =
-        url.indexOf(location.protocol + "//") !== -1
+         url.startsWith("http")
           ? url
           : location.protocol + "//" + location.host + url;
       newUrl = new URL(newUrl);
