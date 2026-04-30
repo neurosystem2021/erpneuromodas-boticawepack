@@ -1027,6 +1027,7 @@ import Proformas from "@/components/ProformaLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
 import Movimiento from "@/components/Movimiento";
 import Swal from "sweetalert2";
+import axios from "axios";
 export default {
   beforeMount() {
     let vm = this;
@@ -2283,14 +2284,14 @@ export default {
 
         // DISPARAR IMPRESIÓN
         if (ventasGeneradas.length > 0) {
-           
+             this.limpiarCart();
             let left = (screen.width / 2) - (400 / 2);
             let top = (screen.height / 2) - (400 / 2);
             let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=350,height=350,top=${top},left=${left}`;
 
             const basePrintUrl = "http://localhost:5000";
 
-            const respImpresion = await this.axios.post(
+            const respImpresion = await axios.post(
                 `${basePrintUrl}/imprimir/guardar_impresion.php`,
                 {
                     ventas: ventasGeneradas
@@ -2328,7 +2329,6 @@ export default {
             
 
             setTimeout(() => {
-                this.limpiarCart();
                 window.location.reload();
             }, 2500);
         }
