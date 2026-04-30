@@ -626,11 +626,11 @@
                   <th class="py-0"></th>
                   <th class="py-0">Códpreferencial</th>
                   <th class="py-0">Producto</th>
-                  <th class="py-0">Modelo</th>
+                  <!-- <th class="py-0">Modelo</th> -->
                   <th class="py-0">Marca</th>
-                  <th class="py-0">Procedencia</th>
+                  <!-- <th class="py-0">Procedencia</th> -->
                   <th class="py-0">Categoria</th>
-                  <th class="py-0">U.M.</th>
+                  <!-- <th class="py-0">U.M.</th> -->
                   <th class="py-0">Empresa</th>
                   <!-- <th class="py-0">Stock</th> -->
                   <!-- <th>Minimo</th> -->
@@ -653,11 +653,11 @@
                   <td class="py-0"> <b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
                   <td class="py-0">{{ prod.CodigoBarra }}</td>
                   <td class="py-0">{{ prod.Producto }}</td>
-                  <td class="py-0">{{prod.ProductoModelo }} </td>
+                  <!-- <td class="py-0">{{prod.ProductoModelo }} </td> -->
                   <td class="py-0">{{prod.ProductoMarca }} </td>
-                  <td class="py-0">{{prod.ProductoDesc3 }} </td>
+                  <!-- <td class="py-0">{{prod.ProductoDesc3 }} </td> -->
                   <td class="py-0">{{prod.ProductoCategoria }} </td>
-                  <td class="py-0">{{prod.ProductoMedicion }} </td>
+                  <!-- <td class="py-0">{{prod.ProductoMedicion }} </td> -->
                   <td class="py-0">{{ prod.NombreEmpresa }}</td>
                   <!-- <td class="py-0" style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td> -->
                   <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
@@ -1661,7 +1661,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 1200px; text-align: center;padding:0; margin:0">
+          <table id="table-render" style="width: 800px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
@@ -1677,13 +1677,8 @@ export default {
                 <td style="text-align:left; pading: 0 0 0 5px ;width: 400px"><b>${
                   data.Producto
                 }</b></td>
-                <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 100px">${
-                  data.ProductoDesc3 ? data.ProductoDesc3 : ""
-                }</td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMedicion}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado ? data.PrecioContado : ""
                 }</b></td>

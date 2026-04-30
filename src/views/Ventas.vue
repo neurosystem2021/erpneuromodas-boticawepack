@@ -5,7 +5,7 @@
     <Menu v-if="false"></Menu>
 <!-- {{ $store.state.proforma }} proforma
 {{ $store.state.lstProductosProforma }} lstProductosProforma -->
-    <b-container fluid class="ancho" id="conten">
+    <b-container fluid  id="conten">
       <div>
         <div>
           <b-button-group size="sm">
@@ -1148,16 +1148,16 @@ export default {
           },
           { key: "CodigoBarra", label: "Código" },
           { key: "Producto" },
-          { key: "ProductoModelo", label: "Modelo" },
+          //{ key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoDesc3", label: "Procedencia" },
+          //{ key: "ProductoDesc3", label: "Procedencia" },
           { key: "ProductoCategoria", label: "Categoria" },
           // { key: "Producto" },
-          { key: "Series" },
+          //{ key: "Series" },
           // { key: "AddSeries" },
           { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoCategoria", label: "Categoria" },
-          { key: "ProductoMedicion", label: "U.M" },
+          //{ key: "ProductoMedicion", label: "U.M" },
           { key: "NombreEmpresa", label: "Empresa" },
           { key: "ProductoPresentacion", label: "Anaquel" },
           { key: "Descripcion", label: "Descripción" },
