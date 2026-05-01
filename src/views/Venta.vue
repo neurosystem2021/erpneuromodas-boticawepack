@@ -1711,6 +1711,7 @@ async loadBarcode(e) {
   let idBusqueda = rawCode;
   let pesoExtraido = null;
   let esFormatoBalanza = false;
+  let esKilage = 0;
 
   if (rawCode.startsWith('2') && rawCode.length === 13) {
     idBusqueda = rawCode.substring(1, 7);
@@ -1718,16 +1719,23 @@ async loadBarcode(e) {
     let pesoString = rawCode.substring(7, 12); 
     pesoExtraido = parseFloat(pesoString) / 1000;
     esFormatoBalanza = true;
+    esKilage = 1;
   }
 
   try {
     let prod = await this.axios.get(this.API + "productos/id/" + idBusqueda, {
-      params: { codigoBarra: idBusqueda }
+      params: { 
+        codigoBarra: idBusqueda,
+        esKilage: esKilage
+      }
     });
 
     if (!prod.data && esFormatoBalanza) {
         prod = await this.axios.get(this.API + "productos/id/" + rawCode, {
-            params: { codigoBarra: rawCode }
+            params: { 
+              codigoBarra: rawCode,
+              esKilage: 1
+            }
         });
         pesoExtraido = null; 
     }
