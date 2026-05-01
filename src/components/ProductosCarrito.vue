@@ -601,12 +601,13 @@
               </b-button>
             </b-input-group-append>
             <input
+              ref="inputCodigoBarra"
               v-model="CodigoBarra"
-              @input="cargarListadoProductos(3)"
+              @input="onInputCodigoBarra"
               type="text"
               class="form-control ml-2  inputResponsive"
               placeholder="Codigo de Barra"
-               v-on:keyup.enter="anadirProductos"
+              v-on:keyup.enter="anadirProductos"
             />
             <b-input-group-append>
               <!--<proveedores-tabla></proveedores-tabla>-->
@@ -1213,6 +1214,36 @@ export default {
     }
   },
   methods: {
+    async onInputCodigoBarra() {
+      if (!this.CodigoBarra) return;
+
+      await this.cargarListadoProductos(3);
+
+      // pequeño delay para no pelear con Vue render
+      setTimeout(() => {
+        this.forzarFocusPersistente();
+      }, 50);
+    },
+    forzarFocusPersistente() {
+      let intentos = 0;
+
+      const intervalo = setInterval(() => {
+        const input = this.$refs.inputCodigoBarra;
+
+        if (input) {
+          input.focus();
+          input.select();
+        }
+
+        intentos++;
+
+        // después de varios intentos lo detenemos
+        if (intentos > 10) {
+          clearInterval(intervalo);
+          //console.log("FOCUS ASEGURADO");
+        }
+      }, 100);
+    },
     seleccionarProducto(prod) {
     // guardar seleccionado
     this.selectedProducto = prod;
@@ -1837,6 +1868,9 @@ export default {
       this.modalNuevoProductos = !this.modalNuevoProductos;
       this.CodigoBarra = "";
       await this.cargarListadoProductos(4);
+       this.$nextTick(() => {
+          this.forzarFocusPersistente();
+        });
     },
     async cargarListadoProductos(tipo) {
       let IdProductos = this.productos.map(v => {
@@ -1884,6 +1918,25 @@ export default {
           default:
             break;
         }
+
+
+        // AUTO AGREGAR SI ES CODIGO DE BARRA
+        if (tipo === 3 && this.CodigoBarra && res.data.length === 1) {
+            this.anadirarProductosSeleccionado(res.data[0], true);
+
+            // LIMPIAR DESPUÉS DEL RENDER
+            this.$nextTick(() => {
+              this.CodigoBarra = "";
+
+               this.cargarListadoProductos(4);
+
+              // DOBLE REFUERZO DE FOCUS
+              setTimeout(() => {
+                this.forzarFocusPersistente();
+              }, 50);
+            });
+          }
+
       });
     },
 
