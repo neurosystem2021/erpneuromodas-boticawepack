@@ -2226,6 +2226,36 @@ export default {
         this.bloquearVenta = false;
         return;
       }
+
+      // 1. Forzar que todo sea número y redondear a 2 decimales para la suma de productos
+      const sumaRealProductos = productos.reduce((total, prod) => {
+          let cant = parseFloat(prod.cantidad) || 0;
+          let prec = parseFloat(prod.precio) || 0;
+          let desc = parseFloat(prod.descuento) || 0;
+          return total + (cant * prec - desc);
+      }, 0);
+
+      // 2. Convertir a número fijo para evitar problemas de precisión
+      const totalCalculado = Number(parseFloat(sumaRealProductos).toFixed(2));
+      const totalExhibido   = Number(parseFloat(this.getTotal()).toFixed(2));
+      const totalPagado     = Number(parseFloat(totalPagos).toFixed(2));
+
+      // Depuración en consola (Presiona F12 para ver si hay diferencia mínima)
+      console.log("Calculado Prod:", totalCalculado, "Exhibido:", totalExhibido, "Pagado:", totalPagado);
+
+      // 3. COMPARACIÓN CORREGIDA
+      if (totalCalculado !== totalExhibido) {
+          this.$toasted.show("¡ERROR!: El total no coincide con los productos.");
+          this.bloquearVenta = false; 
+          return;
+      }
+
+      if (Math.abs(totalPagado - totalExhibido) > 0.01) { // Permite una diferencia mínima de un céntimo
+          this.$toasted.show(`¡ERROR!: El monto pagado (S/ ${totalPagado}) no coincide con el total (S/ ${totalExhibido})`);
+          this.bloquearVenta = false;
+          return;
+      }
+
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         // this.$toasted.show('El RUC debe ser numérico, editar cliente.')
