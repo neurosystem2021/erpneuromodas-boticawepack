@@ -601,6 +601,12 @@
               </b-button>
             </b-input-group-append>
             <input
+              v-model="searchSoloBarras"
+              placeholder="Buscar por Codigo de Barra"
+              class="form-control"
+              @input="cargarListadoPorBarras" 
+            />
+            <input
               ref="inputCodigoBarra"
               v-model="CodigoBarra"
               @input="onInputCodigoBarra"
@@ -965,6 +971,7 @@ export default {
       modalNuevoProductos: false,
       lstProductos: [],
       busqueda: "",
+      searchSoloBarras: "",
       // perPage: 7,
       currentPage: 1,
       searchProducto: "",
@@ -1872,6 +1879,28 @@ export default {
           this.forzarFocusPersistente();
         });
     },
+
+    async cargarListadoPorBarras() {
+      let IdProductos = this.productos.map(v => v.IdProducto);
+      
+      await this.axios(
+        `${this.API}productos/puntoventa/barcode/stock/${this.idAlmacen}`,
+        {
+          params: {
+            search: this.searchSoloBarras,
+            limit: this.perPageModal,
+            page: 0,
+            IdProductos: IdProductos.join(",")
+          }
+        }
+      ).then(res => {
+        this.lstProductosRapido = res.data;
+        this.lstProductosDescripcion = res.data;
+      }).catch(err => {
+        console.error("Error en búsqueda por barras:", err);
+      });
+    },
+
     async cargarListadoProductos(tipo) {
       let IdProductos = this.productos.map(v => {
         return v.IdProducto;

@@ -10,8 +10,21 @@
                 headerTextVariant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">           
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                <div class="d-flex flex-column align-items-center mb-4">
+                    <b-button-group size="sm" class="w-100">
+                        <b-form-select
+                            v-model="id_empresa_local"
+                            :options="$store.state.empresas"
+                            size="lg"
+                            value-field="IDEMPRESA"
+                            text-field="RAZONSOCIAL"
+                            @change="cambiarEmpresa" 
+                        ></b-form-select>
+                    </b-button-group>
+                </div>
+                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" class="mb-2" />  
                     <b-table 
+                        ref="tableCierres"
                         v-if="show"
                         id="my-table" 
                         striped hover 
@@ -24,7 +37,7 @@
                         :current-page="currentPage">
                         
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja + '&empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja + '&empresa=' + id_empresa_local" variant="primary" target="_blank">Ver</b-button>
                         <b-button :href="'/api/index.php/cierrecaja/pdfresumen/' + data.item.IdCierreCaja" target="_blank" variant="success" >PDF Resumen</b-button>
                       </template>
 
@@ -51,7 +64,14 @@
 import config from "@/store/config.js";
 
 export default {
-  mounted() {},
+  mounted() {
+    const guardada = sessionStorage.getItem("empresa");
+    if (guardada) {
+            this.id_empresa_local = guardada;
+        } else if (this.empresa) {
+            this.id_empresa_local = this.empresa;
+        }
+      },
   watch: {
     items() {
       let empresa = sessionStorage.getItem("empresa");
@@ -67,6 +87,7 @@ export default {
   props: ["empresa"],
   data() {
     return {
+      id_empresa_local: this.empresa,
       API: config.API,
       show: false,
       filter: "",
@@ -78,7 +99,40 @@ export default {
       currentPage: 1
     };
   },
+  computed: {
+    nombreEmpresaActual() {
+      const lista = this.$store.state.empresas;
+      if (lista && this.id_empresa_local) {
+        const encontrada = lista.find(e => String(e.IDEMPRESA) === String(this.id_empresa_local));
+        return encontrada ? encontrada.RAZONSOCIAL : "";
+      }
+      return "Seleccione una Empresa";
+    }
+  },
   methods: {
+    cambiarEmpresa(nuevoId) {
+        // 1. Guardamos en el storage por si el usuario refresca manualmente luego
+        sessionStorage.setItem("empresa", nuevoId);
+        
+        // 2. Actualizamos el total de filas para la nueva empresa
+        this.actualizarCount(nuevoId);
+
+        // 3. ¡ESTA ES LA MAGIA! Refresca solo la tabla dentro del modal
+        this.$nextTick(() => {
+            if (this.$refs.tableCierres) {
+                this.$refs.tableCierres.refresh();
+            }
+        });
+    },
+
+    actualizarCount(idEmpresa) {
+        this.axios.get(this.API + "cierrecaja/count", {
+            params: { id_empresa: idEmpresa }
+        })
+        .then(response => {
+            this.totalRows = response.data.total;
+        });
+    },
     selectCierre(item) {
       // console.log(item)
     },

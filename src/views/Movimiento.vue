@@ -546,6 +546,11 @@ export default {
         this.movimiento.alterarProductos = 0;
       }
 
+      if (!confirm("¿Está seguro de que desea registrar este movimiento?")) {
+        this.inProgress = false;
+        return; 
+      }
+
       this.axios
         .post(this.API + "movimientos?id_empresa=" + this.empresa, {
           movimiento: this.movimiento,
