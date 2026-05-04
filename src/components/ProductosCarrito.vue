@@ -581,19 +581,19 @@
           <b-input-group>
             <input
               v-model="searchProducto"
+              @input="onSearchProducto()"
               placeholder="Búsqueda Rápida"
               class="form-control inputResponsive"
-              @input="cargarListadoProductos(1)"
               id="searchProducto"
               label="Búsqueda Rápida"
             >
-            <input
+            <!-- <input
               v-model="searchProductoDesc"
               placeholder="Filtrar Por Descripción"
               class="form-control inputResponsive"
               @input="cargarListadoProductos(2)"
               id="searchProducto"
-            >
+            > -->
             <b-button  @click="limpiarBuscar" variant="warning"> X </b-button>
             <b-input-group-append>
               <b-button @click="startRecognition()" variant="info">
@@ -602,9 +602,9 @@
             </b-input-group-append>
             <input
               v-model="searchSoloBarras"
+              @input="onSearchBarras()"
               placeholder="Buscar por Codigo de Barra"
               class="form-control"
-              @input="cargarListadoPorBarras" 
             />
             <input
               ref="inputCodigoBarra"
@@ -977,6 +977,10 @@ export default {
       searchProducto: "",
       searchProductoDesc: "",
       errorMontoPresentacion: "",
+      searchProducto: "",
+      searchSoloBarras: "",
+      searchTimeout: null,
+      searchTimeoutBarras: null,
       monto: 0,
       selected: 1,
       options: [
@@ -1309,6 +1313,19 @@ export default {
       this.productos[index] = prod;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
+    },
+    onSearchProducto() {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.cargarListadoProductos(1);
+      }, 700);
+    },
+
+    onSearchBarras() {
+      clearTimeout(this.searchTimeoutBarras);
+      this.searchTimeoutBarras = setTimeout(() => {
+        this.cargarListadoPorBarras();
+      }, 700);
     },
     abrirmodalNuevaSerie(index, producto) {
       this.Serie = "";
