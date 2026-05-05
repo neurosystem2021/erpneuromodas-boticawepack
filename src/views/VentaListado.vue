@@ -1850,6 +1850,9 @@ export default {
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+        this.$nextTick(() => {
+          this.metodoPagoCambio(1);
+        });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
