@@ -1522,6 +1522,7 @@ export default {
               this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
+            this.loadCode = "";
           });
       }
     },
