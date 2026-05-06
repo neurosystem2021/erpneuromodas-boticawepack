@@ -494,6 +494,9 @@ export default {
       this.movimiento.proveedor = obj;
     },
     setAlmacenOrigen(obj) {
+      this.movimiento.almacenOrigen = obj;
+      sessionStorage.setItem('almacenActivo', JSON.stringify(obj));
+      this.actualizarPreciosCarrito(obj.IdAlmacen);
       this.limpiarCart();
       if (this.isSalida) {
         this.obtenerStok({
@@ -516,6 +519,8 @@ export default {
     },
     setAlmacenDestino(obj) {
       this.movimiento.almacenDestino = obj;
+      sessionStorage.setItem('almacenActivo', JSON.stringify(obj));
+      this.actualizarPreciosCarrito(obj.IdAlmacen);
       this.obtenerStok({
         IdAlmacen: !this.isTraslado
           ? this.movimiento.almacenDestino.IdAlmacen > 0
@@ -524,6 +529,17 @@ export default {
           : this.movimiento.almacenOrigen.IdAlmacen > 0
             ? this.movimiento.almacenOrigen.IdAlmacen
             : 1
+      });
+    },
+    actualizarPreciosCarrito(idAlmacen) {
+      this.productos.forEach((prod, index) => {
+        if (idAlmacen == 2) {
+          Vue.set(this.productos[index], 'precio', prod.PrecioCosto2 || 0);
+          Vue.set(this.productos[index], 'nuevoPrecioContado', prod.PrecioContado2 || 0);
+        } else {
+          Vue.set(this.productos[index], 'precio', prod.PrecioCosto || 0);
+          Vue.set(this.productos[index], 'nuevoPrecioContado', prod.PrecioContado || 0);
+        }
       });
     },
     setMoneda(obj) {
@@ -536,8 +552,19 @@ export default {
     },
     onSetProducto(obj, precio = false, precioc = false) {
       obj.cantidad = 1;
-      obj.precio = obj.PrecioCosto || 0;
-      obj.nuevoPrecioContado = obj.PrecioContado || 0;
+      
+      const almacenGuardado = sessionStorage.getItem('almacenActivo');
+      const almacenActivo = almacenGuardado 
+        ? JSON.parse(almacenGuardado) 
+        : { IdAlmacen: 1 };
+      
+      if (almacenActivo.IdAlmacen == 2) {
+        obj.precio = obj.PrecioCosto2 || 0;
+        obj.nuevoPrecioContado = obj.PrecioContado2 || 0;
+      } else {
+        obj.precio = obj.PrecioCosto || 0;
+        obj.nuevoPrecioContado = obj.PrecioContado || 0;
+      }
       if (precio) {
         obj.nuevoPrecioContado = precio || 0;
       }
@@ -578,9 +605,11 @@ export default {
           faltaLlenar = true;
         }
 
-        if (prod.stock <= 0 || parseFloat(prod.cantidad) > prod.stock) {
-          faltaStock = true;
-        }
+        // if (this.movimiento.movimientoTipo.Tipo != 0) {
+        //   if (prod.stock <= 0 || parseFloat(prod.cantidad) > prod.stock) {
+        //     faltaStock = true;
+        //   }
+        // }
 
         /*if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
           if(prod.FechaVen.length>10){
@@ -610,10 +639,8 @@ export default {
         }
 
         if (this.movimiento.movimientoTipo.Tipo != 0) {
-          if (
-            prod.stock <= 0 ||
-            parseFloat(prod.cantidad) > prod.stockMovimiento
-          ) {
+          const stockDisponible = parseFloat(prod.stockMovimiento || prod.stock || 0);
+          if (stockDisponible <= 0 || parseFloat(prod.cantidad) > stockDisponible) {
             faltaStock = true;
           }
         }
@@ -671,7 +698,8 @@ export default {
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
             productos: this.productos,
-            ordenCompra: this.ordenCompra
+            ordenCompra: this.ordenCompra,
+            almacenActivo: JSON.parse(sessionStorage.getItem('almacenActivo') || '{"IdAlmacen":1}')
           })
           .then(response => {
             if (response.data.error) {

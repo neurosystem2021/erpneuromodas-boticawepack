@@ -294,6 +294,7 @@
               step="0.00001"
               type="number"
               class="form-control"
+              :disabled="almacen && almacen.IdAlmacen === 2"
               />
           </b-form-group>
         </b-col>
@@ -316,6 +317,7 @@
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
+              :disabled="almacen && almacen.IdAlmacen === 2"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -324,12 +326,25 @@
         </b-col>
         <b-col md="6">
           <b-form-group>
-            <label>Precio 2:</label>
+            <label>Precio de Costo (Almacen2):</label>
+            <input
+              v-model="producto.PrecioCosto2"
+              step="0.00001"
+              type="number"
+              class="form-control"
+              :disabled="!almacen || almacen.IdAlmacen === 1"
+              />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label>Precio Público (Almacen2):</label>
             <input v-model="producto.PrecioContado2"
               type="number"
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
+              :disabled="!almacen || almacen.IdAlmacen === 1"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -497,10 +512,7 @@ export default {
       fechaVenMovimiento: "",
       serieNumero: "",
       title: "Nuevo Producto",
-      almacen: {
-        IdAlmacen: 1,
-        Almacen: "PRINCIPAL"
-      },
+      almacen: null,
       API: config.API,
       nuevo: false,
       show: false,
@@ -579,7 +591,15 @@ export default {
             this.producto.Producto = newVal.Producto;
             this.producto.IdProducto = newVal.IdProducto;
             this.producto.EsPadre = newVal.EsPadre;
-            this.loadAlmacen(1);
+            const almacenGuardado = sessionStorage.getItem('almacenActivo');
+            if (almacenGuardado) {
+              this.$nextTick(() => {
+                const almacen = JSON.parse(almacenGuardado);
+                this.setAlmacen(almacen);
+              });
+            } else {
+              this.loadAlmacen(1);
+            }
             Vue.nextTick(() => {
               if (this.$refs.productoDet)
                 this.$refs.productoDet.show = parseInt(newVal.EsPadre);
@@ -599,6 +619,7 @@ export default {
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
             this.producto.PrecioCosto = newVal.PrecioCosto;
+            this.producto.PrecioCosto2 = newVal.PrecioCosto2;
             this.producto.PrecioContado = newVal.PrecioContado;
             this.producto.PrecioContado2 = newVal.PrecioContado2;
             this.producto.precioConvenio = newVal.precioConvenio;
@@ -737,6 +758,12 @@ export default {
         })
       }
     },*/
+    esAlmacen1() {
+      return this.almacen && this.almacen.IdAlmacen == 1;
+    },
+    esAlmacen2() {
+      return this.almacen && this.almacen.IdAlmacen == 2;
+    },
     loadAlmacen(id) {
       this.axios.get(this.API + "almacenes/id/" + id).then(res => {
         this.setAlmacen(res.data);
@@ -744,7 +771,9 @@ export default {
     },
     setAlmacen(obj) {
       this.almacen = obj;
-      this.$refs.inputAlmacen.setValue(obj.Almacen);
+        if (this.$refs.inputAlmacen) {
+          this.$refs.inputAlmacen.setValue(obj.Almacen);
+        }
       this.loadMovimientoLotes(this.producto.IdProducto);
     },
     changeMovimiento(hash) {
@@ -887,6 +916,8 @@ export default {
         StockMinimo: 0,
         TienePresentacion: 0,
         StockPorMayor: 0,
+        PrecioCosto: 0,
+        PrecioCosto2: 0,
         PrecioContado: 0,
         PrecioContado2: 0,
         PrecioPorMayor: 0,

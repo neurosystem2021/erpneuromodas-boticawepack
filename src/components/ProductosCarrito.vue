@@ -1040,10 +1040,22 @@ export default {
     setProductoUni(obj) {
       this.$refs.autocompleteProducto.setValue("");
       obj.subt = "";
-      obj.precio = obj.PrecioCosto;
-      obj.cantidad = 0;
+      
+      // 👇 Leer almacén activo
+      const almacenGuardado = sessionStorage.getItem('almacenActivo');
+      const almacenActivo = almacenGuardado ? JSON.parse(almacenGuardado) : { IdAlmacen: 1 };
+      
+      // 👇 Asignar precio según almacén
+      if (almacenActivo.IdAlmacen == 2) {
+        obj.precio = obj.PrecioCosto2 || 0;
+        obj.nuevoPrecioContado = obj.PrecioContado2 || 0;
+      } else {
+        obj.precio = obj.PrecioCosto || 0;
+        obj.nuevoPrecioContado = obj.PrecioContado || 0;
+      }
+      
+      obj.cantidad = 1;
       obj.descuento = 0;
-      obj.nuevoPrecioContado = 0;
       obj.Presentacion = obj.ProductoMedicion;
       obj.CantidadPresentacion = 1;
       obj.EsPresentacion = 0;

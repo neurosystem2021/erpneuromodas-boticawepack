@@ -99,6 +99,9 @@ export default {
   methods: {
     rowClick(item, index) {
       this.productoSelect = item;
+      if (!sessionStorage.getItem('almacenActivo')) {
+        sessionStorage.setItem('almacenActivo', JSON.stringify({ IdAlmacen: 1, Almacen: 'PRINCIPAL' }));
+      }
       this.$refs.productoForm.show = true;
       //this.$refs.productoForm.producto.IdProducto = 'a'
       //console.log(this.$refs.productoForm.$refs.productoForm)
@@ -108,6 +111,9 @@ export default {
     },
     nuevoProducto() {
       this.productoSelect = {};
+      if (!sessionStorage.getItem('almacenActivo')) {
+        sessionStorage.setItem('almacenActivo', JSON.stringify({ IdAlmacen: 1, Almacen: 'PRINCIPAL' }));
+      }
       this.$refs.productoForm.show = true;
     },
     myProvider(ctx) {

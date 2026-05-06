@@ -54,10 +54,17 @@ export default {
       };
       await this.axios.post(`${this.API}login`, data).then(res => {
         if (res.data) {
-          //   console.log(window.location);
-          //   let url = `${window.location.origin}/views/V_VentaForm.php`;
-          //   console.log(url);
-          //   window.location = url;
+          if (res.data.IdAlmacen) {
+            sessionStorage.setItem('almacenActivo', JSON.stringify({
+              IdAlmacen: res.data.IdAlmacen,
+              Almacen: res.data.Almacen
+            }));
+          } else {
+            sessionStorage.setItem('almacenActivo', JSON.stringify({
+              IdAlmacen: 1,
+              Almacen: 'PRINCIPAL'
+            }));
+          }
           setTimeout(() => {
             window.location.href = "/views/V_VentaForm.php";
           }, 1000);
