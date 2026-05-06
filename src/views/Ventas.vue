@@ -157,6 +157,8 @@
                       :customParams="{ id_empresa: empresa }"
                       :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
                       :classes="{ input: 'form-control' }"
+                      @focus.native="selectClienteTexto"
+                      @click.native="selectClienteTexto"
                     >
                     </autocomplete>
                     <input
@@ -1282,6 +1284,15 @@ export default {
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
+    selectClienteTexto() {
+      this.$nextTick(() => {
+        // buscar el input real dentro del componente autocomplete
+        let input = this.$refs.inputCliente.$el.querySelector("input");
+        if (input) {
+          input.select();
+        }
+      });
+    },
     togglePopover() {
       if (this.mostrar) {
         this.$root.$emit("bv::hide::popover", `popover-metodopago`);

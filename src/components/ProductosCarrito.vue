@@ -45,6 +45,7 @@
               "
               ref="productoFormEdit"
               :producto-update="productoSelect"
+              @producto-editado="actualizarProductoEnCarrito" 
             ></producto-form>
           </b-input-group-append>
         </b-input-group>
@@ -288,7 +289,7 @@
             type="number"
             style="width: 95px"
             min="0"
-            step="0.00001"
+            step="0.000001"
             class="form-control"
             placeholder="Precio"
             @input="setNuevoPrecioContado(data.index)"
@@ -1235,6 +1236,32 @@ export default {
         this.forzarFocusPersistente();
       }, 50);
     },
+    actualizarProductoEnCarrito(productoEditado) {
+      let index = this.productos.findIndex(
+        p => p.IdProducto === productoEditado.IdProducto
+      );
+
+      if (index !== -1) {
+        let prodActual = this.productos[index];
+
+        // COSTO → afecta P/U
+        let nuevoCosto = parseFloat(productoEditado.PrecioCosto) || 0;
+        prodActual.precio = nuevoCosto;        // ← ESTE ES EL P/U
+        prodActual.PrecioCosto = nuevoCosto;
+
+        // PRECIO VENTA → solo referencia
+        let nuevoVenta = parseFloat(productoEditado.PrecioContado) || 0;
+        prodActual.PrecioContado = nuevoVenta;
+        prodActual.nuevoPrecioContado = nuevoVenta;
+
+        // recalcular subtotal
+        let cantidad = parseFloat(prodActual.cantidad) || 0;
+        prodActual.subtotal = (cantidad * nuevoCosto).toFixed(2);
+        prodActual.total = (cantidad * nuevoCosto).toFixed(2);
+
+        this.$set(this.productos, index, prodActual);
+      }
+    },
     forzarFocusPersistente() {
       let intentos = 0;
 
@@ -1670,8 +1697,11 @@ export default {
     },
     recalcularTotalPorItem(item, index) {
       let produc = { ...item };
-      item.subtotal = parseFloat(produc.cantidad * produc.precio).toFixed(2);
-      item.total = parseFloat(produc.cantidad * produc.precio).toFixed(2);
+      let cantidad = parseFloat(produc.cantidad) || 0;
+      let precio = parseFloat(produc.precio) || 0;
+
+      item.subtotal = (cantidad * precio).toFixed(2);
+      item.total = (cantidad * precio).toFixed(2);
       this.mostrarTablaProductos = false;
 
       this.mostrarTablaProductos = !false;

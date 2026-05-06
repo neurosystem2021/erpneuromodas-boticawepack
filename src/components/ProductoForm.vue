@@ -868,12 +868,18 @@ export default {
         })
         .then(response => {
           if (this.cbGuardar) {
-            this.cbGuardar(
-              response.data.insertId,
-              this.producto.precios,
-              this.producto
-            );
-          }
+              if (this.producto.IdProducto) {
+                // EDITAR → actualizar en carrito
+                this.$emit("producto-editado", this.producto);
+              } else {
+                // NUEVO → agregar al carrito
+                this.cbGuardar(
+                  response.data.insertId,
+                  this.producto.precios,
+                  this.producto
+                );
+              }
+            }
           if (response.data.error) {
             this.$toasted.show(
               response.data.error + " - " + response.data.codigoBarra
