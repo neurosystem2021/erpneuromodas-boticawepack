@@ -708,7 +708,7 @@
             </b-button>
             <b-button
               type="button"
-              v-if="!this.$route.query.idPedido"
+              v-if="!this.$route.query.idPedido && idPerfil == 1"
               :disabled="inProgress"
               variant="primary"
               size="lg"

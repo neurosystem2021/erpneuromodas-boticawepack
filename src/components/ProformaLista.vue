@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" style="background: #D50000 ; color: #ffffff;" class="btnAction">Ver Proformas</b-button>
+        <b-button  v-if="idPerfil == 1" @click="show=true" style="background: #D50000 ; color: #ffffff;" class="btnAction">Ver Proformas</b-button>
         
         <b-form ref="formProformaModal" >    
             <b-modal id="modalProformas" 
@@ -99,6 +99,7 @@ export default {
   },
   data() {
     return {
+      idPerfil: sessionStorage.getItem("IdPerfil") || 0,
       cargandoProforma: false,
       API: config.API,
       show: false,
