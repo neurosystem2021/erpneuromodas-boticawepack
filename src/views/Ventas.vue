@@ -2054,22 +2054,22 @@ export default {
    // RESTRICCION DE STOCK (VENTAS EN 0 O NEGATIVO)
 
     for (let producto of this.productos) {
-        const stock = parseFloat(producto.Stock) || 0;
-        const cantidad = parseFloat(producto.cantidad) || 0;
+      const stock = Number(producto.stock || producto.Stock || 0);
+      const cantidad = Number(producto.cantidad || 0);
 
-        if (stock <= 0) {
-            this.$toasted.show(`El producto "${producto.Producto}" no tiene stock disponible`);
-            this.inProgress = false;
-            this.loading = false;
-            return;
-        }
+      if (stock <= 0) {
+          this.$toasted.show(`El producto "${producto.Producto}" no tiene stock disponible`);
+          this.inProgress = false;
+          this.loading = false;
+          return;
+      }
 
-        if (cantidad > stock) {
-            this.$toasted.show(`Stock insuficiente para "${producto.Producto}". Disponible: ${stock}`);
-            this.inProgress = false;
-            this.loading = false;
-            return;
-        }
+      if (cantidad > stock) {
+          this.$toasted.show(`Stock insuficiente para "${producto.Producto}". Disponible: ${stock}`);
+          this.inProgress = false;
+          this.loading = false;
+          return;
+      }
     }
 
     // 2. Validaciones iniciales
