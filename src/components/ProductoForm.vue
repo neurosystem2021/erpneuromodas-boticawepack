@@ -438,9 +438,19 @@
               type="number"
               style="width:80px;"
             ></b-form-input>
-            <b-input-group-append>
-              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
-            </b-input-group-append>
+              <b-input-group-append>
+                  <b-btn
+                    variant="info"
+                    target="_blank"
+                    :href="'/views/codigoBarra.php?idProducto=' 
+                      + producto.IdProducto 
+                      + '&cantidad=' + cantidadCodigoBarra
+                      + '&idEmpresa=' + empresa">
+
+                    Código de barra
+
+                  </b-btn>
+                </b-input-group-append>
           </b-input-group>
         </div>
        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">

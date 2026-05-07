@@ -1336,7 +1336,7 @@ export default {
     },
     recalcularPUxSubTotal(index) {
       let prod = { ...this.productos[index] };
-      prod.precio = parseFloat(prod.subtotal / prod.cantidad);
+      prod.precio = Math.round((prod.subtotal / prod.cantidad) * 1000000) / 1000000;
       this.productos[index] = prod;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
       this.mostrarTablaProductos = !this.mostrarTablaProductos;
@@ -1699,6 +1699,8 @@ export default {
       let produc = { ...item };
       let cantidad = parseFloat(produc.cantidad) || 0;
       let precio = parseFloat(produc.precio) || 0;
+
+      precio = Math.round(precio * 1000000) / 1000000;
 
       item.subtotal = (cantidad * precio).toFixed(2);
       item.total = (cantidad * precio).toFixed(2);
