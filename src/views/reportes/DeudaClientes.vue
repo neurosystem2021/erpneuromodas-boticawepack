@@ -136,6 +136,7 @@ export default {
             { key: 'FechaDoc', label: 'Emision', sortable: true },
             { key: 'FechaCredito', label: 'Vencimiento', sortable: true },
             { key: 'Letras', label: 'Letras', sortable: true },
+            { key: 'UsuarioReg', label: 'Usuario'},
       ],
       totalRows: 50,
       perPage: 50,
