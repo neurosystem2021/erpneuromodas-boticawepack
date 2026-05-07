@@ -64,7 +64,7 @@
               </tr>
               <tr>
                 <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
+                 <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
               </tr>
               <!--<tr>
                 <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
@@ -142,118 +142,147 @@
       </div>
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+        <button class="btn btn-success" id="printBtn" @click="imprimirWsp()">ENVIAR WHATSAPP</button>
+        <button class="btn btn-primary" id="printBtn" @click="descargarPdf()">DESCARGAR PDF</button>
         <!--<button class="btn btn-success" id="printBtn" @click="enviarWsp()">ENVIAR WHASTAPP</button>-->
       </div>
     </main>
     <!--<footer>
       Invoice was created on a computer and is valid without the signature and seal.
     </footer>-->
+        <b-modal v-model="mdlTelefono" hide-footer title="Teléfono Cliente">
+        <input type="text" v-model="Telefono" class="form-control mb-2 mx-1" placeholder="Teléfono">
+        <b-button class="mx-1 my-1" variant="success" @click="enviar">Enviar</b-button>
+        <b-button class="mx-1 my-1" variant="danger" @click="mdlTelefono=!mdlTelefono"> Cancelar </b-button>
+    </b-modal>
 	</div>
 </template>
 
 <script>
-import {API} from '@/store/config.js'
+import { API } from "@/store/config.js";
 export default {
-	mounted () {
-		this.getProforma()
-    this.getEmpresa()
-	},
-	data () {
-		return {
-			API: API,
-			idProforma: this.$route.params.id,
-			proforma: { productos: [] },
+mounted() {
+    this.getProforma();
+    this.getEmpresa();
+  },
+  data() {
+    return {
+      mdlTelefono: false,
+      API: API,
+      idProforma: this.$route.params.id,
+      proforma: { productos: [] },
+
+
+
       empresa: {},
-      fechaHasta:'',
-		}
-	},
-	computed: {
-		subTotal () {
-			let sumatoria = 0
-			this.proforma.productos.forEach(prod => {
-				sumatoria += (prod.Cantidad * prod.Precio) - prod.Descuento
-			})
-      return sumatoria
-		}
-	},
+      fechaHasta: "",
+      url: "",
+      Telefono: ""
+    };
+  },
+  computed: {
+    subTotal() {
+      let sumatoria = 0;
+      this.proforma.productos.forEach(prod => {
+        sumatoria += prod.Cantidad * prod.Precio - prod.Descuento;
+      });
+      return sumatoria;
+    }
+  },
   methods: {
-    getProforma () {
-      this.axios.get(API + 'proformas/id/' + this.idProforma)
-			.then(res => {
-				this.proforma = res.data
-        this.fechaHasta = this.calcularFechaHasta(this.proforma.FechaReg.substring(0,10),this.proforma.DiasValidos).toISOString().substring(0,10);
-			})
-    },
-    calcularFechaHasta(actual,dias){
-    var date = new Date(actual);
-    date.setDate(date.getDate() + (dias-1));
-    return date;
-    },
-    getEmpresa () {
-      this.axios.get(API + 'empresa/id/' + 1)
-			.then(res => {
-				this.empresa = res.data
-			})
-    },
-    imprimir(){
-    window.print();
-    },
-    async enviarWsp() {
-      const loadingSwal = this.$swal({
-        title: "Cargando...",
-        text: "Por favor espera...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
+    getProforma() {
+      this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
+        this.proforma = res.data;
+        this.fechaHasta = this.calcularFechaHasta(
+          this.proforma.FechaReg.substring(0, 10),
+          this.proforma.DiasValidos
+        )
+          .toISOString()
+          .substring(0, 10);
       });
-      let data = "";
-      await this.axios
-        .get(API + "enviarproformapdf", {
-          params: {
-            IdProforma: this.idProforma
-          }
-        })
-        .then(res => {
-          data = res.data;
-        });
-      this.$swal.close();
-      this.solicitarTelefono(data);
     },
-
-    async solicitarTelefono(data) {
-      console.log(data);
-      const { value: telefono } = await this.$swal({
-        title: "Ingresa tu número de teléfono",
-        input: "text",
-        inputPlaceholder: "Ejemplo: 987654321",
-        showCancelButton: true,
-        inputValidator: value => {
-          const regexTelefono = /^9\d{8}$/; // Valida que comience con 9 y tenga 9 dígitos
-          if (!regexTelefono.test(value)) {
-            return "Ingresa un número válido (9 dígitos, comienza con 9)";
-          }
-        }
+    calcularFechaHasta(actual, dias) {
+      var date = new Date(actual);
+      date.setDate(date.getDate() + (dias - 1));
+      return date;
+    },
+    getEmpresa() {
+      this.axios.get(API + "empresa/id/" + 1).then(res => {
+        this.empresa = res.data;
       });
 
-      if (telefono) {
-        window.open(
-          `https://wa.me/51${telefono}?text=Para poder visualizar la proforma Ingrese al siguiente enlace ${data}`
-        );
+    },
+    imprimir() {
+      window.print();
+    },
+    descargarPdf() {
+      if (this.url) {
+        const link = document.createElement('a');
+        link.href = 'https://' + this.url;
+        link.download = `Proforma_${this.proforma.Anio}-${this.proforma.Numero}.pdf`;
+        link.target = '_blank';
+        link.click();
+        return;
       }
+
+      this.axios(`${this.API}/enviarproformapdf`, {
+        params: { IdProforma: this.idProforma }
+      }).then(res => {
+        if (res.data) {
+          this.url = res.data;
+          const link = document.createElement('a');
+          link.href = 'https://' + this.url;
+          link.download = `Proforma_${this.proforma.Anio}-${this.proforma.Numero}.pdf`;
+          link.target = '_blank';
+          link.click();
+        }
+      }).catch(() => {
+        this.$toasted.error("Error al generar el PDF");
+      });
+    },
+    imprimirWsp() {
+      this.Telefono = "";
+      this.mdlTelefono = true;
+      this.axios(`${this.API}/enviarproformapdf`, {
+        params: { IdProforma: this.idProforma }
+      }).then(res => {
+        if (res.data) {
+          this.url = res.data;
+          // window.open(res.data, "_blank");
+        }
+      });
+    },
+    enviar() {
+      if (this.Telefono.length != 9) {
+        this.$toasted.error("Formato de teléfono incorrecto");
+        return;
+      }
+
+      const mensaje = encodeURIComponent(
+        `Estimado cliente, puede visualizar su proforma en el siguiente enlace:\n\n👉 Click aquí: ${
+          this.url
+        }`
+      );
+
+      window.open(
+        `https://api.whatsapp.com/send/?phone=51${
+          this.Telefono
+        }&text=${mensaje}`,
+        "_blank"
+      );
+
+      this.mdlTelefono = false;
     }
   }
 };
 </script>
 
 <style scoped>
-@import '../../assets/css/invoice.css';
-.celda{
-  text-align:left;
+@import "../../assets/css/invoice.css";
+.celda {
+  text-align: left;
   border: none !important;
-  background: white !important
+ background: white !important;  
 }
 @media print {
   #printBtn {
