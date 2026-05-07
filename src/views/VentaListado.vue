@@ -1796,7 +1796,7 @@ export default {
       // this.venta.comisionista = {}
     },
     eliminarVentana() {
-      this.mostrarMetodo.splice(this.ventaActiva, 1);
+      // this.mostrarMetodo.splice(this.ventaActiva, 1);
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -1945,6 +1945,9 @@ export default {
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -2323,9 +2326,19 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      await this.axios.post(this.API + "ventas", venta).then(async response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
+          
+          if (venta.IdProforma) {
+            try {
+              await this.axios.delete(this.API + "proforma/eliminar/" + venta.IdProforma);
+              console.log("Proforma eliminada");
+            } catch (error) {
+              console.error("Error al eliminar proforma", error);
+            }
+          }
+
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
             "_blank",
@@ -2545,6 +2558,7 @@ export default {
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+      venta.IdProforma = proforma.IdProforma;
       await this.axios
         .get(this.API + "/usuarios/" + proforma.UsuarioReg)
         .then(response => {
@@ -2585,6 +2599,24 @@ export default {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        if (producto.Presentacion) {
+          try {
+            let presObj = typeof producto.Presentacion === 'string' 
+              ? JSON.parse(producto.Presentacion) 
+              : producto.Presentacion;
+            prod.CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
+            prod.bloquearInputPrecio = true;
+            prod.presentacion = producto.Presentacion;
+          } catch (e) {
+            prod.CantidadPresentacion = null;
+            prod.bloquearInputPrecio = false;
+            prod.presentacion = null;
+          }
+        } else {
+          prod.CantidadPresentacion = null;
+          prod.bloquearInputPrecio = false;
+          prod.presentacion = null;
+        }
         productos.push(prod);
       });
 
