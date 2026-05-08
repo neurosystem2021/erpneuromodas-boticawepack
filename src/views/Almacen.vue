@@ -13,7 +13,7 @@
               <b-col md="2">
                 <div class="suma-stock text-center">
                   <b>Stock Valorizado <br />Precio Venta</b>
-                  <div> S/. {{ sumaValorizadoContado | moneda }} </div>
+                  <div> S/. {{ sumaValorizadoSin | moneda }} </div>
                 </div>
               </b-col>  
               <b-col md="2">
@@ -352,7 +352,7 @@ export default {
       hrefExcel: "",
       sumaStock: "...",
       sumaValorizado: "...",
-      sumaValorizadoContado: "...",
+      sumaValorizadoSin: "...",
       APISTOCK: "productos",
       tipoStock: "",
       showKardex: false,
@@ -502,59 +502,34 @@ export default {
       event.target.src = "static/no-photo.png";
     },
     getSumaValorizado() {
-      /*this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
-        .then( response => {
-          this.sumaValorizado = (response.data[0].sumaValorizado);
-        })*/
+  const urlBase = this.API + "productos/stock?idAlmacen=" + this.almacen.IdAlmacen + "&filter=" + (this.filter || "");
 
-      // this.axios.get(this.API + 'empresa/config/1')
-      //   .then( response => {
-      //     this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
-      //   })
+  // 1. Obtener Precio Costo (sumaValorizadoSin en tu base de datos usa PrecioCosto)
+  this.axios.get(urlBase + "&sumaValorizadoSin=1")
+    .then(response => {
+      this.sumaValorizado = response.data[0].monto; // Asignamos a la cajita de Costo
+    });
 
-      this.axios
-        .get(
-          this.API +
-            "productos/stock" +
-            "?idAlmacen=" +
-            this.almacen.IdAlmacen +
-            "&filter=" +
-            (this.filter || "") +
-            "&filter[stock]=mayor&sumaValorizado=1&sumaValorizado=1"
-        )
-        .then(response => {
-          this.sumaValorizado = response.data[0].sumaValorizado;
-        });
-
-      this.axios
-        .get(
-          this.API +
-            "productos/stock" +
-            "?idAlmacen=" +
-            this.almacen.IdAlmacen +
-            "&filter=" +
-            (this.filter || "") +
-            "&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1"
-        )
-        .then(response => {
-          this.sumaValorizadoContado = response.data[0].sumaValorizado;
-        });
-    },
+  // 2. Obtener Precio Venta (sumaValorizado en tu base de datos usa PrecioContado)
+  this.axios.get(urlBase + "&sumaValorizado=1")
+    .then(response => {
+      this.sumaValorizadoSin = response.data[0].monto; // Asignamos a la cajita de Venta
+    });
+},
     getSumaStock() {
-      this.axios
-        .get(
-          this.API +
-            "productos/stock" +
-            "?idAlmacen=" +
-            this.almacen.IdAlmacen +
-            "&filter=" +
-            (this.filter || "") +
-            "&filter[stock]=mayor&sumaStock=1"
-        )
-        .then(response => {
-          this.sumaStock = response.data[0].sumaStock;
-        });
-    },
+  this.axios
+    .get(
+      this.API +
+        "productos/stock" +
+        "?idAlmacen=" +
+        this.almacen.IdAlmacen +
+        "&q=" + (this.filter || "") + // Usa q para la búsqueda de texto
+        "&sumaStock=1" // QUITA el filter[stock]=mayor de aquí
+    )
+    .then(response => {
+      this.sumaStock = response.data[0].sumaStock;
+    });
+},
     getStock(idProducto) {
       let index = this.itemsStock.findIndex(
         item => item.IdProducto == idProducto
