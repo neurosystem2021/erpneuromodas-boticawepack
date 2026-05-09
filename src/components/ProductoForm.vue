@@ -290,7 +290,7 @@
             <label>Precio de Costo:</label>
             <input
               v-model="producto.PrecioCosto"
-              step="0.0001"
+              step="0.000001"
               type="number"
               class="form-control"
               />
@@ -611,7 +611,8 @@ export default {
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
-            this.producto.PrecioCosto = newVal.PrecioCosto;
+            this.producto.PrecioCosto =
+            parseFloat(newVal.PrecioCosto) || 0;
             this.producto.PrecioPorBloque = newVal.PrecioPorBloque;
             this.producto.precioBloque = newVal.precioBloque;
             this.producto.PrecioContado = newVal.PrecioContado;

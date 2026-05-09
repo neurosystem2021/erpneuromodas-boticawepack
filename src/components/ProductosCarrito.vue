@@ -1244,6 +1244,9 @@ export default {
       if (index !== -1) {
         let prodActual = this.productos[index];
 
+        prodActual.CodigoBarra = productoEditado.CodigoBarra;
+        prodActual.Producto = productoEditado.Producto;
+
         // COSTO → afecta P/U
         let nuevoCosto = parseFloat(productoEditado.PrecioCosto) || 0;
         prodActual.precio = nuevoCosto;        // ← ESTE ES EL P/U
@@ -1256,8 +1259,8 @@ export default {
 
         // recalcular subtotal
         let cantidad = parseFloat(prodActual.cantidad) || 0;
-        prodActual.subtotal = (cantidad * nuevoCosto).toFixed(2);
-        prodActual.total = (cantidad * nuevoCosto).toFixed(2);
+        prodActual.subtotal = (cantidad * nuevoCosto).toFixed(6);
+        prodActual.total = (cantidad * nuevoCosto).toFixed(6);
 
         this.$set(this.productos, index, prodActual);
       }
@@ -1702,8 +1705,8 @@ export default {
 
       precio = Math.round(precio * 1000000) / 1000000;
 
-      item.subtotal = (cantidad * precio).toFixed(2);
-      item.total = (cantidad * precio).toFixed(2);
+      item.subtotal = (cantidad * precio).toFixed(6);
+      item.total = (cantidad * precio).toFixed(6);
       this.mostrarTablaProductos = false;
 
       this.mostrarTablaProductos = !false;
