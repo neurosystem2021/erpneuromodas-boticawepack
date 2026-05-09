@@ -294,7 +294,6 @@
               step="0.00001"
               type="number"
               class="form-control"
-              :disabled="almacen && almacen.IdAlmacen === 2"
               />
           </b-form-group>
         </b-col>
@@ -317,7 +316,6 @@
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
-              :disabled="almacen && almacen.IdAlmacen === 2"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -332,7 +330,6 @@
               step="0.00001"
               type="number"
               class="form-control"
-              :disabled="!almacen || almacen.IdAlmacen === 1"
               />
           </b-form-group>
         </b-col>
@@ -344,7 +341,6 @@
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
-              :disabled="!almacen || almacen.IdAlmacen === 1"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
