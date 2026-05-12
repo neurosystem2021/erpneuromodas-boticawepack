@@ -219,6 +219,17 @@ export default {
         })
         .then(response => {
           response.data.map(item => {
+            let ProductoPresentacion = "";
+            let presentacion = null;
+            let ProductoDesc = item.Descripcion;
+
+            if (!item.Presentacion) {
+              presentacion = "UNIDAD";
+            } else {
+              let pres = JSON.parse(item.Presentacion);
+              presentacion = pres.nombre;
+              ProductoPresentacion = pres;
+            }
             this.add([
               item.IdProducto,
               () => {
@@ -232,6 +243,9 @@ export default {
               }
             ]);
 
+            item.ProductoPresentacion = ProductoPresentacion;
+            item.presentacion = presentacion;
+            item.ProductoDesc = ProductoDesc;
             this.filter = "";
             this.show = false;
           });

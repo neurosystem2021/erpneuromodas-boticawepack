@@ -2507,6 +2507,14 @@ async setProducto(producto) {
       const response = await this.axios.post(this.API + "ventas", ventaPayload, { timeout: 20000 });
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
+          if (venta.IdProforma) {
+            try {
+              await this.axios.delete(this.API + "proforma/eliminar/" + venta.IdProforma);
+              console.log("Proforma eliminada");
+            } catch (error) {
+              console.error("Error al eliminar proforma", error);
+            }
+          }
           window.open(
             "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
             "_blank",
@@ -2765,6 +2773,7 @@ async setProducto(producto) {
       console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+      venta.IdProforma = proforma.IdProforma;
       venta.cliente = proforma;
       let productos = [];
       proforma.productos.forEach(async producto => {
@@ -2795,6 +2804,24 @@ async setProducto(producto) {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        if (producto.Presentacion) {
+          try {
+            let presObj = typeof producto.Presentacion === 'string' 
+              ? JSON.parse(producto.Presentacion) 
+              : producto.Presentacion;
+            prod.CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
+            prod.bloquearInputPrecio = true;
+            prod.presentacion = producto.Presentacion;
+          } catch (e) {
+            prod.CantidadPresentacion = null;
+            prod.bloquearInputPrecio = false;
+            prod.presentacion = null;
+          }
+        } else {
+          prod.CantidadPresentacion = null;
+          prod.bloquearInputPrecio = false;
+          prod.presentacion = null;
+        }        
         productos.push(prod);
         // prod.precio = prod.Precio;
         // productos.push({
