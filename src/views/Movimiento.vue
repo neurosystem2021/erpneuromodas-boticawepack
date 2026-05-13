@@ -596,54 +596,45 @@ export default {
       let faltaLlenar = false;
       //let faltaFechaVen = false
       let igualProducto = false;
-      let faltaStock = false;
+      let sinStock = 0;
       let faltaCantidad = false;
       this.productos.forEach((prod, index) => {
+        let stockActual = parseFloat(prod.stock || 0);
+        let cantidadPedida = parseFloat(prod.cantidad || 0);
+        
+        if (this.movimiento.movimientoTipo.Tipo != 0) {
+          if (
+            stockActual <= 0 || 
+            Number(stockActual.toFixed(2)) < Number(cantidadPedida.toFixed(2)) || 
+            prod.stock === undefined
+          ) {
+            sinStock++;
+          }
+        }
+
+        let pro = this.productos.filter(
+          p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
+        );
+        if (pro.length > 1) {
+          igualProducto = true;
+          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1)) {
+            this.$toasted.show(prod.Producto + " repite 2 veces", { duration: 4000 });
+          }
+        }
+
+        let proObs = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1);
+        if (proObs.length > 1) {
+          igualProducto = true;
+          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1)) {
+            this.$toasted.show(prod.Producto + " (Obsequio) repite 2 veces", { duration: 4000 });
+          }
+        }
+
         if (prod.total <= 0 && prod.EsObsequio != 1) {
           faltaLlenar = true;
         }
 
-        // if (this.movimiento.movimientoTipo.Tipo != 0) {
-        //   if (prod.stock <= 0 || parseFloat(prod.cantidad) > prod.stock) {
-        //     faltaStock = true;
-        //   }
-        // }
-
-        /*if (prod.FechaVen == undefined || prod.FechaVen=='' || prod.FechaVen.length>10 ) {
-          if(prod.FechaVen.length>10){
-             this.$toasted.show('La fecha de vencimiento del producto '+prod.Producto+' no tiene el formato correcto')
-          }
-          faltaFechaVen = true
-        }*/
-
-        let pro = this.productos.filter(
-          p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
-        ).length;
-        if (pro > 1) {
-          this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000
-          });
-          igualProducto = true;
-        }
-
-        let proObs = this.productos.filter(
-          p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1
-        ).length;
-        if (proObs > 1) {
-          this.$toasted.show(prod.Producto + ", repite 2 veces", {
-            duration: 4000
-          });
-          igualProducto = true;
-        }
-
-        if (this.movimiento.movimientoTipo.Tipo != 0) {
-          const stockDisponible = parseFloat(prod.stockMovimiento || prod.stock || 0);
-          if (stockDisponible <= 0 || parseFloat(prod.cantidad) > stockDisponible) {
-            faltaStock = true;
-          }
-        }
-
-        if (!(prod.cantidad > 0)) {
+        if (!(cantidadPedida > 0)) {
           faltaCantidad = true;
         }
       });
@@ -681,7 +672,7 @@ export default {
         return;
       }
 
-      if (faltaStock && (this.isTraslado == true || this.isSalida == true)) {
+      if (sinStock >= 1 && (this.isTraslado == true || this.isSalida == true)) {
         this.$toasted.show("No tiene stock para realizar el movimiento");
         this.inProgress = false;
         return;
