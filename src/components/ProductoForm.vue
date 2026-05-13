@@ -611,8 +611,7 @@ export default {
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
             this.producto.ProductoPresentacion = newVal.ProductoPresentacion;
-            this.producto.PrecioCosto =
-            parseFloat(newVal.PrecioCosto) || 0;
+            this.producto.PrecioCosto = newVal.PrecioCosto;
             this.producto.PrecioPorBloque = newVal.PrecioPorBloque;
             this.producto.precioBloque = newVal.precioBloque;
             this.producto.PrecioContado = newVal.PrecioContado;

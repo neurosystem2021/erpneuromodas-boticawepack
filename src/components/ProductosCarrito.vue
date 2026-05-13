@@ -302,7 +302,6 @@
           <b-input v-model="productos[data.index].subtotal"
           type="number"
            @blur="recalcularPUxSubTotal(data.index)"
-           @input="recalcularPUxSubTotal(data.index)"
            />
           <!-- {{data.item.subtotal}} -->
           
@@ -1259,8 +1258,8 @@ export default {
 
         // recalcular subtotal
         let cantidad = parseFloat(prodActual.cantidad) || 0;
-        prodActual.subtotal = (cantidad * nuevoCosto).toFixed(6);
-        prodActual.total = (cantidad * nuevoCosto).toFixed(6);
+        this.$set(prodActual, "subtotal", cantidad * nuevoCosto);
+        this.$set(prodActual, "total", cantidad * nuevoCosto);
 
         this.$set(this.productos, index, prodActual);
       }
@@ -1339,10 +1338,10 @@ export default {
     },
     recalcularPUxSubTotal(index) {
       let prod = { ...this.productos[index] };
-      prod.precio = Math.round((prod.subtotal / prod.cantidad) * 1000000) / 1000000;
+      prod.precio = parseFloat(prod.subtotal / prod.cantidad);
       this.productos[index] = prod;
-      this.mostrarTablaProductos = !this.mostrarTablaProductos;
-      this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      // this.mostrarTablaProductos = !this.mostrarTablaProductos;
+      // this.mostrarTablaProductos = !this.mostrarTablaProductos;
     },
     onSearchProducto() {
       clearTimeout(this.searchTimeout);
@@ -1576,7 +1575,19 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.add([id, false, false, false, false, true, this.isVentas]);
+
+        // AGREGAR DIRECTAMENTE AL CARRITO
+        obj.IdProducto = id;
+        obj.cantidad = 1;
+        obj.precio = obj.PrecioCosto || 0;
+        obj.nuevoPrecioContado = obj.PrecioContado || 0;
+        obj.stock = 0;
+        //Datos del producto
+        obj.CodigoBarra = obj.CodigoBarra || "";
+        obj.ProductoMarca = obj.ProductoMarca || (obj.marca? obj.marca.ProductoMarca: "SIN MARCA");
+
+        obj.estadoPxP = !this.isVentas;
+        this.$store.commit("AGREGAR_PRODUCTO", obj);
       setTimeout(() => {
         this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
       }, 200);
@@ -1703,13 +1714,9 @@ export default {
       let cantidad = parseFloat(produc.cantidad) || 0;
       let precio = parseFloat(produc.precio) || 0;
 
-      precio = Math.round(precio * 1000000) / 1000000;
+      item.subtotal = cantidad * precio;
+      item.total = cantidad * precio;
 
-      item.subtotal = (cantidad * precio).toFixed(6);
-      item.total = (cantidad * precio).toFixed(6);
-      this.mostrarTablaProductos = false;
-
-      this.mostrarTablaProductos = !false;
       this.actualizarDescu(index);
       setTimeout(() => {
         this.$store.state.recalcularTotalPorEmpresaFlag = !this.$store.state
@@ -1849,17 +1856,12 @@ export default {
       });
     },
     getSubtotal(index) {
-      let subtotal = this.productos[index].cantidad * this.productos[index].precio;
-      // let subtotal = this.$options.filters.redondear(
-      //   this.productos[index].cantidad * this.productos[index].precio
-      // );
-      Vue.set(
-        this.productos[index],
-        "subtotal",
-        parseFloat(subtotal).toFixed(2)
+      let subtotal = this.$options.filters.redondear(
+        this.productos[index].cantidad * this.productos[index].precio
       );
+      Vue.set(this.productos[index], "subtotal", subtotal);
       // this.productos[index].subtotal = subtotal
-      return parseFloat(subtotal).toFixed(2);
+      return subtotal;
     },
     getIgv(index) {
       let igv = 0;
