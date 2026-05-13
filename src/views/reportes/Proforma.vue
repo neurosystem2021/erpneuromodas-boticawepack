@@ -2,8 +2,10 @@
 	<div id="invoice-container">
 		<header class="clearfix">
 			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg"> 
+        <div id="accounts" style="margin-top:30px; font-weight:bold;">
+        <img style="max-width: 100%" src="/resources/images/banner-proforma.jpg" />
 			</div>
+		</div>
 			<!--<div id="company">
 				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
 				<div>{{ empresa.DIRECCION }}</div>
@@ -143,7 +145,7 @@
           CTA AHORROS SOLES 
         </div>
       </div> -->
-      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
+      <div id="accounts" style="margin-top:30px; font-weight:bold;">
         <img style="max-width: 100%" src="/resources/images/cuentas.png" />
       </div>
       <br>

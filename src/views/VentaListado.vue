@@ -262,7 +262,7 @@
                   </b-col>
                 </b-row>
 
-                <!-- <b-row>
+                 <b-row>
                   <b-col cols="12">
                     <b-form-group>
                       <input
@@ -273,7 +273,7 @@
                       />
                     </b-form-group>
                   </b-col>
-                </b-row> -->
+                </b-row> 
                 <div class="divCarrito">
                   <b-row class="mt-2 clsCarrito">
                     <b-table striped hover :fields="headerTable" :items="venta.productos" class="tblCarrito">
