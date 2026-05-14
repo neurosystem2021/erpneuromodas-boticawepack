@@ -320,7 +320,7 @@
                                                               step="0.01"
                                                               type="number"
                                                               placeholder="S/."
-                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(ventas[index].totalCart - ventas[index].pago.mastercard.monto - ventas[index].pago.otro.monto - $event.target.value)"
+                                                              @input="actualizarPagos()"
                                                             />
                                                           </td>
                                                         </tr>
@@ -348,7 +348,7 @@
                                                               step="0.01"
                                                               type="number"
                                                               placeholder="S/."
-                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(totalCart - ventas[index].pago.visa.monto - ventas[index].pago.otro.monto - $event.target.value)"
+                                                              @input="actualizarPagos()"
                                                             />
                                                           </td>
                                                         </tr>
@@ -374,7 +374,7 @@
                                                               step="0.01"
                                                               type="number"
                                                               placeholder="S/."
-                                                              @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(totalCart - ventas[index].pago.visa.monto - ventas[index].pago.mastercard.monto - $event.target.value)"
+                                                              @input="actualizarPagos()"
                                                             />
                                                           </td>
                                                         </tr>
@@ -614,6 +614,27 @@ export default {
         this.getVendedor();
       });
       console.log(productos);
+    },
+    actualizarPagos() {
+
+        let total = parseFloat(this.sumatoriaTotal);
+
+        let tarjeta =
+            parseFloat(this.ventas[this.index].pago.visa.monto) || 0;
+
+        let transferencia =
+            parseFloat(this.ventas[this.index].pago.mastercard.monto) || 0;
+
+        let yape =
+            parseFloat(this.ventas[this.index].pago.otro.monto) || 0;
+
+        let restante =
+            total - tarjeta - transferencia - yape;
+
+        this.ventas[this.index].pago.efectivo.monto =
+            restante > 0
+            ? restante.toFixed(2)
+            : 0;
     },
     finalizarVentaOProforma() {
       if (this.index > 0) {
@@ -999,9 +1020,37 @@ export default {
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
+
     aplicarDescuentoGeneral(val) {
-      this.puntosAplicados = 0;
-      this.aplicarDescuento(val);
+        this.puntosAplicados = 0;
+
+        const productos = this.ventas[this.index].productos;
+
+        if (!productos.length) return;
+
+        let porcentaje = parseFloat(val);
+
+        productos.forEach((prod, i) => {
+
+            let subtotal =
+                parseFloat(prod.cantidad) *
+                parseFloat(prod.precio);
+
+            let descuento =
+                subtotal * (porcentaje / 100);
+
+            this.$set(
+                this.ventas[this.index].productos[i],
+                "descuento",
+                descuento.toFixed(2)
+            );
+
+            this.$set(
+                this.ventas[this.index].productos[i],
+                "total",
+                (subtotal - descuento).toFixed(2)
+            );
+        });
     },
 
     distribuirDescuentoPorMonto(montoEfectivo) {
@@ -1236,7 +1285,7 @@ export default {
       ) {
         Object.keys(this.ventas[this.index].pago).forEach((key, index) => {
           this.ventas[this.index].pago[key].monto =
-            key === tipo ? this.totalCart : 0;
+            key === tipo ? this.sumatoriaTotal : 0;
           if (key === tipo) {
             this.idMetodoPago = index + 1;
           }
