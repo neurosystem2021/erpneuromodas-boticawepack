@@ -1714,12 +1714,34 @@ async loadBarcode(e) {
   let esKilage = 0;
 
   if (rawCode.startsWith('2') && rawCode.length === 13) {
-    idBusqueda = rawCode.substring(1, 7);
+    try {
+      let respCompleto = await this.axios.get(this.API + "productos/id/" + rawCode, {
+        params: { codigoBarra: rawCode }
+      });
+      if (respCompleto.data && respCompleto.data.IdProducto) {
+        if (respCompleto.data.Kilage == 1) {
+          idBusqueda = rawCode.substring(1, 7);
         
-    let pesoString = rawCode.substring(7, 12); 
-    pesoExtraido = parseFloat(pesoString) / 1000;
-    esFormatoBalanza = true;
-    esKilage = 1;
+          let pesoString = rawCode.substring(7, 12); 
+          pesoExtraido = parseFloat(pesoString) / 1000;
+          esFormatoBalanza = true;
+          esKilage = 1;
+        } else {
+          // CODIGO DE PRUEBA 2000077010004
+          this.setProducto({ ...respCompleto.data, codigoEscaneado: rawCode });
+          this.loadCode = "";
+          return;
+        }
+      } else {
+          idBusqueda = rawCode.substring(1, 7);
+          let pesoString = rawCode.substring(7, 12); 
+          pesoExtraido = parseFloat(pesoString) / 1000;
+          esFormatoBalanza = true;
+          esKilage = 1;
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   try {
@@ -2341,15 +2363,6 @@ async setProducto(producto) {
 
       let mostrarError = false;
 
-      this.$swal({
-        title: "Procesando venta...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
-
       try { 
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
@@ -2461,6 +2474,29 @@ async setProducto(producto) {
         this.loading = false; this.$swal.close();
         return;
       }
+
+        const productoInvalido = productos.find(p => {
+        const cant = parseFloat(p.cantidad);
+        const prec = parseFloat(p.precio);
+        // Retorna verdadero si es NaN, 0 o negativo
+        return !cant || cant <= 0 || !prec || prec <= 0;
+      });
+
+      if (productoInvalido) {
+        this.$toasted.show("Verifique: Todos los productos deben tener cantidad y precio mayor a cero.");
+        this.loading = false; 
+        this.$swal.close(); 
+        return;
+      }
+
+      this.$swal({
+        title: "Procesando venta...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
       const esNotaCredito = venta.tipoVenta.CodSunat == "07";
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2769,92 +2805,32 @@ async setProducto(producto) {
         let n = parseFloat(valor);
         return isNaN(n) ? 0 : n;
     },
-    cargarProforma(proforma) {
-      console.log(proforma);
-      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
-      venta.IdProforma = proforma.IdProforma;
-      venta.cliente = proforma;
-      let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
-        }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        if (producto.Presentacion) {
-          try {
-            let presObj = typeof producto.Presentacion === 'string' 
-              ? JSON.parse(producto.Presentacion) 
-              : producto.Presentacion;
-            prod.CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
-            prod.bloquearInputPrecio = true;
-            prod.presentacion = producto.Presentacion;
-          } catch (e) {
-            prod.CantidadPresentacion = null;
-            prod.bloquearInputPrecio = false;
-            prod.presentacion = null;
-          }
-        } else {
-          prod.CantidadPresentacion = null;
-          prod.bloquearInputPrecio = false;
-          prod.presentacion = null;
-        }        
-        productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
-      });
-      // console.log(proforma.productos);
-      venta.productos = productos;
+    async cargarProforma(proforma) {
+      let venta = {
+        ...this.venta,
+        IdProforma: proforma.IdProforma,
+        cliente: proforma,
+        productos: proforma.productos || []
+      };
+
+      this.initValueCliente = `${proforma.DniRuc || ''} ${proforma.Cliente || ''}`;
+
       this.ventas.push(venta);
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
-        // this.loadClienteVarios();
+      await this.$nextTick();
+      this.ventaActiva = this.ventas.length - 1;
+
+      await Promise.all([
+        this.getNumeroVenta(),
+        this.getVendedorInfo(),
+        ...venta.productos.map(prod => this.loadMovimientoLotes(prod.IdProducto))
+      ]);
+      await this.$nextTick();
+      const pagoActual = this.ventas[this.ventaActiva].pago;
+      ["efectivo", "visa", "mastercard", "delivery"].forEach(m => {
+        if (pagoActual[m]) pagoActual[m].monto = 0;
       });
-      this.ventas[this.ventaActiva].cliente = proforma;
-      this.$nextTick(() => {
-        setTimeout(() => {
-          console.log("llegó");
-          this.metodoPagoCambio(1);
-        }, 1000);
-      });
+      this.metodoPagoCambio(1);
+      this.$forceUpdate();
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };

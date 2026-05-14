@@ -498,6 +498,9 @@
         <b-col md="4">
         </b-col>
       </b-row>
+      <span  v-if="producto.IdProducto && producto.FechaMod"  class="badge badge-pill badge-primary" style="font-size: 12px; padding: 6px 12px;">
+        🕒 Última modificación: {{ producto.FechaMod }}
+      </span>
       <div slot="modal-footer" >
         <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
           <b-input-group>
@@ -511,9 +514,9 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-        <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
-        </b-btn>-->
+        </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
@@ -627,6 +630,7 @@ export default {
             ProductoTalla: newVal.ProductoTalla
           }*/
             //this.producto.Producto = newVal.Producto.split('-').slice(0, -1).join()
+            this.producto.FechaMod = newVal.FechaMod;
             this.producto.Producto = newVal.Producto;
             this.producto.IdProducto = newVal.IdProducto;
             this.producto.EsPadre = newVal.EsPadre;
@@ -812,7 +816,7 @@ export default {
       Vue.set(this.producto, "PrecioContado", sumatoriaContado);
       this.actualizarPorcentajeUtilidad();
     },
-    /*eliminarProducto (producto) {
+    eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de Anular este producto?')
       if (r) {
@@ -828,7 +832,7 @@ export default {
           }
         })
       }
-    },*/
+    },
     loadAlmacen(id) {
       this.axios.get(this.API + "almacenes/id/" + id).then(res => {
         this.setAlmacen(res.data);

@@ -46,10 +46,9 @@
                   <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
               </template> -->
               <template slot="Reimprimir" slot-scope="data">
-                <a class="fas fa-print btn btn btn-success" href="#" @click.prevent="reimprimir(data.item.idDocVenta)">{{ data.item.TipoDoc }}</a>
-                 <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">
-                    GUÍA REMISIÓN
-                   </b-button>
+                <a class="fas fa-print btn btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+                <b-button variant="primary" @click="irGuiaRemision(data.item)" class="mx-1">GUÍA REMISIÓN</b-button>
+                <a class="fas fa-print btn btn-primary" href="#" @click.prevent="reimprimir(data.item.idDocVenta)"><i class="fas fa-print"></i></a>
               </template>
           </b-table>
             <b-row>
