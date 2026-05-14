@@ -224,7 +224,9 @@
         </template>
 
         <template slot="cantxPrecio" slot-scope="data" v-if="productos[data.index].EsPresentacion">
-          <input v-model="productos[data.index].cantxPrecio" type="number" style="width: 100px" step="0.001" min="0"
+          <input v-model="productos[data.index].cantxPrecio" type="number" style="width: 100px" step="any" min="0"
+            @keydown.up.prevent="productos[data.index].cantidad = Math.floor(Number(productos[data.index].cantidad || 0) + 1)"
+            @keydown.down.prevent="productos[data.index].cantidad = Math.max(0, Math.ceil(Number(productos[data.index].cantidad || 0) - 1))"
             :disabled="bloquearInput ? true : false"
             @input="(val) => changeCant(val.target.value, productos[data.index], data.index)" placeholder="Cantidad"
             class="form-control" />
@@ -234,7 +236,10 @@
         <template slot="cantidad" slot-scope="data">
           <input v-model="productos[data.index].cantidad"
             :disabled="bloquearInput ? true : productos[data.index].EsPresentacion" type="number" autocomplete="off"
-            style="width: 100px; font-weight:bold" class="form-control" step="0.1" min="0" @input="(val) => {
+            style="width: 100px; font-weight:bold" class="form-control" step="any" min="0" 
+            @keydown.up.prevent="productos[data.index].cantidad = Math.floor(Number(productos[data.index].cantidad || 0) + 1)"
+            @keydown.down.prevent="productos[data.index].cantidad = Math.max(0, Math.ceil(Number(productos[data.index].cantidad || 0) - 1))"
+            @input="(val) => {
               changeCant(val.target.value, productos[data.index], data.index)
               $emit('onInputCantidad', val.target.value)
               actualizarDescu(data.index)
