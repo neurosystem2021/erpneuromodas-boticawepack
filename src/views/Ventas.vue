@@ -1120,6 +1120,28 @@ export default {
         this.inProgress = false;
         return;
       }
+      let sinStock = 0;
+      this.productos.forEach(pro => {
+        if (
+          pro.CodigoBarra !== "COSTODELIVERY" &&
+          pro.CodigoBarra !== "MANODEOBRA" &&
+          (pro.stock <= 0 ||
+            parseFloat(pro.cantidad) > pro.stock ||
+            pro.stock == undefined)
+        ) {
+          sinStock += 1;
+        }
+      });
+
+      if (
+        sinStock >= 1 &&
+        this.venta.tipoVenta.CodSunat != "07" &&
+        this.ventaSinStock != 1
+      ) {
+        this.$toasted.error("No se puede proformar un producto sin stock");
+        this.inProgress = false;
+        return;
+      }
 
       let productos = [];
       this.productos.forEach(prod => {
