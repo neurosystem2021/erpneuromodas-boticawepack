@@ -34,7 +34,7 @@
                       ref="inputAlmacen"
                       :url="API + 'almacenes'"
                       anchor="Almacen"
-                      initValue="HUANUCO"
+                      initValue="PUCALLPA"
                       label="writer"
                       placeholder=""
                       :on-select="setAlmacen" 
@@ -400,8 +400,8 @@ export default {
       tipoStock: '',
       showKardex: false,
       almacen: {
-        IdAlmacen: 1,
-        Almacen: 'HUANUCO'
+        IdAlmacen: 2,
+        Almacen: 'PUCALLPA'
       },
       pageOptions: [ 5, 10, 15, 50, 100 ],
       filters: {},

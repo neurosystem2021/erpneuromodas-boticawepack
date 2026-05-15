@@ -1565,12 +1565,12 @@ export default {
           CodSunat: "03"
         },
         almacen: {
-          IdAlmacen: 1,
-          Almacen: "HUANUCO"
+          IdAlmacen: 2,
+          Almacen: "PUCALLPA"
         },
         puntoVenta: {
-          IdDocVentaPuntoVenta: 1,
-          PuntoVenta: "HUANUCO"
+          IdDocVentaPuntoVenta: 2,
+          PuntoVenta: "PUCALLPA"
         },
         vendedor: {},
         adelantosPreOrden: [],
@@ -1755,22 +1755,44 @@ export default {
       this.ventas[this.index].puntoVenta = obj;
       this.getNumeroVenta();
     },
-    getVendedor() {
+    async getVendedor() {
       let usuario = sessionStorage.getItem("User");
-      this.axios
-        .get(this.API + "usuarios/" + usuario)
-        .then(response => {
-          let ref = `inputVendedor${this.index}`;
-          this.$refs[ref][0].setValue(response.data.NombreUsuario);
-          this.setVendedor(response.data);
-          this.loadAlmacen(response.data.IdAlmacen);
-          this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
-          this.getTipoDoc(response.data.IdTipoDoc);
-        })
-        .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+      try {
+
+        const response = await this.axios.get(
+          this.API + "usuarios/" + usuario
+        );
+
+        let ref = `inputVendedor${this.index}`;
+        this.$refs[ref][0].setValue(
+          response.data.NombreUsuario
+        );
+        this.setVendedor(response.data);
+
+        await this.loadAlmacen(
+          response.data.IdAlmacen
+        );
+
+        await this.loadPuntoVenta(
+          response.data.IdDocVentaPuntoVenta
+        );
+
+        await this.getTipoDoc(
+          response.data.IdTipoDoc
+        );
+
+        // FORZAR NUMERACIÓN
+        this.$nextTick(() => {
+          this.getNumeroVenta();
         });
+
+      } catch (error) {
+
+        console.log(error);
+
+        this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo"
+        );
+      }
     },
     setVendedor(obj) {
       // console.log(obj)
