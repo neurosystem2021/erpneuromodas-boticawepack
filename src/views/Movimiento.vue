@@ -153,7 +153,7 @@
                       <autocomplete
                         ref="inputMoneda"
                         :url="API + 'monedas'"
-                        initValue="USD"
+                        initValue="PEN"
                         anchor="Moneda"
                         label="writer"
                         placeholder="Moneda"
