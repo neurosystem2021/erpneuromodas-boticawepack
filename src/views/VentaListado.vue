@@ -11,7 +11,7 @@
       <b-row id="header">
         <b-col cols="12"  class="py-0 mt-0">
           <b-card no-body class="mt-0">
-          <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0" >
+          <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0" @input="(val) => { ventaActiva = val; }">
             <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" class="mt-0 pt-0">
               <b-container fluid>
                 <b-row>
@@ -1215,6 +1215,13 @@ export default {
       autocompleteInput.focus();
     });
   },
+  watch: {
+    ventaActiva(nuevoIndex) {
+      this.$nextTick(() => {
+        this.metodoPagoCambio(null, true);
+      });
+    }
+  },
   methods: {
     toggleMetodoPago(index) {
       if (this.mostrarMP[index]) {
@@ -2007,16 +2014,34 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
-    metodoPagoCambio(tipo = null) {
+    metodoPagoCambio(tipo = null, soloRecalcular = false) {
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
-        });
-        if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        const venta = this.ventas[this.ventaActiva];
+        if (!venta) return;
+
+        const pagoActual = venta.pago;
+        const total = this.getTotal();
+
+        if (!soloRecalcular) {
+          // Resetear todos los montos
+          metodos.forEach(metodo => {
+            if (pagoActual[metodo]) {
+              pagoActual[metodo].descripcion = null;
+              pagoActual[metodo].monto = 0;
+            }
+          });
+
+          venta.idMetodoPago = tipo;
+          if (tipo && metodos[tipo - 1] && pagoActual[metodos[tipo - 1]]) {
+            pagoActual[metodos[tipo - 1]].monto = total;
+          }
+        } else {
+          // Solo actualizar el monto del método activo sin resetear
+          const metodoActivo = metodos[(venta.idMetodoPago || 1) - 1];
+          if (metodoActivo && pagoActual[metodoActivo]) {
+            pagoActual[metodoActivo].monto = total;
+          }
         }
       });
     },
@@ -2494,95 +2519,57 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     async cargarProforma(proforma) {
-      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
+      const clienteBackup = { ...proforma };
+      const productosBackup = [...(proforma.productos || [])];
 
-      let venta = { ...this.venta };
-      venta.cliente = proforma;
-      venta.proforma = proforma;
-      venta.UsuarioProforma = proforma.UsuarioReg;
-      let productos = [];
-      this.loading = true;
-      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
-      for (const producto of proforma.productos) {
-        try {
-          // Espera a que la API responda antes de pasar al siguiente producto
-          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      let venta = {
+        ...this.venta,
+        IdProforma: proforma.IdProforma,
+        proforma: proforma, 
+        cliente: clienteBackup,
+        productos: productosBackup
+      };
 
-          if (prod) {
-            let pres = [];
-            if (prod.PreciosPorProducto) {
-              try {
-                let newPres =
-                  typeof prod.PreciosPorProducto === "string"
-                    ? JSON.parse(prod.PreciosPorProducto)
-                    : prod.PreciosPorProducto;
-                pres = newPres.filter(v => v.cantidad > 0);
-              } catch (e) {
-                pres = [];
-              }
-            }
+      this.initValueCliente = `${proforma.DniRuc || ''} ${proforma.Cliente || ''}`;
 
-            // Asignaciones base
-            prod.PreciosPorProducto = pres;
-            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
-            prod.bloquearInputPrecio = false;
-            prod.CantidadPresentacion = null;
-
-            // Asignaciones desde el objeto 'producto' de la proforma
-            prod.cantidad = producto.Cantidad;
-            prod.precio = producto.Precio;
-            prod.descuento = producto.Descuento ? producto.Descuento : 0;
-            prod.stock = prod.stock; // Mantiene el stock actual del buscador
-
-            // Mapeos específicos que tenías al final de tu código
-            prod.ProductoPresentacion = producto.ProductoPresentacion;
-            prod.Descripcion = producto.presentacion;
-            prod.ProductoDesc = producto.ProductoDesc;
-
-            productos.push(prod);
-          }
-        } catch (error) {
-          console.error(
-            "Error cargando producto individual:",
-            producto.IdProducto,
-            error
-          );
-        }
-      }
-      this.loading = false;
-      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
-      venta.productos = productos;
       this.ventas.push(venta);
+      await this.$nextTick();
+      this.ventaActiva = this.ventas.length - 1;
 
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
+      await Promise.all([
+        this.getNumeroVenta(),
+        this.axios.get(this.API + "usuarios/info/" + sessionStorage.getItem("User"))
+          .then(res => {
+            this.ventas[this.ventaActiva].vendedor = res.data;
+          }).catch(() => {})
+      ]);
 
-        // Aseguramos la asignación del cliente en la posición activa
-        if (this.ventas[this.ventaActiva]) {
-          this.ventas[this.ventaActiva].cliente = proforma;
-        }
+      await this.$nextTick();
+      this.ventas[this.ventaActiva].cliente = clienteBackup;
+      this.ventas[this.ventaActiva].productos = productosBackup;
+
+      const pagoActual = this.ventas[this.ventaActiva].pago;
+      ["efectivo", "visa", "mastercard", "delivery"].forEach(m => {
+        if (pagoActual[m]) pagoActual[m].monto = 0;
       });
 
-      this.$nextTick(() => {
-        setTimeout(() => {
-          console.log("llegó con " + productos.length + " productos");
-          this.metodoPagoCambio(1);
-        }, 1000);
-      });
+      this.metodoPagoCambio(1);
+      
+      this.$forceUpdate();
     },
     getProfomaAnio() {
       let proforma = this.ventas[this.ventaActiva].proforma;
-      if (Object.keys(proforma).length > 0) {
+      if (proforma && Object.keys(proforma).length > 0) {
         return proforma.Anio;
       }
+      return null;
     },
     getProfomaNumero() {
       let proforma = this.ventas[this.ventaActiva].proforma;
-      if (Object.keys(proforma).length > 0) {
+      if (proforma && Object.keys(proforma).length > 0) {
         return proforma.Numero;
       }
+      return null;
     },
     // cargarProforma(proforma) {
     //   this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;

@@ -212,53 +212,84 @@ export default {
       console.log(EsFavoritoFlag);
       this.cargarFavoritas();
     },
-    selectProformas(proforma) {
+    async selectProformas(proforma) {
       this.$emit("guardarDatosProforma", proforma.IdProforma);
-      this.axios
-        .get(this.API + "proformas/detalle", {
+      try {
+        const response = await this.axios.get(this.API + "proformas/detalle", {
+          params: { idProforma: proforma.IdProforma }
+        });
+
+        const detalles = response.data;
+        if (!detalles || !detalles.length) return;
+
+        const idsProductos = detalles.map(d => d.IdProducto);
+        const stockResponse = await this.axios.get(this.API + "productos/puntoventa/stock", {
           params: {
-            idProforma: proforma.IdProforma
+            idProductos: idsProductos,
+            idAlmacen: this.idAlmacen || 1
           }
-        })
-        .then(response => {
-          response.data.map(item => {
-            let ProductoPresentacion = "";
-            let presentacion = null;
-            let ProductoDesc = item.Descripcion;
+        });
 
-            if (!item.Presentacion) {
-              presentacion = "UNIDAD";
-            } else {
-              let pres = JSON.parse(item.Presentacion);
-              presentacion = pres.nombre;
-              ProductoPresentacion = pres;
+        const stockMap = {};
+        (stockResponse.data || []).forEach(p => {
+          stockMap[p.IdProducto] = p;
+        });
+
+        const productosEnriquecidos = detalles.map(item => {
+          const stockInfo = stockMap[item.IdProducto] || {};
+          let pres = [];
+          if (stockInfo.PreciosPorProducto) {
+            try {
+              pres = JSON.parse(stockInfo.PreciosPorProducto).filter(v => v.cantidad > 0);
+            } catch (e) { pres = []; }
+          }
+          let CantidadPresentacion = null;
+          let bloquearInputPrecio = false;
+          let presentacion = null;
+
+          if (item.Presentacion) {
+            try {
+              let presObj = typeof item.Presentacion === 'string'
+                ? JSON.parse(item.Presentacion)
+                : item.Presentacion;
+              CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
+              bloquearInputPrecio = true;
+              presentacion = item.Presentacion; // el string JSON original
+            } catch (e) {
+              CantidadPresentacion = null;
+              bloquearInputPrecio = false;
+              presentacion = null;
             }
-            this.add([
-              item.IdProducto,
-              () => {
-                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-              },
-              {
-                setPrecio: true,
-                setPreOr: item.Precio,
-                cantidad: item.Cantidad,
-                descuento: item.Descuento
-              }
-            ]);
+          }
 
-            item.ProductoPresentacion = ProductoPresentacion;
-            item.presentacion = presentacion;
-            item.ProductoDesc = ProductoDesc;
-            this.filter = "";
-            this.show = false;
-          });
-          proforma.productos = response.data;
-          console.log(proforma.productos);
+          return {
+            ...stockInfo,
+            ...item,
+            Descripcion: item.Descripcion || item.ProductoPresentacion || "UNIDAD",
+            ProductoPresentacion: item.Descripcion || item.ProductoPresentacion || "UNIDAD",
+            cantidad: item.Cantidad,
+            precio: item.Precio,
+            descuento: item.Descuento || 0,
+            stock: stockInfo.stock || 0,
+            PreciosPorProducto: pres,
+            tienePresentacion: pres.length > 0,
+            CantidadPresentacion,
+            bloquearInputPrecio,
+            presentacion,
+          };
+        });
+
+        proforma.productos = productosEnriquecidos;
+
+        this.filter = "";
+        this.show = false;
 
           // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
           this.$emit("onSelectProforma", proforma);
-          this.limpiarCarrito();
-        });
+        } catch (err) {
+          console.error("Error cargando proforma:", err);
+          this.$toasted.error("Error al cargar la proforma");
+        }
     },
     myProvider(ctx) {
       let IdAlmacen = sessionStorage.getItem("IdAlmacen");
