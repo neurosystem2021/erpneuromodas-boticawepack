@@ -109,7 +109,7 @@
                 </b-col>
                 <b-col md="6" class="text-left">
                   <h5>x1</h5>
-                  <span
+                  <span  v-if="idPerfil==1"
                     ><b>Precio C: </b>S/
                     {{ objProd.PrecioCosto | redondear(2) }}</span
                   ><br />
@@ -143,7 +143,7 @@
                 </b-col>
                 <b-col md="6" class="text-left">
                   <h5>x{{ d.cantidad }}</h5>
-                  <span><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span
+                  <span v-if="idPerfil==1"><b>Precio C: </b>S/ {{ d.precioc | redondear(2) }}</span
                   ><br />
                   <b>Precio V: </b>S/ {{ d.precio | redondear(2) }}
                 </b-col>
