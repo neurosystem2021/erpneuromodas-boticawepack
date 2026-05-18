@@ -223,7 +223,7 @@
           </thead>
             <tbody>
               <tr style="border: 1px solid #000000 !important">
-                <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="2">
+                <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="3">
                   <img src="/resources/images/bcp_logo.png" style="max-width: 120px" />
                 </td>
                 <td style="border: 1px solid #000000 !important;text-align: center;">USD</td>
@@ -235,13 +235,18 @@
                 <td style="text-align: center; border: 1px solid #000000 !important;">365-2563145-0-20</td>
                 <td style="text-align: center; border: 1px solid #000000 !important;">0023650025631452059</td>
               </tr>
+              <tr style="border: 1px solid #000000 !important">
+                <td style="text-align: center; border: 1px solid #000000 !important;">SOLES</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">365-7234505-0-74</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">00236500723450507453</td>
+              </tr>
               <tr>
                 <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="2">
                   <img src="/resources/images/bbva_logo.png" style="max-width: 120px" />
                 </td>
                 <td style="text-align: center; border: 1px solid #000000 !important;">USD</td>
-                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
-                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">001102100201068055</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;">01121000020106805527</td>
               </tr>
               <tr>
                 <td style="text-align: center; border: 1px solid #000000 !important;">SOLES</td>
