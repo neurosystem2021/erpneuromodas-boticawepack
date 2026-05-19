@@ -35,7 +35,7 @@
                         :current-page="currentPage">
 
                       <template slot="update" slot-scope="data">
-                        <b-button v-if="!cargandoProforma" @click="selectProformas(data.item)" variant="success"><i class="fas fa-hand-pointer"></i></b-button>
+                        <b-button v-if="!cargandoProforma" @click="selectProformas(data.item)" variant="success" :disabled="data.item.Total == null || Number(data.item.Total) <= 0"><i class="fas fa-hand-pointer"></i></b-button>
                         <div class="d-flex justify-content-center" v-else>
                           <div class="spinner" style="
                             width: 3rem;
@@ -49,15 +49,15 @@
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresaselec" variant="primary" target="_blank">Ver</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma+'?empresa=' + empresaselec" variant="primary" target="_blank" :disabled="data.item.Total == null || Number(data.item.Total) <= 0">Ver</b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proformaticket/' + data.item.IdProforma + '?empresa=' + empresaselec" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button :href="'/nuevo/index.html#/reportes/proformaticket/' + data.item.IdProforma + '?empresa=' + empresaselec" variant="primary" target="_blank" :disabled="data.item.Total == null || Number(data.item.Total) <= 0">Ver Ticket</b-button>
                       </template>
                       
                       <template slot="Eliminar" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-trash"></i></b-button>
+                        <b-button @click="eliminarProf(data.item)" variant="danger" :disabled="data.item.Total == null || Number(data.item.Total) <= 0"><i class="fas fa-trash"></i></b-button>
                       </template>
 
                     </b-table>
@@ -255,9 +255,32 @@ export default {
       return promise
         .then(result => {
           this.items = result.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
+
+              this.$nextTick(() => {
+
+              setTimeout(() => {
+
+                  const filas = document.querySelectorAll('#table-proformas tbody tr');
+
+                  filas.forEach((fila, index) => {
+
+                      const item = this.items[index];
+
+                      if (!item) return;
+
+                      // si total es null, 0 o negativo
+                      if (item.Total == null || Number(item.Total) <= 0) {
+
+                          fila.classList.add('fila-vendida');
+
+                      }
+
+                  });
+
+              }, 200);
+
+          });
+
           return this.items;
         })
         .catch(error => {
@@ -312,6 +335,11 @@ export default {
 };
 </script>
 <style>
+
+#table-proformas tbody tr.fila-vendida td {
+    background: #d4edda !important;
+    color: #155724 !important;
+}
 #modalProformas .modal-dialog {
   max-width: 65% !important;
 }

@@ -2296,6 +2296,7 @@ export default {
         // DISPARAR IMPRESIÓN
         if (ventasGeneradas.length > 0) {
              this.limpiarCart();
+             this.limpiarProforma();
             let left = (screen.width / 2) - (400 / 2);
             let top = (screen.height / 2) - (400 / 2);
             let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=350,height=350,top=${top},left=${left}`;
