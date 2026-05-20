@@ -1146,13 +1146,30 @@ export default {
       totalPagos += parseFloat(this.venta.pago.mastercard.monto);
       totalPagos += parseFloat(this.venta.pago.otro.monto);
 
+      // if (!this.venta.EsCredito) {
+      //   if (this.totalCart != totalPagos) {
+      //     this.$toasted.show("Los pagos no coinciden con la venta");
+      //     this.inProgress = false;
+      //     return;
+      //   }
+      // }
+
       if (!this.venta.EsCredito) {
-        if (this.totalCart != totalPagos) {
-          this.$toasted.show("Los pagos no coinciden con la venta");
-          this.inProgress = false;
-          return;
+
+            let totalVenta = parseFloat(this.sumatoriaTotal).toFixed(2);
+
+            let pagos = parseFloat(totalPagos).toFixed(2);
+
+            if (totalVenta !== pagos) {
+
+                this.$toasted.show(
+                    "Los pagos no coinciden con la venta"
+                );
+
+                this.inProgress = false;
+                return;
+            }
         }
-      }
 
       if (!this.productos.length) {
         this.$toasted.show("No hay productos para vender");
