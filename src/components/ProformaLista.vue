@@ -226,7 +226,8 @@ export default {
         const stockResponse = await this.axios.get(this.API + "productos/puntoventa/stock", {
           params: {
             idProductos: idsProductos,
-            idAlmacen: this.idAlmacen || 1
+            idAlmacen: this.idAlmacen || 1,
+            noLimit: 1
           }
         });
 
