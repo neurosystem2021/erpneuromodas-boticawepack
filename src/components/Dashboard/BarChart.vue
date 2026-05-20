@@ -38,6 +38,50 @@ export default {
     };
   },
   methods: {
+    GraficarDiasRango(dataApi) {
+      this.chartData.labels = [];
+      this.chartData.datasets = [];
+
+      let etiquetas = [];
+      let valores = [];
+      let background = [];
+      let border = [];
+
+      let dataset = {
+        label: "Monto Total",
+        borderWidth: 2,
+        backgroundColor: [],
+        borderColor: [],
+        pointBorderColor: "#2554FF",
+        data: []
+      };
+
+      // ordenar por si acaso, usando año/mes/día
+      dataApi.sort((a, b) => {
+        const d1 = new Date(a.Anio, a.Mes - 1, a.Dia);
+        const d2 = new Date(b.Anio, b.Mes - 1, b.Dia);
+        return d1 - d2;
+      });
+
+      dataApi.forEach(item => {
+        // Etiqueta como quieras: DíaNombre, solo Día, o "2025-11-01"
+        etiquetas.push(`${item.DiaNombre} ${item.Dia}`);
+
+        valores.push(Number(item.Total.toFixed(2)));
+        background.push("rgba(54, 162, 235, 0.2)");
+        border.push("rgba(54, 162, 235, 1)");
+      });
+
+      this.chartData.labels = etiquetas;
+
+      dataset.data = valores;
+      dataset.backgroundColor = background;
+      dataset.borderColor = border;
+
+      this.chartData.datasets.push(dataset);
+
+      this.renderChart(this.chartData, this.options);
+    },
     GraficarDias(mes, dias, dataApi) {
       this.chartData.labels = [];
       this.chartData.datasets = [];
