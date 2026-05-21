@@ -1579,7 +1579,9 @@ export default {
     },
     cambiarTab(index) {
       this.tabActiva = index;
-
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
       this.$forceUpdate();
     },
     addNumber(number) {
@@ -1910,6 +1912,13 @@ async loadBarcode(e) {
 
       let venta = { ...this.venta };
       venta.productos = [];
+      venta.pago = {
+        efectivo: { IdMetodoPago: 1, monto: 0 },
+        visa: { IdMetodoPago: 2, monto: 0 },
+        mastercard: { IdMetodoPago: 3, monto: 0 },
+        delivery: { IdMetodoPago: 4, monto: 0 }
+      };
+      venta.pagocon = 0;
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
@@ -2248,12 +2257,12 @@ async setProducto(producto) {
     },
     getSubTotalDetalle(prod) {
       let subtotal = prod.cantidad * prod.precio;
-      return this.redondear(subtotal);
+      return subtotal.toFixed(2);
     },
 
     getTotalDetalle(prod) {
       let total = (prod.cantidad * prod.precio) - prod.descuento;
-      return this.redondear(total);
+      return total.toFixed(2);
     },
     getSubTotal() {
       let productos = [...this.ventas[this.ventaActiva].productos];
@@ -2829,6 +2838,7 @@ async setProducto(producto) {
       ["efectivo", "visa", "mastercard", "delivery"].forEach(m => {
         if (pagoActual[m]) pagoActual[m].monto = 0;
       });
+      await this.$nextTick();
       this.metodoPagoCambio(1);
       this.$forceUpdate();
     },

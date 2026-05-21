@@ -38,9 +38,15 @@ const mutations = {
       return p;
     })
   },
-  ACTUALIZAR_PRODUCTO ({ productos }, obj) {
-    let index = productos.findIndex( p => p.IdProducto === obj.IdProducto )
-    productos.splice(index, 1, obj)
+  ACTUALIZAR_PRODUCTO({ productos }, obj) {
+    if (!obj.Producto) return 
+    let index = obj.Pos !== undefined 
+      ? obj.Pos 
+      : productos.findIndex(p => p.IdProducto === (obj.Producto && obj.Producto.IdProducto))
+    
+    if (index < 0 || index >= productos.length) return
+    
+    productos.splice(index, 1, obj.Producto)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
     //const itemIndex = productos.findIndex(item => item.IdProducto === producto.IdProducto)
@@ -202,7 +208,8 @@ const actions = {
   actualizarPrecioConvenio ({ commit }, cliente) {
     commit('ACTUALIZAR_PRECIOCONVENIO', cliente);
   },
-  actualizarProducto ({ commit }, obj) {
+  actualizarProducto({ commit }, obj) {
+    if (!obj || (!obj.Pos && obj.Pos !== 0)) return
     commit('ACTUALIZAR_PRODUCTO', obj)
   },
   eliminarProducto ({ commit }, index) {

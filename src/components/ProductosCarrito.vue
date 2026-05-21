@@ -1039,7 +1039,7 @@ export default {
       this.$refs.autocompleteProducto.setValue("");
       obj.subt = "";
       obj.precio = obj.PrecioCosto;
-      obj.cantidad = 0;
+      obj.cantidad = 1;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj.Presentacion = obj.ProductoMedicion;
@@ -1220,7 +1220,8 @@ export default {
     },
     actualizaDesc(index, prod) {
       //Vue.delete(this.productos[index], 'descuento');
-      Vue.set(this.productos[index], "descuento", parseFloat(prod.descuento));
+      if (!prod || !prod.IdProducto) return;
+      Vue.set(this.productos[index], "descuento", parseFloat(prod.descuento || 0));
       this.actualizarProd({ Producto: prod, Pos: index });
     },
     ActualizarDesc(index, val) {
