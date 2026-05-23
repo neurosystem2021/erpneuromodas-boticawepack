@@ -30,9 +30,7 @@
           </b-row>
           <hr>
           <b-row>
-            <b-col></b-col>
-            <b-col></b-col>
-            <b-col>
+            <b-col offset="8" cols="4">
               <b-form-group>
                 <label>Agregar por categoria:</label>
                 <b-form-select v-model="idCategoria" :options="categoriasSelect" v-on:change="setCategoria($event)" class="mb-3" size="md"/>
