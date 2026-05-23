@@ -2,7 +2,7 @@
 import { Bar } from "vue-chartjs";
 export default {
   extends: Bar,
-  props: {},
+  props: {altura: { type: Number, default: 250 }},
   data() {
     return {
       chartData: {
@@ -150,6 +150,7 @@ export default {
     }
   },
   mounted() {
+  this.$el.style.height = this.altura + 'px' 
     //this.renderChart(this.chartData, this.options)
   }
 };

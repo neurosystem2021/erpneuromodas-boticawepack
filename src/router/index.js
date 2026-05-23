@@ -36,6 +36,7 @@ import RegistroHuespedes from "@/views/reportes/RegistroHuespedes.vue";
 import Articulosmovimientos from "@/views/reportes/Articulosmovimientos.vue";
 import PorEntregar from "@/views/reportes/PorEntregar.vue";
 import Estadisticas from "@/views/reportes/Estadisticas.vue";
+import MetodoPago from "@/views/reportes/MetodoPago.vue";
 import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
@@ -200,6 +201,11 @@ export default new Router({
       path: "/reportes/estadisticas",
       name: "Estadisticas",
       component: Estadisticas
+    },
+    {
+      path: "/reportes/metodo-pago",
+      name: "MetodoPago",
+      component: MetodoPago
     },
     {
       path: "/venta",

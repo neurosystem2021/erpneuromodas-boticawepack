@@ -12,6 +12,13 @@ export default {
         legend: {
           display: true,
           position: "bottom"
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
         }
       }
     };
