@@ -433,12 +433,13 @@ export default {
 
           if (response.estado) {
             this.cargarListadoUsuario();
-            this.editarUsuarioFlag = false;
+            this.nuevoUsuarioFlag = false;
+            // LIMPIAR FORMULARIO
+            this.usuario = {};
             this.$swal({
               icon: "success",
               title: "Registro Correcto."
             });
-            this.registrarUsuario = false;
           } else {
             this.errorUsuario = response.msg;
           }
