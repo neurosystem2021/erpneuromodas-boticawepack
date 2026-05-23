@@ -405,30 +405,50 @@ export default {
     openEditar(data) {
       this.limpiarCart();
       this.detalleEdit = [];
-      this.axios
-        .get(this.API + "ordencompra/detalle", {
-          params: {
-            IdOrdenCompra: data.IdOrdenCompra
+      this.infoOrden = data;
+
+      this.axios.get(this.API + "ordencompra/detalle", {
+        params: { IdOrdenCompra: data.IdOrdenCompra }
+      })
+      .then(async response => {
+        this.detalleEdit = response.data;
+
+        // 1) Obtener stock PRIMERO antes de agregar al carrito
+        var stockMap = {};
+
+        if (data.IdAlmacen > 0 && response.data.length > 0) {
+          var idProductos = response.data.map(function(p) { return p.IdProducto; });
+
+          try {
+            var params = new URLSearchParams();
+            params.append('q', '');
+            idProductos.forEach(function(id) { params.append('idProductos[]', id); });
+
+            var stockRes = await this.axios.get(
+              this.API + "productos/stock/" + data.IdAlmacen + "?" + params.toString()
+            );
+
+            stockRes.data.forEach(function(p) {
+              stockMap[p.IdProducto] = p.stock;
+            });
+
+          } catch (e) {
+            console.error("Error obteniendo stock:", e);
           }
-        })
-        .then(response => {
-          this.detalleEdit = response.data;
-          this.infoOrden = data;
-          this.limpiarCart();
-          response.data.map(item => {
-            this.add([item, () => {}, false, true]);
-            if (this.infoOrden.IdAlmacen > 0) {
-              this.obtenerStok({
-                IdAlmacen: this.infoOrden.IdAlmacen,
-                CalculoCantidad: 0
-              });
-            }
-          });
-          this.$refs["modalEdicion"].show();
-        })
-        .catch(error => {
-          console.log(error);
+        }
+
+        // 2) Agregar productos al carrito CON el stock ya inyectado en el objeto
+        response.data.forEach(item => {
+          // Inyectar stock directo en el item antes de pasarlo al carrito
+          if (stockMap[item.IdProducto] !== undefined) {
+            item.stock = stockMap[item.IdProducto];
+          }
+          this.add([item, () => {}, false, true]);
         });
+
+        this.$refs["modalEdicion"].show();
+      })
+      .catch(console.error);
     },
     anularOrden(orden) {
       let r = confirm(
