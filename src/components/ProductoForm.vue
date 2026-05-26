@@ -877,8 +877,12 @@ export default {
           productoSerie: this.productoSerie
         })
         .then(response => {
+          const esEdicion = !!this.producto.IdProducto;
+          // ACTUALIZAR DATOS GENERADOS EN BACKEND
+          this.producto.IdProducto = response.data.insertId;
+          this.producto.CodigoBarra = response.data.codigoBarra;
           if (this.cbGuardar) {
-              if (this.producto.IdProducto) {
+              if (esEdicion) {
                 // EDITAR → actualizar en carrito
                 this.$emit("producto-editado", this.producto);
               } else {
