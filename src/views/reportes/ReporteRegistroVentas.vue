@@ -4,13 +4,22 @@
        <b-col cols="12">
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
-        <b-col cols="3">
-            Fecha
+        <b-col cols="2">
+            Fecha Inicio
             <input type="date" class="form-control" v-model="fechaInicio">
         </b-col>
-        <b-col cols="3">
-            Fecha
+        <b-col cols="1">
+            Hora Inicio
+            <input type="time" class="form-control" v-model="horaInicio">
+        </b-col>
+
+        <b-col cols="2">
+            Fecha Fin
             <input type="date" class="form-control" v-model="fechaFin">
+        </b-col>
+        <b-col cols="1">
+            Hora Fin
+            <input type="time" class="form-control" v-model="horaFin">
         </b-col>
         <b-col cols="3">
             Almacén
@@ -31,10 +40,43 @@
           </b-form-checkbox>
         </b-col>
         <b-col cols="2" class="pt-4">
-            <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+            <b-button variant="info" @click="currentPage = 1; generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
         <b-col cols="12" class="mt-4 table-container">
+
+          <div class="sticky-paginacion">
+          <b-row class="mt-3">
+
+              <b-col md="6">
+
+                <b-pagination
+                  v-model="currentPage"
+                  :total-rows="totalRows"
+                  :per-page="perPage"
+                  @input="generarReporte"
+                ></b-pagination>
+
+              </b-col>
+
+              <b-col md="3">
+
+                <b-form-select
+                  v-model="perPage"
+                  :options="[50,100,200]"
+                  @change="changePerPage"
+                ></b-form-select>
+
+              </b-col>
+
+              <b-col md="3" class="text-right pt-2">
+
+                Total registros: {{ totalRows }}
+
+              </b-col>
+
+            </b-row>
+            </div>
             <table class="table table-hover table-striped ">
                 <thead>
                     <tr>
@@ -111,7 +153,7 @@
                     </tr>
                 </tfoot>
             </table>
-          
+            
         </b-col>
     </b-row>
     <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" :title="title">
@@ -155,6 +197,8 @@ export default {
       dialogDetalle: false,
       fechaInicio: "",
       fechaFin: "",
+      horaInicio: "00:00",
+      horaFin: "23:59",
       almacen: 1,
       API: config.API,
       lstReporte: [],
@@ -186,18 +230,23 @@ export default {
         UtilidadBruta: 0,
         PorcentajeUti: 0
       },
-      detalle: []
+      detalle: [],
+      totalRows: 0,
+      perPage: 50,
+      currentPage: 1,
     };
   },
   mounted() {
+
+    // SOLO HOY
     this.fechaInicio = this.$moment()
-      .startOf("month")
       .format("YYYY-MM-DD");
+
     this.fechaFin = this.$moment()
-      .endOf("month")
       .format("YYYY-MM-DD");
     this.obtenerAlmance();
     this.generarReporte();
+    // NO GENERAR AUTOMÁTICAMENTE
   },
   methods: {
     async abrirModalDetalle(item) {
@@ -296,17 +345,22 @@ export default {
       this.lstReporte = [];
       let params = {
         fechaIni: this.fechaInicio,
+        horaIni: this.horaInicio,
         fechaFin: this.fechaFin,
+        horaFin: this.horaFin,
         declarado: this.declarado,
         almacen: this.almacen,
-        empresa: sessionStorage.getItem("empresa")
+        empresa: sessionStorage.getItem("empresa"),
+        page: this.currentPage,
+        limit: this.perPage
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params
       }).then(res => {
         if (res.data) {
-          let data = res.data;
+          let data = res.data.data;
           this.lstReporte = data;
+          this.totalRows = res.data.total;
           let Cantidad = 0;
           let PrecioCosto = 0;
           let PrecioVenta = 0;
@@ -378,9 +432,9 @@ tfoot td {
 }
 
 thead th {
-  top: 0;
-  background: #f8f9fa; /* color del encabezado */
-  z-index: 2;
+  top: 50px;
+  background: #f8f9fa;
+  z-index: 998;
 }
 
 tfoot td {
@@ -388,5 +442,22 @@ tfoot td {
   background: #006064;
   color: white;
   font-weight: bold;
+}
+
+.sticky-paginacion{
+  position: sticky;
+
+  top: 0px;
+
+  z-index: 999;
+
+  background: white;
+
+  padding: 0px 0;
+
+  border-bottom: 1px solid #ddd;
+  width: 100.7%;
+  left: 0;
+  margin: 0;
 }
 </style>
