@@ -532,6 +532,7 @@ export default {
       //Vue.set(this.$refs.tablaProductos, 'localItems', [])
       //console.log(this.$refs.tablaProductos.localItems)
       //this.myProvider(false)
+        this.itemsStock = []
 
        this.axios.get(this.API + 'productos/puntoventa/stock', {
           params: {
@@ -540,10 +541,11 @@ export default {
             limit: items.length
           }
         }).then((response) => {
-             this.itemsStock = response.data
+            this.itemsStock = Array.isArray(response.data) ? response.data : []
         })
         .catch((error) => {
           console.log(error)
+          this.itemsStock = []
         })
 
         // Cargar la sumatoria
@@ -635,6 +637,7 @@ export default {
         })
     },
     getStock (idProducto) {
+      if (!Array.isArray(this.itemsStock)) return 0
       let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
       return this.itemsStock[index] && this.itemsStock[index].stock
     },

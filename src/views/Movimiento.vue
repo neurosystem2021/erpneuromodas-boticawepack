@@ -128,7 +128,18 @@
                     </b-form-group>
                   </b-col>
                 </b-row>
-            
+                <b-row>
+                  <b-col md="6">
+                    <b-form-group>
+                      <b-form-checkbox id="lote-productos"
+                        v-model="movimiento.loteProductos"
+                        :value="1"
+                        :unchecked-value="0">
+                        Productos con Lote
+                      </b-form-checkbox>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
               </b-col>
               <b-col md="4">
                 <b-row>
@@ -196,13 +207,14 @@
             <b-col>
               <productos-carrito 
                 ref="carrito"
-                :fields="carrito.fields"
+                :fields="camposCarrito"
                 @onAddProducto="onAddProducto" 
                 :onSetProducto="onSetProducto"
                 :tipoCambio="movimiento.TipoCambio"
                 :movTipo = "movimiento.movimientoTipo.Tipo"
                 :almacenDestino = "movimiento.almacenDestino.IdAlmacen"
                 :almacenOrigen = "movimiento.almacenOrigen.IdAlmacen"
+                :loteActivo="movimiento.loteProductos == 1"
                 tipo="mov" padre="compra" :tipoMov="this.movimiento.movimientoTipo.Tipo"></productos-carrito>
             </b-col>
           </b-row>
@@ -293,9 +305,6 @@ export default {
             variant: "danger",
             class: "text-center"
           },
-          { key: "Lote", label: "C. Lote", class: "stocksize" },
-          // { key: "Registro", label: "Reg. Sanitario", class: "stocksize" },
-          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" },
           { key: "acciones", label: "" }
         ]
       },
@@ -309,7 +318,17 @@ export default {
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
-    })
+    }),
+    camposCarrito() {
+      let fields = [...this.carrito.fields];
+      if (this.movimiento.loteProductos == 1) {
+        fields.splice(fields.length - 1, 0,
+          { key: "Lote", label: "C. Lote", class: "stocksize" },
+          { key: "fechavencimiento", label: "Vencimiento", class: "stocksize" }
+        );
+      }
+      return fields;
+    }
   },
   methods: {
     ...mapActions({
@@ -427,6 +446,7 @@ export default {
       return {
         EsCredito: 0,
         alterarProductos: 0,
+        loteProductos: 0,
         FechaVenCredito: "",
         Moneda: "PEN",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
@@ -552,7 +572,7 @@ export default {
     getAlmacenes(value) {
       this.buscarAlmacenes(value);
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
       this.inProgress = true;
 
@@ -664,7 +684,29 @@ export default {
       if (this.isTraslado == true || this.isSalida == true) {
         this.movimiento.alterarProductos = 0;
       }
+      if (this.movimiento.loteProductos == 1) {
+        const lotesAVerificar = this.productos
+          .filter(p => p.Lote && p.Lote.trim() !== '' && p.Lote.trim() !== 'S/N')
+          .map(p => ({ IdProducto: p.IdProducto, Lote: p.Lote.trim(), Producto: p.Producto }));
 
+        if (lotesAVerificar.length > 0) {
+          try {
+            const res = await this.axios.post(this.API + 'movimientos/verificar-lotes', {
+              productos: lotesAVerificar
+            });
+            console.log('Respuesta verificar-lotes:', res.data);
+            if (res.data.error) {
+              this.$toasted.show(res.data.error, { duration: 5000 });
+              this.inProgress = false;
+              return;
+            }
+          } catch (e) {
+            this.$toasted.show("Error al verificar lotes");
+            this.inProgress = false;
+            return;
+          }
+        }
+      }
       let r = confirm("¿Desea Guardar el Movimiento?");
       if (r == true) {
         this.axios

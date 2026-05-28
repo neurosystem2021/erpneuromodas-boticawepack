@@ -219,6 +219,7 @@
             type="text"
             v-bind:class="{ ventasAncho: isVentas }"
             autocomplete="false"
+            v-if="loteActivo"
             ></b-form-input>
         </template>
 
@@ -363,9 +364,9 @@
                   Nro. Factura: <b>{{ productos[data.index].SerieNumero }}</b>
                 </div>
                 <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;" v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>
-                <div class="text-left">
+                <!-- <div class="text-left">
                   Registro Sanitario: <b>{{ productos[data.index].Registro }}</b> 
-                </div>
+                </div> -->
                   
                 <!--<div style="text-align:center;" v-if="!isNota">
                       <small style="font-size:14px;">Stock de lote: <span style="font-weight:bold;"></span> -  D: <span style="font-weight:bold; text-transform:uppercase"></span></small><br />
@@ -395,6 +396,7 @@
           <b-form-input
             v-model="productos[data.index].FechaVen"
             type="date"
+            v-if="loteActivo"
             ></b-form-input>
         </template>
 
@@ -598,7 +600,11 @@ export default {
       },
       type: Array
     },
-    noSubtotal: Boolean
+    noSubtotal: Boolean,
+    loteActivo: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     ...mapState({
@@ -1106,7 +1112,7 @@ export default {
                 console.log(l),
                 {
                   value: l.hashMovimiento,
-                  text: l.Lote,
+                  text: l.Lote && l.Lote !== 'S/N' ? l.Lote : l.hashMovimiento,
                   Stock: l.Stock,
                   IdLote: l.IdLote,
                   Lote: l.Lote,

@@ -154,7 +154,7 @@
                             </b-form-select>
                             <br>
                             <div class="text-left">
-                              Stock de Lote: <b>{{ ((data.item.stockMovimiento || 0) / (data.item.cantidadPress ||
+                              Stock de Lote: <b>{{ ((data.item.stockMovimiento || 0) / (data.item.CantidadPresentacion ||
                                 1)).toFixed(2) }}</b>
                             </div>
                             <div class="text-left">
@@ -163,9 +163,9 @@
                             <!-- Fecha de vencimiento formateada en changeMovimiento segun el lote seleccionado -->
                             <div class="text-left" style="font-size:19px; margin-top: -4.7px; margin-bottom: -1.5px;"
                               v-if="!isNota[index]" v-html="data.item.fechaVenMovimiento"></div>
-                            <div class="text-left">
+                            <!-- <div class="text-left">
                               Registro Sanitario: <b>{{ data.item.Registro }}</b>
-                            </div>
+                            </div> -->
                           </div>
                         </b-popover>
                       </template>
@@ -1070,17 +1070,15 @@ export default {
       }
 
       const lotesProducto = (this.movimientoLotes[producto.IdProducto] || []).filter(
-        lote => lote && (parseFloat(lote.Stock) || 0) > 0
+        lote => lote && parseFloat(lote.Stock || 0) > 0
       );
 
-      if (!lotesProducto.length) {
+      if (!lotesProducto.length) 
         return { lotesDetalle: null };
-      }
 
       const cantidadLinea = this.roundVentaQty(producto.cantidad);
-      if (cantidadLinea <= 0) {
+      if (cantidadLinea <= 0)
         return { lotesDetalle: null };
-      }
 
       const cantidadPresentacion =
         parseFloat(producto.CantidadPresentacion) > 0
@@ -1092,72 +1090,58 @@ export default {
       );
 
       const hashSeleccionado = String(producto.hashMovimiento);
-      const idxSeleccionado = lotesProducto.findIndex(
-        lote => String(lote.value) === hashSeleccionado
-      );
+      const loteSeleccionado = lotesProducto.find(l => String(l.value) === hashSeleccionado);
 
-      const lotesOrdenados =
-        idxSeleccionado >= 0
-          // Se intenta consumir primero el lote que el usuario selecciono en el popup.
-          ? [lotesProducto[idxSeleccionado]].concat(
-              lotesProducto.filter((_, idx) => idx !== idxSeleccionado)
-            )
-          : lotesProducto.slice();
+      const lotesRestantes = lotesProducto
+          .filter(l => String(l.value) !== hashSeleccionado)
+          .sort((a, b) => {
+              if (!a.FechaVen) return 1;
+              if (!b.FechaVen) return -1;
+              return new Date(a.FechaVen) - new Date(b.FechaVen);
+          });
+
+      // ✅ Primero el lote seleccionado, luego por proximidad a vencer
+      const lotesOrdenados = loteSeleccionado
+          ? [loteSeleccionado, ...lotesRestantes]
+          : lotesRestantes;
 
       const lotesDetalle = [];
       for (let i = 0; i < lotesOrdenados.length && restanteUnidades > 0; i++) {
-        const lote = lotesOrdenados[i];
-        const disponibleUnidades = this.roundVentaQty(lote.Stock);
-        if (disponibleUnidades <= 0) {
-          continue;
-        }
+          const lote = lotesOrdenados[i];
+          const disponibleUnidades = this.roundVentaQty(lote.Stock);
+          if (disponibleUnidades <= 0) continue;
 
-        const usarUnidades = this.roundVentaQty(
-          Math.min(restanteUnidades, disponibleUnidades)
-        );
-        if (usarUnidades <= 0) {
-          continue;
-        }
+          const usarUnidades = this.roundVentaQty(Math.min(restanteUnidades, disponibleUnidades));
+          if (usarUnidades <= 0) continue;
+          const cantidadPres = this.roundVentaQty(usarUnidades / cantidadPresentacion);
+          if (cantidadPres <= 0) continue;
 
-        const cantidad = this.roundVentaQty(usarUnidades / cantidadPresentacion);
-        if (cantidad <= 0) {
-          continue;
-        }
+          lotesDetalle.push({
+              hashMovimiento: lote.value,
+              IdLote:   lote.IdLote,
+              Lote:     lote.Lote,
+              FechaVen: lote.FechaVen,
+              Registro: lote.Registro,
+              cantidad: cantidadPres  // unidades de presentación
+          });
 
-        lotesDetalle.push({
-          hashMovimiento: lote.value,
-          IdLote: lote.IdLote,
-          Lote: lote.Lote,
-          FechaVen: lote.FechaVen,
-          Registro: lote.Registro,
-          cantidad
-        });
-
-        restanteUnidades = this.roundVentaQty(restanteUnidades - usarUnidades);
+          restanteUnidades = this.roundVentaQty(restanteUnidades - usarUnidades);
       }
 
-      if (!lotesDetalle.length) {
-        return { lotesDetalle: null };
-      }
+      if (!lotesDetalle.length) return { lotesDetalle: null };
 
       if (restanteUnidades > 0.00001) {
-        return {
-          error:
-            "No hay stock suficiente por lotes para " +
-            (producto.Producto || "el producto")
-        };
+          return { error: "No hay stock suficiente por lotes para " + (producto.Producto || "el producto") };
       }
 
-      // Ajuste final para absorber diferencias minimas por redondeo.
+      // Ajuste final por redondeo
       const sumaCantidad = this.roundVentaQty(
-        lotesDetalle.reduce((acc, lote) => acc + (parseFloat(lote.cantidad) || 0), 0)
+          lotesDetalle.reduce((acc, l) => acc + (parseFloat(l.cantidad) || 0), 0)
       );
       const diferencia = this.roundVentaQty(cantidadLinea - sumaCantidad);
       if (Math.abs(diferencia) > 0 && lotesDetalle.length) {
-        const last = lotesDetalle[lotesDetalle.length - 1];
-        last.cantidad = this.roundVentaQty(
-          (parseFloat(last.cantidad) || 0) + diferencia
-        );
+          const last = lotesDetalle[lotesDetalle.length - 1];
+          last.cantidad = this.roundVentaQty((parseFloat(last.cantidad) || 0) + diferencia);
       }
 
       return { lotesDetalle };
@@ -2868,6 +2852,7 @@ async setProducto(producto) {
       Vue.set(this.ventas[this.ventaActiva].productos, this.index, producto);
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
+      this.loadMovimientoLotes(producto.IdProducto);
     },
     probarImpresora() {
       if (
