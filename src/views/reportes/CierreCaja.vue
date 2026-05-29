@@ -66,12 +66,8 @@
               <td>{{ totalVentasEfectivo | redondear }} </td>
             </tr>
             <tr>
-              <td>Tarjeta S/.</td>
-              <td>{{ totalVentasVisa | redondear }} </td>
-            </tr>
-            <tr>
-              <td>Yape/Plin S/.</td>
-              <td>{{ totalVentasMastercard | redondear }} </td>
+              <td>Tarjeta y Yape/Plin S/.</td>
+              <td>{{ totalVentasVisaTransferencia | redondear }} </td>
             </tr>
             <tr>
               <td>Transferencia S/.</td>
@@ -487,6 +483,16 @@ export default {
       return this.ventas.filter(venta => {
         return venta.Visa > 0  && !venta.EsCredito && venta.EsVale == 0
       })
+    },
+    totalVentasVisaTransferencia () {
+      let total = 0
+      this.ventasVisa.forEach(venta => {
+        total += venta.Visa
+      });
+      this.ventasMastercard.forEach(venta => {
+        total += venta.Mastercard
+      });
+      return total
     },
     totalVentasTransferencia() {
       let total = 0
