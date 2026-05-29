@@ -424,7 +424,8 @@ export default {
           parseFloat(prod.Descuento)
         );
       }, 0);
-      return parseFloat(total * (this.proforma.IGV == 1 ? 0.18 : 0)).toFixed(2);
+      //return parseFloat(total * (this.proforma.IGV == 1 ? 0.18 : 0)).toFixed(2);
+      return parseFloat( this.proforma.IGV == 1 ? total - total / 1.18 : 0).toFixed(2);
     },
     getTotalDescuentos() {
       let total = this.proforma.productos.reduce((sum, prod) => {
@@ -441,7 +442,12 @@ export default {
           parseFloat(prod.Precio * prod.CantidadImportacion)
         );
       }, 0);
-      return parseFloat(total).toFixed(2);
+      //return parseFloat(total).toFixed(2);
+      return parseFloat(
+      this.proforma.IGV == 1
+      ? total / 1.18
+      : total
+      ).toFixed(2);
     },
     getTotal() {
       let total = this.proforma.productos.reduce((sum, prod) => {
