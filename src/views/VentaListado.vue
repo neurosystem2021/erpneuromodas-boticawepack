@@ -11,7 +11,7 @@
       <b-row id="header">
         <b-col cols="12"  class="py-0 mt-0">
           <b-card no-body class="mt-0">
-          <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0" >
+          <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0" @input="(val) => { ventaActiva = val; }">
             <b-tab v-for="(venta,index) in ventas" :key="index" :title="`Venta ${index+1}`" title-link-class="titleTabs" class="mt-0 pt-0">
               <b-container fluid>
                 <b-row>
@@ -497,7 +497,7 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)"/>
+                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.transferencia.monto - $event.target.value)"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -1156,7 +1156,13 @@ export default {
     this.removeSocketListeners();
     this.$socket.disconnect();
   },
-
+  watch: {
+    ventaActiva(nuevoIndex) {
+      this.$nextTick(() => {
+        this.metodoPagoCambio(null, true);
+      });
+    }
+  },
   methods: {
     mostrarVentaFlag() {
       let IdPerfil = [1, 25, "1", "25"];
@@ -2061,16 +2067,34 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
-    metodoPagoCambio(tipo = null) {
+    metodoPagoCambio(tipo = null, soloRecalcular = false) {
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
-        });
-        if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        const venta = this.ventas[this.ventaActiva];
+        if (!venta) return;
+
+        const pagoActual = venta.pago;
+        const total = this.getTotal();
+
+        if (!soloRecalcular) {
+          // Resetear todos los montos
+          metodos.forEach(metodo => {
+            if (pagoActual[metodo]) {
+              pagoActual[metodo].descripcion = null;
+              pagoActual[metodo].monto = 0;
+            }
+          });
+
+          venta.idMetodoPago = tipo;
+          if (tipo && metodos[tipo - 1] && pagoActual[metodos[tipo - 1]]) {
+            pagoActual[metodos[tipo - 1]].monto = total;
+          }
+        } else {
+          // Solo actualizar el monto del método activo sin resetear
+          const metodoActivo = metodos[(venta.idMetodoPago || 1) - 1];
+          if (metodoActivo && pagoActual[metodoActivo]) {
+            pagoActual[metodoActivo].monto = total;
+          }
         }
       });
     },
@@ -2496,65 +2520,43 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     async cargarProforma(proforma) {
-      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
+      const clienteBackup = { ...proforma };
+      const productosBackup = [...(proforma.productos || [])];
 
-      // 1. Obtener datos del usuario
-      try {
-        const response = await this.axios.get(
-          this.API + "/usuarios/" + proforma.UsuarioReg
-        );
-        if (response.data) {
-          venta.UsuarioProforma = response.data.Usuario;
-        }
-      } catch (error) {
-        console.error("Error cargando usuario:", error);
-      }
+      let venta = {
+        ...this.venta,
+        IdProforma: proforma.IdProforma,
+        proforma: proforma, 
+        cliente: clienteBackup,
+        productos: productosBackup
+      };
 
-      venta.cliente = proforma;
-      venta.vendedor = { Usuario: proforma.UsuarioReg };
-      venta.mostrarOp = {};
+      this.initValueCliente = `${proforma.DniRuc || ''} ${proforma.Cliente || ''}`;
 
-      // 2. MAP en lugar de forEach para manejar promesas
-      const promesasProductos = proforma.productos.map(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
-        }
-
-        // Retornamos el objeto procesado
-        return {
-          ...prod,
-          PreciosPorProducto: pres,
-          tienePresentacion: pres.length > 0,
-          bloquearInputPrecio: false,
-          CantidadPresentacion: null,
-          ProductoPresentacion: producto.Descripcion,
-          Descripcion: producto.Descripcion,
-          cantidad: producto.Cantidad,
-          precio: producto.Precio,
-          descuento: producto.Descuento || 0
-        };
-      });
-
-      // 3. ESPERAR a que todos los productos se carguen
-      venta.productos = await Promise.all(promesasProductos);
-
-      // 4. Agregar a la lista y actualizar estado
       this.ventas.push(venta);
+      await this.$nextTick();
+      this.ventaActiva = this.ventas.length - 1;
 
-      // 5. Acciones finales una vez que el DOM y los datos están listos
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
+      await Promise.all([
+        this.getNumeroVenta(),
+        this.axios.get(this.API + "usuarios/info/" + sessionStorage.getItem("User"))
+          .then(res => {
+            this.ventas[this.ventaActiva].vendedor = res.data;
+          }).catch(() => {})
+      ]);
 
-        // Ahora sí, el método de pago se ejecuta con datos reales
-        this.metodoPagoCambio(1);
+      await this.$nextTick();
+      this.ventas[this.ventaActiva].cliente = clienteBackup;
+      this.ventas[this.ventaActiva].productos = productosBackup;
+
+      const pagoActual = this.ventas[this.ventaActiva].pago;
+      ["efectivo", "visa", "mastercard", "delivery"].forEach(m => {
+        if (pagoActual[m]) pagoActual[m].monto = 0;
       });
+
+      this.metodoPagoCambio(1);
+      
+      this.$forceUpdate();
     },
     // cargarProforma(proforma) {
     //   this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;

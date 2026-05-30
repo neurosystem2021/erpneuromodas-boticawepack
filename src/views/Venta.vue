@@ -377,7 +377,7 @@
                                   </td>
                                   <td>
                                     <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.delivery.monto - $event.target.value)"/>
+                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"/>
                                   </td>
                                   </tr>
                                   <tr>
@@ -388,18 +388,18 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal()  - venta.pago.delivery.monto -  venta.pago.visa.monto - $event.target.value)"/>
+                                      @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal()  - venta.pago.transferencia.monto -  venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
                                   <tr>
                                     <td>Transferencia</td>
                                     <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                     <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                                      <b-form-input v-model="ventas[ventaActiva].pago.transferencia.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
                                       <input
-                                        class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
+                                        class="form-control" v-model="ventas[ventaActiva].pago.transferencia.monto" min="0" step="0.01" type="number" placeholder="S/."
                                          @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto  - venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
@@ -1091,7 +1091,7 @@ export default {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
           mastercard: { IdMetodoPago: 3, monto: 0 },
-          delivery: { IdMetodoPago: 4, monto: 0 }
+          transferencia: { IdMetodoPago: 4, monto: 0 }
         },
         idProductos: [],
         NroComprobanteModifica: "",
@@ -1145,7 +1145,7 @@ export default {
             efectivo: { IdMetodoPago: 1, monto: 0 },
             visa: { IdMetodoPago: 2, monto: 0 },
             mastercard: { IdMetodoPago: 3, monto: 0 },
-            delivery: { IdMetodoPago: 4, monto: 0 }
+            transferencia: { IdMetodoPago: 4, monto: 0 }
           },
           idProductos: [],
           NroComprobanteModifica: "",
@@ -1218,6 +1218,13 @@ export default {
       let IdPerfil = [1, 25, "1", "25"];
       let val = sessionStorage.getItem("IdPerfil");
       return IdPerfil.includes(val);
+    },
+    watch: {
+      ventaActiva(nuevoIndex) {
+        this.$nextTick(() => {
+          this.metodoPagoCambio(null, true);
+        });
+      }
     },
     conectarSocket() {
       if (!this.$socket.connected) {
@@ -1437,7 +1444,7 @@ export default {
     },
     cambiarTab(index) {
       this.tabActiva = index;
-
+      this.ventaActiva = index;
       this.$forceUpdate();
     },
     addNumber(number) {
@@ -2057,16 +2064,32 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
-    metodoPagoCambio(tipo = null) {
+    metodoPagoCambio(tipo = null, soloRecalcular = false) {
       this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
-        });
-        if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+        const metodos = ["efectivo", "visa", "mastercard", "transferencia"];
+        const venta = this.ventas[this.ventaActiva];
+        if (!venta) return;
+
+        const pagoActual = venta.pago;
+        const total = this.getTotal();
+
+        if (!soloRecalcular) {
+          metodos.forEach(metodo => {
+            if (pagoActual[metodo]) {
+              pagoActual[metodo].descripcion = null;
+              pagoActual[metodo].monto = 0;
+            }
+          });
+
+          venta.idMetodoPago = tipo;
+          if (tipo && metodos[tipo - 1] && pagoActual[metodos[tipo - 1]]) {
+            pagoActual[metodos[tipo - 1]].monto = total;
+          }
+        } else {
+          const metodoActivo = metodos[(venta.idMetodoPago || 1) - 1];
+          if (metodoActivo && pagoActual[metodoActivo]) {
+            pagoActual[metodoActivo].monto = total;
+          }
         }
       });
     },
@@ -2108,7 +2131,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.inProgress = false;
@@ -2128,7 +2151,7 @@ export default {
         this.inProgress = false;
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
@@ -2357,7 +2380,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
@@ -2379,7 +2402,7 @@ export default {
         );
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
@@ -2566,57 +2589,44 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
-      this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
-      venta.cliente = proforma;
-      venta.vendedor = { Usuario: proforma.UsuarioReg };
-      let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
-        }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
-      });
-      // console.log(proforma.productos);
-      venta.productos = productos;
+    async cargarProforma(proforma) {
+      const clienteBackup = { ...proforma };
+      const productosBackup = [...(proforma.productos || [])];
+
+      let venta = {
+        ...this.venta,
+        IdProforma: proforma.IdProforma,
+        proforma: proforma, 
+        cliente: clienteBackup,
+        productos: productosBackup
+      };
+
+      this.initValueCliente = `${proforma.DniRuc || ''} ${proforma.Cliente || ''}`;
+
       this.ventas.push(venta);
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
-        // this.loadClienteVarios();
+      await this.$nextTick();
+      this.ventaActiva = this.ventas.length - 1;
+
+      await Promise.all([
+        this.getNumeroVenta(),
+        this.axios.get(this.API + "usuarios/info/" + sessionStorage.getItem("User"))
+          .then(res => {
+            this.ventas[this.ventaActiva].vendedor = res.data;
+          }).catch(() => {})
+      ]);
+
+      await this.$nextTick();
+      this.ventas[this.ventaActiva].cliente = clienteBackup;
+      this.ventas[this.ventaActiva].productos = productosBackup;
+
+      const pagoActual = this.ventas[this.ventaActiva].pago;
+      ["efectivo", "visa", "mastercard", "transferencia"].forEach(m => {
+        if (pagoActual[m]) pagoActual[m].monto = 0;
       });
-      this.ventas[this.ventaActiva].cliente = proforma;
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.metodoPagoCambio(1);
-        }, 100);
-      });
+
+      this.metodoPagoCambio(1);
+      
+      this.$forceUpdate();
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };
