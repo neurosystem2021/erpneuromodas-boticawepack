@@ -2007,16 +2007,17 @@ export default {
       prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
       prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
       prod.cantidad = producto.cantidad;
-      prod.CantidadPresentacion = producto.CantidadPresentacion;
+      prod.CantidadPresentacion = producto.CantidadPresentacion > 0 
+        ? producto.CantidadPresentacion 
+        : null;
       prod.precio = producto.PrecioCosto;
       prod.descuento = 0;
-      prod.presentacion = null;
+      prod.presentacion = producto.Presentacion || null;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
+      prod.bloquearInputPrecio = prod.CantidadPresentacion ? true : false;
 
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
       productos.unshift(prod);
       this.metodoPagoCambio(1);
     },

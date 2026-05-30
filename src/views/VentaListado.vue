@@ -1327,7 +1327,8 @@ export default {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
-      //Cargar producto del documento afectado nota credito
+
+      // Cargar productos del documento afectado nota credito
       this.axios
         .get(this.API + "venta/detalle/comprobante", {
           params: {
@@ -1337,26 +1338,22 @@ export default {
               .IdDocVentaPuntoVenta
           }
         })
-        .then(response => {
+        .then(async response => {
+          // Cargar cliente
           this.axios
             .get(this.API + "cliente", {
               params: {
                 idCliente: response.data[0].IdCliente
               }
             })
-            .then(response => {
-              if (response.data) {
-                this.setCliente(response.data.IdCliente);
-
+            .then(clienteResponse => {
+              if (clienteResponse.data) {
+                this.setCliente(clienteResponse.data.IdCliente);
                 this.ventas[this.ventaActiva].CampoDireccion =
-                  response.data.Direccion;
-                this.ventas[this.ventaActiva].cliente = response.data;
-
-                // let txtCliente = `inputCliente${this.ventaActiva}`;
+                  clienteResponse.data.Direccion;
+                this.ventas[this.ventaActiva].cliente = clienteResponse.data;
                 this.ventas[this.ventaActiva].verCliente = false;
-                this.initValueCliente = this.ventas[
-                  this.ventaActiva
-                ].cliente.Cliente;
+                this.initValueCliente = this.ventas[this.ventaActiva].cliente.Cliente;
                 this.ventas[this.ventaActiva].verCliente = true;
                 this.$forceUpdate();
               } else {
@@ -1367,15 +1364,69 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
-
-          response.data.forEach(element => {
-            this.setProducto(element, true);
-          });
+          // ✅ Limpiar productos y cargar con presentacion correcta
+          this.ventas[this.ventaActiva].productos = [];
+          for (let i = 0; i < response.data.length; i++) {
+            await this.setProductoNotaCredito(response.data[i]);
+          }
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
         });
     },
+
+    async setProductoNotaCredito(producto) {
+      let productos = this.ventas[this.ventaActiva].productos;
+      
+      // Parsear la presentacion del detalle original
+      let presNew = {};
+      try {
+        presNew = producto.Presentacion ? JSON.parse(producto.Presentacion) : {};
+      } catch(e) {
+        presNew = {};
+      }
+
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      if (!prod) return;
+
+      let pres = [];
+      if (prod.PreciosPorProducto) {
+        try {
+          let newPres = JSON.parse(prod.PreciosPorProducto);
+          pres = newPres.filter(v => v.cantidad > 0);
+        } catch(e) {
+          pres = [];
+        }
+      }
+
+      prod.PreciosPorProducto = pres;
+      prod.ProductoDesc = producto.Descripcion;
+
+      // ✅ Respetar descripcion/presentacion original
+      prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      
+      prod.cantidad = producto.cantidad;
+      prod.precio = producto.PrecioCosto || producto.precio;
+      prod.descuento = 0;
+      
+      // ✅ Respetar CantidadPresentacion original sin sobreescribir con null
+      prod.CantidadPresentacion = (producto.CantidadPresentacion && producto.CantidadPresentacion > 0)
+        ? producto.CantidadPresentacion
+        : null;
+
+      // ✅ Respetar presentacion original
+      prod.presentacion = producto.Presentacion || null;
+      
+      prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+      
+      // ✅ Bloquear precio si tiene presentacion, como en venta normal
+      prod.bloquearInputPrecio = presNew.nombre ? true : false;
+      prod.esPresentacion = presNew.nombre ? true : false;
+
+      productos.unshift(prod);
+      this.metodoPagoCambio(1);
+    },
+
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
         this.bloquearInput = true;
