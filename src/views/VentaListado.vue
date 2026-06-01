@@ -508,18 +508,18 @@
                                       </td>
                                       <td>
                                         <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                        @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal()  - venta.pago.delivery.monto -  venta.pago.visa.monto - $event.target.value)"/>
+                                        @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal()  - venta.pago.transferencia.monto -  venta.pago.visa.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
                                     <tr>
                                       <td>Transferencia</td>
                                       <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                       <td>
-                                        <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                                        <b-form-input v-model="ventas[ventaActiva].pago.transferencia.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
+                                          class="form-control" v-model="ventas[ventaActiva].pago.transferencia.monto" min="0" step="0.01" type="number" placeholder="S/."
                                           @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto  - venta.pago.visa.monto - $event.target.value)"/>
                                       </td>
                                     </tr>
@@ -1040,7 +1040,7 @@ export default {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
           mastercard: { IdMetodoPago: 3, monto: 0 },
-          delivery: { IdMetodoPago: 4, monto: 0 }
+          transferencia: { IdMetodoPago: 4, monto: 0 }
         },
         idProductos: [],
         NroComprobanteModifica: "",
@@ -1100,7 +1100,7 @@ export default {
             efectivo: { IdMetodoPago: 1, monto: 0 },
             visa: { IdMetodoPago: 2, monto: 0 },
             mastercard: { IdMetodoPago: 3, monto: 0 },
-            delivery: { IdMetodoPago: 4, monto: 0 }
+            transferencia: { IdMetodoPago: 4, monto: 0 }
           },
           idProductos: [],
           NroComprobanteModifica: "",
@@ -1156,13 +1156,13 @@ export default {
     this.removeSocketListeners();
     this.$socket.disconnect();
   },
-  watch: {
-    ventaActiva(nuevoIndex) {
-      this.$nextTick(() => {
-        this.metodoPagoCambio(null, true);
-      });
-    }
-  },
+  // watch: {
+  //   ventaActiva(nuevoIndex) {
+  //     this.$nextTick(() => {
+  //       this.metodoPagoCambio(null, true);
+  //     });
+  //   }
+  // },
   methods: {
     mostrarVentaFlag() {
       let IdPerfil = [1, 25, "1", "25"];
@@ -1866,7 +1866,7 @@ export default {
         )[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
-          this.irTxtLoadBarcode();
+          this.irBusquedaProducto();
         });
 
         return false;
@@ -2069,7 +2069,7 @@ export default {
     },
     metodoPagoCambio(tipo = null, soloRecalcular = false) {
       this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const metodos = ["efectivo", "visa", "mastercard", "transferencia"];
         const venta = this.ventas[this.ventaActiva];
         if (!venta) return;
 
@@ -2109,7 +2109,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         this.inProgress = false;
@@ -2129,7 +2129,7 @@ export default {
         this.inProgress = false;
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
@@ -2274,7 +2274,7 @@ export default {
       venta.adelantosPreOrden = [];
       if (venta.selectOpcionVenta != 2) {
         venta.DireccionEntrega = venta.EsDelivery
-          ? this.infoDelivery.Direccion || ""
+          ? (this.infoDelivery && this.infoDelivery.Direccion) || ""
           : "";
       }
       venta.PagoCon = venta.pagocon;
@@ -2312,8 +2312,7 @@ export default {
         this.inProgress = false;
         if (this.ventas.length == 1) {
           this.inProgress = false;
-          window.location.reload();
-          this.inProgress = false;
+          setTimeout(() => window.location.reload(), 600);
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
@@ -2335,7 +2334,7 @@ export default {
         this.obtenerMonto(venta.pago.efectivo.monto) +
         this.obtenerMonto(venta.pago.visa.monto) +
         this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
+        this.obtenerMonto(venta.pago.transferencia.monto);
       if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
         this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
         return;
@@ -2352,7 +2351,7 @@ export default {
         );
         return;
       }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+      if (this.obtenerMonto(venta.pago.transferencia.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
@@ -2483,7 +2482,7 @@ export default {
       venta.adelantosPreOrden = [];
       if (venta.selectOpcionVenta != 2) {
         venta.DireccionEntrega = venta.EsDelivery
-          ? this.infoDelivery.Direccion || ""
+          ? (this.infoDelivery && this.infoDelivery.Direccion) || ""
           : "";
       }
       venta.PagoCon = venta.pagocon;
@@ -2550,7 +2549,7 @@ export default {
       this.ventas[this.ventaActiva].productos = productosBackup;
 
       const pagoActual = this.ventas[this.ventaActiva].pago;
-      ["efectivo", "visa", "mastercard", "delivery"].forEach(m => {
+      ["efectivo", "visa", "mastercard", "transferencia"].forEach(m => {
         if (pagoActual[m]) pagoActual[m].monto = 0;
       });
 
@@ -2789,9 +2788,7 @@ export default {
   watch: {
     ventaActiva() {
       this.$nextTick(() => {
-        setTimeout(() => {
-          this.metodoPagoCambio(1);
-        }, 100);
+          this.metodoPagoCambio(null, true);
       });
     }
   }

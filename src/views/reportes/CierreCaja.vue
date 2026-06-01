@@ -275,7 +275,7 @@
               </td>
               <td>{{ item.TransferenciaDesc }}</td>
               <td>{{ estadoVenta(item) }}</td>
-              <td>S/. {{ item.Yape | redondear }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -1325,13 +1325,13 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach(venta => {
-        if (!venta.Anulado) total += venta.Yape;
+        if (!venta.Anulado) total += venta.Transferencia;
       });
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter(venta => {
-        return venta.Yape != 0 && !venta.EsCredito;
+        return venta.Transferencia != 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {

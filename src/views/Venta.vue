@@ -1219,13 +1219,13 @@ export default {
       let val = sessionStorage.getItem("IdPerfil");
       return IdPerfil.includes(val);
     },
-    watch: {
-      ventaActiva(nuevoIndex) {
-        this.$nextTick(() => {
-          this.metodoPagoCambio(null, true);
-        });
-      }
-    },
+    // watch: {
+    //   ventaActiva(nuevoIndex) {
+    //     this.$nextTick(() => {
+    //       this.metodoPagoCambio(null, true);
+    //     });
+    //   }
+    // },
     conectarSocket() {
       if (!this.$socket.connected) {
         console.log("🔗 Conectando socket...");
@@ -1851,9 +1851,7 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      setTimeout(() => {
         this.metodoPagoCambio(1);
-      }, 1000);
     },
     irAlPrimerProducto(event) {
       if (event) {
@@ -2356,8 +2354,7 @@ export default {
         }
 
         if (this.ventas.length == 1) {
-          window.location.reload();
-          this.inProgress = false;
+          setTimeout(() => window.location.reload(), 600);
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
@@ -2834,9 +2831,7 @@ export default {
     },
     ventaActiva() {
       this.$nextTick(() => {
-        setTimeout(() => {
-          this.metodoPagoCambio(1);
-        }, 1000);
+          this.metodoPagoCambio(null, true);
       });
     }
   }
