@@ -268,7 +268,7 @@
                       <div class="my-1">
                         <b-button class="btnAction mb-2" block variant="primary" @click="guardarProforma()"
                           style="font-weight: bold; font-size: 1.2rem"> Crear Proforma</b-button>
-                        <b-button class="btnAction mb-2" block variant="success" @click="guardarVenta()"
+                        <b-button v-if="idPerfil == 1 || idPerfil == 5 || idPerfil == 9" class="btnAction mb-2" block variant="success" @click="guardarVenta()"
                           style="font-weight: bold; font-size: 1.2rem"> <i class="fas fa-shopping-cart"></i>
                           PAGAR</b-button>
                         <delivery-modal class="btnAction solo-desktop mb-2" style="width: 100%" block
@@ -2812,9 +2812,40 @@ async setProducto(producto) {
       await this.$nextTick();
       this.ventaActiva = this.ventas.length - 1;
 
+      if (proforma.UsuarioReg) {
+        try {
+          const resVendedor = await this.axios.get(
+            this.API + 'usuarios/info/' + proforma.UsuarioReg
+          );
+          if (resVendedor.data) {
+            const datosVendedor = resVendedor.data;
+            
+            this.ventas[this.ventaActiva].vendedor = datosVendedor;
+            
+            const almacen = {
+              IdAlmacen: datosVendedor.IdAlmacen,
+              Almacen: datosVendedor.Almacen,
+              DescuentoActivo: datosVendedor.DescuentoActivo
+            };
+            const puntoVenta = {
+              IdDocVentaPuntoVenta: datosVendedor.IdDocVentaPuntoVenta,
+              PuntoVenta: datosVendedor.PuntoVenta
+            };
+
+            this.ventas[this.ventaActiva].almacen = almacen;
+            this.ventas[this.ventaActiva].puntoVenta = puntoVenta;
+
+            this.$refs.inputVendedor && 
+              this.$refs.inputVendedor.setValue(datosVendedor.NombreUsuario);
+            this.$refs.inputAlmacen && 
+              this.$refs.inputAlmacen.setValue(datosVendedor.Almacen);
+          }
+        } catch (e) {
+          console.error('Error cargando vendedor de proforma:', e);
+        }
+      }
       await Promise.all([
         this.getNumeroVenta(),
-        this.getVendedorInfo(),
         ...venta.productos.map(prod => this.loadMovimientoLotes(prod.IdProducto))
       ]);
       await this.$nextTick();

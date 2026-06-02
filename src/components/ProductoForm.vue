@@ -3,7 +3,7 @@
     <b-btn v-if="showButton" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
-    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" modal-class="modal-fullscreen-custom" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" modal-class="modal-fullscreen-custom" :title="title" size="lg" ref="productoForm" v-model="show"@shown="fixBodyScroll"@hidden="fixBodyScroll">      
       <b-row>
         <b-col md="6">
            <b-form-group>
@@ -574,6 +574,14 @@ export default {
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
     show(val) {
+      if (!val) {
+        this.$nextTick(() => {
+          document.body.style.overflow = '';
+          document.body.style.paddingRight = '';
+          document.body.classList.remove('modal-open');
+        });
+        return;
+      }
       this.preproducto = { ...this.productoUpdate };
       let newVal = this.productoUpdate || {};
       if (newVal.IdProducto && !this.nuevo) {
@@ -1103,11 +1111,29 @@ export default {
           }
 
           this.$refs.productoForm.hide();
-          this.$emit("productoactualizado");
+          this.$nextTick(() => {
+            this.$emit("productoactualizado");
+            if (this.cbGuardar) {
+              this.cbGuardar();
+            }
+          });
         })
         .catch(error => {
           console.error(error);
           this.$toasted.show("Error al guardar");
+        });
+    },
+    fixBodyScroll() {
+        this.$nextTick(() => {
+          document.body.style.overflow = '';
+          document.body.style.paddingRight = '';
+          document.body.classList.remove('modal-open');
+          
+          const modalBody = document.querySelector('#modalProducto .modal-body');
+          if (modalBody) {
+            modalBody.style.overflowY = 'auto';
+            modalBody.style.maxHeight = '75vh';
+          }
         });
     },
     focusAutocomplete(ref) {
