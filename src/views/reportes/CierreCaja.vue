@@ -79,9 +79,9 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="3"></td>
-                    <td class="total"><b>Total Efectivo</b></td>
-                    <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+                    <td colspan="4"></td>
+                    <td colspan="2" class="total"><b>Total Efectivo</b></td>
+                    <td colspan="1" class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -154,9 +154,9 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="4"></td>
-                    <td class="total"><b>Total Tarjeta</b></td>
-                    <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+                    <td colspan="5"></td>
+                    <td colspan="2" class="total"><b>Total Tarjeta</b></td>
+                    <td colspan="1" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -229,9 +229,9 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="4"></td>
-                    <td class="total"><b>Total Yape/Plin</b></td>
-                    <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                    <td colspan="5"></td>
+                    <td colspan="2" class="total"><b>Total Yape/Plin</b></td>
+                    <td colspan="1" class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -304,9 +304,9 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="4"></td>
-                    <td class="total"><b>Total Transferencia</b></td>
-                    <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+                    <td colspan="5"></td>
+                    <td colspan="2" class="total"><b>Total Transferencia</b></td>
+                    <td colspan="1" class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -377,26 +377,24 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="3"></td>
-                    <td><b>Total Credito</b></td>
-                    <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+                    <td colspan="4"></td>
+                    <td colspan="2" class="total"><b>Total Credito</b></td>
+                    <td colspan="2" class="total"><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
 
               <b-row>
               <b-col v-if="totalIngresos">
-                <h5>Ingresos</h5><br>
+                <h5>Ingresos</h5>
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in ingresos" :key="index">
-                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -406,7 +404,6 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3"></td>
                       <td colspan="3"></td>
                       <td class="total"><b>Total Ingresos</b></td>
                       <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
@@ -416,17 +413,15 @@
               </b-col>
 
               <b-col v-if="totalSalidas">
-                <h5>Salidas</h5><br>
+                <h5>Salidas</h5>
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in salidas" :key="index">
-                      <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -436,7 +431,6 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3"></td>
                       <td colspan="3"></td>
                       <td class="total-salida"><b>Total Salidas</b></td>
                       <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
