@@ -217,7 +217,7 @@
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(item, index) in ventasTransferencia"
+                    v-for="(item, index) in ventasMastercard"
                     :key="index"
                     :class="{ anulado: item.Anulado }"
                   >
@@ -284,7 +284,7 @@
                     </td>
                     <td>{{ item.MastercardDesc }}</td>
                     <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Yape | redondear }}</td>
+                    <td>S/. {{ item.Mastercard | redondear }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -292,7 +292,7 @@
                     <td colspan="5"></td>
                     <td class="total"><b>Total Yape/Plin</b></td>
                     <td class="total">
-                      <b>S/. {{ totalVentasTransferencia | redondear }}</b>
+                      <b>S/. {{ totalVentasMastercard | redondear }}</b>
                     </td>
                   </tr>
                 </tfoot>
@@ -314,7 +314,7 @@
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(item, index) in ventasMastercard"
+                    v-for="(item, index) in ventasTransferencia"
                     :key="index"
                     :class="{ anulado: item.Anulado }"
                   >
@@ -381,7 +381,7 @@
                     </td>
                     <td>{{ item.TransferenciaDesc }}</td>
                     <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Mastercard | redondear }}</td>
+                    <td>S/. {{ item.Transferencia | redondear }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -389,7 +389,7 @@
                     <td colspan="5"></td>
                     <td class="total"><b>Total Transferencia</b></td>
                     <td class="total">
-                      <b>S/. {{ totalVentasMastercard | redondear }}</b>
+                      <b>S/. {{ totalVentasTransferencia | redondear }}</b>
                     </td>
                   </tr>
                 </tfoot>
@@ -837,11 +837,11 @@
                 </tr>
                 <tr>
                   <td>Yape/Plin S/.</td>
-                  <td>{{ totalVentasTransferencia | redondear }}</td>
+                  <td>{{ totalVentasMastercard | redondear }}</td>
                 </tr>
                 <tr>
                   <td>Transferencia S/.</td>
-                  <td>{{ totalVentasMastercard | redondear }}</td>
+                  <td>{{ totalVentasTransferencia | redondear }}</td>
                 </tr>
 
                 <tr>
@@ -1226,7 +1226,7 @@
               </td>
               <!-- <td>{{ item.TransferenciaDesc }}</td> -->
               <!-- <td>{{ estadoVenta(item) }}</td> -->
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -1632,14 +1632,14 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Yape;
+        if (!venta.Anulado) total += venta.Transferencia;
       });
       console.log("totalVentasTransferencia", total);
       return total;
     },
     ventasTransferencia() {
       return this.ventas.filter((venta) => {
-        return venta.Yape != 0 && !venta.EsCredito;
+        return venta.Transferencia != 0 && !venta.EsCredito;
       });
     },
     totalVentasCredito() {
