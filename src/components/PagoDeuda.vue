@@ -305,6 +305,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     // console.log(response.data)
                     this.$toasted.show('Se pagó la deuda del cliente.')
+                    this.$emit('deuda-actualizada')
                     this.show = false
                     this.initForm()
                     window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
