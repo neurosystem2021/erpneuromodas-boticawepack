@@ -863,21 +863,40 @@ export default {
 
     loadBarcode(e) {
       e.preventDefault();
-      let idProducto = this.loadCode;
-      let id_empresa = this.empresa;
-      if (idProducto) {
-        let params = { codigoBarra: idProducto, id_empresa: id_empresa };
-        this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then(response => {
-            if (response.data.IdProducto) {
-              this.setProducto(response.data);
+      let codigoBarra = this.loadCode;
+      
+      if (!codigoBarra) return;
+
+      this.axios
+        .get(this.API + "ver_productos", {
+          params: { codigoBarra: codigoBarra, id_empresa: this.empresa }
+        })
+        .then(response => {
+          if (!response.data || !response.data.IdProducto) {
+            this.loadCode = "";
+            this.$toasted.show("No se encontró ningún producto");
+            return;
+          }
+
+          let idProducto = response.data.IdProducto;
+
+          this.axios
+            .get(this.API + "productos/puntoventa/modal/stock/" + this.idAlmacen, {
+              params: {
+                idProductos: [idProducto],
+                idAlmacen: this.idAlmacen,
+                id_empresa: this.empresa
+              }
+            })
+            .then(r => {
+              if (r.data && r.data.length > 0) {
+                this.setProducto(r.data[0]);
             } else {
               this.loadCode = "";
-              this.$toasted.show("No se encontró ningun producto");
+              this.$toasted.show("No se encontró ningún producto");
             }
           });
-      }
+      });
     },
 
     buscarProductosCodigoBarrasModal(e) {

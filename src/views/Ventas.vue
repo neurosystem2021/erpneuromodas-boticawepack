@@ -942,7 +942,7 @@ export default {
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
-      // obtenerStok: "obtenerStock",
+      obtenerStok: "obtenerStock",
       actualizarPrecioConvenio: "actualizarPrecioConvenio",
       add: "agregarProducto"
     }),
@@ -1207,7 +1207,7 @@ export default {
             id_empresa: this.empresa
           }
         })
-        .then(response => {
+        .then(async response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
@@ -1215,10 +1215,10 @@ export default {
                 id_empresa: this.empresa
               }
             })
-            .then(response => {
-              if (response.data) {
-                this.$refs.inputCliente.setValue(response.data.Cliente);
-                this.venta.cliente = response.data;
+            .then(resCliente => {
+              if (resCliente.data) {
+                this.$refs.inputCliente.setValue(resCliente.data.Cliente);
+                this.venta.cliente = resCliente.data;
                 this.venta.CampoDireccion = this.venta.cliente.Direccion;
               } else {
                 this.$toasted.show("No se encontro al cliente");
@@ -1228,13 +1228,45 @@ export default {
               console.error(error);
             });
           this.limpiarCart();
-          response.data.map(item => {
+
+          const items = response.data;
+          const idAlmacen = this.venta.almacen.IdAlmacen;
+
+          const idProductos = items.map(i => i.IdProducto);
+
+          let stockMap = {};
+          try {
+            const resStock = await this.axios.get(
+              this.API + "productos/puntoventa/modal/stock/" + idAlmacen,
+              {
+                params: {
+                  idProductos: idProductos,
+                  id_empresa: this.empresa,
+                  noLimit: 1,
+                  fechaHasta: this.$moment().format("YYYY-MM-DD")
+                }
+              }
+            );
+            if (resStock.data && resStock.data.length) {
+              resStock.data.forEach(p => {
+                stockMap[p.IdProducto] = p.stock;
+              });
+            }
+          } catch (e) {
+            console.error("Error obteniendo stock:", e);
+          }
+
+          items.forEach(item => {
             item.Empresa = empresa.value;
             item.NombreEmpresa = empresa.text;
             item.estadoPxP = false;
-            let preciosProd = [];
             item.precioCont = item.PrecioContado;
-            preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
+
+            if (stockMap[item.IdProducto] !== undefined) {
+              item.stock = stockMap[item.IdProducto];
+            }
+
+            let preciosProd = JSON.parse(item.PreciosPorProducto || "[]");
             let fPP = preciosProd.filter(p => p.cantidad === 0);
 
             if (!item.PreciosPorProducto || fPP.length === 4) {
@@ -1244,7 +1276,15 @@ export default {
           });
           this.venta.NotaIdMotivo = null;
           this.bloquearInput = true;
-          // this.obtenerStok({ IdAlmacen: this.venta.almacen.IdAlmacen });
+
+          await this.$nextTick();
+          setTimeout(() => {
+            this.obtenerStok({ IdAlmacen: idAlmacen });
+          }, 500);
+        })
+        .catch(error => {
+          console.error(error);
+          this.$toasted.show("Ha ocurrido un error cargando el documento");
         });
     },
     setDocRefConsumo(obj) {
