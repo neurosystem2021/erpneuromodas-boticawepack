@@ -992,6 +992,7 @@ th {
 }
 .total {
   background-color: #e4ff95;
+  color: #000;
 }
 .total-salida {
   background-color: #ffd4d3;
