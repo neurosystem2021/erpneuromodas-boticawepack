@@ -26,8 +26,7 @@
               </b-col>
               <b-col md="3">
                 <b-form-group label="Tipo Comprobante:">
-                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc"
-                    @change="setMes(mesSelect)" size="md" />
+                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
                 </b-form-group>
               </b-col>
             </b-row>
@@ -96,8 +95,7 @@
               </b-col>
               <b-col md="4">
                 <b-form-group label="Tipo Comprobante:">
-                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc"
-                    @change="setAnioMes(anioSelect)" size="md" />
+                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
                 </b-form-group>
               </b-col>
             </b-row>
@@ -236,6 +234,16 @@ export default {
     this.initDia(0)
     this.obtenerTiposDocumento()
     this.getAlmacenes()
+  },
+  watch: {
+    idTipoDoc(nuevoValor) {
+      if (this.tabActive === 0) {
+        const mes = this.meses.find(ms => ms.value === this.mesSelect)
+        if (mes) this.getDataDias(this.anioSelect, this.mesSelect, mes.dias, this.idAlmacen)
+      } else if (this.tabActive === 1) {
+        this.getDataMes(this.anioSelect, this.idAlmacen)
+      }
+    }
   },
   data() {
     return {
@@ -450,11 +458,12 @@ export default {
       }).catch(e => console.error(e))
     },
     getDataDias(anio, mes, dias, idAlmacen) {
+      const tipoDoc = this.idTipoDoc !== 'TODOS' ? this.idTipoDoc : undefined
       this.axios.get(this.API + 'ventas/estadistica/dia', {
         params: {
           anio, mes,
-          idAlmacen: idAlmacen || this.idAlmacen,
-          tipoDoc: this.idTipoDoc !== 'TODOS' ? this.idTipoDoc : undefined  // ← AÑADIR
+          idAlmacen: (idAlmacen !== null && idAlmacen !== undefined) ? idAlmacen : this.idAlmacen,
+          tipoDoc: tipoDoc
         }
       }).then(r => {
         this.calcularKpiDia(r.data)
@@ -467,11 +476,12 @@ export default {
     },
 
     getDataMes(anio, idAlmacen) {
+      const tipoDoc = this.idTipoDoc !== 'TODOS' ? this.idTipoDoc : undefined
       this.axios.get(this.API + 'ventas/estadistica/mes', {
         params: {
           anio,
-          idAlmacen: idAlmacen || this.idAlmacen,
-          tipoDoc: this.idTipoDoc !== 'TODOS' ? this.idTipoDoc : undefined  // ← AÑADIR
+          idAlmacen: (idAlmacen !== null && idAlmacen !== undefined) ? idAlmacen : this.idAlmacen,
+          tipoDoc: tipoDoc
         }
       }).then(r => {
         this.calcularKpiMes(r.data, this.meses)
