@@ -131,6 +131,74 @@
                           <b-input-group-append>
                             <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                           </b-input-group-append>
+                           <b-button
+                            v-show="venta.cliente.TotalDeuda > 0"
+                            :id="`popover-deudas${index}`"
+                            variant="danger"
+                            size="sm"
+                            class="ml-2"
+                            @click="toggleDeudas(index)"
+                          >
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Deuda: S/ {{ venta.cliente.TotalDeuda }}
+                          </b-button>
+
+                          <b-popover
+                            :target="`popover-deudas${index}`"
+                            title="Deudas pendientes"
+                            triggers="manual"
+                            placement="bottom"
+                            :show.sync="mostrarDeudas[index]"
+                            popover-class="popover-deudas"
+                          >
+                            <div style="width:100%">
+
+                              <div class="mb-2"  style="background:#fff;">
+                                <strong>Cliente:</strong>
+                                {{ venta.cliente.Cliente }}
+                              </div>
+
+                              <div class="mb-2"  style="background:#fff;">
+                                <strong>Total deuda:</strong>
+                                S/ {{ venta.cliente.TotalDeuda }}
+                              </div>
+
+                              <table class="table table-sm table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th>Fecha</th>
+                                    <th>Documento</th>
+                                    <th>Vence</th>
+                                    <th>Saldo</th>
+                                  </tr>
+                                </thead>
+
+                                <tbody>
+
+                                  <tr v-if="loadingDeudas">
+                                    <td colspan="4" class="text-center">
+                                      Cargando...
+                                    </td>
+                                  </tr>
+
+                                  <tr
+                                    v-for="item in deudasCliente"
+                                    :key="item.IdDocVenta"
+                                  >
+                                    <td  style="background:#fff;">{{ item.FechaDoc }}</td>
+                                    <td  style="background:#fff;" >{{ item.Correlativo }}</td>
+                                    <td  style="background:#fff;">{{ item.FechaCredito }}</td>
+                                    <td  style="background:#fff;">
+                                      S/ {{ item.Saldo }}
+                                    </td>
+                                  </tr>
+
+                                </tbody>
+
+                              </table>
+
+                            </div>
+                          </b-popover>
                         </b-input-group>
   
                           <b-form-select v-if="ventas[ventaActiva].cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
@@ -421,7 +489,7 @@
                       </b-button-group>  -->
                       <div class="ocultarMovil">
                         <b-button-group size="sm">
-                          <pago-deuda></pago-deuda>
+                          <pago-deuda @deuda-actualizada="actualizarDeudaActual"></pago-deuda>
                         </b-button-group>
                       </div>
                        <div class="ocultarMovil">
@@ -1199,6 +1267,9 @@ export default {
       cantidadInput: "",
       mostrarMP: {},
       mostrarOp: {},
+      mostrarDeudas: {},
+      deudasCliente: {},
+      loadingDeudas: false,
       diasValidosProf: 0
     };
   },
@@ -1213,6 +1284,132 @@ export default {
     });
   },
   methods: {
+    async actualizarDeudaActual() {
+
+        const cliente =
+          this.ventas[this.ventaActiva].cliente;
+
+        if (!cliente.IdCliente) {
+          return;
+        }
+
+        const total = await this.cargarResumenDeudaCliente(
+          cliente.IdCliente
+        );
+
+        this.$set(
+          this.ventas[this.ventaActiva].cliente,
+          'TotalDeuda',
+          total
+        );
+
+      },
+      async toggleDeudas(index) {
+
+        if (this.mostrarDeudas[index]) {
+
+          this.$set(
+            this.mostrarDeudas,
+            index,
+            false
+          );
+
+          return;
+        }
+
+        await this.cargarDeudasCliente();
+
+        this.$set(
+          this.mostrarDeudas,
+          index,
+          true
+        );
+
+      },
+      async cargarDeudasCliente() {
+
+      const cliente =
+        this.ventas[this.ventaActiva].cliente;
+
+      if (!cliente.IdCliente) {
+        return;
+      }
+
+      this.loadingDeudas = true;
+
+      try {
+
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          {
+            params: {
+              idCliente: cliente.IdCliente
+            }
+          }
+        );
+
+        response.data.forEach(item => {
+
+          try {
+
+            item.NotasCredito =
+              JSON.parse(item.NotasCredito || "[]");
+
+          }
+          catch(e) {
+
+            item.NotasCredito = [];
+
+          }
+
+        });
+
+        this.deudasCliente = response.data;
+
+      }
+      catch(error){
+
+        console.log(error);
+
+        this.$toasted.show(
+          "Error al cargar deudas"
+        );
+
+      }
+      finally{
+
+        this.loadingDeudas = false;
+
+      }
+
+    },
+    async cargarResumenDeudaCliente(idCliente) {
+
+      try {
+
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          {
+            params: {
+              idCliente
+            }
+          }
+        );
+
+        const totalDeuda = response.data.reduce((total, item) => {
+          return total + parseFloat(item.Saldo || 0);
+        }, 0);
+
+        return parseFloat(totalDeuda.toFixed(2));
+
+      } catch (error) {
+
+        console.log(error);
+        return 0;
+
+      }
+
+    },
     toggleMetodoPago(index) {
       if (this.mostrarMP[index]) {
         this.$root.$emit("bv::hide::popover", `popover-metodopago${index}`);
@@ -1866,6 +2063,17 @@ export default {
           // inputCliente.setValue(obj.Cliente);
         }
         this.ventas[this.ventaActiva].cliente = obj;
+        this.cargarResumenDeudaCliente(
+            obj.IdCliente
+          ).then(total => {
+
+            this.$set(
+              this.ventas[this.ventaActiva].cliente,
+              'TotalDeuda',
+              total
+            );
+
+        });
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
@@ -1881,6 +2089,17 @@ export default {
                 // inputCliente.setValue(response.data.Cliente);
               }
               this.ventas[this.ventaActiva].cliente = response.data;
+              this.cargarResumenDeudaCliente(
+                  response.data.IdCliente
+                ).then(total => {
+
+                  this.$set(
+                    this.ventas[this.ventaActiva].cliente,
+                    'TotalDeuda',
+                    total
+                  );
+
+                });
               this.ventas[this.ventaActiva].CampoDireccion =
                 response.data.Direccion;
             } else {
@@ -2851,7 +3070,16 @@ export default {
   font-weight: bold;
 }
 </style>
+<style >
+.popover-body {
+    background-color: #fff !important;
+}
+</style>
   <style>
+.popover {
+    max-width: 1200px !important;
+    width: 1200px !important;
+}
 .text-area {
   field-sizing: content !important;
 }
