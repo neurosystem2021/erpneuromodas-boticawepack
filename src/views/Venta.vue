@@ -101,6 +101,74 @@
                             <b-input-group-append>
                                 <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                             </b-input-group-append>
+                            <b-button
+                            v-show="venta.cliente.TotalDeuda > 0"
+                            :id="`popover-deudas${index}`"
+                            variant="danger"
+                            size="sm"
+                            class="ml-2"
+                            @click="toggleDeudas(index)"
+                          >
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Deuda: S/ {{ venta.cliente.TotalDeuda }}
+                          </b-button>
+
+                          <b-popover
+                            :target="`popover-deudas${index}`"
+                            title="Deudas pendientes"
+                            triggers="manual"
+                            placement="bottom"
+                            :show.sync="mostrarDeudas[index]"
+                            popover-class="popover-deudas"
+                          >
+                            <div style="width:100%">
+
+                              <div class="mb-2"  style="background:#fff;">
+                                <strong>Cliente:</strong>
+                                {{ venta.cliente.Cliente }}
+                              </div>
+
+                              <div class="mb-2"  style="background:#fff;">
+                                <strong>Total deuda:</strong>
+                                S/ {{ venta.cliente.TotalDeuda }}
+                              </div>
+
+                              <table class="table table-sm table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th>Fecha</th>
+                                    <th>Documento</th>
+                                    <th>Vence</th>
+                                    <th>Saldo</th>
+                                  </tr>
+                                </thead>
+
+                                <tbody>
+
+                                  <tr v-if="loadingDeudas">
+                                    <td colspan="4" class="text-center">
+                                      Cargando...
+                                    </td>
+                                  </tr>
+
+                                  <tr
+                                    v-for="item in deudasCliente"
+                                    :key="item.IdDocVenta"
+                                  >
+                                    <td  style="background:#fff;">{{ item.FechaDoc }}</td>
+                                    <td  style="background:#fff;" >{{ item.Correlativo }}</td>
+                                    <td  style="background:#fff;">{{ item.FechaCredito }}</td>
+                                    <td  style="background:#fff;">
+                                      S/ {{ item.Saldo }}
+                                    </td>
+                                  </tr>
+
+                                </tbody>
+
+                              </table>
+
+                            </div>
+                          </b-popover>
                             </b-input-group>
 
                         <b-form-select v-if="ventas[ventaActiva].cliente.IdCliente" v-model="venta.CampoDireccion" class="mb-3">
@@ -278,7 +346,7 @@
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
                   </b-col> -->
                   <b-col md="12" class="mt-1">
-                    <pago-deuda></pago-deuda>
+                    <pago-deuda @deuda-actualizada="actualizarDeudaActual"></pago-deuda>
                   </b-col>
                   <b-col md="12" class="mt-1">
                     <Movimiento></Movimiento>
@@ -1191,6 +1259,9 @@ export default {
       index: 0,
       mostrar: {},
       mostrarOp: {},
+      mostrarDeudas: {},
+      deudasCliente: {},
+      loadingDeudas: false,
       cantidadInput: "",
       objProd: {},
       capturaIndex: null
@@ -1228,6 +1299,132 @@ export default {
     this.$socket.disconnect();
   },
   methods: {
+    async actualizarDeudaActual() {
+
+        const cliente =
+          this.ventas[this.ventaActiva].cliente;
+
+        if (!cliente.IdCliente) {
+          return;
+        }
+
+        const total = await this.cargarResumenDeudaCliente(
+          cliente.IdCliente
+        );
+
+        this.$set(
+          this.ventas[this.ventaActiva].cliente,
+          'TotalDeuda',
+          total
+        );
+
+      },
+      async toggleDeudas(index) {
+
+        if (this.mostrarDeudas[index]) {
+
+          this.$set(
+            this.mostrarDeudas,
+            index,
+            false
+          );
+
+          return;
+        }
+
+        await this.cargarDeudasCliente();
+
+        this.$set(
+          this.mostrarDeudas,
+          index,
+          true
+        );
+
+      },
+      async cargarDeudasCliente() {
+
+      const cliente =
+        this.ventas[this.ventaActiva].cliente;
+
+      if (!cliente.IdCliente) {
+        return;
+      }
+
+      this.loadingDeudas = true;
+
+      try {
+
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          {
+            params: {
+              idCliente: cliente.IdCliente
+            }
+          }
+        );
+
+        response.data.forEach(item => {
+
+          try {
+
+            item.NotasCredito =
+              JSON.parse(item.NotasCredito || "[]");
+
+          }
+          catch(e) {
+
+            item.NotasCredito = [];
+
+          }
+
+        });
+
+        this.deudasCliente = response.data;
+
+      }
+      catch(error){
+
+        console.log(error);
+
+        this.$toasted.show(
+          "Error al cargar deudas"
+        );
+
+      }
+      finally{
+
+        this.loadingDeudas = false;
+
+      }
+
+    },
+    async cargarResumenDeudaCliente(idCliente) {
+
+      try {
+
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          {
+            params: {
+              idCliente
+            }
+          }
+        );
+
+        const totalDeuda = response.data.reduce((total, item) => {
+          return total + parseFloat(item.Saldo || 0);
+        }, 0);
+
+        return parseFloat(totalDeuda.toFixed(2));
+
+      } catch (error) {
+
+        console.log(error);
+        return 0;
+
+      }
+
+    },
     mostrarVentaFlag() {
       let IdPerfil = [1, 25, "1", "25"];
       let val = sessionStorage.getItem("IdPerfil");
@@ -2043,6 +2240,17 @@ export default {
           // inputCliente.setValue(obj.Cliente);
         }
         this.ventas[this.ventaActiva].cliente = obj;
+        this.cargarResumenDeudaCliente(
+                  obj.IdCliente
+                ).then(total => {
+
+                  this.$set(
+                    this.ventas[this.ventaActiva].cliente,
+                    'TotalDeuda',
+                    total
+                  );
+
+                });
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
@@ -2988,7 +3196,16 @@ export default {
   border: 1px solid red !important;
 }
 </style>
+<style >
+.popover-body {
+    background-color: #fff !important;
+}
+</style>
 <style>
+.popover {
+    max-width: 1000px !important;
+    width: 1000px !important;
+}
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
