@@ -220,29 +220,10 @@ export default {
           }
         })
         .then(response => {
-          response.data.map(item => {
-            this.add([
-              item.IdProducto,
-              () => {
-                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-              },
-              {
-                setPrecio: true,
-                setPreOr: item.Precio,
-                cantidad: item.Cantidad,
-                descuento: item.Descuento
-              }
-            ]);
-
-            this.filter = "";
-            this.show = false;
-          });
           proforma.productos = response.data;
-          // console.log(proforma);
-
-          // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
-          this.$emit("onSelectProforma", proforma);
-          this.limpiarCarrito();
+          this.filter = "";
+          this.show = false;
+          this.$emit("cargarProforma", proforma);
         });
     },
     myProvider(ctx) {

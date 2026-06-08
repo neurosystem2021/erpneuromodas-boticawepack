@@ -6,6 +6,7 @@
         v-model="text"  
         @input="buscar"
         @focus="buscar"
+        @click="$event.target.select()"
       />
       <div>
         <div v-for="(list,index) in listado" :key="index" @click="guardarCliente(list)" class="trDetails">

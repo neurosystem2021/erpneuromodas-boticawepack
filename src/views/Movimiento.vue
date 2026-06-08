@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container class="bv-example-row" fluid>
           <b-row>
               <b-col md="8">
 
@@ -189,8 +189,8 @@
                 </b-row>
               </b-col>
           </b-row>
-          <b-row>
-            <b-col>
+          <b-row no-gutters>
+            <b-col cols="12" style="padding-left: 15px; padding-right: 15px;">
               <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" @onAddProducto="onAddProducto" :idAlmacen="IdAlmacen"></productos-carrito>
             </b-col>
           </b-row>

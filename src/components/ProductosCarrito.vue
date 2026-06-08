@@ -829,6 +829,24 @@ export default {
 </script>
 
 <style>
+fieldset.b-form-group,
+fieldset {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.input-group {
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+.table-responsive {
+  width: 100% !important;
+}
 #modalImagen .modal-dialog {
   max-width: 75% !important;
 }

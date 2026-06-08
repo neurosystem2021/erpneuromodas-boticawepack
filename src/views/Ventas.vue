@@ -121,39 +121,49 @@
                     </b-row>
                   </b-col>
                   <b-col lg="6" xl="6" cols="12" class="ocultarMovil">
-                    <b-row>
-                      <b-col lg="6" xl="6" cols="12">
-                        <center>
-
-                          <h1>
-                            {{ (ventas[ventaActiva].cliente.Puntos || 0) | redondeoMenor }}
-                          </h1>
-                          <p> Puntos del cliente</p>
-
-                        </center>
-                      </b-col>
-
-                      <b-col md="3" cols="12" style="text-align: center;">
-                        <h1>
+                    <div style="display: flex; align-items: center; justify-content: space-around; gap: 8px; padding: 4px 0;">
+                      <b-col md="4">
+                        <b-form-group class="text-center" v-if="venta.cliente.Cliente && ventas[ventaActiva].tipoVenta.CodSunat != '07' && ventas[ventaActiva].tipoVenta.CodSunat != '08'">
+                            <div class="puntos">
+                                {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
+                            </div>
+                            Puntos del cliente
+                        </b-form-group>
+                        <b-input-group prepend="Puntos" 
+                          :append="ventas[ventaActiva].descuentoPuntos.descuento | redondear"
+                          v-if="ventas[ventaActiva].cliente.Puntos && ventas[ventaActiva].descuentoGeneral == 0 && ventas[ventaActiva].tipoVenta.CodSunat != '07' && ventas[ventaActiva].tipoVenta.CodSunat != '08'">
+                          <b-form-input
+                            v-model="ventas[ventaActiva].puntosAplicados"
+                            min="0"
+                            :max="ventas[ventaActiva].cliente.Puntos"
+                            @input="aplicarPuntos"  
+                            type="number"
+                          ></b-form-input>
+                        </b-input-group>
+                        <b-form-text v-if="ventas[ventaActiva].descuentoPuntos.ValorPunto">
+                          1 Punto equivale a: S/ {{ ventas[ventaActiva].descuentoPuntos.ValorPunto | redondear }}
+                        </b-form-text>
+                    </b-col>
+                      <!-- Serie / Número -->
+                      <div style="text-align: center; flex: 1;">
+                        <h1 style="margin-bottom: 0;">
                           {{ ventas[ventaActiva].Serie }} - {{ ventas[ventaActiva].Numero }}
                         </h1>
-                        <center>
-                          <p style="padding: 2px 3px; border-radius: 25px; background: yellow; font-size: 1rem;"> Valor
-                            Referencial</p>
-                        </center>
-                      </b-col>
-                      <b-col md="3" cols="12" style="text-align: center; align-items: center; align-content: center;">
+                        <p style="padding: 2px 3px; border-radius: 25px; background: yellow; 
+                                  font-size: 1rem; display: inline-block; margin-bottom: 0;">
+                          Valor Referencial
+                        </p>
+                      </div>
 
-                        <b-col cols="12">
-                          <b-input-group prepend="Vendedor:" class="mt-2">
-                            <input type="text" class="form-control" v-model="ventas[ventaActiva].vendedor.Usuario"
-                              disabled style="max-width: 150px;">
-                          </b-input-group>
-                        </b-col>
+                      <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                        <b-input-group prepend="Vendedor:" class="mt-2">
+                          <input type="text" class="form-control"
+                                v-model="ventas[ventaActiva].vendedor.Usuario"
+                                disabled style="max-width: 150px;">
+                        </b-input-group>
+                      </div>
 
-                      </b-col>
-                    </b-row>
-
+                    </div>
                   </b-col>
                   <!-- <b-col cols="3">
                     <b-form-checkbox
@@ -333,6 +343,25 @@
                             <tr>
                               <td class="text-center">Opciones</td>
                             </tr>
+                            <tr v-if="ventas[ventaActiva].puntosAplicados === 0">
+                                            <td>
+                                                <b-input-group prepend="S/" append="Descuento">
+                                                    <input
+                                                        v-model="ventas[ventaActiva].descuentoGeneral"
+                                                        :disabled="bloquearInput ? true : false"
+                                                        min="0"
+                                                        value="0"
+                                                        @input="(val) => { aplicarDescuentoGeneral(val.target.value) }"
+                                                        type="number"
+                                                        class="form-control"
+                                                        step="0.01"
+                                                    />
+                                                </b-input-group>
+                                                <b-form-text>
+                                                    Descuento general a toda la venta.
+                                                </b-form-text>
+                                            </td>
+                                        </tr>
                             <!-- <tr v-if="puntosAplicados == 0"> -->
 
                             <tr>
@@ -460,7 +489,7 @@
                             <td>
                               <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0"
                                 step="0.01" type="number" placeholder="S/."
-                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
+                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
                             </td>
                           </tr>
                           <tr>
@@ -474,7 +503,7 @@
                             <td>
                               <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0"
                                 step="0.01" type="number" placeholder="S/."
-                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
+                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
                             </td>
                           </tr>
                           <tr>
@@ -488,7 +517,7 @@
                             <td>
                               <input class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0"
                                 step="0.01" type="number" placeholder="S/."
-                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal() - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)" />
+                                @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)" />
                             </td>
                           </tr>
                         </tbody>
@@ -533,8 +562,8 @@
                         Venta</b-button>
                       <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar
                         Impresora</b-button>
-                      <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal"
-                        @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                      <!-- <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal"
+                        @onPagarDelivery="onPagarDelivery"></delivery-modal> -->
                       <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
                         <span v-if="mostrarNav"> Ocultar Nav</span>
@@ -605,19 +634,19 @@
                             </b-popover>
                           </td> -->
                           <td class="table-success">SubTotal</td>
-                          <td class="table-success">{{ getSubTotal() }}</td>
+                          <td class="table-success">{{ getSubTotal(ventaActiva) }}</td>
                         </tr>
                         <tr>
                           <td class="table-danger">Descuento</td>
                           <td class="table-danger">
-                            {{ getDescuento() }}
+                            {{ getDescuento(ventaActiva) }}
                           </td>
                         </tr>
 
                         <tr>
                           <td><b>TOTAL</b></td>
                           <td class="table-danger">
-                            {{ getTotal() }}
+                            {{ getTotal(ventaActiva) }}
                           </td>
                         </tr>
                         <tr>
@@ -629,7 +658,7 @@
                           <td>
                             <label>Vuelto:</label>
                             <b>S/
-                              {{ parseFloat(ventas[ventaActiva].pagocon - getTotal()).toFixed(2) }}
+                              {{ parseFloat(ventas[ventaActiva].pagocon - getTotal(ventaActiva)).toFixed(2) }}
 
                             </b>
                           </td>
@@ -858,7 +887,7 @@ import ClientesForm from "@/components/ClientesForm";
 import Proformas from "@/components/ProformaLista.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
-import DeliveryModal from "@/components/DeliveryModal.vue";
+// import DeliveryModal from "@/components/DeliveryModal.vue";
 import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
@@ -874,7 +903,7 @@ export default {
     PagoDeuda,
     Movimiento,
     PreOrdenLista,
-    DeliveryModal,
+    // DeliveryModal,
     ConfigVenta,
     ConfigVenta,
     ProductoForm,
@@ -973,6 +1002,9 @@ export default {
         Numero: "",
         Observacion: "",
         comisionista: {},
+        puntosAplicados: 0,
+        descuentoPuntos: {},
+        descuentoGeneral: 0,
         tipoVenta: {
           IdTipoDoc: 7,
           TipoDoc: "BOLETA ELEC.",
@@ -1028,6 +1060,9 @@ export default {
           pagocon: 0,
           cliente: {},
           EsCredito: 0,
+          puntosAplicados: 0,
+          descuentoPuntos: {},
+          descuentoGeneral: 0,
           Serie: "",
           Numero: "",
           Observacion: "",
@@ -1106,6 +1141,12 @@ export default {
     });
   },
   methods: {
+  ...mapActions({
+    aplicarDescuento: 'aplicarDescuentoGeneral',
+    limpiarCart: 'limpiarCarrito',
+    obtenerStok: 'obtenerStock',
+    add:'agregarProducto'
+  }),
     abrirCodigoBarra() {
       this.$refs["modalCodigoBarra"].show();
       this.modalAbiertCode = true;
@@ -1199,79 +1240,139 @@ export default {
       document.getElementById(txtCodeBar).select();
     },
     setDocRef(obj) {
-      this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
-      this.ventas[this.ventaActiva].NroComprobanteModifica = obj.NroComprobante;
-      if (
+    this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
+    this.ventas[this.ventaActiva].NroComprobanteModifica = obj.NroComprobante;
+
+    if (
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "07" ||
         this.ventas[this.ventaActiva].tipoVenta.CodSunat == "08"
-      ) {
+    ) {
         this.ventas[this.ventaActiva].Serie = this.ventas[
-          this.ventaActiva
+            this.ventaActiva
         ].Serie.replace(/^./, obj.NroComprobante[0]);
-      }
-      this.axios
+    }
+
+    this.axios
         .get(this.API + "ventas/solonumero", {
-          params: {
-            serie: this.ventas[this.ventaActiva].Serie,
-            idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
-          }
+            params: {
+                serie: this.ventas[this.ventaActiva].Serie,
+                idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
+            }
         })
         .then(response => {
-          this.ventas[this.ventaActiva].Numero = response.data.numero;
+            this.ventas[this.ventaActiva].Numero = response.data.numero;
         })
         .catch(error => {
-          console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+            console.log(error);
+            this.$toasted.show("Ha ocurrido un error al obtener el número de venta");
         });
-      //Cargar producto del documento afectado nota credito
-      this.axios
+
+    this.axios
         .get(this.API + "venta/detalle/comprobante", {
-          params: {
-            NroComprobante: obj.NroComprobante,
-            idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-              .IdDocVentaPuntoVenta
-          }
+            params: {
+                NroComprobante: obj.NroComprobante,
+                idDocVenta: obj.IdDocVenta,
+                IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta.IdDocVentaPuntoVenta
+            }
         })
-        .then(response => {
-          this.axios
-            .get(this.API + "cliente", {
-              params: {
-                idCliente: response.data[0].IdCliente
-              }
-            })
-            .then(response => {
-              if (response.data) {
-                this.setCliente(response.data.IdCliente);
+        .then(async response => {
+            const productosDelComprobante = response.data;
 
-                this.ventas[this.ventaActiva].CampoDireccion =
-                  response.data.Direccion;
-                this.ventas[this.ventaActiva].cliente = response.data;
+            if (!productosDelComprobante || productosDelComprobante.length === 0) {
+                this.$toasted.show("No se encontraron productos en el comprobante");
+                return;
+            }
 
-                // let txtCliente = `inputCliente${this.ventaActiva}`;
-                this.ventas[this.ventaActiva].verCliente = false;
-                this.initValueCliente = this.ventas[
-                  this.ventaActiva
-                ].cliente.Cliente;
-                this.ventas[this.ventaActiva].verCliente = true;
-                this.$forceUpdate();
-              } else {
-                this.$toasted.show("No se encontro al cliente");
-              }
-            })
-            .catch(error => {
-              console.log(error);
+            // ✅ Cargar cliente directo sin pasar por setCliente() para no limpiar descuentos
+            try {
+                const idCliente = productosDelComprobante[0].IdCliente;
+                const resCliente = await this.axios.get(this.API + "cliente", {
+                    params: { idCliente: idCliente }
+                });
+                if (resCliente.data) {
+                    this.ventas[this.ventaActiva].cliente = resCliente.data;
+                    this.ventas[this.ventaActiva].CampoDireccion = resCliente.data.Direccion;
+                    this.initValueCliente = resCliente.data.Cliente;
+                } else {
+                    this.$toasted.show("No se encontró al cliente");
+                }
+            } catch (error) {
+                console.log("Error cargando cliente:", error);
+                this.$toasted.show("Error al cargar el cliente del comprobante");
+            }
+
+            // ✅ Limpiar productos actuales
+            this.ventas[this.ventaActiva].productos = [];
+
+            // ✅ Cargar cada producto con su precio y descuento original
+            for (const element of productosDelComprobante) {
+                let prod = {};
+
+                // Obtener stock del producto
+                try {
+                    await this.axios(this.API + "productos/puntoventa/stock", {
+                        params: {
+                            idProductos: [element.IdProducto],
+                            idAlmacen: this.ventas[this.ventaActiva].almacen.IdAlmacen || 1
+                        }
+                    }).then(res => {
+                        prod = res.data[0];
+                    });
+                } catch (error) {
+                    console.log("Error cargando stock:", error);
+                    this.$toasted.show(`Error cargando stock del producto ${element.IdProducto}`);
+                }
+
+                // Si no se obtuvo el producto, saltar
+                if (!prod || !prod.IdProducto) continue;
+
+                // Preparar presentaciones
+                let pres = [];
+                if (prod.PreciosPorProducto) {
+                    try {
+                        pres = JSON.parse(prod.PreciosPorProducto).filter(v => v.cantidad > 0);
+                    } catch (e) {
+                        pres = [];
+                    }
+                }
+
+                prod.PreciosPorProducto = pres;
+
+                // ✅ Respetar presentación original del comprobante
+                prod.presentacion = element.Presentacion || prod.ProductoPresentacion || "UNIDAD";
+                prod.ProductoPresentacion = element.Descripcion || prod.ProductoPresentacion || "UNIDAD";
+
+                prod.tienePresentacion = pres.length > 0;
+                prod.bloquearInputPrecio = false;
+                prod.CantidadPresentacion = parseFloat(element.CantidadxPresentacion) || 1;
+                prod.esPresentacion = false;
+                prod.pres = "";
+
+                // ✅ Asignar valores exactos del comprobante original
+                prod.cantidad  = parseFloat(element.cantidad) || 1;
+                prod.precio    = parseFloat(element.precio)   || prod.PrecioContado;
+                prod.descuento = parseFloat(element.descuento) || 0;
+
+                // ✅ Insertar con $set para garantizar reactividad
+                this.$set(
+                    this.ventas[this.ventaActiva].productos,
+                    this.ventas[this.ventaActiva].productos.length,
+                    prod
+                );
+            }
+
+            // ✅ Resetear motivo y recalcular total con descuentos cargados
+            this.ventas[this.ventaActiva].NotaIdMotivo = null;
+            this.$nextTick(() => {
+                this.metodoPagoCambio(1);
             });
-
-          this.ventas.productos = [];
-
-          response.data.forEach(element => {
-            this.setProducto(element, true);
-          });
-          this.ventas[this.ventaActiva].NotaIdMotivo = null;
-          this.$forceUpdate();
+            this.$forceUpdate();
+        })
+        .catch(error => {
+            console.log("Error cargando detalle del comprobante:", error);
+            this.$toasted.show("Error al cargar el detalle del comprobante");
         });
-    },
+},
     setMotivo(ev) {
       if (ev == "01" || ev == "02" || ev == "06" || ev == null) {
         this.bloquearInput = true;
@@ -1485,7 +1586,7 @@ export default {
       element.dispatchEvent(event);
     },
     setVendedor(obj) {
-      if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
+      // if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
       this.venta.vendedor = obj;
       this.ventas[0].vendedor = obj;
     },
@@ -1563,7 +1664,6 @@ export default {
                 <td style="width: 80px">${data.Color ? data.Color : ""}</td>
                 <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
                 <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
-                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
@@ -1592,7 +1692,7 @@ export default {
       `;
     },
     loadBarcode(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -1686,6 +1786,13 @@ export default {
       if (obj.CodSunat == "07" || obj.CodSunat == "08") {
         // 07 - nota de credito, 08 - Nota de debito
         this.isNota[this.ventaActiva] = true;
+        this.ventas[this.ventaActiva].puntosAplicados = 0;
+        this.ventas[this.ventaActiva].descuentoPuntos = {};
+        this.ventas[this.ventaActiva].descuentoGeneral = 0;
+        // Limpiar descuentos de productos
+        this.ventas[this.ventaActiva].productos.forEach((prod, index) => {
+          this.$set(this.ventas[this.ventaActiva].productos, index, { ...prod, descuento: 0 });
+        });
         // this.limpiarCart();
         if (this.ventas[this.ventaActiva].EsDelivery) {
           // this.anularPagoDelivery();
@@ -1712,6 +1819,78 @@ export default {
 
       this.ventas[this.ventaActiva].tipoVenta = obj;
       this.getNumeroVenta();
+    },
+    aplicarPuntos(val) {
+      const venta = this.ventas[this.ventaActiva];
+      let puntos = parseFloat(val) || 0;
+      if (puntos > venta.cliente.Puntos) {
+        puntos = venta.cliente.Puntos;
+        venta.puntosAplicados = puntos;
+      }
+      if (puntos <= 0) {
+        venta.puntosAplicados = 0;
+        venta.descuentoPuntos = {};
+        // Limpiar descuento de todos los productos
+        venta.productos.forEach((prod, index) => {
+          this.$set(venta.productos, index, { ...prod, descuento: 0 });
+        });
+        // Actualizar el pago
+        this.$nextTick(() => {
+          venta.pago.efectivo.monto = this.getTotal();
+        });
+        return;
+      }
+
+      this.axios.get(this.API + 'ventas/descuento/' + puntos)
+        .then((response) => {
+          venta.descuentoPuntos = response.data;
+          const descuento = parseFloat(response.data.descuento) || 0;
+          this.aplicarDescuentoAProductos(descuento);
+          this.$nextTick(() => {
+            venta.pago.efectivo.monto = this.getTotal();
+          });
+        });
+    },
+
+    aplicarDescuentoGeneral(val) {
+      const descuento = parseFloat(val) || 0;
+      this.ventas[this.ventaActiva].descuentoGeneral = descuento;
+      this.aplicarDescuentoAProductos(descuento);
+    },
+
+    reaplicarDescuentoVigente(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      const venta = this.ventas[idx];
+      if (venta.puntosAplicados > 0 && venta.descuentoPuntos && venta.descuentoPuntos.descuento) {
+        this.aplicarDescuentoAProductos(parseFloat(venta.descuentoPuntos.descuento), idx);
+      } else if (parseFloat(venta.descuentoGeneral) > 0) {
+        this.aplicarDescuentoAProductos(parseFloat(venta.descuentoGeneral), idx);
+      }
+    },
+    aplicarDescuentoAProductos(descuentoTotal, ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      const productos = this.ventas[idx].productos;
+      if (!productos.length) return;
+
+      const subtotal = parseFloat(this.getSubTotal(idx));
+      if (subtotal <= 0) return;
+
+      productos.forEach((prod, index) => {
+        const subtotalProd = parseFloat(prod.cantidad * prod.precio);
+        const proporcion = subtotalProd / subtotal;
+        const descuentoProd = parseFloat((descuentoTotal * proporcion).toFixed(2));
+        this.$set(this.ventas[idx].productos, index, { ...prod, descuento: descuentoProd });
+      });
+
+      const totalDistribuido = productos.reduce((sum, p) => sum + parseFloat(p.descuento), 0);
+      const diferencia = parseFloat((descuentoTotal - totalDistribuido).toFixed(2));
+      if (diferencia !== 0 && productos.length > 0) {
+        const ultimo = productos[productos.length - 1];
+        this.$set(this.ventas[idx].productos, productos.length - 1, {
+          ...ultimo,
+          descuento: parseFloat((parseFloat(ultimo.descuento) + diferencia).toFixed(2))
+        });
+      }
     },
     async getNumeroVenta() {
       // await setTimeout(() => {
@@ -1748,7 +1927,7 @@ export default {
         )[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
-          this.irTxtLoadBarcode();
+          this.reaplicarDescuentoVigente();
         });
 
         return false;
@@ -1780,22 +1959,46 @@ export default {
       prod.esPresentacion = false;
       prod.pres = "";
       productos.unshift(prod);
-      if (esNota) {
-        if (producto.Producto == "TAPAJUNTA") {
-          console.log(prod);
-        }
-        prod.cantidad = producto.cantidad;
-        prod.precio = producto.PrecioContado;
-      }
+      // if (esNota) {
+      //   if (producto.Producto == "TAPAJUNTA") {
+      //     console.log(prod);
+      //   }
+      //   prod.cantidad = producto.cantidad;
+      //   prod.precio = producto.PrecioContado;
+      // }
       this.$nextTick(() => {
         let input = document.getElementById("txtCodeBar0");
         input.focus();
         input.select();
+        this.reaplicarDescuentoVigente();
       });
       this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+      this.$nextTick(() => {
+        this.reaplicarDescuentoVigente();
+        // ✅ Recalcular el pago después de quitar el producto
+        this.$nextTick(() => {
+          const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+          const ventaActual = this.ventas[this.ventaActiva].pago;
+          // Detectar qué método tiene monto > 0 y recalcular solo ese
+          metodos.forEach((metodo, i) => {
+            if (ventaActual[metodo].monto > 0) {
+              metodos.forEach(m => {
+                ventaActual[m].descripcion = null;
+                ventaActual[m].monto = 0;
+              });
+              ventaActual[metodo].monto = this.getTotal();
+            }
+          });
+          // Si ninguno tenía monto, asignar efectivo por defecto
+          const hayPago = metodos.some(m => ventaActual[m].monto > 0);
+          if (!hayPago) {
+            ventaActual.efectivo.monto = this.getTotal();
+          }
+        });
+      });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -1808,6 +2011,15 @@ export default {
         params = { idCliente: obj.IdCliente || obj };
       }
 
+      const limpiarDescuentos = () => {
+        const venta = this.ventas[this.ventaActiva];
+        venta.puntosAplicados = 0;
+        venta.descuentoPuntos = {};
+        venta.descuentoGeneral = 0;
+        venta.productos.forEach((prod, index) => {
+          this.$set(venta.productos, index, { ...prod, descuento: 0 });
+        });
+      };
       let ref = `inputCliente${this.ventaActiva}`;
       let inputCliente = this.$refs[ref];
       if (typeof obj === "object") {
@@ -1816,6 +2028,7 @@ export default {
         }
         this.ventas[this.ventaActiva].cliente = obj;
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
+        limpiarDescuentos();
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
           this.ventas[this.ventaActiva].EsOrganizacion = 0;
@@ -1832,6 +2045,7 @@ export default {
               this.ventas[this.ventaActiva].cliente = response.data;
               this.ventas[this.ventaActiva].CampoDireccion =
                 response.data.Direccion;
+              limpiarDescuentos();
             } else {
               this.$toasted.show("No se encontró al cliente");
             }
@@ -1879,70 +2093,40 @@ export default {
 
       return parseFloat(total).toFixed(2);
     },
-    getSubTotal() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          if (prod.esPresentacion) {
-            return (
-              total +
-              parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio
-              ).toFixed(2)
-            );
-          } else {
-            return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
-          }
-          // return (
-          //   total +
-          //   parseFloat(prod.cantidad * prod.CantidadPresentacion * prod.precio)
-          // );
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+    getSubTotal(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      let prod = [...this.ventas[idx].productos];
+      if (prod.length == 0) return 0;
+      let subtotal = prod.reduce((total, prod) => {
+        if (prod.esPresentacion) {
+          return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio).toFixed(2);
+        } else {
+          return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
+        }
+      }, 0);
+      return parseFloat(subtotal).toFixed(2);
     },
-    getDescuento() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          return total + parseFloat(prod.descuento);
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+    getDescuento(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      let prod = [...this.ventas[idx].productos];
+      if (prod.length == 0) return 0;
+      let subtotal = prod.reduce((total, prod) => {
+        return total + (parseFloat(prod.descuento) || 0);
+      }, 0);
+      return parseFloat(subtotal).toFixed(2);
     },
-    getTotal() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
-      if (prod.length == 0) {
-        return 0;
-      } else {
-        let subtotal = prod.reduce((total, prod) => {
-          if (prod.esPresentacion) {
-            return (
-              total +
-              parseFloat(
-                prod.CantidadPresentacion * prod.cantidad * prod.precio -
-                  prod.descuento
-              )
-            );
-          } else {
-            return (
-              total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
-            );
-          }
-          // return (
-          //   total +
-          //   parseFloat(
-          //     prod.cantidad * prod.CantidadPresentacion * prod.precio
-          //   ) -
-          //   parseFloat(prod.descuento)
-          // );
-        }, 0);
-        return parseFloat(subtotal).toFixed(2);
-      }
+    getTotal(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      let prod = [...this.ventas[idx].productos];
+      if (prod.length == 0) return 0;
+      let subtotal = prod.reduce((total, prod) => {
+        if (prod.esPresentacion) {
+          return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio - prod.descuento);
+        } else {
+          return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
+        }
+      }, 0);
+      return parseFloat(subtotal).toFixed(2);
     },
     setOpcionVenta(opc) {
       this.ventas[this.ventaActiva].nombreLlevar = "";
@@ -1958,23 +2142,39 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
-    metodoPagoCambio(tipo = null) {
-      this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
-        });
-        if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
-        }
+    metodoPagoCambio(tipo = null, ventaIndex = null) {
+      const indexUsado = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      
+      const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+      const ventaActual = this.ventas[indexUsado].pago;
+      
+      metodos.forEach(metodo => {
+        ventaActual[metodo].descripcion = null;
+        ventaActual[metodo].monto = 0;
       });
+      
+      if (tipo && metodos[tipo - 1]) {
+        ventaActual[metodos[tipo - 1]].monto = this.getTotal(indexUsado);
+      }
     },
 
     async guardarVenta() {
       this.inProgress = true;
+      const ventaIndex = this.ventaActiva;
       let venta = this.ventas[this.ventaActiva];
+      if (venta.cliente && venta.cliente.IdCliente) {
+        try {
+          const resCliente = await this.axios.get(this.API + "cliente", {
+            params: { idCliente: venta.cliente.IdCliente }
+          });
+          if (resCliente.data) {
+            // Solo actualizar los puntos, no reemplazar todo el cliente
+            venta.cliente.Puntos = resCliente.data.Puntos;
+          }
+        } catch (e) {
+          console.log("Error recargando cliente:", e);
+        }
+      }
       let productos = venta.productos;
       let totalPagos = 0;
 
@@ -2139,7 +2339,11 @@ export default {
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
-      venta.puntosAplicados = this.puntosAplicados || 0;
+      if (venta.tipoVenta.CodSunat == "07" || venta.tipoVenta.CodSunat == "08") {
+        venta.puntosAplicados = 0;
+      } else {
+        venta.puntosAplicados = venta.puntosAplicados || 0;
+      }
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
       venta.IdPedido = this.$route.query.idPedido || null;
@@ -2449,8 +2653,16 @@ export default {
       // }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      // venta.productos = this.productos;
-      venta.puntosAplicados = this.puntosAplicados || 0;
+
+      venta.productos.forEach((prod, index) => {
+        this.$set(venta.productos, index, {
+          ...prod,
+          descuento: 0
+        });
+      });
+
+      venta.puntosAplicados = 0;
+      venta.descuentoPuntos = {};
       // venta.totalCart = this.totalCart || 0;
       venta.IdPreOrden = this.$route.query.idPreOrden || null;
       venta.IdPedido = this.$route.query.idPedido || null;
@@ -2499,32 +2711,63 @@ export default {
       try {
         this.initValueCliente = `${proforma.DniRuc} ${proforma.Cliente}`;
 
-        // Clonar estructura base de venta
+        // Capturar el índice que tendrá esta nueva venta
+        const nuevoIndex = this.ventas.length;
+
+        // Clonar estructura base de venta con pago fresco
         let venta = {
-          ...this.venta,
+          ...JSON.parse(JSON.stringify(this.venta)), // deep clone para evitar referencias compartidas
           cliente: null,
           vendedor: null,
-          productos: []
+          productos: [],
+          pago: {
+            efectivo: { IdMetodoPago: 1, monto: 0, descripcion: null },
+            visa:     { IdMetodoPago: 2, monto: 0, descripcion: null },
+            mastercard: { IdMetodoPago: 3, monto: 0, descripcion: null },
+            delivery: { IdMetodoPago: 4, monto: 0, descripcion: null }
+          },
+          puntosAplicados: 0,
+          descuentoPuntos: {},
+          descuentoGeneral: 0
         };
 
-        // Obtener usuario que registró la proforma
+        // Obtener vendedor
         const respUsuario = await this.axios.get(
           `${this.API}/usuarios/${proforma.UsuarioReg}`
         );
-
         if (respUsuario.data) {
           venta.UsuarioProforma = respUsuario.data.Usuario;
         }
 
-        // Asignar cliente y vendedor (ANTES de push)
-        venta.cliente = { ...proforma };
-        venta.vendedor = { Usuario: proforma.UsuarioReg };
+        // Asignar vendedor desde la venta 0 (ya cargado)
+        venta.vendedor = { ...this.ventas[0].vendedor };
 
-        // Cargar productos correctamente (await real)
+        // Cargar cliente
+        const respCliente = await this.axios.get(this.API + "cliente", {
+          params: { idCliente: proforma.IdCliente }
+        });
+
+        if (respCliente.data && respCliente.data.IdCliente) {
+          venta.cliente = respCliente.data;
+        } else {
+          venta.cliente = { ...proforma };
+        }
+
+        // Cargar productos usando el almacen de ventas[0] directamente
+        const idAlmacen = this.ventas[0].almacen.IdAlmacen || 1;
         const productos = [];
 
         for (const producto of proforma.productos) {
-          const prod = await this.obtenerStockBuscador(producto.IdProducto);
+          let prod = {};
+          // Obtener stock usando el almacen correcto, sin depender de ventaActiva
+          await this.axios(this.API + "productos/puntoventa/stock", {
+            params: {
+              idProductos: [producto.IdProducto],
+              idAlmacen: idAlmacen
+            }
+          }).then(response => {
+            prod = response.data[0];
+          });
 
           // Presentaciones
           let pres = [];
@@ -2538,8 +2781,6 @@ export default {
           }
 
           prod.PreciosPorProducto = pres;
-
-          // Datos del producto
           prod.presentacion = producto.Presentacion || "UNIDAD";
           prod.ProductoPresentacion = producto.Descripcion;
           prod.cantidad = producto.Cantidad;
@@ -2547,15 +2788,8 @@ export default {
           prod.precio = producto.Precio;
           prod.descuento = producto.Descuento || 0;
           prod.bloquearInputPrecio = false;
-          prod.stock = prod.stock;
-
-          // Lógica de presentación (CORREGIDA)
           prod.tienePresentacion = pres.length > 0;
-
-          prod.esPresentacion = pres.some(
-            v => v.nombre === producto.Presentacion
-          );
-
+          prod.esPresentacion = pres.some(v => v.nombre === producto.Presentacion);
           prod.pres = prod.esPresentacion
             ? JSON.stringify(pres.find(v => v.nombre === producto.Presentacion))
             : null;
@@ -2563,20 +2797,40 @@ export default {
           productos.push(prod);
         }
 
-        // Asignar productos finales
         venta.productos = productos;
+        venta.almacen = { ...this.ventas[0].almacen };
+        venta.puntoVenta = { ...this.ventas[0].puntoVenta };
 
-        // Insertar venta YA COMPLETA
+        // Calcular el total directamente sobre los productos sin depender de getTotal()
+        const totalVenta = productos.reduce((total, prod) => {
+          if (prod.esPresentacion) {
+            return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio - prod.descuento);
+          } else {
+            return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
+          }
+        }, 0);
+
+        // Asignar el pago directamente sobre el objeto venta ANTES de hacer push
+        venta.pago.efectivo.monto = parseFloat(totalVenta).toFixed(2);
+
+        // Insertar venta YA COMPLETA con pago ya calculado
         this.ventas.push(venta);
 
-        // Activar venta correctamente
+        // Solo cambiar ventaActiva y número, sin llamar setCliente ni metodoPagoCambio
         this.$nextTick(() => {
-          this.ventaActiva = this.ventas.length - 1;
-          this.setCliente(venta.cliente);
-          this.getNumeroVenta();
-          this.getVendedorInfo();
-          this.metodoPagoCambio(1);
+          this.ventaActiva = nuevoIndex;
+          // Obtener número de venta para este índice
+          this.axios.get(this.API + "ventas/numero", {
+            params: {
+              idPuntoVenta: venta.puntoVenta.IdDocVentaPuntoVenta || 1,
+              idTipoDoc: venta.tipoVenta.IdTipoDoc
+            }
+          }).then(response => {
+            this.ventas[nuevoIndex].Serie = response.data.serie;
+            this.ventas[nuevoIndex].Numero = response.data.numero + nuevoIndex;
+          });
         });
+
       } catch (error) {
         console.error("Error al cargar proforma:", error);
       }
@@ -2900,40 +3154,23 @@ export default {
   overflow-y: scroll;
 }
 
-@media (max-width: 1250px) {
-  .divCarrito {
-    height: 70vh;
-  }
+@media (max-width: 1024px) {
+  .txtAutoComplete { min-width: 60% !important; }
+  .divCarrito      { height: 60vh; }
+  .clsCarrito      { position: relative; max-height: 60vh; overflow-y: scroll; }
+  .formResponsive  { max-width: 100%; }
+  .autocomplete-input { max-width: 100% !important; }
+  .tblCarrito      { font-size: 0.75rem; }
+  /* ocultarMovil y mostrarMovil NO se tocan aquí — tablet ve todo */
+}
 
-  .clsCarrito {
-    position: relative;
-    max-height: 70vh;
-    overflow-y: scroll;
-  }
-
-  .ocultarMovil {
-    display: none;
-  }
-
-  .mostrarMovil {
-    display: inline;
-  }
-
-  .txtAutoComplete {
-    min-width: 20% !important;
-  }
-
-  .formResponsive {
-    max-width: 100%;
-  }
-
-  .autocomplete-input {
-    max-width: 100% !important;
-  }
-
-  .tblCarrito {
-    font-size: 0.7rem;
-  }
+@media (max-width: 767px) {
+  .ocultarMovil { display: none !important; }
+  .mostrarMovil { display: block !important; }
+  .txtAutoComplete { min-width: 100% !important; }
+  .divCarrito      { height: 70vh; }
+  .clsCarrito      { position: relative; max-height: 70vh; overflow-y: scroll; }
+  .tblCarrito      { font-size: 0.7rem; }
 }
 </style>
 <style>

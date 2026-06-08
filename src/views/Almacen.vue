@@ -502,34 +502,30 @@ export default {
       event.target.src = "static/no-photo.png";
     },
     getSumaValorizado() {
-  const urlBase = this.API + "productos/stock?idAlmacen=" + this.almacen.IdAlmacen + "&filter=" + (this.filter || "");
+      const urlBase = this.API + "productos/stock?idAlmacen=" + this.almacen.IdAlmacen + "&filter=" + (this.filter || "");
 
-  // 1. Obtener Precio Costo (sumaValorizadoSin en tu base de datos usa PrecioCosto)
-  this.axios.get(urlBase + "&sumaValorizadoSin=1")
-    .then(response => {
-      this.sumaValorizado = response.data[0].monto; // Asignamos a la cajita de Costo
-    });
+      // Precio Costo → usa sumaValorizadoSin=1
+      this.axios.get(urlBase + "&sumaValorizadoSin=1")
+        .then(response => {
+          this.sumaValorizado = response.data[0].monto;
+        });
 
-  // 2. Obtener Precio Venta (sumaValorizado en tu base de datos usa PrecioContado)
-  this.axios.get(urlBase + "&sumaValorizado=1")
-    .then(response => {
-      this.sumaValorizadoSin = response.data[0].monto; // Asignamos a la cajita de Venta
-    });
-},
+      // Precio Venta → usa sumaValorizado=1
+      this.axios.get(urlBase + "&sumaValorizado=1")
+        .then(response => {
+          this.sumaValorizadoSin = response.data[0].monto;
+        });
+    },
     getSumaStock() {
-  this.axios
-    .get(
-      this.API +
-        "productos/stock" +
-        "?idAlmacen=" +
-        this.almacen.IdAlmacen +
-        "&q=" + (this.filter || "") + // Usa q para la búsqueda de texto
-        "&sumaStock=1" // QUITA el filter[stock]=mayor de aquí
-    )
-    .then(response => {
-      this.sumaStock = response.data[0].sumaStock;
-    });
-},
+      this.axios
+        .get(
+          this.API + "productos/stock" + "?idAlmacen=" + this.almacen.IdAlmacen 
+              + "&sumaStock=1" + (this.filter ? this.filter : "")
+        )
+        .then(response => {
+          this.sumaStock = response.data[0].sumaStock;
+        });
+    },
     getStock(idProducto) {
       let index = this.itemsStock.findIndex(
         item => item.IdProducto == idProducto

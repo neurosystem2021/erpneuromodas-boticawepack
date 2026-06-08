@@ -3,7 +3,7 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
       <b-row>
         <b-col md="12" style="margin-top: -10px; margin-bottom: -10px;">
             <b-btn v-if="showNew" variant="success" size="md" @click="eliminaId"><b>Nuevo</b></b-btn>    
@@ -22,6 +22,7 @@
               ></b-form-input>
           </b-form-group>
           <label>Código barra Modelo:</label>
+            <b-form-group>
             <b-form-input 
               ref="inputCodigoBarra"
               v-model="producto.CodeBarModelo"
@@ -29,7 +30,7 @@
               type="text"
               class="form-control upper"
               ></b-form-input>
-          </b-form-group>
+            </b-form-group>
           <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
