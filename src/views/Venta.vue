@@ -2141,6 +2141,36 @@ export default {
         return;
       }
 
+       let errores = productos.filter(p => {
+          const precio = parseFloat(p.precio);
+          return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+
+          this.$toasted.show(
+            `El producto "${errores[0].Producto}" tiene precio inválido`
+          );
+
+          this.bloquearVenta = false;
+          return;
+      }
+
+      let errorescantidad = productos.filter(p => {
+          const cantidad = parseFloat(p.cantidad);
+          return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+
+          this.$toasted.show(
+            `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+          );
+
+          this.bloquearVenta = false;
+          return;
+      }
+      
       if (!venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         // this.$swal({
