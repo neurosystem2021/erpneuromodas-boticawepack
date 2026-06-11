@@ -11,4 +11,33 @@ export default {
 </script>
 
 <style>
+.btnAction {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  border: 0px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  display: block;
+  width: 100%;
+  margin: 1.5% 0px;
+  text-transform: uppercase;
+  /* margin: 20px 0 0; */
+}
+
+.btnAction2 {
+  margin: 2px 0;
+  border-radius: 25px !important;
+  border: 0px !important;
+  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.751);
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  margin: 1.5% 0px;
+  text-transform: uppercase;
+  /* margin: 20px 0 0; */
+}
 </style>

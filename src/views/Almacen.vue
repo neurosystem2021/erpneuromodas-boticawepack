@@ -77,16 +77,32 @@
         <b-row>
           <b-col md="6">
             <b-row>
+              <b-col md="2">
+                <b-form-group>
+                  <label>Codigo de Barra:</label>
+                  <autocomplete
+                    :url="API + 'productos/codigobarra'"
+                    :debounce="400"
+                    ref="inputCodigoBarra"
+                    anchor="CodigoBarra"
+                    label="writer"
+                    :on-select="val => generateFilter('codigobarra', val.CodigoBarra)"
+                    :onInput="(val) => generateFilter('codigobarra', val)"
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
               <b-col md="3">
                 <b-form-group>
                   <label>Categoría:</label>
                   <autocomplete
                     :url="API + 'categorias'"
+                    :debounce="400"
                     ref="inputCategoria"
                     anchor="ProductoCategoria"
                     label="writer"
                     :on-select="val => generateFilter('categoria', val.ProductoCategoria)"
-                    :onInput="(val) => !val ? generateFilter('categoria', val) : false"
+                    :onInput="(val) => generateFilter('categoria', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -96,6 +112,7 @@
                   <label>Artículo:</label>
                   <autocomplete
                     :url="API + 'productos'"
+                    :debounce="400"
                     ref="inputProducto"
                     anchor="Producto"
                     label="writer"
@@ -105,30 +122,32 @@
                   </autocomplete>
                 </b-form-group>
               </b-col>
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Marca:</label>
                   <autocomplete
                     :url="API + 'marcas'"
+                    :debounce="400"
                     ref="inputMarca"
                     anchor="ProductoMarca"
                     label="writer"
                     :on-select="val => generateFilter('marca', val.ProductoMarca)"
-                    :onInput="(val) => !val ? generateFilter('marca', val) : false"
+                    :onInput="(val) => generateFilter('marca', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
               </b-col>  
-              <b-col md="3">
+              <b-col md="2">
                 <b-form-group>
                   <label>Modelo:</label>
                   <autocomplete
                     :url="API + 'productos/modelos'"
+                    :debounce="400"
                     ref="inputModelo"
                     anchor="ProductoModelo"
                     label="writer"
                     :on-select="val => generateFilter('modelo', val.ProductoModelo)"
-                    :onInput="(val) => !val ? generateFilter('modelo', val) : false"
+                    :onInput="(val) => generateFilter('modelo', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -142,11 +161,12 @@
                   <label>Color:</label>
                   <autocomplete
                     :url="API + 'productos/colores'"
+                    :debounce="400"
                     ref="inputColor"
                     anchor="Color"
                     label="writer"
                     :on-select="val => generateFilter('color', val.Color)"
-                    :onInput="(val) => !val ? generateFilter('color', val) : false"
+                    :onInput="(val) => generateFilter('color', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -156,11 +176,12 @@
                   <label>Talla:</label>
                   <autocomplete
                     :url="API + 'tallas'"
+                    :debounce="400"
                     ref="inputTalla"
                     anchor="ProductoTalla"
                     label="writer"
                     :on-select="val => generateFilter('talla', val.ProductoTalla)"
-                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
+                    :onInput="(val) => generateFilter('talla', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -170,11 +191,12 @@
                   <label>Genero:</label>
                   <autocomplete
                     :url="API + 'productos/generos'"
+                    :debounce="400"
                     ref="inputGenero"
                     anchor="Genero"
                     label="writer"
                     :on-select="val => generateFilter('genero', val.Genero)"
-                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
+                    :onInput="(val) => generateFilter('genero', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -184,11 +206,12 @@
                   <label>Botapie/Manga:</label>
                   <autocomplete
                     :url="API + 'productos/botapies'"
+                    :debounce="400"
                     ref="inputBotapie"
                     anchor="Botapie"
                     label="writer"
                     :on-select="val => generateFilter('botapie', val.Botapie)"
-                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
+                    :onInput="(val) => generateFilter('botapie', val)"
                     :classes="{input: 'form-control upper'}">
                   </autocomplete>
                 </b-form-group>
@@ -236,8 +259,8 @@
               :current-page="currentPage">
 
                 <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
+                  <div :class="data.item.stock > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                    {{ data.item.stock }}
                   </div>
                 </template>
                 <template slot="Producto" slot-scope="data">
@@ -279,15 +302,20 @@ export default {
     })
 
     this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen
+
+    this.getSumaStock()
+    this.getSumaValorizado()
   },
   data() {
     return {
       API: config.API,
+      APISTOCK: 'productos/stock',
       hrefExcel: '',
       sumaStock: '...',
       sumaValorizado: '...',
       sumaValorizadoContado: '...',
-      APISTOCK: 'productos',
+      // APISTOCK: 'productos',
+      debounceTimers: {},
       tipoStock: '',
       showKardex: false,
       almacen: {
@@ -322,45 +350,49 @@ export default {
     }
   },
   watch: {
-    items (items) {
-      //Vue.set(this.$refs.tablaProductos, 'localItems', [])
-      //console.log(this.$refs.tablaProductos.localItems)
-      //this.myProvider(false)
+    // items (items) {
+    //   //Vue.set(this.$refs.tablaProductos, 'localItems', [])
+    //   //console.log(this.$refs.tablaProductos.localItems)
+    //   //this.myProvider(false)
 
-       this.axios.get(this.API + 'productos/stock', {
-          params: {
-            idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
-          }
-        }).then((response) => {
-             this.itemsStock = response.data
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+    //    this.axios.get(this.API + 'productos/stock', {
+    //       params: {
+    //         idProductos: items.map((item) => item.IdProducto),
+    //         idAlmacen: this.almacen.IdAlmacen
+    //       }
+    //     }).then((response) => {
+    //          this.itemsStock = response.data
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
 
-        // Cargar la sumatoria
-        console.log('asdasd')
-        this.getSumaStock()
-        this.getSumaValorizado()
+    //     // // Cargar la sumatoria
+    //     // console.log('asdasd')
+    //     // this.getSumaStock()
+    //     // this.getSumaValorizado()
 
-      /*console.log(items[0].hasOwnProperty('stock'))
-      if (!items[0].hasOwnProperty('stock')) {
-      //console.log(items)
-        // ejecutar solo cuando los productos no tengan stock
-        this.axios.get(this.API + 'productos/stock', {
-          params: {
-            idProductos: items.map((item) => item.IdProducto),
-            idAlmacen: this.almacen.IdAlmacen
-          }
-        }).then((response) => {
-         // console.log(response.data)
-             this.items = []
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-      }*/
+    //   /*console.log(items[0].hasOwnProperty('stock'))
+    //   if (!items[0].hasOwnProperty('stock')) {
+    //   //console.log(items)
+    //     // ejecutar solo cuando los productos no tengan stock
+    //     this.axios.get(this.API + 'productos/stock', {
+    //       params: {
+    //         idProductos: items.map((item) => item.IdProducto),
+    //         idAlmacen: this.almacen.IdAlmacen
+    //       }
+    //     }).then((response) => {
+    //      // console.log(response.data)
+    //          this.items = []
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    //   }*/
+    // },
+    filter(val) {
+      this.getSumaStock();
+      this.getSumaValorizado();
     }
   },
   computed: {
@@ -372,36 +404,36 @@ export default {
   },
   methods: {
     getSumaValorizado () {
-    
-      /*this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1')
-        .then( response => {
-          this.sumaValorizado = (response.data[0].sumaValorizado);
-        })*/
-      
-      // this.axios.get(this.API + 'empresa/config/1')
-      //   .then( response => {
-      //     this.sumaValorizado = response.data && response.data.CONFIG && response.data.CONFIG.SUMA_VALORIZADO;
-      //   })
+  // Se concatena de manera limpia el string de filtros actual (this.filter)
+  let urlCosto = this.API + 'productos/stock?idAlmacen=' + this.almacen.IdAlmacen + (this.filter || '') + '&filter[stock]=mayor&sumaValorizado=1';
+  this.axios.get(urlCosto)
+    .then( response => {
+      this.sumaValorizado = response.data[0] ? response.data[0].sumaValorizado : 0;
+    })
 
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizado=1')
-        .then( response => {
-          this.sumaValorizado = (response.data[0].sumaValorizado);
-        })
+  let urlVenta = this.API + 'productos/stock?idAlmacen=' + this.almacen.IdAlmacen + (this.filter || '') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1';
+  this.axios.get(urlVenta)
+    .then( response => {
+      this.sumaValorizadoContado = response.data[0] ? response.data[0].sumaValorizado : 0;
+    })
+},
 
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaValorizado=1&sumaValorizadoContado=1')
-        .then( response => {
-          this.sumaValorizadoContado = (response.data[0].sumaValorizado);
-        })
-    },
-    getSumaStock () {
-      this.axios.get(this.API + 'productos/stock' + '?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (this.filter||'') + '&filter[stock]=mayor&sumaStock=1')
-        .then( response => {
-          this.sumaStock = response.data[0].sumaStock
-        })
-    },
+getSumaStock () {
+  // Modificamos para enviar la consulta usando el string completo 'this.filter' 
+  // para ir en perfecta sintonía con el backend y la tabla b-table
+  let urlStock = this.API + 'productos/stock?idAlmacen=' + this.almacen.IdAlmacen + (this.filter || '') + '&sumaStock=1&filter[stock]=mayor';
+  
+  this.axios.get(urlStock)
+    .then( response => {
+      this.sumaStock = response.data[0] ? response.data[0].sumaStock : 0;
+    })
+    .catch(() => {
+      this.sumaStock = 0;
+    })
+},
     getStock (idProducto) {
-      let index = this.itemsStock.findIndex(item => item.IdProducto == idProducto)
-      return this.itemsStock[index] && this.itemsStock[index].stock
+      const item = this.items.find(i => i.IdProducto == idProducto);
+      return item ? item.stock : 0;
     },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
@@ -416,6 +448,11 @@ export default {
     setAlmacen (obj) {
       this.almacen = obj
       this.limpiarFiltros()
+      this.getSumaStock()
+      this.getSumaValorizado()
+      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen
+      this.productoSelect = {}
+
       console.log(this.filter)
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
@@ -442,35 +479,37 @@ export default {
       this.$refs.tablaProductos.refresh()
     },
     myProvider (ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      let url = this.API + this.APISTOCK + '?idAlmacen=' + this.almacen.IdAlmacen + '&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
-      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( url )
-      
-      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' + this.almacen.IdAlmacen + '&filter='+ (ctx.filter||'')
-      console.log(this.hrefExcel);
+      let url = this.API + this.APISTOCK 
+        + '?idAlmacen=' + this.almacen.IdAlmacen 
+        + '&limit=' + ctx.perPage 
+        + '&page=' + ctx.currentPage 
+        + (ctx.filter || '')
+        + '&sortBy=' + ctx.sortBy
+        + '&sortDesc=' + (ctx.sortDesc ? 1 : 0)
+      // ← eliminar la línea duplicada de sortDesc
+
+      let promise = this.axios.get(url)
+      this.hrefExcel = '/api/index.php/reporte/stock?idAlmacen=' 
+        + this.almacen.IdAlmacen + (ctx.filter || '')
 
       return promise.then((result) => {
         this.items = result.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
-      }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
-        return []
-      })
+        return this.items
+      }).catch(() => [])
     },
-    limpiarFiltros () {
-      this.APISTOCK = 'productos'
+    limpiarFiltros() {
+
+      Object.keys(this.debounceTimers).forEach(key => {
+        clearTimeout(this.debounceTimers[key])
+      })
+      this.debounceTimers = {}
+      this.APISTOCK = 'productos/stock'
       this.tipoStock = ''
       this.filters = {}
       this.filter = ''
       this.$refs.inputCategoria.setValue('')
       this.$refs.inputProducto.setValue('')
+      this.$refs.inputCodigoBarra.setValue('')
       this.$refs.inputMarca.setValue('')
       this.$refs.inputModelo.setValue('')
       this.$refs.inputColor.setValue('')
@@ -482,21 +521,29 @@ export default {
       this.limpiarClassRows()
       console.log(this.filter)
     },
-    generateFilter (key, value) {
-      this.filters[key] = value
-      
-      let filter = ''
-      for (var key in this.filters) {
-        filter += '&filter[' + key + ']=' + this.filters[key]
-        
-        if(key == 'stock' || key == 'minimo') {
-          // si la consulta se hace al stock jalar de otro endpoint
-          this.APISTOCK = 'productos/stock'
-        }
+    generateFilter(key, value) {
+      if (!value) {
+        this.$delete(this.filters, key)
+      } else {
+        this.$set(this.filters, key, value)
       }
 
-      
-      this.filter = filter
+      if (this.debounceTimers[key]) {
+        clearTimeout(this.debounceTimers[key])
+      }
+
+      this.debounceTimers[key] = setTimeout(() => {
+        let filter = ''
+        for (var k in this.filters) {
+          if (this.filters[k]) {
+            filter += '&filter[' + k + ']=' + this.filters[k]
+            if (k == 'stock' || k == 'minimo') {
+              this.APISTOCK = 'productos/stock'
+            }
+          }
+        }
+        this.filter = filter;
+      }, 400)
     },
     exportarProductos () {
 

@@ -12,6 +12,7 @@ import VueAxios from 'vue-axios'
 import Toasted from 'vue-toasted';
 import VueMoment from 'vue-moment'
 import { detect } from 'detect-browser';
+import VueSweetalert2 from 'vue-sweetalert2';
 
 const browser = detect();
 
@@ -23,6 +24,7 @@ import '../static/styles.css'
 Vue.prototype.$browser = detect()
 
 Vue.config.productionTip = false
+Vue.use(VueSweetalert2)
 
 Vue.use(VueAxios, axios)
 Vue.use(Toasted, {

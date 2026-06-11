@@ -1,6 +1,7 @@
 
 import { API } from '../config.js'
 import axios from 'axios'
+import Vue from 'vue'
 
 const state = {
   productos: [],
@@ -13,12 +14,16 @@ const mutations = {
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
+        // Inicializar stock como propiedad reactiva
+        Vue.set(item, 'stock', item.stock || 0)
         productos.push(item)
       } else {
         productos[index].cantidad += 1
       }
     } else {
       if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
+        // Inicializar stock como propiedad reactiva
+        Vue.set(item, 'stock', item.stock || 0)
         productos.push(item)
       }
     }
@@ -47,13 +52,15 @@ const mutations = {
     state.totalCart = total
   },
   OBTENER_STOCK (state, items) {
-    state.productos = state.productos.map((prod) => {
+    state.productos = state.productos.map((prod, idx) => {
       let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
-      prod.stock = items[index] && items[index].stock
+      if (index >= 0) {
+        Vue.set(prod, 'stock', items[index].stock)
+      } else {
+        Vue.set(prod, 'stock', 0)
+      }
       return prod
     })
-    //state.productos[index].stock = item.stock
-    // Vue.set(state.productos[index], 'stock', item.stock)
   }
 }
 
@@ -131,13 +138,30 @@ const actions = {
     commit('ACTUALIZAR_TOTAL', total)
   },
   obtenerStock({ commit, state }, obj) {
+    const productos = obj.productos || state.productos
+    
+    if (!productos || productos.length === 0) {
+      return
+    }
+
     axios.get(API + 'productos/stock', {
       params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
+        idProductos: productos.map(prod => prod.IdProducto),
         idAlmacen: obj.IdAlmacen
       }
     }).then((response) => {
-        commit('OBTENER_STOCK', response.data)
+        // Actualizar stock en los productos pasados con reactividad
+        productos.forEach(prod => {
+          const stockItem = response.data.find(item => item.IdProducto == prod.IdProducto)
+          if (stockItem) {
+            Vue.set(prod, 'stock', stockItem.stock)
+          }
+        })
+        
+        // También actualizar en el store si los productos vinieron de allá
+        if (!obj.productos) {
+          commit('OBTENER_STOCK', response.data)
+        }
     })
     .catch((error) => {
       console.log(error)

@@ -209,7 +209,7 @@
 
 <script>
 import Menu from '@/components/Menu'
-import ProductosCarrito from '@/components/ProductosCarrito'
+import ProductosCarrito from '@/components/ProductosCarritoNuevo'
 //import ProveedoresTabla from 'components/ProveedoresTabla'
 import ProveedoresForm from '@/components/ProveedoresForm'
 import { mapState, mapActions } from 'vuex'

@@ -127,13 +127,19 @@
 
       </b-table>
     </b-col>
+    <b-col md="12">
+      <slot name="pagar"></slot>
+    </b-col>
     <b-col md="3">
+      <slot name="acciones"></slot>
+    </b-col>
+    <b-col md="2">
       <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2" v-if="!noSubtotal">
+    <b-col md="3"  v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
@@ -207,6 +213,10 @@ export default {
     setPrecio: Boolean,
     bloquearInput:Boolean,
     igvTotal: Boolean,
+    productosLocales: {
+      type: Array,
+      default: () => []
+    },
     onSetProducto: {
       type: Function,
       default (obj) {
@@ -244,8 +254,10 @@ export default {
     noSubtotal: Boolean
   },
   computed: {
+    productos () {
+      return this.productosLocales
+    },
     ...mapState({
-      productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
     sumatoriaSubTotal () {
@@ -302,20 +314,20 @@ export default {
     asignarVuelto () {
       this.vuelto = this.pagocon - this.sumatoriaTotal
     },
-    loadBarcode (e) {
+    loadBarcode(e) {
       e.preventDefault()
-      let idProducto = this.loadCode.substring(2, this.loadCode.length -2);
-
+      const raw = this.loadCode
+      const idProducto = raw.substring(2, raw.length - 2)
+      console.log('Barcode raw:', raw, '→ ID:', idProducto) // ← para debug
       if (idProducto) {
-        this.add([idProducto, (obj) => {
-          if (obj) {
-            this.$emit('onAddProducto')
-            this.$toasted.show('Producto añadido correctamente')
-          } else {
-            this.$toasted.show('No se encontró ningun producto')
-          }
+        this.$emit('onAddProducto', [idProducto])
+        this.loadCode = ''
+      } else {
+        // Si el formato no tiene prefijo/sufijo, emitir directo
+        if (raw) {
+          this.$emit('onAddProducto', [raw])
           this.loadCode = ''
-        }, { setPrecio: this.setPrecio,  setSuma: true }])
+        }
       }
     },
     /*alterarBuscadorProductos() {
@@ -350,21 +362,17 @@ export default {
       this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },  
-    setProducto (obj) {
+    setProducto(obj) {
       this.$refs.autocompleteProducto.setValue('')
-      //obj.FLETE = 0
-      obj.precio = 0
-      obj.cantidad = 0
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
-      obj.descuento = 0
+      obj.precio         = obj.PrecioContado || 0
+      obj.cantidad       = 1
+      obj.descuento      = 0
+      obj.subtotal       = obj.PrecioContado || 0   // ← pre-calcular
+      obj.total          = obj.PrecioContado || 0   // ← pre-calcular
+      obj.igv            = 0
       obj.nuevoPrecioContado = 0
-      obj = this.onSetProducto(obj)
-      this.add([obj, () => {
-        this.$emit('onAddProducto', obj)
-      },{ setPrecioCosto: (this.tipo == 'mov' ? true : false) }])
-
-      // Vue.set(this.productos, obj.IdProducto, obj)
+      const objFinal     = this.onSetProducto(obj)  // ← variable nueva, no reasignar
+      this.$emit('onAddProducto', objFinal)
     },
     renderChild(data) {
       return `
@@ -430,8 +438,9 @@ export default {
       this.buscar(value)
     },
     quitarProducto (index) {
-      this.eliminar(index)
-      this.$emit('onRemoveProducto', index)
+      const productosCopia = this.productos.slice()
+      productosCopia.splice(index, 1)
+      this.$emit('onRemoveProducto', productosCopia)
       this.$toasted.show('Producto quitado del listado')
     }
   },
