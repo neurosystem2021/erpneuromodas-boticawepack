@@ -330,7 +330,7 @@ export default {
       this.$refs[ref].handleDoubleClick();
     },
     loadClienteVarios() {
-      this.axios.get(this.API + "clientes/00000001").then(res => {
+      this.axios.get(this.API + "clientes/00000000").then(res => {
         if (res.data.IdCliente) {
           this.setCliente(res.data);
         }
@@ -469,11 +469,10 @@ export default {
     },
     setCliente(cliente) {
       this.cliente = cliente;
-      this.$refs.inputCliente.setValue(
-        cliente.ClienteDniRuc
-          ? cliente.ClienteDniRuc
-          : cliente.Cliente.toUpperCase()
-      );
+      const label = cliente.ClienteDniRuc
+        ? cliente.ClienteDniRuc
+        : `${cliente.DniRuc} ${cliente.Cliente}`.toUpperCase();
+      this.$refs.inputCliente.setValue(label);
     },
     eliminar(index) {
       this.productosCarrito.splice(index, 1);

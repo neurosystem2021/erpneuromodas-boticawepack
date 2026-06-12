@@ -1,188 +1,233 @@
 <template>
-	<div id="invoice-container">
-		<header class="clearfix">
-			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg">
-			</div>
-			<!--<div id="company">
-				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
-				<div>{{ empresa.DIRECCION }}</div>
-				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>-->
-		</header>
-		<main>
-      <div id="details" class="clearfix">
-        <div id="client">
-          <br>
-          <h5 class="to" style=":black">COTIZACION A:</h5>
-          <table>
+  <div id="invoice-container">
+    <div class="accent-bar"></div>
+
+    <!-- ENCABEZADO -->
+    <header class="inv-header clearfix">
+      <div class="inv-header__brand">
+        <img src="/resources/images/banner-proforma.jpg" class="inv-header__logo" />
+      </div>
+      <div class="inv-header__badge">
+        <div class="inv-header__badge-type">Cotización</div>
+        <div class="inv-header__badge-num">{{ proforma.Anio }}-{{ proforma.Numero }}</div>
+      </div>
+    </header>
+
+    <main>
+      <!-- INFO CLIENTE / DOCUMENTO -->
+      <div id="details" class="inv-details clearfix">
+        <div class="inv-details__col">
+          <div class="inv-details__col-title">Datos del cliente</div>
+          <table class="inv-info-table">
             <tbody>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
+                <td class="inv-info-table__lbl">Cliente</td>
+                <td class="inv-info-table__val">{{ proforma.Cliente }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Documento</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Documento }}</td>
+                <td class="inv-info-table__lbl">Documento</td>
+                <td class="inv-info-table__val">{{ proforma.DniRuc }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
-              </tr>
-              <!-- <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
-                <td class="celda" style="text-transform: uppercase">: Soles</td>
-              </tr> -->
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
+                <td class="inv-info-table__lbl">Dirección</td>
+                <td class="inv-info-table__val">{{ proforma.ClienteDireccion }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">T. Pago:</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CRÉDITO' :'CONTADO' }}</td>
-                
+                <td class="inv-info-table__lbl">Atendido por</td>
+                <td class="inv-info-table__val">{{ proforma.UsuarioReg }}</td>
+              </tr>
+              <tr>
+                <td class="inv-info-table__lbl">T. Pago</td>
+                <td class="inv-info-table__val">
+                  <span :class="proforma.EsCredito == 1 ? 'badge badge--green' : 'badge badge--blue'">
+                    {{ proforma.EsCredito == 1 ? 'CRÉDITO' : 'CONTADO' }}
+                  </span>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div id="invoice">
-          <h1>COTIZACION {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
-          <div style="height:15px"></div>
-          <table>
+
+        <div class="inv-details__col">
+          <div class="inv-details__col-title">Detalles del documento</div>
+          <table class="inv-info-table">
             <tbody>
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Fecha de emisión</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
+                <td class="inv-info-table__lbl">Fecha de emisión</td>
+                <td class="inv-info-table__val">{{ proforma.FechaReg ? proforma.FechaReg.substring(0, 10) : '' }}</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo Validez</td>
-                <td class="celda" style="text-transform: uppercase">: {{proforma.DiasValidos}} d</td>
-              </tr>
-              <!-- <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.EsCredito == 1 ? 'CREDITO' : 'CONTADO'}}</td>
-              </tr> -->
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Tiempo de Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.PorEntregar == 1 ? proforma.PorEntregarDias +' D' : 'INMEDIATO'}}</td>
-              </tr>
-              <!-- <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;"> Fecha Crédito</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaCredito}}</td>
+                <td class="inv-info-table__lbl">Validez</td>
+                <td class="inv-info-table__val">{{ proforma.DiasValidos }} días</td>
               </tr>
               <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;"> Días de Crédito</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.DiasCredito}}</td>
-              </tr> -->
-              <!--<tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>-->
+                <td class="inv-info-table__lbl">Entrega</td>
+                <td class="inv-info-table__val">
+                  <span :class="proforma.PorEntregar == 1 ? 'badge badge--orange' : 'badge badge--green'">
+                    {{ proforma.PorEntregar == 1 ? proforma.PorEntregarDias + ' días' : 'INMEDIATO' }}
+                  </span>
+                </td>
+              </tr>
+              <tr v-if="proforma.Observacion">
+                <td class="inv-info-table__lbl">Observación</td>
+                <td class="inv-info-table__val">{{ proforma.Observacion }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <table border="0" cellspacing="0" cellpadding="0" min-width="100%" class="tblProductos">
-        <thead>
-          <tr>
-            <th class="total">#</th>
-            <th class="qty">CANT.</th>
-            <th colspan="2" class="desc">DESCRIPCIÓN</th>
-            <th class="qty">U.M.</th>
-            <th class="qty">MODELO</th>
-            <th class="qty">MARCA</th>
-            <th class="qty">TALLA</th>
-            <th class="qty">COLOR</th>
-            <th class="qty">GENERO</th>
-            <th class="qty">BOTAPIE</th>
-            <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(prod, index) in proforma.productos" :key="index">
-           
-            <td class="total">{{ index+1 }}</td>
-            <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
-            <td colspan="2"  class="desc" style="font-size:0.75rem">
-              <h3 style="color:#000; font-size:1rem">{{ prod.Producto }} - {{ prod.CodigoBarra }} <p v-if="presentacionProducto(prod)">({{ presentacionProducto(prod)}})</p> </h3><p v-if='prod.ProductoDesc'>{{ prod.ProductoDesc }}</p><p v-if="prod.ProductoDesc2"> {{prod.ProductoDesc2}}</p><p v-if="prod.ProductoDesc3">{{ prod.ProductoDesc3 }}</p>
-            </td>
-             <td class="qty" style="font-size:1.1rem">
-              {{ getPresentacion(prod)}} 
-            </td>
-            <td class="qty">
-              {{ prod.ProductoModelo }}
-            </td>
-            <td class="qty">
-              {{ prod.ProductoMarca }}
-            </td>
-            <td class="qty">
-              {{ prod.ProductoTalla }}
-            </td>
-            <td class="qty">
-              {{ prod.Color }}
-            </td>
-            <td class="qty">
-              {{ prod.Genero }}
-            </td>
-            <td class="qty">
-              {{ prod.Botapie }}
-            </td>
-            
-            <td class="unit" style="font-size:1.1rem">S/. {{ prod.Precio | moneda }}</td>
-            <td class="total" style="font-size:1.1rem">
-              <div>
-                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br><span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="10"></td>
-            <td colspan="2">SUBTOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
-          </tr>
-          <tr>
-            <td colspan="10"></td>
-            <td colspan="2" style="background:#010067 ; color:#fff">TOTAL</td>
-            <td style="background:#010067 ; color:#fff">S/. {{ subTotal | redondear }}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
-        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
-      </div>
-      <br>
-      <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <!-- <div class="notice">ESTA COTIZACION SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div> -->
-        <div class="notice">PAGOS: - Factura a {{DiasCredito}} días - S/. {{ subTotal | redondear }}</div>
-        <div class="notice">Observación(es): {{proforma.Observacion}}</div>
-      </div>
-      <div>
-        <br>
-        <div id="accounts" style="margin-top:-10px; font-weight:bold; margin-left: 450px;">
-          <img style="max-width: 100%" src="/resources/images/firma.png" />
-        </div>
-        <table>
+
+      <!-- TABLA DE PRODUCTOS -->
+      <div class="inv-table-wrap">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th class="center">#</th>
+              <th class="center">Cant.</th>
+              <th colspan="2" class="left">Descripción</th>
+              <th class="center">U.M.</th>
+              <th class="center">Modelo</th>
+              <th class="center">Marca</th>
+              <th class="center">Talla</th>
+              <th class="center">Color</th>
+              <th class="center">Género</th>
+              <th class="center">Botapie</th>
+              <th class="right">Precio U.</th>
+              <th class="right">Total</th>
+            </tr>
+          </thead>
           <tbody>
-            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:50%"></td>
-            <td style="border: none !important; border-top:3px solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px solid #FD8100; background: white !important; width:10%"></td>
+            <tr v-for="(prod, index) in proforma.productos" :key="index">
+              <td class="center inv-table__num">{{ index + 1 }}</td>
+              <td class="center">
+                <span class="qty-pill">{{ prod.Cantidad }}</span>
+              </td>
+              <td colspan="2" class="left">
+                <div class="prod-name">
+                  {{ prod.Producto }} - {{ prod.CodigoBarra }}
+                  <span v-if="presentacionProducto(prod)" class="prod-pres">({{ presentacionProducto(prod) }})</span>
+                </div>
+                <div v-if="prod.ProductoDesc" class="prod-desc">{{ prod.ProductoDesc }}</div>
+                <div v-if="prod.ProductoDesc2" class="prod-desc">{{ prod.ProductoDesc2 }}</div>
+                <div v-if="prod.ProductoDesc3" class="prod-desc">{{ prod.ProductoDesc3 }}</div>
+              </td>
+              <td class="center">{{ getPresentacion(prod) }}</td>
+              <td class="center">{{ prod.ProductoModelo }}</td>
+              <td class="center">{{ prod.ProductoMarca }}</td>
+              <td class="center">{{ prod.ProductoTalla }}</td>
+              <td class="center">{{ prod.Color }}</td>
+              <td class="center">{{ prod.Genero }}</td>
+              <td class="center">{{ prod.Botapie }}</td>
+              <td class="right precio">S/. {{ prod.Precio | moneda }}</td>
+              <td class="right precio">
+                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}
+                <div v-if="prod.Descuento" class="dsct-label">Dsct: {{ prod.Descuento | moneda('S/. ') }}</div>
+              </td>
+            </tr>
           </tbody>
+          <tfoot>
+            <tr class="inv-table__subtotal">
+              <td colspan="10"></td>
+              <td colspan="2" class="right">Subtotal</td>
+              <td class="right">S/. {{ subTotal | redondear }}</td>
+            </tr>
+            <tr class="inv-table__total">
+              <td colspan="10"></td>
+              <td colspan="2" class="right">TOTAL</td>
+              <td class="right">S/. {{ subTotal | redondear }}</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
-      <div style="text-align:center">
-        <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
+
+      <!-- CUENTAS BANCARIAS -->
+      <div class="inv-accounts">
+        <div class="cuentas-titulo">Cuentas bancarias para depósito / transferencia</div>
+        <div class="cuentas-grid">
+          <div class="banco-card">
+            <div class="banco-header bcp-header">
+              <span class="banco-nombre">›BCP‹</span>
+            </div>
+            <table class="banco-table">
+              <tr>
+                <td class="banco-lbl banco-lbl--red">Cta. Corriente Soles</td>
+                <td class="banco-val">-</td>
+              </tr>
+              <tr>
+                <td class="banco-lbl banco-lbl--gray">Cta. Interbancaria</td>
+                <td class="banco-val">-</td>
+              </tr>
+            </table>
+          </div>
+          <div class="banco-card">
+            <div class="banco-header bbva-header">
+              <span class="banco-nombre">BBVA Continental</span>
+            </div>
+            <table class="banco-table">
+              <tr>
+                <td class="banco-lbl banco-lbl--red">Cta. Corriente Soles</td>
+                <td class="banco-val">-</td>
+              </tr>
+              <tr>
+                <td class="banco-lbl banco-lbl--gray">Cta. Interbancaria</td>
+                <td class="banco-val">-</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTAS Y FIRMA -->
+      <div class="inv-footer-row">
+        <div class="inv-notes">
+          <div class="inv-notes__title">Nota:</div>
+          <div class="inv-notes__line">Los productos serán entregados en el local comercial.</div>
+
+          <template v-if="proforma.EsDescripcion == 1">
+            <div class="inv-notes__line" v-if="proforma.DescripcionProforma">
+              <strong>Plazo de Entrega:</strong> {{ proforma.DescripcionProforma }}
+            </div>
+            <div class="inv-notes__line" v-if="proforma.DescripcionProforma2">
+              <strong>Validez de la oferta:</strong> {{ proforma.DescripcionProforma2 }}
+            </div>
+            <div class="inv-notes__line" v-if="proforma.DescripcionProforma3">
+              <strong>Lugar de Entrega:</strong> {{ proforma.DescripcionProforma3 }}
+            </div>
+            <div class="inv-notes__line" v-if="proforma.DescripcionProforma4">
+              <strong>Garantía:</strong> {{ proforma.DescripcionProforma4 }}
+            </div>
+            <div class="inv-notes__line" v-if="proforma.DescripcionProforma5">
+              {{ proforma.DescripcionProforma5 }}
+            </div>
+          </template>
+
+          <div class="inv-notes__line">
+            Esta cotización tiene validez de <strong>{{ proforma.DiasValidos }}</strong> días.
+          </div>
+        </div>
+
+        <div class="inv-firma-wrap">
+          <!-- <img src="/resources/images/firma.png" class="inv-firma-img" /> -->
+          <div class="inv-firma-line">
+            <span class="inv-firma-label">Firma / Sello de autorización</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÓN IMPRIMIR -->
+      <div class="inv-print-row">
+        <button class="btn-imprimir" id="printBtn" @click="imprimirPantalla">
+          Imprimir
+        </button>
+        <button class="btn-imprimir" id="printBtn" @click="imprimir">
+          Imprimir cotización
+        </button>
+        <button class="btn btn-success" id="printBtn" @click="enviarWsp()">
+          Enviar por WhatsApp
+        </button>
       </div>
     </main>
-    <!--<footer>
-      Invoice was created on a computer and is valid without the signature and seal.
-    </footer>-->
-	</div>
+  </div>
 </template>
 
 <script>
@@ -256,51 +301,530 @@ export default {
         this.empresa = res.data;
       });
     },
-    // window.print();
     imprimir() {
-      this.axios(`${API}venta/proforma/generar_pdf?id=${this.idProforma}`).then(
-        res => {
-          if (res.data.url) {
-            window.open(res.data.url, "_blank");
+      this.axios(`${API}venta/proforma/generar_pdf?id=${this.idProforma}`).then(res => {
+        if (res.data.url) {
+          this.urlPdfGenerado = res.data.url; // Guardamos la URL para habilitar el botón de descarga
+          window.open(res.data.url, "_blank");
+        }
+      });
+    },
+
+    async enviarWsp() {
+      const loadingSwal = this.$swal({
+        title: "Generando PDF...",
+        text: "Por favor espera...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+
+      try {
+        // Genera el PDF usando proforma.php del dompdf (igual que el botón "Imprimir cotización")
+        const res = await this.axios.get(`${API}venta/proforma/generar_pdf?id=${this.idProforma}`);
+        
+        this.$swal.close();
+
+        if (res.data.url) {
+          const urlPdf = res.data.url;
+          await this.solicitarTelefono(urlPdf);
+        } else {
+          this.$swal({ title: "Error", text: "No se pudo generar el PDF.", icon: "error" });
+        }
+      } catch (e) {
+        this.$swal.close();
+        this.$swal({ title: "Error", text: "Ocurrió un error al generar el PDF.", icon: "error" });
+      }
+    },
+
+    async solicitarTelefono(data) {
+      console.log(data);
+      const { value: telefono } = await this.$swal({
+        title: "Ingresa tu número de teléfono",
+        input: "text",
+        inputPlaceholder: "Ejemplo: 987654321",
+        showCancelButton: true,
+        inputValidator: value => {
+          const regexTelefono = /^9\d{8}$/; // Valida que comience con 9 y tenga 9 dígitos
+          if (!regexTelefono.test(value)) {
+            return "Ingresa un número válido (9 dígitos, comienza con 9)";
           }
         }
-      );
+      });
+
+      if (telefono) {
+        window.open(
+          `https://wa.me/51${telefono}?text=Para poder visualizar la proforma Ingrese al siguiente enlace ${data}`
+        );
+      }
+    },
+
+    imprimirPantalla() {
+      window.print();
     }
   }
 };
+function imprimirPantalla() {
+  // Llama al asistente de impresión nativo del navegador (Equivalente exacto a pulsar Ctrl + P)
+  window.print();
+}
 </script>
 
 <style scoped>
-@import "../../assets/css/invoice.css";
+/* ─── RESET ─────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
 
-.total {
+/* ─── BARRA ACENTO SUPERIOR ──────────────────────────── */
+/* (ver .accent-bar más abajo) */
+
+/* ─── CONTENEDOR PRINCIPAL ───────────────────────────── */
+#invoice-container {
+  max-width: 960px;
+  margin: 1.5rem auto;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  color: #222;
+}
+
+.inv-header__brand {
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.accent-bar {
+  height: 5px;
+  background: linear-gradient(to right, #010067 65%, #fd8100 100%);
+}
+
+/* ─── ENCABEZADO ─────────────────────────────────────── */
+.inv-header {
+  background: #010067;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inv-header__logo {
+  max-height: 90px;
+  max-width: 280px;
+  object-fit: contain;
+}
+
+.inv-header__badge {
+  background: #fd8100;
+  border-radius: 8px;
+  padding: 10px 22px;
+  text-align: center;
+  min-width: 140px;
+}
+
+.inv-header__badge-type {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.inv-header__badge-num {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* ─── SECCIÓN INFO (CLIENTE / DOCUMENTO) ─────────────── */
+.inv-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.inv-details__col {
+  padding: 1.25rem 2rem;
+}
+
+.inv-details__col:first-child {
+  border-right: 1px solid #ebebeb;
+}
+
+.inv-details__col-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.inv-info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inv-info-table td {
+  padding: 4px 0;
+  vertical-align: top;
+  border: none;
+  background: transparent;
+}
+
+.inv-info-table__lbl {
+  color: #888;
+  font-weight: 600;
+  width: 38%;
+  font-size: 12px;
+}
+
+.inv-info-table__val {
+  color: #222;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+/* ─── BADGES ─────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.badge--green {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge--blue {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge--orange {
+  background: #fff3e0;
+  color: #bf360c;
+}
+
+/* ─── TABLA DE PRODUCTOS ─────────────────────────────── */
+.inv-table-wrap {
+  overflow-x: auto;
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+.inv-table thead tr {
+  background: #010067;
+}
+
+.inv-table thead th {
+  color: #fff;
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 8px;
+  white-space: nowrap;
+}
+
+.inv-table thead th.center {
+  text-align: center;
+}
+
+.inv-table thead th.left {
+  text-align: left;
+}
+
+.inv-table thead th.right {
+  text-align: right;
+}
+
+.inv-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.inv-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.inv-table tbody td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border: none;
+  background: transparent;
+}
+
+.inv-table tbody td.center {
+  text-align: center;
+}
+
+.inv-table tbody td.left {
+  text-align: left;
+}
+
+.inv-table tbody td.right {
+  text-align: right;
+}
+
+.inv-table__num {
+  color: #aaa;
+  font-size: 11px;
+}
+
+/* ─── PRODUCTO EN TABLA ──────────────────────────────── */
+.prod-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #222;
+}
+
+.prod-pres {
+  font-weight: 400;
+  font-size: 11px;
+  color: #888;
+}
+
+.prod-desc {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.qty-pill {
+  display: inline-block;
+  background: #eef0f5;
+  color: #333;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.precio {
+  color: #010067;
+  font-weight: 600;
+}
+
+.dsct-label {
+  font-size: 10px;
+  color: #e67e22;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* ─── TFOOT ──────────────────────────────────────────── */
+.inv-table__subtotal td {
+  padding: 10px 8px;
+  font-size: 13px;
+  color: #555;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: none;
+  background: transparent;
+}
+
+.inv-table__total td {
+  padding: 12px 8px;
+  font-size: 15px;
+  font-weight: 700;
   background: #010067 !important;
   color: #fff !important;
+  border: none;
 }
 
-.tblProductos {
-  background: #fd8100 !important;
+/* ─── CUENTAS BANCARIAS ──────────────────────────────── */
+.inv-accounts {
+  padding: 1rem 2rem;
+  border-top: 1px solid #ebebeb;
 }
 
-.celda {
-  text-align: left !important;
-  border: none !important;
-  background: white !important;
+.cuentas-titulo {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
-table.tblProductos tr {
-  background: #fd8100 !important;
+.cuentas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
-table.tblProductos td.celda {
-  text-align: left !important;
-  border: none !important;
-  background: white !important;
+.banco-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
+.banco-header {
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+}
+
+.bcp-header {
+  background: #010067;
+}
+
+.bbva-header {
+  background: #004a97;
+}
+
+.banco-nombre {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.banco-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.banco-table tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.banco-table tr:last-child {
+  border-bottom: none;
+}
+
+.banco-lbl {
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  width: 45%;
+  color: #fff;
+}
+
+.banco-lbl--red {
+  background: #cc0000;
+}
+
+.banco-lbl--gray {
+  background: #888;
+}
+
+.banco-val {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+  background: #f9f9f9;
+  letter-spacing: 0.3px;
+}
+
+/* ─── PIE: NOTAS Y FIRMA ─────────────────────────────── */
+.inv-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #ebebeb;
+  background: #fafafa;
+}
+
+.inv-notes__title {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  color: #010067;
+}
+
+.inv-notes__line {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.inv-firma-wrap {
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 180px;
+}
+
+.inv-firma-img {
+  max-width: 140px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.inv-firma-line {
+  border-top: 2px solid #010067;
+  padding-top: 6px;
+}
+
+.inv-firma-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+}
+
+/* ─── BOTÓN IMPRIMIR ─────────────────────────────────── */
+.inv-print-row {
+  text-align: center;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #ebebeb;
+}
+
+.btn-imprimir {
+  background: #010067;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.2s;
+}
+
+.btn-imprimir:hover {
+  background: #fd8100;
+}
+
+/* ─── PRINT ──────────────────────────────────────────── */
 @media print {
-  #printBtn {
-    display: none;
+
+  #printBtn,
+  .inv-print-row {
+    display: none !important;
+  }
+
+  #invoice-container {
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  .inv-table-wrap {
+    overflow-x: visible;
   }
 }
 </style>

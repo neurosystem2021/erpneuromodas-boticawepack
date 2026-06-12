@@ -10,7 +10,7 @@
     </b-modal>
     <b-row id="header">
       <b-col cols="12" class="py-0 mt-0">
-        <b-card no-body class="mt-0">
+        <b-card no-body class="mt-0" style="background-color: #E3F2FD;">
           <b-tabs v-model="ventaActiva" content-class="mt-0" pills card class="mt-0">
             <b-tab v-for="(venta, index) in ventas" :key="index" :title="`Venta ${index + 1}`" title-link-class="titleTabs"
               class="mt-0 pt-0">
@@ -546,6 +546,7 @@
 
                     </b-col>
                   </b-col>
+                  
                   <b-col lg="3" xl="3" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2">
                       <b-button block variant="warning" class="btnAction" @click="anadirVentana()"> Añadir
@@ -554,6 +555,10 @@
                           class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear
                         Proforma</b-button>
+                      <busqueda-modelo
+                        :idAlmacen="venta.almacen.IdAlmacen"
+                        @onAgregarProductos="cargarProductosDeModelo">
+                      </busqueda-modelo>
                       <b-button v-if="touchHab" variant="danger" class="btnAction" block @click="activarModalTouch()"><i
                           class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i
@@ -885,6 +890,7 @@ import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import ClientesForm from "@/components/ClientesForm";
 import Proformas from "@/components/ProformaLista.vue";
+import BusquedaModelo from "@/components/BusquedaModelo.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 // import DeliveryModal from "@/components/DeliveryModal.vue";
@@ -903,6 +909,7 @@ export default {
     PagoDeuda,
     Movimiento,
     PreOrdenLista,
+    BusquedaModelo,
     // DeliveryModal,
     ConfigVenta,
     ConfigVenta,
@@ -1891,6 +1898,38 @@ export default {
           descuento: parseFloat((parseFloat(ultimo.descuento) + diferencia).toFixed(2))
         });
       }
+    },
+    async cargarProductosDeModelo(productos) {
+      for (const item of productos) {
+        const existe = this.ventas[this.ventaActiva].productos
+          .some(v => v.IdProducto == item.IdProducto);
+
+        if (existe) {
+          this.ventas[this.ventaActiva].productos
+            .find(v => v.IdProducto == item.IdProducto).cantidad += parseFloat(item.cantidad);
+          continue;
+        }
+
+        let prod = await this.obtenerStockBuscador(item.IdProducto);
+        let pres = [];
+        if (prod.PreciosPorProducto) {
+          pres = JSON.parse(prod.PreciosPorProducto).filter(v => v.cantidad > 0);
+        }
+        prod.PreciosPorProducto = pres;
+        prod.presentacion      = prod.ProductoPresentacion || 'UNIDAD';
+        prod.ProductoPresentacion = prod.ProductoPresentacion || 'UNIDAD';
+        prod.cantidad          = parseFloat(item.cantidad) || 1;
+        prod.precio            = parseFloat(item.precio)   || prod.PrecioContado;
+        prod.descuento         = parseFloat(item.descuento) || 0;
+        prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = 1;
+        prod.esPresentacion    = false;
+        prod.pres              = '';
+        this.ventas[this.ventaActiva].productos.unshift(prod);
+      }
+      this.metodoPagoCambio(1);
+      this.reaplicarDescuentoVigente();
     },
     async getNumeroVenta() {
       // await setTimeout(() => {
