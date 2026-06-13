@@ -310,6 +310,11 @@
                     </b-table>
                   </b-row>
                 </div>
+                <b-row class="justify-content-center">
+                  <b-button block class="mx-1 btnAction" type="submit" style="max-width: 300px; width: 100%;font-size: 1.5rem; margin-top: 10px;" size="lg" variant="success" @click="guardarVenta()">
+                    <i class="fas fa-shopping-cart"></i> PAGAR
+                  </b-button>
+                </b-row>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
                   <b-col lg="3" xl="3" cols="12">
                     <b-row>
@@ -551,8 +556,8 @@
                     <b-row class="centrado d-flex justify-content-center my-2">
                       <b-button block variant="warning" class="btnAction" @click="anadirVentana()"> Añadir
                         Venta</b-button>
-                      <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i
-                          class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      <!-- <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i
+                          class="fas fa-shopping-cart"></i> PAGAR</b-button> -->
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear
                         Proforma</b-button>
                       <busqueda-modelo
@@ -563,9 +568,9 @@
                           class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
                       <b-button v-else variant="success" class="btnAction" block @click="activarModalTouch()"><i
                           class="fas fa-keyboard"></i> Habilitar Touch</b-button>
-                      <b-button block v-if="ventas.length > 1" variant="danger" @click="eliminarVentana()"> Cancelar
+                      <b-button block v-if="ventas.length > 1" variant="danger" @click="eliminarVentana()" class="btnAction"> Cancelar
                         Venta</b-button>
-                      <b-button class="btnAction" block variant="danger" @click="testImpresora()">Probar
+                      <b-button class="btnAction" block style="background-color: #6F42C1;" @click="testImpresora()">Probar
                         Impresora</b-button>
                       <!-- <delivery-modal style="min-width: 100%; margin: 1% 0;" ref="deliveryModal"
                         @onPagarDelivery="onPagarDelivery"></delivery-modal> -->

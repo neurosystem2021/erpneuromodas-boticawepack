@@ -1,6 +1,6 @@
 <template>
     <div class="contenedor-raiz" style="margin-top:5px; margin-bottom:5px;">
-        <b-button block class="btnAction" style="background-color: purple;" @click="abrirModal">
+        <b-button block class="btnAction" style="background-color: #592E37;" @click="abrirModal">
             <i class="fas fa-search"></i> Buscar Modelo
         </b-button>
 
@@ -246,6 +246,7 @@ export default {
             this.modelo = {};
             this.loadCode = '';
             this.codeBarModelo = '';
+            this.cliente = {};
         },
 
         setAltImg(event) {
@@ -263,7 +264,7 @@ export default {
         loadClienteVarios() {
             this.axios.get(this.API + 'clientes/00000000').then(res => {
                 if (res.data.IdCliente) {
-                    this.cliente = res.data;
+                    this.setCliente(res.data);
                 }
             });
         },

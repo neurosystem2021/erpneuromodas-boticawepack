@@ -53,7 +53,9 @@
               <!-- Columna Gráfica + Tabla (derecha) -->
               <b-col md="10">
                 <h5 class="font-weight-bold">Valor de venta por día</h5>
-                <bar-chart ref="chartGrafica" id="grafico"></bar-chart>
+                <div style="position:relative; height:420px; width:100%;">
+                  <bar-chart ref="chartGrafica" id="grafico"></bar-chart>
+                </div>
 
                 <b-table class="mt-3" :items="tablaDias" :fields="camposDia" small striped hover bordered responsive>
                   <template slot="Total" slot-scope="data">
@@ -116,8 +118,10 @@
 
               <!-- Columna Gráfica + Tabla (derecha) -->
               <b-col md="10">
-                <h5 class="font-weight-bold">Valor de venta por mes</h5>
+              <h5 class="font-weight-bold">Valor de venta por mes</h5>
+              <div style="position:relative; height:420px; width:100%;">
                 <bar-chart ref="chartGraficaMes" id="graficoMes"></bar-chart>
+              </div>
 
                 <b-table class="mt-3" :items="tablaMeses" :fields="camposMes" small striped hover bordered responsive>
                   <template slot="Total" slot-scope="data">
@@ -190,8 +194,10 @@
 
               <!-- Columna Gráfica + Tabla (derecha) -->
               <b-col md="10">
-                <h5 class="font-weight-bold">Valor de venta por rango</h5>
+              <h5 class="font-weight-bold">Valor de venta por rango</h5>
+              <div style="position:relative; height:420px; width:100%;">
                 <line-chart ref="chartGraficaRango" id="graficoRango"></line-chart>
+              </div>
 
                 <b-table v-if="tablaRango.length > 0" class="mt-3" :items="tablaRango" :fields="camposRango" small striped hover bordered responsive>
                   <template slot="Total" slot-scope="data">
@@ -464,10 +470,12 @@ export default {
 </script>
 
 <style scoped>
-#grafico canvas,
-#graficoMes canvas,
-#graficoRango canvas {
-  height: 380px !important;
+#grafico,
+#graficoMes,
+#graficoRango {
+  display: block;
+  width: 100% !important;
+  height: 420px !important;
 }
 
 .kpi-card {
