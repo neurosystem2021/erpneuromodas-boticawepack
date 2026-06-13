@@ -381,7 +381,7 @@
                                               <b-popover 
                                                   :target="`popover-metodopago-${index}`"
                                                   placement="bottom" 
-                                                  triggers="click" 
+                                                  triggers="click blur focus"
                                                   custom-class="custom-popover"
                                                   auto-hide
                                                 >
@@ -389,7 +389,7 @@
                                                     <table class="table table-bordered table-sm">
                                                       <tbody>
                                                         <tr>
-                                                          <td colspan="3" class="text-center font-weight-bold">Método de Pago</td>
+                                                          <td colspan="4" class="text-center font-weight-bold">Método de Pago</td>
                                                         </tr>
                                                         <tr>
                                                           <td>Efectivo</td>
@@ -525,7 +525,7 @@
                                               target="popover-opciones"
                                               placement="bottom" 
                                               custom-class="custom-popover"
-                                              title="Opciones" triggers="click" auto-hide>
+                                              title="Opciones" triggers="click blur focus" auto-hide>
                                             <table class="table b-table border table-footer">
                                               <tbody>
                                                 <tr>

@@ -1067,6 +1067,14 @@ export default {
               this.$toasted.show("No se encontró ningun producto");
             }
           });
+        const existe = this.productos.find(p => p.IdProducto == prod.IdProducto);
+        if (existe) {
+          existe.cantidad = parseFloat(existe.cantidad) + 1;
+          this.loadCode = "";
+          let barCodeInput = document.getElementById("txtBarcode");
+          if (barCodeInput) barCodeInput.focus();
+          return;
+        }
         prod.Series = await this.obtenerSeriePorProducto(idProducto);
         let p = await this.axios(
           `${this.API}/productos/stock/${this.idAlmacen}`,

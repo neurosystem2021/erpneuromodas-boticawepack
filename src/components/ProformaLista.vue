@@ -17,7 +17,7 @@
                 <b-tabs pills card>
                   <b-tab title="Proformas" active>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <div class="table-responsive ">
+                    <div class="table-responsive table-proforma-scroll">
                       <b-table 
                           :key="tableKey"
                           v-if="show"
@@ -78,7 +78,7 @@
                       </b-input-group>
                     <b-form-group>
                     </b-form-group>
-                    <div class="table-responsive ">
+                    <div class="table-responsive table-proforma-scroll">
                      <b-table 
                         v-if="show"
                         id="table-proformas" 
@@ -161,38 +161,36 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-        { key: "EsFavoritoFlag", label: "Favorito" },
-        { key: "IdProforma", label: "Id" },
-        { key: "Descripcion", label: "Desc." },
-        { key: "Anio", label: "Año" },
-        "Numero",
-        "Cliente",
-        { key: "DniRuc", label: "Documento" },
-        "FechaReg",
-        { key: "UsuarioReg", label: "Empleado" },
-        { key: "Total", label: "Total" },
-        "update",
-        "ver",
-        "verTicket",
-        ,
-        "Anular"
+        { key: "ver",           label: "Ver",       thStyle: { width: "60px" } },
+        { key: "verTicket",     label: "Ticket",    thStyle: { width: "90px" } },
+        { key: "update",        label: "Editar",    thStyle: { width: "70px" } },
+        { key: "Total",         label: "Total",     thStyle: { width: "90px" } },
+        { key: "Cliente",       label: "Cliente",   thStyle: { width: "180px" } },
+        { key: "Descripcion",   label: "Desc.",     thStyle: { width: "150px" }, tdClass: "td-descripcion"},
+        { key: "EsFavoritoFlag",label: "Favorito",  thStyle: { width: "80px" } },
+        { key: "IdProforma",    label: "Id",        thStyle: { width: "60px" } },
+        { key: "Anio",          label: "Año",       thStyle: { width: "60px" } },
+        { key: "Numero",        label: "Número",    thStyle: { width: "80px" } },
+        { key: "DniRuc",        label: "Documento", thStyle: { width: "110px" } },
+        { key: "FechaReg",      label: "Fecha",     thStyle: { width: "100px" } },
+        { key: "UsuarioReg",    label: "Empleado",  thStyle: { width: "120px" } },
+        { key: "Anular",        label: "Anular",    thStyle: { width: "70px" } }
       ],
       fieldsFavoritas: [
         // { key: "EsFavoritoFlag", label: "Favorito" },
-        { key: "IdProforma", label: "Id" },
-        { key: "Descripcion" },
-        { key: "Anio", label: "Año" },
-        "Numero",
-        "Cliente",
-        { key: "DniRuc", label: "Documento" },
-        "FechaReg",
-        { key: "UsuarioReg", label: "Empleado" },
-        { key: "Total", label: "Total" },
-        "update",
-        "ver",
-        "verTicket",
-        ,
-        "Anular"
+        { key: "ver",           label: "Ver",       thStyle: { width: "60px" } },
+        { key: "verTicket",     label: "Ticket",    thStyle: { width: "90px" } },
+        { key: "update",        label: "Editar",    thStyle: { width: "70px" } },
+        { key: "Total",         label: "Total",     thStyle: { width: "90px" } },
+        { key: "Cliente",       label: "Cliente",   thStyle: { width: "180px" } },
+        { key: "Descripcion",   label: "Desc.",     thStyle: { width: "150px" }, tdClass: "td-descripcion"},
+        { key: "IdProforma",    label: "Id",        thStyle: { width: "60px" } },
+        { key: "Anio",          label: "Año",       thStyle: { width: "60px" } },
+        { key: "Numero",        label: "Número",    thStyle: { width: "80px" } },
+        { key: "DniRuc",        label: "Documento", thStyle: { width: "110px" } },
+        { key: "FechaReg",      label: "Fecha",     thStyle: { width: "100px" } },
+        { key: "UsuarioReg",    label: "Empleado",  thStyle: { width: "120px" } },
+        { key: "Anular",        label: "Anular",    thStyle: { width: "70px" } }
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -342,37 +340,133 @@ export default {
 };
 </script>
 <style>
+css/* ── Modal: ocupa toda la ventana ── */
 #modalProformas .modal-dialog {
-  max-width: 85% !important;
-  margin: auto;
+  max-width: 85vw !important;
+  width: 98vw !important;
+  margin: 1vh auto !important;
 }
-.table-responsive-proforma {
-  width: 100%;
+
+#modalProformas .modal-content {
+  height: 96vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#modalProformas .modal-header {
+  flex-shrink: 0;
+}
+
+#modalProformas .modal-footer {
+  flex-shrink: 0;
+}
+
+#modalProformas .modal-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Tabs ── */
+#modalProformas .tabs {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#modalProformas .tab-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#modalProformas .tab-pane.active {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bootstrap-Vue genera .card y .card-body dentro de b-tabs con card */
+#modalProformas .card {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: none;
+}
+
+#modalProformas .card-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+/* ── Buscador: no crece ── */
+#modalProformas .form-control,
+#modalProformas .input-group {
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Paginación: no crece ── */
+#modalProformas .pagination,
+#modalProformas nav {
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
+/* ── Contenedor tabla con ambos scrolls ── */
+.table-proforma-scroll {
+  flex: 1;
   overflow-x: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
-.table-inner-scroll {
-  min-width: 900px; /* Asegura que la tabla sea más grande */
-  display: inline-block; /* Permite que overflow-x funcione */
+/* ── Tabla con layout fijo para respetar anchos de cabeceras ── */
+.table-proforma-scroll > table,
+.table-proforma-scroll .table {
+  min-width: 1100px !important;
+  width: 100% !important;
+  table-layout: fixed !important;
 }
-.table-responsive td,
-.table-responsive th,
-#table-proformas td,
-#table-proformas th {
-  white-space: nowrap;
+
+/* ── Todas las celdas sin salto por defecto ── */
+.table-proforma-scroll td,
+.table-proforma-scroll th {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow: visible;
 }
-@media only screen and (max-width: 850px) {
+
+/* ── Descripción permite salto de línea ── */
+.td-descripcion {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+/* ── Responsive móvil ── */
+@media (max-width: 768px) {
   #modalProformas .modal-dialog {
-    min-width: 100% !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
   }
 
-  .table-responsive {
-    /* width: 300px !important; */
-    overflow-x: auto !important;
-    /* -webkit-overflow-scrolling: touch; */
+  #modalProformas .modal-content {
+    height: 100vh;
+    border-radius: 0;
   }
-}
-.mdlProforma {
-  width: 80%;
 }
 </style>
