@@ -245,11 +245,9 @@
               >
 <!--  
               -->
-                <template slot="verstock" slot-scope="data">
-                  <b-button variant="info" size="sm" @click="ObtenerStock(data.index,data.item)">Ver Stock</b-button>
-                </template>
                 <template slot="stock" slot-scope="data">
                     <span v-if="data.item.stock !== null && data.item.stock !== undefined" :class="data.item.stock<=0 ? 'bgStockNegativo' : 'bgStockPositivo'">{{ data.item.stock }}</span>
+                    <span v-else>...</span>
                 </template>
                 <template slot="presentaciones" slot-scope="data">
                   <b-button size="sm" variant="info" @click="showPresentacion(data.item)"><i class="fas fa-list"></i></b-button>
@@ -456,6 +454,7 @@ export default {
       },
       pageOptions: [5, 10, 15, 50, 100],
       cancelTokenSource: null,  
+      stockRequestId: 0,
       debounceTimer: null,   
       filters: {},
       filter: "",
@@ -477,12 +476,6 @@ export default {
           sortable: true
         },
         { key: "CompuestosProducto", label: "Compuestos", sortable: true },
-        {
-          key: "verstock",
-          label: "Ver Stock.",
-          sortable: false,
-          class: "text-center"
-        },
         {
           key: "stock",
           label: "Stock G.",
@@ -630,6 +623,41 @@ export default {
       // this.items[index].stock = data.stock;
       // console.log(stock);
       // console.log(producto);
+    },
+    async cargarStockProductos(productos) {
+      const requestId = ++this.stockRequestId;
+      const idProductos = productos.map(item => item.IdProducto);
+
+      if (!idProductos.length) {
+        this.itemsStock = [];
+        return;
+      }
+
+      try {
+        const response = await this.axios.get(
+          `${this.API}productos/puntoventa/stock`,
+          {
+            params: {
+              idProductos,
+              idAlmacen: this.almacen.IdAlmacen,
+              limit: idProductos.length
+            }
+          }
+        );
+
+        if (requestId !== this.stockRequestId) {
+          return;
+        }
+
+        this.itemsStock = response.data;
+
+        this.items.forEach((item, index) => {
+          const stock = this.getStock(item.IdProducto);
+          this.$set(this.items[index], "stock", stock || 0);
+        });
+      } catch (error) {
+        console.log(error);
+      }
     },
     exportarFechas() {
       if (this.desdeInicio == 1 && this.exportar.fechaHasta == "") {
@@ -834,6 +862,8 @@ export default {
       if (this.cancelTokenSource) {
         this.cancelTokenSource.cancel("Nueva búsqueda en curso");
       }
+      this.stockRequestId++;
+      this.itemsStock = [];
       this.cancelTokenSource = this.axios.CancelToken.source();
 
       let url =
@@ -856,7 +886,12 @@ export default {
         const result = await this.axios.get(url, {
           cancelToken: this.cancelTokenSource.token
         });
-        this.items = result.data;
+        this.items = result.data.map(item =>
+          Object.assign({}, item, {
+            stock: item.stock === undefined ? null : item.stock
+          })
+        );
+        this.cargarStockProductos(this.items);
       } catch (err) {
         if (this.axios.isCancel(err)) {
           console.log("Petición cancelada:", err.message);

@@ -96,7 +96,7 @@
           </b-col>
         </b-row>
       </b-modal>
-
+      <div class="contenedor-carrito">
       <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.ControlaStock" style="font-size:17px; font-weight:bold">
@@ -334,6 +334,7 @@
         </template>
 
       </b-table>
+      </div>
     </b-col>
     <b-col md="3">
       <slot name="operaciones"></slot>
@@ -341,28 +342,39 @@
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2">
-          <table class="table b-table border table-footer">
+    <b-col md="2">
+      <slot name="accionesventa"></slot>
+    </b-col>
+    <b-col md="3">
+          <table class="table border table-footer resumen-venta">
             <tbody>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-success">SubTotal</td>
+              <tr>
+                <td class="table-success resumen-subtotal">SubTotal</td>
                 <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
               </tr>
-              <tr v-if="sumatoriaDescuento > 0">
+              <tr>
                 <td class="table-danger">Descuento</td>
                 <td class="table-danger">- {{ sumatoriaDescuento }}</td>
               </tr>
-              <tr>
-                <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal }}</td>
-              </tr>
+              <!-- <tr>
+                <td class="resumen-subtotal subtotal-final-label">
+                  SubTotal
+                </td>
+                <td class="resumen-subtotal text-right">
+                  S/ {{ sumatoriaSubTotal }}
+                </td>
+              </tr> -->
               <tr v-if="sumatoriaIgv > 0">
                 <td><b>IGV</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
               <tr>
-                <td><b>TOTAL</b></td>
-                <td class="table-danger">{{ sumatoriaTotal }}</td>
+                <td class="resumen-total-label total-final-label">
+                  TOTAL
+                </td>
+                <td class="resumen-total-monto">
+                  S/ {{ sumatoriaTotal }}
+                </td>
               </tr>
               <tr>
                 <td  colspan="2">
@@ -373,8 +385,12 @@
                     v-model="pagocon"
                     :disabled="bloquearInput?true:false"
                     @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
+                    <div class="vuelto-contenedor">
+                    <label>Vuelto:</label>
+                    <div class="resumen-vuelto">
+                      S/ {{ vuelto | redondear }}
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -1177,4 +1193,82 @@ td.vertical {
 .popover {
   min-width: 290px !important;
 }
+.contenedor-carrito{
+    min-height:200px;
+}
+
+.resumen-venta{
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.resumen-venta td{
+    padding:12px;
+}
+
+.resumen-subtotal{
+    font-size:18px;
+    font-weight:700;
+}
+
+.resumen-total-label{
+    font-size:22px;
+    font-weight:900;
+    color:#222;
+}
+
+.resumen-total-monto{
+   background:#c8f0d0 !important;
+    font-size:27px;
+    font-weight:900;
+    text-align:left;
+}
+
+.total-final-label{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:22px;
+    font-weight:900;
+}
+
+.subtotal-final-label{
+    background:#ffc7c0 !important;
+    color:#424242 !important;
+    font-size:22px;
+    font-weight:900;
+}
+.total-final{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:28px;
+    font-weight:900;
+}
+
+.resumen-venta tr:last-child td{
+    padding-top:18px;
+    padding-bottom:18px;
+}
+
+.resumen-vuelto{
+    font-size:24px;
+    font-weight:900;
+    color:#28a745;
+    margin-top:5px;
+}
+
+.vuelto-contenedor{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:-20px;
+}
+
+.vuelto-contenedor label{
+    margin:0;
+    font-weight:700;
+    font-size:16px;
+}
+
 </style>

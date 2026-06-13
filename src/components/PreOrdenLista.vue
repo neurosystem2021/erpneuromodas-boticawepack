@@ -1,6 +1,8 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="success" class="btnAction">Cargar Pre Orden</b-button>
+        <b-button @click="show=true" variant="success" class="btn-pos btn-accion">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            Cargar Pre Orden</b-button>
         
         <b-form >    
             <b-modal id="modalPreOrden" 
@@ -110,5 +112,4 @@ import { mapActions } from 'vuex'
     }
 </script>
 <style>
-
 </style>

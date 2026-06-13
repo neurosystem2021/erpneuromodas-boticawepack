@@ -3,25 +3,8 @@
         <Menu v-if="false"></Menu>
 
         <br />
-        <b-container fluid style="width: calc(100% - 200px)" class="bv-example-row">
-            <div>
-                <div class="float-right">
-                    <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <pre-orden-lista :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                    </b-button-group>
-                    
-                </div>
-            </div>
-            <br /><br />
+
+          <b-container fluid class="ancho px-20 py-0" id="conten">
             <b-form @submit="guardarVenta" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="6">
@@ -193,6 +176,34 @@
 
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
+                                  <tbody>
+                                    <div class="acciones-pos">
+                                        <div class="fila-botones">
+
+                                            <pago-deuda></pago-deuda>
+
+                                            <proformas
+                                                :idAlmacen="venta.almacen.IdAlmacen"
+                                                @onSelectProforma="setCliente">
+                                            </proformas>
+
+                                        </div>
+
+                                        <div class="fila-botones">
+
+                                            <pre-orden-lista
+                                                :idAlmacen="venta.almacen.IdAlmacen"
+                                                @onSelectPreOrden="setCliente">
+                                            </pre-orden-lista>
+
+                                            <config-venta
+                                                @onUpdateConfig="eliminarCliente">
+                                            </config-venta>
+
+                                        </div>
+                                    </div>
+                                    </tbody>
+
                                     <tbody>
                                         <tr>
                                             <td  class="text-center">Opciones</td>
@@ -241,91 +252,170 @@
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
-                                        <tr>
-                                            <td colspan="3" class="text-center">Metodo de Pago</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Efectivo</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.efectivo.descripcion"
-                                                    :disabled="bloquearInput?true:false"
-                                                    type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    v-model="venta.pago.efectivo.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                    class="form-control"
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tarjeta Débito o Crédito</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.visa.descripcion"
-                                                    :disabled="bloquearInput?true:false"
-                                                    type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    class="form-control"
-                                                    v-model="venta.pago.visa.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Yape, Plin o Transf.</td>
-                                            <td>
-                                                <b-form-input
-                                                    v-model="venta.pago.mastercard.descripcion"
-                                                    :disabled="bloquearInput?true:false"
-                                                    type="text"
-                                                    placeholder="Descripcion"
-                                                ></b-form-input>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    class="form-control"
-                                                    v-model="venta.pago.mastercard.monto"
-                                                    :disabled="bloquearInput?true:false"
-                                                    min="0"
-                                                    step="0.01"
-                                                    type="number"
-                                                    placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
-                                                />
-                                            </td>
-                                        </tr>
-                                    </tbody>
+
+                                      <tr>
+                                          <td>Efectivo</td>
+
+                                          <td>
+                                              <b-button
+                                                  variant="info"
+                                                  size="sm"
+                                                  class="mt-1"
+                                                  @click="metodoPagoCambio(1)">
+                                                  <i class="fas fa-check"></i>
+                                              </b-button>
+                                          </td>
+
+                                          <td>
+                                              <b-form-input
+                                                  v-model="venta.pago.efectivo.descripcion"
+                                                  type="text"
+                                                  placeholder="Descripcion">
+                                              </b-form-input>
+                                          </td>
+
+                                          <td>
+                                              <input
+                                                  v-model="venta.pago.efectivo.monto"
+                                                  min="0"
+                                                  step="0.01"
+                                                  type="number"
+                                                  placeholder="S/."
+                                                  class="form-control"/>
+                                          </td>
+                                      </tr>
+
+                                      <tr>
+                                          <td>Tarjeta</td>
+
+                                          <td>
+                                              <b-button
+                                                  variant="info"
+                                                  size="sm"
+                                                  class="mt-1"
+                                                  @click="metodoPagoCambio(2)">
+                                                  <i class="fas fa-check"></i>
+                                              </b-button>
+                                          </td>
+
+                                          <td>
+                                              <b-form-input
+                                                  v-model="venta.pago.visa.descripcion"
+                                                  type="text"
+                                                  placeholder="Descripcion">
+                                              </b-form-input>
+                                          </td>
+
+                                          <td>
+                                              <input
+                                                  class="form-control"
+                                                  v-model="venta.pago.visa.monto"
+                                                  min="0"
+                                                  step="0.01"
+                                                  type="number"
+                                                  placeholder="S/."
+                                                  @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"
+                                              />
+                                          </td>
+                                      </tr>
+
+                                      <tr>
+                                          <td>Yape/Plin</td>
+
+                                          <td>
+                                              <b-button
+                                                  variant="info"
+                                                  size="sm"
+                                                  class="mt-1"
+                                                  @click="metodoPagoCambio(3)">
+                                                  <i class="fas fa-check"></i>
+                                              </b-button>
+                                          </td>
+
+                                          <td>
+                                              <b-form-input
+                                                  v-model="venta.pago.mastercard.descripcion"
+                                                  type="text"
+                                                  placeholder="Descripcion">
+                                              </b-form-input>
+                                          </td>
+
+                                          <td>
+                                              <input
+                                                  class="form-control"
+                                                  v-model="venta.pago.mastercard.monto"
+                                                  min="0"
+                                                  step="0.01"
+                                                  type="number"
+                                                  placeholder="S/."
+                                                  @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.transferencia.monto - $event.target.value)"
+                                              />
+                                          </td>
+                                      </tr>
+
+                                      <tr>
+                                          <td>Transferencia</td>
+
+                                          <td>
+                                              <b-button
+                                                  variant="info"
+                                                  size="sm"
+                                                  class="mt-1"
+                                                  @click="metodoPagoCambio(4)">
+                                                  <i class="fas fa-check"></i>
+                                              </b-button>
+                                          </td>
+
+                                          <td>
+                                              <b-form-input
+                                                  v-model="venta.pago.transferencia.descripcion"
+                                                  type="text"
+                                                  placeholder="Descripcion">
+                                              </b-form-input>
+                                          </td>
+
+                                          <td>
+                                              <input
+                                                  class="form-control"
+                                                  v-model="venta.pago.transferencia.monto"
+                                                  min="0"
+                                                  step="0.01"
+                                                  type="number"
+                                                  placeholder="S/."
+                                                  @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - $event.target.value)"
+                                              />
+                                          </td>
+                                      </tr>
+
+                                  </tbody>
                                 </table>
                             </template>
+                            <template slot="accionesventa">
+
+                              <div class="acciones-venta">
+                                  <b-button
+                                      class="btn-venta btn-efectuar"
+                                      type="submit"
+                                      :disabled="inProgress">
+
+                                      <i class="fas fa-check-circle mr-2"></i>
+                                      Efectuar Venta
+                                  </b-button>
+
+                                  <b-button
+                                      class="btn-venta btn-proforma"
+                                      type="button"
+                                      :disabled="inProgress"
+                                      @click="guardarProforma">
+
+                                      <i class="fas fa-file-alt mr-2"></i>
+                                      Crear Proforma
+
+                                  </b-button>
+                              </div>
+
+                          </template>
                         </productos-carrito>
-                    </b-col>
-                </b-row>
-                <b-row align-h="center" class="text-center">
-                    <b-col cols="8">
-                        <br />
-                        <b-button class="btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
-                        <br />
-                        <br />
                     </b-col>
                 </b-row>
             </b-form>
@@ -366,6 +456,7 @@ import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
 // import * as Swal from "sweetalert2";
+import { Bar } from 'vue-chartjs';
 
 export default {
   beforeMount() {
@@ -492,7 +583,8 @@ export default {
       this.venta.pago.efectivo.monto = parseFloat(
         newVal -
           (parseFloat(this.venta.pago.visa.monto) +
-            parseFloat(this.venta.pago.mastercard.monto))
+            parseFloat(this.venta.pago.mastercard.monto) +
+            parseFloat(this.venta.pago.transferencia.monto))
       ).toFixed(2);
     }
   },
@@ -565,7 +657,8 @@ export default {
         pago: {
           efectivo: { IdMetodoPago: 1, monto: 0 },
           visa: { IdMetodoPago: 2, monto: 0 },
-          mastercard: { IdMetodoPago: 3, monto: 0 }
+          mastercard: { IdMetodoPago: 3, monto: 0 },
+          transferencia: { IdMetodoPago: 4, monto: 0 }
         },
         CampoDireccion: "direccion",
         NroComprobanteModifica: "",
@@ -925,6 +1018,11 @@ export default {
   totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))
     ? 0
     : parseFloat(this.venta.pago.mastercard.monto);
+
+  totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))
+    ? 0
+    : parseFloat(this.venta.pago.transferencia.monto);
+
   if (
     (isNaN(parseFloat(this.venta.pago.efectivo.monto))
       ? 0
@@ -957,6 +1055,20 @@ export default {
     this.inProgress = false;
     return;
   }
+
+  if (
+    (isNaN(parseFloat(this.venta.pago.transferencia.monto))
+      ? 0
+      : parseFloat(this.venta.pago.transferencia.monto)
+    ).toFixed(2) < 0
+  ) {
+    this.$toasted.show(
+      "El metodo de pago transferencia no puede ser negativo"
+    );
+    this.inProgress = false;
+    return;
+  }
+
   if (!this.venta.EsCredito) {
     if (
       parseFloat(this.totalCart).toFixed(2) !=
@@ -1088,6 +1200,31 @@ export default {
       this.inProgress = false;
     });
 },
+    metodoPagoCambio(tipo) {
+
+      this.venta.pago.efectivo.monto = 0;
+      this.venta.pago.visa.monto = 0;
+      this.venta.pago.mastercard.monto = 0;
+      this.venta.pago.transferencia.monto = 0;
+
+      switch (tipo) {
+        case 1:
+          this.venta.pago.efectivo.monto = this.totalCart;
+          break;
+
+        case 2:
+          this.venta.pago.visa.monto = this.totalCart;
+          break;
+
+        case 3:
+          this.venta.pago.mastercard.monto = this.totalCart;
+          break;
+
+        case 4:
+          this.venta.pago.transferencia.monto = this.totalCart;
+          break;
+      }
+    },
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
       this.venta.cliente = {};
@@ -1107,7 +1244,99 @@ export default {
 .puntos {
   font-size: 52px;
 }
-.big-text {
-  font-size: 30px;
+.big-text{
+    font-size:45px;
+    font-weight:500;
+    line-height:1;
 }
+-- Diseños de los botones de acciones
+.acciones-pos{
+    padding:5px;
+}
+
+.fila-botones{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.fila-botones > *{
+    flex:1;
+}
+
+.acciones-pos{
+    width:100%;
+}
+
+.btn-pos{
+    min-width:218px;
+    height:42px;
+    border-radius:12px !important;
+    font-size:18px !important;
+    font-weight:600 !important;
+}
+</style>
+
+<style scoped>
+.Baracciones-venta{
+    margin-top:10px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:12px;
+
+    padding:15px;
+}
+
+.btn-venta{
+    width:100%;
+    height:50px;
+
+    font-size:18px;
+    font-weight:700;
+
+    margin-top:8px;
+
+    border-radius:12px !important;
+
+    transition:all .25s ease;
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,.12);
+}
+
+.btn-venta:hover{
+
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.20);
+}
+
+.btn-venta:active{
+
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.15);
+}
+
+.btn-proforma{
+    background:#1677ff !important;
+    border-color:#1677ff !important;
+}
+
+.btn-proforma:hover{
+    background:#0f67e6 !important;
+    border-color:#0f67e6 !important;
+}
+
+.btn-efectuar{
+    background:#28a745 !important;
+    border-color:#28a745 !important;
+}
+
+.btn-efectuar:hover{
+    background:#23913d !important;
+    border-color:#23913d !important;
+}
+
 </style>

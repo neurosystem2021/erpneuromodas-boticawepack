@@ -79,8 +79,12 @@
               <td>{{ totalVentasVisa | moneda }} </td>
             </tr>
             <tr>
-              <td>Yape, Plin o Transf. S/.</td>
+              <td>Yape/Plin S/.</td>
               <td>{{ totalVentasMastercard | moneda }} </td>
+            </tr>
+             <tr>
+              <td>Transferencia S/.</td>
+              <td>{{ totalVentasTransferencia | moneda }} </td>
             </tr>
             <tr>
               <td>Ingresos S/.</td>
@@ -189,7 +193,7 @@
       
 
       <b-row class="no-print">
-        <h5>Ventas Yape, Plin o Transf.</h5><br>
+        <h5>Ventas Yape/Plin</h5><br>
         <table class="table b-table table-sm">
           <thead>
             <tr>
@@ -209,8 +213,36 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Yape, Plin o Transf.</b></td>
+              <td class="total"><b>Total Yape/Plin</b></td>
               <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </b-row>
+
+      <b-row class="no-print">
+        <h5>Ventas Transferencia</h5><br>
+        <table class="table b-table table-sm">
+          <thead>
+            <tr>
+              <th>Recibo</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Estado</th><th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>{{ item.Cliente }}</td>
+              <td>{{ item.TransferenciaDesc }}</td>
+              <td>{{ estadoVenta(item) }}</td>
+              <td>S/. {{ item.Transferencia | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"></td>
+              <td class="total"><b>Total Transferencia</b></td>
+              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -339,10 +371,10 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia + this.totalIngresos - this.totalSalidas
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTransferencia 
     },
     totalSalidas () {
       let total = 0
@@ -389,9 +421,21 @@ export default {
       });
       return total
     },
+     totalVentasTransferencia () {
+      let total = 0
+      this.ventasTransferencia.forEach(venta => {
+        if (!venta.Anulado) total += venta.Transferencia
+      });
+      return total
+    },
     ventasMastercard () {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0  && !venta.EsCredito
+      })
+    },
+    ventasTransferencia () {
+      return this.ventas.filter(venta => {
+        return venta.Transferencia > 0  && !venta.EsCredito
       })
     },
     totalVentasCredito () {
