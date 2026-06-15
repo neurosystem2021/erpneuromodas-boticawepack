@@ -17,6 +17,9 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
+          <b-button variant="primary" @click="startRecognition">
+                              <i class="fas fa-microphone"></i>
+           </b-button>
           <input v-model="loadCode"
                   :disabled="bloquearInput?true:false || isNota"
                   @keydown.enter.prevent="loadBarcode"
@@ -583,6 +586,66 @@ export default {
       actualizarTotal: "actualizarTotalCart",
       actualizarProd: "actualizarProducto"
     }),
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+
+    search() {
+      const texto = this.query || "";
+
+      // Coloca el texto en el autocomplete
+      this.$refs.autocompleteProducto.setValue(texto);
+
+      // Fuerza la búsqueda del autocomplete
+      this.$nextTick(() => {
+        try {
+          this.$refs.autocompleteProducto.type = texto;
+
+          if (this.$refs.autocompleteProducto.handleDoubleClick) {
+            this.$refs.autocompleteProducto.handleDoubleClick();
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    },
     abrirLotes(target) {
       //this.$refs.popover.$emit('open')
     },
