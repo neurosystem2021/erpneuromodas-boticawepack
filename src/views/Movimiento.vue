@@ -574,6 +574,7 @@ export default {
       this.movimiento.proveedor = obj;
     },
     setAlmacenOrigen(obj) {
+    this.movimiento.almacenOrigen = obj;
       this.limpiarCart();
       if (this.isSalida) {
         this.obtenerStok({
