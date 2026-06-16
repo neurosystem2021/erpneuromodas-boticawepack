@@ -304,11 +304,26 @@
 
 
                       </template>
+                      <template slot="precioMayor" slot-scope="data">
+                        <small
+                          style="display:block;width:105px"
+                          v-show="data.item.PrecioDocena"
+                        >
+                          Por 12 -> S/{{ data.item.PrecioDocena }}
+                        </small>
+
+                        <small v-show="data.item.PrecioCentena">
+                          Por 100 -> S/{{ data.item.PrecioCentena }}
+                        </small>
+                      </template>
                       <template slot="cantidad" slot-scope="data">
                         <input v-model="data.item.cantidad" type="number"
                           style="text-align:center; font-weight:bold; width: 90px;" autocomplete="false"
                           :ref="`cantidad${data.index}`" :disabled="data.item.esPresentacion"
-                          @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 1)" class="form-control"
+                            @input="metodoPagoCambio(1);
+                            if (tipo != 'mov') actualizarPrecioProducto(data.item);
+                            "
+                          @focus="abrirModalTouch(data.index, 1)" class="form-control"
                           @keydown.enter="irBusquedaProducto"
                           :tabindex="`${data.index}3`"
                           />
@@ -968,6 +983,7 @@ export default {
         { key: "Anaquel", class: "d-none d-md-table-cell" },
         { key: "pres", label: "" },
         { key: "Descripcion", label: "Presentacion" },
+        { key: "precioMayor", label: "Precio Mayor" },
         { key: "CantidadPresentacion", label: "	CanXPrec" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
@@ -1138,6 +1154,32 @@ export default {
   },
 
   methods: {
+    actualizarPrecioProducto(item) {
+      let precio =
+        item.cantidad >= 100
+          ? item.PrecioCentena
+          : item.cantidad >= 12
+            ? item.PrecioDocena
+            : item.PrecioContado;
+
+      const cliente = this.ventas[this.ventaActiva].cliente;
+
+        console.log("CLIENTE:", cliente);
+        console.log("EsVIP:", cliente.EsVIP);
+        console.log("precioConvenio:", item.precioConvenio);
+
+      if (
+        cliente &&
+        cliente.EsVIP &&
+        item.precioConvenio > 0 &&
+        item.precioConvenio < precio
+      ) {
+        console.log("APLICANDO PRECIO VIP");
+        precio = item.precioConvenio;
+      }
+
+      item.precio = precio;
+    },
     mostrarVentaFlag() {
       let IdPerfil = [1, 25, "1", "25"];
       let val = sessionStorage.getItem("IdPerfil");
@@ -1925,6 +1967,7 @@ export default {
         prod.presentacion = null;
         prod.CantidadPresentacion = null;
       }
+      this.actualizarPrecioProducto(prod);
 
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
@@ -1965,6 +2008,11 @@ export default {
         }
         console.log("sss");
         this.ventas[this.ventaActiva].cliente = obj;
+        this.ventas[this.ventaActiva].productos.forEach(item => {
+          this.actualizarPrecioProducto(item);
+        });
+
+        this.metodoPagoCambio(1);
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
