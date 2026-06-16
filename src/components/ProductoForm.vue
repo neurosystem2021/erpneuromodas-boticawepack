@@ -294,6 +294,8 @@
               step="0.00001"
               type="number"
               class="form-control"
+              :disabled="producto.EsPadre == 1"
+              :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
           </b-form-group>
         </b-col>
@@ -316,6 +318,8 @@
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
+              :disabled="producto.EsPadre == 1"
+              :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -330,6 +334,8 @@
               step="0.00001"
               type="number"
               class="form-control"
+              :disabled="producto.EsPadre == 1"
+              :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
           </b-form-group>
         </b-col>
@@ -341,6 +347,8 @@
               step="0.01"
               class="form-control"
               @input="actualizarPorcentajeUtilidad"
+              :disabled="producto.EsPadre == 1"
+              :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
               <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -596,9 +604,10 @@ export default {
             } else {
               this.loadAlmacen(1);
             }
-            Vue.nextTick(() => {
-              if (this.$refs.productoDet)
+            this.$nextTick(() => {
+              if (this.$refs.productoDet) {
                 this.$refs.productoDet.show = parseInt(newVal.EsPadre);
+              }
             });
             // this.producto.Genero = newVal.Genero
             // this.producto.Botapie = newVal.Botapie
@@ -722,19 +731,35 @@ export default {
       });
     },
     calcularPreciosPaquete(prodDetalles) {
-      let sumatoriaCosto = 0;
-      let sumatoriaContado = 0;
+      let sumatoriaCosto    = 0;
+      let sumatoriaContado  = 0;
+      let sumatoriaCosto2   = 0;
+      let sumatoriaContado2 = 0;
+
       prodDetalles.forEach(prod => {
         if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad;
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad;
+          // Almacen 1
+          sumatoriaCosto   += parseFloat(prod.PrecioCosto   || 0) * parseFloat(prod.Cantidad || 0);
+          sumatoriaContado += parseFloat(prod.PrecioContado || 0) * parseFloat(prod.Cantidad || 0);
+          // Almacen 2
+          sumatoriaCosto2   += parseFloat(prod.PrecioCosto2   || 0) * parseFloat(prod.Cantidad || 0);
+          sumatoriaContado2 += parseFloat(prod.PrecioContado2 || 0) * parseFloat(prod.Cantidad || 0);
         }
       });
-      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto);
-      sumatoriaContado = this.$options.filters.redondear(sumatoriaContado);
 
-      Vue.set(this.producto, "PrecioCosto", sumatoriaCosto);
-      Vue.set(this.producto, "PrecioContado", sumatoriaContado);
+      // Redondear
+      sumatoriaCosto    = this.$options.filters.redondear(sumatoriaCosto);
+      sumatoriaContado  = this.$options.filters.redondear(sumatoriaContado);
+      sumatoriaCosto2   = this.$options.filters.redondear(sumatoriaCosto2);
+      sumatoriaContado2 = this.$options.filters.redondear(sumatoriaContado2);
+
+      // Almacen 1
+      Vue.set(this.producto, 'PrecioCosto',    sumatoriaCosto);
+      Vue.set(this.producto, 'PrecioContado',  sumatoriaContado);
+      // Almacen 2 ← ahora usa sus propios valores
+      Vue.set(this.producto, 'PrecioCosto2',   sumatoriaCosto2);
+      Vue.set(this.producto, 'PrecioContado2', sumatoriaContado2);
+
       this.actualizarPorcentajeUtilidad();
     },
     /*eliminarProducto (producto) {

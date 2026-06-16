@@ -603,12 +603,14 @@ export default {
         let cantidadPedida = parseFloat(prod.cantidad || 0);
         
         if (this.movimiento.movimientoTipo.Tipo != 0) {
-          if (
-            stockActual <= 0 || 
-            Number(stockActual.toFixed(2)) < Number(cantidadPedida.toFixed(2)) || 
-            prod.stock === undefined
-          ) {
-            sinStock++;
+          if (prod.EsPadre != 1) {
+            if (
+              stockActual <= 0 || 
+              Number(stockActual.toFixed(2)) < Number(cantidadPedida.toFixed(2)) || 
+              prod.stock === undefined
+            ) {
+              sinStock++;
+            }
           }
         }
 

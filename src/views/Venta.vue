@@ -129,8 +129,8 @@
                 <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
                   <template slot="stock" slot-scope="data">
                     <span style="font-weight: bold; font-size: 0.75rem">
-                      {{ data.item.stock }}
-
+                      <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+                      <div v-if="!data.item.EsPadre">{{ data.item.stock }}</div>
                     </span>
                   </template>
                   <template slot="Producto" slot-scope="data">
@@ -164,8 +164,8 @@
                      
                      
                   </template>
-                  <template slot="movimiento" slot-scope="data">
-                      <b-button style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
+                  <!-- <template slot="movimiento" slot-scope="data">
+                      <b-button v-if="!data.item.EsPadre" style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
                       <b-popover  placement="right" :target="'popover-lote' + data.index" :title="data.item.Producto" triggers="focus">
                         <div style="text-align:center">
                           <b-form-select v-if="!isNota[index]"
@@ -191,7 +191,7 @@
                           </div>
                         </div>
                       </b-popover>
-                  </template>
+                  </template> -->
                   <template slot="cantidad" slot-scope="data">
                     <input
                       v-model="data.item.cantidad"
@@ -1049,8 +1049,8 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "40%" } },
-        { key: "movimiento", label: "" },
+        { key: "Producto", thStyle: { width: "25%" } },
+        // { key: "movimiento", label: "" },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
@@ -1074,7 +1074,7 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "acciones", label: "", thStyle: { width: "5%" } }
+        { key: "acciones", label: "", thStyle: { width: "7%" } }
       ],
       busqueda: "",
       loadCode: "",
@@ -1991,6 +1991,7 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
+      prod.EsPadre = prod.EsPadre || 0;
       prod.cantidad = 1;
       let precioBuscador = this.ventas[this.ventaActiva].almacen.IdAlmacen == 2 
           ? prod.PrecioContado2 
@@ -2017,7 +2018,7 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      this.loadMovimientoLotes(prod.IdProducto);
+      // this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
     },
 
@@ -2555,15 +2556,16 @@ export default {
       }
       const esNotaCredito = venta.tipoVenta.CodSunat == "07";
       console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-      if (
-        !esNotaCredito &&
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
+      const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
+      const sinStock = productos.some(v => {
+        if (v.EsPadre == 1) return false;
+        if (idAlmacen == 2) return false;
+        const cantReal = parseFloat(v.cantidad) * (v.CantidadPresentacion ? v.CantidadPresentacion : 1);
+        const stockActual = parseFloat(v.stock) || 0;
+        return cantReal > stockActual;
+      });
+
+      if (!esNotaCredito && sinStock) {
         this.$toasted.show("No se puede vender un producto sin stock");
         // this.$swal({
         //   position: "center",
@@ -2574,6 +2576,39 @@ export default {
         //   confirmButtonColor: "#0275d8"
         // });
         return;
+      }
+
+      if (!esNotaCredito) {
+        for (const v of productos) {
+          if (v.EsPadre != 1) continue;
+
+          const resHijos = await this.axios.get(this.API + "productosdet", {
+            params: { idProducto: v.IdProducto }
+          });
+
+          const hijos = resHijos.data;
+          if (!hijos || hijos.length === 0) continue;
+
+          for (const hijo of hijos) {
+            const cantNecesaria = parseFloat(hijo.Cantidad) * parseFloat(v.cantidad);
+
+            const resStockHijo = await this.axios.get(
+              this.API + "productos/puntoventa/stock",
+              { params: { idProductos: [hijo.IdProductoDet], idAlmacen } }
+            );
+
+            const stockHijo = resStockHijo.data && resStockHijo.data[0]
+              ? parseFloat(resStockHijo.data[0].stock) || 0
+              : 0;
+
+            if (cantNecesaria > stockHijo) {
+              this.$toasted.show(
+                `Stock insuficiente: "${hijo.Producto}" necesita ${cantNecesaria} unid. y solo hay ${stockHijo}`
+              );
+              return;
+            }
+          }
+        }
       }
 
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
@@ -2614,7 +2649,7 @@ export default {
           CantidadPresentacion: item.CantidadPresentacion || 1,
 
           // ✔ json
-          Presentacion: item.CantidadPresentacion
+          Presentacion: (item.CantidadPresentacion && !item.EsPadre)
             ? JSON.stringify({
                 nombre: item.Descripcion,
                 cantidad: item.CantidadPresentacion,

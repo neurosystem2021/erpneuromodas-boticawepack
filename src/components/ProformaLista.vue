@@ -73,7 +73,6 @@
                     <b-form-group>
                     </b-form-group>
                      <b-table 
-                        v-if="show"
                         id="table-proformas" 
                         ref="tableProformas"
                        :filter="filter"
@@ -276,7 +275,7 @@ export default {
     },
     eliminarProf(data) {
       this.$swal({
-        target: document.getElementById("conten"),
+        // target: document.getElementById("conten"),
         title:
           "Se anulará la proforma: <strong>" +
           data.Anio +
