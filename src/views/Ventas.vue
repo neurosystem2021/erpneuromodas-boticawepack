@@ -1090,6 +1090,7 @@ export default {
 
   data() {
     return {
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       vuelto: 0,
       // TipoDocumento:
       //   this.empresa == "modasjes" ? "NOTA DE VENTA" : "BOLEC. ELECTR",
@@ -1738,7 +1739,8 @@ export default {
         .then(response => {
           this.setVendedor(response.data);
           this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
-          //this.$refs.inputVendedor.$refs.input.disabled = true
+          //this.$refs.inputVendedor.$refs.input.disabled = true;
+          this.$refs.inputVendedor.$refs.input.disabled = Number(this.idPerfil) !== 1;
           this.loadAlmacen(response.data.IdAlmacen);
           this.loadPuntoVenta(response.data.IdDocVentaPuntoVenta);
           // bloquear ambos inputs
