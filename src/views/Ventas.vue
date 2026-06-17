@@ -376,8 +376,8 @@
                                               <br>
                                               <b-badge v-if="idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
                                               <b-badge v-if="idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
-                                              <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
-                                              <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                                              <b-badge v-if="idMetodoPago==3" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
+                                              <b-badge v-if="idMetodoPago==4" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                                               <b-popover 
                                                   :target="`popover-metodopago-${index}`"
                                                   placement="bottom" 
