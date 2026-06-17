@@ -79,9 +79,9 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="4"></td>
-                    <td colspan="2" class="total"><b>Total Efectivo</b></td>
-                    <td colspan="1" class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+                    <td colspan="5"></td>
+                    <td colspan="1" class="total"><b>Total Efectivo</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -155,8 +155,8 @@
                 <tfoot>
                   <tr>
                     <td colspan="5"></td>
-                    <td colspan="2" class="total"><b>Total Tarjeta</b></td>
-                    <td colspan="1" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+                    <td colspan="1" class="total"><b>Total Tarjeta</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -230,8 +230,8 @@
                 <tfoot>
                   <tr>
                     <td colspan="5"></td>
-                    <td colspan="2" class="total"><b>Total Yape/Plin</b></td>
-                    <td colspan="1" class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                    <td colspan="1" class="total"><b>Total Yape/Plin</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -305,8 +305,8 @@
                 <tfoot>
                   <tr>
                     <td colspan="5"></td>
-                    <td colspan="2" class="total"><b>Total Transferencia</b></td>
-                    <td colspan="1" class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+                    <td colspan="1" class="total"><b>Total Transferencia</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -377,24 +377,25 @@
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="4"></td>
-                    <td colspan="2" class="total"><b>Total Credito</b></td>
-                    <td colspan="2" class="total"><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
+                    <td colspan="5"></td>
+                    <td colspan="1" class="total"><b>Total Credito</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
 
               <b-row>
               <b-col v-if="totalIngresos">
-                <h5>Ingresos</h5>
+                <h5>Ingresos</h5><br>
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Ingreso</th><th>Monto</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in ingresos" :key="index">
+                      <!-- <td>{{ item.UsuarioReg }}</td> -->
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -404,7 +405,8 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3"></td>
+                      <td colspan="2"></td>
+                      <td colspan="1"></td>
                       <td class="total"><b>Total Ingresos</b></td>
                       <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
                     </tr>
@@ -413,15 +415,16 @@
               </b-col>
 
               <b-col v-if="totalSalidas">
-                <h5>Salidas</h5>
+                <h5>Salidas</h5><br>
                 <table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                      <th>Usuario</th><th>ID</th><th>Fecha</th><th>Salida</th><th>Monto</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in salidas" :key="index">
+                      <!-- <td>{{ item.UsuarioReg }}</td> -->
                       <td>{{ item.UsuarioReg }}</td>
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -431,7 +434,8 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3"></td>
+                      <td colspan="2"></td>
+                      <td colspan="1"></td>
                       <td class="total-salida"><b>Total Salidas</b></td>
                       <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
                     </tr>
@@ -562,6 +566,79 @@
                 </tfoot>
               </table>
             </div>
+            </b-tab>
+           <b-tab title="Yape/Plin">
+              <div class="scrollVertical">
+                <h5>Detalle de Ventas Pagadas con Yape/Plin</h5>
+                <table class="table b-table table-sm">
+                  <thead>
+                    <tr class="thDetalle">
+                      <th>Recibo</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Vendedor</th>
+                      <th>Cliente</th>
+                      <th>Estado</th>
+                      <th>Monto Pagado (Yape/Plin)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{ anulado: item.Anulado }">
+                      <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                      <td>{{ item.FechaDoc }}</td>
+                      <td>{{ formatoHora(item.FechaDoc) }}</td>
+                      <td>{{ item.UsuarioVenta }}</td>
+                      <td>{{ item.Cliente }}</td>
+                      <td>{{ estadoVenta(item) }}</td>
+                      <td>S/. {{ item.Yape | redondear }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="5"></td>
+                      <td class="total"><b>Total Yape/Plin</b></td>
+                      <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </b-tab>
+
+            <b-tab title="Transferencias">
+              <div class="scrollVertical">
+                <h5>Detalle de Ventas Pagadas con Transferencia</h5>
+                <table class="table b-table table-sm">
+                  <thead>
+                    <tr class="thDetalle">
+                      <th>Recibo</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Vendedor</th>
+                      <th>Cliente</th>
+                      <th>Estado</th>
+                      <th>Monto Pagado (Transferencia)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{ anulado: item.Anulado }">
+                      <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                      <td>{{ item.FechaDoc }}</td>
+                      <td>{{ formatoHora(item.FechaDoc) }}</td>
+                      <td>{{ item.UsuarioVenta }}</td>
+                      <td>{{ item.Cliente }}</td>
+                      <td>{{ estadoVenta(item) }}</td>
+                      <td>S/. {{ item.Mastercard | redondear }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="5"></td>
+                      <td class="total"><b>Total Transferencia</b></td>
+                      <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </b-tab>
           </b-tabs>
         </b-card>
@@ -978,7 +1055,7 @@
               </td>
               <!-- <td>{{ item.MastercardDesc }}</td> -->
               <!-- <td>{{ estadoVenta(item) }}</td> -->
-              <td>S/. {{ item.Mastercard | redondear }}</td>
+              <td>S/. {{ item.Yape | redondear }}</td>
             </tr>
           </tbody>
           <tfoot>
@@ -1377,6 +1454,57 @@ export default {
           (this.totalAdelantos ? this.totalAdelantos : 0))
       );
     },
+
+    reportePorYape() {
+      let productos = [];
+      this.ventasMastercard.filter(v => !v.Anulado).forEach(venta => {
+        if (!venta.productos) return;
+        venta.productos.forEach(producto => {
+          productos.push({ ...producto, montoVenta: venta.Yape });
+        });
+      });
+
+      const productosUnicos = Array.from(new Set(productos.map(i => i.IdProducto)))
+        .map(id => ({ IdProducto: id }));
+
+      let resultado = [];
+      productosUnicos.forEach(p => {
+        let lst = productos.filter(v => v.IdProducto == p.IdProducto);
+        resultado.push({
+          IdProducto: p.IdProducto,
+          Producto: lst[0].Producto,
+          total: lst.reduce((t, x) => t + parseFloat(x.Cantidad), 0),
+          Precio: lst.reduce((t, x) => t + parseFloat(x.Precio * x.Cantidad) - parseFloat(x.Descuento), 0)
+        });
+      });
+      return resultado;
+    },
+
+    reportePorTransferencia() {
+      let productos = [];
+      this.ventasTransferencia.filter(v => !v.Anulado).forEach(venta => {
+        if (!venta.productos) return;  // ← AGREGAR ESTA GUARDA
+        venta.productos.forEach(producto => {
+          productos.push({ ...producto, montoVenta: venta.Mastercard });
+        });
+      });
+
+      const productosUnicos = Array.from(new Set(productos.map(i => i.IdProducto)))
+        .map(id => ({ IdProducto: id }));
+
+      let resultado = [];
+      productosUnicos.forEach(p => {
+        let lst = productos.filter(v => v.IdProducto == p.IdProducto);
+        resultado.push({
+          IdProducto: p.IdProducto,
+          Producto: lst[0].Producto,
+          total: lst.reduce((t, x) => t + parseFloat(x.Cantidad), 0),
+          Precio: lst.reduce((t, x) => t + parseFloat(x.Precio * x.Cantidad) - parseFloat(x.Descuento), 0)
+        });
+      });
+      return resultado;
+    },
+
     granTotalSinPagoCliente() {
       return this.totalVentasEfectivo - this.totalSalidas;
     },
@@ -1557,6 +1685,7 @@ export default {
       let productos = [];
 
       this.ventas.filter(ventas => !ventas.Anulado).forEach(venta => {
+        if (!venta.productos) return;
         venta.productos.forEach(producto => {
           productos.push(producto);
         });
@@ -1640,6 +1769,14 @@ export default {
         : venta.EsCredito
           ? "CREDITO"
           : "APLICADO";
+    },
+    formatoHora(fecha) {
+      if (!fecha) return "";
+      if (typeof fecha === "string" && fecha.includes(" ")) {
+        return fecha.split(" ")[1].substring(0, 5);
+      }
+      const d = new Date(fecha);
+      return isNaN(d) ? fecha : d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
     },
     async loadDetalles() {
       if (this.ventas.length == 0) {
