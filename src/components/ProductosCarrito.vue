@@ -580,12 +580,13 @@
         <b-col cols="12">
           <b-input-group>
             <input
+              ref="inputProducto"
               v-model="searchProducto"
               @input="onSearchProducto()"
-              placeholder="Búsqueda Rápida"
+              placeholder="Búsqueda Producto"
               class="form-control inputResponsive"
               id="searchProducto"
-              label="Búsqueda Rápida"
+              label="Búsqueda Producto"
             >
             <!-- <input
               v-model="searchProductoDesc"
@@ -607,12 +608,11 @@
               class="form-control"
             />
             <input
-              ref="inputCodigoBarra"
               v-model="CodigoBarra"
               @input="onInputCodigoBarra"
               type="text"
               class="form-control ml-2  inputResponsive"
-              placeholder="Codigo de Barra"
+              placeholder="Busqueda rápida por Codigo de Barra"
               v-on:keyup.enter="anadirProductos"
             />
             <b-input-group-append>
@@ -1230,10 +1230,6 @@ export default {
 
       await this.cargarListadoProductos(3);
 
-      // pequeño delay para no pelear con Vue render
-      setTimeout(() => {
-        this.forzarFocusPersistente();
-      }, 50);
     },
     actualizarProductoEnCarrito(productoEditado) {
       let index = this.productos.findIndex(
@@ -1268,7 +1264,7 @@ export default {
       let intentos = 0;
 
       const intervalo = setInterval(() => {
-        const input = this.$refs.inputCodigoBarra;
+        const input = this.$refs.inputProducto;
 
         if (input) {
           input.focus();

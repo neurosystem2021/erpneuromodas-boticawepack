@@ -228,9 +228,13 @@ export default {
         "_blank"
       );
     },
-    generarCodigoBarra(reporte) {
-      window.open(`/views/codigoBarra.php?hash=${this.IdMovimiento}`, "_blank");
-    },
+
+      generarCodigoBarra() {
+        window.open(
+          `/views/codigoBarra.php?hash=${this.IdMovimiento}&idEmpresa=${sessionStorage.getItem("empresa")}`,
+          "_blank"
+        );
+      },
     async exportarXls() {
       const table = this.$refs.miTabla; // Obtener la referencia de la tabla
       let txt = "";
