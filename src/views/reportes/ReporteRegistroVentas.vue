@@ -314,10 +314,13 @@ export default {
         }
       });
       let params = {
-        fechaIni: this.fechaInicio,
-        fechaFin: this.fechaFin,
-        declarado: this.declarado,
-        almacen: this.almacen
+          fechaIni: this.fechaInicio,
+          horaIni: this.horaInicio,
+          fechaFin: this.fechaFin,
+          horaFin: this.horaFin,
+          declarado: this.declarado,
+          almacen: this.almacen,
+          empresa: sessionStorage.getItem("empresa")
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
