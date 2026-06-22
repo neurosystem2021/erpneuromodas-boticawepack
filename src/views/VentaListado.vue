@@ -1154,27 +1154,50 @@ export default {
   },
 
   methods: {
+    // actualizarPrecioProducto(item) {
+    //   let precio =
+    //     item.cantidad >= 100
+    //       ? item.PrecioCentena
+    //       : item.cantidad >= 12
+    //         ? item.PrecioDocena
+    //         : item.PrecioContado;
+
+    //   const cliente = this.ventas[this.ventaActiva].cliente;
+
+    //     console.log("CLIENTE:", cliente);
+    //     console.log("EsVIP:", cliente.EsVIP);
+    //     console.log("precioConvenio:", item.precioConvenio);
+
+    //   if (
+    //     cliente &&
+    //     cliente.EsVIP &&
+    //     item.precioConvenio > 0 &&
+    //     item.precioConvenio < precio
+    //   ) {
+    //     console.log("APLICANDO PRECIO VIP");
+    //     precio = item.precioConvenio;
+    //   }
+
+    //   item.precio = precio;
+    // },
     actualizarPrecioProducto(item) {
-      let precio =
-        item.cantidad >= 100
-          ? item.PrecioCentena
-          : item.cantidad >= 12
-            ? item.PrecioDocena
-            : item.PrecioContado;
+
+      let precio = item.PrecioContado;
+
+      if (item.cantidad >= 100 && Number(item.PrecioCentena) > 0) {
+        precio = item.PrecioCentena;
+      } else if (item.cantidad >= 12 && Number(item.PrecioDocena) > 0) {
+        precio = item.PrecioDocena;
+      }
 
       const cliente = this.ventas[this.ventaActiva].cliente;
-
-        console.log("CLIENTE:", cliente);
-        console.log("EsVIP:", cliente.EsVIP);
-        console.log("precioConvenio:", item.precioConvenio);
 
       if (
         cliente &&
         cliente.EsVIP &&
-        item.precioConvenio > 0 &&
+        Number(item.precioConvenio) > 0 &&
         item.precioConvenio < precio
       ) {
-        console.log("APLICANDO PRECIO VIP");
         precio = item.precioConvenio;
       }
 
