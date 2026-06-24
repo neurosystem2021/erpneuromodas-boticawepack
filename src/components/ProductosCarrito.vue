@@ -295,7 +295,7 @@
             :ref="'cantidad-' + data.index"
             v-model="productos[data.index].cantidad"
             :disabled="
-              productos[data.index].estadoPxP == false || bloquearInput
+              productos[data.index].estadoPxP == false || bloquearInput || bloquearCantidadSolo
                 ? true
                 : false || esDelivery
             "
@@ -345,7 +345,7 @@
           <input
             v-model="productos[data.index].precio"
             :disabled="
-              productos[data.index].disabled || bloquearInput
+              productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
                 ? true
                 : false ||
                   esDelivery ||
@@ -363,37 +363,28 @@
           />
         </template>
         <template slot="subtotal" slot-scope="data">
-          <input
-          class="form-control"
-          :value="getSubtotal(data.index)"
-          disabled
-          style="width: 105px"
-          />
-          <!-- <div>
-            {{ getSubtotal(data.index) }}
-          </div> -->
-          <!-- <div v-else>
-            <input
-              type="number"
-              style="width: 105px"
-              min="0"
-              step="0.00001"
-              placeholder="Subtotal"
-              class="form-control"
-              v-model="productos[data.index].subt"
-              disabled
-              @input="
-                (val) =>
-                  setSubtotal(
-                    data.index,
-                    val.target.value,
-                    productos[data.index]
-                  )
-              "
-            />
-            <b>{{ getSubtotal(data.index) }}</b>
-          </div> -->
-        </template>
+  <input
+    class="form-control"
+    :disabled="
+      productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
+        ? true
+        : false ||
+          esDelivery ||
+          (productos[data.index].EsObsequio == 1 && tipoMov == 0
+            ? true
+            : false)
+    "
+    :value="subtotalEditando === data.index ? subtotalTemp : productos[data.index].subtotal"
+    style="width: 105px"
+    type="number"
+    step="0.00001"
+    min="0"
+    @focus="onSubtotalFocus(data.index)"
+    @input="val => actualizarSubtotalEnVivo(data.index, val.target.value)"
+    @blur="onSubtotalBlur(data.index)"
+    @keydown.enter.prevent="onSubtotalBlur(data.index)"
+  />
+</template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -416,6 +407,15 @@
           <input
             class="form-control"
             v-model="productos[data.index].FLETE"
+            :disabled="
+              productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
+                ? true
+                : false ||
+                  esDelivery ||
+                  (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                    ? true
+                    : false)
+            "
             type="number"
             min="0"
              style="width: 120px"
@@ -447,7 +447,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            :disabled="bloquearInput ? true : false"
+            :disabled="bloquearInput || bloquearPrecioSolo ? true : false"
             style="width: 105px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
@@ -489,7 +489,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput ? true : false || esDelivery"
+            :disabled="bloquearInput || bloquearPrecioSolo ? true : false || esDelivery"
             v-model="productos[data.index].descuento"
             style="width: 90px"
             type="number"
@@ -522,7 +522,14 @@
 
         <template slot="Descripcion" slot-scope="data">
           <textarea
-            :disabled="bloquearInput ? true : false"
+            :disabled="productos[data.index].disabled || bloquearInput || bloquearPrecioSolo || bloquearCantidadSolo
+              ? true
+              : false ||
+              esDelivery ||
+              (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                ? true
+                : false)
+            "
             class="form-control"
             placeholder="Descripción"
             cols="9"
@@ -710,7 +717,9 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
-      productoUrl: ""
+      productoUrl: "",
+      subtotalEditando: null,
+      subtotalTemp: '',
     };
   },
   created() {
@@ -753,6 +762,8 @@ export default {
     idAlmacen: Number,
     bloquearInput: Boolean,
     esDelivery: Boolean,
+    bloquearCantidadSolo: { type: Boolean, default: false },
+    bloquearPrecioSolo: { type: Boolean, default: false },
     onSetProducto: {
       type: Function,
       default(obj) {
@@ -938,6 +949,105 @@ export default {
       }
 
       return mostrar;
+    },
+    onSubtotalInput(index, val) {
+      // 1. Sincronizar inmediatamente el input text para permitir cualquier cantidad de decimales
+      this.subtotalTemp = val;
+
+      // Si termina en punto (ej: "12.") o está vacío, dejamos que el usuario siga escribiendo
+      if (!val || val.toString().slice(-1) === '.') return;
+
+      let subtotal = parseFloat(val);
+      if (isNaN(subtotal) || subtotal < 0) return;
+
+      // 2. Actualizar el subtotal original del producto
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      // Recalcular P/U = Subtotal / Cantidad
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        // 3. Quitamos el .toFixed(8) temporalmente aquí o usamos una precisión más alta sin redondear a string
+        let nuevoPrecio = subtotal / cantidad;
+        Vue.set(this.productos[index], 'precio', nuevoPrecio);
+
+        // Recalcular los componentes de la fila
+        this.setNuevoPrecioContado(index);
+      }
+    },
+    onSubtotalFocus(index) {
+      this.subtotalEditando = index;
+
+      // SOLUCIÓN: Leer el valor puro con todos sus decimales, no el truncado por getSubtotal()
+      let subtotalPuro = this.productos[index].subtotal;
+
+      // Si no está definido o es nulo, usamos un string vacío o el cálculo por defecto
+      this.subtotalTemp = subtotalPuro !== undefined && subtotalPuro !== null
+        ? subtotalPuro.toString()
+        : this.getSubtotal(index).toString();
+    },
+
+    actualizarSubtotalEnVivo(index, val) {
+      // 1. Guardamos el texto real en el input para evitar el parpadeo
+      this.subtotalTemp = val;
+
+      if (!val || val.toString().slice(-1) === '.') return;
+
+      let subtotal = parseFloat(val);
+      if (isNaN(subtotal) || subtotal < 0) return;
+
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        // 2. Forzamos el cálculo del P/U inmediatamente en la fila para que se vea el cambio
+        let nuevoPrecio = subtotal / cantidad;
+        this.productos[index].precio = nuevoPrecio;
+      }
+    },
+
+    onSubtotalBlur(index) {
+      let val = this.subtotalTemp;
+      this.subtotalEditando = null;
+
+      if (!val || isNaN(parseFloat(val))) {
+        this.subtotalTemp = '';
+        return;
+      }
+
+      let subtotal = parseFloat(val);
+      let cantidad = parseFloat(this.productos[index].cantidad);
+
+      // 1. Ejecutar cálculos del sistema
+      if (cantidad > 0) {
+        Vue.set(this.productos[index], 'precio', subtotal / cantidad);
+        this.setNuevoPrecioContado(index);
+      }
+
+      // 2. Asegurar que guardamos el float completo en el objeto reactivo
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      this.subtotalTemp = '';
+    },
+
+    procesarSubtotal(index) {
+      let val = this.subtotalTemp;
+
+      if (!val || isNaN(parseFloat(val))) return;
+
+      let subtotal = parseFloat(val);
+      if (subtotal < 0) return;
+
+      // 1. Actualizamos el subtotal en el objeto (idealmente deberías mutarlo mediante un commit de Vuex, 
+      // pero manteniendo tu lógica actual lo hacemos con Vue.set)
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      // 2. Recalculamos P/U = Subtotal / Cantidad
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        let nuevoPrecio = subtotal / cantidad;
+        Vue.set(this.productos[index], 'precio', nuevoPrecio);
+
+        // 3. Ejecutar tus métodos de actualización global de la fila
+        this.setNuevoPrecioContado(index);
+      }
     },
     abrirMicrofono() {
       this.busqueda = "";

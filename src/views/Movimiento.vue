@@ -145,9 +145,33 @@
                         type="text"
                         placeholder=""></b-form-input>
                     </b-form-group>
+                    <b-form-group v-if="isNotaCredito">
+                      <label>Doc. Ref:</label>                    
+                      <autocomplete
+                          required="required"
+                          ref="inputDocRef"
+                          :url="API + 'movimientos/lista'"
+                          anchor="NroComprobante"
+                          initValue=""
+                          label="writer"
+                          placeholder=""
+                          :on-select="setDocRef" 
+                          :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                    </b-form-group>
+                      
+                    <b-form-select v-if="isNotaCredito"
+                      v-model="movimiento.NotaIdMotivo" 
+                      :options="itemsMotivoNota" 
+                      v-on:change="setMotivo($event)" 
+                      class="mb-3" 
+                      size="md" 
+                    required/>
                     <b-form-group>
                       <label>Moneda:</label>
                       <autocomplete
+                        ref="inputMoneda"
                         :url="API + 'monedas'"
                         initValue="PEN"
                         anchor="Moneda"
@@ -215,9 +239,14 @@
                 ref="carrito"
                 @onAddProducto="onAddProducto" 
                 :tipoCambio="movimiento.TipoCambio"
+                :esNotaCredito="isNotaCredito"
                 :fields="fields"
                 :gravada="gravada"
                 :igvGeneral="igvGeneral"
+                :bloquearInput="bloquearTodoCarrito"
+                :bloquearCantidadSolo="bloquearSoloCantidad"
+                :bloquearPrecioSolo="bloquearSoloPrecio"
+                :esNotaCreditoDisminucion="esNotaCreditoDisminucion"
                 tipo="mov" :tipoMov="this.movimiento.movimientoTipo.Tipo" :onSetProducto="onSetProducto"></productos-carrito>
             </b-col>
           </b-row>
@@ -251,6 +280,24 @@ export default {
       newRuc: "",
       API: config.API,
       ultimoMovimiento: "",
+      serieManualNC: false,
+      bloquearTodoCarrito: false,
+      bloquearSoloCantidad: false,
+      bloquearSoloPrecio: false,
+      itemsMotivoNota: [
+        { value: null, text: "-- SELECCIONE EL MOTIVO --" },
+        { value: "01", text: "ANULACION DE LA OPERACION" },
+        // { value: "02", text: "ANULACION POR ERROR EN EL RUC" },
+        // { value: "03", text: "CORRECION POR ERROR EN LA DESCRIPCION" },
+        // { value: "04", text: "DESCUENTO GLOBAL" },
+        // { value: "05", text: "DESCUENTO POR ITEM" },
+        // { value: "06", text: "DEVOLUCION TOTAL" },
+        { value: "07", text: "DEVOLUCION POR ITEM" },
+        // { value: "08", text: "BONIFICACION" },
+        { value: "09", text: "DISMINUCION EN EL VALOR" },
+        // { value: "10", text: "OTROS CONCEPTOS" }
+        { value: "11", text: "AJUSTE GLOBAL" },
+      ],
       movimiento: this.initMovimiento(),
       isTraslado: true,
       isSalida: false,
@@ -289,7 +336,23 @@ export default {
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
-    })
+    }),
+    esNotaCreditoDisminucion() {
+      return (
+        this.movimiento.movimientoTipo.CodSunat == "07" &&
+        this.movimiento.NotaIdMotivo == "09"
+      );
+    },
+    isNotaCredito() {
+      return (
+        Object.keys(this.movimiento.movimientoTipo).length > 0 &&
+        this.movimiento.movimientoTipo.CodSunat == "07"
+      );
+    },
+    modoNotaCredito() {
+      if (!this.isNotaCredito) return null;
+      return this.movimiento.NotaIdMotivo;
+    },
   },
   methods: {
     ...mapActions({
@@ -298,6 +361,146 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
+    setMotivo(ev) {
+      this.movimiento.NotaIdMotivo = ev;
+
+      if (ev === "01") {
+        this.bloquearTodoCarrito = true;
+        this.bloquearSoloCantidad = false;
+        this.bloquearSoloPrecio = false;
+      } else if (ev === "09") {
+        this.bloquearTodoCarrito = false;
+        this.bloquearSoloCantidad = true;
+        this.bloquearSoloPrecio = false;
+      } else if (ev === "07") {
+        this.bloquearTodoCarrito = false;
+        this.bloquearSoloCantidad = false;
+        this.bloquearSoloPrecio = true;
+      } else if (ev === "11") {
+        this.bloquearTodoCarrito = false;
+        this.bloquearSoloCantidad = false;
+        this.bloquearSoloPrecio = false;
+      } else {
+        // null o cualquier otro caso: sin bloqueo
+        this.bloquearTodoCarrito = false;
+        this.bloquearSoloCantidad = false;
+        this.bloquearSoloPrecio = false;
+      }
+    },
+    setDocRef(obj) {
+      this.serieManualNC = false;
+      this.movimiento.NotaIdMotivo = null;
+      this.bloquearTodoCarrito = true;
+      this.bloquearSoloCantidad = false;
+      this.bloquearSoloPrecio = false;
+
+      console.log("CodSunat recibido:", obj.CodSunat);
+      console.log("Serie del doc:", obj.Serie);
+      this.movimiento.almacenDestino.IdAlmacen = obj.IdAlmacenDestino;
+      this.movimiento.almacenOrigen.IdAlmacen = obj.IdAlmacenDestino;
+      this.movimiento.TipoCambio = obj.TipoCambio;
+      this.setMoneda({
+        Moneda: obj.Moneda,
+        TipoCambio: obj.TipoCambio,
+      });
+
+      this.$nextTick(() => {
+        if (this.$refs.inputMoneda) {
+          this.$refs.inputMoneda.setValue(obj.Moneda);
+        }
+      });
+      this.movimiento.EsConsumoVale = obj.EsConsumoVale;
+      this.movimiento.CodSunatModifica = obj.CodSunat;
+      this.movimiento.NroComprobanteModifica = obj.NroComprobante;
+      this.movimiento.IdComprobanteModifica = obj.IdDocVenta;
+      this.movimiento.EsFacturaValeNC = obj.EsFacturaVale;
+
+      let nuevaSerie = "_C01";
+      if (obj.Serie) {
+        const prefix = obj.Serie.charAt(0).toUpperCase();
+        if (prefix === "F") nuevaSerie = "FC01";
+        else if (prefix === "B") nuevaSerie = "BC01";
+      }
+      this.serieManualNC = true;
+      Vue.set(this.movimiento, "Serie", nuevaSerie);
+      this.$nextTick(() => {
+        this.cargarNumero();
+      });
+
+      if (obj.EsFacturaVale == 1) {
+        this.$toasted.info(
+          "Es una factura de vales realizados, los vales pasarán a pendiente",
+          { duration: 5000 }
+        );
+      }
+
+      // Cargar producto del documento afectado nota credito
+      this.axios
+        .get(this.API + "movimiento/detalle/comprobante", {
+          params: {
+            hashMovimiento: obj.Hash
+          }
+        })
+        .then(response => {
+          this.axios
+            .get(this.API + "proveedor", {
+              params: {
+                idProveedor: obj.IdProveedor
+              }
+            })
+            .then(response => {
+              if (response.data) {
+                this.setProveedor(response.data);
+                this.$refs.inputProveedor.setValue(response.data.Proveedor);
+              } else {
+                this.$toasted.show("No se encontro al cliente");
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+
+          this.limpiar();
+          response.data.map(item => {
+            item.nuevoPrecioContado = item.PrecioContado || 0;
+            // Calcular subtotal inicial: cantidad × precio (lógica normal, sin tipo de cambio)
+            const cantidad = parseFloat(item.cantidad) || 0;
+            const precio = parseFloat(item.precio) || 0;
+            item.subtotal = cantidad * precio;
+            item._precioBase = precio;
+            this.$store.state.cart.productos.push(item);
+          });
+
+          const idAlmacen = this.movimiento.almacenOrigen.IdAlmacen > 0
+            ? this.movimiento.almacenOrigen.IdAlmacen
+            : 1;
+          this.obtenerStok({ IdAlmacen: idAlmacen });
+
+          this.$nextTick(() => {
+            this.$forceUpdate();
+            if (this.$refs.carrito) {
+              this.$refs.carrito.$forceUpdate();
+            }
+          });
+          this.$nextTick(() => {
+            this.$forceUpdate();
+            if (this.$refs.carrito) {
+              this.$refs.carrito.$forceUpdate();
+              // Forzar reactividad en cada producto del subtotal
+              this.$store.state.cart.productos.forEach((prod, index) => {
+                if (this.$refs.carrito.getSubtotal) {
+                  this.$refs.carrito.getSubtotal(index);
+                }
+              });
+            }
+          });
+        });
+    },
+    loadFirstAlmacen(cb) {
+      this.axios.get(this.API + "almacenes/primero").then(res => {
+        cb(res.data);
+      });
+    },
     onSetProducto(obj, cant, precio) {
       if (cant) {
         obj.cantidad = cant;
@@ -389,33 +592,61 @@ export default {
       this.$nextTick(() => { this.show = true });*/
     },
     setTipoMovimiento(obj) {
+      this.serieManualNC = false;
+
+      this.bloquearTodoCarrito = false;
+      this.bloquearSoloCantidad = false;
+      this.bloquearSoloPrecio = false;
+      this.movimiento.NotaIdMotivo = null;
+
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 };
         this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.isTraslado = false;
         this.isSalida = false;
-        if (this.$refs.inputAlmacenDestino) {
-          this.$refs.inputAlmacenDestino.setValue("");
-        }
+
+        this.loadFirstAlmacen(almacen => {
+          this.movimiento.almacenDestino = almacen;
+          this.$nextTick(() => {
+            if (this.$refs.inputAlmacenDestino) {
+              this.$refs.inputAlmacenDestino.setValue(almacen.Almacen);
+            }
+          });
+        });
+
       } else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 };
         this.movimiento.almacenOrigen = { IdAlmacen: 1 };
-        if (this.$refs.inputAlmacenOrigen) {
-          this.$refs.inputAlmacenOrigen.setValue("");
-        }
         this.isTraslado = false;
         this.isSalida = true;
+
+        this.loadFirstAlmacen(almacen => {
+          this.movimiento.almacenOrigen = almacen;
+          this.$nextTick(() => {
+            if (this.$refs.inputAlmacenOrigen) {
+              this.$refs.inputAlmacenOrigen.setValue(almacen.Almacen);
+            }
+          });
+        });
+
       } else {
         this.movimiento.almacenDestino = { IdAlmacen: 1 };
         this.movimiento.almacenOrigen = { IdAlmacen: 1 };
         this.isTraslado = true;
         this.isSalida = false;
-        if (this.$refs.inputAlmacenDestino) {
-          this.$refs.inputAlmacenDestino.setValue("");
-        }
-        if (this.$refs.inputAlmacenOrigen) {
-          this.$refs.inputAlmacenOrigen.setValue("");
-        }
+
+        this.loadFirstAlmacen(almacen => {
+          this.movimiento.almacenDestino = almacen;
+          this.movimiento.almacenOrigen = almacen;
+          this.$nextTick(() => {
+            if (this.$refs.inputAlmacenDestino) {
+              this.$refs.inputAlmacenDestino.setValue(almacen.Almacen);
+            }
+            if (this.$refs.inputAlmacenOrigen) {
+              this.$refs.inputAlmacenOrigen.setValue(almacen.Almacen);
+            }
+          });
+        });
       }
       this.movimiento.movimientoTipo = obj;
 
@@ -459,7 +690,9 @@ export default {
     },
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
-      if (obj.Moneda === "USD") {
+      if (obj.TipoCambio) {
+        this.movimiento.TipoCambio = obj.TipoCambio;
+      } else if (obj.Moneda === "USD") {
         this.movimiento.TipoCambio = 3.7;
       } else {
         this.movimiento.TipoCambio = 1;
@@ -538,14 +771,27 @@ export default {
         return;
       }
 
-      if (sinStock >= 1 && (this.isTraslado == true || this.isSalida == true)) {
+      if (this.movimiento.movimientoTipo.CodSunat == "07") {
+        this.movimiento.NotaDescMotivo = this.itemsMotivoNota.filter(
+          item => item.value == this.movimiento.NotaIdMotivo
+        )[0].text;
+      }
+
+      const esNC = this.movimiento.movimientoTipo.CodSunat == "07";
+      if (sinStock >= 1 && (this.isTraslado == true || this.isSalida == true) && !esNC) {
         this.$toasted.show("No tiene stock para realizar el movimiento");
         this.inProgress = false;
         return;
       }
 
-      if (this.isTraslado == true || this.isSalida == true) {
+      const esNotaCreditoConPrecio =
+        this.movimiento.movimientoTipo.CodSunat == "07" &&
+        (this.movimiento.NotaIdMotivo == "09" || this.movimiento.NotaIdMotivo == "11");
+
+      if ((this.isTraslado == true || this.isSalida == true) && !esNotaCreditoConPrecio) {
         this.movimiento.alterarProductos = 0;
+      } else if (esNotaCreditoConPrecio) {
+        this.movimiento.alterarProductos = 1;
       }
       let productos = [];
       productos = this.productos;
