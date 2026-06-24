@@ -118,6 +118,12 @@
           :current-page="currentPage"
           show-empty
           empty-text="No hay productos/lotes en el rango seleccionado">
+          <template #table-busy>
+            <div class="text-center text-secondary my-3">
+              <b-spinner class="align-middle mr-2"></b-spinner>
+              <strong>Cargando...</strong>
+            </div>
+          </template>
         </b-table>
       </b-col>
 
@@ -210,6 +216,7 @@ export default {
     },
     limpiarFiltro () {
       this.q = "";
+      this.idAlmacen = 0;
       this.mostrarVencidos = false;
       this.currentPage = 1;
       this.cargarReporte();
@@ -286,17 +293,21 @@ export default {
     },
     decorateRow (item) {
       const row = Object.assign({}, item);
-      row.StockLote = this.toNumber(row.StockLote != null ? row.StockLote : row.stock);
+
+      // El backend ya calcula StockLote (stock real del lote en ese almacén),
+      // DiasParaVencer y EstadoVencimiento. Aquí solo formateamos para mostrar.
+      row.StockLote = this.toNumber(row.StockLote);
       row.StockLoteFmt = this.formatNumber(row.StockLote);
+
       row.DiasParaVencer = parseInt(row.DiasParaVencer, 10);
       if (isNaN(row.DiasParaVencer)) {
         row.DiasParaVencer = 0;
       }
-      row.DiasParaVencerFmt = row.DiasParaVencer;
+
       row.FechaVenFmt = this.formatDate(row.FechaVen);
       row.Movimiento = (row.Serie || "") + "-" + (row.Numero || "");
 
-      // BootstrapVue RC11 pinta la fila usando _rowVariant en cada item.
+      // BootstrapVue pinta la fila usando _rowVariant en cada item.
       if (row.EstadoVencimiento === "VENCIDO") {
         row._rowVariant = "danger";
       } else if (row.EstadoVencimiento === "POR VENCER") {
@@ -306,9 +317,9 @@ export default {
       }
 
       if (row.DiasParaVencer < 0) {
-        row.DiasParaVencerFmt = "Vencido (" + row.DiasParaVencer + ")";
-      } else if (row.DiasParaVencer <= 180) {
-        row.DiasParaVencerFmt = row.DiasParaVencer + " (<=6m)";
+        row.DiasParaVencerFmt = "Vencido (" + Math.abs(row.DiasParaVencer) + " días)";
+      } else {
+        row.DiasParaVencerFmt = row.DiasParaVencer + (row.DiasParaVencer <= 180 ? " (<=6m)" : "");
       }
 
       return row;
