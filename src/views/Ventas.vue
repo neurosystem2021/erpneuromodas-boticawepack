@@ -1635,8 +1635,23 @@ export default {
     anadirVentana() {
       this.initValueCliente = "00000000 CLIENTE VARIOS";
 
-      let venta = { ...this.venta };
-      venta.productos = [];
+      let venta = { 
+        ...this.venta,
+        productos: [],
+        pago: {
+          efectivo: { IdMetodoPago: 1, monto: 0, descripcion: null },
+          visa: { IdMetodoPago: 2, monto: 0, descripcion: null },
+          mastercard: { IdMetodoPago: 3, monto: 0, descripcion: null },
+          delivery: { IdMetodoPago: 4, monto: 0, descripcion: null }
+        },
+        pagocon: 0,
+        cliente: {},
+        EsCredito: 0,
+        NroComprobanteModifica: "",
+        CodSunatModifica: "",
+        NotaIdMotivo: "",
+        NotaDescMotivo: "",
+      };
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
@@ -1808,6 +1823,9 @@ export default {
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
+      this.$nextTick(() => {
+        this.metodoPagoCambio(1);
+      });
     },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
@@ -1976,14 +1994,16 @@ export default {
     metodoPagoCambio(tipo = null) {
       this.$nextTick(() => {
         const metodos = ["efectivo", "visa", "mastercard", "delivery"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
-        metodos.forEach(metodo => {
-          ventaActual[metodo].descripcion = null;
-          ventaActual[metodo].monto = 0;
-        });
+        const pago = {
+          efectivo: { IdMetodoPago: 1, monto: 0, descripcion: null },
+          visa: { IdMetodoPago: 2, monto: 0, descripcion: null },
+          mastercard: { IdMetodoPago: 3, monto: 0, descripcion: null },
+          delivery: { IdMetodoPago: 4, monto: 0, descripcion: null }
+        };
         if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+          pago[metodos[tipo - 1]].monto = this.getTotal();
         }
+        Vue.set(this.ventas[this.ventaActiva], 'pago', pago);
       });
     },
 
@@ -2411,7 +2431,16 @@ export default {
     },
     cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
+      let venta = { 
+        ...this.venta,
+        pago: {
+          efectivo: { IdMetodoPago: 1, monto: 0, descripcion: null },
+          visa: { IdMetodoPago: 2, monto: 0, descripcion: null },
+          mastercard: { IdMetodoPago: 3, monto: 0, descripcion: null },
+          delivery: { IdMetodoPago: 4, monto: 0, descripcion: null }
+        },
+        pagocon: 0,
+      };
       venta.cliente = proforma;
       let productos = [];
 

@@ -70,8 +70,8 @@
                 <tfoot>
                   <tr>
                     <td colspan="3"></td>
-                    <td class="total"><b>Total Efectivo</b></td>
-                    <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
+                    <td colspan="2" class="total"><b>Total Efectivo</b></td>
+                    <td colspan="2" class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
                 </tfoot>
               </table>
@@ -141,8 +141,8 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Tarjeta</b></td>
-              <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+              <td colspan="2" class="total"><b>Total Tarjeta</b></td>
+              <td colspan="2" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -211,8 +211,8 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Yape/Plin</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+              <td colspan="2" class="total"><b>Total Yape/Plin</b></td>
+              <td colspan="2" class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -281,8 +281,8 @@
           <tfoot>
             <tr>
               <td colspan="4"></td>
-              <td class="total"><b>Total Transferencia</b></td>
-              <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
+              <td colspan="2" class="total"><b>Total Transferencia</b></td>
+              <td colspan="2" class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
           </tfoot>
         </table>
@@ -399,9 +399,9 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
+                <td colspan="3"></td>
+                <td colspan="1" class="total-salida"><b>Total Salidas</b></td>
+                <td colspan="2" class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -428,9 +428,9 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
-                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+                <td colspan="4"></td>
+                <td colspan="1" class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td colspan="2" class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
@@ -457,9 +457,9 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+                <td colspan="4"></td>
+                <td colspan="1" class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td colspan="2" class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
