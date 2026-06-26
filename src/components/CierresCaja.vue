@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Ver Cierres</b-button>
+        <b-button @click="show=true" variant="warning"><i class="fa fa-list mx-1" aria-hidden="true" ></i>Ver Cierres</b-button>   
         
         <b-form >    
             <b-modal id="modalCierres" 
@@ -25,6 +25,10 @@
                         
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja" variant="primary" target="_blank">Ver</b-button>
+                      </template>
+
+                      <template slot="IdTurno" slot-scope="data">
+                        {{ data.item.IdTurno==1?'MAÑANA':(data.item.IdTurno==2?'TARDE':'NOCHE') }}
                       </template>
 
                     </b-table>
@@ -67,7 +71,7 @@ import config from '@/store/config.js'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdCierreCaja', 'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
+                fields: [ 'IdCierreCaja', 'FechaCierre', { key: 'IdTurno', label: 'Turno'}, 'UsuarioReg', 'ver' ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1
