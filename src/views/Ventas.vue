@@ -316,158 +316,87 @@
                   </b-button>
                 </b-row>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
-                  <b-col lg="3" xl="3" cols="12">
+                 <b-col lg="3" xl="4" cols="12">
                     <b-row>
-                      <b-col cols="12" class="mt-1">
-                        <!-- <b-button-group size="sm" class="ocularMovil">
-                          <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      </b-button-group>  -->
-                        <b-button-group size="sm" class="ocularMovil">
-                          <pago-deuda></pago-deuda>
-                        </b-button-group>
-                        <b-button-group size="sm">
-                          <movimiento></movimiento>
-                        </b-button-group>
-                        <b-button-group size="sm">
-                          <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"
-                            @cargarProforma="cargarProforma"></proformas>
-                        </b-button-group>
-                        <b-button-group size="sm" class="ocularMovil" v-if="false">
-                          <pre-orden-lista v-show="!this.$route.query.idPreOrden" :idAlmacen="venta.almacen.IdAlmacen"
-                            @onSelectPreOrden="setCliente" @onPreOrden="selectPreOrden"></pre-orden-lista>
-                        </b-button-group>
-                        <b-button-group size="sm" class="ocularMovil">
-
-                          <config-venta @onUpdateConfig="eliminarCliente"
-                            @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                        </b-button-group>
+                      <!-- BOTONES DE ACCIONES RÁPIDAS -->
+                      <b-col cols="12" class="mt-2">
+                        <div class="d-flex flex-wrap gap-2" style="gap: 6px;">
+                          <b-button-group size="sm" class="ocularMovil">
+                            <pago-deuda></pago-deuda>
+                          </b-button-group>
+                          <b-button-group size="sm">
+                            <movimiento></movimiento>
+                          </b-button-group>
+                          <b-button-group size="sm">
+                            <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"
+                              @cargarProforma="cargarProforma">
+                            </proformas>
+                          </b-button-group>
+                          <b-button-group size="sm" class="ocularMovil">
+                            <config-venta @onUpdateConfig="eliminarCliente"
+                              @onUpdateConfigComision="eliminarComisionista">
+                            </config-venta>
+                          </b-button-group>
+                        </div>
                       </b-col>
-                      <b-col cols="12" class="mt-1">
-                        <table class="table b-table border table-footer">
-                          <tbody>
-                            <tr>
-                              <td class="text-center">Opciones</td>
-                            </tr>
-                            <tr v-if="ventas[ventaActiva].puntosAplicados === 0">
-                                            <td>
-                                                <b-input-group prepend="S/" append="Descuento">
-                                                    <input
-                                                        v-model="ventas[ventaActiva].descuentoGeneral"
-                                                        :disabled="bloquearInput ? true : false"
-                                                        min="0"
-                                                        value="0"
-                                                        @input="(val) => { aplicarDescuentoGeneral(val.target.value) }"
-                                                        type="number"
-                                                        class="form-control"
-                                                        step="0.01"
-                                                    />
-                                                </b-input-group>
-                                                <b-form-text>
-                                                    Descuento general a toda la venta.
-                                                </b-form-text>
-                                            </td>
-                                        </tr>
-                            <!-- <tr v-if="puntosAplicados == 0"> -->
 
-                            <tr>
-                              <td>
-                                <b-form-checkbox v-model="ventas[ventaActiva].EsCredito" :value="1"
-                                  :unchecked-value="0">
-                                  Venta a credito
-                                </b-form-checkbox>
-                                <b-form-input v-if="ventas[ventaActiva].EsCredito" v-model="venta.FechaCredito"
-                                  type="date">
-                                </b-form-input>
-                                <b-form-checkbox v-model="ventas[ventaActiva].PorEntregar" :value="1"
-                                  :unchecked-value="0">
-                                  Por entregar
-                                </b-form-checkbox>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td class="text-center">Proforma</td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <b-input-group prepend="Proforma válido por:" append="días">
-                                  <b-form-input :disabled="bloquearInput ? true : false"
-                                    v-model="ventas[ventaActiva].diasValidosProf" min="0" value="0" type="number"></b-form-input>
-                                </b-input-group>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <b-input-group>
-                                  <b-form-checkbox :disabled="bloquearInput ? true : false"
-                                    v-model="venta.EsCreditoProforma" :value="1" :unchecked-value="0">
-                                    Proforma a Credito
-                                  </b-form-checkbox>
-                                  <div v-if="venta.EsCreditoProforma">
-                                    <div class="mb-3">
-                                      <input v-model="venta.FechaCreditoProforma" type="date" class="form-control"
-                                        required placeholder="Fecha Crédito" />
-                                    </div>
-                                  </div>
-                                </b-input-group>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <b-input-group>
-                                  <b-form-checkbox :disabled="bloquearInput ? true : false" v-model="venta.EsDescripcion"
-                                    :value="1" :unchecked-value="0">
-                                    Nota
-                                  </b-form-checkbox>
-                                  <div v-if="venta.EsDescripcion">
-                                    <div class="mb-3">
-                                      <input v-model="venta.DescripcionProforma" type="text" class="form-control"
-                                        required placeholder="Plazo de Entrega" />
-                                    </div>
-                                    <div class="mb-3">
-                                      <input v-model="venta.DescripcionProforma2" type="text" class="form-control"
-                                        required placeholder="Validez de la oferta" />
-                                    </div>
-                                    <div class="mb-3">
-                                      <input v-model="venta.DescripcionProforma3" type="text" class="form-control"
-                                        required placeholder="Lugar de Entrega" />
-                                    </div>
-                                    <div class="mb-3">
-                                      <input v-model="venta.DescripcionProforma4" type="text" class="form-control"
-                                        required placeholder="Garantia" />
-                                    </div>
-                                  </div>
-                                </b-input-group>
-                              </td>
-                            </tr>
+                      <!-- PANEL DE OPCIONES MEJORADO -->
+                      <b-col cols="12" class="mt-2">
+                        <div class="panel-opciones">
 
-                            <!-- <tr>
-                                            <td>
-                                                <b-input-group prepend="Prof. válida por:" append="días">
-                                                <b-form-input
-                                                    :disabled="bloquearInput?true:false"
-                                                    v-model="diasValidosProf"
-                                                    min="0"
-                                                    value="0"
-                                                    type="number"
-                                                ></b-form-input>
-                                            </b-input-group>
-                                            </td>
-                                        </tr> -->
-                          </tbody>
-                        </table>
+                          <!-- Proforma a Crédito -->
+                          <div class="opcion-item">
+                            <div class="opcion-header">
+                              <b-form-checkbox :disabled="bloquearInput ? true : false"
+                                v-model="venta.EsCreditoProforma" :value="1" :unchecked-value="0"
+                                class="opcion-checkbox">
+                                <span class="opcion-label">
+                                  <i class="fas fa-calendar-alt text-warning mr-1"></i>
+                                  Proforma a Crédito
+                                </span>
+                              </b-form-checkbox>
+                            </div>
+                            <b-collapse :visible="!!venta.EsCreditoProforma">
+                              <div class="opcion-body">
+                                <input v-model="venta.FechaCreditoProforma" type="date"
+                                  class="form-control form-control-sm" placeholder="Fecha Crédito" />
+                              </div>
+                            </b-collapse>
+                          </div>
+
+                          <!-- Nota / Descripción -->
+                          <div class="opcion-item">
+                            <div class="opcion-header">
+                              <b-form-checkbox :disabled="bloquearInput ? true : false" v-model="venta.EsDescripcion"
+                                :value="1" :unchecked-value="0" class="opcion-checkbox">
+                                <span class="opcion-label">
+                                  <i class="fas fa-sticky-note text-info mr-1"></i>
+                                  Nota / Descripción
+                                </span>
+                              </b-form-checkbox>
+                            </div>
+                            <b-collapse :visible="!!venta.EsDescripcion">
+                              <div class="opcion-body">
+                                <input v-model="venta.DescripcionProforma" type="text"
+                                  class="form-control form-control-sm mb-1" placeholder="Plazo de Entrega" />
+                                <input v-model="venta.DescripcionProforma2" type="text"
+                                  class="form-control form-control-sm mb-1" placeholder="Validez de la oferta" />
+                                <input v-model="venta.DescripcionProforma3" type="text"
+                                  class="form-control form-control-sm mb-1" placeholder="Lugar de Entrega" />
+                                <input v-model="venta.DescripcionProforma4" type="text"
+                                  class="form-control form-control-sm" placeholder="Garantía" />
+                              </div>
+                            </b-collapse>
+                          </div>
+
+                        </div>
                       </b-col>
-                      <!-- <b-col md="12" class="mt-1">
-                     
-                        <b-button type="button" block variant="primary"><i class="fas fa-redo"></i> Actualizar</b-button>
-                      </b-col> -->
-
-
                     </b-row>
                   </b-col>
-                  <b-col lg="3" xl="3" cols="12">
+                  <b-col lg="3" xl="1" cols="12" style="margin-right:-71px;">
 
 
-                    <b-col cols="12" class="text-left">
+                    <!-- <b-col cols="12" class="text-left">
                       <table class="table b-table border table-footer table-sm">
                         <tbody>
                           <tr>
@@ -527,7 +456,7 @@
                           </tr>
                         </tbody>
                       </table>
-                    </b-col>
+                    </b-col> -->
                     <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                       <b-form-group>
                         <label style="font-weight:bold">Nombre:</label>
@@ -552,7 +481,7 @@
                     </b-col>
                   </b-col>
                   
-                  <b-col lg="3" xl="3" cols="12">
+                  <b-col lg="3" xl="3" cols="12" >
                     <b-row class="centrado d-flex justify-content-center my-2">
                       <b-button block variant="warning" class="btnAction" @click="anadirVentana()"> Añadir
                         Venta</b-button>
@@ -582,95 +511,167 @@
 
                     </b-row>
                   </b-col>
-                  <b-col lg="3" xl="3" cols="12">
-                    <table class="table b-table border table-footer" style="font-size:0.85rem">
+                  <b-col lg="3" xl="4" cols="12" style="margin-left: 55px;">
+                   <table class="table b-table border table-footer" style="font-size:0.85rem">
                       <tbody>
                         <tr>
-                          <!-- <td>
-                            <b-button class="p-1 ml-1 mt-1" id="popover-metodopago" variant="success"><i class="fas fa-credit-card" ></i></b-button>
+                          <td>
+                            <!-- CAMBIO: index en lugar de ventaActiva -->
+                            <b-button class="p-1 ml-1 mt-1" :id="`popover-metodopago-${index}`" variant="success">
+                              <i class="fas fa-credit-card"></i>
+                            </b-button>
                             <br>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==1" variant="success" style="font-size: 0.70rem;">EFECTIVO</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
-                            <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover target="popover-metodopago" title="Metodo de pago" placement="bottomleft" triggers="focus" :style="{ minWidth: '600px' }">
-                            <slot name="metodopago" style="width: 1200px;" >
-                              <table class="table b-table border table-footer table-sm">
-                                <tbody>
-                                  <tr>
-                                    <td>Efectivo</td>
-                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
-                                    <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                    </td>
-                                    <td>
-                                      <input v-model="ventas[ventaActiva].pago.efectivo.monto" min="0" step="0.01" type="number" placeholder="S/." class="form-control"/>
-                                    </td>
-                                   </tr>
-                                  <tr>
-                                    <td>Tarjeta</td>
-                                    <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
-                                    <td>
-                                      <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
-                                    </td>
-                                    <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"/>
-                                    </td>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago == 1" variant="success"
+                              style="font-size: 0.70rem;">EFECTIVO</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago == 2" variant="info"
+                              style="font-size: 0.70rem;">TARJETA</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago == 3" variant="info"
+                              style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
+                            <b-badge v-if="ventas[ventaActiva].idMetodoPago == 4" variant="info"
+                              style="font-size: 0.70rem;">TRANSF.</b-badge>
+
+                            <!-- CAMBIO: target usa index -->
+                            <b-popover :target="`popover-metodopago-${index}`" placement="bottomleft"
+                              triggers="click blur focus" custom-class="custom-popover" auto-hide>
+                              <div class="table-responsive p-2">
+                                <table class="table b-table border table-footer table-sm">
+                                  <tbody>
+                                    <tr>
+                                      <td>Efectivo</td>
+                                      <td><b-button variant="info" size="sm" class="mt-1"
+                                          @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
+                                      <td>
+                                        <b-form-input v-model="ventas[ventaActiva].pago.efectivo.descripcion"
+                                          type="text" placeholder="Descripcion"></b-form-input>
+                                      </td>
+                                      <td>
+                                        <input v-model="ventas[ventaActiva].pago.efectivo.monto" min="0" step="0.01"
+                                          type="number" placeholder="S/." class="form-control" />
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>Tarjeta</td>
+                                      <td><b-button variant="info" size="sm" class="mt-1"
+                                          @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
+                                      <td>
+                                        <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text"
+                                          placeholder="Descripcion"></b-form-input>
+                                      </td>
+                                      <td>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto"
+                                          min="0" step="0.01" type="number" placeholder="S/."
+                                          @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.mastercard.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
+                                      </td>
                                     </tr>
                                     <tr>
                                       <td>Yape/Plin</td>
-                                      <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
+                                      <td><b-button variant="info" size="sm" class="mt-1"
+                                          @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                       <td>
-                                        <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                                        <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion"
+                                          type="text" placeholder="Descripcion"></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto"
+                                          min="0" step="0.01" type="number" placeholder="S/."
+                                          @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.delivery.monto - $event.target.value)" />
                                       </td>
                                     </tr>
                                     <tr>
                                       <td>Transferencia</td>
-                                      <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
+                                      <td><b-button variant="info" size="sm" class="mt-1"
+                                          @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                       <td>
-                                        <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
+                                        <b-form-input v-model="ventas[ventaActiva].pago.delivery.descripcion"
+                                          type="text" placeholder="Descripcion"></b-form-input>
                                       </td>
                                       <td>
-                                        <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                        <input class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto"
+                                          min="0" step="0.01" type="number" placeholder="S/."
+                                          @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear(getTotal(ventaActiva) - ventas[ventaActiva].pago.visa.monto - ventas[ventaActiva].pago.mastercard.monto - $event.target.value)" />
                                       </td>
                                     </tr>
                                   </tbody>
-                              </table>
-                            </slot>
+                                </table>
+                              </div>
                             </b-popover>
-                          </td> -->
-                          <td class="table-success">SubTotal</td>
-                          <td class="table-success">{{ getSubTotal(ventaActiva) }}</td>
-                        </tr>
-                        <tr>
-                          <td class="table-danger">Descuento</td>
-                          <td class="table-danger">
-                            {{ getDescuento(ventaActiva) }}
                           </td>
+                          <td class="table-success resumen-subtotal">SubTotal</td>
+                          <td class="table-success  resumen-subtotal">{{ getSubTotal(ventaActiva) }}</td>
                         </tr>
 
                         <tr>
-                          <td><b>TOTAL</b></td>
-                          <td class="table-danger">
-                            {{ getTotal(ventaActiva) }}
+                          <td>
+                            <!-- CAMBIO: index en lugar de ventaActiva -->
+                            <b-button class="p-1 ml-1 mt-1" :id="`popover-opciones-${index}`" variant="warning">
+                              <i class="fas fa-tags"></i>
+                            </b-button>
+
+                            <!-- CAMBIO: target usa index -->
+                            <b-popover :target="`popover-opciones-${index}`" placement="bottomleft"
+                              custom-class="custom-popover" title="Opciones" triggers="click blur focus" auto-hide>
+                              <table class="table b-table border table-footer">
+                                <tbody>
+                                  <tr v-if="ventas[ventaActiva].puntosAplicados === 0">
+                                    <td>
+                                      <b-input-group prepend="S/" append="Descuento">
+                                        <input v-model="ventas[ventaActiva].descuentoGeneral"
+                                          :disabled="bloquearInput ? true : false" min="0" value="0"
+                                          @input="(val) => { aplicarDescuentoGeneral(val.target.value) }" type="number"
+                                          class="form-control" step="0.01" />
+                                      </b-input-group>
+                                      <b-form-text>Descuento general a toda la venta.</b-form-text>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      <b-form-checkbox v-model="ventas[ventaActiva].EsCredito" :value="1"
+                                        :unchecked-value="0">
+                                        Venta a credito
+                                      </b-form-checkbox>
+                                      <b-form-input v-if="ventas[ventaActiva].EsCredito" v-model="venta.FechaCredito"
+                                        type="date">
+                                      </b-form-input>
+                                      <b-form-checkbox v-model="ventas[ventaActiva].PorEntregar" :value="1"
+                                        :unchecked-value="0">
+                                        Por entregar
+                                      </b-form-checkbox>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      <b-input-group prepend="Proforma válido por:" append="días">
+                                        <b-form-input :disabled="bloquearInput ? true : false"
+                                          v-model="ventas[ventaActiva].diasValidosProf" min="0" value="0" type="number">
+                                        </b-form-input>
+                                      </b-input-group>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </b-popover>
                           </td>
+                          <td class="table-danger resumen-subtotal">Descuento</td>
+                          <td class="table-danger  resumen-subtotal">{{ getDescuento(ventaActiva) }}</td>
+                        </tr>
+
+                        <tr>
+                          <td></td>
+                          <td class="resumen-total-label total-final-label"><b>TOTAL</b></td>
+                          <td class="resumen-total-monto table-danger">{{ getTotal(ventaActiva) }}</td>
                         </tr>
                         <tr>
-                          <td colspan="1">
+                          <td colspan="3">
                             <label>pagó con:</label>
                             <b-form-input type="text" placeholder="Pagó con" v-model="ventas[ventaActiva].pagocon">
                             </b-form-input><br>
-                          </td>
-                          <td>
-                            <label>Vuelto:</label>
-                            <b>S/
-                              {{ parseFloat(ventas[ventaActiva].pagocon - getTotal(ventaActiva)).toFixed(2) }}
-
-                            </b>
+                            <div class="vuelto-contenedor">
+                              <label>Vuelto:</label>
+                              <div class="resumen-vuelto">
+                                <b>S/ {{ parseFloat(ventas[ventaActiva].pagocon - getTotal(ventaActiva)).toFixed(2)
+                                  }}</b>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -1144,13 +1145,13 @@ export default {
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
-    this.$nextTick(() => {
-      setTimeout(() => {
-        let inputElement = `autocompleteProducto${this.ventaActiva}`;
-        let autocompleteInput = document.getElementById(inputElement);
-        autocompleteInput.focus();
-      }, 500);
-    });
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     let inputElement = `autocompleteProducto${this.ventaActiva}`;
+    //     let autocompleteInput = document.getElementById(inputElement);
+    //     autocompleteInput.focus();
+    //   }, 500);
+    // });
   },
   methods: {
   ...mapActions({
@@ -3198,6 +3199,126 @@ export default {
   overflow-y: scroll;
 }
 
+.contenedor-carrito{
+    min-height:200px;
+}
+
+.resumen-venta{
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.resumen-venta td{
+    padding:12px;
+}
+
+.resumen-subtotal{
+    font-size:18px;
+    font-weight:700;
+}
+
+.resumen-total-label{
+    font-size:22px;
+    font-weight:900;
+    color:#222;
+}
+
+.resumen-total-monto{
+   background:#c8f0d0 !important;
+    font-size:27px;
+    font-weight:900;
+    text-align:left;
+}
+
+.total-final-label{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:22px;
+    font-weight:900;
+}
+
+.subtotal-final-label{
+    background:#ffc7c0 !important;
+    color:#424242 !important;
+    font-size:22px;
+    font-weight:900;
+}
+.total-final{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:28px;
+    font-weight:900;
+}
+
+.resumen-venta tr:last-child td{
+    padding-top:18px;
+    padding-bottom:18px;
+}
+
+.resumen-vuelto{
+    font-size:24px;
+    font-weight:900;
+    color:#28a745;
+    margin-top:5px;
+}
+
+.vuelto-contenedor{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:-20px;
+}
+
+.vuelto-contenedor label{
+    margin:0;
+    font-weight:700;
+    font-size:16px;
+}
+.panel-opciones {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.opcion-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.opcion-item:last-child {
+  border-bottom: none;
+}
+
+.opcion-header {
+  padding: 10px 14px;
+  background: #f8f9fa;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.opcion-header:hover {
+  background: #e9ecef;
+}
+
+.opcion-checkbox {
+  margin: 0;
+  width: 100%;
+}
+
+.opcion-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.opcion-body {
+  padding: 10px 14px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+}
 @media (max-width: 1024px) {
   .txtAutoComplete { min-width: 60% !important; }
   .divCarrito      { height: 60vh; }

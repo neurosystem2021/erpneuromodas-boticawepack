@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="primary" >Ver Proformas</b-button>
+        <b-button @click="show=true" variant="primary" class="btn-pos btn-accion"><i class="fas fa-file-alt mr-2"></i>Ver Proformas</b-button>
         <b-form>
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="primary">Pago Deuda</b-button>
+        <b-button @click="show=true" variant="primary" class="btn-pos btn-accion"><i class="fas fa-money-bill-wave mr-2"></i>Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
             <b-modal id="modalConfigVenta" 
@@ -246,4 +246,15 @@ import config from '@/store/config.js'
 </script>
 <style>
 
+.btn-accion{
+    background:#12B8D0 !important;
+    border:1px solid #12B8D0 !important;
+    color:#fff !important;
+    font-weight: bold;
+}
+
+.btn-accion:hover{
+    background:#0DA6BC !important;
+    border-color:#0DA6BC !important;
+}
 </style>
