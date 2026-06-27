@@ -410,7 +410,7 @@ export default {
       let res = await this.axios(this.API + "tipocambio/usd").then(res => {
         return res.data;
       });
-      this.movimiento.TipoCambio = res;
+      //this.movimiento.TipoCambio = res;
       this.tipoCambio = res;
     },
     imprimirCodigoMulti(evt) {
@@ -577,7 +577,7 @@ export default {
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
       if (obj.Moneda === "USD") {
-        this.movimiento.TipoCambio = this.tipocambio;
+        this.movimiento.TipoCambio = this.tipoCambio;
       } else {
         this.movimiento.TipoCambio = 1;
       }
