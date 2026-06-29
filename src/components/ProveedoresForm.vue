@@ -27,6 +27,12 @@
               v-model="proveedor.Direccion"
               type="text"></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Teléfono:</label>
+            <b-form-input 
+              v-model="proveedor.Telefono"
+              type="text"></b-form-input>
+          </b-form-group>
         </b-col>
       </b-row>
       <div slot="modal-footer" >
@@ -41,54 +47,76 @@
   </div>
 </template>
 <script>
-import config from '@/store/config.js'
+import config from "@/store/config.js";
 export default {
   data() {
     return {
       API: config.API,
       show: false,
       proveedor: {
-        Proveedor: '',
-        Ruc: '',
-        Direccion: '',
-        Observacion: '',
+        Proveedor: "",
+        Ruc: "",
+        Direccion: "",
+        Telefono: "",
+        Observacion: "",
         FechaReg: null
       }
-    }
+    };
   },
-  props: ['newRuc'],
+  props: ["newRuc"],
   methods: {
-    shownProveedorForm () {
-      this.proveedor.Ruc = this.$parent.$parent.newRuc
-      this.proveedor.Direccion = ''
-      this.proveedor.Proveedor = ''
+    shownProveedorForm() {
+      this.proveedor.Ruc = this.$parent.$parent.newRuc;
+      this.proveedor.Direccion = "";
+      this.proveedor.Proveedor = "";
+      this.proveedor.Telefono = "";
     },
     consultarRUC() {
-      this.axios.get(this.API + 'consultarRUC', {
+      this.axios
+        .get(this.API + "consultarRUC", {
           params: {
-            type: 'RUC',
+            type: "RUC",
             numero: this.proveedor.Ruc
           }
-      }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data.result
-          this.proveedor.Proveedor = data.RazonSocial
-          this.proveedor.Direccion = data.Direccion
-      })
-      .catch((error) => {
-          this.$toasted.show('No se encontró el RUC')        
-          console.log(error)
-      })
+        })
+        .then(response => {
+          this.$toasted.show("Proveedor encontrado, se llenarán sus datos");
+          var data = response.data;
+          this.proveedor.Proveedor = data.razonSocial;
+          this.proveedor.Direccion = data.direccion;
+        })
+        .catch(error => {
+          this.$toasted.show("No se encontró el RUC");
+          console.log(error);
+        });
     },
     guardarProveedor() {
-      this.axios.post(this.API + 'proveedores', this.proveedor)
-      .then((response) => {
-        this.$toasted.show('Proveedor guardado correctamente')
-        this.$refs.proveedorForm.hide()
-      })
-      .catch((error) => {
-        this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
-      })
+      this.axios
+        .post(this.API + "proveedores", this.proveedor)
+        .then(response => {
+          this.$toasted.success("Proveedor guardado correctamente");
+          this.$refs.proveedorForm.hide();
+
+          // Soporta varias formas en que la API puede devolver el ID
+          const idProveedor = response.data.IdProveedor 
+            || response.data.id 
+            || response.data;
+
+          const proveedorGuardado = {
+            IdProveedor: idProveedor,
+            Proveedor: this.proveedor.Proveedor,
+            Ruc: this.proveedor.Ruc,
+            ProveedorRuc: this.proveedor.Ruc + ' - ' + this.proveedor.Proveedor
+          };
+
+          this.$parent.$parent.setProveedor(proveedorGuardado);
+          this.$parent.$parent.$refs.inputProveedor.setValue(
+            this.proveedor.Ruc + ' - ' + this.proveedor.Proveedor
+          );
+        })
+        .catch(error => {
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+        });
     }
   }
 }
