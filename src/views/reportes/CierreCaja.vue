@@ -96,9 +96,18 @@
                       <td class="text-center"><estado-badge :anulado="item.Anulado" /></td>
                       <td class="text-right num">{{ item.Mastercard | redondear }}</td>
                     </tr>
+                    <tr v-for="(item, index) in salidasYape" :key="'salida-' + index"
+                      class="fila-salida-yape" :class="{ anulado: item.Anulado }">
+                      <td>—</td>
+                      <td>{{ item.FechaDoc }}</td>
+                      <td colspan="2">{{ item.Concepto }}</td>
+                      <td><span class="badge-tipo badge-tipo--salida">Salida Yape</span></td>
+                      <td class="text-center"><estado-badge :anulado="item.Anulado" /></td>
+                      <td class="text-right num text-danger">- S/. {{ item.Importe | redondear }}</td>
+                    </tr>
                     <template slot="footer">
                       <td colspan="6"><b>Total Yape / Plin</b></td>
-                      <td class="text-right num"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                      <td class="text-right num"><b>S/. {{ totalVentasMastercardNeto | redondear }}</b></td>
                     </template>
                   </data-table>
                 </section-block>
@@ -232,133 +241,51 @@
               </b-alert>
             </b-tab>
 
-            <!-- ===================== TAB YAPE/PLIN ===================== -->
-            <b-tab title="Yape/Plin">
-              <div class="scrollVertical">
-                <h5>Detalle de Ventas Pagadas con Yape/Plin y Tarjeta</h5>
-                <table class="table b-table table-sm">
-                  <thead>
-                    <tr class="thDetalle">
-                      <th>Tipo</th>
-                      <th>Recibo</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Vendedor</th>
-                      <th>Cliente</th>
-                      <th>Estado</th>
-                      <th>Monto Pagado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item, index) in ventasMastercard" :key="'yape-' + index"
-                      :class="{ anulado: item.Anulado }">
-                      <td>
-                        <span class="badge-tipo badge-tipo--yape">Yape/Plin</span>
-                      </td>
-                      <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-                      <td>{{ item.FechaDoc }}</td>
-                      <td>{{ formatoHora(item.FechaDoc) }}</td>
-                      <td>{{ item.UsuarioVenta }}</td>
-                      <td>{{ item.Cliente }}</td>
-                      <td>{{ estadoVenta(item) }}</td>
-                      <td>S/. {{ item.Mastercard | redondear }}</td>
-                    </tr>
-                    <tr v-for="(item, index) in ventasVisa" :key="'visa-' + index" :class="{ anulado: item.Anulado }">
-                      <td>
-                        <span class="badge-tipo badge-tipo--tarjeta">Tarjeta</span>
-                      </td>
-                      <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-                      <td>{{ item.FechaDoc }}</td>
-                      <td>{{ formatoHora(item.FechaDoc) }}</td>
-                      <td>{{ item.UsuarioVenta }}</td>
-                      <td>{{ item.Cliente }}</td>
-                      <td>{{ estadoVenta(item) }}</td>
-                      <td>S/. {{ item.Visa | redondear }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="6"></td>
-                      <td class="total"><b>Total Yape/Plin</b></td>
-                      <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
-                    </tr>
-                    <tr>
-                      <td colspan="6"></td>
-                      <td class="total"><b>Total Tarjeta</b></td>
-                      <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
-                    </tr>
-                    <tr class="fila-gran-total">
-                      <td colspan="6"></td>
-                      <td class="total"><b>TOTAL COMBINADO</b></td>
-                      <td class="total"><b>S/. {{ totalVentasVisaTransferencia | redondear }}</b></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </b-tab>
-
-            <b-tab title="Transferencias">
-              <div class="scrollVertical">
-                <h5>Detalle de Ventas Pagadas con Transferencia</h5>
-                <table class="table b-table table-sm">
-                  <thead>
-                    <tr class="thDetalle">
-                      <th>Recibo</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Vendedor</th>
-                      <th>Cliente</th>
-                      <th>Estado</th>
-                      <th>Monto Pagado (Transferencia)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item, index) in ventasTransferencia" :key="index" :class="{ anulado: item.Anulado }">
-                      <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-                      <td>{{ item.FechaDoc }}</td>
-                      <td>{{ formatoHora(item.FechaDoc) }}</td>
-                      <td>{{ item.UsuarioVenta }}</td>
-                      <td>{{ item.Cliente }}</td>
-                      <td>{{ estadoVenta(item) }}</td>
-                      <td>S/. {{ item.Transferencia | redondear }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="5"></td>
-                      <td class="total"><b>Total Transferencia</b></td>
-                      <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </b-tab>
             <!-- ===================== TAB GALONAJE ===================== -->
-            <!-- <b-tab title="Galonaje">
+           <b-tab title="Galonaje">
               <div class="px-2 px-md-3">
-                <section-block icon="fa-gas-pump" title="Contrómetros" subtitle="Lectura inicial / final por surtidor">
-                  <data-table :headers="['Producto', 'Isla', 'Cara', 'V. I.', 'V. F.', 'Venta']"
+
+                <!-- NUEVO: Detalle de ventas por producto -->
+                <section-block icon="fa-list-alt" title="Detalle de Ventas por Producto"
+                  subtitle="Ventas del turno actual">
+                  <data-table :headers="['Producto', 'Isla', 'Cara', 'Cantidad', 'Precio', 'Monto']"
                     :align="['left', 'left', 'left', 'right', 'right', 'right']">
-                    <tr v-for="(resumen, index) in resumenHistorial" :key="index">
-                      <td>{{ resumen.Producto }}</td>
-                      <td>{{ resumen.Isla }}</td>
+                    <tr v-for="(producto, index) in productosVendidos" :key="index">
+                      <td>{{ producto.Producto }}</td>
+                      <td>{{ producto.Isla }}</td>
                       <td>
-                        <span class="badge-cara" :class="resumen.Cara == 1 ? 'badge-cara--a' : 'badge-cara--b'">
-                          Cara {{ resumen.Cara == 1 ? 'A' : (resumen.Cara == 2 ? 'B' : '') }}
+                        <span v-if="producto.Isla" class="badge-cara"
+                          :class="producto.Cara == 1 ? 'badge-cara--a' : 'badge-cara--b'">
+                          {{ producto.Cara == 1 ? 'Cara A' : 'Cara B' }}
                         </span>
                       </td>
-                      <td class="text-right num">{{ parseFloat(resumen.ValorInicial).toFixed(4) }}</td>
-                      <td class="text-right num">{{ parseFloat(resumen.Restante).toFixed(4) }}</td>
-                      <td class="text-right num"><b>{{ parseFloat(resumen.VentaTotal).toFixed(4) }}</b></td>
+                      <td class="text-right num">{{ parseFloat(producto.CantidadVendida).toFixed(4) }}</td>
+                      <td class="text-right num">
+                        {{ producto.CantidadVendida > 0
+                          ? (producto.MontoVendido / producto.CantidadVendida).toFixed(4)
+                        : '0.0000' }}
+                      </td>
+                      <td class="text-right num">{{ parseFloat(producto.MontoVendido).toFixed(2) }}</td>
                     </tr>
+                    <template slot="footer">
+                      <td colspan="3"></td>
+                      <td class="text-right">
+                        <b>{{ sumaCampo(productosVendidos, 'CantidadVendida') | redondear }}</b>
+                      </td>
+                      <td></td>
+                      <td class="text-right num">
+                        <b>S/. {{ sumaCampo(productosVendidos, 'MontoVendido') | redondear }}</b>
+                      </td>
+                    </template>
                   </data-table>
                 </section-block>
+
               </div>
 
               <b-alert variant="success" class="text-center no-print gran-total-alert" show>
                 <i class="fas fa-coins"></i> GRAN TOTAL: <b>S/. {{ granTotal | moneda }}</b>
               </b-alert>
-            </b-tab> -->
+            </b-tab>
           </b-tabs>
         </b-card>
       </b-col>
@@ -379,20 +306,28 @@
             </b-col>
             <b-col cols="12" v-if="!this.$route.params.id" class="mb-3">
               Turno
-              <b-form-select v-model="turno" :options="turnos" />
+              <b-form-select v-model="turno" :options="turnos" @change="actualizarTurnoCierre" />
             </b-col>
             <b-col cols="12">
               <b-button-group>
-                <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i
-                    class="fa fa-unlock mx-1" aria-hidden="true"></i>
+                <b-button variant="danger" class="mb-2" @click="cerrarCaja" v-if="!this.$route.params.id"><i
+                    class="fa fa-unlock mx-1 " aria-hidden="true"></i>
                   Cerrar Caja</b-button>
               </b-button-group>
-              <b-button-group>
+              <b-button-group class="mb-2">
                 <cierres-caja></cierres-caja>
+              </b-button-group>
+              <b-button-group class="mb-2">
+                <movimiento @actualizar="loadData" v-if="!this.$route.params.id"></movimiento>
               </b-button-group>
               <b-button-group>
                 <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i>
                   Imprimir</b-button>
+              </b-button-group>
+              <b-button-group>
+                <b-button variant="secondary" @click="imprimirTicket"><i class="fa fa-receipt mx-1"
+                    aria-hidden="true"></i>
+                  Imprimir Ticket</b-button>
               </b-button-group>
             </b-col>
           </b-row>
@@ -468,14 +403,13 @@
     </b-row>
 
     <!-- ============ VERSIÓN IMPRESIÓN (TICKET) ============ -->
-    <b-row class="si-print">
-      <!-- <b-col cols="12" class="text-center">
-        <h3>Cierre de Caja</h3>
-        <h6 v-if="cierre.FechaCierre">Fecha Cierre: {{ cierre.FechaCierre }}</h6>
-        <h6 v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
-        <div v-if="cierre.UsuarioReg">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
-      </b-col> -->
+    <b-row class="si-print" v-if="modoImpresion === 'detallado'">
       <h2>Cierre de Caja</h2>
+      <div class="cierre-meta-print">
+        <div v-if="cierre.FechaCierre"><b>Fecha:</b> {{ cierre.FechaCierre }}</div>
+        <div v-if="cierre.IdTurno"><b>Turno:</b> {{ cierre.IdTurno == 1 ? 'MAÑANA' : cierre.IdTurno == 2 ? 'TARDE' : 'NOCHE' }}</div>
+        <div v-if="cierre.UsuarioReg"><b>Empleado:</b> {{ cierre.UsuarioReg }}</div>
+      </div>
       <hr>
       <b-col cols="5">
 
@@ -542,12 +476,58 @@
       </b-col>
     </b-row>
 
+    <!-- ============ VERSIÓN IMPRESIÓN (TICKET SIMPLE / NUEVO FORMATO) ============ -->
+    <b-row class="si-print ticket-simple" v-if="modoImpresion === 'simple'">
+      <b-col cols="5">
+        <div class="cierre-meta-print">
+          <div v-if="cierre.FechaCierre"><b>Fecha:</b> {{ cierre.FechaCierre }}</div>
+          <div v-if="cierre.IdTurno"><b>Turno:</b> {{ cierre.IdTurno == 1 ? 'MAÑANA' : cierre.IdTurno == 2 ? 'TARDE' : 'NOCHE' }}</div>
+          <div v-if="cierre.UsuarioReg"><b>Empleado:</b> {{ cierre.UsuarioReg }}</div>
+        </div>
+        <table class="table table-sm tableResumenSimple">
+          <tbody>
+            <tr>
+              <td>GRAN TOTAL COMBUSTIBLE</td>
+              <td>{{ granTotalVenta | redondear }}</td>
+            </tr>
+            <tr>
+              <td>INGRESOS</td>
+              <td>{{ totalIngresos | redondear }}</td>
+            </tr>
+            <tr class="fila-espaciadora"><td colspan="2"></td></tr>
+            <tr>
+              <td>SALIDA</td>
+              <td>{{ totalSalidas | redondear }}</td>
+            </tr>
+            <tr>
+              <td>TARJETAS Y YAPE</td>
+              <td>{{ totalVentasVisaTransferencia | redondear }}</td>
+            </tr>
+            <tr>
+              <td>VALES DE CREDITO</td>
+              <td>{{ totalVentasValeCredito | redondear }}</td>
+            </tr>
+            <tr>
+              <td>CANJES</td>
+              <td>{{ totalVentasCanje | redondear }}</td>
+            </tr>
+            <tr class="fila-espaciadora"><td colspan="2"></td></tr>
+            <tr class="fila-gran-total-simple">
+              <td>GRAN TOTAL EFECTIVO</td>
+              <td>{{ granTotal | redondear }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </b-col>
+    </b-row>
+
   </b-container>
 </template>
 
 <script>
 import config from "@/store/config.js";
 import CierresCaja from "@/components/CierresCaja.vue";
+import Movimiento from '@/components/Movimiento'
 
 // ---------- Subcomponentes pequeños de presentación ----------
 const SectionBlock = {
@@ -612,7 +592,7 @@ const EstadoBadge = {
 };
 
 export default {
-  components: { CierresCaja, "section-block": SectionBlock, "data-table": DataTable, "estado-badge": EstadoBadge },
+  components: { CierresCaja, Movimiento, "section-block": SectionBlock, "data-table": DataTable, "estado-badge": EstadoBadge },
   async mounted() {
     this.Usuario = sessionStorage.getItem("User");
     this.IdSurtidor = sessionStorage.getItem("IdSurtidor");
@@ -645,6 +625,8 @@ export default {
       ],
       cierre: {},
       vendedor: {},
+      salidasYape: [],
+      modoImpresion: "detallado",
       productosVendidos: [],
       historial: [],
       productosVendidosTotal: 0,
@@ -654,10 +636,17 @@ export default {
     };
   },
   computed: {
-    FechaActual() {
-      return this.$moment().format("YYYY-MM-DD H:mm:ss");
+    totalSalidasYape() {
+      return this.salidasYape
+        .filter(s => !s.Anulado)
+        .reduce((t, s) => t + parseFloat(s.Importe || 0), 0);
     },
-    // ---- Totales generales (migrados del cierre antiguo) ----
+    totalVentasMastercardNeto() {
+      return this.totalVentasMastercard - this.totalSalidasYape;
+    },
+    FechaActual() {
+      return this.$moment().format("YYYY-MM-DD HH:mm:ss");
+    },
     granTotalVenta() {
       return (
         this.totalVentasEfectivo +
@@ -674,6 +663,7 @@ export default {
     granTotal() {
       return (
         this.totalVentasEfectivo +
+        this.totalVentasMastercardNeto +
         this.totalVentasCanje +
         this.totalIngresos -
         this.totalSalidas
@@ -705,18 +695,12 @@ export default {
     ventasVisa() {
       return this.ventas.filter(v => v.Visa > 0 && !v.EsCredito && v.EsVale == 0);
     },
-
-    // ✅ CORREGIDO: ahora filtra Anulado en ambas listas
     totalVentasVisaTransferencia() {
       const visa = this.ventasVisa
         .filter(v => !v.Anulado)
         .reduce((t, v) => t + v.Visa, 0);
-      const yape = this.ventasMastercard
-        .filter(v => !v.Anulado)
-        .reduce((t, v) => t + v.Mastercard, 0);
-      return visa + yape;
+      return visa + this.totalVentasMastercardNeto;
     },
-
     totalVentasTransferencia() {
       return this.ventasTransferencia
         .filter(v => !v.Anulado)
@@ -770,9 +754,12 @@ export default {
     sumaCampo(lista, campo) {
       return lista.reduce((sum, item) => sum + parseFloat(item[campo] || 0), 0);
     },
-    // ---- Migrado del cierre antiguo: marcar/resaltar fila al hacer click ----
     toggleMarcado(item) {
-      item.check = !item.check;
+      this.$set(item, 'check', !item.check);
+    },
+    // ---- NUEVO: sincroniza cierre.IdTurno cuando cambia el select de turno ----
+    actualizarTurnoCierre(val) {
+      this.$set(this.cierre, 'IdTurno', val);
     },
     async obtenerHistorioGalones() {
       await this.axios(`${this.API}historialgalones/resumen`, {
@@ -892,11 +879,10 @@ export default {
       });
       return resultado;
     },
-
     reportePorTransferencia() {
       let productos = [];
       this.ventasTransferencia.filter(v => !v.Anulado).forEach(venta => {
-        if (!venta.productos) return;  // ← AGREGAR ESTA GUARDA
+        if (!venta.productos) return;
         venta.productos.forEach(producto => {
           productos.push({ ...producto, montoVenta: venta.Mastercard });
         });
@@ -938,7 +924,21 @@ export default {
       this.loadData();
     },
     imprimir() {
-      window.print();
+      this.modoImpresion = 'detallado';
+      this.$nextTick(() => { this.$nextTick(() => { window.print(); }); });
+    },
+    imprimirTicket() {
+      this.modoImpresion = 'simple';
+      this.$nextTick(() => { this.$nextTick(() => { window.print(); }); });
+    },
+    getSalidasYape() {
+      let params = { idCierre: this.$route.params.id };
+      if (this.vendedor.Usuario) params.usuario = this.vendedor.Usuario;
+
+      this.axios
+        .get(this.API + "cajaybanco/salidasyape", { params })
+        .then(res => { this.salidasYape = res.data; })
+        .catch(err => console.log(err));
     },
     loadData() {
       this.productosVendidos = [];
@@ -946,6 +946,7 @@ export default {
       this.getVentas();
       this.getIngresos();
       this.getSalidas();
+      this.getSalidasYape();
     },
     cerrarCaja() {
       if (!this.turno) {
@@ -954,15 +955,13 @@ export default {
       }
       let r = confirm("¿Está seguro de cerrar la caja?");
       if (r) {
-        this.axios
-          .post(this.API + "cierrecaja", {
-            idTurno: this.turno,
-            user: this.vendedor.Usuario
-          })
-          .then(res => {
-            this.loadData();
-            this.$toasted.show("¡Caja cerrada!");
-          });
+        this.axios.post(this.API + "cierrecaja", {
+          idTurno: this.turno,
+          user: this.vendedor.Usuario
+        }).then(res => {
+          this.loadData();
+          this.$toasted.show("¡Caja cerrada!");
+        });
       }
     },
     focusAutocomplete(ref) {
@@ -1000,7 +999,8 @@ export default {
         .get(this.API + "cierrecaja/ventas", { params })
         .then(res => {
           this.ventas = res.data;
-          this.ventas.forEach(vt => { vt.check = false; });
+          this.ventas = res.data.map(vt => ({ ...vt, check: false }));
+
           if (this.ventas.length > 0) this.getProductos(this.ventas);
         })
         .catch(err => console.log(err));
@@ -1160,45 +1160,16 @@ export default {
 }
 
 /* Acentos de color por tipo de medio de pago (barra izquierda) */
-.section-block--efectivo .section-block__head {
-  border-left: 4px solid #1d8a4e;
-}
-
-.section-block--tarjeta .section-block__head {
-  border-left: 4px solid #1565c0;
-}
-
-.section-block--yape .section-block__head {
-  border-left: 4px solid #6a1b9a;
-}
-
-.section-block--transferencia .section-block__head {
-  border-left: 4px solid #00838f;
-}
-
-.section-block--vale .section-block__head {
-  border-left: 4px solid #b8860b;
-}
-
-.section-block--canje .section-block__head {
-  border-left: 4px solid #8d6e63;
-}
-
-.section-block--credito .section-block__head {
-  border-left: 4px solid #455a64;
-}
-
-.section-block--ingreso .section-block__head {
-  border-left: 4px solid #1d8a4e;
-}
-
-.section-block--salida .section-block__head {
-  border-left: 4px solid #c62828;
-}
-
-.section-block--default .section-block__head {
-  border-left: 4px solid var(--c-primary);
-}
+.section-block--efectivo .section-block__head { border-left: 4px solid #1d8a4e; }
+.section-block--tarjeta .section-block__head { border-left: 4px solid #1565c0; }
+.section-block--yape .section-block__head { border-left: 4px solid #6a1b9a; }
+.section-block--transferencia .section-block__head { border-left: 4px solid #00838f; }
+.section-block--vale .section-block__head { border-left: 4px solid #b8860b; }
+.section-block--canje .section-block__head { border-left: 4px solid #8d6e63; }
+.section-block--credito .section-block__head { border-left: 4px solid #455a64; }
+.section-block--ingreso .section-block__head { border-left: 4px solid #1d8a4e; }
+.section-block--salida .section-block__head { border-left: 4px solid #c62828; }
+.section-block--default .section-block__head { border-left: 4px solid var(--c-primary); }
 
 /* ============ DATA TABLE ============ */
 .data-table {
@@ -1266,15 +1237,8 @@ export default {
   font-weight: 700;
 }
 
-.badge-cara--a {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.badge-cara--b {
-  background: #e8f5e9;
-  color: #1d8a4e;
-}
+.badge-cara--a { background: #e3f2fd; color: #1565c0; }
+.badge-cara--b { background: #e8f5e9; color: #1d8a4e; }
 
 /* Badge de estado */
 .estado-badge {
@@ -1286,15 +1250,8 @@ export default {
   letter-spacing: 0.02em;
 }
 
-.estado-badge--aplicado {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.estado-badge--anulado {
-  background: #fdecea;
-  color: var(--c-danger);
-}
+.estado-badge--aplicado { background: #e3f2fd; color: #1565c0; }
+.estado-badge--anulado { background: #fdecea; color: var(--c-danger); }
 
 /* Alerta gran total */
 .gran-total-alert {
@@ -1385,44 +1342,67 @@ export default {
   white-space: nowrap;
 }
 
-.ocultarNoPrint {
-  display: none;
+.ocultarNoPrint { display: none; }
+.si-print { display: none; }
+
+/* ============ CIERRE META PRINT ============ */
+.cierre-meta-print {
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  line-height: 1.8;
 }
 
-.si-print {
-  display: none;
+.cierre-meta-print b {
+  font-weight: 700;
 }
 
-/* ✅ CLAVE: fuera del @media print para que funcione en preview */
+/* ============ TABLAS IMPRESIÓN ============ */
 .tableResumen {
   width: 100%;
   font-weight: bold;
   table-layout: fixed;
 }
 
-.tableResumen td:first-child {
-  width: 65%;
-}
-
+.tableResumen td:first-child { width: 65%; }
 .tableResumen td:last-child {
   width: 35%;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
+.tableResumenSimple {
+  width: 100%;
+  font-weight: bold;
+  table-layout: fixed;
+  border: none;
+}
+
+.tableResumenSimple td {
+  border: none;
+  padding: 6px 4px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.tableResumenSimple td:first-child { width: 65%; text-align: left; }
+.tableResumenSimple td:last-child {
+  width: 35%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableResumenSimple .fila-espaciadora td { padding: 10px 0 0 0; }
+.fila-gran-total-simple td { border-top: 2px solid #000 !important; padding-top: 10px; }
+
+.ticket-print { width: 100%; max-width: 320px; font-size: 0.85rem; }
+.ticket-title { text-align: center; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+.ticket-meta { font-size: 0.8rem; margin-bottom: 4px; line-height: 1.6; }
+.ticket-hr { border: none; border-top: 1px dashed #aaa; margin: 6px 0; }
+
 @media print {
-  .no-print {
-    display: none !important;
-  }
-
-  .si-print {
-    display: block !important;
-  }
-
-  .ocultarNoPrint {
-    display: block;
-    font-size: 0.6rem;
-  }
+  .no-print { display: none !important; }
+  .si-print { display: block !important; }
+  .ocultarNoPrint { display: block; font-size: 0.6rem; }
 
   th {
     background: #fff !important;
@@ -1430,21 +1410,15 @@ export default {
     border: 1px solid #ccc;
   }
 
-  .page-break {
-    page-break-before: always;
-  }
+  .page-break { page-break-before: always; }
 
-
-  /* Ticket de impresión */
-  .tableResumen {
-    width: 100%;
-    font-weight: bold;
-  }
-
+  .tableResumen { width: 100%; font-weight: bold; }
   .tableResumen td:last-child {
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
+
+  .fila-salida-yape td { background-color: #fff3f3; color: #c62828; }
 
   .badge-tipo {
     display: inline-block;
@@ -1455,21 +1429,17 @@ export default {
     white-space: nowrap;
   }
 
-  .badge-tipo--yape {
-    background: #f3e5f5;
-    color: #6a1b9a;
-  }
+  .badge-tipo--yape { background: #f3e5f5; color: #6a1b9a; }
+  .badge-tipo--tarjeta { background: #e3f2fd; color: #1565c0; }
+  .badge-tipo--salida { background: #fdecea; color: #c62828; }
+  .fila-salida-resumen td { color: #c62828; }
 
-  .badge-tipo--tarjeta {
-    background: #e3f2fd;
-    color: #1565c0;
-  }
-
-  /* Fila de gran total en tfoot */
   .fila-gran-total td {
     border-top: 2px solid var(--c-border);
     background: #f0f4ff;
     font-size: 0.9rem;
   }
+
+  .ticket-simple .tableResumenSimple td { border: none; }
 }
 </style>
