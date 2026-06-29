@@ -7,7 +7,7 @@
         >Orden de Compra</b-button
       >
     </div>
-    <div>
+    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
       <b-container class="bv-example-row px-5" fluid>
         <b-row>
           <b-col md="8">
@@ -233,9 +233,11 @@
               :almacenDestino="movimiento.almacenDestino.IdAlmacen"
               :almacenOrigen="movimiento.almacenOrigen.IdAlmacen"
               :idAlmacen="
-                this.movimiento.almacenDestino.IdAlmacen > 0
-                  ? this.movimiento.almacenDestino.IdAlmacen
-                  : this.movimiento.almacenOrigen.IdAlmacen
+                this.movimiento.movimientoTipo.Tipo == 1
+                  ? this.movimiento.almacenOrigen.IdAlmacen
+                  : this.movimiento.movimientoTipo.Tipo == 2
+                    ? this.movimiento.almacenOrigen.IdAlmacen
+                    : this.movimiento.almacenDestino.IdAlmacen
               "
               tipo="mov"
               padre="compra"
@@ -248,7 +250,7 @@
             <b-button
               variant="success"
               size="lg"
-              @click="guardarMovimiento"
+              type="submit"
               :disabled="inProgress"
               >Guardar</b-button
             >
@@ -264,7 +266,7 @@
         </b-row>
       </b-container>
       <br /><br />
-    </div>
+    </b-form>
 
     <b-modal
       v-model="modalMovimientos"
@@ -574,6 +576,7 @@ export default {
       this.movimiento.proveedor = obj;
     },
     setAlmacenOrigen(obj) {
+      this.movimiento.almacenOrigen = obj; 
       this.limpiarCart();
       if (this.isSalida) {
         this.obtenerStok({
@@ -596,6 +599,7 @@ export default {
     },
     setAlmacenDestino(obj) {
       this.movimiento.almacenDestino = obj;
+      this.limpiarCart();
       this.obtenerStok({
         IdAlmacen: !this.isTraslado
           ? this.movimiento.almacenDestino.IdAlmacen > 0
