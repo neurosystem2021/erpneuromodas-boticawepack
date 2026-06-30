@@ -44,7 +44,7 @@
                               <autocomplete
                                   required="required"
                                   :ref="`inputDocRef${i}`"
-                                  :url="`${API}ventas/lista/${tab.puntoVenta.IdDocVentaPuntoVenta}?idAlmacen=${tab.almacen.IdAlmacen}`"
+                                  :url="`${API}ventas/lista/${tab.puntoVenta.IdDocVentaPuntoVenta}`"
                                   anchor="NroComprobante"
                                   initValue=""
                                   label="writer"
