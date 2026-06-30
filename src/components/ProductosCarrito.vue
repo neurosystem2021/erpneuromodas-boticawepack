@@ -3,7 +3,7 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <autocomplete ref="autocompleteProducto" :url="APIProductos"
+          <autocomplete ref="autocompleteProducto" :url="APIProductos" :debounce="600"
             :customParams="{ 'sortBy': isVentas ? 'stock' : 'IdProducto', 'sortDesc': 1, limit: '40', nopadre: (isVentas ? 0 : 1) }"
             :onShouldRenderChild="renderChild" anchor="Producto" label="writer" placeholder="Agregar Producto"
             :on-select="setProducto" :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
