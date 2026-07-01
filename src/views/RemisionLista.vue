@@ -91,8 +91,6 @@
                       &nbsp;&nbsp;
                       <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
                       &nbsp;&nbsp;
-                      <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
-                      &nbsp;&nbsp;
                   </div>
                 </template>
 
@@ -107,11 +105,11 @@
 </template>
 
 <script>
-import config from "@/store/config.js";
-import ProductoKardex from "@/components/ProductoKardex";
+import config from '@/store/config.js'
+import ProductoKardex from '@/components/ProductoKardex'
 export default {
   beforeMount() {
-    this.generateFilter("fechaReferencia", this.fechaReferencia);
+    this.generateFilter('fechaReferencia', this.fechaReferencia)
   },
   data() {
     return {
@@ -119,61 +117,55 @@ export default {
       loading: false,
       estadoVenta: 1,
       optionsEstado: [
-        { value: "1", text: "PENDIENTE" },
-        { value: "2", text: "EMITIDOS" }
+        { value: '1', text: 'PENDIENTE'},
+        { value: '2', text: 'EMITIDOS' }
       ],
       fechaInicio: this.$moment().format("YYYY-MM-DD"),
       fechaFin: this.$moment().format("YYYY-MM-DD"),
       fechaReferencia: this.$moment().format("YYYY-MM-DD"),
-      filters: {},
-      filter: "",
-      sortBy: "FechaReg",
+      filters: { },
+      filter: '',
+      sortBy: 'FechaReg',
       sortDesc: false,
       items: [],
       itemsDetalle: [],
       isBusy: false,
       fields: [
-        { key: "detalles", label: "" },
-        { key: "IdDocVentaRemision", label: "ID", sortable: true },
-        { key: "Serie", label: "Serie", sortable: true },
-        { key: "Numero", sortable: true },
-        { key: "FechaTraslado", label: "Fecha Traslado", sortable: true },
-        { key: "PesoBruto", label: "Peso Total", sortable: true },
-        {
-          key: "RazonSocialCliente",
-          label: "Razón Social Cliente",
-          sortable: true
-        },
-        { key: "DireccionOrigen", label: "Dirección Origen" },
-        { key: "DireccionDestino", label: "Dirección Destino" },
-        { key: "estado", sortable: false, class: "text-center" }
+            { key: 'detalles', label: '' },
+            { key: 'IdDocVentaRemision', label: 'ID', sortable: true },
+            { key: 'Serie', label: 'Serie', sortable: true },
+            { key: 'Numero', sortable: true },
+            { key: 'FechaTraslado', label: 'Fecha Traslado', sortable: true },
+            { key: 'PesoBruto', label: 'Peso Total', sortable: true},
+            { key: 'RazonSocialCliente', label: 'Razón Social Cliente', sortable: true },
+            { key: 'DireccionOrigen', label: 'Dirección Origen' },
+            { key: 'DireccionDestino', label: 'Dirección Destino' },
+            { key: 'estado', sortable: false, class: 'text-center' },
       ],
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
       itemsStatus: {},
-      isBoleta: false
-    };
+      isBoleta: false,
+    }
   },
   watch: {
-    items(items) {
-      if (items.length) {
-        this.axios
-          .get(this.API + "remision/detalle", {
-            params: {
-              idRemisiones: items.map(item => item.IdDocVentaRemision)
-            }
-          })
-          .then(response => {
-            this.itemsDetalle = response.data;
-            this.items.map(item => {
-              item.productos = this.getDetalles(item.IdDocVentaRemision);
-              return item;
-            });
-          })
-          .catch(error => {
-            console.log(error);
-          });
+    items (items) {
+      if (items.length){
+        this.axios.get(this.API + 'remision/detalle', {
+           params: {
+             idRemisiones: items.map((item) => item.IdDocVentaRemision),
+           }
+         }).then((response) => {
+            this.itemsDetalle = response.data
+            this.items.map((item) => {
+              item.productos = this.getDetalles(item.IdDocVentaRemision)
+              return item
+            })
+         })
+         .catch((error) => {
+           console.log(error)
+         })
       }
     }
   },
@@ -227,129 +219,114 @@ export default {
         this.$refs.tablaVentas.refresh();
       });
     },
-    getStatus(idDocVenta) {
-      let obj = this.itemsStatus[idDocVenta] || {};
+    getStatus (idDocVenta) {
+      let obj = this.itemsStatus[idDocVenta] || {}
       if (obj.Estado) {
-        obj.image = obj.Estado == 2 ? "success.png" : "error.png";
+        obj.image = obj.Estado == 2 ? 'success.png' : 'error.png'
       }
-
-      return obj;
+      
+      return obj
     },
-    async emitirElectronico(doc) {
-      this.loading = true;
-      this.axios
-        .post(this.API + "emitirguiaelectronica/" + doc.IdDocVentaRemision)
-        .then(response => {
-          if (response.data.Estado == 1) {
-            this.$toasted.error(response.data.msj_sunat);
-            this.loading = false;
-          } else {
-            this.$toasted.success(response.data.msj_sunat);
-            this.loading = false;
-          }
-        });
+    async emitirElectronico (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'emitirguiaelectronica/' + doc.IdDocVentaRemision ).then((response) => {
+        if(response.data.Estado == 1) {
+          this.$toasted.error(response.data.msj_sunat)                  
+          this.loading = false
+        } else {
+          this.$toasted.success(response.data.msj_sunat)
+          this.loading = false
+        }
+      });
     },
-    getDetalles(idDocVentaRemision) {
-      let detalles = this.itemsDetalle.filter(
-        item => item.IdDocVentaRemision == idDocVentaRemision
-      );
+    getDetalles (idDocVentaRemision) {
+      let detalles = this.itemsDetalle.filter(item => item.IdDocVentaRemision == idDocVentaRemision)
       //let index = this.items.findIndex((item) => item.idDocVenta == idDocVenta)
       //this.items[index].productos = detalles
-      return detalles;
+      return detalles
     },
-    focusAutocomplete(ref) {
+    focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick();
+      this.$refs[ref].handleDoubleClick()
     },
-    setAlmacen(obj) {
-      this.almacen = obj;
-      this.limpiarFiltros();
-      Vue.nextTick(() => this.$refs.tablaVentas.refresh());
+    setAlmacen (obj) {
+      this.almacen = obj
+      this.limpiarFiltros()
+      Vue.nextTick(() => this.$refs.tablaVentas.refresh())
     },
     actualizarTabla() {
-      this.$refs.tablaVentas.refresh();
+      this.$refs.tablaVentas.refresh()
     },
-    myProvider(ctx) {
+    myProvider (ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
-
-      let url =
-        this.API +
-        "remision?estado=" +
-        this.estadoVenta +
-        "&filter=" +
-        (ctx.filter || "") +
-        "&sortBy=" +
-        ctx.sortBy;
-      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
-      let promise = this.axios.get(url);
-      return promise
-        .then(result => {
-          //this.items = result.data
-          this.items = result.data.map(el => {
-            if (el.Anulado === 1) {
-              el._rowVariant = "warning";
-            }
-            return el;
-          });
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
+      
+      let url = this.API + 'remision?estado=' + this.estadoVenta + '&filter='+ (ctx.filter||'')+'&sortBy='+ctx.sortBy
+      url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
+      let promise = this.axios.get( url )
+      return promise.then((result) => {
+        //this.items = result.data
+        this.items = result.data.map(el => {
+          if (el.Anulado === 1) {
+            el._rowVariant = 'warning'
+          }
+          return el
         })
-        .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return [];
-        });
+        //this.totalRows = this.items.length
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        return(this.items)
+      }).catch(error => {
+        // Here we could override the busy state, setting isBusy to false
+        // this.isBusy = false
+        // Returning an empty array, allows table to correctly handle busy state in case of error
+        return []
+      })
     },
-    limpiarFiltros() {
-      this.filters = {};
-      this.filter = "";
-      this.fechaInicio = this.$moment().format("YYYY-MM-DD");
-      this.fechaFin = this.$moment().format("YYYY-MM-DD");
+    limpiarFiltros () {
+      this.filters = {}
+      this.filter = ''
+      this.fechaInicio = this.$moment().format("YYYY-MM-DD")
+      this.fechaFin = this.$moment().format("YYYY-MM-DD")
       //this.$refs.inputVendedor.setValue('')
     },
-    generateFilter(key, value) {
-      this.filters[key] = value;
-      let filter = "";
+    generateFilter (key, value) {
+      this.filters[key] = value
+      let filter = ''
       for (var key in this.filters) {
-        filter += "&filter[" + key + "]=" + this.filters[key];
+        filter += '&filter[' + key + ']=' + this.filters[key]
       }
-      this.filter = filter;
+      this.filter = filter
     },
-    exportarProductos() {},
-    moverAEmitidos(doc) {
-      this.loading = true;
-      this.axios
-        .post(this.API + "moveraemitidosguia", {
-          idDocVentaRemision: doc.IdDocVentaRemision
-        })
-        .then(response => {
-          this.$refs.tablaVentas.refresh();
-          this.loading = false;
-        });
+    exportarProductos () {
     },
-    cambiarAAnonimo(doc) {
-      let r = confirm("¿Desea Cambiar a Cliente Anónimo?");
+    moverAEmitidos (doc) {
+      this.loading = true
+      this.axios.post(this.API + 'moveraemitidosguia', {
+        idDocVentaRemision: doc.IdDocVentaRemision
+      }).then( response => {
+        this.$refs.tablaVentas.refresh()
+        this.loading = false
+      })
+    },
+    cambiarAAnonimo (doc) {
+      let r = confirm('¿Desea Cambiar a Cliente Anónimo?')
       if (r == true) {
-        this.loading = true;
-        this.axios
-          .post(this.API + "cambiaraanonimo", {
-            idDocVenta: doc.idDocVenta
-          })
-          .then(response => {
-            this.$refs.tablaVentas.refresh();
-            this.loading = false;
-          });
+        this.loading = true
+        this.axios.post(this.API + 'cambiaraanonimo', {
+          idDocVenta: doc.idDocVenta
+        }).then( response => {
+          this.$refs.tablaVentas.refresh()
+          this.loading = false
+        })
       }
-    }
+    },
+   
   },
   components: {
     ProductoKardex
   }
-};
+}
 </script>
 
 <style scope>
@@ -369,7 +346,7 @@ export default {
 }
 .table-detalle th {
   color: #fff;
-  background-color: #6c757d;
+  background-color: #6c757d; 
 }
 .table-detalle tbody td {
   font-size: 18px;
@@ -380,15 +357,14 @@ export default {
   max-width: 300px;
 }
 @media (min-width: 992px) {
-  .modal-xl .modal-dialog {
-    max-width: 1200px;
-  }
+    .modal-xl .modal-dialog {
+        max-width: 1200px;
+    }
 }
 .prod-detalle {
   margin: 0 30px;
 }
-.prod-detalle th,
-.prod-detalle td {
+.prod-detalle th, .prod-detalle td{
   background-color: #ffffff;
 }
-</style>
+</style> 

@@ -266,6 +266,7 @@ export default {
         codUndPesoBruto: 'KGM',
         codModalidadTraslado: '01',
         codMotivoTraslado: '01',
+        descripcionMotivoTraslado:'VENTA',
         fechaTraslado: this.$moment().format("YYYY-MM-DD")
       },
       cliente: {},
@@ -380,14 +381,14 @@ export default {
         }).then((response) => {
           
           if (response.data[0]) {
-            this.axios.get(this.API + 'cliente', {
+            this.axios.get(this.API + 'proveedor', {
               params: {
-                  idCliente: response.data[0].IdProveedor
+                  idProveedor: response.data[0].IdProveedor
               }})
               .then((response) => {
                 if (response.data) {
-                  this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                  this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
+                  this.$set(this.remision, 'nroDocumentoCliente', response.data.Ruc);
+                  this.$set(this.remision, 'razonSocialCliente', response.data.Proveedor);
                   this.$set(this.remision, 'direccionCliente', response.data.Direccion);
                   this.cliente = response.data;
                 } else {
@@ -471,6 +472,7 @@ export default {
 }
 </script>
 <style>
+
   fieldset .row {
     margin-bottom: 5pX;
   }
@@ -490,4 +492,4 @@ export default {
     border-bottom: 1px solid #cacaca;
     padding-bottom: 4px;
   }
-</style>
+</style> 
