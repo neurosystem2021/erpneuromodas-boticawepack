@@ -1933,15 +1933,15 @@ export default {
                 "noopener"
               );
               // -------------------------
-              await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                mode: "cors",
-                cache: "default",
-                body: comandaJson
-              }).catch(error => console.error("Error:", error));
+              // await fetch("http://localhost:5000/imprimir/getcmdped.php", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json"
+              //   },
+              //   mode: "cors",
+              //   cache: "default",
+              //   body: comandaJson
+              // }).catch(error => console.error("Error:", error));
             })
             .catch(error => {
               console.error(error);
