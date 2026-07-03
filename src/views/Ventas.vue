@@ -1163,7 +1163,48 @@ export default {
                 this.inProgress = false
             })
         },
-        guardarVenta (evt) {
+        async validarNotaCredito() {
+
+        if (this.venta.tipoVenta.CodSunat != '07') {
+            return true;
+        }
+
+        try {
+
+            const response = await this.axios.get(
+                this.API + 'ventas/validar/notacredito',
+                {
+                    params: {
+                        NroComprobante: this.venta.NroComprobanteModifica
+                    }
+                }
+            );
+
+            if (response.data.existe) {
+
+                this.$toasted.error(
+                    'Este comprobante ya tiene una Nota de Crédito registrada.'
+                );
+
+                return false;
+            }
+
+            return true;
+
+        } catch (e) {
+
+            console.log(e);
+
+            this.$toasted.error(
+                'No se pudo validar el comprobante.'
+            );
+
+            return false;
+
+        }
+
+        },
+      async guardarVenta (evt) {
             evt.preventDefault();
 
             this.inProgress = true
@@ -1259,6 +1300,12 @@ export default {
             }
 
             if(this.venta.tipoVenta.CodSunat == '07' || this.venta.tipoVenta.CodSunat == '08') {
+                const permitido = await this.validarNotaCredito();
+
+                if (!permitido) {
+                    this.inProgress = false;
+                    return;
+                }
                 if(this.TieneIgvComprobante != this.tieneIgv){
                     if(this.TieneIgvComprobante){
                         this.$toasted.show('El comprobante de referencia tiene IGV, seleccione NOTA DE CREDITO/IGV ELEC.',{duration:3000})
