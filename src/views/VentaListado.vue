@@ -2662,15 +2662,15 @@ export default {
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
-      await this.axios
-        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
-        .then(response => {
-          if (response.data) {
-            venta.UsuarioProforma = response.data.Usuario;
-          }
-        });
+      // await this.axios
+      //   .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+      //   .then(response => {
+      //     if (response.data) {
+      //       venta.UsuarioProforma = response.data.Usuario;
+      //     }
+      //   });
       venta.cliente = proforma;
-      venta.vendedor = { Usuario: proforma.UsuarioReg };
+      // venta.vendedor = { Usuario: proforma.UsuarioReg };
       venta.mostrarOp = {};
       // console.log("proforma", proforma);
       let productos = [];
