@@ -75,11 +75,31 @@
                     <b-badge v-else variant="danger" style="font-size: 1.1rem;">0</b-badge>
                 </template>
                 <template slot="Estado" slot-scope="data">
-                    <div v-if="data.item.AnuladoConsumo==0">
-                      <b-badge :variant="data.item.MontoDisponible <= 0 ? 'success' : 'primary'" style="font-size: 0.9rem;">{{ data.item.MontoDisponible <= 0 ? 'Completado' : 'Activo' }}</b-badge>
-                    </div>
-                    <b-badge v-else variant="danger" style="font-size: 0.9rem;">Anulado N.C.</b-badge>
-                </template>
+
+                  <b-badge
+                      v-if="data.item.Anulado == 1"
+                      variant="danger"
+                      style="font-size: 0.9rem;"
+                  >
+                      Anulado
+                  </b-badge>
+
+                  <b-badge
+                      v-else-if="data.item.AnuladoConsumo == 1"
+                      variant="danger"
+                      style="font-size: 0.9rem;"
+                  >
+                      Anulado N.C.
+                  </b-badge>
+
+                  <b-badge
+                      v-else
+                      :variant="data.item.MontoDisponible <= 0 ? 'success' : 'primary'"
+                      style="font-size: 0.9rem;"
+                  >
+                      {{ data.item.MontoDisponible <= 0 ? 'Completado' : 'Activo' }}
+                  </b-badge>
+              </template>
                 <template slot="Ver" slot-scope="data">
                   <b-button :href="'/imprimir/index.php?IdDocVenta=' + data.item.IdDocVenta" variant="success" target="_blank" size="sm">Documento</b-button>
                 </template>
