@@ -260,7 +260,7 @@
             type="number"
             style="width: 95px"
             class="form-control"
-            step="0.001"            
+            step="1"            
             min="0"
             @input="
               (val) => {
