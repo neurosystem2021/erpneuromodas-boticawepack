@@ -338,12 +338,10 @@ export default {
     },
     items (items) {
       if (items.length){
-        this.axios.get(this.API + 'ventas/detalle', {
-           params: {
-             idAlmacen: this.almacen.IdAlmacen,
-             idDocVentas: items.map((item) => item.idDocVenta),
-           }
-         }).then((response) => {
+            this.axios.post(this.API + 'ventas/detalle/facturador', {
+            idAlmacen: this.almacen.IdAlmacen,
+            idDocVentas: items.map(item => item.idDocVenta)
+            }).then((response) => {
               this.itemsDetalle = response.data
               this.items.map((item) => {
                 item.productos = this.getDetalles(item.idDocVenta)
