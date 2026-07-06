@@ -2250,6 +2250,17 @@ export default {
         return;
       }
 
+        if (
+            venta.tipoVenta.IdTipoDoc != 12 &&
+            productos.some(v => v.stock < v.CantidadPresentacion * v.cantidad)
+        ) {
+            this.bloquearVenta = false;
+
+            this.$toasted.show("No se puede vender un producto sin stock.");
+
+            return;
+        }
+
       // 1. Forzar que todo sea número y redondear a 2 decimales para la suma de productos
       const sumaRealProductos = productos.reduce((total, prod) => {
           let cant = parseFloat(prod.cantidad) || 0;
