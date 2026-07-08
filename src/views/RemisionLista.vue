@@ -87,9 +87,9 @@
                       &nbsp;&nbsp;
                       <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
                       &nbsp;&nbsp;
-                      <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
-                      &nbsp;&nbsp;
                       <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
+                      &nbsp;&nbsp;
+                      <b-button variant="primary" @click="regenerarDescarga(data.item)">DESCARGA</b-button>
                       &nbsp;&nbsp;
                   </div>
                 </template>
@@ -170,21 +170,54 @@ export default {
     }
   },
   methods: {
-    regenerarPDF (doc) {
-      this.$refs.tablaVentas.refresh()
-      this.loading = true
-      this.axios.post(this.API + 'generarpdfguiaelectronica/' + doc.IdDocVentaRemision ).then(res => {
-        console.log(res)
-        this.$toasted.success('El PDF fue generado nuevamente', { duration: 7000 })
-        this.loading = false
-      })
+    async regenerarPDF(doc) {
+      this.$refs.tablaVentas.refresh();
+      this.loading = true;
+      await this.axios
+        .post(this.API + "generarpdfguiaelectronica/" + doc.IdDocVentaRemision)
+        .then(res => {
+          console.log(res);
+          this.$toasted.success("El PDF fue generado nuevamente", {
+            duration: 7000
+          });
+          this.loading = false;
+        });
     },
-    setFechaReferencia () {
-      this.generateFilter('fechaReferencia', this.fechaReferencia)
-      
+
+    regenerarDescarga(doc) {
+      this.$refs.tablaVentas.refresh();
+      this.loading = true;
+
+      this.axios.get(this.API + 'imprimirguiapdf/' + doc.IdDocVentaRemision, { responseType: 'blob' })
+        .then(res => {
+
+          const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'Guia-' + doc.IdDocVentaRemision + '.pdf');
+          document.body.appendChild(link);
+          link.click();
+
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+
+          this.$toasted.success('El PDF fue generado y descargado', { duration: 7000 });
+          this.loading = false;
+        })
+        .catch(err => {
+          console.error(err);
+          this.$toasted.error('Hubo un error al generar el PDF');
+          this.loading = false;
+        });
+      },
+
+    setFechaReferencia() {
+      this.generateFilter("fechaReferencia", this.fechaReferencia);
+
       this.$nextTick(() => {
-        this.$refs.tablaVentas.refresh()
-      })
+        this.$refs.tablaVentas.refresh();
+      });
     },
     getStatus (idDocVenta) {
       let obj = this.itemsStatus[idDocVenta] || {}
@@ -204,24 +237,6 @@ export default {
           this.$toasted.success(response.data.msj_sunat)
           this.loading = false
         }
-        this.$nextTick(() => {
-          this.$refs.tablaVentas.refresh()
-        })
-      });
-    },
-    async validarElectronico (doc) {
-      this.loading = true
-      this.axios.post(this.API + 'validarguiaelectronica/' + doc.IdDocVentaRemision ).then((response) => {
-        if(response.data.Estado == 1) {
-          this.$toasted.error(response.data.msj_sunat)                  
-          this.loading = false
-        } else {
-          this.$toasted.success(response.data.msj_sunat)
-          this.loading = false
-        }
-        this.$nextTick(() => {
-          this.$refs.tablaVentas.refresh()
-        })
       });
     },
     getDetalles (idDocVentaRemision) {
@@ -352,4 +367,4 @@ export default {
 .prod-detalle th, .prod-detalle td{
   background-color: #ffffff;
 }
-</style>
+</style> 
