@@ -174,7 +174,7 @@
                 <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
-                <td><b>IGV (10%)</b></td>
+                <td><b>IGV (10.5%)</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
               <tr>
@@ -273,7 +273,7 @@ export default {
       let sumatoria = 0
       if (this.igvTotal) {
         // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
-        sumatoria = this.sumatoriaTotal / 1.10
+        sumatoria = this.sumatoriaTotal / 1.105
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.subtotal)
@@ -298,7 +298,7 @@ export default {
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal
         //sumatoria = sumatoria * 0.10
-        sumatoria = sumatoria - (sumatoria/1.10)
+        sumatoria = sumatoria - (sumatoria/1.105)
       } else {
         this.productos.map((value) => {
           sumatoria += parseFloat(value.igv)

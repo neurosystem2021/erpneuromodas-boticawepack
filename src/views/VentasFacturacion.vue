@@ -158,10 +158,10 @@
                         <td>{{ item.Descuento }}</td>
                         <td v-if="row.item.TieneIgv">
                          <!-- {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }} -->
-                          {{ (item.Subtotal / (row.item.IgvNuevo==1?1.10:1.18)) | redondear }}                          
+                          {{ (item.Subtotal / (row.item.IgvNuevo==1?1.105:1.18)) | redondear }}                          
                         </td>
                         <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal - (item.Subtotal / (row.item.IgvNuevo==1?1.10:1.18)) | redondear}}
+                          {{ item.Subtotal - (item.Subtotal / (row.item.IgvNuevo==1?1.105:1.18)) | redondear}}
                         </td>
                         <td>{{ item.Subtotal | redondear }}</td>
                       </tr>
