@@ -1922,7 +1922,7 @@ export default {
     anadirVentana() {
       this.initValueCliente = "00000000 CLIENTE VARIOS";
 
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.productos = [];
       this.ventas.push(venta);
       this.$nextTick(() => {
@@ -2859,7 +2859,7 @@ export default {
       console.log("aqui", proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
 
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
       venta.proforma = proforma;
       venta.UsuarioProforma = proforma.UsuarioReg;

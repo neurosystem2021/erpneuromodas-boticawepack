@@ -1,5 +1,5 @@
 <template>
-    <b-container fluid class="ancho px-0 py-0"  id="conten">
+    <b-container fluid class="ancho px-0 py-0">
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
           <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
@@ -580,7 +580,7 @@
                             <b-popover 
                               :target="`popover-metodopago${index}`" 
                               title="Metodo de pago" 
-                              triggers="manual" 
+                              triggers="manual blur focus" 
                               placement="top" 
                               :show.sync="mostrarMP[index]" 
                               :style="{ minWidth: '600px' }">
@@ -607,12 +607,7 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                              @input="
-                                              ventas[ventaActiva].pago.efectivo.monto = 
-                                              $options.filters.redondear(
-                                               getTotal() - 
-                                                ventas[ventaActiva].pago.mastercard.monto - 
-                                              $event.target.value)"/>
+                                              @input="actualizarEfectivoPorPago()"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -623,7 +618,8 @@
                                       </td>
                                       <td>
                                         <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                          @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear( getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                          @input="actualizarEfectivoPorPago()"
+/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -635,7 +631,7 @@
                                       <td>
                                         <input
                                           class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                           @input="ventas[ventaActiva].pago.efectivo.monto = $options.filters.redondear( getTotal() - ventas[ventaActiva].pago.visa.monto - $event.target.value)"/>
+                                           @input="actualizarEfectivoPorPago()"/>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -660,7 +656,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="manual blur focus" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -1570,6 +1566,18 @@ export default {
         this.bloquearInput = false;
       }
     },
+    actualizarEfectivoPorPago() {
+      this.$nextTick(() => {
+        const pago = this.ventas[this.ventaActiva].pago;
+        const otros =
+          this.obtenerMonto(pago.visa.monto) +
+          this.obtenerMonto(pago.mastercard.monto) +
+          this.obtenerMonto(pago.delivery.monto);
+        pago.efectivo.monto = parseFloat(
+          (this.getTotal() - otros).toFixed(2)
+        );
+      });
+    },
     activarModalTouch() {
       this.touchHab = !this.touchHab;
     },
@@ -1875,7 +1883,7 @@ export default {
     anadirVentana() {
       this.initValueCliente = "00000000 CLIENTE VARIOS";
 
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.productos = [];
       this.ventas.push(venta);
       this.$nextTick(() => {
@@ -2679,7 +2687,7 @@ export default {
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
 
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
       venta.proforma = proforma;
       venta.UsuarioProforma = proforma.UsuarioReg;
