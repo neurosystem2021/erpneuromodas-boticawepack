@@ -417,6 +417,19 @@
                                                     :unchecked-value="0">
                                                     Por entregar
                                                 </b-form-checkbox>
+                                                <b-form-checkbox 
+                                                    v-model="ventas[ventaActiva].NotaPedido"
+                                                    :value="1"
+                                                    :unchecked-value="0">
+                                                    Nota de pedido
+                                                </b-form-checkbox>
+                                                <b-form-textarea
+                                                    v-if="ventas[ventaActiva].NotaPedido"
+                                                    v-model="ventas[ventaActiva].DescripcionNotaPedido"
+                                                    placeholder="Ingrese la descripción de la nota de pedido"
+                                                    rows="2"
+                                                    class="mt-2"
+                                                ></b-form-textarea>
                                             </td>
                                         </tr>
                                         <tr>
@@ -1051,6 +1064,8 @@ export default {
         NotaDescMotivo: "",
         EsCreditoProforma: 0,
         FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
+        NotaPedido: 0,
+        DescripcionNotaPedido: "",
         EsDescripcion: 0,
         DescripcionProforma: "",
         DescripcionProforma2: "",
