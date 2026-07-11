@@ -3,33 +3,84 @@
       <b-container class="bv-example-row">
         <b-row>
           <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
+            <b-form-group label="Buscar" class="mb-0">
               <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+                <b-form-input v-model="filter" placeholder="Buscar" />
                 <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+                  <b-btn :disabled="!filter" @click="limpiarBuscador">Limpiar</b-btn>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <br />
           </b-col>
-          <b-col md="6" class="my-1">
-            <b-row>
-            <b-col md="8">
 
-              <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Clientes</p>
-            </b-col>
-            </b-row>
+          <b-col md="4" class="my-1">
+            <b-form-group label="Mostrar" class="mb-0">
+              <b-form-select :options="pageOptions" v-model="perPage" @input="generarReporte"/>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="2" class="my-1">
+            <p style="margin-top: 32px;">de <b class="text-success">{{ this.totalRows }}</b> Clientes</p>
+          </b-col>
+
+          <b-col md="3" class="my-1">
+            <b-form-group label="Departamento" class="mb-0">
+              <b-form-select 
+                v-model="ubigeoSeleccionado.departamento" 
+                @change="cambioDepartamento">
+                <option :value="null">-- Todos --</option>
+                <option 
+                  v-for="dep in $store.state.listUbigeo" 
+                  :key="dep.id" 
+                  :value="dep">
+                  {{ dep.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="3" class="my-1">
+            <b-form-group label="Provincia" class="mb-0">
+              <b-form-select 
+                v-model="ubigeoSeleccionado.provincia" 
+                :disabled="!ubigeoSeleccionado.departamento"
+                @change="cambioProvincia">
+                <option :value="null">-- Todas --</option>
+                <option 
+                  v-for="prov in provinciasDisponibles" 
+                  :key="prov.id" 
+                  :value="prov">
+                  {{ prov.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="3" class="my-1">
+            <b-form-group label="Distrito" class="mb-0">
+              <b-form-select 
+                v-model="ubigeoSeleccionado.distrito" 
+                :disabled="!ubigeoSeleccionado.provincia">
+                <option :value="null">-- Todos --</option>
+                <option 
+                  v-for="dist in distritosDisponibles" 
+                  :key="dist.id" 
+                  :value="dist">
+                  {{ dist.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="3" class="my-1">
+            <b-form-group label="&nbsp;" class="mb-0">
+              <b-button variant="primary" block @click="generarReporte()">Generar <i class="fa fa-search"></i></b-button>
+            </b-form-group>
           </b-col>
 
           <b-table small
             ref="tablaClientes"
-            :filter="filter"
+            :filter="filterQuery"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             striped
@@ -65,6 +116,10 @@ import ClienteForm from "@/components/ClientesFormEdit";
 
 export default {
   mounted() {
+    if (this.$store.state.listUbigeo.length === 0) {
+      this.$store.dispatch("GetUbigeo");
+    }
+
     this.axios.get(this.API + "clientes/count").then(response => {
       this.totalRows = response.data.total;
     });
@@ -74,6 +129,7 @@ export default {
       API: config.API,
       pageOptions: [5, 10, 15, 50, 100],
       filter: null,
+      filterQuery: "", // El estado controlado que el Provider escuchará
       sortBy: "IdCliente",
       sortDesc: false,
       clienteSelect: {},
@@ -84,14 +140,24 @@ export default {
         { key: "DniRuc", sortable: true },
         { key: "Direccion", sortable: true },
         { key: "Telefono", sortable: false },
-        { key: "Telefono", sortable: false },
         { key: "Email", sortable: false },
         { key: "Puntos", sortable: true },
-        { key: "EsVIP", sortable: true }
+        { key: "EsVIP", sortable: true },
+        // { key: "Departamento", sortable: true },
+        { key: "Provincia", sortable: true },
+        { key: "Distrito", sortable: true }
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+
+      ubigeoSeleccionado: {
+        departamento: null,
+        provincia: null,
+        distrito: null
+      },
+      provinciasDisponibles: [],
+      distritosDisponibles: []
     };
   },
   methods: {
@@ -108,9 +174,39 @@ export default {
       this.clienteSelect = {};
       this.$refs.clienteForm.show = true;
     },
+    cambioDepartamento(dep) {
+      this.ubigeoSeleccionado.provincia = null;
+      this.ubigeoSeleccionado.distrito = null;
+      this.distritosDisponibles = [];
+      this.provinciasDisponibles = dep ? dep.children : [];
+    },
+    cambioProvincia(prov) {
+      this.ubigeoSeleccionado.distrito = null;
+      this.distritosDisponibles = prov ? prov.children : [];
+    },
+    
+    // Al presionar generar, traspasamos el 'filter' a 'filterQuery' y refrescamos la tabla
+    generarReporte() {
+      this.currentPage = 1;
+      this.filterQuery = this.filter || "";
+      this.$nextTick(() => {
+        if (this.$refs.tablaClientes) {
+          this.$refs.tablaClientes.refresh();
+        }
+      });
+    },
+    limpiarBuscador() {
+      this.filter = '';
+      this.generarReporte();
+    },
+
     myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
+      let codUbigeo = "";
+      if (this.ubigeoSeleccionado.distrito) codUbigeo = this.ubigeoSeleccionado.distrito.id;
+      else if (this.ubigeoSeleccionado.provincia) codUbigeo = this.ubigeoSeleccionado.provincia.id;
+      else if (this.ubigeoSeleccionado.departamento) codUbigeo = this.ubigeoSeleccionado.departamento.id;
+
+      // Usamos ctx.filter (que equivale a filterQuery internamente)
       let url =
         this.API +
         "clientes?limit=" +
@@ -120,11 +216,12 @@ export default {
         "&q=" +
         (ctx.filter || "") +
         "&sortBy=" +
-        ctx.sortBy;
+        ctx.sortBy +
+        "&ubigeo=" + codUbigeo; 
+        
       url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
-      let promise = this.axios.get(url);
 
-      return promise
+      return this.axios.get(url)
         .then(result => {
           this.items = result.data;
           console.log(result.data);
@@ -147,5 +244,16 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+/* Cuando la pantalla sea grande (computadoras), dale un ancho máximo más holgado */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1450px !important; /* Ajusta este número (ej. 1350px o 1500px) a tu gusto */
+  }
+}
+
+/* Opcional: Hace que los textos de la cabecera no se amontonen */
+#my-table th {
+  white-space: nowrap;
+}
 </style>

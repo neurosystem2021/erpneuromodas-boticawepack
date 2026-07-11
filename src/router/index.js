@@ -40,6 +40,7 @@ import Dashboard from "@/views/reportes/Dashboard.vue";
 import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import ReporteEfectivoParcial from "@/views/reportes/ReporteEfectivoParcial.vue";
 import KardexValorizado from "@/views/KardexValorizado.vue";
 import PreOrden from "@/views/PreOrden.vue";
 import CargarComprasXml from "@/views/CargarComprasXml.vue";
@@ -165,6 +166,11 @@ export default new Router({
       path: "/reportes/rankingclientes",
       name: "RankingClientes",
       component: RankingClientes
+    },
+    {
+      path: "/reportes/ReporteEfectivoParcial",
+      name: "ReporteEfectivoParcial",
+      component: ReporteEfectivoParcial
     },
     {
       path: "/reportes/huespedes",

@@ -1,47 +1,8 @@
 <template>
   <div>
-    <b-button @click="promptPassword"  class="btnAction" style="background-color: #183b76; color:white; font-weight: bold;">Movimiento</b-button>
+    <b-button @click="promptPassword" variant="primary" class="btn-pos btn-accion" style="font-weight: bold;"><i class="fas fa-shopping-cart"></i>Caja/Banco</b-button>
     <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
       <b-tabs content-class="mt-3">
-        <b-tab title="Gasto" style="text-align: left;">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4">
-                  <label>Cuenta:</label>
-                  <autocomplete
-                  required="required"
-                  ref="inputCaja"
-                  :url="API + 'cuentas'"
-                  anchor="Cuenta"
-                  label="writer"
-                  placeholder=""
-                   :on-select="setCuenta" 
-                  initValue="Caja Principal"
-                  :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
-                  :onInput="(val) => newDniRuc = val"
-                  :classes="{input: 'form-control'}"
-                  >
-                  </autocomplete>
-                  <br>
-                  <label>Gasto:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template>
-              <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-        
         <b-tab title="Ingreso" style="text-align: left;">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
@@ -118,7 +79,45 @@
             </template>
           </b-form>
         </b-tab>
-        <b-tab title="Dep. Cuenta Bancaria" style="text-align: left;">
+        <b-tab title="Yape" style="text-align: left;">
+          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+            <div class="my-3">
+              <b-row>
+                <b-col md="4">
+                  <label>Cuenta:</label>
+                  <autocomplete
+                  required="required"
+                  ref="inputCaja"
+                  :url="API + 'cuentas'"
+                  anchor="Cuenta"
+                  label="writer"
+                  placeholder=""
+                   :on-select="setCuenta" 
+                  initValue="Caja Principal"
+                  :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
+                  :onInput="(val) => newDniRuc = val"
+                  :classes="{input: 'form-control'}"
+                  >
+                  </autocomplete>
+                  <br>
+                  <label>Monto:</label>
+                  <b-form-group>
+                    <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                  </b-form-group>
+                  <label>N° de Operacion</label>
+                  <b-form-group>
+                    <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </div>
+            <template>
+              <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
+              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+            </template>
+          </b-form>
+        </b-tab>
+        <b-tab title="Transferencia" style="text-align: left;">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
@@ -304,7 +303,7 @@ export default {
         this.axios
           .post(this.API + "cajaybanco/gasto", {
             producto: this.selectProducto,
-            concepto: "Gasto " + " - " + this.selectProducto.GastoDesc,
+            concepto: "Yape " + " - " + this.selectProducto.GastoDesc,
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
@@ -393,7 +392,7 @@ export default {
         this.axios
           .post(this.API + "cajaybanco/deposito", {
             producto: this.selectProducto,
-            concepto: "Deposito " + " - " + this.selectProducto.DepositoDesc,
+            concepto: "Transferencia " + " - " + this.selectProducto.DepositoDesc,
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdCuenta: this.Cuenta.IdCuenta,
             IdHabitacion: this.selectProducto.IdProducto,

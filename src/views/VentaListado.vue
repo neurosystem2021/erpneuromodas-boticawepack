@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="ancho px-0 py-0" id="conten">
+  <b-container fluid >
     <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
       <div class="d-block text-center">
         <h3 style="text-decoration: underline;">{{ productoNombre }}</h3>
@@ -75,7 +75,7 @@
                 <b-row>
                   <b-col lg="6" xl="6" cols="12">
                     <b-row>
-                      <b-col lg="4" xl="4" cols="12" class="mostrarMovil">
+                      <b-col lg="4" xl="4" cols="12" class="mostrarMovil" style="font-size: 1.5rem; font-weight: bold; text-align: center;background-color: yellow;">
                         Tipo de Venta: {{ ventas[ventaActiva].Serie }} - {{ ventas[ventaActiva].Numero }}
                       </b-col>
                       <b-col lg="4" xl="4" cols="12" class="ocultarMovil">
@@ -150,6 +150,126 @@
                             <b-input-group-append>
                               <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                             </b-input-group-append>
+                            <b-button
+                              v-show="venta.cliente.TotalDeuda > 0"
+                              :id="`popover-deudas${index}`"
+                              variant="danger"
+                              size="sm"
+                              class="ml-2"
+                              @click="toggleDeudas(index)"
+                            >
+                              <i class="fa fa-exclamation-triangle"></i>
+                              Deuda: S/ {{ venta.cliente.TotalDeuda }}
+                            </b-button>
+                            <b-popover
+                              :target="`popover-deudas${index}`"
+                              title="Deudas pendientes"
+                              triggers="manual blur"
+                              placement="bottom"
+                              :show.sync="mostrarDeudas[index]"
+                              popover-class="popover-deudas"
+                            >
+                              <div style="width:100%">
+
+                                <div class="mb-2"  style="background:#fff;">
+                                  <strong>Cliente:</strong>
+                                  {{ venta.cliente.Cliente }}
+                                </div>
+
+                                <div class="mb-2"  style="background:#fff;">
+                                  <strong>Total deuda:</strong>
+                                  S/ {{ venta.cliente.TotalDeuda }}
+                                </div>
+
+                                <table class="table table-sm table-bordered">
+                                  <thead>
+                                    <tr>
+                                      <th>Fecha</th>
+                                      <th>Documento</th>
+                                      <th>Vence</th>
+                                      <th>Saldo</th>
+                                    </tr>
+                                  </thead>
+
+                                  <tbody>
+
+                                    <tr v-if="loadingDeudas">
+                                      <td colspan="4" class="text-center">
+                                        Cargando...
+                                      </td>
+                                    </tr>
+
+                                    <tr
+                                      v-for="item in deudasClienteCredito"
+                                      :key="item.IdDocVenta"
+                                    >
+                                      <td  style="background:#fff;">{{ item.FechaDoc }}</td>
+                                      <td  style="background:#fff;" >{{ item.Correlativo }}</td>
+                                      <td  style="background:#fff;">{{ item.FechaCredito }}</td>
+                                      <td  style="background:#fff;">
+                                        S/ {{ item.Saldo }}
+                                      </td>
+                                    </tr>
+
+                                  </tbody>
+
+                                </table>
+
+                              </div>
+                            </b-popover>
+                            <b-button
+                              v-show="venta.cliente.TotalDeudaEfectivoParcial > 0"
+                              :id="`popover-deudasparcial${index}`"
+                              variant="warning"
+                              size="sm"
+                              class="ml-2"
+                              @click="toggleDeudasParcial(index)"
+                            >
+                              <i class="fa fa-coins"></i>
+                              Efvo. Parcial: S/ {{ venta.cliente.TotalDeudaEfectivoParcial }}
+                            </b-button>
+
+                            <b-popover
+                              :target="`popover-deudasparcial${index}`"
+                              title="Deudas pendientes (Efectivo Parcial)"
+                              triggers="manual blur"
+                              placement="bottom"
+                              :show.sync="mostrarDeudasParcial[index]"
+                              popover-class="popover-deudas"
+                            >
+                              <div style="width:100%">
+                                <div class="mb-2" style="background:#fff;">
+                                  <strong>Cliente:</strong> {{ venta.cliente.Cliente }}
+                                </div>
+
+                                <div class="mb-2" style="background:#fff;">
+                                  <strong>Total deuda (Efvo. Parcial):</strong>
+                                  S/ {{ venta.cliente.TotalDeudaEfectivoParcial }}
+                                </div>
+
+                                <table class="table table-sm table-bordered">
+                                  <thead>
+                                    <tr>
+                                      <th>Fecha</th>
+                                      <th>Documento</th>
+                                      <th>Vence</th>
+                                      <th>Saldo</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr v-if="loadingDeudas">
+                                      <td colspan="4" class="text-center">Cargando...</td>
+                                    </tr>
+                                    <tr v-for="item in deudasClienteEfectivoParcial" :key="item.IdDocVenta">
+                                      <td style="background:#fff;">{{ item.FechaDoc }}</td>
+                                      <td style="background:#fff;">{{ item.Correlativo }}</td>
+                                      <td style="background:#fff;">{{ item.FechaCredito }}</td>
+                                      <td style="background:#fff;">S/ {{ item.Saldo }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </b-popover>
                           </b-input-group>
 
                           <b-form-select v-if="ventas[ventaActiva].cliente.IdCliente" v-model="venta.CampoDireccion"
@@ -174,6 +294,23 @@
                       <b-col lg="6" xl="6" cols="12" class="pt-0">
                         <b-form-input v-model="venta.nombreOrganizacion" v-if="venta.EsOrganizacion"
                           :id="`txtNombreOrganizacion-${index}`" placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
+                      </b-col>
+                      <b-col cols="12" v-if="ventas[ventaActiva].idProforma > 0" class="mt-1">
+                        <b-row class="ml-1">
+                          <h5 class="mt-1">
+                            Proforma Seleccionada:
+                            <b-badge variant="info" style="font-size: 1.2rem">{{
+                              ventas[ventaActiva].anioNumeroProforma
+                            }}</b-badge>
+                          </h5>
+                          <b-button
+                            class="ml-2 mb-1"
+                            size="sm"
+                            variant="warning"
+                            @click="limpiarProforma"
+                            ><b>Quitar</b></b-button
+                          >
+                        </b-row>
                       </b-col>
                     </b-row>
                   </b-col>
@@ -374,7 +511,7 @@
                       </b-button-group>  -->
                         <div class="ocultarMovil">
                           <b-button-group size="sm">
-                            <pago-deuda></pago-deuda>
+                            <pago-deuda @deuda-actualizada="actualizarDeudaActual"></pago-deuda>
                           </b-button-group>
                         </div>
                         <div class="ocultarMovil">
@@ -382,10 +519,12 @@
                             <movimiento></movimiento>
                           </b-button-group>
                         </div>
-                        <b-button-group size="sm">
+                        <div class="ocultarMovil">
+                        <b-button-group size="sm" >
                           <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"
                             @cargarProforma="cargarProforma"></proformas>
                         </b-button-group>
+                        </div>
                         <div class="ocultarMovil">
                           <b-button-group size="sm" class="ocularMovil" v-if="false">
                             <pre-orden-lista v-show="!this.$route.query.idPreOrden" :idAlmacen="venta.almacen.IdAlmacen"
@@ -426,28 +565,34 @@
                   </b-col>
                   <b-col md="4" cols="12">
                     <b-row class="centrado d-flex justify-content-center my-2">
-                      <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear
-                        Proforma</b-button>
                       <b-button v-if="mostrarVentaFlag()" block class="mx-1 btnAction" :disabled="inProgress"
                         variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
+                      
+                      <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear
+                        Proforma</b-button>
+                      
                       <b-button block variant="warning" class="btnAction" @click="anadirVentana()"> Nueva
                         Ventana</b-button>
-                      <delivery-modal v-if="mostrarVentaFlag()" style="min-width: 100%; margin: 1% 0;"
+
+                      <delivery-modal v-if="mostrarVentaFlag()" style="min-width: 100%; margin: 1% 0;" class="ocultarMovil"
                         ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                      <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction" block
+
+                      <b-button v-if="touchHab" style="background: #B0BEC5; color: #ffffff;" class="btnAction ocultarMovil" block
                         @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                      <b-button v-else style="background: #A1887F; color:#ffffff" class="btnAction" block
+                      <b-button v-else style="background: #A1887F; color:#ffffff" class="btnAction ocultarMovil" block
                         @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+
                       <b-button block v-if="ventas.length > 1" variant="danger" @click="eliminarVentana()"> Cancelar
                         Venta</b-button>
-                      <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction" block @click="ocultarNav()">
+
+                      <b-button :variant="mostrarNav ? 'danger' : 'info'" class="btnAction ocultarMovil" block @click="ocultarNav()">
                         <i class="fas fa-bars"></i>
                         <span v-if="mostrarNav"> Ocultar Nav</span>
                         <span v-else> Mostrar Nav</span>
                       </b-button>
                     </b-row>
                   </b-col>
-                  <b-col lg="3" xl="3" cols="12">
+                  <b-col lg="3" xl="4" cols="12">
                     <table class="table b-table border table-footer" style="font-size:0.85rem">
                       <tbody>
                         <tr>
@@ -463,7 +608,7 @@
                               style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 4" variant="info"
                               style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual"
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual blur focus"
                               placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
                               <slot name="metodopago" style="width: 1200px;">
                                 <table class="table b-table border table-footer table-sm">
@@ -523,13 +668,27 @@
                                           @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto - venta.pago.visa.monto - $event.target.value)" />
                                       </td>
                                     </tr>
+                                    <tr>
+                                      <td colspan="4" class="text-center py-2">
+                                        <b-form-checkbox
+                                          v-model="ventas[ventaActiva].EfectivoParcial"
+                                          :value="1"
+                                          :unchecked-value="0"
+                                          switch
+                                          size="lg"
+                                          class="d-flex justify-content-center align-items-center efectivoParcialSwitch"
+                                        >
+                                          <i class="fas fa-coins"></i> <b>EFECTIVO PARCIAL</b>
+                                        </b-form-checkbox>
+                                      </td>
+                                    </tr>
                                   </tbody>
                                 </table>
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-success">SubTotal</td>
-                          <td class="table-success">{{ getSubTotal() }}</td>
+                          <td class="table-success resumen-subtotal">SubTotal</td>
+                          <td class="table-success resumen-subtotal">{{ getSubTotal() }}</td>
                         </tr>
                         <tr>
                           <td>
@@ -538,7 +697,7 @@
                               <i class="fas fa-tags"></i>
                             </b-button>
 
-                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="manual"
+                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="manual blur focus"
                               placement="top" :show.sync="mostrarOp[index]" :style="{ minWidth: '600px' }">
                               <slot :name="`opciones${ventaActiva}`">
                                 <table class="table b-table border table-footer">
@@ -633,16 +792,16 @@
 
                             </b-popover>
                           </td>
-                          <td class="table-danger">Descuento</td>
-                          <td class="table-danger">
+                          <td class="table-danger resumen-subtotal">Descuento</td>
+                          <td class="table-danger resumen-subtotal">
                             {{ getDescuento() }}
                           </td>
                         </tr>
 
                         <tr>
                           <td></td>
-                          <td><b>TOTAL</b></td>
-                          <td class="table-danger">
+                          <td class="resumen-total-label total-final-label"><b>TOTAL</b></td>
+                          <td class="resumen-total-monto table-danger">
                             {{ getTotal() }}
                           </td>
                         </tr>
@@ -650,14 +809,15 @@
                           <td colspan="2">
                             <label>pagó con:</label>
                             <b-form-input type="text" placeholder="Pagó con" v-model="ventas[ventaActiva].pagocon">
-                            </b-form-input><br>
-                          </td>
-                          <td>
-                            <label>Vuelto:</label>
-                            <b>S/
-                              {{ parseFloat(ventas[ventaActiva].pagocon - getTotal()).toFixed(2) }}
-
-                            </b>
+                            </b-form-input></td>
+                            <td><br><br>
+                          <div class="vuelto-contenedor">
+                              <label>Vuelto:</label>
+                              <div class="resumen-vuelto">
+                                <b>S/ {{ parseFloat(ventas[ventaActiva].pagocon - getTotal(ventaActiva)).toFixed(2)
+                                  }}</b>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -977,7 +1137,8 @@ export default {
         //   variant: "success",
         //   class: "text-center"
         // },
-        { key: "descuento", label: "Descuento" },
+        { key: "descuento", label: "Descuento", class: "d-none d-md-table-cell" },
+
         {
           key: "total",
           label: "Total",
@@ -1022,6 +1183,7 @@ export default {
           mastercard: { IdMetodoPago: 3, monto: 0 },
           delivery: { IdMetodoPago: 4, monto: 0 }
         },
+        EfectivoParcial: 0,
         idProductos: [],
         NroComprobanteModifica: "",
         CodSunatModifica: "",
@@ -1046,6 +1208,8 @@ export default {
         EsOrganizacion: 0,
         NombreOrganizacion: "",
         productos: [],
+        idProforma: 0,
+        anioNumeroProforma: "",
         accionBoton: 1
       },
       ventas: [
@@ -1082,6 +1246,7 @@ export default {
             mastercard: { IdMetodoPago: 3, monto: 0 },
             delivery: { IdMetodoPago: 4, monto: 0 }
           },
+          EfectivoParcial: 0,
           idProductos: [],
           NroComprobanteModifica: "",
           CodSunatModifica: "",
@@ -1098,7 +1263,9 @@ export default {
           EsOrganizacion: 0,
           NombreOrganizacion: "",
           productos: [],
-          accionBoton: 1
+          accionBoton: 1,
+          idProforma: 0,             // 👈 NUEVO
+          anioNumeroProforma: ""     // 👈 NUEVO
         }
       ],
       bloquearInput: false,
@@ -1116,6 +1283,10 @@ export default {
       objProd: {},
       cantidadInput: "",
       mostrarOp: {},
+      mostrarDeudas: {},
+      mostrarDeudasParcial: {},
+      deudasCliente: [],
+      loadingDeudas: false,
       diasValidosProf: 0
     };
   },
@@ -1139,9 +1310,131 @@ export default {
 
   methods: {
     mostrarVentaFlag() {
-      let IdPerfil = [1, 25, "1", "25"];
+      let IdPerfil = [1, 25, 26, "1", "25","26"];
       let val = sessionStorage.getItem("IdPerfil");
       return IdPerfil.includes(val);
+    },
+    toggleEfectivoParcial() {
+      this.ventas[this.ventaActiva].EfectivoParcial =
+      this.ventas[this.ventaActiva].EfectivoParcial ? 0 : 1;
+    },
+    async actualizarDeudaActual() {
+      const cliente = this.ventas[this.ventaActiva].cliente;
+      if (!cliente.IdCliente) return;
+
+      const totales = await this.cargarResumenDeudaCliente(cliente.IdCliente);
+
+      this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+      this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+    },
+      async toggleDeudas(index) {
+
+        if (this.mostrarDeudas[index]) {
+
+          this.$set(
+            this.mostrarDeudas,
+            index,
+            false
+          );
+
+          return;
+        }
+
+        await this.cargarDeudasCliente();
+
+        this.$set(
+          this.mostrarDeudas,
+          index,
+          true
+        );
+
+      },
+      async cargarDeudasCliente() {
+
+      const cliente =
+        this.ventas[this.ventaActiva].cliente;
+
+      if (!cliente.IdCliente) {
+        return;
+      }
+
+      this.loadingDeudas = true;
+
+      try {
+
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          {
+            params: {
+              idCliente: cliente.IdCliente
+            }
+          }
+        );
+
+        response.data.forEach(item => {
+
+          try {
+
+            item.NotasCredito =
+              JSON.parse(item.NotasCredito || "[]");
+
+          }
+          catch(e) {
+
+            item.NotasCredito = [];
+
+          }
+
+        });
+
+        this.deudasCliente = response.data;
+
+      }
+      catch(error){
+
+        console.log(error);
+
+        this.$toasted.show(
+          "Error al cargar deudas"
+        );
+
+      }
+      finally{
+
+        this.loadingDeudas = false;
+
+      }
+
+    },
+    async cargarResumenDeudaCliente(idCliente) {
+      try {
+        const response = await this.axios.get(
+          this.API + "cliente/deudas",
+          { params: { idCliente } }
+        );
+
+        // Un documento con EfectivoParcial=1 cuenta como "efectivo parcial",
+        // aunque también tenga EsCredito=1, para evitar contarlo doble.
+        const totalEfectivoParcial = response.data.reduce((total, item) => {
+          return item.EfectivoParcial == 1
+            ? total + parseFloat(item.Saldo || 0)
+            : total;
+        }, 0);
+
+        const totalCredito = response.data.reduce((total, item) => {
+          return (item.EfectivoParcial != 1 && item.EsCredito == 1)
+            ? total + parseFloat(item.Saldo || 0)
+            : total;
+        }, 0);
+
+        return {
+          totalCredito: parseFloat(totalCredito.toFixed(2)),
+          totalEfectivoParcial: parseFloat(totalEfectivoParcial.toFixed(2))
+        };
+      } catch (error) {
+        console.log(error);
+        return { totalCredito: 0, totalEfectivoParcial: 0 };
+      }
     },
     abrirModal() {
       this.touchModal = true;
@@ -1248,7 +1541,7 @@ export default {
           this.$swal({
             position: "top-end",
             icon: "info",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             title:
               "Pedido de Delivery de: <br> " +
               "<strong>" +
@@ -1965,6 +2258,10 @@ export default {
         }
         console.log("sss");
         this.ventas[this.ventaActiva].cliente = obj;
+        this.cargarResumenDeudaCliente(obj.IdCliente).then(totales => {
+          this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+          this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+        });
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
@@ -1980,6 +2277,10 @@ export default {
                 // inputCliente.setValue(response.data.Cliente);
               }
               this.ventas[this.ventaActiva].cliente = response.data;
+              this.cargarResumenDeudaCliente(obj.IdCliente).then(totales => {
+                this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+                this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+              });
               this.ventas[this.ventaActiva].CampoDireccion =
                 response.data.Direccion;
             } else {
@@ -2124,6 +2425,7 @@ export default {
 
     async guardarVenta() {
       this.inProgress = true;
+      try {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2173,7 +2475,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2189,7 +2491,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
@@ -2206,7 +2508,7 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.inProgress = false;
@@ -2220,7 +2522,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2239,7 +2541,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2254,7 +2556,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2279,7 +2581,7 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2331,6 +2633,14 @@ export default {
             "_blank",
             "noopener"
           );
+
+          // 👇 Solo aquí, al confirmar la venta, marcamos la proforma como facturada
+          if (venta.idProforma > 0) {
+            this.axios.put(this.API + "proforma/marcarpuntoventa", {
+              IdProforma: venta.idProforma,
+              IdDocVenta: response.data.insertId 
+            });
+          }
         }
         this.inProgress = false;
         if (this.ventas.length == 1) {
@@ -2348,6 +2658,12 @@ export default {
         //   return;
         // }
       });
+      } catch (error) {
+      console.error("Error en guardarVenta:", error);
+      this.$toasted.show("Ocurrió un error al procesar la venta: " + error.message);
+    } finally {
+      this.inProgress = false;   // 👈 esto garantiza que el botón nunca se quede bloqueado
+    }
     },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
@@ -2419,7 +2735,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2434,7 +2750,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
@@ -2450,7 +2766,7 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         return;
@@ -2463,7 +2779,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2481,7 +2797,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2495,7 +2811,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            // target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2518,7 +2834,7 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          // target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2571,6 +2887,12 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
+    
+    limpiarProforma() {
+      this.ventas[this.ventaActiva].idProforma = 0;
+      this.ventas[this.ventaActiva].anioNumeroProforma = "";
+    },
+
     async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
@@ -2584,6 +2906,9 @@ export default {
       venta.cliente = proforma;
       venta.vendedor = { Usuario: proforma.UsuarioReg };
       venta.mostrarOp = {};
+
+      venta.idProforma = proforma.IdProforma;
+      venta.anioNumeroProforma = proforma.Anio + "-" + proforma.Numero;
       // console.log("proforma", proforma);
       let productos = [];
       proforma.productos.forEach(async producto => {
@@ -2842,6 +3167,16 @@ export default {
       this.productoNombre = producto;
       this.productoUrl = url;
       this.$refs["modalImagen"].show();
+    },
+    async toggleDeudasParcial(index) {
+      if (this.mostrarDeudasParcial[index]) {
+        this.$set(this.mostrarDeudasParcial, index, false);
+        return;
+      }
+
+      await this.cargarDeudasCliente();
+
+      this.$set(this.mostrarDeudasParcial, index, true);
     }
   },
   computed: {
@@ -2862,6 +3197,14 @@ export default {
       } else {
         return this.API + "productos";
       }
+    },
+    deudasClienteCredito() {
+      return (this.deudasCliente || []).filter(
+        d => d.EfectivoParcial != 1 && d.EsCredito == 1
+      );
+    },
+    deudasClienteEfectivoParcial() {
+      return (this.deudasCliente || []).filter(d => d.EfectivoParcial == 1);
     }
   },
   watch: {
@@ -2948,13 +3291,75 @@ export default {
   color: #fff !important;
   background: #65ba9b !important;
 }
+.resumen-venta{
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.resumen-venta td{
+    padding:12px;
+}
+
+.resumen-subtotal{
+    font-size:18px;
+    font-weight:700;
+}
+
+.resumen-total-label{
+    font-size:22px;
+    font-weight:900;
+    color:#222;
+}
+
+.resumen-total-monto{
+   background:#c8f0d0 !important;
+    font-size:27px;
+    font-weight:900;
+    text-align:left;
+}
+
+.resumen-venta tr:last-child td{
+    padding-top:18px;
+    padding-bottom:18px;
+}
+
+.resumen-vuelto{
+    font-size:24px;
+    font-weight:900;
+    color:#28a745;
+    margin-top:5px;
+}
+
+.vuelto-contenedor{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:-20px;
+}
+
+.vuelto-contenedor label{
+    margin:0;
+    font-weight:700;
+    font-size:16px;
+}
 
 .pagocon .input-group-text {
   font-size: 0.8rem;
   font-weight: bold;
 }
 </style>
+<style >
+.popover-body {
+    background-color: #fff !important;
+}
+</style>
 <style>
+.popover {
+    max-width: 500px !important;
+    width: 500px !important;
+}
 /* .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
     background-color: #e6e6e6;
@@ -3055,14 +3460,28 @@ export default {
   overflow-y: scroll;
 }
 
+.efectivoParcialSwitch {
+  font-size: 1rem;
+}
+
+.efectivoParcialSwitch .custom-control-label {
+  cursor: pointer;
+  padding-left: 8px;
+}
+
+.efectivoParcialSwitch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
 @media (max-width: 1250px) {
   .divCarrito {
-    height: 70vh;
+    height: 20vh;
   }
 
   .clsCarrito {
     position: relative;
-    max-height: 70vh;
+    max-height: 20vh;
     overflow-y: scroll;
   }
 

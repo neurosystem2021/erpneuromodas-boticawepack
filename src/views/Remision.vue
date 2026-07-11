@@ -470,7 +470,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
   fieldset .row {
     margin-bottom: 5pX;
   }

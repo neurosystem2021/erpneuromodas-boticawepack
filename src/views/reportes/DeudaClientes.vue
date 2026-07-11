@@ -8,9 +8,9 @@
                   <label>Buscar:</label>
               
               <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+                <b-form-input v-model="filter" placeholder="Buscar" @input="onFilterInput" />
                 <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+                  <b-btn :disabled="!filter" @click="limpiarFiltro">Limpiar</b-btn>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -35,43 +35,116 @@
           </b-col>
           <b-col md="4">
             <b-row>
-            <b-col md="8">
+            <b-col md="12">
 
               <b-form-group>
                   <label>Mostrar:</label>
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
             </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
+            <b-col md="">
+             </b-col>
             </b-row>
           </b-col>
+
           <b-col md="4">
+            <b-form-group>
+              <label>Departamento</label>
+              <b-form-select v-model="ubigeoSeleccionado.departamento">
+                <option :value="null">-- TODOS --</option>
+                <option 
+                  v-for="dep in $store.state.listUbigeo" 
+                  :key="dep.id" 
+                  :value="dep">
+                  {{ dep.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="4">
+            <b-form-group>
+              <label>Provincia</label>
+              <b-form-select 
+                v-model="ubigeoSeleccionado.provincia" 
+                :disabled="!ubigeoSeleccionado.departamento">
+                <option :value="null">-- TODOS --</option>
+                <option 
+                  v-for="prov in provinciasDisponibles" 
+                  :key="prov.id" 
+                  :value="prov">
+                  {{ prov.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="4">
+            <b-form-group>
+              <label>Distrito</label>
+              <b-form-select 
+                v-model="ubigeoSeleccionado.distrito" 
+                :disabled="!ubigeoSeleccionado.provincia">
+                <option :value="null">-- TODOS --</option>
+                <option 
+                  v-for="dist in distritosDisponibles" 
+                  :key="dist.id" 
+                  :value="dist">
+                  {{ dist.name }}
+                </option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col md="3">
             <b-form-group>
               <label>Fecha Emisión Inicio:</label>
               <b-form-input
                 v-model="rango.fechaDesde"
                 type="date"
                 step="1"
-                @input="val => $refs.tablaProductos.refresh()"
+                @input="generarReporte"
                 placeholder="Fecha Inicio">
               </b-form-input>
             </b-form-group>
           </b-col>
-          <b-col md="4">
+          <b-col md="3">
             <b-form-group>
               <label>Fecha Emisión Fin:</label>
               <b-form-input
                 v-model="rango.fechaHasta"
                 type="date"
                 step="1"
-                @input="val =>$refs.tablaProductos.refresh() "
+                @input="generarReporte"
                 placeholder="Fecha Inicio">
               </b-form-input>
             </b-form-group>
           </b-col>
-          <b-col md="4">
+          <b-col md="1" class="d-flex align-items-center">
+          <b-form-group class="mt-4">
+            <b-form-checkbox
+              v-model="soloCredito"
+              switch
+              @change="cambioSoloCredito">
+              Es Crédito
+            </b-form-checkbox>
+          </b-form-group>
+        </b-col>
+        <b-col md="1" class="d-flex align-items-center">
+          <b-form-group class="mt-4">
+            <b-form-checkbox
+              v-model="soloEfectivoParcial"
+              switch
+              @change="cambioSoloEfectivoParcial">
+              Es Efectivo Parcial
+            </b-form-checkbox>
+          </b-form-group>
+        </b-col>
+          <b-col md="1">
+            <b-form-group class="mt-4">
+              <b-button variant="primary" block @click="generarReporte()">Generar <i class="fa fa-search"></i></b-button>
+            </b-form-group>
+          </b-col>
+          <b-col md="3">
             <h4>
               <b-form-group class="mt-4">
               <span > Total: {{ calcularTotal() }} </span>
@@ -96,6 +169,16 @@
             <template slot="Saldo" slot-scope="data">
                 {{ data.item.Saldo | redondear(2) }}
             </template>
+            <template slot="TipoDeuda" slot-scope="data">
+                <b-button
+                  size="sm"
+                  :variant="data.item.EfectivoParcial == 1 ? 'warning' : 'info'"
+                  disabled
+                  style="font-weight: bold;"
+                  block>
+                  {{ data.item.EfectivoParcial == 1 ? 'Efectivo Parcial' : 'Crédito' }}
+                </b-button>
+            </template>
           </b-table>
             <b-row>
                 <b-col md="6" class="my-1">
@@ -105,7 +188,9 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage+'&fechaDesde='+rango.fechaDesde+'&fechaHasta='+rango.fechaHasta" target="_blank">Exportar</b-button>
+          <b-button variant="success" size="lg" 
+            :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen+'&limit='+perPage+'&fechaDesde='+rango.fechaDesde+'&fechaHasta='+rango.fechaHasta + obtenerParamsUbigeo() + '&esCredito=' + (soloCredito ? 1 : 0) + '&esEfectivoParcial=' + (soloEfectivoParcial ? 1 : 0) + '&q=' + filter" 
+            target="_blank">Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -123,14 +208,10 @@ import DetalleDeudaCliente from "@/components/DetalleDeudaCliente.vue";
 
 export default {
   mounted() {
-    this.axios
-      .get(
-        this.API + "clientes/deuda/count?idalmacen=" + this.almacen.IdAlmacen
-      )
-      .then(response => {
-        console.log(response);
-        this.totalRows = response.data.total;
-      });
+      if (this.$store.state.listUbigeo.length === 0) {
+        this.$store.dispatch("GetUbigeo");
+      }
+      this.actualizarTotal(); // esto ya cubre el conteo inicial con todos los filtros
   },
   data() {
     return {
@@ -141,6 +222,10 @@ export default {
       sortDesc: false,
       items: [],
       isBusy: false,
+      soloCredito: false,
+      soloEfectivoParcial: false,
+      // temporizador interno para el debounce del buscador de texto
+      _filterTimeout: null,
       fields: [
         { key: "DniRuc", label: "DNI/RUC", sortable: true },
         { key: "Cliente", label: "Cliente", sortable: true },
@@ -151,7 +236,10 @@ export default {
         { key: "Saldo", label: "Saldo", sortable: true },
         { key: "FechaDoc", label: "Emision", sortable: true },
         { key: "FechaCredito", label: "Vencimiento", sortable: true },
-        { key: "Letras", label: "Letras", sortable: true }
+        { key: "Letras", label: "Letras", sortable: true },
+        { key: "Provincia", label: "Provincia", sortable: true },
+        { key: "Distrito", label: "Distrito", sortable: true },
+        { key: "TipoDeuda", label: "Tipo", sortable: false }
       ],
       totalRows: 50,
       perPage: 50,
@@ -160,16 +248,78 @@ export default {
         IdAlmacen: 1
       },
       rango: {
-        fechaDesde: this.$moment().format("YYYY-01-01"),
+        fechaDesde: this.$moment().subtract(3, 'months').format("YYYY-MM-DD"),
         fechaHasta: this.$moment().format("YYYY-MM-DD")
       },
       showLetras: false,
-      urlImg: "/resources/images/logo.png"
+      urlImg: "/resources/images/logo.png",
+      
+      // RESTRUTURACIÓN DE UBIGEO DATA
+      ubigeoSeleccionado: {
+        departamento: null,
+        provincia: null,
+        distrito: null
+      },
+      provinciasDisponibles: [],
+      distritosDisponibles: []
     };
   },
-  methods: {
+  watch: {
+    // Usamos watch en vez de @change para evitar la condición de carrera
+    // entre el listener del v-model y un handler manual sobre el mismo evento
+    // "change": con watch, Vue garantiza que el callback corre DESPUÉS de que
+    // el dato ya fue actualizado, así el request nunca sale con el valor viejo.
+    'ubigeoSeleccionado.departamento'(dep) {
+      this.ubigeoSeleccionado.provincia = null;
+      this.ubigeoSeleccionado.distrito = null;
+      this.distritosDisponibles = [];
+      this.provinciasDisponibles = dep ? dep.children : [];
+      this.generarReporte();
+    },
+    'ubigeoSeleccionado.provincia'(prov) {
+      this.ubigeoSeleccionado.distrito = null;
+      this.distritosDisponibles = prov ? prov.children : [];
+      this.generarReporte();
+    },
+    'ubigeoSeleccionado.distrito'() {
+      this.generarReporte();
+    }
+  },
+methods: {
+    // Devuelve el querystring del nivel de ubigeo más específico seleccionado.
+    // Se manda solo uno (el más profundo), porque el backend ya filtra en cascada:
+    // si seleccionas Distrito, eso ya implica su Provincia y Departamento.
+    obtenerParamsUbigeo() {
+      if (this.ubigeoSeleccionado.distrito) {
+        return "&idDistrito=" + this.ubigeoSeleccionado.distrito.id;
+      }
+      if (this.ubigeoSeleccionado.provincia) {
+        return "&idProvincia=" + this.ubigeoSeleccionado.provincia.id;
+      }
+      if (this.ubigeoSeleccionado.departamento) {
+        return "&idDepartamento=" + this.ubigeoSeleccionado.departamento.id;
+      }
+      return "";
+    },
+
+    // recalcula el total de filas respetando TODOS los filtros activos
+    actualizarTotal() {
+      this.axios
+        .get(
+          this.API + "clientes/deuda/count?idalmacen=" + this.almacen.IdAlmacen +
+          "&q=" + this.filter +
+          "&fechaDesde=" + this.rango.fechaDesde +
+          "&fechaHasta=" + this.rango.fechaHasta +
+          this.obtenerParamsUbigeo() +
+          "&esCredito=" + (this.soloCredito ? 1 : 0) +
+          "&esEfectivoParcial=" + (this.soloEfectivoParcial ? 1 : 0)
+        )
+        .then(response => {
+          this.totalRows = response.data.total;
+        });
+    },
+
     focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
     },
     calcularTotal() {
@@ -183,25 +333,50 @@ export default {
       let res = await this.axios(
         `${this.API}cliente/imprimir/deudas_cliente?idalmacen=${
           this.almacen.IdAlmacen
-        }&limit=perPage&fechaDesde=${this.rango.fechaDesde}&fechaHasta=${
+        }&limit=${this.perPage}&fechaDesde=${this.rango.fechaDesde}&fechaHasta=${
           this.rango.fechaHasta
-        }"&q=${this.filter}`
+        }&q=${this.filter}${this.obtenerParamsUbigeo()}&esCredito=${this.soloCredito ? 1 : 0}&esEfectivoParcial=${this.soloEfectivoParcial ? 1 : 0}`
       ).catch(e => console.log(e));
       if (res.data) {
-        console.log(res.data.url);
         window.open(res.data.url, "_blank");
       }
     },
     setAlmacen(obj) {
       this.almacen = obj;
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh());
+      this.generarReporte();
     },
+
+    // Recarga la tabla Y el contador de total, siempre juntos.
+    generarReporte() {
+      this.currentPage = 1;
+      this.actualizarTotal();
+      if (this.$refs.tablaProductos) {
+        this.$refs.tablaProductos.refresh();
+      }
+    },
+
+    // Buscador de texto: debounce de 400ms para no disparar una petición por cada tecla
+    onFilterInput() {
+      if (this._filterTimeout) clearTimeout(this._filterTimeout);
+      this._filterTimeout = setTimeout(() => {
+        this.generarReporte();
+      }, 400);
+    },
+    limpiarFiltro() {
+      this.filter = "";
+      this.generarReporte();
+    },
+
+    cambioSoloCredito(val) {
+      if (val) this.soloEfectivoParcial = false;
+      this.generarReporte();
+    },
+    cambioSoloEfectivoParcial(val) {
+      if (val) this.soloCredito = false;
+      this.generarReporte();
+    },
+
     myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      // console.log(ctx.filter)
-      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
       let promise = this.axios.get(
         this.API +
           "cliente/deudas?idalmacen=" +
@@ -215,22 +390,20 @@ export default {
           "&fechaDesde=" +
           this.rango.fechaDesde +
           "&fechaHasta=" +
-          this.rango.fechaHasta
+          this.rango.fechaHasta +
+          this.obtenerParamsUbigeo() +
+          "&sortBy=" + ctx.sortBy +
+          "&sortDesc=" + (ctx.sortDesc ? 1 : 0) +
+          "&esCredito=" + (this.soloCredito ? 1 : 0) +
+          "&esEfectivoParcial=" + (this.soloEfectivoParcial ? 1 : 0)
       );
 
       return promise
         .then(response => {
-          console.log(response);
           this.items = response.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
           return this.items;
         })
         .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
           return [];
         });
     },
@@ -246,13 +419,9 @@ export default {
         );
       }
     }
-  },
+},
   components: {
-    // ProductoForm
     DetalleDeudaCliente
   }
 };
 </script>
-
-<style>
-</style>

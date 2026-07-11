@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true"  class="btnAction" variant="info">Pago Deuda</b-button>
+        <b-button block @click="show=true" variant="primary" class="btn-pos btn-accion"><i class="fas fa-money-bill-wave"></i>Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
             <b-modal id="modalConfigVenta" 
@@ -78,6 +78,7 @@
                                     <th>Apli. Nota</th>
                                     <th>Saldo</th>
                                     <th class="text-center">Aplicar</th>
+                                    <th class="text-center">Metodo</th>
                                     <th class="text-center">Cuenta</th>
                                 </tr>
                             </thead>
@@ -102,6 +103,9 @@
                                             min="0"
                                             class="form-control"
                                             placeholder="0"/>
+                                    </td>   
+                                    <td>
+                                        <b-form-select v-model="item.metodoparcial" :options="metodoparcial" class="mb-3" size="md"/>
                                     </td>
                                     <td>
                                         <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
@@ -128,7 +132,26 @@
                             </b-btn>
                         </div>
                         <hr>
-                        <br><br>
+                        <b-row class="mb-1 align-items-end">
+                            <b-col cols="5">
+                                <label for="input-fecha-inicio-pagos">Fecha inicio:</label>
+                                <b-form-input v-model="fechaInicioPagos"
+                                    id="input-fecha-inicio-pagos"
+                                    type="date"></b-form-input>
+                            </b-col>
+                            <b-col cols="5">
+                                <label for="input-fecha-fin-pagos">Fecha fin:</label>
+                                <b-form-input v-model="fechaFinPagos"
+                                    id="input-fecha-fin-pagos"
+                                    type="date"></b-form-input>
+                            </b-col>
+                            <b-col cols="2">
+                                <b-btn size="sm" variant="primary" @click="generarPagos">
+                                    Generar
+                                </b-btn>
+                            </b-col>
+                        </b-row>
+                        <br>
                         <table class="table b-table table-sm">
                             <thead>
                                 <tr>
@@ -178,6 +201,9 @@ import config from '@/store/config.js'
                 vendedor: {},
                 show: false,
                 cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
+                fechaInicioPagos: '',
+                fechaFinPagos: '',
+                clienteActual: null,
             }
         },
         methods: {
@@ -189,7 +215,11 @@ import config from '@/store/config.js'
                 this.cajaBanco = {
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
+                this.fechaInicioPagos = this.$moment().subtract(1, 'months').format("YYYY-MM-DD")
+                this.fechaFinPagos = this.$moment().format("YYYY-MM-DD")
+                this.clienteActual = null
                 this.$refs.inputCliente.setValue('')
+                this.getVendedor()
             },
             getVendedor () {
                 let usuario = sessionStorage.getItem('User')
@@ -213,19 +243,41 @@ import config from '@/store/config.js'
             cargarDeuda (cliente) {
                 this.cajaBanco.cliente = cliente
 
-                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
-                .then((response) => {
-                    response.data.map(data=>data.NotasCredito=JSON.parse(data.NotasCredito) )
-                    this.documentos = response.data
-                    this.documentos.map(d=>d.cuenta=null)
+                Promise.all([
+                    this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente),
+                    this.axios.get(this.API + 'cuentas'),
+                    this.axios.get(this.API + 'metodoparcial')
+                ])
+                .then(([resDeudas, resCuentas, resMetodo]) => {
+                    // Cuentas
+                    this.cuentas = [{ value: null, text: '-- SELECCIONE CUENTA --' }]
+                    resCuentas.data.map(c => {
+                        this.cuentas.push({ value: c.IdCuenta, text: c.Cuenta })
+                    })
+
+                    // Métodos
+                    this.metodoparcial = [{ value: null, text: '-- SELECCIONE METODO --' }]
+                    resMetodo.data.map(c => {
+                        this.metodoparcial.push({ value: c.IdTipoCajaBanco, text: c.TipoCajaBanco })
+                    })
+
+                    // Buscar los valores por defecto según texto
+                    const cuentaDefault = this.cuentas.find(c => c.text.trim().toUpperCase() === 'CAJA PRINCIPAL')
+                    const metodoDefault = this.metodoparcial.find(m => m.text.trim().toUpperCase() === 'EFECTIVO')
+
+                    // Documentos
+                    resDeudas.data.map(data => data.NotasCredito = JSON.parse(data.NotasCredito))
+                    this.documentos = resDeudas.data
+                    this.documentos.map(d => {
+                        d.cuenta = cuentaDefault ? cuentaDefault.value : null
+                        d.metodoparcial = metodoDefault ? metodoDefault.value : null
+                    })
                 })
                 .catch((error) => {
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
-
                 this.cargarPagos(cliente)
-                this.cargarCuentas()
             },
             cargarCuentas(){
                  this.axios.get(this.API + 'cuentas')
@@ -241,8 +293,14 @@ import config from '@/store/config.js'
                 })
             },
             cargarPagos (cliente) {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
+                this.clienteActual = cliente
+                this.axios.get(this.API + 'cliente/pagos', {
+                    params: {
+                        idCliente: cliente.IdCliente,
+                        fechaInicio: this.fechaInicioPagos,
+                        fechaFin: this.fechaFinPagos
+                    }
+                })
                 .then((response) => {
                    this.pagos = response.data
                 })
@@ -250,6 +308,17 @@ import config from '@/store/config.js'
                     console.log(error)
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
+            },
+            generarPagos () {
+                if (!this.clienteActual) {
+                    this.$toasted.show('Error: primero seleccione un cliente')
+                    return
+                }
+                if (!this.fechaInicioPagos || !this.fechaFinPagos) {
+                    this.$toasted.show('Error: seleccione fecha inicio y fin')
+                    return
+                }
+                this.cargarPagos(this.clienteActual)
             },
             guardarPago (evt) {
                 evt.preventDefault()
@@ -268,7 +337,9 @@ import config from '@/store/config.js'
                 }
 
                for (let index = 0; index < this.documentos.length; index++) {
-                    if (parseFloat(this.documentos[index].aplicar)>parseFloat(this.documentos[index].Saldo)){
+                    const aplicar = Math.round(parseFloat(this.documentos[index].aplicar) * 100) / 100
+                    const saldo = Math.round(parseFloat(this.documentos[index].Saldo) * 100) / 100
+                    if (aplicar > saldo) {
                         this.isLoading = false
                         this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo')
                         return;
@@ -305,6 +376,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     console.log(response.data)
                     this.$toasted.show('Se pagó la deuda del cliente.')
+                    this.$emit('deuda-actualizada')
                     this.show = false
                     this.initForm()
                     window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
@@ -318,7 +390,28 @@ import config from '@/store/config.js'
     }
 </script>
 <style scoped>
+
+.btn-accion{
+    background:#12B8D0 !important;
+    border:1px solid #12B8D0 !important;
+    color:#fff !important;
+    font-weight: bold;
+}
+
+.btn-accion:hover{
+    background:#0DA6BC !important;
+    border-color:#0DA6BC !important;
+}
+
+</style>
+<style>
 #modalConfigVenta .modal-dialog{
-    max-width: 65% !important;
+    max-width: 90% !important;
+    width: 1300px !important;
+}
+
+#modalConfigVenta .modal-body{
+    max-height: 80vh;
+    overflow-y: auto;
 }
 </style>
