@@ -3154,43 +3154,7 @@ export default {
   border: 1px solid red !important;
 }
 </style>
-<style >
-.popover-body {
-    background-color: #fff !important;
-}
-</style>
 <style>
-.popover {
-    max-width: 1200px !important;
-    width: 1200px !important;
-}
-#header .btnAction {
-  margin: 2px 0 !important;
-  border-radius: 25px !important;
-  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  font-size: 1.2rem !important;
-  font-weight: bold !important;
-}
-#header .btn-group,
-#header .btn-group-sm {
-  display: block !important;
-  width: 100% !important;
-}
-
-#header .btn-group > .btn,
-#header .btn-group-sm > .btn {
-  display: block !important;
-  width: 100% !important;
-  margin: 2px 0 !important;
-  border-radius: 25px !important;
-  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75) !important;
-  font-size: 1.2rem !important;
-  font-weight: bold !important;
-}
 .titleTabs {
   font-size: 1.2rem !important;
   font-weight: bold;
