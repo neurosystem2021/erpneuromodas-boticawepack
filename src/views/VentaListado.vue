@@ -608,7 +608,7 @@
                               style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 4" variant="info"
                               style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual blur focus"
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual blur"
                               placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
                               <slot name="metodopago" style="width: 1200px;">
                                 <table class="table b-table border table-footer table-sm">
@@ -697,7 +697,7 @@
                               <i class="fas fa-tags"></i>
                             </b-button>
 
-                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="manual blur focus"
+                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="manual blur"
                               placement="top" :show.sync="mostrarOp[index]" :style="{ minWidth: '600px' }">
                               <slot :name="`opciones${ventaActiva}`">
                                 <table class="table b-table border table-footer">

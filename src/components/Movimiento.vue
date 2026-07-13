@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button @click="promptPassword" variant="primary" class="btn-pos btn-accion" style="font-weight: bold;"><i class="fas fa-shopping-cart"></i>Caja/Banco</b-button>
+    <b-button block @click="promptPassword" variant="primary" class="btn-pos btn-accion" style="font-weight: bold;"><i class="fas fa-shopping-cart"></i>Caja/Banco</b-button>
     <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
       <b-tabs content-class="mt-3">
         <b-tab title="Ingreso" style="text-align: left;">

@@ -116,7 +116,7 @@
                             <b-popover
                               :target="`popover-deudas${index}`"
                               title="Deudas pendientes"
-                              triggers="manual"
+                              triggers="manual blur"
                               placement="bottom"
                               :show.sync="mostrarDeudas[index]"
                               popover-class="popover-deudas"
@@ -151,10 +151,7 @@
                                       </td>
                                     </tr>
 
-                                    <tr
-                                      v-for="item in deudasCliente"
-                                      :key="item.IdDocVenta"
-                                    >
+                                    <tr v-for="item in deudasClienteCredito" :key="item.IdDocVenta">
                                       <td  style="background:#fff;">{{ item.FechaDoc }}</td>
                                       <td  style="background:#fff;" >{{ item.Correlativo }}</td>
                                       <td  style="background:#fff;">{{ item.FechaCredito }}</td>
@@ -167,6 +164,59 @@
 
                                 </table>
 
+                              </div>
+                            </b-popover>
+                            <b-button
+                              v-show="venta.cliente.TotalDeudaEfectivoParcial > 0"
+                              :id="`popover-deudasparcial${index}`"
+                              variant="warning"
+                              size="sm"
+                              class="ml-2"
+                              @click="toggleDeudasParcial(index)"
+                            >
+                              <i class="fa fa-coins"></i>
+                              Efvo. Parcial: S/ {{ venta.cliente.TotalDeudaEfectivoParcial }}
+                            </b-button>
+
+                            <b-popover
+                              :target="`popover-deudasparcial${index}`"
+                              title="Deudas pendientes (Efectivo Parcial)"
+                              triggers="manual blur"
+                              placement="bottom"
+                              :show.sync="mostrarDeudasParcial[index]"
+                              popover-class="popover-deudas"
+                            >
+                              <div style="width:100%">
+                                <div class="mb-2" style="background:#fff;">
+                                  <strong>Cliente:</strong> {{ venta.cliente.Cliente }}
+                                </div>
+
+                                <div class="mb-2" style="background:#fff;">
+                                  <strong>Total deuda (Efvo. Parcial):</strong>
+                                  S/ {{ venta.cliente.TotalDeudaEfectivoParcial }}
+                                </div>
+
+                                <table class="table table-sm table-bordered">
+                                  <thead>
+                                    <tr>
+                                      <th>Fecha</th>
+                                      <th>Documento</th>
+                                      <th>Vence</th>
+                                      <th>Saldo</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr v-if="loadingDeudas">
+                                      <td colspan="4" class="text-center">Cargando...</td>
+                                    </tr>
+                                    <tr v-for="item in deudasClienteEfectivoParcial" :key="item.IdDocVenta">
+                                      <td style="background:#fff;">{{ item.FechaDoc }}</td>
+                                      <td style="background:#fff;">{{ item.Correlativo }}</td>
+                                      <td style="background:#fff;">{{ item.FechaCredito }}</td>
+                                      <td style="background:#fff;">S/ {{ item.Saldo }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
                               </div>
                             </b-popover>
                             </b-input-group>
@@ -320,14 +370,14 @@
                 <b-col cols="4">
                   <b-row>
                     <b-col md="12" class="mt-1">
-                    <b-button class="btnAction" block style="background: #B71C1C; color: #fff; font-weight: bold; font-size: 1.2rem" @click="anadirVentana()"> Nueva Ventana</b-button>
+                    <b-button block style="background: #B71C1C; color: #fff; font-weight: bold;" @click="anadirVentana()"> Nueva Ventana</b-button>
                   </b-col>
-                    <b-col md="12" class="mt-1">
-                      <b-button class="btnAction" block v-if="ventas.length>1" variant="dark" style="font-weight: bold; font-size: 1.2rem"  @click="eliminarVentana()"> Cancelar Venta</b-button>
+                    <b-col md="12">
+                      <b-button block v-if="ventas.length>1" variant="dark" style="font-weight: bold;"  @click="eliminarVentana()"> Cancelar Venta</b-button>
                     </b-col>
                     <b-col md="12" class="mt-1">
-                      <b-button class="btnAction" v-if="touchHab" variant="danger" style="font-weight: bold; font-size: 1.2rem" block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
-                      <b-button class="btnAction" v-else style="background: #00796B; color: #fff; font-weight: bold; font-size: 1.2rem" block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
+                      <b-button v-if="touchHab" variant="danger" style="font-weight: bold; " block @click="activarModalTouch()"><i class="fas fa-desktop"></i> Deshabilitar Touch</b-button>
+                      <b-button v-else style="background: #00796B; color: #fff; font-weight: bold; " block @click="activarModalTouch()"><i class="fas fa-keyboard"></i> Habilitar Touch</b-button>
                     </b-col>
                     <!-- <b-col md="12" class="mt-1">
                    
@@ -339,8 +389,8 @@
                   <b-col md="12" class="mt-1">
                     <!-- <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button> -->
                   </b-col>
-                  <b-col md="12" class="mt-1">
-                      <b-button type="button" block variant="secondary" class="btnAction" @click="setScreen" style="font-weight: bold; font-size: 1.2rem" ><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
+                  <b-col md="12">
+                      <b-button type="button" block variant="secondary" @click="setScreen" style="font-weight: bold;" ><i class="fas fa-desktop"></i> {{navDisabled?'Mostrar Nav':'Ocultar Nav'}}  </b-button>
                   </b-col>
                   <!-- <b-col md="12" class="mt-1">
                     <b-button block @click="toggleNav()"> Ocular Nav</b-button>
@@ -348,7 +398,7 @@
                   <b-col md="12" class="mt-1">
                     <pago-deuda @deuda-actualizada="actualizarDeudaActual"></pago-deuda>
                   </b-col>
-                  <b-col md="12" class="mt-1">
+                  <b-col  md="12" class="mt-1">
                     <Movimiento></Movimiento>
                   </b-col>
                   </b-row>
@@ -420,7 +470,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="manual blur" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
@@ -471,6 +521,20 @@
                                          @input="venta.pago.efectivo.monto = $options.filters.redondear(getTotal() - venta.pago.mastercard.monto  - venta.pago.visa.monto - $event.target.value)"/>
                                     </td>
                                   </tr>
+                                  <tr>
+                                    <td colspan="4" class="text-center py-2">
+                                      <b-form-checkbox
+                                        v-model="ventas[ventaActiva].EfectivoParcial"
+                                        :value="1"
+                                        :unchecked-value="0"
+                                        switch
+                                        size="lg"
+                                        class="d-flex justify-content-center align-items-center efectivoParcialSwitch"
+                                      >
+                                        <i class="fas fa-coins"></i> <b>EFECTIVO PARCIAL</b>
+                                      </b-form-checkbox>
+                                    </td>
+                                  </tr>
                                 </tbody>
                             </table>
                           </slot>
@@ -493,7 +557,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="manual blur" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -1161,6 +1225,7 @@ export default {
           mastercard: { IdMetodoPago: 3, monto: 0 },
           delivery: { IdMetodoPago: 4, monto: 0 }
         },
+        EfectivoParcial: 0,
         idProductos: [],
         NroComprobanteModifica: "",
         CodSunatModifica: "",
@@ -1215,6 +1280,7 @@ export default {
             mastercard: { IdMetodoPago: 3, monto: 0 },
             delivery: { IdMetodoPago: 4, monto: 0 }
           },
+          EfectivoParcial: 0,
           idProductos: [],
           NroComprobanteModifica: "",
           CodSunatModifica: "",
@@ -1247,7 +1313,8 @@ export default {
       mostrar: {},
       mostrarOp: {},
       mostrarDeudas: {},
-      deudasCliente: {},
+      mostrarDeudasParcial: {},
+      deudasCliente: [],
       loadingDeudas: false,
       cantidadInput: "",
       objProd: {},
@@ -1291,25 +1358,14 @@ export default {
       return IdPerfil.includes(val);
     },
     async actualizarDeudaActual() {
+      const cliente = this.ventas[this.ventaActiva].cliente;
+      if (!cliente.IdCliente) return;
 
-        const cliente =
-          this.ventas[this.ventaActiva].cliente;
+      const totales = await this.cargarResumenDeudaCliente(cliente.IdCliente);
 
-        if (!cliente.IdCliente) {
-          return;
-        }
-
-        const total = await this.cargarResumenDeudaCliente(
-          cliente.IdCliente
-        );
-
-        this.$set(
-          this.ventas[this.ventaActiva].cliente,
-          'TotalDeuda',
-          total
-        );
-
-      },
+      this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+      this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+    },
       async toggleDeudas(index) {
 
         if (this.mostrarDeudas[index]) {
@@ -1390,31 +1446,32 @@ export default {
 
     },
     async cargarResumenDeudaCliente(idCliente) {
-
       try {
-
         const response = await this.axios.get(
           this.API + "cliente/deudas",
-          {
-            params: {
-              idCliente
-            }
-          }
+          { params: { idCliente } }
         );
 
-        const totalDeuda = response.data.reduce((total, item) => {
-          return total + parseFloat(item.Saldo || 0);
+        const totalEfectivoParcial = response.data.reduce((total, item) => {
+          return item.EfectivoParcial == 1
+            ? total + parseFloat(item.Saldo || 0)
+            : total;
         }, 0);
 
-        return parseFloat(totalDeuda.toFixed(2));
+        const totalCredito = response.data.reduce((total, item) => {
+          return (item.EfectivoParcial != 1 && item.EsCredito == 1)
+            ? total + parseFloat(item.Saldo || 0)
+            : total;
+        }, 0);
 
+        return {
+          totalCredito: parseFloat(totalCredito.toFixed(2)),
+          totalEfectivoParcial: parseFloat(totalEfectivoParcial.toFixed(2))
+        };
       } catch (error) {
-
         console.log(error);
-        return 0;
-
+        return { totalCredito: 0, totalEfectivoParcial: 0 };
       }
-
     },
     conectarSocket() {
       if (!this.$socket.connected) {
@@ -1695,9 +1752,12 @@ export default {
           this.setPuntoVenta(puntoVenta);
           // this.$refs.inputVendedor.setValue(response.data.NombreUsuario);
           // bloquear ambos inputs
-          this.$refs.inputAlmacen.$refs.input.disabled = true;
-          this.$refs.inputPuntoVenta.$refs.input.disabled = true;
-          // this.$refs.inputVendedor.$refs.input.disabled = true;
+          if (this.$refs.inputAlmacen && this.$refs.inputAlmacen.$refs.input) {
+            this.$refs.inputAlmacen.$refs.input.disabled = true;
+          }
+          if (this.$refs.inputPuntoVenta && this.$refs.inputPuntoVenta.$refs.input) {
+            this.$refs.inputPuntoVenta.$refs.input.disabled = true;
+          }
         })
         .catch(error => {
           console.log(error);
@@ -1716,7 +1776,9 @@ export default {
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
-      this.$refs.inputAlmacen.setValue(obj.Almacen);
+      if (this.$refs.inputAlmacen && typeof this.$refs.inputAlmacen.setValue === "function") {
+        this.$refs.inputAlmacen.setValue(obj.Almacen);
+      }
       this.getCategorias();
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
         this.cargarPreOrden();
@@ -1846,7 +1908,10 @@ export default {
       if (event) {
         event.preventDefault();
       }
-      document.getElementById("txtLoadBarcode").focus();
+      let input = document.getElementById("txtLoadBarcode");
+      if (input) {
+        input.focus();
+      }
     },
 
     getProductosCategoria(idProductoCategoria) {
@@ -2157,17 +2222,10 @@ export default {
           // inputCliente.setValue(obj.Cliente);
         }
         this.ventas[this.ventaActiva].cliente = obj;
-         this.cargarResumenDeudaCliente(
-            obj.IdCliente
-          ).then(total => {
-
-            this.$set(
-              this.ventas[this.ventaActiva].cliente,
-              'TotalDeuda',
-              total
-            );
-
-          });
+        this.cargarResumenDeudaCliente(obj.IdCliente).then(totales => {
+          this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+          this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+        });
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
@@ -2183,17 +2241,10 @@ export default {
                 // inputCliente.setValue(response.data.Cliente);
               }
               this.ventas[this.ventaActiva].cliente = response.data;
-              this.cargarResumenDeudaCliente(
-                  response.data.IdCliente
-                ).then(total => {
-
-                  this.$set(
-                    this.ventas[this.ventaActiva].cliente,
-                    'TotalDeuda',
-                    total
-                  );
-
-                });
+              this.cargarResumenDeudaCliente(response.data.IdCliente).then(totales => {
+                this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeuda', totales.totalCredito);
+                this.$set(this.ventas[this.ventaActiva].cliente, 'TotalDeudaEfectivoParcial', totales.totalEfectivoParcial);
+              });
               this.ventas[this.ventaActiva].CampoDireccion =
                 response.data.Direccion;
             } else {
@@ -3019,6 +3070,16 @@ export default {
         }
       }
     },
+    async toggleDeudasParcial(index) {
+      if (this.mostrarDeudasParcial[index]) {
+        this.$set(this.mostrarDeudasParcial, index, false);
+        return;
+      }
+
+      await this.cargarDeudasCliente();
+
+      this.$set(this.mostrarDeudasParcial, index, true);
+    },
     anularPagoDelivery() {
       this.limpiarCart();
       this.venta.EsDelivery = false;
@@ -3067,6 +3128,16 @@ export default {
     }
     //Fin Sockets
   },
+  computed: {
+    deudasClienteCredito() {
+      return (this.deudasCliente || []).filter(
+        d => d.EfectivoParcial != 1 && d.EsCredito == 1
+      );
+    },
+    deudasClienteEfectivoParcial() {
+      return (this.deudasCliente || []).filter(d => d.EfectivoParcial == 1);
+    }
+  },
   watch: {
     busqueda() {
       this.getProductosCategoriaSearch(this.busqueda);
@@ -3099,6 +3170,17 @@ export default {
   align-items: center;
   justify-content: center;
   border-right: 2px solid black;
+}
+.efectivoParcialSwitch {
+  font-size: 1rem;
+}
+.efectivoParcialSwitch .custom-control-label {
+  cursor: pointer;
+  padding-left: 8px;
+}
+.efectivoParcialSwitch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #28a745;
+  border-color: #28a745;
 }
 .contentCard {
   cursor: pointer;
