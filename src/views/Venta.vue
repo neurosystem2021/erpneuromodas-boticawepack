@@ -1778,14 +1778,36 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
+          this.ventas[this.ventaActiva].productos = [];
 
           response.data.forEach(element => {
-            this.setProducto(element);
+            this.cargarProductoReferencia(element);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.$forceUpdate();
         });
+    },
+    async cargarProductoReferencia(element) {
+      let prod = await this.obtenerStockBuscador(element.IdProducto);
+      let pres = [];
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+      prod.PreciosPorProducto = pres;
+      prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+
+      // Datos reales del detalle original (nombres tal como los devuelve el endpoint)
+      prod.cantidad = element.cantidad;
+      prod.precio = element.precio;
+      prod.descuento = element.descuento ? element.descuento : 0;
+      prod.CantidadPresentacion = element.CantidadPresentacion || null;
+      prod.Descripcion = element.Presentacion || "UNIDAD";
+      prod.ProductoPresentacion = element.Presentacion || "UNIDAD";
+      prod.bloquearInputPrecio = !!element.CantidadPresentacion;
+      prod.presentacion = null; // el detalle no guarda el JSON completo de la presentación, solo nombre y cantidad
+
+      this.ventas[this.ventaActiva].productos.push(prod);
     },
     someMethod(text) {
       this.someMethod = text;
