@@ -168,6 +168,7 @@
                     <input
                       v-model="data.item.cantidad"
                       type="number"
+                      :disabled="campoBloqueado(venta, index, 'cantidad')"
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       :id="`input${data.index}`"
@@ -184,7 +185,7 @@
                   </template>
                   <template slot="precio" slot-scope="data">
                     <input
-                      :disabled="data.item.bloquearInputPrecio"
+                      :disabled="isNota[index] ? campoBloqueado(venta, index, 'precio') : data.item.bloquearInputPrecio"
                       v-model="data.item.precio"
                       min="0"
                       step="0.00001"
@@ -200,6 +201,7 @@
                     <input
                       v-model="data.item.descuento"
                       type="number"
+                      :disabled="isNota[index] ? campoBloqueado(venta, index, 'descuento') : data.item.bloquearInputPrecio"
                       style="text-align:center; font-weight:bold; width: 75px;font-size: 0.8rem"
                       autocomplete="false"
                       @focus="abrirModalTouch(data.index,3)"
@@ -352,7 +354,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="manual blur" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
@@ -425,7 +427,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="manual blur" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -1710,6 +1712,25 @@ export default {
         this.metodoPagoCambio(1);
       });
     },
+    campoBloqueado(venta, index, campo) {
+      if (!this.isNota[index]) {
+        return false;
+      }
+      const motivo = venta.NotaIdMotivo;
+      let bloqueado = true;
+
+      if (motivo === "05" && campo === "descuento") {
+        bloqueado = false; // Descuento por item -> solo habilita descuento
+      }
+      if (motivo === "07" && campo === "cantidad") {
+        bloqueado = false; // Devolucion por item -> solo habilita cantidad
+      }
+      if (motivo === "09" && campo === "precio") {
+        bloqueado = false; // Disminucion en el valor -> solo habilita precio
+      }
+
+      return bloqueado;
+    },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
@@ -2446,70 +2467,78 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
-      console.log(proforma);
+    async cargarProforma(proforma) {
+      console.log("aqui", proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
+
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
+      venta.proforma = proforma;
+      venta.UsuarioProforma = proforma.UsuarioReg;
+
       let productos = [];
-      proforma.productos.forEach(async producto => {
-        let prod = await this.obtenerStockBuscador(producto.IdProducto);
-        let pres = [];
-        if (prod.PreciosPorProducto) {
-          let newPres = JSON.parse(prod.PreciosPorProducto);
-          pres = newPres.filter(v => v.cantidad > 0);
+      this.loading = true;
+      for (const producto of proforma.productos) {
+        try {
+          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+
+          if (prod) {
+            let pres = [];
+            if (prod.PreciosPorProducto) {
+              try {
+                let newPres =
+                  typeof prod.PreciosPorProducto === "string"
+                    ? JSON.parse(prod.PreciosPorProducto)
+                    : prod.PreciosPorProducto;
+                pres = newPres.filter(v => v.cantidad > 0);
+              } catch (e) {
+                pres = [];
+              }
+            }
+
+            prod.PreciosPorProducto = pres;
+            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+            prod.bloquearInputPrecio = false;
+            prod.CantidadPresentacion = null;
+
+            prod.cantidad = producto.Cantidad;
+            prod.precio = producto.Precio;
+            prod.descuento = producto.Descuento ? producto.Descuento : 0;
+            prod.stock = prod.stock;
+
+            prod.ProductoPresentacion = producto.Descripcion || "UNIDAD";
+            prod.Descripcion = producto.Descripcion || "UNIDAD";
+            prod.ProductoDesc = producto.ProductoDesc;
+
+            productos.push(prod);
+          }
+        } catch (error) {
+          console.error(
+            "Error cargando producto individual:",
+            producto.IdProducto,
+            error
+          );
         }
-        prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
-        prod.cantidad = producto.Cantidad;
-        prod.precio = producto.Precio;
-        prod.descuento = producto.Descuento ? producto.Descuento : 0;
-        prod.stock = prod.stock;
-        productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
-      });
-      // console.log(proforma.productos);
+      }
+      this.loading = false;
+      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
       venta.productos = productos;
       this.ventas.push(venta);
+
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        // this.loadClienteVarios();
+
+        // Aseguramos la asignación del cliente en la posición activa
+        if (this.ventas[this.ventaActiva]) {
+          this.ventas[this.ventaActiva].cliente = proforma;
+        }
       });
-      this.ventas[this.ventaActiva].cliente = proforma;
+
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
+          console.log("llegó con " + productos.length + " productos");
           this.metodoPagoCambio(1);
         }, 1000);
       });
