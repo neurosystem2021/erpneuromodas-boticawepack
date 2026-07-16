@@ -1031,6 +1031,10 @@
                   <td>Mov. Efectivo S/.</td>
                   <td>{{ totalEfectivoNuevo | redondear }}</td>
                 </tr>
+                <tr style="background-color: #cde3fa; font-weight: bold;">
+                  <td>Saldo Efectivo Parcial S/.</td>
+                  <td>{{ saldoEfectivoParcial | redondear }}</td>
+                </tr>
               </tbody>
               <tfoot>
                 <tr>
@@ -1039,6 +1043,10 @@
                     <b>S/. {{ (totalYapeNuevo + totalTransferenciaNuevo + totalTarjetaNuevo + totalEfectivoNuevo) | redondear }}</b>
                   </td>
                 </tr>
+                <!-- <tr :style="{ backgroundColor: diferenciaCierre < 0 ? '#ffd4d3' : '#cde3fa' }">
+                  <td><b>Diferencia S/.</b></td>
+                  <td><b>{{ diferenciaCierre | redondear }}</b></td>
+                </tr> -->
               </tfoot>
             </table>
           </b-col>
@@ -1760,7 +1768,24 @@ export default {
       });
       return resultado;
     },
-
+    totalEfectivoParcial() {
+      let total = 0;
+      this.ventasParcial.forEach((venta) => {
+        if (!venta.Anulado) total += venta.Total;
+      });
+      return total;
+    },
+    saldoEfectivoParcial() {
+      return this.totalEfectivoParcial - this.totalIngresos;
+    },
+    diferenciaCierre() {
+      const totalMovimientos =
+        this.totalYapeNuevo +
+        this.totalTransferenciaNuevo +
+        this.totalTarjetaNuevo +
+        this.totalEfectivoNuevo;
+      return this.granTotal - totalMovimientos;
+    },
     reportePorTransferencia() {
       let productos = [];
       this.ventasTransferencia.filter(v => !v.Anulado).forEach(venta => {

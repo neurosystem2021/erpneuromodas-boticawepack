@@ -79,7 +79,7 @@
             </template>
           </b-form>
         </b-tab>
-        <b-tab title="Yape" style="text-align: left;">
+        <b-tab title="Gasto Parcial" style="text-align: left;">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
@@ -104,7 +104,7 @@
                   <b-form-group>
                     <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
                   </b-form-group>
-                  <label>N° de Operacion</label>
+                  <label>Descripcion</label>
                   <b-form-group>
                     <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
                   </b-form-group>
@@ -117,7 +117,7 @@
             </template>
           </b-form>
         </b-tab>
-        <b-tab title="Transferencia" style="text-align: left;">
+        <!-- <b-tab title="Transferencia" style="text-align: left;">
           <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
               <b-row>
@@ -154,7 +154,7 @@
               <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
             </template>
           </b-form>
-        </b-tab>
+        </b-tab> -->
       </b-tabs>
     </b-modal>
   </div>
@@ -303,7 +303,7 @@ export default {
         this.axios
           .post(this.API + "cajaybanco/gasto", {
             producto: this.selectProducto,
-            concepto: "Yape " + " - " + this.selectProducto.GastoDesc,
+            concepto: "Gasto parcial " + " - " + this.selectProducto.GastoDesc,
             IdPreOrden: this.selectProducto.IdPreOrden,
             IdHabitacion: this.selectProducto.IdProducto,
             IdCuenta: this.Cuenta.IdCuenta,
