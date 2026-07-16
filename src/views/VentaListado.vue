@@ -371,7 +371,8 @@
                     <b-form-group class="formResponsive">
                       <b-input-group>
                         <b-input-group-append>
-                          <autocomplete :ref="`autocompleteProducto${index}`" :id="`autocompleteProducto${index}`"
+                          <autocomplete :key="`prod-${index}-${ventas[index].almacen.IdAlmacen}`"
+                            :ref="`autocompleteProducto${index}`" :id="`autocompleteProducto${index}`"
                             :url="APIProductos" :customParams="{ 'sortBy': 'stock', 'sortDesc': 1, limit: '25' }"
                             :onShouldRenderChild="renderChild" anchor="Producto" label="writer"
                             placeholder="Agregar Producto" :on-select="setProducto"
@@ -1290,8 +1291,8 @@ export default {
       diasValidosProf: 0
     };
   },
-  mounted() {
-    this.getVendedorInfo();
+  async mounted() {
+    await this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
     this.$nextTick(() => {
@@ -1883,11 +1884,10 @@ export default {
       this.$refs.productoFormEdit.show = true;
       this.$refs.productoFormEdit.nuevo = false;
     },
-    getVendedorInfo() {
-      let usuario = sessionStorage.getItem("User");
-      this.axios
-        .get(this.API + "/usuarios/" + usuario)
-        .then(response => {
+    async getVendedorInfo() {
+        let usuario = sessionStorage.getItem("User");
+        try {
+          const response = await this.axios.get(this.API + "/usuarios/" + usuario);
           this.setVendedor(response.data);
           let almacen = {
             IdAlmacen: response.data.IdAlmacen,
@@ -1906,15 +1906,11 @@ export default {
           document.getElementById(e).disabled = true;
           let p = `inputPuntoVenta${this.ventaActiva}`;
           document.getElementById(p).disabled = true;
-          // this.$refs.inputVendedor.$refs.input.disabled = true;
-        })
-        .catch(error => {
+        } catch (error) {
           console.log("error", error);
-          this.$toasted.show(
-            "Ha ocurrido un error, vuelva a intentarlo # vendedor"
-          );
-        });
-    },
+          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo # vendedor");
+        }
+      },
     focusAutocomplete(ref) {
       let prod = "autocompleteProducto";
       let val = ref.includes(prod);
@@ -2939,6 +2935,24 @@ export default {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        if (producto.Presentacion) {
+          try {
+            let presObj = typeof producto.Presentacion === 'string' 
+              ? JSON.parse(producto.Presentacion) 
+              : producto.Presentacion;
+            prod.CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
+            prod.bloquearInputPrecio = true;
+            prod.presentacion = producto.Presentacion;
+          } catch (e) {
+            prod.CantidadPresentacion = null;
+            prod.bloquearInputPrecio = false;
+            prod.presentacion = null;
+          }
+        } else {
+          prod.CantidadPresentacion = null;
+          prod.bloquearInputPrecio = false;
+          prod.presentacion = null;
+        }
         productos.push(prod);
       });
 

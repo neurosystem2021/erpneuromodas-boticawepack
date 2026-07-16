@@ -5,7 +5,7 @@
         <b-form ref="formProformaModal" >    
         
             <b-modal id="modalProformas" 
-                title="Buscar Proforma"
+                title="Buscar Orden"
                 class="modalOrdenCompra"
                 size="lg" v-model="show"
                 header-bg-variant="dark"
@@ -89,7 +89,7 @@
                 </div>
                   </b-tab>
 
-                  <b-tab title="Proformas Facturadas">
+                  <b-tab title="Ordenes Facturadas">
                     <b-row class="align-items-center mb-2">
                       <b-col cols="8">
                         <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFav = 1" />
@@ -203,6 +203,15 @@
                       @input="recalcularSubtotal(row.item)"
                     />
                   </template>
+                  <template slot="presentacion" slot-scope="row">
+                    <b-form-select
+                      v-if="row.item.tienePresentacion"
+                      v-model="row.item.PresentacionSeleccionada"
+                      :options="opcionesPresentacion(row.item)"
+                      @change="cambiarPresentacionEditar(row.item, $event)"
+                    />
+                    <span v-else>{{ row.item.presentacion }}</span>
+                  </template>
                   <template slot="Descuento" slot-scope="row">
                     <b-form-input
                       type="number" step="0.01" min="0"
@@ -265,6 +274,7 @@ export default {
       productosEditar: [],
       camposProductosEditar: [
         { key: "Descripcion", label: "Producto" },
+        { key: "presentacion", label: "Presentación" },
         { key: "Cantidad", label: "Cant." },
         { key: "Precio", label: "Precio" },
         { key: "Descuento", label: "Desc." },
@@ -394,19 +404,74 @@ export default {
             IdAlmacen: sessionStorage.getItem("IdAlmacen")
           }
         })
-        .then(response => {
+        .then(async response => {
           this.proformaEditar = { ...item };
-          this.productosEditar = response.data.map(p => ({
-            ...p,
-            Descripcion: p.Producto || p.NombreProducto || p.Descripcion || "",
-            Subtotal: p.Cantidad * p.Precio - (p.Descuento || 0)
-          }));
-          // 🆕 limpia el buscador cada vez que se abre el modal de edición
+
+          // 👇 por cada producto, traemos su catálogo de presentaciones
+          this.productosEditar = await Promise.all(
+            response.data.map(async p => {
+              let pres = [];
+              try {
+                const stockRes = await this.axios(
+                  this.API + "productos/puntoventa/stock",
+                  {
+                    params: {
+                      idProductos: [p.IdProducto],
+                      idAlmacen: this.idAlmacen || sessionStorage.getItem("IdAlmacen") || 1
+                    }
+                  }
+                );
+                const prodStock = stockRes.data[0];
+                if (prodStock && prodStock.PreciosPorProducto) {
+                  pres = JSON.parse(prodStock.PreciosPorProducto).filter(
+                    v => v.cantidad > 0
+                  );
+                }
+              } catch (e) {
+                pres = [];
+              }
+
+              // 🆕 Parsear la presentación guardada en BD (viene como JSON string o null)
+              let presentacionActual = null;
+              try {
+                presentacionActual = p.Presentacion ? JSON.parse(p.Presentacion) : null;
+              } catch (e) {
+                presentacionActual = null;
+              }
+
+              // 🆕 Buscar dentro de las opciones (`pres`) la que coincide con lo guardado
+              let presInicial = null;
+              try {
+                if (presentacionActual && pres.length) {
+                  presInicial = pres.find(x =>
+                    String(x.cantidad) === String(presentacionActual.cantidad) &&
+                    String(x.nombre || "").trim() === String(presentacionActual.nombre || "").trim()
+                  ) || null;
+                }
+              } catch (e) {
+                presInicial = null;
+              }
+
+              return {
+                ...p,
+                Descripcion: p.Producto || p.NombreProducto || p.Descripcion || "",
+                presentacion: presentacionActual ? String(presentacionActual.nombre || "").trim() : "UNIDAD",
+                esPresentacion: !!presentacionActual,
+                PreciosPorProducto: pres,
+                tienePresentacion: pres.length > 0,
+                PrecioUnitario: p.Precio, // 🆕 precio base actual, usado al volver a "UNIDAD"
+                PresentacionSeleccionada: presInicial, // 🆕 objeto de presentación o null
+                Subtotal: this.calcularSubtotalItem(p)
+              };
+            })
+          );
+
           this.buscarProductoTexto = "";
           this.resultadosProductoEditar = [];
           this.showEditar = true;
         })
-        .catch(() => {
+        .catch(err => {
+          console.log(err); // 🆕 para ver el error real en consola si vuelve a fallar
           this.$toasted.error("No se pudo cargar el detalle de la proforma");
         });
     },
@@ -503,6 +568,9 @@ export default {
       });
     },
 
+    calcularSubtotalItem(item) {
+      return (item.Cantidad * item.Precio) - (item.Descuento || 0);
+    },
     recalcularSubtotal(item) {
       if (item.stockDisponible !== undefined && item.Cantidad > item.stockDisponible) {
         this.$toasted.error(`Solo hay ${item.stockDisponible} unidades disponibles`);
@@ -511,6 +579,30 @@ export default {
       item.Subtotal = item.Cantidad * item.Precio - (item.Descuento || 0);
     },
 
+    opcionesPresentacion(item) {
+      return [
+        { value: null, text: "UNIDAD" },
+        ...item.PreciosPorProducto.map(pres => ({
+          value: pres,
+          text: `${String(pres.nombre || "").trim()} (${pres.cantidad} und - S/ ${pres.precio})`
+        }))
+      ];
+    },
+
+    cambiarPresentacionEditar(item, seleccion) {
+      if (!seleccion) {
+        item.presentacion = "UNIDAD";
+        item.esPresentacion = false;
+        item.PresentacionSeleccionada = null;
+        item.Precio = item.PrecioUnitario;
+      } else {
+        item.presentacion = String(seleccion.nombre || "").trim();
+        item.esPresentacion = true;
+        item.PresentacionSeleccionada = seleccion;
+        item.Precio = parseFloat(seleccion.precio);
+      }
+      this.recalcularSubtotal(item);
+    },
     quitarProductoEditar(index) {
       const producto = this.productosEditar[index];
 
@@ -538,7 +630,8 @@ export default {
           IdProducto: p.IdProducto,
           Cantidad: p.Cantidad,
           Precio: p.Precio,
-          Descuento: p.Descuento
+          Descuento: p.Descuento,
+          Presentacion: p.PresentacionSeleccionada || null
         }))
       };
 
