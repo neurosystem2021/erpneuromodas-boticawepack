@@ -1896,6 +1896,7 @@ export default {
       prod.CantidadPresentacion = null;
       if (pres.length == 0) {
         productos.unshift(prod);
+        this.metodoPagoCambio(1);
         this.bloquearVenta = false;
         return;
       }
@@ -1904,7 +1905,6 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      this.metodoPagoCambio(1);
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);

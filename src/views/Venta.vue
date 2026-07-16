@@ -1877,6 +1877,7 @@ export default {
       );
       if (pres.length == 0) {
         productos.unshift(prod);
+        this.metodoPagoCambio(1);
         return;
       }
 
@@ -1887,7 +1888,6 @@ export default {
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
       // });
-      this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
       if (event) {

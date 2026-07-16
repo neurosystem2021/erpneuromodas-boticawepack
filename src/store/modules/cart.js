@@ -185,7 +185,7 @@ const actions = {
               }
             }
             obj.descuento = 0;
-            obj.nuevoPrecioContado = 0;
+            obj.nuevoPrecioContado = obj.PrecioContado;
 
             let arr2 = [
               { desc: obj.ProductoDesc },
