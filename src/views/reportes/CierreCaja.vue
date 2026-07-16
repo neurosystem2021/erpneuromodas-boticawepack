@@ -486,7 +486,7 @@
                     <td colspan="3"></td>
                     <td colspan="2" class="total" style="background-color: #EDF537"><b>Total Credito</b></td>
                     <td colspan="3" class="total" style="background-color: #EDF537">
-                      <b>S/. {{ totalVentasCredito | moneda | redondear }}</b>
+                      <b>S/. {{ totalVentasCredito | redondear }}</b>
                     </td>
                   </tr>
                 </tfoot>
@@ -564,9 +564,9 @@
                   <tr>
                     <td colspan="3"></td>
                     <td colspan="2" style="background-color: #EDF537"><b>Total Ventas Parciales</b></td>
-                    <td colspan="3" style="background-color: #EDF537">
-                      <b>S/. {{ totalEfectivoParcial | moneda | redondear }}</b>
-                    </td>
+                    <td colspan="3" class="total" style="background-color: #EDF537">
+                    <b>S/. {{ totalEfectivoParcial | redondear }}</b>
+                  </td>
                   </tr>
                 </tfoot>
               </table>
