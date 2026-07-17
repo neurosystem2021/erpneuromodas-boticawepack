@@ -100,7 +100,10 @@ export default {
       fields: [
             { key: 'DniRuc', label: 'DNI / RUC', sortable: true },
             { key: 'Cliente', label: 'Cliente', sortable: true },
-            { key: 'FechaNacimiento', label: 'Fecha Nacimiento', sortable: true },
+            { key: 'Direccion', label: 'Direccion', sortable: true },
+            { key: 'CantidadCompras', label: 'Compras', sortable: true },
+            { key: 'PromedioCompra', label: 'Promedio', sortable: true },
+            { key: 'UltimaCompra', label: 'Última Compra', sortable: true },
             { key: 'Puntos', label: 'Puntos', sortable: true },
             { key: 'Total', label: 'Total', sortable: true},
       ],

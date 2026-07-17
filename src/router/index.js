@@ -17,6 +17,8 @@ import ReporteVentas from '@/views/reportes/Ventas.vue'
 import StockMinimo from '@/views/reportes/StockMinimo.vue'
 import Comisionistas from '@/views/reportes/Comisionistas.vue'
 import DeudaClientes from '@/views/reportes/DeudaClientes.vue'
+import Reportehistorialcliente from '@/views/reportes/Reportehistorialcliente.vue'
+import Reportecomprascliente from '@/views/reportes/Reportecomprascliente.vue'
 import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
@@ -117,7 +119,17 @@ export default new Router({
       path: '/reportes/deudaclientes',
       name: 'DeudaClientes',
       component: DeudaClientes
+    },   
+    {
+      path: '/reportes/reportehistorialcliente',
+      name: 'Reportehistorialcliente',
+      component: Reportehistorialcliente
     },    
+    {
+      path: '/reportes/reportecomprascliente',
+      name: 'Reportecomprascliente',
+      component: Reportecomprascliente
+    }, 
     {
       path: '/reportes/deudaproveedores',
       name: 'DeudaProveedores',
