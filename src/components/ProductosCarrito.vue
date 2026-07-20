@@ -15,6 +15,9 @@
             :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
+           <b-button variant="primary" @click="startRecognition">
+              <i class="fas fa-microphone"></i>
+           </b-button>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
@@ -156,7 +159,8 @@
           </div>
         </div>
       </b-modal>
-
+      <div class="divCarrito">
+      <div class="clsCarrito">
       <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <div style="width: 75px;">
@@ -432,6 +436,8 @@
           </div>
         </template>
       </b-table>
+      </div>
+      </div>
     </b-col>
     <b-col md="3">
       <slot name="operaciones"></slot>
@@ -443,39 +449,51 @@
       <slot name="adicional"></slot>
     </b-col>
     <b-col md="3">
-          <table class="table b-table border table-footer">
+          <table class="table border table-footer resumen-venta">
             <tbody>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-success">SubTotal</td>
+              <tr>
+                <td class="table-success resumen-subtotal">SubTotal</td>
                 <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
               </tr>
-              <tr v-if="sumatoriaDescuento > 0">
-                <td class="table-danger">Descuento</td>
-                <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
-              </tr>
               <tr>
-                <td><b>SubTotal</b></td>
-                <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
+                <td class="table-danger">Descuento</td>
+                <td class="table-danger">- {{ sumatoriaDescuento }}</td>
               </tr>
+              <!-- <tr>
+                <td class="resumen-subtotal subtotal-final-label">
+                  SubTotal
+                </td>
+                <td class="resumen-subtotal text-right">
+                  S/ {{ sumatoriaSubTotal }}
+                </td>
+              </tr> -->
               <tr v-if="sumatoriaIgv > 0">
                 <td><b>IGV</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
               <tr>
-                <td><b>TOTAL</b></td>
-                <td class="table-danger">{{ sumatoriaTotal }}</td>
+                <td class="resumen-total-label total-final-label">
+                  TOTAL
+                </td>
+                <td class="resumen-total-monto">
+                  S/ {{ sumatoriaTotal }}
+                </td>
               </tr>
               <tr>
                 <td  colspan="2">
                   <label>pagó con:</label>
                   <b-form-input
                     type="text"
-                    :disabled="bloquearInput?true:false"
                     placeholder="Pagó con"
                     v-model="pagocon"
+                    :disabled="bloquearInput?true:false"
                     @input="asignarVuelto"></b-form-input><br>
-                  <label>Vuelto:</label>
-                  <b>S/  {{ vuelto | redondear }}</b>
+                    <div class="vuelto-contenedor">
+                    <label>Vuelto:</label>
+                    <div class="resumen-vuelto">
+                      S/ {{ vuelto | redondear }}
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -676,6 +694,65 @@ export default {
       actualizarProd : 'actualizarProducto',
       obtenerStok: 'obtenerStock',
     }),
+    startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Lo siento, tu navegador no soporta la búsqueda por voz.");
+        return;
+      }
+
+      this.recognition = new webkitSpeechRecognition();
+      this.recognition.lang = "es-ES";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        console.log("Speech recognition service has started");
+      };
+
+      this.recognition.onresult = event => {
+        if (event.results.length > 0) {
+          this.query = event.results[0][0].transcript;
+          this.search();
+        }
+      };
+
+      this.recognition.onerror = event => {
+        console.error("Speech Recognition Error:", event);
+        alert(`Error en el reconocimiento de voz: ${event.error}`);
+      };
+
+      this.recognition.onend = async () => {
+        if (!this.query) {
+          alert("No se pudo captar ninguna palabra");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    },
+    search() {
+      const texto = this.query || "";
+
+      // Coloca el texto en el autocomplete
+      this.$refs.autocompleteProducto.setValue(texto);
+
+      // Fuerza la búsqueda del autocomplete
+      this.$nextTick(() => {
+        try {
+          this.$refs.autocompleteProducto.type = texto;
+
+          if (this.$refs.autocompleteProducto.handleDoubleClick) {
+            this.$refs.autocompleteProducto.handleDoubleClick();
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    },
     obtenerAnaquel(data){
       if(data.Anaqueles && data.Anaqueles!='null' && this.idAlmacen>0){
         let obj = JSON.parse(data.Anaqueles)
@@ -1192,6 +1269,93 @@ export default {
     color: #dc3545;
     border-right: 2px solid #dc3545;
   }
+.divCarrito{
+    height:30vh;
+    border:1px solid #dee2e6;
+    border-radius:6px;
+    background:#fff;
+}
+
+.clsCarrito{
+    height:100%;
+    overflow-y:auto;
+}
+
+/* RESUMEN DE VENTAS EN EL PUNTO DE VENTA */
+
+.resumen-venta{
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+}
+
+.resumen-venta td{
+    padding:12px;
+}
+
+.resumen-subtotal{
+    font-size:18px;
+    font-weight:700;
+}
+
+.resumen-total-label{
+    font-size:22px;
+    font-weight:900;
+    color:#222;
+}
+
+.resumen-total-monto{
+   background:#c8f0d0 !important;
+    font-size:27px;
+    font-weight:900;
+    text-align:left;
+}
+
+.total-final-label{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:22px;
+    font-weight:900;
+}
+
+.subtotal-final-label{
+    background:#ffc7c0 !important;
+    color:#424242 !important;
+    font-size:22px;
+    font-weight:900;
+}
+.total-final{
+    background:#c8f0d0 !important;
+    color:#0f5132 !important;
+    font-size:28px;
+    font-weight:900;
+}
+
+.resumen-venta tr:last-child td{
+    padding-top:18px;
+    padding-bottom:18px;
+}
+
+.resumen-vuelto{
+    font-size:24px;
+    font-weight:900;
+    color:#28a745;
+    margin-top:5px;
+}
+
+.vuelto-contenedor{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:-20px;
+}
+
+.vuelto-contenedor label{
+    margin:0;
+    font-weight:700;
+    font-size:16px;
+}
 </style>
 <style>
   .popover{
@@ -1268,4 +1432,6 @@ export default {
   #modalCantidad .modal-dialog {
       max-width: 40% !important;
   }
+
+
 </style>

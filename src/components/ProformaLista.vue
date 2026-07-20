@@ -1,6 +1,16 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary" size="sm">Ver Proformas</b-button>
+        <b-button
+            block
+            @click="show = true"
+            variant="primary"
+            size="lg"
+            class="btn-panel btn-proforma">
+
+            <i class="fas fa-file-alt mr-2"></i>
+            Proformas
+
+        </b-button>
         
         <b-form ref="formProformaModal">    
             <b-modal id="modalProformas" 
@@ -189,5 +199,22 @@ import { mapActions } from 'vuex'
 <style>
 #modalProformas .modal-dialog {
     max-width: 88% !important;
+}
+
+.btn-proforma{
+    background:#1863d4;
+    border-color:#1863d4;
+    color:#fff;
+
+    transition: all .25s ease;
+}
+
+.btn-proforma:hover{
+    background:#1456b8;
+    border-color:#1456b8;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 16px rgba(24,99,212,.35);
 }
 </style>

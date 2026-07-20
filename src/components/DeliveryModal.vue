@@ -1,6 +1,17 @@
 <template>
     <div>
-        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button
+            block
+            @click="show = true"
+            variant="info"
+            size="lg"
+            class="btn-panel btn-delivery"
+            :class="{ parpadea: pedidos.length > 0 }">
+
+            <img src="static/logo.png" class="mr-2 logo-delivery">
+            Delivery
+
+        </b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -805,5 +816,44 @@ export default {
   0% { opacity: 1.0; }
    50% { opacity: 0.0; }
   100% { opacity: 1.0; }
+}
+
+
+.btn-panel{
+    height:50px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:15px;
+    transition:.25s;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+.btn-delivery{
+
+    background:#1863d4;
+    transition:.25s;
+
+}
+
+.btn-delivery:hover{
+
+    background:#f57c00;
+    border-color:#f57c00;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 18px rgba(245,124,0,.35);
+
+}
+
+.btn-delivery{
+    background:#1863d4;
+    border-color:#1863d4;
+    color:#fff;
+}
+
+.logo-delivery{
+    width:20px;
+    height:20px;
 }
 </style>

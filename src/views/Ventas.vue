@@ -5,29 +5,6 @@
         <Menu v-if="false"></Menu>
 
         <b-container fluid class="ancho"  id="conten">
-            <div>
-                <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
-                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil" v-if="false">
-                        <pre-orden-lista 
-                            v-show="!this.$route.query.idPreOrden"
-                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
-                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                    </b-button-group>
-                </div>
-            </div>
             <br /><br />
             <b-row>
                 <b-col md="12" v-if="this.$route.query.idPedido">
@@ -251,6 +228,7 @@
                 </b-row>
                 <b-row>
                     <b-col> 
+                        <div class="tabla-ventas">
                         <productos-carrito 
                             @onInputCantidad="actualizarDescuento"
                             @onAddProducto="onAddProducto"
@@ -269,6 +247,33 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                     <tbody>
+                                        <div>
+                                            <div class="panel-acciones">
+
+                                              <div class="fila-botones">
+
+                                                    <delivery-modal
+                                                        ref="deliveryModal"
+                                                        @onPagarDelivery="onPagarDelivery">
+                                                    </delivery-modal>
+
+                                                    <pago-deuda></pago-deuda>
+                                               </div>
+
+                                               <div class="fila-botones">
+
+                                                    <proformas
+                                                        :idAlmacen="venta.almacen.IdAlmacen"
+                                                        @onSelectProforma="setCliente">
+                                                    </proformas>
+
+                                                    <config-venta
+                                                        @onUpdateConfig="eliminarCliente"
+                                                        @onUpdateConfigComision="eliminarComisionista">
+                                                    </config-venta>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <tr>
                                             <td  class="text-center">Opciones</td>
                                         </tr>
@@ -338,6 +343,7 @@
                                         </tr>
                                         <tr>
                                             <td>Efectivo</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(1)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.efectivo.descripcion"
@@ -360,6 +366,7 @@
                                         </tr>
                                         <tr>
                                             <td>Tarjeta</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.visa.descripcion"
@@ -383,6 +390,7 @@
                                         </tr>
                                         <tr>
                                             <td>Yape / Plin</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.mastercard.descripcion"
@@ -405,7 +413,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="vertical-align: middle !important;">Transferencia</td>
+                                        <td style="vertical-align: middle !important;">Transferencia</td>
+                                        <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.transferencia.descripcion"
@@ -439,19 +448,48 @@
                                         <tr><td><h3 :class="{'text-danger': manoDeObraNeta <= 0}">{{ manoDeObraNeta | redondear }}</h3></td></tr>
                                     </tbody>
                                 </table>
+
+                                <b-row align-h="center" class="text-center">
+                                    <b-col cols="8">
+                                        <br />
+                                        <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
+                                        <div class="acciones-pos">
+
+                                        <b-button
+                                            type="submit"
+                                            :disabled="inProgress"
+                                            variant="success"
+                                            class="btn-pos btn-vender">
+
+                                            <i class="fas fa-check-circle mr-2"></i>
+                                            EFECTUAR VENTA
+
+                                        </b-button>
+
+                                        <b-button
+                                            type="button"
+                                            v-if="!this.$route.query.idPedido"
+                                            :disabled="inProgress"
+                                            variant="primary"
+                                            @click="guardarProforma"
+                                            class="btn-pos btn-proforma">
+
+                                            <i class="fas fa-file-invoice mr-2"></i>
+                                            CREAR PROFORMA
+
+                                        </b-button>
+
+                                    </div>
+
+                                        
+                                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
+                                        <br />
+                                        <br />
+                                    </b-col>
+                                </b-row>
                             </template>
                         </productos-carrito>
-                    </b-col>
-                </b-row>
-                <b-row align-h="center" class="text-center">
-                    <b-col cols="8">
-                        <br />
-                        <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                        <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
-                        <!--<b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>-->
-                        <br />
-                        <br />
+                        </div>
                     </b-col>
                 </b-row>
             </b-form>
@@ -1180,6 +1218,33 @@ export default {
                 this.$toasted.show('Ha ocurrido un error, en la emision a sunat')
             })
         },
+        
+        metodoPagoCambio(tipo) {
+
+            this.venta.pago.efectivo.monto = 0;
+            this.venta.pago.visa.monto = 0;
+            this.venta.pago.mastercard.monto = 0;
+            this.venta.pago.transferencia.monto = 0;
+
+            switch (tipo) {
+                case 1:
+                this.venta.pago.efectivo.monto = this.totalCart;
+                break;
+
+                case 2:
+                this.venta.pago.visa.monto = this.totalCart;
+                break;
+
+                case 3:
+                this.venta.pago.mastercard.monto = this.totalCart;
+                break;
+
+                case 4:
+                this.venta.pago.transferencia.monto = this.totalCart;
+                break;
+            }
+        },
+
         eliminarCliente () {
             this.$refs.inputCliente.setValue('')
             this.venta.cliente = {}
@@ -1303,7 +1368,7 @@ export default {
     font-size: 52px;
 }
 .big-text {
-    font-size: 30px;
+    font-size: 40px;
 }
 .tablaMetodo {
     display: none !important;
@@ -1338,5 +1403,78 @@ export default {
 }
 .fondo {
   background:#EFF9FF;
+}
+
+.acciones-pos{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100%;
+    padding:15px;
+}
+
+.btn-pos{
+
+    width:150%;
+    min-height:50px;
+
+    font-size:18px;
+    font-weight:600;
+
+    border:none;
+
+    border-radius:12px;
+
+    margin-bottom:14px;
+
+    transition:.20s;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+
+.btn-pos:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+.btn-vender{
+
+    background:#28a745;
+
+}
+
+.btn-vender:hover{
+
+    background:#23923d;
+
+}
+
+.btn-proforma{
+
+    background:#0d6efd;
+
+}
+
+.btn-proforma:hover{
+
+    background:#0b5ed7;
+
+}
+
+/* PONER EL FILA Y COLUMNA DE 2 */
+
+.fila-botones{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.fila-botones > *{
+    flex:1;
 }
 </style>

@@ -1,6 +1,16 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary">Pago Deuda</b-button>
+        <b-button
+            block
+            @click="show = true"
+            variant="primary"
+            size="lg"
+            class="btn-panel btn-pago">
+
+            <i class="fas fa-credit-card mr-2"></i>
+            Pago Deuda
+
+        </b-button>
         
         <b-form @submit="guardarPago">    
             <b-modal id="modalConfigVenta" 
@@ -318,5 +328,22 @@ import config from '@/store/config.js'
 <style>
 #modalConfigVenta .modal-dialog{
     max-width: 65% !important;
+}
+
+.btn-pago{
+    background:#1863d4;
+    border-color:#1863d4;
+    color:#fff;
+
+    transition: all .25s ease;
+}
+
+.btn-pago:hover{
+    background:#1456b8;
+    border-color:#1456b8;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 16px rgba(24,99,212,.35);
 }
 </style>

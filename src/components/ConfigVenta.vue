@@ -1,6 +1,16 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-primary">Configurar</b-button>
+        <b-button
+            block
+            @click="show = true"
+            variant="secondary"
+            size="lg"
+            class="btn-panel btn-config">
+
+            <i class="fas fa-cog mr-2"></i>
+            Configuración
+
+        </b-button>
         
         <b-form @submit="guardarConfigVenta">    
             <b-modal id="modalConfigVenta" 
@@ -159,5 +169,20 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
+.btn-config{
+    background:#5f6368;
+    border-color:#5f6368;
+    color:#fff;
 
+    transition: all .25s ease;
+}
+
+.btn-config:hover{
+    background:#4b4f54;
+    border-color:#4b4f54;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
 </style>
