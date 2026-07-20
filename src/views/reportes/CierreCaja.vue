@@ -1235,7 +1235,7 @@ export default {
         this.totalIngresosTarjeta +
         this.totalIngresos -
         this.totalSalidas -
-        this.totalSalidasTarjeta -
+        //this.totalSalidasTarjeta -
         this.totalAdelantosActivos
       );
     },
