@@ -637,6 +637,21 @@
               <td>Transferencia S/.</td>
               <td>{{ totalVentasTransferencia | redondear }} </td>
             </tr>
+
+            <tr style="background:#eef9ee;">
+                <td>Ingreso cuenta bancaria S/.</td>
+                <td>{{ totalIngresosTarjeta | redondear }}</td>
+            </tr>
+
+            <tr style="background:#eef9ee;">
+                <td>Salida cuenta bancaria S/.</td>
+                <td>{{ totalSalidasTarjeta | redondear }}</td>
+            </tr>
+
+            <tr class="table-success">
+                <td><b>Saldo Cuenta Bancaria S/.</b></td>
+                <td><b>{{ totalIngresosTarjeta - totalSalidasTarjeta | redondear }}</b></td>
+            </tr>
             
             <tr>
               <td colspan="2"></td>
@@ -1232,7 +1247,7 @@ export default {
         this.totalVentasMastercard +
         this.totalVentasTransferencia +
         this.totalVentasEfectivo +
-        this.totalIngresosTarjeta +
+        //this.totalIngresosTarjeta +
         this.totalIngresos -
         this.totalSalidas -
         //this.totalSalidasTarjeta -
