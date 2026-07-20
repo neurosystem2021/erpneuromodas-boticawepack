@@ -1031,6 +1031,14 @@
                   <td>Mov. Efectivo S/.</td>
                   <td>{{ totalEfectivoNuevo | redondear }}</td>
                 </tr>
+                <tr style="background-color: #FFD4D3;">
+                  <td>Gastos Parciales S/.</td>
+                  <td>{{ gastosParciales | redondear }}</td>
+                </tr>
+                <tr style="background-color: #fff3cd ;">
+                  <td><b>Efectivo Neto S/.</b></td>
+                  <td><b>{{ efectivoNetoParcial | redondear }}</b></td>
+                </tr>
                 <tr style="background-color: #cde3fa; font-weight: bold;">
                   <td>Saldo Efectivo Parcial S/.</td>
                   <td>{{ saldoEfectivoParcial | redondear }}</td>
@@ -1041,6 +1049,12 @@
                   <td class="total"><b>Total</b></td>
                   <td class="total">
                     <b>S/. {{ (totalYapeNuevo + totalTransferenciaNuevo + totalTarjetaNuevo + totalEfectivoNuevo) | redondear }}</b>
+                  </td>
+                </tr>
+                <tr style="background-color: #B2FBD3; font-weight: bold;">
+                  <td><b>Confrontacion Total</b></td>
+                  <td>
+                    <b>S/. {{ (totalYapeNuevo + totalTransferenciaNuevo + totalTarjetaNuevo + totalEfectivoNuevo + saldoEfectivoParcial) | redondear }}</b>
                   </td>
                 </tr>
                 <!-- <tr :style="{ backgroundColor: diferenciaCierre < 0 ? '#ffd4d3' : '#cde3fa' }">
@@ -1777,6 +1791,18 @@ export default {
     },
     saldoEfectivoParcial() {
       return this.totalEfectivoParcial - this.totalIngresos;
+    },
+    gastosParciales() {
+      let total = 0;
+      this.salidas.forEach((salida) => {
+        if (!salida.Anulado && salida.Concepto && salida.Concepto.toLowerCase().includes('gasto parcial')) {
+          total += salida.Importe;
+        }
+      });
+      return total;
+    },
+    efectivoNetoParcial() {
+      return this.totalEfectivoNuevo - this.gastosParciales;
     },
     diferenciaCierre() {
       const totalMovimientos =

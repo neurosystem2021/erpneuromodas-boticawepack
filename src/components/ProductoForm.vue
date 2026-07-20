@@ -468,6 +468,15 @@
                 </b-form-group>
 
                 <b-form-group class="text-left">
+                  <label>Unidad de Medida:</label>
+                  <b-form-select
+                    :value="producto.precios[i - 1].IdProductoMedicion"
+                    :options="medicionesSelectOptions"
+                    @change="(val) => setMedicionPresentacion(i - 1, val)"
+                  ></b-form-select>
+                </b-form-group>
+
+                <b-form-group class="text-left">
                   <label>Cantidad:</label>
                   <input
                     v-model="producto.precios[i - 1].cantidad"
@@ -626,6 +635,7 @@ export default {
       producto: {},
       productosDet: [],
       file: "",
+      medicionesList: [],
       manterproducto: {
         default: false,
         type: Boolean
@@ -634,6 +644,7 @@ export default {
   },
   beforeMount() {
     this.initForm();
+    this.cargarMediciones();
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
   watch: {
@@ -731,13 +742,17 @@ export default {
             this.producto.TienePresentacion = newVal.TienePresentacion;
             this.producto.Imagen = newVal.Imagen;
             if (newVal.PreciosPorProducto) {
-              this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
+              this.producto.precios = JSON.parse(newVal.PreciosPorProducto).map(p => ({
+                ...p,
+                IdProductoMedicion: p.IdProductoMedicion || 1,
+                ProductoMedicion: p.ProductoMedicion || "UND"
+              }));
             } else {
               this.producto.precios = [
-                { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0 },
-                { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0 }
+                { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+                { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+                { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+                { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" }
               ];
             }
             this.$refs.file.value = null;
@@ -1051,10 +1066,10 @@ export default {
         },
         Imagen: null,
         precios: [
-          { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0 },
-          { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0 }
+          { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" }
         ]
       };
     },
@@ -1096,24 +1111,23 @@ export default {
           PreciosPorProducto: this.producto.precios
         })
         .then(response => {
+          if (response.data.error) {
+            this.$toasted.show(
+              response.data.error + " - " + response.data.codigoBarra
+            );
+            return;
+          }
+
+          const idProductoFinal = this.producto.IdProducto || response.data.insertId;
+
           if (this.cbGuardar) {
             this.cbGuardar(
               this.producto.IdProducto ? this.producto : response.data.insertId,
               this.producto.precios
             );
           }
-          if (response.data.error) {
-            this.$toasted.show(
-              response.data.error + " - " + response.data.codigoBarra
-            );
-            return;
-          } else {
-            this.$toasted.info("Producto guardado correctamente");
-          }
 
-          // this.initForm()
-          // this.producto.talla = {}
-          // this.$refs.inputTalla.setValue('')
+          this.$toasted.info("Producto guardado correctamente");
 
           //INSERTANDO IMAGEN
           let formData = new FormData();
@@ -1121,17 +1135,17 @@ export default {
 
           this.axios({
             method: "post",
-            url: this.API + "producto/imagen/" + response.data.insertId,
+            url: this.API + "producto/imagen/" + idProductoFinal,
             data: formData,
             headers: { "Content-Type": "multipart/form-data" }
           }).then(res => {
-            // console.log(res);
             this.$refs.file.value = null;
             this.file = "";
           });
 
           this.$refs.productoForm.hide();
-          this.$emit("productoactualizado");
+          // FIX: antes se emitía sin argumento, el padre recibía undefined
+          this.$emit("productoactualizado", idProductoFinal);
         })
         .catch(error => {
           console.log(error);
@@ -1202,6 +1216,20 @@ export default {
           });
       }
     },
+    cargarMediciones() {
+      this.axios.get(this.API + 'mediciones').then(response => {
+        this.medicionesList = response.data;
+      });
+    },
+    setMedicionPresentacion(index, idMedicion) {
+      const medicion = this.medicionesList.find(
+        m => m.IdProductoMedicion == idMedicion
+      );
+      if (medicion) {
+        this.producto.precios[index].IdProductoMedicion = medicion.IdProductoMedicion;
+        this.producto.precios[index].ProductoMedicion = medicion.Codigo || medicion.ProductoMedicion;
+      }
+    },
     checkIsHijo(val) {
       if (val && this.producto.IdProducto) {
         this.axios
@@ -1227,7 +1255,14 @@ export default {
       }
     }
   },
-  computed: {},
+  computed: {
+    medicionesSelectOptions() {
+      return this.medicionesList.map(m => ({
+        value: m.IdProductoMedicion,
+        text: m.ProductoMedicion
+      }));
+    }
+  },
   components: {
     CategoriaForm,
     MarcaForm,

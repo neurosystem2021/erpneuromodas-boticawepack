@@ -216,19 +216,6 @@
                       <span >
                         {{ producto.ProductoMarca }}
                       </span>
-
-                      <!-- <autocomplete v-else
-                        required="required"
-                        :url="API + 'marcas'"
-                        :ref="`inputMarca${index}`"
-                        anchor="ProductoMarca"
-                        label="writer"
-                        :placeholder.sync="producto.ProductoMarca"
-                        :on-select="(val) => setMarca(val, index)"
-                        :onFocus="focusAutocomplete.bind(null, `inputMarca${index}`)"                
-                        :classes="{input: 'form-control upper'}">
-                      </autocomplete> -->
-
                     </td>
                     <td> 
                       <b-button variant="info" v-if="producto.TienePresentacion" @click="abrirModalPresentacion(producto,index)">
@@ -239,14 +226,13 @@
                       <input type="text" v-model="producto.ProductoMedicion"  :disabled="!producto.editable" class="form-control" style="width: 120px;">
                     </td>
                     <td class="px-2" style="text-align: center;"> <input type="number" v-if="producto.esPresentacion" v-model="producto.precantidad" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" :disabled="!producto.editable"  v-if="!producto.esPresentacion" v-model="producto.cantidad" @input="camnbiarIGV(index)" class="form-control" style="width: 90px;"> </td>
-                    <!-- <td class="px-2" style="text-align: center;"> PrecioCosto - {{ producto.PrecioCosto }}</td> -->
+                    <td class="px-2" style="text-align: center;"> <input type="number" :disabled="!producto.editable"  v-if="!producto.esPresentacion" v-model="producto.cantidad" @input="cambiarIGV(index)" class="form-control" style="width: 90px;"> </td>
                     <td class="px-2" style="text-align: center;">
-                      <input type="number" v-model="producto.precioUnitario" v-if="producto.editable" class="form-control" style="width: 90px;" @input="camnbiarIGV(index)">
+                      <input type="number" v-model="producto.precioUnitario" v-if="producto.editable" class="form-control" style="width: 90px;" @input="cambiarIGV(index)">
                        <span v-else> {{ producto.precioUnitario }} </span>
                     </td>
                     <td class="px-2" style="text-align: center;"> <input type="number"  v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad ).toFixed(2) }}</td>
+                    <td class="px-2" style="text-align: center;">{{ parseFloat((parseFloat(producto.PrecioCosto) || 0) * (parseFloat(producto.cantidad) || 0)).toFixed(2) }}</td>
                    
                     <td class="px-2" style="text-align: center;"> 
                         <b-form-checkbox
@@ -255,14 +241,14 @@
                           value="1"
                           unchecked-value="0"
                           :disabled="!producto.editable"
-                          @change="camnbiarIGV(index)"
+                          @change="cambiarIGV(index)"
                         >
                         {{ producto.igv }}
                         </b-form-checkbox>
 
                     </td>
                     
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad + parseFloat(producto.igv)).toFixed(2)  }}</td>
+                    <td class="px-2" style="text-align: center;">{{ parseFloat((parseFloat(producto.PrecioCosto) || 0) * (parseFloat(producto.cantidad) || 0) + (parseFloat(producto.igv) || 0)).toFixed(2)  }}</td>
                     <td>
                       <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
                       <b-button variant="success" v-else @click="nuevoProducto(producto,index)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
@@ -281,7 +267,7 @@
                 <tbody>
                   <tr>
                     <td> <b>Total Factura XML</b></td>
-                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
+                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML || 0).toFixed(1) }}</td>
                   </tr>
                   <tr>
                     <td> <b>Total Factura</b></td>
@@ -302,7 +288,7 @@
               </b-alert>
             </b-col>
             <b-col cols="12" style="text-align: center;" v-if="lstProductos.length>0">
-                <b-button variant="success" @click="registrarIngreso"> Guardar </b-button>
+                <b-button variant="success" :disabled="guardando" @click="registrarIngreso"> Guardar </b-button>
             </b-col>
             </b-row>
             <b-modal v-model="modalPresentacion" size="lg" hide-footer hide-heade>
@@ -351,9 +337,13 @@
   </template>
   
   <script>
+import Vue from "vue";
 import config from "@/store/config.js";
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./../components/ProductoForm";
+
+const TASA_IGV = 0.18;
+
 export default {
   components: {
     ProductoForm
@@ -373,14 +363,14 @@ export default {
       isVentas: false,
       loadCode: "",
       producto: {},
-      index: "",
+      index: 0,
       totalFacturaXML: 0,
       productoSelect: {},
+      guardando: false,
       showButton: {
         default: false,
         type: Boolean
-      },
-      index: 0
+      }
     };
   },
   methods: {
@@ -390,66 +380,82 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
-    async productoactualizado(IdProducto) {
-      console.log(IdProducto);
-      this.$swal({
-        title: "Procesando...",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
-      let pro = { ...this.lstProductos[this.index] };
-      let IdAlmacen = "";
-
+    getIdAlmacenActivo() {
       if (this.isSalida) {
-        IdAlmacen =
-          this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
-      } else {
-        IdAlmacen = !this.isTraslado
-          ? this.movimiento.almacenDestino.IdAlmacen > 0
-            ? this.movimiento.almacenDestino.IdAlmacen
-            : 1
-          : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
+        return this.movimiento.almacenOrigen.IdAlmacen > 0
+          ? this.movimiento.almacenOrigen.IdAlmacen
+          : 1;
       }
-
-      const response = await this.axios(`${this.API}productos/stock`, {
-        params: {
-          idAlmacen: IdAlmacen,
-          idProductos: [IdProducto]
-        }
-      });
-      let res = response.data[0];
-
-      pro.IdProducto = res.IdProducto;
-      pro.CodigoBarra = res.CodigoBarra;
-      pro.stock = res.stock;
-      pro.PrecioContado = res.PrecioContado;
-      pro.PrecioContado = res.PrecioContado;
-      let presentacion = [];
-
-      pro.TienePresentacion = false;
-      if (pro.PreciosPorProducto) {
-        presentacion = JSON.parse(pro.PreciosPorProducto);
-        pro.TienePresentacion = presentacion.some(v => v.cantidad > 0);
-      }
-      pro.ProductoMarca = res.ProductoMarca;
-      pro.presentacion = presentacion.filter(v => v.cantidad > 0);
-
-      Vue.set(this.lstProductos, this.index, pro);
-
-      this.$nextTick(() => {
-        this.productos = [...this.lstProductos];
-      });
-
-      this.$swal.close();
+      return !this.isTraslado
+        ? this.movimiento.almacenDestino.IdAlmacen > 0
+          ? this.movimiento.almacenDestino.IdAlmacen
+          : 1
+        : this.movimiento.almacenOrigen.IdAlmacen > 0
+          ? this.movimiento.almacenOrigen.IdAlmacen
+          : 1;
     },
+    async productoactualizado(IdProducto) {
+  // Guard: si el formulario hijo emitió sin un IdProducto válido, no llamamos al backend
+  if (!IdProducto || isNaN(parseInt(IdProducto))) {
+    this.$toasted.error(
+      "No se pudo obtener el producto registrado. Vuelva a intentarlo."
+    );
+    console.warn("productoactualizado recibió un IdProducto inválido:", IdProducto);
+    return;
+  }
+
+  this.$swal({
+    title: "Procesando...",
+    text: "Por favor espera",
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      this.$swal.showLoading();
+    }
+  });
+  let pro = { ...this.lstProductos[this.index] };
+  let IdAlmacen = this.getIdAlmacenActivo();
+
+  try {
+    const response = await this.axios(`${this.API}productos/stock`, {
+      params: {
+        idAlmacen: IdAlmacen,
+        idProductos: [IdProducto]
+      }
+    });
+    let res = response.data[0];
+
+    if (!res) {
+      this.$toasted.error("No se encontró información de stock para el producto");
+      return;
+    }
+
+    pro.IdProducto = res.IdProducto;
+    pro.CodigoBarra = res.CodigoBarra;
+    pro.stock = res.stock;
+    pro.PrecioContado = res.PrecioContado;
+    let presentacion = [];
+
+    pro.TienePresentacion = false;
+    if (pro.PreciosPorProducto) {
+      presentacion = JSON.parse(pro.PreciosPorProducto);
+      pro.TienePresentacion = presentacion.some(v => v.cantidad > 0);
+    }
+    pro.ProductoMarca = res.ProductoMarca;
+    pro.presentacion = presentacion.filter(v => v.cantidad > 0);
+
+    Vue.set(this.lstProductos, this.index, pro);
+
+    this.$nextTick(() => {
+      this.productos = [...this.lstProductos];
+    });
+  } catch (error) {
+    this.$toasted.error("No se pudo actualizar el producto");
+    console.error(error);
+  } finally {
+    this.$swal.close();
+  }
+},
     editarProducto(Pro) {
       this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
@@ -457,7 +463,6 @@ export default {
       this.$refs.productoFormEdit.manterproducto = false;
     },
     nuevoProducto(Pro, index) {
-      console.log(index);
       this.index = index;
       this.productoSelect = Pro;
       this.$refs.productoFormEdit.show = true;
@@ -477,7 +482,7 @@ export default {
       const validExtension = file.name.toLowerCase().endsWith(".xml");
 
       if (!validMimeTypes.includes(file.type) && !validExtension) {
-        alert("Por favor selecciona un archivo XML válido.");
+        this.$toasted.error("Por favor selecciona un archivo XML válido.");
         return;
       }
       const reader = new FileReader();
@@ -485,6 +490,13 @@ export default {
         const xml = event.target.result;
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "application/xml");
+
+        const parserError = xmlDoc.getElementsByTagName("parsererror");
+        if (parserError.length > 0) {
+          this.$toasted.error("El archivo XML no tiene un formato válido.");
+          this.clearFileInput();
+          return;
+        }
 
         this.totalFacturaXML = "";
         try {
@@ -494,12 +506,7 @@ export default {
           const party = accountingSupplier.getElementsByTagName(
             "cbc:PayableAmount"
           )[0];
-          // const partyId = party.getElementsByTagName(
-          //   "cac:PayableAmount "
-          // )[0];
-          // const id = party.getElementsByTagName("cbc:ID")[0];
           this.totalFacturaXML = party.textContent;
-          // this.movimiento.totalFacturaXML = id.textContent;
         } catch (error) {
           console.warn("No se pudo obtener total:", error);
         }
@@ -556,7 +563,6 @@ export default {
           if (!regAddress)
             throw new Error("No se encontró RegistrationAddress");
 
-          // Extraer los campos por separado
           const line = regAddress.getElementsByTagName("cbc:Line")[0];
           const district = regAddress.getElementsByTagName("cbc:District")[0];
           const city = regAddress.getElementsByTagName("cbc:CityName")[0];
@@ -564,7 +570,6 @@ export default {
             "cbc:CountrySubentity"
           )[0];
 
-          // Concatenar la dirección
           const direccion =
             (line ? line.textContent.trim() + ", " : "") +
             (district ? district.textContent.trim() + ", " : "") +
@@ -581,6 +586,15 @@ export default {
         }
 
         const invoiceLines = xmlDoc.getElementsByTagName("cac:InvoiceLine");
+
+        if (invoiceLines.length === 0) {
+          this.$toasted.error(
+            "El XML no contiene líneas de factura (cac:InvoiceLine)"
+          );
+          this.clearFileInput();
+          return;
+        }
+
         const productos = Array.from(invoiceLines).map((item, index) => {
           const descripcionTags = item.getElementsByTagName("cbc:Description");
           const cantidadTags = item.getElementsByTagName(
@@ -596,22 +610,21 @@ export default {
               "cbc:PriceAmount"
             );
             if (priceAmountTags.length > 0) {
-              precioConIGV = parseFloat(priceAmountTags[0].textContent);
+              precioConIGV = parseFloat(priceAmountTags[0].textContent) || 0;
             }
           }
 
           const cantidad =
             cantidadTags.length > 0
-              ? parseFloat(cantidadTags[0].textContent)
+              ? parseFloat(cantidadTags[0].textContent) || 0
               : 0;
 
-          const precioUnitario = (precioConIGV / 1.18).toFixed(6); // precio sin IGV
-          const igvUnitario = (precioConIGV - precioUnitario).toFixed(6);
-          const totalLinea = (cantidad * precioUnitario).toFixed(2);
-          const totalIGV = (cantidad * igvUnitario).toFixed(2);
-          const totalConIGV = (cantidad * precioConIGV).toFixed(2);
+          const precioUnitario = precioConIGV / (1 + TASA_IGV);
+          const igvUnitario = precioConIGV - precioUnitario;
+          const totalLinea = cantidad * precioUnitario;
+          const totalIGV = cantidad * igvUnitario;
+          const totalConIGV = cantidad * precioConIGV;
 
-          // Afectación IGV
           let tipoAfectacion = "";
           const taxCategory = item.getElementsByTagName("cac:TaxCategory")[0];
           if (taxCategory) {
@@ -629,12 +642,12 @@ export default {
             descripcion:
               descripcionTags.length > 0 ? descripcionTags[0].textContent : "",
             cantidad: cantidad.toFixed(2),
-            precioUnitario: parseFloat(precioUnitario).toFixed(2),
-            igv: parseFloat(igvUnitario*cantidad).toFixed(2),
-            totalLinea: parseFloat(totalLinea),
-            totalIGV: parseFloat(totalIGV),
-            totalConIGV: parseFloat(totalConIGV),
-            precioConIGV: parseFloat(precioConIGV),
+            precioUnitario: precioUnitario.toFixed(2),
+            igv: parseFloat((igvUnitario * cantidad).toFixed(2)),
+            totalLinea: parseFloat(totalLinea.toFixed(2)),
+            totalIGV: parseFloat(totalIGV.toFixed(2)),
+            totalConIGV: parseFloat(totalConIGV.toFixed(2)),
+            precioConIGV: parseFloat(precioConIGV.toFixed(2)),
             tieneIgv: tipoAfectacion
           };
         });
@@ -658,78 +671,73 @@ export default {
           this.$swal.showLoading();
         }
       });
-      await this.validarExisteProductos();
-      await this.obtenerStock();
-      this.$swal.close();
+      try {
+        await this.validarExisteProductos();
+        await this.obtenerStock();
+      } catch (error) {
+        this.$toasted.error("Ocurrió un error al procesar el XML");
+        console.error(error);
+      } finally {
+        this.$swal.close();
+      }
     },
     async validarExisteProductos() {
-      for (const element of this.productos) {
-        element.IdProducto = "";
-        element.CodigoBarra = "";
-        element.Producto = element.descripcion;
-        element.PrecioCosto = element.precioUnitario;
-        element.igv = element.igv;
-        element.tieneIgv = element.tieneIgv;
-        element.editable = false;
+      // Preparamos los items localmente
+      const items = this.productos.map(element => ({
+        ...element,
+        IdProducto: "",
+        CodigoBarra: "",
+        Producto: element.descripcion,
+        PrecioCosto: element.precioUnitario,
+        editable: false
+      }));
 
-        try {
-          const res = await this.axios.get(
-            `${this.API}buscarproductos/nombrexml`,
-            {
-              params: {
-                Producto: element.descripcion
-              }
-            }
-          );
+      // Búsquedas en paralelo en vez de secuenciales (evita N round-trips en serie)
+      const resultados = await Promise.all(
+        items.map(element =>
+          this.axios
+            .get(`${this.API}buscarproductos/nombrexml`, {
+              params: { Producto: element.descripcion }
+            })
+            .then(res => ({ element, data: res.data }))
+            .catch(error => {
+              console.error("Error al validar producto:", error);
+              return { element, data: [] };
+            })
+        )
+      );
 
-          if (res.data.length > 0) {
-            let productos = res.data;
-            let background = this.generarColorClaroHex();
-            await productos.forEach(producto => {
-              producto.descripcion = element.descripcion;
-              producto.background = background;
-              producto.cantidad = element.cantidad;
-              producto.igv = element.igv;
-              producto.tieneIgv = element.tieneIgv;
-              producto.PrecioCosto = element.precioUnitario;
-              producto.orden = element.orden;
-              producto.editable = element.editable;
-              this.lstPreProductos.push(producto);
-            });
-          } else {
-            element.IdProducto = "";
-            element.CodigoBarra = "";
-            element.background = "#FFFFFF";
-            this.lstPreProductos.push(element);
-          }
-        } catch (error) {
-          console.error("Error al validar producto:", error);
+      resultados.forEach(({ element, data }) => {
+        if (data && data.length > 0) {
+          const background = this.generarColorClaroHex();
+          data.forEach(producto => {
+            producto.descripcion = element.descripcion;
+            producto.background = background;
+            producto.cantidad = element.cantidad;
+            producto.igv = element.igv;
+            producto.tieneIgv = element.tieneIgv;
+            producto.PrecioCosto = element.precioUnitario;
+            producto.orden = element.orden;
+            producto.editable = element.editable;
+            this.lstPreProductos.push(producto);
+          });
+        } else {
+          element.IdProducto = "";
+          element.CodigoBarra = "";
+          element.background = "#FFFFFF";
           this.lstPreProductos.push(element);
         }
-      }
+      });
+
       this.clearFileInput();
     },
     clearFileInput() {
-      this.$refs.fileInput.reset();
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.reset();
+      }
     },
     async obtenerStock() {
-      let productos = [];
-      let IdAlmacen = "";
-
-      if (this.isSalida) {
-        IdAlmacen =
-          this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
-      } else {
-        IdAlmacen = !this.isTraslado
-          ? this.movimiento.almacenDestino.IdAlmacen > 0
-            ? this.movimiento.almacenDestino.IdAlmacen
-            : 1
-          : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
-      }
+      let IdAlmacen = this.getIdAlmacenActivo();
 
       const promesas = this.lstPreProductos.map(async producto => {
         producto.precioUnitario = producto.PrecioCosto;
@@ -763,7 +771,7 @@ export default {
         return producto;
       });
 
-      productos = await Promise.all(promesas);
+      const productos = await Promise.all(promesas);
 
       this.lstProductos = productos.sort((a, b) => {
         if (a.orden < b.orden) return -1;
@@ -797,7 +805,6 @@ export default {
         FechaVenCredito: "",
         Moneda: "USD",
         FechaPeriodoTributario: this.$moment().year() + "" + currentMonth,
-        // MovimientoFecha: this.$moment().format("YYYY-MM-DDTH:mm"),
         MovimientoFecha:
           this.$browser.name == "chrome"
             ? this.$moment().format("YYYY-MM-DDThh:mm:ss")
@@ -835,8 +842,8 @@ export default {
           );
         })
         .catch(error => {
-          console.log(error);
-          // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+          console.error(error);
+          this.$toasted.error("Ha ocurrido un error, vuelva a intentarlo");
         });
     },
     setTipoMovimiento(obj) {
@@ -931,17 +938,21 @@ export default {
         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
       };
 
-      // Generar color hasta que no esté usado ni sea blanco
+      let intentos = 0;
       do {
         const hue = Math.floor(Math.random() * 360);
         const saturation = Math.floor(Math.random() * 50) + 50;
         const lightness = Math.floor(Math.random() * 30) + 70;
         hexColor = hslToHex(hue, saturation, lightness);
-      } while (hexColor === "#FFFFFF" || coloresUsados.includes(hexColor));
+        intentos += 1;
+      } while (
+        (hexColor === "#FFFFFF" || coloresUsados.includes(hexColor)) &&
+        intentos < 50
+      );
 
       return hexColor;
     },
-    async registrarIngreso(data) {
+    async registrarIngreso() {
       if (!this.movimiento.Serie) {
         this.$toasted.error("Es importante la Serie");
         this.$refs.txtcargarNumero.focus();
@@ -951,7 +962,7 @@ export default {
       const colores = {};
 
       this.lstProductos.forEach((producto, index) => {
-        const bg = producto.background.toUpperCase(); // normalizamos a mayúsculas
+        const bg = (producto.background || "").toUpperCase();
         if (bg !== "#FFFFFF") {
           if (!colores[bg]) {
             colores[bg] = [];
@@ -981,6 +992,8 @@ export default {
         );
         return false;
       }
+
+      this.guardando = true;
       this.$swal({
         title: "Procesando...",
         text: "Por favor espera",
@@ -990,25 +1003,42 @@ export default {
           this.$swal.showLoading();
         }
       });
-      this.movimiento.productos = this.lstProductos;
-      await this.axios
-        .post(`${this.API}/movimientoxml`, this.movimiento)
-        .then(res => {
-          if (res.data) {
-            this.$swal({
-              icon: "success",
-              title: "Registro Correcto",
-              allowOutsideClick: false,
-              allowEscapeKey: false
-            }).then(respuesta => {
-              if (respuesta.isConfirmed) {
-                window.location.reload();
-              }
-            });
-          }
-        });
 
-      console.log("Registrando ingreso...", data);
+      this.movimiento.productos = this.lstProductos;
+
+      try {
+        const res = await this.axios.post(
+          `${this.API}/movimientoxml`,
+          this.movimiento
+        );
+
+        if (res.data && res.data.error) {
+          this.$swal.close();
+          this.$toasted.error(res.data.error);
+          return;
+        }
+
+        if (res.data) {
+          this.$swal({
+            icon: "success",
+            title: "Registro Correcto",
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          }).then(respuesta => {
+            if (respuesta.isConfirmed) {
+              window.location.reload();
+            }
+          });
+        }
+      } catch (error) {
+        this.$swal.close();
+        this.$toasted.error(
+          "Ocurrió un error al registrar el ingreso. Intente nuevamente."
+        );
+        console.error(error);
+      } finally {
+        this.guardando = false;
+      }
     },
     renderChild(data) {
       if (this.idAlmacen) {
@@ -1080,51 +1110,46 @@ export default {
       `;
     },
     async setProducto(obj) {
+      if (!obj || !obj.IdProducto) {
+        this.$toasted.error("Producto inválido, intente seleccionarlo nuevamente");
+        return false;
+      }
       if (this.lstPreProductos.some(v => v.IdProducto == obj.IdProducto)) {
         this.$toasted.error("El producto ya se encuentra en el listado");
         return false;
       }
       obj.background = this.generarColorClaroHex();
-      let IdAlmacen = "";
-      if (this.isSalida) {
-        IdAlmacen =
-          this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
-      } else {
-        IdAlmacen = !this.isTraslado
-          ? this.movimiento.almacenDestino.IdAlmacen > 0
-            ? this.movimiento.almacenDestino.IdAlmacen
-            : 1
-          : this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1;
-      }
+      let IdAlmacen = this.getIdAlmacenActivo();
 
-      const response = await this.axios(`${this.API}productos/stock`, {
-        params: {
-          idAlmacen: IdAlmacen,
-          idProductos: [obj.IdProducto]
+      try {
+        const response = await this.axios(`${this.API}productos/stock`, {
+          params: {
+            idAlmacen: IdAlmacen,
+            idProductos: [obj.IdProducto]
+          }
+        });
+        let res = response.data[0];
+        obj.stock = res.stock;
+        obj.precioUnitario = res.PrecioContado;
+
+        obj.cantidad = 1;
+        obj.editable = true;
+        obj.tieneIgv = 0;
+        obj.igv = 0;
+        obj.TienePresentacion = false;
+        let presentacion = [];
+        if (obj.PreciosPorProducto) {
+          presentacion = JSON.parse(obj.PreciosPorProducto);
+          obj.TienePresentacion = presentacion.some(v => v.cantidad > 0);
         }
-      });
-      let res = response.data[0];
-      obj.stock = res.stock;
-      obj.precioUnitario = res.PrecioContado;
-
-      obj.cantidad = 1;
-      obj.editable = true;
-      obj.tieneIgv = 0;
-      obj.igv = 0;
-      obj.TienePresentacion = false;
-      let presentacion = [];
-      if (obj.PreciosPorProducto) {
-        presentacion = JSON.parse(obj.PreciosPorProducto);
-        obj.TienePresentacion = presentacion.some(v => v.cantidad > 0);
+        obj.ProductoMarca = res.ProductoMarca;
+        obj.presentacion = presentacion.filter(v => v.cantidad > 0);
+        this.lstProductos.unshift(obj);
+        this.productos = [...this.lstProductos];
+      } catch (error) {
+        this.$toasted.error("No se pudo agregar el producto");
+        console.error(error);
       }
-      obj.ProductoMarca = res.ProductoMarca;
-      obj.presentacion = presentacion.filter(v => v.cantidad > 0);
-      this.lstProductos.unshift(obj);
-      this.productos = [...this.lstProductos];
     },
     loadBarcode(e) {
       if (e) {
@@ -1139,10 +1164,15 @@ export default {
           .then(response => {
             if (response.data.IdProducto) {
               this.setProducto(response.data);
+              this.loadCode = "";
             } else {
               this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
             }
+          })
+          .catch(error => {
+            console.error(error);
+            this.$toasted.error("Error al buscar el producto");
           });
       }
     },
@@ -1168,15 +1198,17 @@ export default {
       }
       Vue.set(this.lstProductos, this.index, prod);
       this.modalPresentacion = false;
-      // prod.precioCosto = obj;
     },
-    camnbiarIGV(index) {
+    cambiarIGV(index) {
       this.$nextTick(() => {
         let prod = { ...this.lstProductos[index] };
+        const cantidad = parseFloat(prod.cantidad) || 0;
+        const precioUnitario = parseFloat(prod.precioUnitario) || 0;
         prod.igv =
-          prod.tieneIgv == 1 ? prod.cantidad * prod.precioUnitario * 0.18 : 0;
+          prod.tieneIgv == 1
+            ? parseFloat((cantidad * precioUnitario * TASA_IGV).toFixed(2))
+            : 0;
         Vue.set(this.lstProductos, index, prod);
-        console.log(prod);
       });
     }
   },
@@ -1189,8 +1221,7 @@ export default {
       }
     },
     mostrarAdvertencia() {
-      let val = this.lstProductos.some(v => !v.CodigoBarra);
-      return val;
+      return this.lstProductos.some(v => !v.CodigoBarra);
     },
     Proveedor() {
       if (this.rucProveedor && this.nameProveedor) {
@@ -1211,16 +1242,16 @@ export default {
       let total = 0;
       if (this.lstProductos.length > 0) {
         total = this.lstProductos.reduce((sum, producto) => {
-          return sum + parseFloat(producto.precioUnitario * producto.cantidad + parseFloat(producto.igv));
+          const precioUnitario = parseFloat(producto.precioUnitario) || 0;
+          const cantidad = parseFloat(producto.cantidad) || 0;
+          const igv = parseFloat(producto.igv) || 0;
+          return sum + precioUnitario * cantidad + igv;
         }, 0);
       }
       return parseFloat(total).toFixed(1);
     },
     mostrarAnadirProductos() {
-      if (this.lstProductos.length > 0) {
-        return true;
-      }
-      return false;
+      return this.lstProductos.length > 0;
     }
   },
   mounted() {}

@@ -17,6 +17,7 @@ import CategoriasNuevo from "@/views/CategoriasNuevo.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import Usuario from "@/views/Usuario.vue";
+import Importar from "@/views/Importar.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
 import VentaListado from "@/views/VentaListado.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
@@ -66,6 +67,11 @@ export default new Router({
       path: "/productos",
       name: "Productos",
       component: Productos
+    },
+    {
+      path: "/importar",
+      name: "Importar",
+      component: Importar
     },
     {
       path: "/usuario",

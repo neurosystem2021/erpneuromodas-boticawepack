@@ -220,7 +220,6 @@ export default {
           let TotalVenta = 0;
           let TotalCosto = 0;
           let UtilidadBruta = 0;
-          let PorcentajeUti = 0;
           data.forEach(element => {
             Cantidad += element.Cantidad;
             PrecioCosto += element.PrecioCosto;
@@ -228,8 +227,8 @@ export default {
             TotalVenta += element.TotalVenta;
             TotalCosto += element.TotalCosto;
             UtilidadBruta += element.UtilidadBruta;
-            PorcentajeUti += element.PorcentajeUti;
           });
+          let PorcentajeUti = TotalCosto > 0 ? (UtilidadBruta / TotalCosto) * 100 : 0;
           this.footer = {
             Producto: "TOTAL",
             Cantidad: parseFloat(Cantidad).toFixed(2),

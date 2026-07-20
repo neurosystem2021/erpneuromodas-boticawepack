@@ -13,7 +13,7 @@
                 body-bg-variant="light"
                 body-text-variant="dark">     
                 <b-tabs pills card>
-                  <b-tab title="Proformas" active>
+                  <b-tab title="Ordenes" active>
                   <b-row class="align-items-center mb-2">
                     <b-col cols="8">
                       <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />

@@ -64,17 +64,18 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="6">Sumatoria</td>
+              <td colspan="5">Sumatoria</td>
               <td>
-                <strong class="sumTotalVenta">
-                  {{ totalCompras }}
-                </strong>
+                <strong class="sumTotalVenta">{{ totalVentas }}</strong>
               </td>
               <td>
-                <strong class="sumTotalCosto">{{ totalVentas }} </strong>
+                <strong class="sumTotalCosto">{{ totalCompras }}</strong>
               </td>
               <td>
-                <strong class="sumUtilidadBruta"> {{ Porcentaje }} %</strong>
+                <strong class="sumUtilidadBruta">{{ utilidadBruta }}</strong>
+              </td>
+              <td>
+                <strong>{{ Porcentaje }} %</strong>
               </td>
             </tr>
           </tfoot>
@@ -99,6 +100,7 @@ export default {
       agrupadoAplicado: false, // controla el formato mostrado, solo cambia al Generar
       totalCompras: 0,
       totalVentas: 0,
+      utilidadBruta: 0,
       Porcentaje: 0,
     };
   },
@@ -141,6 +143,7 @@ export default {
       });
       this.totalCompras = parseFloat(totalCompras).toFixed(2);
       this.totalVentas = parseFloat(totalVentas).toFixed(2);
+      this.utilidadBruta = parseFloat(totalVentas - totalCompras).toFixed(2);
       this.Porcentaje = parseFloat(
         (100 * (totalVentas - totalCompras)) / totalCompras
       ).toFixed(2);

@@ -2915,44 +2915,38 @@ export default {
           pres = newPres.filter(v => v.cantidad > 0);
         }
         prod.PreciosPorProducto = pres;
-        prod.Descripcion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.ProductoPresentacion = producto.ProductoPresentacion
-          ? prod.ProductoPresentacion
-          : "UNIDAD";
-        prod.cantidad = 1;
-        prod.precio = producto.PrecioContado;
-        prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
-        prod.bloquearInputPrecio = false;
-        prod.CantidadPresentacion = null;
-        prod.ProductoPresentacion = producto.Descripcion;
-        prod.Descripcion = producto.Descripcion;
         prod.cantidad = producto.Cantidad;
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        prod.bloquearInputPrecio = false;
+
         if (producto.Presentacion) {
           try {
-            let presObj = typeof producto.Presentacion === 'string' 
-              ? JSON.parse(producto.Presentacion) 
+            let presObj = typeof producto.Presentacion === 'string'
+              ? JSON.parse(producto.Presentacion)
               : producto.Presentacion;
             prod.CantidadPresentacion = presObj.cantidad ? parseFloat(presObj.cantidad) : null;
             prod.bloquearInputPrecio = true;
             prod.presentacion = producto.Presentacion;
+            prod.ProductoPresentacion = producto.Descripcion || presObj.nombre || "UNIDAD";
+            prod.Descripcion = prod.ProductoPresentacion;
           } catch (e) {
             prod.CantidadPresentacion = null;
             prod.bloquearInputPrecio = false;
             prod.presentacion = null;
+            prod.ProductoPresentacion = "UNIDAD";
+            prod.Descripcion = "UNIDAD";
           }
         } else {
           prod.CantidadPresentacion = null;
           prod.bloquearInputPrecio = false;
           prod.presentacion = null;
+          prod.ProductoPresentacion = "UNIDAD";
+          prod.Descripcion = "UNIDAD";
         }
+
+        prod.tienePresentacion = prod.PreciosPorProducto.some(v => v.cantidad > 0);
         productos.push(prod);
       });
 

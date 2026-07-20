@@ -64,7 +64,23 @@
                   :id="`txtNombreOrganizacion-${index}`"
                   placeholder="NOMBRE DE LA ORGANIZACIÓN"></b-form-input>
                 </b-col>
-                 
+                 <b-col cols="12" v-if="ventas[ventaActiva].idProforma > 0" class="mt-1">
+                  <b-row class="ml-1">
+                    <h5 class="mt-1">
+                      Proforma Seleccionada:
+                      <b-badge variant="info" style="font-size: 1.2rem">{{
+                        ventas[ventaActiva].anioNumeroProforma
+                      }}</b-badge>
+                    </h5>
+                    <b-button
+                      class="ml-2 mb-1"
+                      size="sm"
+                      variant="warning"
+                      @click="limpiarProforma"
+                      ><b>Quitar</b></b-button
+                    >
+                  </b-row>
+                </b-col>
               </b-row>
               <b-row>
                 <b-col cols="6" class="py-0">
@@ -1242,7 +1258,9 @@ export default {
         EsOrganizacion: 0,
         NombreOrganizacion: "",
         productos: [],
-        accionBoton: 1
+        accionBoton: 1,
+        idProforma: 0,
+        anioNumeroProforma: ""
       },
       ventas: [
         {
@@ -1297,7 +1315,9 @@ export default {
           EsOrganizacion: 0,
           NombreOrganizacion: "",
           productos: [],
-          accionBoton: 1
+          accionBoton: 1,
+          idProforma: 0,
+          anioNumeroProforma: "",
         }
       ],
       bloquearInput: false,
@@ -1356,6 +1376,10 @@ export default {
       let IdPerfil = [1, 25, "1", "25"];
       let val = sessionStorage.getItem("IdPerfil");
       return IdPerfil.includes(val);
+    },
+    limpiarProforma() {
+      this.ventas[this.ventaActiva].idProforma = 0;
+      this.ventas[this.ventaActiva].anioNumeroProforma = "";
     },
     async actualizarDeudaActual() {
       const cliente = this.ventas[this.ventaActiva].cliente;
@@ -1974,25 +1998,22 @@ export default {
       });
     },
     eliminarVentana() {
-      this.mostrarMetodo.splice(this.ventaActiva, 1);
+      this.$delete(this.mostrar, this.ventaActiva);
       this.ventas.splice(this.ventaActiva, 1);
 
+      if (this.ventaActiva >= this.ventas.length) {
+        this.ventaActiva = Math.max(this.ventas.length - 1, 0);
+      }
+
       this.$nextTick(() => {
-        if (this.ventaActiva != 0) {
-          this.ventaActiva = this.ventaActiva - 1;
-        } else {
-          this.ventaActiva = 0;
-        }
         this.metodoPagoCambio(1);
-      });
-      let header = document.getElementById("header");
-      header.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-      this.$toasted.info("Opción de venta cerrada.");
-      this.$forceUpdate();
-      this.$nextTick(() => {
+        let header = document.getElementById("header");
+        header.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+        this.$toasted.info("Opción de venta cerrada.");
+        this.$forceUpdate();
         this.irTxtLoadBarcode();
       });
     },
@@ -2369,7 +2390,7 @@ export default {
       //     this.$swal.showLoading();
       //   }
       // });
-
+      try {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
       let totalPagos = 0;
@@ -2630,23 +2651,29 @@ export default {
             "_blank",
             "noopener"
           );
+
+          // Agregar esto:
+          if (venta.idProforma > 0) {
+            this.axios.put(this.API + "proforma/marcarpuntoventa", {
+              IdProforma: venta.idProforma,
+              IdDocVenta: response.data.insertId
+            });
+          }
         }
 
         if (this.ventas.length == 1) {
           window.location.reload();
-          this.inProgress = false;
         } else {
           this.eliminarVentana();
           this.getVendedorInfo();
-          this.inProgress = false;
         }
-
-        // if (response.data.actualizar) {
-        //   this.$toasted.show(response.data.msg);
-        //   this.inProgress = false;  return;
-        // }
       });
-      this.$swal.close();
+      } catch (error) {
+        console.error("Error en guardarVenta:", error);
+        this.$toasted.show("Ocurrió un error al procesar la venta: " + error.message);
+      } finally {
+        this.inProgress = false;
+      }
     },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
@@ -2866,11 +2893,25 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
+    async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+
+      await this.axios
+        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+        .then(response => {
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
+          }
+        });
+
       venta.cliente = proforma;
       venta.vendedor = { Usuario: proforma.UsuarioReg };
+      venta.verCliente = true;
+
+      venta.idProforma = proforma.IdProforma;
+      venta.anioNumeroProforma = proforma.Anio + "-" + proforma.Numero;
+
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -2900,6 +2941,29 @@ export default {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+
+        if (producto.Presentacion) {
+          try {
+            let presObj =
+              typeof producto.Presentacion === "string"
+                ? JSON.parse(producto.Presentacion)
+                : producto.Presentacion;
+            prod.CantidadPresentacion = presObj.cantidad
+              ? parseFloat(presObj.cantidad)
+              : null;
+            prod.bloquearInputPrecio = true;
+            prod.presentacion = producto.Presentacion;
+          } catch (e) {
+            prod.CantidadPresentacion = null;
+            prod.bloquearInputPrecio = false;
+            prod.presentacion = null;
+          }
+        } else {
+          prod.CantidadPresentacion = null;
+          prod.bloquearInputPrecio = false;
+          prod.presentacion = null;
+        }
+
         productos.push(prod);
       });
       // console.log(proforma.productos);
