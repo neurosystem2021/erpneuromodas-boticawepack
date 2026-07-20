@@ -2110,12 +2110,11 @@ export default {
       prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-      if (pres.length == 0) {
+      prod.tienePresentacion = prod.TienePresentacion == 1;
+      if (prod.TienePresentacion != 1 || pres.length == 0) {
         productos.unshift(prod);
         this.metodoPagoCambio(1);
+        this.irTxtLoadBarcode();
         return;
       }
       prod.bloquearInputPrecio = false;
@@ -2145,6 +2144,7 @@ export default {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
       this.$nextTick(() => {
         this.metodoPagoCambio(1);
+        this.irTxtLoadBarcode();
       });
     },
     setAltImg(event) {
@@ -2930,9 +2930,7 @@ export default {
         prod.cantidad = 1;
         prod.precio = producto.PrecioContado;
         prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
+        prod.tienePresentacion = prod.TienePresentacion == 1;
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
         prod.ProductoPresentacion = producto.Descripcion;
@@ -3014,6 +3012,7 @@ export default {
       }
       this.modalPresentacion = false;
       this.metodoPagoCambio(1);
+      this.irTxtLoadBarcode();
     },
     probarImpresora() {
       if (
