@@ -498,7 +498,7 @@
                         </b-button-group>
                       </div>
                       <b-button-group size="sm">
-                          <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma" @cargarProforma="cargarProforma"></proformas>
+                          <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"></proformas>
                       </b-button-group>
                        <div class="ocultarMovil">
                         <b-button-group size="sm" class="ocularMovil" v-if="false">
@@ -1022,23 +1022,13 @@
          :producto-update="productoSelect"  @actualizarProducto="actualizarRegistro($event)"
          ></producto-form>
         
-        <b-modal v-model="loading" hide-footer hide-header size="md">
-        <b-row>
-          <b-col
-            cols="6"
-            style="text-align: center; align-items: center; align-content: center"
-          >
+        <div v-if="loading" class="loading-overlay">
+          <div class="loading-box">
             <div class="spinner"></div>
-          </b-col>
-          <b-col
-            cols="6"
-            style="text-align: center; align-items: center; align-content: center"
-          >
             <h3>Cargando Datos</h3>
             <h5>Un Momento por favor...</h5>
-          </b-col>
-        </b-row>
-      </b-modal>
+          </div>
+        </div>
 
       </b-container>
   </template>
@@ -1080,6 +1070,7 @@ export default {
       bloquearVenta: false,
       mostrarNav: true,
       isNota: [],
+      procesandoSeleccion: false,
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1550,12 +1541,15 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
+          this.ventas[this.ventaActiva].productos = [];
 
           response.data.forEach(element => {
             this.setProducto(element, true);
           });
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
+          this.$nextTick(() => {
+            this.metodoPagoCambio(1);
+          });
           this.$forceUpdate();
         });
     },
@@ -2001,17 +1995,15 @@ export default {
       });
       // }, 1000);
     },
-    async setProducto(producto) {
+    async setProducto(producto, esReferencia = false) {
       let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+
+      if (!esReferencia && productos.some(v => v.IdProducto == producto.IdProducto)) {
+        productos.filter(v => v.IdProducto == producto.IdProducto)[0].cantidad += parseFloat(1);
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
         });
-
         return false;
       }
       // console.log("producto", producto);
@@ -2023,20 +2015,36 @@ export default {
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
+      prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+      prod.bloquearInputPrecio = false;
+
+      if (esReferencia) {
+        // Viene de un documento de referencia (nota de crédito/débito):
+        // respetar cantidad, precio, descuento y presentación originales
+        prod.cantidad = parseFloat(producto.cantidad) || 1;
+        prod.precio = parseFloat(producto.precio);
+        prod.descuento = parseFloat(producto.descuento) || 0;
+        prod.CantidadPresentacion = producto.CantidadPresentacion || null;
+        prod.presentacion = producto.Presentacion || null;
+        prod.esPresentacion = !!producto.CantidadPresentacion;
+        prod.Descripcion = producto.DescripcionPresentacion || prod.ProductoPresentacion || "UNIDAD";
+        prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
+        prod.bloquearInputPrecio = prod.esPresentacion;
+
+        productos.unshift(prod);
+        this.bloquearVenta = false;
+
+        this.metodoPagoCambio(1);
+        return;
+      }
+
+      // Flujo normal (agregar producto nuevo desde buscador)
+      prod.Descripcion = prod.ProductoPresentacion ? prod.ProductoPresentacion : "UNIDAD";
+      prod.ProductoPresentacion = prod.ProductoPresentacion ? prod.ProductoPresentacion : "UNIDAD";
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-      prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
       if (pres.length == 0) {
         productos.unshift(prod);
@@ -2685,83 +2693,127 @@ export default {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
     async cargarProforma(proforma) {
+      if (this.loading) {
+        console.warn("[cargarProforma] Ya hay una carga en curso, se ignora esta llamada duplicada");
+        return;
+      }
+
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
 
       let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
       venta.proforma = proforma;
       venta.UsuarioProforma = proforma.UsuarioReg;
-      let productos = [];
+
       this.loading = true;
-      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
-      for (const producto of proforma.productos) {
-        try {
-          // Espera a que la API responda antes de pasar al siguiente producto
-          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      console.log("[cargarProforma] Iniciando carga de proforma", proforma.IdProforma);
+      const t0 = performance.now();
 
-          if (prod) {
-            let pres = [];
-            if (prod.PreciosPorProducto) {
-              try {
-                let newPres =
-                  typeof prod.PreciosPorProducto === "string"
-                    ? JSON.parse(prod.PreciosPorProducto)
-                    : prod.PreciosPorProducto;
-                pres = newPres.filter(v => v.cantidad > 0);
-              } catch (e) {
-                pres = [];
-              }
-            }
+      try {
+        const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen || 1;
+        const idProductos = proforma.productos.map(p => p.IdProducto);
 
-            // Asignaciones base
-            prod.PreciosPorProducto = pres;
-            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
-            prod.bloquearInputPrecio = false;
-            prod.CantidadPresentacion = null;
+        console.log("[cargarProforma] Pidiendo stock para", idProductos.length, "productos");
 
-            // Asignaciones desde el objeto 'producto' de la proforma
-            prod.cantidad = producto.Cantidad;
-            prod.precio = producto.Precio;
-            prod.descuento = producto.Descuento ? producto.Descuento : 0;
-            prod.stock = prod.stock; // Mantiene el stock actual del buscador
+        // Timeout de seguridad: si el backend no responde en 15s, abortamos
+        const stockPromise = this.axios(this.API + "productos/puntoventa/stock", {
+          params: { idProductos, idAlmacen },
+          timeout: 15000 // axios aborta la petición sola a los 15s
+        });
 
-            // Mapeos específicos que tenías al final de tu código
-            prod.ProductoPresentacion = producto.ProductoPresentacion;
-            prod.Descripcion = producto.presentacion;
-            prod.ProductoDesc = producto.ProductoDesc;
+        const stockResponse = await stockPromise;
 
-            productos.push(prod);
+        console.log("[cargarProforma] Stock recibido en", (performance.now() - t0).toFixed(0), "ms");
+
+        const stockMap = {};
+        (stockResponse.data || []).forEach(item => {
+          stockMap[item.IdProducto] = item;
+        });
+
+        let productos = [];
+        let faltantes = [];
+
+        for (const producto of proforma.productos) {
+          const base = stockMap[producto.IdProducto];
+          if (!base) {
+            faltantes.push(producto.IdProducto);
+            continue;
           }
-        } catch (error) {
-          console.error(
-            "Error cargando producto individual:",
-            producto.IdProducto,
-            error
+
+          let prod = { ...base };
+          let pres = [];
+          if (prod.PreciosPorProducto) {
+            try {
+              let newPres =
+                typeof prod.PreciosPorProducto === "string"
+                  ? JSON.parse(prod.PreciosPorProducto)
+                  : prod.PreciosPorProducto;
+              pres = newPres.filter(v => v.cantidad > 0);
+            } catch (e) {
+              pres = [];
+            }
+          }
+
+          // Asignaciones base
+          prod.PreciosPorProducto = pres;
+          prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+          prod.bloquearInputPrecio = false;
+          prod.CantidadPresentacion = null;
+
+          // Asignaciones desde el objeto 'producto' de la proforma
+          prod.cantidad = producto.Cantidad;
+          prod.precio = producto.Precio;
+          prod.descuento = producto.Descuento ? producto.Descuento : 0;
+
+          // --- Presentación (igual que en Listado) ---
+          const presentacionObj = producto.ProductoPresentacion; // objeto {nombre, cantidad, precio} o "" si no tiene
+          prod.esPresentacion = !!presentacionObj;
+          prod.CantidadPresentacion = presentacionObj ? presentacionObj.cantidad : null;
+          prod.bloquearInputPrecio = !!presentacionObj;
+          prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
+          prod.Descripcion = producto.presentacion; // texto "DOCENA..." para el badge
+          prod.ProductoDesc = producto.ProductoDesc;
+
+          productos.push(prod);
+        }
+
+        if (faltantes.length) {
+          console.warn("[cargarProforma] El backend NO devolvió stock para estos IDs:", faltantes);
+          this.$toasted.show(
+            `Atención: ${faltantes.length} producto(s) no se pudieron cargar (sin respuesta del servidor)`
           );
         }
-      }
-      this.loading = false;
-      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
-      venta.productos = productos;
-      this.ventas.push(venta);
 
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
+        venta.productos = productos;
+        this.ventas.push(venta);
 
-        // Aseguramos la asignación del cliente en la posición activa
-        if (this.ventas[this.ventaActiva]) {
-          this.ventas[this.ventaActiva].cliente = proforma;
-        }
-      });
+        this.$nextTick(() => {
+          this.ventaActiva = this.ventas.length - 1;
+          this.getNumeroVenta();
+          this.getVendedorInfo();
+          if (this.ventas[this.ventaActiva]) {
+            this.ventas[this.ventaActiva].cliente = proforma;
+          }
+        });
 
-      this.$nextTick(() => {
-        setTimeout(() => {
-          console.log("llegó con " + productos.length + " productos");
+        this.$nextTick(() => {
           this.metodoPagoCambio(1);
-        }, 1000);
-      });
+        });
+
+      } catch (error) {
+        console.error("[cargarProforma] ERROR:", error);
+        if (error.code === "ECONNABORTED") {
+          this.$toasted.show(
+            "El servidor no respondió a tiempo (15s). Puede ser un problema del backend, avisa al equipo técnico."
+          );
+        } else {
+          this.$toasted.show("Ocurrió un error al cargar la proforma");
+        }
+      } finally {
+        console.log("[cargarProforma] Finalizado en", (performance.now() - t0).toFixed(0), "ms");
+        this.loading = false;
+        console.log("[cargarProforma] loading ahora es:", this.loading);
+      }
     },
     getProfomaAnio() {
       let proforma = this.ventas[this.ventaActiva].proforma;
@@ -3009,6 +3061,11 @@ export default {
         return this.API + "productos";
       }
     }
+    },
+  watch: {
+    loading(val) {
+      console.log("[WATCH] loading cambió a:", val, new Error().stack);
+    }
   }
 };
 </script>
@@ -3204,5 +3261,21 @@ export default {
   .tblCarrito {
     font-size: 0.7rem;
   }
+}
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-box {
+  text-align: center;
+}
+.loading-box h3,
+.loading-box h5 {
+  margin-top: 10px;
 }
 </style>
