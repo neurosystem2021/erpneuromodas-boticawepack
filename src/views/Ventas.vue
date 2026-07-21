@@ -439,7 +439,7 @@
                                     </tbody>
                                 </table>
                             </template>
-                            <template slot="adicional" v-if="!venta.EsCredito">
+                            <template slot="adicional">
                                 <table class="table b-table border table-footer table-sm text-center" v-if="false">
                                     <tbody>
                                         <tr><td>Mano de obra bruta</td></tr>
@@ -450,8 +450,8 @@
                                 </table>
 
                                 <b-row align-h="center" class="text-center">
-                                    <b-col cols="8">
-                                        <br />
+                                    <b-col cols="5">
+                                        
                                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                                         <div class="acciones-pos">
 
@@ -459,7 +459,7 @@
                                             type="submit"
                                             :disabled="inProgress"
                                             variant="success"
-                                            class="btn-pos btn-vender">
+                                            class="btn-pos btn-vender" style="font-size:24px;">
 
                                             <i class="fas fa-check-circle mr-2"></i>
                                             EFECTUAR VENTA
@@ -472,7 +472,7 @@
                                             :disabled="inProgress"
                                             variant="primary"
                                             @click="guardarProforma"
-                                            class="btn-pos btn-proforma">
+                                            class="btn-pos btn-proforma" style="font-size:24px;">
 
                                             <i class="fas fa-file-invoice mr-2"></i>
                                             CREAR PROFORMA
@@ -521,6 +521,7 @@ export default {
     },
     data () {
         return {
+            metodoSeleccionado: 1,
             isNota: false,
             dni: '',
             adelanto: 0,
@@ -1411,12 +1412,12 @@ export default {
     justify-content:center;
     align-items:center;
     height:100%;
-    padding:15px;
+    padding:0px;
 }
 
 .btn-pos{
 
-    width:150%;
+    width:200%;
     min-height:50px;
 
     font-size:18px;
@@ -1443,9 +1444,11 @@ export default {
 }
 
 .btn-vender{
-
+    height: 80px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
     background:#28a745;
-
 }
 
 .btn-vender:hover{
@@ -1455,7 +1458,10 @@ export default {
 }
 
 .btn-proforma{
-
+    height: 80px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
     background:#0d6efd;
 
 }
