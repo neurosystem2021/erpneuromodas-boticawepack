@@ -1044,23 +1044,13 @@
         <producto-form :cbGuardar="(id,pxp) => agregarObj(id,pxp)" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
         <!-- MODALS TOUCH -->
 
-        <b-modal v-model="loading" hide-footer hide-header size="md">
-        <b-row>
-          <b-col
-            cols="6"
-            style="text-align: center; align-items: center; align-content: center"
-          >
+        <div v-if="loading" class="loading-overlay">
+          <div class="loading-box">
             <div class="spinner"></div>
-          </b-col>
-          <b-col
-            cols="6"
-            style="text-align: center; align-items: center; align-content: center"
-          >
             <h3>Cargando Datos</h3>
             <h5>Un Momento por favor...</h5>
-          </b-col>
-        </b-row>
-      </b-modal>
+          </div>
+        </div>
   </b-container>
 </template>
 <script>
@@ -1110,6 +1100,7 @@ export default {
       categorias: [],
       productosCategoria: [],
       isNota: [],
+      procesandoSeleccion: false,
       tieneIgv: [],
       diasValidosProf: 0,
       UsuarioLogin: sessionStorage.getItem("User"),
@@ -2093,29 +2084,63 @@ export default {
         this.metodoPagoCambio(1);
       });
     },
+    async setProductoNotaCredito(producto) {
+      let productos = this.ventas[this.ventaActiva].productos;
+      let presNew = producto.Presentacion
+        ? JSON.parse(producto.Presentacion)
+        : {};
+
+      let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      let pres = [];
+      if (prod.PreciosPorProducto) {
+        let newPres = JSON.parse(prod.PreciosPorProducto);
+        pres = newPres.filter(v => v.cantidad > 0);
+      }
+
+      prod.PreciosPorProducto = pres;
+      prod.ProductoDesc = producto.Descripcion;
+      prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
+      prod.cantidad = producto.cantidad;
+      prod.CantidadPresentacion = producto.CantidadPresentacion || null;
+      prod.esPresentacion = !!producto.CantidadPresentacion;
+      prod.precio = parseFloat(producto.precio);
+      prod.descuento = parseFloat(producto.descuento) || 0;
+      prod.presentacion = producto.Presentacion || null;
+      prod.tienePresentacion = prod.PreciosPorProducto.some(v => v.cantidad > 0);
+
+      prod.bloquearInputPrecio = prod.esPresentacion;
+
+      productos.unshift(prod);
+      this.metodoPagoCambio(1);
+    },
     setAltImg(event) {
       event.target.src = "static/no-photo.png";
     },
     setDocRef(obj) {
-      this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
-      this.ventas[this.ventaActiva].NroComprobanteModifica = obj.NroComprobante;
+      const ventaIndex = this.ventaActiva; // 👈 capturamos el índice ANTES de cualquier async
+
+      this.ventas[ventaIndex].CodSunatModifica = obj.CodSunat;
+      this.ventas[ventaIndex].NroComprobanteModifica = obj.NroComprobante;
       if (
-        this.ventas[this.ventaActiva].tipoVenta.CodSunat == "07" ||
-        this.ventas[this.ventaActiva].tipoVenta.CodSunat == "08"
+        this.ventas[ventaIndex].tipoVenta.CodSunat == "07" ||
+        this.ventas[ventaIndex].tipoVenta.CodSunat == "08"
       ) {
-        this.ventas[this.ventaActiva].Serie = this.ventas[
-          this.ventaActiva
-        ].Serie.replace(/^./, obj.NroComprobante[0]);
+        this.ventas[ventaIndex].Serie = this.ventas[ventaIndex].Serie.replace(
+          /^./,
+          obj.NroComprobante[0]
+        );
       }
+
       this.axios
         .get(this.API + "ventas/solonumero", {
           params: {
-            serie: this.ventas[this.ventaActiva].Serie,
-            idTipoDoc: this.ventas[this.ventaActiva].tipoVenta.IdTipoDoc
+            serie: this.ventas[ventaIndex].Serie,
+            idTipoDoc: this.ventas[ventaIndex].tipoVenta.IdTipoDoc
           }
         })
         .then(response => {
-          this.ventas[this.ventaActiva].Numero = response.data.numero;
+          this.ventas[ventaIndex].Numero = response.data.numero;
         })
         .catch(error => {
           console.log(error);
@@ -2127,86 +2152,37 @@ export default {
           params: {
             NroComprobante: obj.NroComprobante,
             idDocVenta: obj.IdDocVenta,
-            IdDocVentaPuntoVenta: this.ventas[this.ventaActiva].puntoVenta
-              .IdDocVentaPuntoVenta
+            IdDocVentaPuntoVenta: this.ventas[ventaIndex].puntoVenta.IdDocVentaPuntoVenta
           }
         })
         .then(async response => {
           this.axios
             .get(this.API + "cliente", {
-              params: {
-                idCliente: response.data[0].IdCliente
-              }
+              params: { idCliente: response.data[0].IdCliente }
             })
-            .then(response => {
-              if (response.data) {
-                this.setCliente(response.data.IdCliente);
-
-                this.ventas[this.ventaActiva].CampoDireccion =
-                  response.data.Direccion;
-                this.ventas[this.ventaActiva].cliente = response.data;
-
-                // let txtCliente = `inputCliente${this.ventaActiva}`;
-                this.ventas[this.ventaActiva].verCliente = false;
-                this.initValueCliente = this.ventas[
-                  this.ventaActiva
-                ].cliente.Cliente;
-                this.ventas[this.ventaActiva].verCliente = true;
+            .then(resCliente => {
+              if (resCliente.data) {
+                this.setCliente(resCliente.data.IdCliente);
+                this.ventas[ventaIndex].CampoDireccion = resCliente.data.Direccion;
+                this.ventas[ventaIndex].cliente = resCliente.data;
+                this.ventas[ventaIndex].verCliente = false;
+                this.initValueCliente = this.ventas[ventaIndex].cliente.Cliente;
+                this.ventas[ventaIndex].verCliente = true;
                 this.$forceUpdate();
               } else {
                 this.$toasted.show("No se encontro al cliente");
               }
             })
-            .catch(error => {
-              console.log(error);
-            });
+            .catch(error => console.log(error));
 
-          this.ventas.productos = [];
-          for (let index = 0; index < response.data.length; index++) {
-            // console.log("ssssss", response.data[index]);
-            await this.setProductoNotaCredito(response.data[index]);
+          this.ventas[ventaIndex].productos = [];
+          for (let i = 0; i < response.data.length; i++) {
+            await this.setProductoNotaCredito(response.data[i], ventaIndex);
           }
-          // response.data.forEach(element => {
-          //   console.log("ssssss", element);
-          //   this.setProductoNotaCredito(element);
-          // });
-          this.ventas[this.ventaActiva].NotaIdMotivo = null;
+          this.ventas[ventaIndex].NotaIdMotivo = null;
+          this.metodoPagoCambio(1, ventaIndex); // 👈 una sola vez, al final, con el índice correcto
           this.$forceUpdate();
         });
-    },
-    async setProductoNotaCredito(producto) {
-      let productos = this.ventas[this.ventaActiva].productos;
-      let presNew = producto.Presentacion
-        ? JSON.parse(producto.Presentacion)
-        : {};
-
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-
-      let pres = [];
-
-      if (prod.PreciosPorProducto) {
-        let newPres = JSON.parse(prod.PreciosPorProducto);
-        pres = newPres.filter(v => v.cantidad > 0);
-      }
-
-      console.log("presNew", presNew.nombre);
-      prod.PreciosPorProducto = pres;
-      prod.ProductoDesc = producto.Descripcion;
-      prod.Descripcion = presNew.nombre ? presNew.nombre : "UNIDAD";
-      prod.ProductoPresentacion = presNew.nombre ? presNew.nombre : "UNIDAD";
-      prod.cantidad = producto.cantidad;
-      prod.CantidadPresentacion = producto.CantidadPresentacion;
-      prod.precio = producto.PrecioCosto;
-      prod.descuento = 0;
-      prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
-
-      prod.bloquearInputPrecio = false;
-      prod.CantidadPresentacion = null;
-      productos.unshift(prod);
-      this.metodoPagoCambio(1);
     },
     someMethod(text) {
       this.someMethod = text;
@@ -2306,16 +2282,13 @@ export default {
         return parseFloat(subtotal).toFixed(2);
       }
     },
-    getTotal() {
-      let prod = [...this.ventas[this.ventaActiva].productos];
+    getTotal(ventaIndex = this.ventaActiva) {
+      let prod = [...this.ventas[ventaIndex].productos];
       if (prod.length == 0) {
         return 0;
       } else {
         let subtotal = prod.reduce((total, prod) => {
-          // console.log(prod);
-          return (
-            total + parseFloat(prod.cantidad * prod.precio - prod.descuento)
-          );
+          return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
         }, 0);
         return parseFloat(subtotal).toFixed(2);
       }
@@ -2334,17 +2307,16 @@ export default {
         this.ventas[this.ventaActiva].comisionista = {};
       }
     },
-    metodoPagoCambio(tipo = null) {
-      console.log("top", tipo);
+    metodoPagoCambio(tipo = null, ventaIndex = this.ventaActiva) {
       this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "transferencia"];
-        const ventaActual = this.ventas[this.ventaActiva].pago;
+        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const ventaActual = this.ventas[ventaIndex].pago;
         metodos.forEach(metodo => {
           ventaActual[metodo].descripcion = null;
           ventaActual[metodo].monto = 0;
         });
         if (tipo && metodos[tipo - 1]) {
-          ventaActual[metodos[tipo - 1]].monto = this.getTotal();
+          ventaActual[metodos[tipo - 1]].monto = this.getTotal(ventaIndex);
         }
       });
     },
@@ -2843,7 +2815,11 @@ export default {
       }
     },
     async cargarProforma(proforma) {
-      console.log("aqui", proforma);
+      if (this.loading) {
+        console.warn("[cargarProforma] Ya hay una carga en curso, se ignora esta llamada duplicada");
+        return;
+      }
+
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
 
       let venta = JSON.parse(JSON.stringify(this.venta));
@@ -2851,77 +2827,115 @@ export default {
       venta.proforma = proforma;
       venta.UsuarioProforma = proforma.UsuarioReg;
 
-      let productos = [];
       this.loading = true;
-      // CAMBIO CLAVE: Usar for...of en lugar de forEach para manejar el async/await
-      for (const producto of proforma.productos) {
-        try {
-          // Espera a que la API responda antes de pasar al siguiente producto
-          let prod = await this.obtenerStockBuscador(producto.IdProducto);
+      console.log("[cargarProforma] Iniciando carga de proforma", proforma.IdProforma);
+      const t0 = performance.now();
 
-          if (prod) {
-            let pres = [];
-            if (prod.PreciosPorProducto) {
-              try {
-                let newPres =
-                  typeof prod.PreciosPorProducto === "string"
-                    ? JSON.parse(prod.PreciosPorProducto)
-                    : prod.PreciosPorProducto;
-                pres = newPres.filter(v => v.cantidad > 0);
-              } catch (e) {
-                pres = [];
-              }
-            }
+      try {
+        const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen || 1;
+        const idProductos = proforma.productos.map(p => p.IdProducto);
 
-            // Asignaciones base
-            prod.PreciosPorProducto = pres;
-            prod.tienePresentacion = pres.some(v => v.cantidad > 0);
-            prod.bloquearInputPrecio = false;
-            prod.CantidadPresentacion = null;
+        console.log("[cargarProforma] Pidiendo stock para", idProductos.length, "productos");
 
-            // Asignaciones desde el objeto 'producto' de la proforma
-            prod.cantidad = producto.Cantidad;
-            prod.precio = producto.Precio;
-            prod.descuento = producto.Descuento ? producto.Descuento : 0;
-            prod.stock = prod.stock; // Mantiene el stock actual del buscador
+        // Timeout de seguridad: si el backend no responde en 15s, abortamos
+        const stockPromise = this.axios(this.API + "productos/puntoventa/stock", {
+          params: { idProductos, idAlmacen },
+          timeout: 15000 // axios aborta la petición sola a los 15s
+        });
 
-            // Mapeos específicos que tenías al final de tu código
-            prod.ProductoPresentacion = producto.ProductoPresentacion;
-            prod.Descripcion = producto.presentacion;
-            prod.ProductoDesc = producto.ProductoDesc;
+        const stockResponse = await stockPromise;
 
-            productos.push(prod);
+        console.log("[cargarProforma] Stock recibido en", (performance.now() - t0).toFixed(0), "ms");
+
+        const stockMap = {};
+        (stockResponse.data || []).forEach(item => {
+          stockMap[item.IdProducto] = item;
+        });
+
+        let productos = [];
+        let faltantes = [];
+
+        for (const producto of proforma.productos) {
+          const base = stockMap[producto.IdProducto];
+          if (!base) {
+            faltantes.push(producto.IdProducto);
+            continue;
           }
-        } catch (error) {
-          console.error(
-            "Error cargando producto individual:",
-            producto.IdProducto,
-            error
+
+          let prod = { ...base };
+          let pres = [];
+          if (prod.PreciosPorProducto) {
+            try {
+              let newPres =
+                typeof prod.PreciosPorProducto === "string"
+                  ? JSON.parse(prod.PreciosPorProducto)
+                  : prod.PreciosPorProducto;
+              pres = newPres.filter(v => v.cantidad > 0);
+            } catch (e) {
+              pres = [];
+            }
+          }
+
+          // Asignaciones base
+          prod.PreciosPorProducto = pres;
+          prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+          prod.bloquearInputPrecio = false;
+          prod.CantidadPresentacion = null;
+
+          // Asignaciones desde el objeto 'producto' de la proforma
+          prod.cantidad = producto.Cantidad;
+          prod.precio = producto.Precio;
+          prod.descuento = producto.Descuento ? producto.Descuento : 0;
+
+          // --- Presentación (igual que en Listado) ---
+          const presentacionObj = producto.ProductoPresentacion; // objeto {nombre, cantidad, precio} o "" si no tiene
+          prod.esPresentacion = !!presentacionObj;
+          prod.CantidadPresentacion = presentacionObj ? presentacionObj.cantidad : null;
+          prod.bloquearInputPrecio = !!presentacionObj;
+          prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
+          prod.Descripcion = producto.presentacion; // texto "DOCENA..." para el badge
+          prod.ProductoDesc = producto.ProductoDesc;
+
+          productos.push(prod);
+        }
+
+        if (faltantes.length) {
+          console.warn("[cargarProforma] El backend NO devolvió stock para estos IDs:", faltantes);
+          this.$toasted.show(
+            `Atención: ${faltantes.length} producto(s) no se pudieron cargar (sin respuesta del servidor)`
           );
         }
-      }
-      this.loading = false;
-      // Ahora 'productos' tiene los 30 registros porque el bucle esperó a todos
-      venta.productos = productos;
-      this.ventas.push(venta);
 
-      this.$nextTick(() => {
-        this.ventaActiva = this.ventas.length - 1;
-        this.getNumeroVenta();
-        this.getVendedorInfo();
+        venta.productos = productos;
+        this.ventas.push(venta);
 
-        // Aseguramos la asignación del cliente en la posición activa
-        if (this.ventas[this.ventaActiva]) {
-          this.ventas[this.ventaActiva].cliente = proforma;
-        }
-      });
+        this.$nextTick(() => {
+          this.ventaActiva = this.ventas.length - 1;
+          this.getNumeroVenta();
+          this.getVendedorInfo();
+          if (this.ventas[this.ventaActiva]) {
+            this.ventas[this.ventaActiva].cliente = proforma;
+          }
+        });
 
-      this.$nextTick(() => {
-        setTimeout(() => {
-          console.log("llegó con " + productos.length + " productos");
+        this.$nextTick(() => {
           this.metodoPagoCambio(1);
-        }, 1000);
-      });
+        });
+
+      } catch (error) {
+        console.error("[cargarProforma] ERROR:", error);
+        if (error.code === "ECONNABORTED") {
+          this.$toasted.show(
+            "El servidor no respondió a tiempo (15s). Puede ser un problema del backend, avisa al equipo técnico."
+          );
+        } else {
+          this.$toasted.show("Ocurrió un error al cargar la proforma");
+        }
+      } finally {
+        console.log("[cargarProforma] Finalizado en", (performance.now() - t0).toFixed(0), "ms");
+        this.loading = false;
+        console.log("[cargarProforma] loading ahora es:", this.loading);
+      }
     },
     showPresentacion(prod, index) {
       this.producto = { ...prod };

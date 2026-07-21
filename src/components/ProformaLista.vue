@@ -31,7 +31,7 @@
                         <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                       </template>
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button @click="selectProformas(data.item)" variant="success" :disabled="procesandoSeleccion"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
@@ -87,7 +87,7 @@
                         <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                       </template> -->
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button @click="selectProformas(data.item)" variant="success" :disabled="procesandoSeleccion"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
@@ -146,6 +146,7 @@ export default {
     return {
       API: config.API,
       show: false,
+      procesandoSeleccion: false,
       search: "",
       lstProformasFavoritas: [],
       filter: "",
@@ -213,51 +214,42 @@ export default {
       this.cargarFavoritas();
     },
     selectProformas(proforma) {
+      if (this.procesandoSeleccion) {
+        console.warn("[selectProformas] Ya se está procesando una selección, se ignora este clic");
+        return;
+      }
+      this.procesandoSeleccion = true;
+
       this.$emit("guardarDatosProforma", proforma.IdProforma);
       this.axios
         .get(this.API + "proformas/detalle", {
-          params: {
-            idProforma: proforma.IdProforma
-          }
+          params: { idProforma: proforma.IdProforma }
         })
         .then(response => {
-          response.data.map(item => {
-            let ProductoPresentacion = "";
-            let presentacion = null;
-            let ProductoDesc = item.Descripcion;
-
+          response.data.forEach(item => {
             if (!item.Presentacion) {
-              presentacion = "UNIDAD";
+              item.presentacion = "UNIDAD";
+              item.ProductoPresentacion = "";
             } else {
               let pres = JSON.parse(item.Presentacion);
-              presentacion = pres.nombre;
-              ProductoPresentacion = pres;
+              item.presentacion = pres.nombre;
+              item.ProductoPresentacion = pres;
             }
-            this.add([
-              item.IdProducto,
-              () => {
-                this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-              },
-              {
-                setPrecio: true,
-                setPreOr: item.Precio,
-                cantidad: item.Cantidad,
-                descuento: item.Descuento
-              }
-            ]);
-
-            item.ProductoPresentacion = ProductoPresentacion;
-            item.presentacion = presentacion;
-            item.ProductoDesc = ProductoDesc;
-            this.filter = "";
-            this.show = false;
+            item.ProductoDesc = item.Descripcion;
           });
-          proforma.productos = response.data;
-          console.log(proforma.productos);
 
-          // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
+          proforma.productos = response.data;
+          this.filter = "";
+          this.show = false;
+
           this.$emit("onSelectProforma", proforma);
-          this.limpiarCarrito();
+        })
+        .catch(error => {
+          console.error("[selectProformas] Error:", error);
+          this.$toasted.show("Ocurrió un error al cargar el detalle de la proforma");
+        })
+        .finally(() => {
+          this.procesandoSeleccion = false;
         });
     },
     myProvider(ctx) {

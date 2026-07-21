@@ -170,6 +170,7 @@
       <div style="text-align:center">
         <button class="btn btn-success" id="printBtn" @click="imprimir()">IMPRIMIR</button>
         <button class="btn btn-success" id="printBtn" @click="imprimirWsp()">ENVIAR WHATSAPP</button>
+        <button class="btn btn-primary" id="printBtn" @click="descargarPdf()">DESCARGAR PDF</button>
       </div>
     </main>
     <!--<footer>
@@ -235,6 +236,31 @@ export default {
     },
     imprimir() {
       window.print();
+    },
+    descargarPdf() {
+      if (this.url) {
+        const link = document.createElement('a');
+        link.href = 'https://' + this.url;
+        link.download = `Proforma_${this.proforma.Anio}-${this.proforma.Numero}.pdf`;
+        link.target = '_blank';
+        link.click();
+        return;
+      }
+
+      this.axios(`${this.API}/enviarproformapdf`, {
+        params: { IdProforma: this.idProforma }
+      }).then(res => {
+        if (res.data) {
+          this.url = res.data;
+          const link = document.createElement('a');
+          link.href = 'https://' + this.url;
+          link.download = `Proforma_${this.proforma.Anio}-${this.proforma.Numero}.pdf`;
+          link.target = '_blank';
+          link.click();
+        }
+      }).catch(() => {
+        this.$toasted.error("Error al generar el PDF");
+      });
     },
     imprimirWsp() {
       this.Telefono = "";
