@@ -144,7 +144,10 @@
                                 v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'"
                                 idModal="editCliente" @onAddCliente="setCliente"
                                 :editCliente="venta.cliente"></clientes-form>
-                              <AutoComplete :value="ventas[index].cliente.Cliente" @guardarCliente="setCliente"
+                                <AutoComplete 
+                                :value="ventas[index].cliente.Cliente"
+                                :class="{ 'cliente-vip': ventas[index].cliente && ventas[index].cliente.EsVIP }"
+                                @guardarCliente="setCliente"
                                 @dniRuc="newDniRuc = $event" />
                             </b-input-group-prepend>
                             <b-input-group-append>
@@ -2030,11 +2033,25 @@ export default {
         if (inputCliente && typeof inputCliente.setValue === "function") {
           // inputCliente.setValue(obj.Cliente);
         }
-        console.log("sss");
+        // console.log("sss");
+        // this.ventas[this.ventaActiva].cliente = obj;
+        // this.ventas[this.ventaActiva].productos.forEach(item => {
+        //   this.actualizarPrecioProducto(item);
+        // });
+
+        const clienteAnterior = this.ventas[this.ventaActiva].cliente;
+
         this.ventas[this.ventaActiva].cliente = obj;
-        this.ventas[this.ventaActiva].productos.forEach(item => {
-          this.actualizarPrecioProducto(item);
-        });
+
+        // Solo recalcular cuando cambia de cliente normal a VIP
+        if (
+            !clienteAnterior.EsVIP &&
+            obj.EsVIP
+        ) {
+            this.ventas[this.ventaActiva].productos.forEach(item => {
+                this.actualizarPrecioProducto(item);
+            });
+        }
 
         this.metodoPagoCambio(1);
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
@@ -3027,6 +3044,11 @@ export default {
 }
 </style>
 <style>
+.cliente-vip input {
+    background-color: #d4edda !important;
+    border: 2px solid #28a745 !important;
+    font-weight: bold;
+}
 /* .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
     background-color: #e6e6e6;
