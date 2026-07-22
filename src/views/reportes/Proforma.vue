@@ -227,13 +227,13 @@
                   <img src="/resources/images/bcp_logo.png" style="max-width: 120px" />
                 </td>
                 <td style="border: 1px solid #000000 !important;text-align: center;">USD</td>
-                <td style="border: 1px solid #000000 !important;text-align: center;">365-2495697-1-36</td>
-                <td style="border: 1px solid #000000 !important;text-align: center;">00236500249569713650</td>
+                <td style="border: 1px solid #000000 !important;text-align: center;"></td>
+                <td style="border: 1px solid #000000 !important;text-align: center;"></td>
               </tr>
               <tr style="border: 1px solid #000000 !important">
                 <td style="text-align: center; border: 1px solid #000000 !important;">SOLES</td>
-                <td style="text-align: center; border: 1px solid #000000 !important;">365-2563145-0-20</td>
-                <td style="text-align: center; border: 1px solid #000000 !important;">0023650025631452059</td>
+                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
+                <td style="text-align: center; border: 1px solid #000000 !important;"></td>
               </tr>
               <tr>
                 <td  style="border: 1px solid #000000 !important;text-align: center;" rowspan="2">
