@@ -1242,6 +1242,15 @@ export default {
         prodActual.CodigoBarra = productoEditado.CodigoBarra;
         prodActual.Producto = productoEditado.Producto;
 
+        // Marca
+        prodActual.IdProductoMarca = productoEditado.IdProductoMarca;
+        prodActual.ProductoMarca = productoEditado.ProductoMarca;
+
+        if (productoEditado.marca) {
+          prodActual.ProductoMarca = productoEditado.marca.ProductoMarca;
+          prodActual.IdProductoMarca = productoEditado.marca.IdProductoMarca;
+        }
+
         // COSTO → afecta P/U
         let nuevoCosto = parseFloat(productoEditado.PrecioCosto) || 0;
         prodActual.precio = nuevoCosto;        // ← ESTE ES EL P/U
