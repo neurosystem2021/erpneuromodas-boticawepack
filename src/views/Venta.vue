@@ -2322,7 +2322,7 @@ export default {
     },
     metodoPagoCambio(tipo = null, ventaIndex = this.ventaActiva) {
       this.$nextTick(() => {
-        const metodos = ["efectivo", "visa", "mastercard", "delivery"];
+        const metodos = ["efectivo", "visa", "mastercard", "transferencia"];
         const ventaActual = this.ventas[ventaIndex].pago;
         metodos.forEach(metodo => {
           ventaActual[metodo].descripcion = null;

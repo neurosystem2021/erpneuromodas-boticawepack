@@ -285,7 +285,7 @@ export default {
     },
     eliminarProf(data) {
       this.$swal({
-        target: document.getElementById("conten"),
+        // target: document.getElementById("conten"),
         title:
           "Se anulará la proforma: <strong>" +
           data.Anio +

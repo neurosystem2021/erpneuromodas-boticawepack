@@ -2304,7 +2304,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2320,7 +2320,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.bloquearVenta = false;
@@ -2337,7 +2337,7 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.bloquearVenta = false;
@@ -2351,7 +2351,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2370,7 +2370,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            //target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2385,7 +2385,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            //target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2410,7 +2410,7 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2426,7 +2426,7 @@ export default {
           title: "No se puede vender Por debajo del precio Costo. Verifique",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.bloquearVenta = false;
@@ -2532,7 +2532,7 @@ export default {
           title: "Debe seleccionar un cliente",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2548,7 +2548,7 @@ export default {
           title: "El RUC debe ser numérico, editar cliente.",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.bloquearVenta = false;
@@ -2565,7 +2565,7 @@ export default {
             "Una factura debe ser emitida para una empresa, no a un usuario común",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
         this.bloquearVenta = false;
@@ -2579,7 +2579,7 @@ export default {
           title: "Una boleta no debe ser emitida para una empresa",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2598,7 +2598,7 @@ export default {
             title: "Debe seleccionar un Documento de Referencia...",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            //target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2613,7 +2613,7 @@ export default {
             title: "Debe seleccionar un Motivo",
             showConfirmButton: true,
             confirmButtonText: "Entiendo",
-            target: document.getElementById("conten"),
+            //target: document.getElementById("conten"),
             confirmButtonColor: "#0275d8"
           });
 
@@ -2638,7 +2638,7 @@ export default {
           title: "No hay productos para vender",
           showConfirmButton: true,
           confirmButtonText: "Entiendo",
-          target: document.getElementById("conten"),
+          //target: document.getElementById("conten"),
           confirmButtonColor: "#0275d8"
         });
 
@@ -2771,8 +2771,8 @@ export default {
           prod.CantidadPresentacion = presentacionObj ? presentacionObj.cantidad : null;
           prod.bloquearInputPrecio = !!presentacionObj;
           prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
-          prod.Descripcion = producto.presentacion; // texto "DOCENA..." para el badge
-          prod.ProductoDesc = producto.ProductoDesc;
+          prod.Descripcion = ""; // texto "DOCENA..." para el badge
+          prod.ProductoDesc = "";
 
           productos.push(prod);
         }
