@@ -2026,8 +2026,9 @@ export default {
         prod.CantidadPresentacion = producto.CantidadPresentacion || null;
         prod.presentacion = producto.Presentacion || null;
         prod.esPresentacion = !!producto.CantidadPresentacion;
-        prod.Descripcion = producto.DescripcionPresentacion || prod.ProductoPresentacion || "UNIDAD";
+        prod.Descripcion = prod.ProductoPresentacion || "UNIDAD"; // nombre de presentación, ya no depende de la BD
         prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
+        prod.ProductoDesc = producto.ProductoDesc || "";
         prod.bloquearInputPrecio = prod.esPresentacion;
 
         productos.unshift(prod);
@@ -2769,7 +2770,7 @@ export default {
           prod.CantidadPresentacion = presentacionObj ? presentacionObj.cantidad : null;
           prod.bloquearInputPrecio = !!presentacionObj;
           prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
-          prod.Descripcion = ""; // texto "DOCENA..." para el badge
+          prod.Descripcion = presentacionObj ? presentacionObj.nombre : (prod.ProductoPresentacion || "UNIDAD");
           prod.ProductoDesc = "";
 
           productos.push(prod);

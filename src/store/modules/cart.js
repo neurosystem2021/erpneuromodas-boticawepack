@@ -201,6 +201,9 @@ const actions = {
             obj.EsObsequio = 0;
             obj.CantidadPresentacion = 1;
             obj.EsPresentacion = 0;
+            obj.ProductoMedicion = obj.medicion
+              ? obj.medicion.ProductoMedicion || "UNIDAD"
+              : obj.ProductoMedicion || "UNIDAD";
             obj.Presentacion = obj.ProductoMedicion;
             commit("AGREGAR_PRODUCTO", obj);
             if (cb) cb(obj);
