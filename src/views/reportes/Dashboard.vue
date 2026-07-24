@@ -7,12 +7,27 @@
               <b-row>
                   <b-col cols="6">
                     Desde:
-                     <input type="date" class="form-control" v-model="fechaInicio" @input="recargarReportes()">
+                    <input
+                      type="date"
+                      class="form-control"
+                      v-model="fechaInicio">
                   </b-col>
                   <b-col cols="6">
                       Hasta:
-                     <input type="date" class="form-control" v-model="fechaFin" @input="recargarReportes()">
+                     <input
+                      type="date"
+                      class="form-control"
+                      v-model="fechaFin">
                   </b-col>
+              </b-row>
+              <b-row class="mt-3">
+                <b-col cols="12" class="text-center">
+                  <b-button
+                    variant="primary"
+                    @click="recargarReportes">
+                    <i class="fa fa-search"></i> Generar Reporte
+                  </b-button>
+                </b-col>
               </b-row>
               <b-row >
                 <b-col cols="12" class="my-5" v-if="MostrarDoughnutVendedor">
@@ -81,10 +96,10 @@ export default {
     this.fechaFin = this.$moment().format("YYYY-MM-DD");
     // this.fechaInicio = "2024-03-01";
     // this.fechaFin = "2025-03-03";
-    this.getDataRankinVendedor();
-    this.getProdcutosMasVendidos();
-    this.getMovimientos();
-    this.getUtilidadBruta();
+    // this.getDataRankinVendedor();
+    // this.getProdcutosMasVendidos();
+    // this.getMovimientos();
+    // this.getUtilidadBruta();
     // this.getAlmacenes();
   },
   data() {
