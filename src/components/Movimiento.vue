@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <b-button-group size="sm">
-      <b-button @click="promptPassword" variant="outline-primary">Movimiento</b-button>
-    </b-button-group>
+  <div>      
+    <b-button @click="promptPassword" variant="primary" style="background: #5E35B1;" class="btnAction">Movimiento</b-button>
     <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
       <b-tabs content-class="mt-3">
         <b-tab title="Gasto">

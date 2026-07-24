@@ -5,7 +5,7 @@
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
-            ref="autocompleteProducto"
+            :ref="`autocompleteProducto${index}`"
             :url="APIProductos"
             :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
             :onShouldRenderChild="renderChild"
@@ -13,7 +13,7 @@
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
             :classes="{input: 'form-control'}">
           </autocomplete>
           <input v-model="loadCode"
@@ -22,7 +22,6 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
@@ -97,12 +96,12 @@
         </div>
       </b-modal>
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small responsive  striped hover :items="productos" :fields="fields" :ref="`tablaCarrito${index}`">
         <template slot="eventPres" slot-scope="data">
           <b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
           <br>
-          <b-button style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
-          <b-popover placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
+          <b-button style="margin-top:2px;" :id="'popover-imagen' + index + '-' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-popover placement="right" :target="'popover-imagen' + index + '-' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
               <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
             </div>
@@ -134,23 +133,16 @@
             min="0"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
-              if(this.ventas){
-                if(!productos[data.index].PreciosPorProducto) {
+              if(!productos[data.index].PreciosPorProducto) {
                 productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
                 return
-                }
-
-                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-                if(reg && reg.cantidad){
-                  productos[data.index].precio = reg.precio
-                  return
-                }
-                
-                productos[data.index].precio = productos[data.index].PrecioContado 
-              }else{
-            
               }
-
+              let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
+              if(reg && reg.cantidad){
+                productos[data.index].precio = reg.precio
+                return
+              }
+              productos[data.index].precio = productos[data.index].PrecioContado
             }"
             placeholder="Cantidad"/>
         </template>
@@ -194,22 +186,7 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FLETE"
-            type="number"
-            min="0"
-            placeholder="Flete"></b-form-input>
-        </template>-->
-        
-        <!--<template slot="lote" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].IdLote"
-            type="text"
-            min="0"
-            placeholder="Lote"></b-form-input>
-        </template>-->
-        
+
         <template slot="manoobra" slot-scope="data">
           <input 
             @change="(e) => addManoDeObra(data.index, e)"
@@ -249,7 +226,6 @@
         </template>
 
         <template slot="descuento" slot-scope="data">
-          <!-- {{ productos[data.index] }} -->
           <input
             :disabled="bloquearInput?true:false  || esDelivery"
             v-model="productos[data.index].descuento"
@@ -287,10 +263,6 @@
             cols="9" rows="3"
             style="width: 150px"
             v-model="productos[data.index].Descripcion"></textarea>
-          <!--<b-form-input
-            v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>-->
         </template>        
 
         <template slot="total" slot-scope="data">
@@ -316,7 +288,6 @@
            <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click.stop="row.toggleDetails">></b-button>
         </template>
         <template slot="row-details" slot-scope="row">
-
         </template>
 
         <template slot="stock" slot-scope="data">
@@ -330,40 +301,51 @@
         </template>
       </b-table>
     </b-col>
-    <b-col md="3">
-      <slot name="operaciones"></slot>
+    <b-col md="12">
+      <slot name="botonPagar"></slot>
     </b-col>
-    <b-col md="4">
-      <slot name="metodopago"></slot>
-    </b-col>
-    <b-col md="2">
-      <slot name="adicional"></slot>
-    </b-col>
-    <b-col md="3">
+    <b-col md="12">
+      <div class="footer-carrito">
+        <div class="footer-col footer-botones-izq">
+          <slot name="botonesIzquierda"></slot>
+        </div>
+        <div class="footer-col footer-adicional">
+          <slot name="adicional"></slot>
+        </div>
+        <div class="footer-col footer-totales">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
+                <td></td>
                 <td class="table-success">SubTotal</td>
                 <td class="table-success">{{ parseFloat(sumatoriaSubTotal) + parseFloat(sumatoriaDescuento) | redondear }}</td>
               </tr>
               <tr v-if="sumatoriaDescuento > 0">
+                <td></td>
                 <td class="table-danger">Descuento</td>
                 <td class="table-danger">- {{ sumatoriaDescuento  }}</td>
               </tr>
               <tr>
+                <td style="vertical-align: middle; width: 60px;">
+                  <slot name="metodopago"></slot>
+                </td>
                 <td><b>SubTotal</b></td>
                 <td class="table-danger">{{ sumatoriaSubTotal  }}</td>
               </tr>
               <tr v-if="sumatoriaIgv > 0">
+                <td></td>
                 <td><b>IGV</b></td>
                 <td class="table-danger">{{ sumatoriaIgv }}</td>
               </tr>
               <tr>
+                <td style="vertical-align: middle; width: 60px;">
+                  <slot name="operaciones"></slot>
+                </td>
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
               <tr>
-                <td  colspan="2">
+                <td colspan="3">
                   <label>pagó con:</label>
                   <b-form-input
                     type="text"
@@ -377,8 +359,12 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="footer-col footer-botones-der">
+          <slot name="botonesDerecha"></slot>
+        </div>
+      </div>
     </b-col>
-    <br><br>
   </b-row>
 </template>
 
@@ -398,22 +384,11 @@ export default {
   },
   data() {
     return {
-      readerSize: {
-        width: 1600,
-        height: 1080
-      },
+      readerSize: { width: 1600, height: 1080 },
       detecteds: [
-        "code_128_reader",
-        "ean_reader",
-        "ean_8_reader",
-        "code_39_reader",
-        "code_39_vin_reader",
-        "codabar_reader",
-        "upc_reader",
-        "upc_e_reader",
-        "i2of5_reader",
-        "2of5_reader",
-        "code_93_reader"
+        "code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader",
+        "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader",
+        "i2of5_reader", "2of5_reader", "code_93_reader"
       ],
       result: "",
       format: "",
@@ -437,26 +412,28 @@ export default {
     };
   },
   created() {
-    // Add barcode scan listener and pass the callback function
     this.$barcodeScanner.init(this.onBarcodeScanned);
   },
   destroyed() {
-    // Remove listener when component is destroyed
     this.$barcodeScanner.destroy();
   },
   watch: {
-    sumatoriaTotal(sum) {
+    sumatoriaTotal() {
       this.asignarVuelto();
     },
     productos(prods) {
-      let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
-
-      if (pi >= 0 && !this.productos[pi].precioBruta) {
-        this.productos[pi].precioBruta = this.productos[pi].precio;
+      let pi = prods.findIndex(p => p.CodigoBarra === "MANODEOBRA");
+      if (pi >= 0 && !prods[pi].precioBruta) {
+        prods[pi].precioBruta = prods[pi].precio;
       }
     }
   },
   props: {
+    // ---- NUEVO: cada instancia recibe SU PROPIO array de productos ----
+    // (antes se leía de state.cart.productos, compartido globalmente)
+    productos: { type: Array, default: () => [] },
+    index: { type: [Number, String], default: 0 },
+    // --------------------------------------------------------------
     isVentas: Boolean,
     tipo: String,
     setPrecio: Boolean,
@@ -467,37 +444,22 @@ export default {
     esDelivery: Boolean,
     onSetProducto: {
       type: Function,
-      default(obj) {
-        return obj;
-      }
+      default(obj) { return obj; }
     },
-    showButton: {
-      default: true,
-      type: Boolean
-    },
+    showButton: { default: true, type: Boolean },
     fields: {
       default() {
         return [
-          {
-            key: "stock",
-            label: "Stock",
-            variant: "info",
-            class: "text-center"
-          },
+          { key: "stock", label: "Stock", variant: "info", class: "text-center" },
           { key: "CodigoBarra", label: "Código" },
-          // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: "Producto", label: "Artículo" },
           { key: "Descripcion", label: "Descripción" },
           { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoModelo", label: "Modelo" },
-          // { key: 'ProductoPresentacion', label: 'Present.' },
-          // { key: 'ProductoMedicion', label: 'Medición' },
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
           { key: "igv", label: "IGV" },
-          // { key: 'flete', label: 'FLETE' },
-          // { key: 'lote', label: 'Lote' },
           { key: "precioVenta", label: "Precio venta (S/)" },
           { key: "total", label: "Total", variant: "danger" },
           { key: "acciones", label: "" }
@@ -508,7 +470,7 @@ export default {
   },
   computed: {
     ...mapState({
-      productos: state => state.cart.productos,
+      // productos ya NO viene del store: es prop. Solo dejamos lo que sigue siendo global
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos() {
@@ -521,7 +483,6 @@ export default {
     sumatoriaSubTotal() {
       let sumatoria = 0;
       if (this.igvTotal) {
-        // sumatoria = this.sumatoriaTotal - this.sumatoriaIgv
         sumatoria = this.sumatoriaTotal / 1.18;
       } else {
         this.productos.map(value => {
@@ -538,7 +499,8 @@ export default {
       this.productos.map(value => {
         sumatoria += parseFloat(value.total) - parseFloat(value.descuento || 0);
       });
-
+      // seguimos actualizando el total global de Vuex: el padre lo usa
+      // para saber cuál es el total "activo" en el watcher de VentasForm
       this.actualizarTotal(sumatoria);
       return this.$options.filters.redondear(sumatoria);
     },
@@ -546,7 +508,6 @@ export default {
       let sumatoria = 0;
       if (this.igvTotal) {
         sumatoria = this.sumatoriaTotal;
-        //sumatoria = sumatoria * 0.18
         sumatoria = sumatoria - sumatoria / 1.18;
       } else {
         this.productos.map(value => {
@@ -565,27 +526,17 @@ export default {
   },
   methods: {
     ...mapActions({
-      add: "agregarProducto",
       buscar: "buscarProductos",
-      eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
-      actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
-    setSubtotal(index, val, prod) {
-      let precio = this.$options.filters.redondear(
-        val / this.productos[index].cantidad,
-        4
-      );
+    setSubtotal(index, val) {
+      let precio = this.$options.filters.redondear(val / this.productos[index].cantidad, 4);
       Vue.set(this.productos[index], "precio", precio);
     },
     actualizarPorcentajeUtilidad(index) {
-      this.productos[
-        index
-      ].PorcentajeUtilidad = this.$options.filters.redondear(
-        ((this.productos[index].precio - this.productos[index].PrecioCosto) /
-          this.productos[index].PrecioCosto) *
-          100,
+      this.productos[index].PorcentajeUtilidad = this.$options.filters.redondear(
+        ((this.productos[index].precio - this.productos[index].PrecioCosto) / this.productos[index].PrecioCosto) * 100,
         2
       );
     },
@@ -597,11 +548,8 @@ export default {
         prod.cantidad = prod.cantidadPres;
         prod.cantidad *= val;
       }
-      this.$nextTick(() => {
-        this.actualizarProd(prod);
-      });
+      // Ya no dispatch a Vuex: el producto ya está en el array del padre (por referencia)
     },
-
     abrirCodigoBarra() {
       this.$refs["modalCodigoBarra"].show();
       this.modalAbiertCode = true;
@@ -620,102 +568,58 @@ export default {
           this.modalAbiertCode = false;
         }
       }
-
-      // do something...
     },
-
-    cambiarPrecio(index, prod) {
-      var utilidad =
-        this.productos[index].PrecioCosto *
-        (this.productos[index].PorcentajeUtilidad / 100);
-      this.productos[index].precio = this.$options.filters.redondear(
-        this.productos[index].PrecioCosto + utilidad,
-        2
-      );
+    cambiarPrecio(index) {
+      var utilidad = this.productos[index].PrecioCosto * (this.productos[index].PorcentajeUtilidad / 100);
+      this.productos[index].precio = this.$options.filters.redondear(this.productos[index].PrecioCosto + utilidad, 2);
     },
-
     addManoDeObra(index, e) {
       let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
       if (pi < 0) {
         this.$toasted.error("Primero seleccione el producto MANODEOBRA");
-
         this.productos[index].EsManoDeObra = 0;
         return;
       }
-
       if (this.productos[index].EsManoDeObra) {
         e.target.parentNode.parentNode.style.backgroundColor = "#e7c4ff";
         this.productos[pi].precio =
           parseFloat(this.productos[pi].precio) -
-          parseFloat(this.productos[index].precio) *
-            parseFloat(this.productos[index].cantidad);
+          parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad);
         this.productos[index].disabled = true;
       } else {
         e.target.parentNode.parentNode.removeAttribute("style");
         this.productos[pi].precio = 0;
         this.productos[pi].precio =
           parseFloat(this.productos[pi].precio) +
-          parseFloat(this.productos[index].precio) *
-            parseFloat(this.productos[index].cantidad);
+          parseFloat(this.productos[index].precio) * parseFloat(this.productos[index].cantidad);
         this.productos[index].disabled = false;
       }
     },
-
     updateManoDeObraNeta(index) {
       let pManoObra = this.productos.find(p => p.CodigoBarra === "MANODEOBRA");
       let precio = pManoObra ? pManoObra.precioBruta : 0;
-
       this.productos.filter(p => p.EsManoDeObra).map(p => {
         precio -= parseFloat(p.precio) * parseFloat(p.cantidad);
       });
-
       let pi = this.productos.findIndex(p => p.CodigoBarra === "MANODEOBRA");
-
       if (pi >= 0 && index !== pi) {
         this.productos[pi].precio = precio;
       }
     },
-
     asignarDisabledProf(index, e) {
-      if (e.target.checked === true) {
-        this.productos[index].disabledProf = 1;
-        return;
-      }
-      this.productos[index].disabledProf = 0;
+      this.productos[index].disabledProf = e.target.checked === true ? 1 : 0;
     },
-
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    // loadBarcode (e) {
-    //   e.preventDefault()
-    //   let idProducto = this.loadCode;
-
-    //   if (idProducto) {
-    //     this.add([idProducto, (obj) => {
-    //       if (obj) {
-    //         this.$emit('onAddProducto')
-    //         this.$toasted.show('Producto añadido correctamente')
-    //       } else {
-    //         this.$toasted.show('No se encontró ningun producto')
-    //       }
-    //       this.loadCode = ''
-    //     }, { setPrecio: this.setPrecio,  setSuma: true }, true])
-    //   }
-    // },
-
     loadBarcode(e) {
-      if (e) {
-        e.preventDefault();
-      }
+      if (e) e.preventDefault();
       let idProducto = this.loadCode;
-
       if (idProducto) {
         let params = { codigoBarra: idProducto };
         this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
+          .get(this.API + "productos/id/" + idProducto, { params })
           .then(response => {
-            console.log("sss");
             if (response.data.IdProducto) {
               this.setProducto(response.data);
             } else {
@@ -725,38 +629,16 @@ export default {
           });
       }
     },
-
-    /*alterarBuscadorProductos() {
-      this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
-
-      this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
-        console.log('paste')
-        this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
-      }
-
-      this.$refs.autocompleteProducto.handleKeyDown = (e) =>{
-        let key = e.keyCode;
-
-        if (key == 13) {
-          if(this.pasteCode) {
-            e.preventDefault()
-            let idProducto = this.pasteCode.substring(2, this.pasteCode.length -2);
-            this.add([idProducto, () => {
-              this.$emit('onAddProducto')
-            }])
-          } else {
-            e.preventDefault()
-            this.handleKeyDown(e) 
-          }   
-        } else {
-          this.handleKeyDown(e)
-        }
-        this.pasteCode = false
-      }
-    },*/
     focusAutocomplete(ref) {
-      this.$refs[ref].type = "";
-      this.$refs[ref].handleDoubleClick();
+      const comp = this.$refs[ref];
+      if (comp && comp.handleDoubleClick) {
+        comp.type = "";
+        comp.handleDoubleClick();
+      }
+    },
+    clonarVentaBase() {
+      // Clona profundamente preVenta para que cada pestaña tenga sus propios objetos anidados
+      return JSON.parse(JSON.stringify(this.preVenta));
     },
     editarProducto(Pro) {
       this.productoSelect = Pro;
@@ -764,11 +646,7 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      this.add([id, false, false, false, false, true, this.isVentas]);
-      setTimeout(() => {
-        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
-      }, 200);
-
+      // Antes: this.add([id, ...]) directo al store. Ahora se resuelve vía setProducto/emit.
       if (this.isVentas) {
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
         if (fPP.length != 4) {
@@ -781,8 +659,10 @@ export default {
           this.productoSelect = obj;
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
           this.showPresentacion(this.productoSelect);
+          return;
         }
       }
+      this.setProducto(obj);
     },
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
@@ -805,71 +685,53 @@ export default {
       }
 
       this.$refs["modalCant"].show();
-      // this.preciosProd = JSON.parse(obj.PreciosPorProducto)
       this.objProd = obj;
     },
     setProductoUni(obj) {
       this.objProd.cantxPrecio = 1;
-      this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
-      obj.precio = 0;
-      obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
+      let refAuto = `autocompleteProducto${this.index}`;
+      this.$refs[refAuto] && this.$refs[refAuto].setValue("");
+
+      obj.precio = obj.PrecioContado || 0;
+      obj.cantidad = 1;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+      obj.cantidadPres = 1;
       obj = this.onSetProducto(obj);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        { setPrecioCosto: this.tipo == "mov" ? true : false },
-        false,
-        this.cliente.EsVIP
-      ]);
-      // Vue.set(this.productos, obj.IdProducto, obj)
+
+      // ---- NUEVO: en vez de dispatch al store, se emite al padre ----
+      this.$emit("setProducto", obj);
+      this.$emit("onAddProducto", obj);
+      this.$toasted.success("Producto añadido correctamente");
+      // -----------------------------------------------------------
+
       this.$refs["modalCant"].hide();
-      obj.cantidadPres = obj.cantidad;
-      this.actualizarProd(obj);
     },
     setProductoCant(prod) {
       this.objProd.cantxPrecio = 1;
       this.cant = prod.cantidad;
       let obj = this.objProd;
-      this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
-      // this.objProd.precio = 0
-      // this.objProd.cantidad = 0
-      obj.precio = 0;
-      obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
+      let refAuto = `autocompleteProducto${this.index}`;
+      this.$refs[refAuto] && this.$refs[refAuto].setValue("");
+
+      obj.precio = obj.precio || 0;
+      obj.cantidad = 1;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
-      this.add([
-        obj,
-        () => {
-          this.$emit("onAddProducto", obj);
-          this.$toasted.success("Producto añadido correctamente");
-        },
-        false,
-        false,
-        this.cliente.EsVIP
-      ]);
-      this.$refs["modalCant"].hide();
       obj.cantidadPres = this.cant;
-      this.actualizarProd(obj);
+
+      this.$emit("setProducto", obj);
+      this.$emit("onAddProducto", obj);
+      this.$toasted.success("Producto añadido correctamente");
+
+      this.$refs["modalCant"].hide();
     },
     showPresentacion(obj) {
       if (!obj.PreciosPorProducto !== "") {
         this.precioCont = obj.PrecioContado;
         obj.estadoPxP = false;
-        this.preciosProd = obj.PreciosPorProducto
-          ? JSON.parse(obj.PreciosPorProducto)
-          : [];
+        this.preciosProd = obj.PreciosPorProducto ? JSON.parse(obj.PreciosPorProducto) : [];
         this.objProd = obj;
         this.$refs["modalCant"].show();
         return;
@@ -877,60 +739,27 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let styleStock = "";
-        if (data.stock <= 0) {
-          styleStock = "table-danger";
-        } else {
-          styleStock = "table-success";
-        }
-
+        let styleStock = data.stock <= 0 ? "table-danger" : "table-success";
         return `
         <style>
-          #table-render {
-            font-size: 13px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-          }
-          #table-render td, #table-render th {
-            border: 1px solid #eaeaea;
-          }
-          #table-render td, #table-render th {
-            color: #000000 !important;
-          }
-          .imagen{
-            width: 100%;
-            heigth: 100%;
-          }
-          .imagen:hover{
-            width: 250px;
-            heigth: 250px;
-          }
+          #table-render { font-size: 13px; margin-bottom: 5px; margin-top: 5px; }
+          #table-render td, #table-render th { border: 1px solid #eaeaea; color: #000000 !important; }
+          .imagen{ width: 100%; heigth: 100%; }
+          .imagen:hover{ width: 250px; heigth: 250px; }
         </style>
         <div>
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr>
                 <td style="width: 60px" class="${styleStock}"><b>${
-          data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
+          data.stock ? (Number.isInteger(data.stock) ? data.stock : data.stock.toFixed(2)) : data.stock
         }</b></td>
-                <td style="width: 200px"><b>${data.Producto} - ${
-          data.CodigoBarra
-        }</b></td>
+                <td style="width: 200px"><b>${data.Producto} - ${data.CodigoBarra}</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
-                <td style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
+                <td style="width: 65px" class="table-primary"><b>${data.PrecioContado}</b></td>
                 <td style="width: 5%">
-                  <img src="${
-                    data.Imagen == null || data.Imagen == ""
-                      ? "static/no-photo.png"
-                      : "/resources/images/productos/" + data.Imagen
-                  }" class="imagen">
+                  <img src="${data.Imagen == null || data.Imagen == "" ? "static/no-photo.png" : "/resources/images/productos/" + data.Imagen}" class="imagen">
                 </td>
               </tr>
             </tbody>
@@ -938,37 +767,15 @@ export default {
         </div>
         `;
       }
-      return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
-        data.ProductoMarca
-      } / ${data.ProductoModelo}
-      `;
+      return `<b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo}`;
     },
-    // setCantidad (index, val) {
-    //   this.$emit('onInputCantidad', val)
-    // },
     setNuevoPrecioContado(index) {
-      // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio);
       if (this.productos[index].TieneIgv) {
         precio += precio * 0.18;
       }
-      let precioFinal = 0;
-      //if(this.isVentas){
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precioFinal =
-      // }else{
-      precioFinal =
-        (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
-      // precio = (precio / (1-this.productos[index].PorcentajeUtilidad/100))
-      //}
-
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      //precio += (precio * (this.productos[index].PorcentajeUtilidad/100))
-      // let precio = parseFloat(this.productos[index].precio) + (this.productos[index].precio * (this.productos[index].PorcentajeUtilidad/100))
-
+      let precioFinal = (precio * this.productos[index].PorcentajeUtilidad) / 100 + precio;
       let normalPrecio = this.$options.filters.redondear(precioFinal);
-      //let nuevoPrecio = this.$options.filters.redondeoMayor(precio)
       let nuevoPrecio = this.$options.filters.redondear(precioFinal, 1);
 
       if (this.tipoCambio > 0) {
@@ -976,79 +783,54 @@ export default {
         nuevoPrecio *= this.tipoCambio;
       }
 
-      Vue.set(
-        this.productos[index],
-        "normalPrecioContado",
-        parseFloat(normalPrecio).toFixed(2)
-      );
-      Vue.set(
-        this.productos[index],
-        "nuevoPrecioContado",
-        Math.ceil(nuevoPrecio)
-      );
+      Vue.set(this.productos[index], "normalPrecioContado", parseFloat(normalPrecio).toFixed(2));
+      Vue.set(this.productos[index], "nuevoPrecioContado", Math.ceil(nuevoPrecio));
       this.getSubtotal(index);
-
-      // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio
       this.updateManoDeObraNeta(index);
     },
-    actualizarDescu(index) {
-      let obj = this.productos[index];
-      this.actualizarProd(obj);
+    actualizarDescu() {
+      // el producto ya se muta por referencia dentro de productos[]
+      // no requiere dispatch: el padre observa tab.productos directamente
     },
     getSubtotal(index) {
-      let subtotal = this.$options.filters.redondear(
-        this.productos[index].cantidad * this.productos[index].precio
-      );
+      let subtotal = this.$options.filters.redondear(this.productos[index].cantidad * this.productos[index].precio);
       Vue.set(this.productos[index], "subtotal", subtotal);
-      // this.productos[index].subtotal = subtotal
       return subtotal;
     },
     getIgv(index) {
       let igv = 0;
       if (this.productos[index].TieneIgv) {
-        igv = this.$options.filters.redondear(
-          this.productos[index].subtotal * 0.18
-        );
+        igv = this.$options.filters.redondear(this.productos[index].subtotal * 0.18);
       }
-
       Vue.set(this.productos[index], "igv", igv);
-      // this.productos[index].igv = igv
       return igv;
     },
     getTotal(index) {
       let total = parseFloat(this.productos[index].subtotal);
-
       if (this.productos[index].FLETE) {
         total += parseFloat(this.productos[index].FLETE);
       }
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
       }
-      // if (this.productos[index].descuento) {
-      //   total -= parseFloat(this.productos[index].descuento)
-      // }
-
       total = this.$options.filters.redondear(total);
       Vue.set(this.productos[index], "total", total);
-      // this.productos[index].total = total
       return total;
     },
     getData(value) {
       this.buscar(value);
     },
     quitarProducto(index) {
-      this.eliminar(index);
+      // ---- NUEVO: se pide al padre que elimine el producto de SU array ----
+      this.$emit("eliminarProducto", index);
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
     },
-
     formatFecha(fecha) {
       if (fecha) {
         return this.$moment(fecha, "YYYY-MM-DD hh:mm:ss").format("YYYY-MM-DD");
-      } else {
-        return "";
       }
+      return "";
     }
   },
   components: {
@@ -1058,28 +840,14 @@ export default {
 </script>
 
 <style scoped>
-.contentCard {
-  cursor: pointer;
-}
-.disabledMouse {
-  background: #cecece;
-  cursor: inherit;
-}
-.form-check-input {
-  margin-left: -0.2rem !important;
-}
-.oferta {
-  border: 4px solid #dc3545;
-}
-.ofertanom {
-  color: #dc3545;
-  border-right: 2px solid #dc3545;
-}
+.contentCard { cursor: pointer; }
+.disabledMouse { background: #cecece; cursor: inherit; }
+.form-check-input { margin-left: -0.2rem !important; }
+.oferta { border: 4px solid #dc3545; }
+.ofertanom { color: #dc3545; border-right: 2px solid #dc3545; }
 </style>
 <style>
-.popover {
-  max-width: 420px !important;
-}
+.popover { max-width: 420px !important; }
 .nomCart {
   display: flex;
   justify-content: center;
@@ -1087,55 +855,48 @@ export default {
   align-items: center;
   border-right: 2px solid black;
 }
-#modalCodigoBarra {
-  padding: 0 !important;
-}
-#modalCodigoBarra .modal-dialog {
-  max-width: 50vw !important;
-  max-height: 50vh !important;
-}
-#modalCodigoBarra .modal-body {
-  padding-bottom: 1px !important;
-  margin-bottom: 1px !important;
-}
-#codigoBarraStyle video,
-canvas {
-  width: 100%;
-  height: 100%;
-}
-.cameraBarra {
-  height: 50vh;
-  width: auto;
-  margin: 0 auto;
-}
+#modalCodigoBarra { padding: 0 !important; }
+#modalCodigoBarra .modal-dialog { max-width: 50vw !important; max-height: 50vh !important; }
+#modalCodigoBarra .modal-body { padding-bottom: 1px !important; margin-bottom: 1px !important; }
+#codigoBarraStyle video, canvas { width: 100%; height: 100%; }
+.cameraBarra { height: 50vh; width: auto; margin: 0 auto; }
 @media only screen and (max-width: 1440px) {
-  #modalCodigoBarra .modal-dialog {
-    max-width: 50vw !important;
-    max-height: 50vh !important;
-  }
-  .cameraBarra {
-    height: 50vh;
-    width: auto;
-  }
+  #modalCodigoBarra .modal-dialog { max-width: 50vw !important; max-height: 50vh !important; }
+  .cameraBarra { height: 50vh; width: auto; }
 }
 @media only screen and (max-width: 750px) {
-  #modalCodigoBarra .modal-dialog {
-    max-width: 100vw !important;
-    max-height: 80vh !important;
-  }
-  .cameraBarra {
-    height: 80vh;
-    width: auto;
-  }
+  #modalCodigoBarra .modal-dialog { max-width: 100vw !important; max-height: 80vh !important; }
+  .cameraBarra { height: 80vh; width: auto; }
 }
 @media only screen and (max-width: 375px) {
-  #modalCodigoBarra .modal-dialog {
-    max-width: 100vw !important;
-    max-height: 80vh !important;
-  }
-  .cameraBarra {
-    height: 80vh;
-    width: auto;
-  }
+  #modalCodigoBarra .modal-dialog { max-width: 100vw !important; max-height: 80vh !important; }
+  .cameraBarra { height: 80vh; width: auto; }
 }
+.footer-carrito {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 15px;
+}
+.footer-col { flex: 1 1 220px; min-width: 220px; }
+.footer-col .btn { display: block; width: 100%; margin-bottom: 8px; }
+.boton-pagar-chico {
+  display: block;
+  width: 300px;
+  max-width: 90%;
+  height: 50px;
+  font-size: 1.4rem !important;
+  font-weight: bold;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+@media only screen and (max-width: 900px) {
+  .footer-carrito { flex-direction: column; }
+  .footer-col { width: 100%; }
+}
+.footer-totales table.table-footer td { padding: 0.35rem 0.5rem !important; vertical-align: middle !important; }
+.footer-totales table.table-footer td:first-child { width: 45px !important; text-align: center; }
+.footer-totales .btn.p-1 { padding: 0.25rem 0.4rem !important; margin: 0 !important; display: inline-block !important; width: auto !important; }
+.footer-totales .badge { display: block; margin-top: 2px; font-size: 0.65rem !important; }
 </style>

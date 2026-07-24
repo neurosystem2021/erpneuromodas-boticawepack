@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button block @click="show=true" variant="outline-info" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+        <b-button block @click="show=true" variant="info" class="btnAction" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
         <b-modal id="modalPedidos" 
             title="DELIVERY PEDI2.PE"
             size="lg" v-model="show"
@@ -190,7 +190,7 @@ export default {
     this.escucharMotorizadoOnline();
     this.escucharCoordsMotorizado();
     this.escucharEstadoPedido();
-    this.getEmpresaDatos();
+    // this.getEmpresaDatos();
   },
   beforeDestroy(){
       this.sockets.unsubscribe('lista-on-motorizado');
@@ -301,45 +301,45 @@ export default {
             this.$toasted.show('Servicio de delivery no disponible, porfavor actualice la pagina')
         }
     },
-    getEmpresaDatos(){
-        let hostUrl = sessionStorage.getItem('HostUrl')
-        let idAlmacen = sessionStorage.getItem('IdAlmacen')
-        if(hostUrl != null && idAlmacen != null){
-            this.axios.get(this.APINODE + '/api/plataforma/empresa', {
-               params: { 
-                HostUrl:hostUrl,
-                IdAlmacen:idAlmacen
-                }
-            }).then(res => {
-                if(res.data.success==true){
-                    this.idEmpresa = res.data.data.IdEmpresa
-                    this.empresa = res.data.data
-                    this.$socket.connect()
-                    this.getPedidos()
-                }
-            }).catch(err => {
-                this.idEmpresa = null
-                this.empresa = {}
-                this.$swal({
-                    icon: 'error',
-                    title: 'Sin servicio de delivery',
-                    text: 'No hay conexión con el servidor de delivery',
-                    //target: document.getElementById('conten'),
-                    footer: 'Por favor cierre sesion e ingrese nuevamente'
-                })
-            })   
-        }else{
-            this.idEmpresa = null
-            this.empresa = {}
-            this.$swal({
-                icon: 'error',
-                title: 'Error en la autentificación de delivery',
-                text: 'No hay conexión con el servidor de delivery',
-                target: document.getElementById('conten'),
-                footer: 'Por favor cierre sesion e ingrese nuevamente'
-            })
-        }
-    },
+    // getEmpresaDatos(){
+    //     let hostUrl = sessionStorage.getItem('HostUrl')
+    //     let idAlmacen = sessionStorage.getItem('IdAlmacen')
+    //     if(hostUrl != null && idAlmacen != null){
+    //         this.axios.get(this.APINODE + '/api/plataforma/empresa', {
+    //            params: { 
+    //             HostUrl:hostUrl,
+    //             IdAlmacen:idAlmacen
+    //             }
+    //         }).then(res => {
+    //             if(res.data.success==true){
+    //                 this.idEmpresa = res.data.data.IdEmpresa
+    //                 this.empresa = res.data.data
+    //                 this.$socket.connect()
+    //                 this.getPedidos()
+    //             }
+    //         }).catch(err => {
+    //             this.idEmpresa = null
+    //             this.empresa = {}
+    //             this.$swal({
+    //                 icon: 'error',
+    //                 title: 'Sin servicio de delivery',
+    //                 text: 'No hay conexión con el servidor de delivery',
+    //                 //target: document.getElementById('conten'),
+    //                 footer: 'Por favor cierre sesion e ingrese nuevamente'
+    //             })
+    //         })   
+    //     }else{
+    //         this.idEmpresa = null
+    //         this.empresa = {}
+    //         this.$swal({
+    //             icon: 'error',
+    //             title: 'Error en la autentificación de delivery',
+    //             text: 'No hay conexión con el servidor de delivery',
+    //             target: document.getElementById('conten'),
+    //             footer: 'Por favor cierre sesion e ingrese nuevamente'
+    //         })
+    //     }
+    // },
     getPedidos(){
         if(this.idEmpresa != null){
             this.pedidos = []
