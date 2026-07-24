@@ -2771,7 +2771,7 @@ export default {
           prod.bloquearInputPrecio = !!presentacionObj;
           prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
           prod.Descripcion = presentacionObj ? presentacionObj.nombre : (prod.ProductoPresentacion || "UNIDAD");
-          prod.ProductoDesc = "";
+          prod.ProductoDesc = producto.Descripcion || "";
 
           productos.push(prod);
         }
