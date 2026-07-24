@@ -607,7 +607,7 @@
                                     </td>
                                     <td>
                                       <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/."
-                                              @input="actualizarEfectivoPorPago()"/>
+                                      @input="actualizarEfectivoPorPago()"/>
                                     </td>
                                     </tr>
                                     <tr>
@@ -618,8 +618,7 @@
                                       </td>
                                       <td>
                                         <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." 
-                                          @input="actualizarEfectivoPorPago()"
-/>
+                                         @input="actualizarEfectivoPorPago()"/>
                                       </td>
                                     </tr>
                                     <tr>
@@ -2773,7 +2772,7 @@ export default {
           prod.bloquearInputPrecio = !!presentacionObj;
           prod.presentacion = presentacionObj ? JSON.stringify(presentacionObj) : null;
           prod.Descripcion = presentacionObj ? presentacionObj.nombre : (prod.ProductoPresentacion || "UNIDAD");
-          prod.ProductoDesc = "";
+          prod.ProductoDesc = producto.Descripcion || "";
 
           productos.push(prod);
         }
