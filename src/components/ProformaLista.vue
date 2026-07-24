@@ -132,7 +132,13 @@ export default {
   },
   watch: {
     items() {
-      this.axios.get(this.API + "proformas/count").then(response => {
+      let IdAlmacen = sessionStorage.getItem("IdAlmacen");
+      this.axios.get(this.API + "proformas/count", {
+        params: {
+          IdAlmacen: IdAlmacen,
+          filter: this.filter
+        }
+      }).then(response => {
         this.totalRows = response.data.total;
       });
     },
@@ -228,11 +234,11 @@ export default {
         .then(response => {
           response.data.forEach(item => {
             if (!item.Presentacion) {
-              item.presentacion = "UNIDAD";
+              item.Presentacion = "UNIDAD";
               item.ProductoPresentacion = "";
             } else {
               let pres = JSON.parse(item.Presentacion);
-              item.presentacion = pres.nombre;
+              item.Presentacion = pres.nombre;
               item.ProductoPresentacion = pres;
             }
             item.ProductoDesc = item.Descripcion;
