@@ -342,13 +342,34 @@
     <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
-    <b-col md="4">
-      <slot name="metodopago"></slot>
-    </b-col>
-    <b-col md="2">
+    <b-col md="4" style="padding-left: 95px;">
       <slot name="accionesventa"></slot>
     </b-col>
-    <b-col md="3">
+    <b-col
+        md="1"
+        class="text-center"
+        style="padding-top:25px;">
+
+        <b-button
+            id="popover-metodopago"
+            variant="success"
+            size="lg"
+            class="btn-metodo-pago">
+
+            <i class="fas fa-credit-card"></i>
+
+        </b-button>
+
+        <b-popover
+            target="popover-metodopago"
+            triggers="click"
+            placement="top"
+            custom-class="popover-metodos">
+
+            <slot name="metodopago"></slot>
+        </b-popover>
+    </b-col>
+    <b-col md="4">
           <table class="table border table-footer resumen-venta">
             <tbody>
               <tr>
@@ -1253,9 +1274,6 @@ td.vertical {
   vertical-align: middle;
   text-align: center;
 }
-.popover {
-  min-width: 290px !important;
-}
 .contenedor-carrito{
     min-height:200px;
 }
@@ -1332,6 +1350,27 @@ td.vertical {
     margin:0;
     font-weight:700;
     font-size:16px;
+}
+
+</style>
+
+<style>
+  .btn-metodo-pago{
+      width:58px;
+      height:58px;
+      border-radius:14px;
+      box-shadow:0 6px 15px rgba(0,0,0,.18);
+      transition:.2s;
+  }
+
+  .btn-metodo-pago:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 22px rgba(0,0,0,.25);
+  }
+
+  .popover{
+    max-width: 400px !important;
+    width: 400px !important;
 }
 
 </style>
