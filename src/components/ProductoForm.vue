@@ -59,6 +59,22 @@
           </b-form-group>
 
           <b-form-group>
+            <label>Código Producto Sunat:</label>
+            <b-input-group>
+              <autocomplete
+                :url="API + 'codigoproductosunat'"
+                ref="inputCodigoSunat"
+                anchor="busqueda_label"
+                label="writer"
+                :placeholder.sync="producto.codigoSunat.busqueda_label"
+                :on-select="setCodigoSunat"
+                :onFocus="focusAutocomplete.bind(null, 'inputCodigoSunat')"
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
+
+          <b-form-group>
             <label>Modelo:</label>
             <b-input-group>
               <autocomplete
@@ -623,6 +639,17 @@ export default {
               // this.producto.Genero = newVal.Genero
               // this.producto.Botapie = newVal.Botapie
               // this.producto.Color = newVal.Color
+              this.producto.CodigoProductoSunat = newVal.CodigoSunat || '00000000'
+              this.producto.codigoSunat = {
+                codigo: newVal.CodigoSunat || '00000000',
+                busqueda_label: newVal.CodigoSunatDescripcion
+                  ? (newVal.CodigoSunat + ' - ' + newVal.CodigoSunatDescripcion)
+                  : '00000000 - NO REGISTRADO / COMODÍN GENÉRICO'
+              }
+              
+              if (this.$refs.inputCodigoSunat) {
+                this.$refs.inputCodigoSunat.setValue(this.producto.codigoSunat.busqueda_label)
+              }
               this.producto.PorcentajeUtilidad = newVal.PorcentajeUtilidad;
               this.producto.PrecioPorMayor = newVal.PrecioPorMayor;
               this.producto.ControlaStockMinimo = newVal.ControlaStockMinimo;
@@ -917,6 +944,11 @@ export default {
         PorcentajeLiquidacion: 0,
         TienePresentacion: 0,
         // modelo: {},
+        CodigoProductoSunat: '00000000',
+        codigoSunat: {
+          codigo: '00000000',
+          busqueda_label: '00000000 - NO REGISTRADO / COMODÍN GENÉRICO'
+        },
         //talla: {},
         EsServicio: 0,
         EsMercaderia: 0,
@@ -1047,9 +1079,30 @@ export default {
         });
       this.$emit("productoactualizado");
     },
-    focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick();
+    focusAutocomplete(refName) {
+      this.$nextTick(() => {
+        const component = this.$refs[refName]
+        if (!component) return
+
+        // 1. Seleccionar todo el texto del input
+        const inputEl = component.$el ? component.$el.querySelector('input') : null
+        if (inputEl) {
+          inputEl.select()
+        }
+
+        // 2. Restaurar el comportamiento original: forzar apertura de la lista
+        if (typeof component.handleDoubleClick === 'function') {
+          component.handleDoubleClick()
+        }
+      })
+    },
+
+    setCodigoSunat(obj) {
+      this.producto.codigoSunat = obj;
+      this.producto.CodigoProductoSunat = obj.CodigoSunat;
+      if (this.$refs.inputCodigoSunat) {
+        this.$refs.inputCodigoSunat.setValue(obj.busqueda_label);
+      }
     },
     crearCategoria() {
       if (this.$refs.inputCategoria.type) {
