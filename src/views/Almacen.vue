@@ -548,8 +548,10 @@ export default {
 
         // Cargar la sumatoria
         this.getSumaStock()
-        this.getSumaValorizado()
-        this.getSumaValorizadoSin()
+        if (this.verValorizado) {
+          this.getSumaValorizado()
+          this.getSumaValorizadoSin()
+        }
 
       /*console.log(items[0].hasOwnProperty('stock'))
       if (!items[0].hasOwnProperty('stock')) {
@@ -603,7 +605,13 @@ export default {
         }).then(r => {
           if (r.data) {
             this.verValorizado = true;
+            this.getSumaValorizado()
+            this.getSumaValorizadoSin()
+          } else {
+            alert('Contraseña incorrecta')
           }
+        }).catch(() => {
+          alert('Contraseña incorrecta')
         })
       }
     },
