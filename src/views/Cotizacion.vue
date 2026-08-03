@@ -917,22 +917,22 @@ export default {
         );
         return;
       }
-      if (
-        this.productos.some(
-          v =>
-            (v.stock < 0 && !(v.cantidadSucursal || v.cantidadImportacion)) ||
-            (v.stock < v.cantidad &&
-              !(v.cantidadSucursal || v.cantidadImportacion))
-        )
-      ) {
-        this.$toasted.error(
-          "No puede vender un producto sin stock, sin que seleccione Cantidad en otra sucursal o Importación , cantidad. Verifique.",
-          {
-            duration: 2000
-          }
-        );
-        return;
-      }
+      // if (
+      //   this.productos.some(
+      //     v =>
+      //       (v.stock < 0 && !(v.cantidadSucursal || v.cantidadImportacion)) ||
+      //       (v.stock < v.cantidad &&
+      //         !(v.cantidadSucursal || v.cantidadImportacion))
+      //   )
+      // ) {
+      //   this.$toasted.error(
+      //     "No puede vender un producto sin stock, sin que seleccione Cantidad en otra sucursal o Importación , cantidad. Verifique.",
+      //     {
+      //       duration: 2000
+      //     }
+      //   );
+      //   return;
+      // }
       console.log(this.responsable);
       console.log(Object.keys(this.responsable));
       let Responsable = "";
@@ -1090,7 +1090,8 @@ export default {
           parseFloat(prod.descuento)
         );
       }, 0);
-      return parseFloat(total * (this.igv == 1 ? 0.18 : 0)).toFixed(2);
+      //return parseFloat(total * (this.igv == 1 ? 0.18 : 0)).toFixed(2);
+       return parseFloat( this.igv == 1 ? (total - total / 1.18) : 0).toFixed(2);
     },
     getSubTotal() {
       let total = this.productos.reduce((sum, prod) => {
@@ -1101,7 +1102,8 @@ export default {
           parseFloat(prod.precio * prod.cantidadImportacion)
         );
       }, 0);
-      return parseFloat(total).toFixed(2);
+      //return parseFloat(total / 1.18).toFixed(2);
+      return parseFloat(this.igv == 1 ? total / 1.18 : total).toFixed(2);
     },
     getTotalDescuentos() {
       let total = this.productos.reduce((sum, prod) => {

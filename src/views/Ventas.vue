@@ -1140,6 +1140,47 @@ export default {
           this.inProgress = false;
         });
     },
+          async validarNotaCredito() {
+
+        if (this.venta.tipoVenta.CodSunat != '07') {
+            return true;
+        }
+
+        try {
+
+            const response = await this.axios.get(
+                this.API + 'ventas/validar/notacredito',
+                {
+                    params: {
+                        NroComprobante: this.venta.NroComprobanteModifica
+                    }
+                }
+            );
+
+            if (response.data.existe) {
+
+                this.$toasted.error(
+                    'Este comprobante ya tiene una Nota de Crédito registrada.'
+                );
+
+                return false;
+            }
+
+            return true;
+
+        } catch (e) {
+
+            console.log(e);
+
+            this.$toasted.error(
+                'No se pudo validar el comprobante.'
+            );
+
+            return false;
+
+        }
+
+        },
     async guardarVenta(evt) {
       evt.preventDefault();
 
@@ -1253,6 +1294,12 @@ export default {
           this.$toasted.show("Debe seleccionar un Motivo");
           this.inProgress = false;
           return;
+        }
+        const permitido = await this.validarNotaCredito();
+
+        if (!permitido) {
+            this.inProgress = false;
+            return;
         }
         this.venta.NotaDescMotivo = this.itemsMotivoNota.filter(
           item => item.value == this.venta.NotaIdMotivo
