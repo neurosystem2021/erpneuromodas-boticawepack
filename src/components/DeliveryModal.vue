@@ -189,7 +189,7 @@ export default {
     this.escucharMotorizadoOnline();
     this.escucharCoordsMotorizado();
     this.escucharEstadoPedido();
-    this.getEmpresaDatos();
+    //this.getEmpresaDatos();
     console.log("hola");
   },
   beforeDestroy(){
