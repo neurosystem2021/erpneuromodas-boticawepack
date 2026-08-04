@@ -50,7 +50,7 @@
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -126,7 +126,7 @@
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -201,7 +201,7 @@
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -276,7 +276,7 @@
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -349,7 +349,7 @@
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
                             <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -891,7 +891,7 @@
                         </thead>
                         <tbody>
                           <tr v-for="(prod, index) in item.productos" :key="index">
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                             <!-- <td>{{ prod.Descripcion }}</td> -->
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
@@ -963,7 +963,7 @@
                     <tr v-for="(prod, index) in item.productos" :key="index">
                      
                       
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                       <!-- <td>{{ prod.Descripcion }}</td> -->
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
@@ -1032,7 +1032,7 @@
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
                      
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                       <!-- <td>{{ prod.Descripcion }}</td> -->
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
@@ -1101,7 +1101,7 @@
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
                      
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                       <!-- <td>{{ prod.Descripcion }}</td> -->
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
@@ -1169,7 +1169,7 @@
                   <tbody>
                     <tr v-for="(prod, index) in item.productos" :key="index">
                      
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <td class="detalle-producto">{{ getNombreProducto(prod) }}</td>
                       <!-- <td>{{ prod.Descripcion }}</td> -->
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
@@ -1777,6 +1777,12 @@ export default {
       }
       const d = new Date(fecha);
       return isNaN(d) ? fecha : d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
+    },
+    getNombreProducto(prod) {
+      if (prod.CodigoBarra === "MANODEOBRA" && prod.Descripcion) {
+        return prod.Producto + " - " + prod.Descripcion;
+      }
+      return prod.Producto;
     },
     async loadDetalles() {
       if (this.ventas.length == 0) {

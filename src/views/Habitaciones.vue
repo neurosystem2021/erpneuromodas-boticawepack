@@ -1284,15 +1284,13 @@ export default {
   }, */
     calcularManoObra(e) {
       console.log(e);
-      let pManoObra = e.find(p => p.CodigoBarra === "MANODEOBRA");
-      let precio = pManoObra ? pManoObra.Precio : 0;
-      let cantidad = pManoObra
-        ? pManoObra.Cantidad == undefined
-          ? 0
-          : pManoObra.Cantidad
-        : 0;
-      this.totalManoObraBruta = Number(precio * cantidad);
-      this.totalManoObraMenoMat = Number(precio * cantidad);
+      let productosManoObra = e.filter(p => p.CodigoBarra === "MANODEOBRA");
+      let totalBruta = productosManoObra.reduce((sum, p) => {
+        let cantidad = p.Cantidad == undefined ? 0 : p.Cantidad;
+        return sum + Number(p.Precio * cantidad);
+      }, 0);
+      this.totalManoObraBruta = totalBruta;
+      this.totalManoObraMenoMat = totalBruta;
       e.map(preorden => {
         if (preorden.EsManoDeObra == 1) {
           this.totalManoObraMenoMat =
@@ -1397,7 +1395,10 @@ export default {
     display: block;
   }
 }
-</ > <style scoped > h5 {
+</style> 
+
+<style scoped > 
+h5 {
   font-size: 1.2rem;
 }
 h6 {
