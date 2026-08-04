@@ -16,6 +16,8 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue"
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue"
 
 Vue.use(Router)
 
@@ -91,6 +93,16 @@ export default new Router({
       path: '/facturacion',
       name: 'VentasFacturacion',
       component: VentasFacturacion
-    }
+    },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
   ]
 })
