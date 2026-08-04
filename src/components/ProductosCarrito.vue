@@ -295,7 +295,7 @@
             :ref="'cantidad-' + data.index"
             v-model="productos[data.index].cantidad"
             :disabled="
-              productos[data.index].estadoPxP == false || bloquearInput
+              productos[data.index].estadoPxP == false || bloquearInput || bloquearCantidadSolo
                 ? true
                 : false || esDelivery
             "
@@ -345,7 +345,7 @@
           <input
             v-model="productos[data.index].precio"
             :disabled="
-              productos[data.index].disabled || bloquearInput
+              productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
                 ? true
                 : false ||
                   esDelivery ||
@@ -363,37 +363,28 @@
           />
         </template>
         <template slot="subtotal" slot-scope="data">
-          <input
-          class="form-control"
-          :value="getSubtotal(data.index)"
-          disabled
-          style="width: 105px"
-          />
-          <!-- <div>
-            {{ getSubtotal(data.index) }}
-          </div> -->
-          <!-- <div v-else>
-            <input
-              type="number"
-              style="width: 105px"
-              min="0"
-              step="0.00001"
-              placeholder="Subtotal"
-              class="form-control"
-              v-model="productos[data.index].subt"
-              disabled
-              @input="
-                (val) =>
-                  setSubtotal(
-                    data.index,
-                    val.target.value,
-                    productos[data.index]
-                  )
-              "
-            />
-            <b>{{ getSubtotal(data.index) }}</b>
-          </div> -->
-        </template>
+  <input
+    class="form-control"
+    :disabled="
+      productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
+        ? true
+        : false ||
+          esDelivery ||
+          (productos[data.index].EsObsequio == 1 && tipoMov == 0
+            ? true
+            : false)
+    "
+    :value="subtotalEditando === data.index ? subtotalTemp : productos[data.index].subtotal"
+    style="width: 105px"
+    type="number"
+    step="0.00001"
+    min="0"
+    @focus="onSubtotalFocus(data.index)"
+    @input="val => actualizarSubtotalEnVivo(data.index, val.target.value)"
+    @blur="onSubtotalBlur(data.index)"
+    @keydown.enter.prevent="onSubtotalBlur(data.index)"
+  />
+</template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
@@ -416,6 +407,15 @@
           <input
             class="form-control"
             v-model="productos[data.index].FLETE"
+            :disabled="
+              productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
+                ? true
+                : false ||
+                  esDelivery ||
+                  (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                    ? true
+                    : false)
+            "
             type="number"
             min="0"
              style="width: 120px"
@@ -447,7 +447,7 @@
 
         <template slot="precioVenta" slot-scope="data">
           <input
-            :disabled="bloquearInput ? true : false"
+            :disabled="bloquearInput || bloquearPrecioSolo ? true : false"
             style="width: 105px"
             v-model="productos[data.index].nuevoPrecioContado"
             type="number"
@@ -489,7 +489,7 @@
 
         <template slot="descuento" slot-scope="data">
           <input
-            :disabled="bloquearInput ? true : false || esDelivery"
+            :disabled="bloquearInput || bloquearPrecioSolo ? true : false || esDelivery"
             v-model="productos[data.index].descuento"
             style="width: 90px"
             type="number"
@@ -522,7 +522,14 @@
 
         <template slot="Descripcion" slot-scope="data">
           <textarea
-            :disabled="bloquearInput ? true : false"
+            :disabled="productos[data.index].disabled || bloquearInput || bloquearPrecioSolo || bloquearCantidadSolo
+              ? true
+              : false ||
+              esDelivery ||
+              (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                ? true
+                : false)
+            "
             class="form-control"
             placeholder="Descripción"
             cols="9"
@@ -710,7 +717,9 @@ export default {
       productoSelect: {},
       idPerfil: sessionStorage.getItem("IdPerfil"),
       productoNombre: "",
-      productoUrl: ""
+      productoUrl: "",
+      subtotalEditando: null,
+      subtotalTemp: '',
     };
   },
   created() {
@@ -739,7 +748,6 @@ export default {
         element.igv = 55555555;
       });
       this.$forceUpdate();
-      // console.log(this.igvGeneral);
     }
   },
   props: {
@@ -754,6 +762,8 @@ export default {
     idAlmacen: Number,
     bloquearInput: Boolean,
     esDelivery: Boolean,
+    bloquearCantidadSolo: { type: Boolean, default: false },
+    bloquearPrecioSolo: { type: Boolean, default: false },
     onSetProducto: {
       type: Function,
       default(obj) {
@@ -850,7 +860,7 @@ export default {
         }
       }
       total = parseFloat(sumatoria) + parseFloat(igv);
-      console.log("total", total);
+
       this.actualizarTotal(total);
       return this.$options.filters.redondear(total);
     },
@@ -939,6 +949,105 @@ export default {
       }
 
       return mostrar;
+    },
+    onSubtotalInput(index, val) {
+      // 1. Sincronizar inmediatamente el input text para permitir cualquier cantidad de decimales
+      this.subtotalTemp = val;
+
+      // Si termina en punto (ej: "12.") o está vacío, dejamos que el usuario siga escribiendo
+      if (!val || val.toString().slice(-1) === '.') return;
+
+      let subtotal = parseFloat(val);
+      if (isNaN(subtotal) || subtotal < 0) return;
+
+      // 2. Actualizar el subtotal original del producto
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      // Recalcular P/U = Subtotal / Cantidad
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        // 3. Quitamos el .toFixed(8) temporalmente aquí o usamos una precisión más alta sin redondear a string
+        let nuevoPrecio = subtotal / cantidad;
+        Vue.set(this.productos[index], 'precio', nuevoPrecio);
+
+        // Recalcular los componentes de la fila
+        this.setNuevoPrecioContado(index);
+      }
+    },
+    onSubtotalFocus(index) {
+      this.subtotalEditando = index;
+
+      // SOLUCIÓN: Leer el valor puro con todos sus decimales, no el truncado por getSubtotal()
+      let subtotalPuro = this.productos[index].subtotal;
+
+      // Si no está definido o es nulo, usamos un string vacío o el cálculo por defecto
+      this.subtotalTemp = subtotalPuro !== undefined && subtotalPuro !== null
+        ? subtotalPuro.toString()
+        : this.getSubtotal(index).toString();
+    },
+
+    actualizarSubtotalEnVivo(index, val) {
+      // 1. Guardamos el texto real en el input para evitar el parpadeo
+      this.subtotalTemp = val;
+
+      if (!val || val.toString().slice(-1) === '.') return;
+
+      let subtotal = parseFloat(val);
+      if (isNaN(subtotal) || subtotal < 0) return;
+
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        // 2. Forzamos el cálculo del P/U inmediatamente en la fila para que se vea el cambio
+        let nuevoPrecio = subtotal / cantidad;
+        this.productos[index].precio = nuevoPrecio;
+      }
+    },
+
+    onSubtotalBlur(index) {
+      let val = this.subtotalTemp;
+      this.subtotalEditando = null;
+
+      if (!val || isNaN(parseFloat(val))) {
+        this.subtotalTemp = '';
+        return;
+      }
+
+      let subtotal = parseFloat(val);
+      let cantidad = parseFloat(this.productos[index].cantidad);
+
+      // 1. Ejecutar cálculos del sistema
+      if (cantidad > 0) {
+        Vue.set(this.productos[index], 'precio', subtotal / cantidad);
+        this.setNuevoPrecioContado(index);
+      }
+
+      // 2. Asegurar que guardamos el float completo en el objeto reactivo
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      this.subtotalTemp = '';
+    },
+
+    procesarSubtotal(index) {
+      let val = this.subtotalTemp;
+
+      if (!val || isNaN(parseFloat(val))) return;
+
+      let subtotal = parseFloat(val);
+      if (subtotal < 0) return;
+
+      // 1. Actualizamos el subtotal en el objeto (idealmente deberías mutarlo mediante un commit de Vuex, 
+      // pero manteniendo tu lógica actual lo hacemos con Vue.set)
+      Vue.set(this.productos[index], 'subtotal', subtotal);
+
+      // 2. Recalculamos P/U = Subtotal / Cantidad
+      let cantidad = parseFloat(this.productos[index].cantidad);
+      if (cantidad > 0) {
+        let nuevoPrecio = subtotal / cantidad;
+        Vue.set(this.productos[index], 'precio', nuevoPrecio);
+
+        // 3. Ejecutar tus métodos de actualización global de la fila
+        this.setNuevoPrecioContado(index);
+      }
     },
     abrirMicrofono() {
       this.busqueda = "";
@@ -1117,7 +1226,7 @@ export default {
       this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
 
       this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
-        console.log('paste')
+    
         this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
       }
 
@@ -1174,6 +1283,11 @@ export default {
       }
     },
     setProducto(obj) {
+      // if (this.productos.some(v => v.IdProducto == obj.IdProducto)) {
+      //   this.$toasted.error("El producto ya se encuentra en la lista");
+      //   return false;
+      // }
+
       obj.TieneIgv = this.igvGeneral;
       this.precioCont = obj.PrecioContado;
       obj.subtotal = obj.PrecioContado;
@@ -1329,7 +1443,7 @@ export default {
           <table id="table-render" style="width: 830px; text-align: center;padding:0; margin:0">
             <tbody>
               <tr style="padding:0; margin:0" class="${styleStock}">
-                <td style="width: 60px" ><b>${
+                <td style="width: 60px"><b>${
           data.EsPadre == 1
             ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
@@ -1492,7 +1606,6 @@ export default {
     },
     //
     abrirCodigoBarra() {
-      console.log("abrirCodigoBarra");
       this.$refs["modalCodigoBarra"].show();
       this.modalAbiertCode = true;
       this.result = "";
