@@ -248,17 +248,17 @@
                   <span v-if="!esTransportePrivado" class="gr-mode-tag">bloqueado (modalidad pública)</span>
                 </div>
 
-                <div class="gr-row-4">
+                <div class="gr-row-2">
                   <div class="gr-field">
                     <label for="placaVehiculo">Placa vehículo <span class="gr-req" v-if="esTransportePrivado">*</span></label>
                     <input type="text" class="form-control form-control-sm" style="text-transform:uppercase" id="placaVehiculo" placeholder="Ej. XYZ123"
                       v-model="remision.placaVehiculo" :disabled="!esTransportePrivado" :required="esTransportePrivado">
                   </div>
-                  <!--<div class="gr-field">
+                  <div class="gr-field">
                     <label for="placaCarreta">Placa carreta</label>
                     <input type="text" class="form-control form-control-sm" style="text-transform:uppercase" id="placaCarreta" placeholder="N° de placa"
                       v-model="remision.placaCarreta" :disabled="!esTransportePrivado">
-                  </div>-->
+                  </div>
                 </div>
 
                 <div class="gr-field">
