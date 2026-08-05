@@ -613,18 +613,19 @@
           }).then((response) => {
             
             if (response.data[0]) {
-              this.axios.get(this.API + 'cliente', {
+              this.axios.get(this.API + 'proveedor', {
                 params: {
-                    idCliente: response.data[0].IdProveedor
+                    idProveedor: response.data[0].IdProveedor
                 }})
-                .then((response) => {
-                  if (response.data) {
-                    this.$set(this.remision, 'nroDocumentoCliente', response.data.DniRuc);
-                    this.$set(this.remision, 'razonSocialCliente', response.data.Cliente);
-                    this.$set(this.remision, 'direccionCliente', response.data.Direccion);
-                    this.cliente = response.data;
+                .then((provResponse) => {
+                  if (provResponse.data && provResponse.data[0]) {
+                    const prov = provResponse.data[0];   // <-- ojo aquí, es un array
+                    this.$set(this.remision, 'nroDocumentoCliente', prov.Ruc);        // <-- Ruc, no DniRuc
+                    this.$set(this.remision, 'razonSocialCliente', prov.Proveedor);   // <-- Proveedor, no Cliente
+                    this.$set(this.remision, 'direccionCliente', prov.Direccion);
+                    this.cliente = prov;
                   } else {
-                    this.$toasted.show('No se encontro al cliente');
+                    this.$toasted.show('No se encontró al proveedor');
                   }
                 })
                 .catch((error) => {
