@@ -70,8 +70,8 @@
           </b-input-group>
         </b-col>
         <b-col cols="12" class="mt-3">
-          <div class="clsTable">
-             <b-table :items="productosCarrito" :fields="fieldsCarrito" >
+          <div class="clsTable model-cart-table">
+             <b-table :items="productosCarrito" :fields="fieldsCarrito" class="model-cart-grid">
               <template slot="Imagen" slot-scope="data"> 
                 <b-img style="border-radius: 10px; width:50px" fluid
                       :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
@@ -80,13 +80,13 @@
                 {{ data.item.Producto }} - {{ data.item.CodigoBarra }}
               </template>
               <template slot="cantidad" slot-scope="data">
-                <input type="number" class="form-control" style="width: 120px;" v-model="data.item.cantidad">
+                <input type="number" class="form-control cart-number" v-model="data.item.cantidad">
               </template>
               <template slot="descuento" slot-scope="data">
-                <input type="number" class="form-control" style="width: 120px;" v-model="data.item.descuento">
+                <input type="number" class="form-control cart-number" v-model="data.item.descuento">
               </template>
               <template slot="precio" slot-scope="data">
-                <input type="number" class="form-control" style="width: 120px;" v-model="data.item.precio">
+                <input type="number" class="form-control cart-number" v-model="data.item.precio">
               </template>
               <template slot="subTotal" slot-scope="data">
                   {{ 
@@ -129,8 +129,20 @@
             </table>
         </b-col>
     </b-row>
-    <b-modal v-model="modalProducto" size="xl" hide-footer id="mdlProducto" :title="`MODELO: ${modelo.ProductoModelo}`"> 
+    <b-modal v-model="modalProducto" size="xl" hide-footer id="mdlProducto" :title="`MODELO: ${modelo.ProductoModelo}`">
+        <div class="multi-product-toolbar">
+          <b-form-checkbox :checked="todosProductosSeleccionados" @change="seleccionarTodosProductos">
+            Seleccionar todos
+          </b-form-checkbox>
+          <span class="selection-count">{{ productosSeleccionados.length }} seleccionados</span>
+          <b-button variant="success" :disabled="!productosSeleccionados.length" @click="agregarProductosSeleccionados">
+            <i class="fa fa-cart-plus" aria-hidden="true"></i> Agregar seleccionados
+          </b-button>
+        </div>
         <b-table :items="productos" :fields="fields" size="lg" :per-page="perPage" :current-page="currentPage" small  id="my-table">
+            <template slot="seleccionar" slot-scope="data">
+              <b-form-checkbox v-model="productosSeleccionados" :value="data.item.IdProducto" class="product-check"></b-form-checkbox>
+            </template>
             <template slot="stock" slot-scope="data">
                <b-alert 
                 show 
@@ -225,6 +237,7 @@ export default {
       perPage: 10,
       API: config.API,
       productos: [],
+      productosSeleccionados: [],
       productosCarrito: [],
       options: [
         { value: 5, text: "5" },
@@ -244,7 +257,6 @@ export default {
         { key: "Color" },
         { key: "Genero" },
         { key: "Botapie" },
-        { key: "ProductoTalla", label: "Talla" },
         { key: "Imagen" },
         { key: "cantidad" },
         { key: "precio" },
@@ -254,6 +266,7 @@ export default {
         { key: "action", label: "" }
       ],
       fields: [
+        { key: "seleccionar", label: "Elegir", class: "text-center" },
         { key: "action", label: "" },
         { key: "stock" },
         { key: "Producto" },
@@ -266,6 +279,11 @@ export default {
         { key: "Imagen" }
       ]
     };
+  },
+  computed: {
+    todosProductosSeleccionados() {
+      return this.productos.length > 0 && this.productosSeleccionados.length === this.productos.length;
+    }
   },
   created() {
     this.$barcodeScanner.init(this.onBarcodeScanned);
@@ -340,6 +358,7 @@ export default {
       console.log("modelo", modelo);
       this.modelo = modelo;
       this.productos = [];
+      this.productosSeleccionados = [];
       this.currentPage = 1;
       let prods = await this.axios(`${this.API}productos_modelo`, {
         params: { ...modelo, sortBy: "stock" }
@@ -364,7 +383,7 @@ export default {
       this.productos.push(...resultados.sort((a, b) => b.stock - a.stock));
       this.modalProducto = true;
     },
-    andirProducto(item) {
+    andirProducto(item, cerrarModal = true) {
       if (!this.productosCarrito.some(v => v.IdProducto == item.IdProducto)) {
         let prod = {
           ...item,
@@ -373,8 +392,22 @@ export default {
           descuento: 0
         };
         this.productosCarrito.unshift(prod);
-        this.modalProducto = false;
+        if (cerrarModal) this.modalProducto = false;
       }
+    },
+    seleccionarTodosProductos(marcado) {
+      this.productosSeleccionados = marcado
+        ? this.productos.map(producto => producto.IdProducto)
+        : [];
+    },
+    agregarProductosSeleccionados() {
+      const seleccionados = this.productos.filter(producto =>
+        this.productosSeleccionados.some(id => id == producto.IdProducto)
+      );
+      seleccionados.forEach(producto => this.andirProducto(producto, false));
+      this.modalProducto = false;
+      this.productosSeleccionados = [];
+      this.$toasted.show(`${seleccionados.length} producto(s) agregado(s) correctamente`);
     },
     busquedaPorCodeBar() {
       let idProducto = this.loadCode;

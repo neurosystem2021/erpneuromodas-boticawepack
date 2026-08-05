@@ -1,9 +1,14 @@
 <template>
-    <b-container fluid>
-      <b-row>
+    <b-container class="xml-movement-page" fluid>
+      <div class="xml-heading">
+        <div class="xml-heading__icon"><i class="fas fa-file-code"></i></div>
+        <div><small>INVENTARIO INTELIGENTE</small><h1>Movimiento desde XML</h1><p>Importa y revisa los productos del comprobante antes de registrar el ingreso.</p></div>
+        <span class="xml-heading__status"><i class="fas fa-shield-alt"></i> Validación de compra</span>
+      </div>
+      <b-row class="xml-data-grid">
 
       
-      <b-col md="8">
+      <b-col md="8" class="xml-card xml-card--main">
         <b-row>
           <b-col md="4">
             <b-form-group>
@@ -83,7 +88,7 @@
             
         </b-row>
       </b-col>
-     <b-col md="4">
+     <b-col md="4" class="xml-card xml-card--document">
                 <b-row>
                   <b-col md="4">
                     <b-form-group>
@@ -179,8 +184,8 @@
                 </b-input-group>
               </b-col>
 
-              <b-col cols="12" class="mt-2">
-               <table width="100%" class="table">
+            <b-col cols="12" class="mt-2 xml-table-wrap">
+               <table width="100%" class="table xml-products-table">
                 <thead>
                     <tr>
                         <th>Grupo</th>
@@ -276,16 +281,16 @@
             <producto-form @productoactualizado="productoactualizado" :showButton="false" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
                       
 
-            <b-col cols="12" md="4">
-              <table width="100%" class="table"> 
+            <b-col cols="12" md="4" class="xml-totals-wrap">
+              <table width="100%" class="table xml-totals"> 
                 <tbody>
                   <tr>
                     <td> <b>Total Factura XML</b></td>
-                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
+                    <td> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
                   </tr>
                   <tr>
                     <td> <b>Total Factura</b></td>
-                    <td style="background: rgb(245, 198, 203);"> {{ totalFactura }}</td>
+                    <td> {{ totalFactura }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1227,6 +1232,87 @@ export default {
 };
 </script>
 <style scoped>
+.xml-movement-page {
+  min-height: 100vh;
+  padding: 12px 20px 28px;
+  color: #102744;
+  background: linear-gradient(145deg, #f4f9fd 0%, #eaf3fa 55%, #f8fbfe 100%);
+}
+.xml-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 76px;
+  margin-bottom: 12px;
+  padding: 11px 20px;
+  color: #fff;
+  border-radius: 20px;
+  background: linear-gradient(118deg, #082b58, #0b568e 63%, #08a0c4);
+  box-shadow: 0 15px 34px rgba(9, 52, 94, .18);
+}
+.xml-heading__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  color: #78ebff;
+  font-size: 21px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 14px;
+  background: rgba(255,255,255,.1);
+}
+.xml-heading small { color: #84ecff; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; }
+.xml-heading h1 { margin: 0; font-size: 25px; font-weight: 900; }
+.xml-heading p { margin: 1px 0 0; color: rgba(239,249,255,.83); font-size: 12px; }
+.xml-heading__status { margin-left: auto; padding: 8px 13px; white-space: nowrap; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(2,31,64,.25); font-size: 11px; font-weight: 800; }
+.xml-heading__status i { margin-right: 6px; color: #42e5a2; }
+.xml-data-grid { margin: 0 -7px 12px; }
+.xml-card {
+  margin: 0 7px;
+  padding: 15px 16px 4px;
+  border: 1px solid #d9e7f2;
+  border-radius: 20px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 12px 30px rgba(31, 69, 108, .08);
+}
+.xml-card--main { max-width: calc(66.666667% - 14px); }
+.xml-card--document { max-width: calc(33.333333% - 14px); }
+.xml-movement-page label { margin-bottom: 5px; color: #29425f; font-size: 12px; font-weight: 850; }
+.xml-movement-page .form-control {
+  min-height: 44px;
+  color: #18304e;
+  font-weight: 700;
+  border: 1px solid #cfdeea;
+  border-radius: 11px;
+  background: #fbfdff;
+  box-shadow: none;
+}
+.xml-movement-page .form-control:focus { border-color: #1599df; box-shadow: 0 0 0 4px rgba(21,153,223,.13); }
+.xml-movement-page .form-control[readonly] { background: #edf3f8; }
+.xml-table-wrap { padding: 0 !important; overflow-x: auto; border: 1px solid #d9e6f1; border-radius: 18px; background: #fff; box-shadow: 0 12px 30px rgba(31,69,108,.08); }
+.xml-products-table { margin: 0; min-width: 1280px; }
+.xml-products-table thead { color: #fff; background: linear-gradient(105deg, #0a376d, #087fae); }
+.xml-products-table th { padding: 12px 10px; border: 0; white-space: nowrap; font-size: 11px; letter-spacing: .25px; }
+.xml-products-table td { padding: 9px 8px; vertical-align: middle; border-color: #e4edf5; font-size: 12px; }
+.xml-products-table tbody tr { transition: background .18s ease; }
+.xml-products-table tbody tr:hover { background: #eef8ff !important; }
+.xml-products-table .form-control { min-height: 38px; height: 38px; }
+.xml-totals-wrap { margin-top: 14px; padding-left: 0; }
+.xml-totals { overflow: hidden; margin: 0; border: 1px solid #d9e7f2; border-radius: 15px; background: #fff; box-shadow: 0 9px 22px rgba(32,69,105,.08); }
+.xml-totals td { padding: 13px 15px; border-color: #e4edf5; }
+.xml-totals td:last-child { color: #b81432; background: #ffe1e6; font-size: 16px; font-weight: 900; text-align: right; }
+.xml-movement-page .btn { border-radius: 10px; font-weight: 800; }
+@media (max-width: 991px) {
+  .xml-card { max-width: calc(100% - 14px); flex: 0 0 calc(100% - 14px); margin-bottom: 12px; }
+  .xml-heading__status { display: none; }
+}
+@media (max-width: 575px) {
+  .xml-movement-page { padding: 8px; }
+  .xml-heading { padding: 10px 13px; border-radius: 16px; }
+  .xml-heading p { display: none; }
+  .xml-heading h1 { font-size: 20px; }
+}
 .contentCard {
   cursor: pointer;
 }

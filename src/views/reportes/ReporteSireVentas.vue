@@ -1,6 +1,7 @@
 <template>
-  <b-container fluid class="px-5 mb-5">
-    <b-row>
+  <b-container fluid class="ops-page">
+    <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-receipt"></i></div><div><small>SUNAT · SIRE</small><h1>SIRE de ventas</h1><p>Consulta comprobantes y genera el registro electrónico para SUNAT.</p></div><span><i class="fas fa-shield-alt"></i> Registro electrónico</span></header>
+    <b-row class="ops-card">
        <b-col cols="2">
             Fecha Desde:
             <input type="date" class="form-control" v-model="fechaInicio">
@@ -27,7 +28,7 @@
             Declarado
           </b-form-checkbox>
         </b-col>
-        <b-col cols="5" class="pt-4">
+        <b-col cols="5" class="pt-4 ops-actions">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-refresh" aria-hidden="true"></i> RECARGAR </b-button>
             <!-- <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button> -->
             <!-- <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button> -->
@@ -36,7 +37,7 @@
                 <img  src="static/sire.png" style="width: 120px;cursor: pointer;"/>
             </button>
         </b-col>
-        <b-col cols="12" class="mt-4 table-container">
+        <b-col cols="12" class="mt-4 table-container ops-results">
             <table class="table table-hover table-striped ">
                 <thead>
                     <tr>

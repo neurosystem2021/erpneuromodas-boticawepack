@@ -49,7 +49,10 @@ module.exports = {
      * Source Maps
      */
 
-    productionSourceMap: true,
+    // Los mapas de producción duplicaban el peso del paquete y dejaban la
+    // compilación bloqueada durante varios minutos. El código fuente se
+    // mantiene en este proyecto; el despliegue solo necesita los assets.
+    productionSourceMap: false,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 

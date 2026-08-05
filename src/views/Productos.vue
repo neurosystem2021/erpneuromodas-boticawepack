@@ -1,63 +1,87 @@
 <template>
-  <div>
-      <b-container fluid>
-        <b-row>
-          <b-col md="5" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
-          </b-col>
-          <b-col md="7" class="my-1">
-            <b-row>
-              <b-col md="6">
-                <b-form-group horizontal label="Mostrar" class="mb-0">
-                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>
-              </b-col>
-              <b-col md="2">
-                <codigo-multiple></codigo-multiple>
-              </b-col>
-            </b-row>
-          </b-col>
+  <div class="product-catalog-page">
+    <b-container fluid class="product-catalog-shell">
+      <section class="product-catalog-card">
+        <header class="product-catalog-header">
+          <div class="product-catalog-heading">
+            <span class="product-catalog-heading__icon"><i class="fas fa-boxes"></i></span>
+            <div>
+              <span class="product-catalog-eyebrow">INVENTARIO INTELIGENTE</span>
+              <h1>Catálogo de productos</h1>
+              <p>Administra, busca y actualiza tus artículos desde un solo lugar.</p>
+            </div>
+          </div>
+          <div class="product-catalog-header__actions">
+            <div class="product-catalog-counter">
+              <strong>{{ totalRows }}</strong>
+              <span>artículos registrados</span>
+            </div>
+            <b-button class="product-catalog-new" @click="nuevoProducto">
+              <i class="fas fa-plus"></i>
+              <span>Nuevo producto</span>
+            </b-button>
+          </div>
+        </header>
 
+        <div class="product-catalog-toolbar">
+          <div class="product-catalog-search">
+            <span class="product-catalog-search__icon"><i class="fas fa-search"></i></span>
+            <b-form-input
+              v-model="filter"
+              placeholder="Buscar por código, producto, categoría, marca o modelo..."
+              @input="currentPage = 1"
+            />
+            <button type="button" class="product-catalog-search__clear"
+              :disabled="!filter" @click="filter = ''" aria-label="Limpiar búsqueda">
+              <i class="fas fa-times"></i><span>Limpiar</span>
+            </button>
+          </div>
+          <div class="product-catalog-limit">
+            <label for="catalog-page-size">Mostrar</label>
+            <b-form-select id="catalog-page-size" :options="pageOptions"
+              v-model="perPage" @input="currentPage = 1"/>
+            <span>por página</span>
+          </div>
+          <div class="product-catalog-multiple">
+            <codigo-multiple></codigo-multiple>
+          </div>
+        </div>
+
+        <div class="product-catalog-table-wrap">
           <b-table small
             ref="tablaProductos"
             :filter="filter"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
-            striped
-            hover
+            striped hover
             @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
+            id="my-table"
+            :busy.sync="isBusy"
+            :items="myProvider"
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
-        </b-row>
-        <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
-        <br />
-        <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" @click="nuevoProducto">Nuevo</b-button>
-            </b-col>
-        </b-row>
-        <br /><br />
-      </b-container>
+            :current-page="currentPage"
+            class="product-catalog-table">
+            <template slot="empty">
+              <div class="product-catalog-empty">
+                <span><i class="fas fa-box-open"></i></span>
+                <strong>No encontramos productos</strong>
+                <small>Prueba con otra palabra o registra un nuevo artículo.</small>
+              </div>
+            </template>
+          </b-table>
+        </div>
+
+        <footer class="product-catalog-footer">
+          <div class="product-catalog-footer__summary">
+            Página <strong>{{ currentPage }}</strong> · {{ totalRows }} artículos
+          </div>
+          <b-pagination :total-rows="totalRows" :per-page="perPage"
+            v-model="currentPage" class="product-catalog-pagination my-0" />
+        </footer>
+      </section>
+      <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+    </b-container>
   </div>
 </template>
 

@@ -1,12 +1,27 @@
 <template>
-  <b-row>
+  <b-row class="inventory-cart">
     <b-col md="12">
-      <b-form-group class="ocultarMovil">
-        <label>Agregar Productos:</label>
-        <b-input-group>
+      <div class="inventory-list-meta" v-if="productos.length">
+        <div>
+          <span class="inventory-list-meta__icon"><i class="fas fa-box-open"></i></span>
+          <span>
+            <strong>Productos agregados</strong>
+            <small>Revisa cantidades, costos e importes del movimiento</small>
+          </span>
+        </div>
+        <div v-if="tipo === 'mov'" class="inventory-list-meta__actions">
+          <slot name="movimientoAcciones"></slot>
+          <div class="inventory-list-meta__total"><small>TOTAL</small><strong>S/. {{ sumatoriaTotal }}</strong></div>
+        </div>
+        <b-badge pill>{{ productos.length }} {{ productos.length === 1 ? 'producto' : 'productos' }}</b-badge>
+      </div>
+      <b-form-group class="ocultarMovil inventory-product-search">
+        <label>Agregar productos</label>
+        <b-input-group class="inventory-product-search__bar">
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -36,7 +51,10 @@
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <p>Búsqueda Avanzada: Producto ,Categoría, Marca , Modelo , Color</p>
+      <p class="inventory-search-help">
+        <i class="fas fa-filter"></i>
+        Búsqueda avanzada por producto, categoría, marca, modelo o color.
+      </p>
       <div class="mostrarMovil">
       <b-form-group>
       <b-row>
@@ -45,6 +63,7 @@
           <autocomplete
             ref="autocompleteProducto2"
             :url="API + 'productos'"
+            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '25' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -102,7 +121,7 @@
         </div>
       </b-modal>
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table class="inventory-cart-table" small responsive hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
@@ -214,8 +233,8 @@
           {{ getTotal(data.index) }}
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
-          <b-button style="margin-top:5px" :disabled="bloquearInput?true:false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+          <b-button class="inventory-row-action inventory-row-action--delete" variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)"><i class="fas fa-trash-alt"></i></b-button>
+          <b-button class="inventory-row-action inventory-row-action--edit" :disabled="bloquearInput?true:false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -231,14 +250,14 @@
 
       </b-table>
     </b-col>
-    <b-col md="3">
+    <b-col md="3" v-if="$slots.operaciones">
       <slot name="operaciones"></slot>
     </b-col>
-    <b-col md="4">
+    <b-col md="4" v-if="$slots.metodopago">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2" v-if="!noSubtotal">
-          <table class="table b-table border table-footer">
+    <b-col :md="tipo === 'mov' ? 4 : 3" :offset-md="tipo === 'mov' ? 8 : 2" v-if="!noSubtotal">
+          <table class="table b-table border table-footer inventory-movement-summary">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
                 <td class="table-success">SubTotal</td>
@@ -260,7 +279,7 @@
                 <td><b>TOTAL</b></td>
                 <td class="table-danger">{{ sumatoriaTotal }}</td>
               </tr>
-              <tr>
+              <tr v-if="tipo !== 'mov'">
                 <td  colspan="2" class="ocularMovil">
                   <label>pagó con:</label>
                   <b-form-input
@@ -673,6 +692,81 @@ export default {
     //   } / ${data.ProductoModelo} / ${data.ProductoTalla}
     //   `;
     // },
+    renderSuggestion(data) {
+      const escapeHtml = value =>
+        String(value == null ? "" : value).replace(/[&<>"']/g, character => {
+          const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          };
+          return entities[character];
+        });
+      const stockNumber = Number(data.stock);
+      const stockLabel = Number.isFinite(stockNumber)
+        ? Number.isInteger(stockNumber)
+          ? stockNumber
+          : stockNumber.toFixed(2)
+        : "0";
+      const hasStock = stockNumber > 0;
+      const productName = escapeHtml(data.Producto || "Producto sin nombre");
+      const barcode = escapeHtml(data.CodigoBarra || "Sin código");
+      const details = [
+        data.ProductoCategoria,
+        data.ProductoMarca,
+        data.ProductoModelo,
+        data.ProductoTalla ? `Talla ${data.ProductoTalla}` : ""
+      ]
+        .filter(Boolean)
+        .map(escapeHtml)
+        .join(" · ");
+      const image = data.Imagen
+        ? `/resources/images/productos/${encodeURIComponent(data.Imagen)}`
+        : "/static/no-photo.png";
+      const price = Number(data.PrecioContado);
+      const priceLabel = Number.isFinite(price) ? price.toFixed(2) : "0.00";
+
+      return `
+        <article class="inventory-suggestion">
+          <span class="inventory-suggestion__stock ${
+            hasStock ? "is-available" : "is-empty"
+          }">
+            <strong>${
+              data.EsPadre == 1
+                ? '<i class="fas fa-layer-group" aria-hidden="true"></i>'
+                : escapeHtml(stockLabel)
+            }</strong>
+          </span>
+          <span class="inventory-suggestion__main">
+            <strong>${productName}</strong>
+            <small>${barcode}${details ? ` · ${details}` : ""}</small>
+          </span>
+          <span class="inventory-suggestion__tags">
+            <em>${escapeHtml(data.Color || "Sin color")}</em>
+            <em>${escapeHtml(data.Genero || "Sin género")}</em>
+            <em>${escapeHtml(data.Botapie || "Sin detalle")}</em>
+          </span>
+          <span class="inventory-suggestion__location">
+            <small>Anaquel</small>
+            <strong>${escapeHtml(data.Anaquel || "—")}</strong>
+          </span>
+          <span class="inventory-suggestion__price">
+            <small>Precio</small>
+            <strong>S/ ${priceLabel}</strong>
+          </span>
+          <span class="inventory-suggestion__photo" title="Imagen del producto">
+            <i class="fas fa-camera" aria-hidden="true"></i>
+            <img
+              src="${image}"
+              alt="${productName}"
+              onerror="this.style.display='none'"
+            />
+          </span>
+        </article>
+      `;
+    },
     renderChild(data) {
       // if (this.idAlmacen) {
       let styleStock = "";
@@ -697,7 +791,7 @@ export default {
           }
         </style>
         <div>
-          <table id="table-render" style="width: 830px; text-align: center  ">
+          <table id="table-render" style="width: 1300px; text-align: center; padding:0; margin:0">
             <tbody>
               <tr>
                 <td  style="width: 60px" class="${styleStock}"><b>${
@@ -709,7 +803,7 @@ export default {
               : data.stock.toFixed(2)
             : data.stock
       }</b></td>
-                <td style="width: 200px" ><b>${data.Producto} - ${
+                <td style="width: 300px" ><b>${data.Producto} - ${
         data.CodigoBarra
       }</b></td>
                 <td style="width: 100px" >${data.ProductoCategoria}</td>
@@ -730,7 +824,7 @@ export default {
                 <td class="table-primary"  style="width: 65px"><b>${
                   data.PrecioContado
                 }</b></td>
-                <td style="border: 1px solid #eaeaea;width: 100px">
+                <td style="border: 1px solid #eaeaea;width: 65px">
                 ${
                   data.Imagen
                     ? `<img class="imgProducto" style="border-radius: 10px;" src="/resources/images/productos/${
@@ -920,9 +1014,580 @@ canvas {
   }
 }
 .imgProducto {
-  width: 40px;
+  display:block;
+  width:42px;
+  height:42px;
+  margin:auto;
+  object-fit:contain;
+  border-radius:8px!important;
+  background:#fff;
 }
 .imgProducto:hover {
-  width: 120px;
+  width:42px;
+}
+
+/* Acabado moderno para el detalle del movimiento de inventario */
+.inventory-cart {
+  margin: 0 !important;
+}
+.inventory-cart > .col-md-12 {
+  padding: 0;
+}
+.inventory-product-search {
+  margin-bottom: 0 !important;
+}
+.inventory-product-search > label {
+  display: none;
+}
+.inventory-product-search__bar {
+  display: flex;
+  min-height: 56px;
+  overflow: visible;
+  flex-wrap: nowrap !important;
+  border: 1px solid #d5e3f0;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 9px 24px rgba(25, 61, 103, .09);
+}
+.inventory-product-search__bar > div:first-child {
+  flex: 1 1 43%;
+  min-width: 250px;
+}
+.inventory-product-search__bar .autocomplete {
+  position: relative;
+  width: 100%;
+}
+.inventory-product-search__bar .autocomplete ul {
+  left: 0;
+  right: auto;
+  z-index: 1085;
+  width: min(1460px, calc(100vw - 90px));
+  min-width: 760px;
+  max-height: none;
+  margin-top: 9px;
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  border: 1px solid #cfe0ee;
+  border-radius: 18px;
+  background: rgba(247, 251, 255, .985);
+  box-shadow: 0 22px 48px rgba(8, 39, 76, .22);
+  backdrop-filter: blur(14px);
+}
+.inventory-product-search__bar .autocomplete ul::before {
+  display: none;
+}
+.inventory-product-search__bar .autocomplete ul li {
+  margin: 0 0 7px;
+  padding: 0;
+  border: 0;
+}
+.inventory-product-search__bar .autocomplete ul li:last-child {
+  margin-bottom: 0;
+}
+.inventory-product-search__bar .autocomplete ul li a,
+.inventory-product-search__bar .autocomplete ul li a:hover,
+.inventory-product-search__bar .autocomplete ul li a:focus {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  color: inherit;
+  background: transparent;
+  text-decoration: none;
+}
+.inventory-product-search__bar .autocomplete ul li.focus-list a {
+  color: inherit;
+  background: transparent;
+}
+.inventory-suggestion {
+  display: grid;
+  grid-template-columns: 78px minmax(360px, 2.7fr) minmax(285px, 1.7fr) 92px 125px 58px;
+  align-items: center;
+  gap: 0;
+  min-height: 78px;
+  padding: 0 10px;
+  border: 1px solid #dbe7f1;
+  border-radius: 14px;
+  color: #16314f;
+  background: linear-gradient(135deg, #fff 0%, #f7fbff 72%, #eef8ff 100%);
+  box-shadow: 0 5px 14px rgba(28, 72, 115, .07);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.inventory-product-search__bar .autocomplete ul li a:hover .inventory-suggestion,
+.inventory-product-search__bar .autocomplete ul li.focus-list .inventory-suggestion {
+  border-color: #64b9e6;
+  background: linear-gradient(135deg, #f5fbff 0%, #e7f7ff 100%);
+  box-shadow: 0 10px 22px rgba(15, 113, 171, .15);
+  transform: translateY(-1px);
+}
+.inventory-product-search__bar .autocomplete ul li a:hover .inventory-suggestion__main strong,
+.inventory-product-search__bar .autocomplete ul li.focus-list .inventory-suggestion__main strong { color:#0b284c!important; }
+.inventory-product-search__bar .autocomplete ul li a:hover .inventory-suggestion__main small,
+.inventory-product-search__bar .autocomplete ul li.focus-list .inventory-suggestion__main small { color:#667c93!important; }
+.inventory-product-search__bar .autocomplete ul li a:hover .inventory-suggestion__tags em,
+.inventory-product-search__bar .autocomplete ul li.focus-list .inventory-suggestion__tags em { color:#45627f!important; }
+.inventory-suggestion__stock,
+.inventory-suggestion__photo {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  border-radius: 11px;
+}
+.inventory-suggestion__stock {
+  color: #006c39;
+  border: 1px solid #35dc83;
+  background: #aef4cd;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), 0 4px 12px rgba(16,185,105,.18);
+}
+.inventory-suggestion__stock.is-empty {
+  color: #b50024;
+  border-color: #ff5570;
+  background: #ffc0ca;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 4px 12px rgba(239,35,67,.2);
+}
+.inventory-suggestion__stock small,
+.inventory-suggestion__location small,
+.inventory-suggestion__price small {
+  align-self: end;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+  opacity: .72;
+}
+.inventory-suggestion__stock strong {
+  align-self: center;
+  font-size: 19px;
+  font-weight: 900;
+}
+.inventory-suggestion__main,
+.inventory-suggestion__location,
+.inventory-suggestion__price {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.inventory-suggestion__main,
+.inventory-suggestion__tags,
+.inventory-suggestion__location,
+.inventory-suggestion__price {
+  min-height: 58px;
+  padding: 8px 13px;
+  justify-content: center;
+  border-left: 1px solid #e3edf5;
+}
+.inventory-suggestion__main strong {
+  overflow: hidden;
+  color: #0b284c;
+  font-size: 14px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inventory-suggestion__main small {
+  margin-top: 4px;
+  overflow: hidden;
+  color: #667c93;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inventory-suggestion__tags {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.inventory-suggestion__tags em {
+  max-width: 100%;
+  padding: 4px 7px;
+  overflow: hidden;
+  border: 1px solid #d4e4f1;
+  border-radius: 999px;
+  color: #45627f;
+  background: #f0f6fb;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inventory-suggestion__location {
+  align-items: center;
+}
+.inventory-suggestion__location strong {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.inventory-suggestion__price {
+  align-items: flex-end;
+  padding-right: 4px;
+}
+.inventory-suggestion__price strong {
+  margin-top: 3px;
+  color: #08714b;
+  font-size: 15px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.inventory-suggestion__photo {
+  position: relative;
+  order: 6;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border: 1px solid #cfe1ef;
+  color: #1684c5;
+  background: linear-gradient(145deg, #eff8ff, #dff1fc);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .72);
+}
+.inventory-suggestion__photo i {
+  font-size: 18px;
+}
+.inventory-suggestion__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #edf6fc;
+}
+.inventory-product-search__bar > input.form-control {
+  flex: 1 1 43%;
+  min-width: 260px;
+}
+.inventory-product-search__bar .form-control {
+  min-height: 54px;
+  border: 0 !important;
+  border-radius: 14px !important;
+  padding: 0 17px;
+  font-size: 15px;
+  font-weight: 700;
+  background: transparent;
+}
+.inventory-product-search__bar > .btn,
+.inventory-product-search__bar .input-group-append .btn {
+  min-width: 55px;
+  min-height: 54px;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  background: linear-gradient(145deg, #103968, #087aa9);
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+.inventory-product-search__bar > .btn-warning {
+  background: linear-gradient(145deg, #123f72, #0a78aa);
+}
+.inventory-product-search__bar .btn-success {
+  background: linear-gradient(145deg, #0cad68, #18c879);
+}
+.inventory-product-search__bar .btn-primary {
+  border-radius: 0 14px 14px 0;
+}
+.inventory-product-search__bar .btn:hover {
+  z-index: 3;
+  filter: brightness(1.08);
+  box-shadow: 0 7px 17px rgba(8, 66, 125, .24);
+  transform: translateY(-1px);
+}
+.inventory-search-help {
+  margin: 8px 4px 14px;
+  color: #718299;
+  font-size: 11px;
+  font-weight: 700;
+}
+.inventory-search-help i {
+  margin-right: 6px;
+  color: #1586c7;
+}
+.inventory-list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 2px 0 10px;
+  padding: 11px 15px;
+  border: 1px solid #dbe8f3;
+  border-radius: 14px;
+  color: #183653;
+  background: linear-gradient(135deg, #f8fbff 0%, #eef7ff 100%);
+}
+.inventory-list-meta > div,
+.inventory-list-meta > div > span:last-child {
+  display: flex;
+  align-items: center;
+}
+.inventory-list-meta > div > span:last-child {
+  align-items: flex-start;
+  flex-direction: column;
+}
+.inventory-list-meta__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-right: 11px;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(145deg, #123f72, #0c8dbc);
+  box-shadow: 0 7px 14px rgba(14, 91, 145, .18);
+}
+.inventory-list-meta strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+.inventory-list-meta small {
+  margin-top: 1px;
+  color: #70849a;
+  font-size: 10px;
+  font-weight: 700;
+}
+.inventory-list-meta .badge {
+  padding: 7px 12px;
+  color: #08714d;
+  background: #d9f7e8;
+  font-size: 10px;
+  font-weight: 900;
+}
+.inventory-cart-table {
+  margin: 0;
+  overflow: auto;
+  border: 1px solid #dae6f1;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fbfe, #eef6fc);
+  box-shadow: 0 12px 28px rgba(26, 60, 98, .08);
+}
+.inventory-cart-table .table {
+  min-width: 1040px;
+  margin: 0;
+  color: #263d59;
+  border-collapse: separate;
+  border-spacing: 0 7px;
+  background: transparent;
+}
+.inventory-cart-table .table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 10px;
+  border-top: 0;
+  border-bottom: 0;
+  color: #3b5875;
+  background: linear-gradient(180deg, #edf5fb, #e3eef7);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.inventory-cart-table .table tbody td {
+  height: 62px;
+  padding: 9px 10px;
+  vertical-align: middle;
+  border-top: 1px solid #e2ebf3;
+  border-bottom: 1px solid #e2ebf3;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, .96);
+}
+.inventory-cart-table .table tbody td:first-child {
+  border-left: 1px solid #e2ebf3;
+  border-radius: 12px 0 0 12px;
+}
+.inventory-cart-table .table tbody td:last-child {
+  border-right: 1px solid #e2ebf3;
+  border-radius: 0 12px 12px 0;
+}
+.inventory-cart-table .table-hover tbody tr:hover {
+  background: transparent;
+}
+.inventory-cart-table .table-hover tbody tr:hover td {
+  border-color: #bcd9ee;
+  background: #f2f9ff;
+  box-shadow: 0 7px 18px rgba(24, 83, 132, .06);
+}
+.inventory-cart-table .table tbody td.table-info {
+  color: #075a75;
+  background: #dff6fb;
+}
+.inventory-cart-table .table tbody td.table-success {
+  color: #08663f;
+  background: #dff7e9;
+}
+.inventory-cart-table .table tbody td.table-danger {
+  color: #92243a;
+  background: #ffe3e8;
+}
+.inventory-cart-table .form-control {
+  min-height: 40px;
+  border: 1px solid #cfdeec;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 800;
+  background: #f9fcff;
+}
+.inventory-cart-table .btn-success {
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #08a85d, #20c977);
+  box-shadow: 0 7px 15px rgba(16, 176, 103, .22);
+}
+.inventory-row-action {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: 2px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  transition: transform .18s ease, filter .18s ease !important;
+}
+.inventory-row-action--delete {
+  background: linear-gradient(145deg, #ff405d, #e51f3d) !important;
+  box-shadow: 0 7px 15px rgba(229, 31, 61, .22);
+}
+.inventory-row-action--edit {
+  background: linear-gradient(145deg, #1979e9, #0b58bb) !important;
+  box-shadow: 0 7px 15px rgba(25, 121, 233, .22);
+}
+.inventory-row-action:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.inventory-movement-summary {
+  width: 100%;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid #dce8f2 !important;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(29, 65, 106, .11);
+}
+.inventory-summary-top {
+  display: flex;
+  justify-content: flex-end;
+  margin: 4px 0 14px;
+}
+.inventory-summary-top .inventory-movement-summary {
+  width: min(100%, 555px);
+  margin-top: 0;
+}
+.inventory-movement-summary td {
+  padding: 15px 17px !important;
+  border: 0 !important;
+  font-weight: 800;
+}
+.inventory-movement-summary tr:last-child td {
+  color: #fff;
+  background: linear-gradient(135deg, #0d356c, #078db8);
+  font-size: 16px;
+  letter-spacing: .2px;
+}
+.inventory-movement-summary tr:last-child td:last-child {
+  text-align: right;
+  font-size: 19px;
+}
+.inventory-movement-summary .table-success {
+  color: #0b6746;
+  background: #d9f7e8;
+}
+.inventory-list-meta__actions {
+  flex: 1;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 18px;
+}
+.inventory-list-meta__actions .inventory-save-button--inline {
+  min-width: 220px;
+  min-height: 46px;
+  margin: 0;
+  border-radius: 13px !important;
+}
+.inventory-list-meta__total {
+  display: flex;
+  min-width: 125px;
+  min-height: 46px;
+  padding: 6px 15px;
+  align-items: flex-start !important;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 13px;
+  color: #fff;
+  background: linear-gradient(135deg, #0d356c, #078db8);
+  box-shadow: 0 8px 18px rgba(13, 53, 108, .18);
+}
+.inventory-list-meta__total small { margin:0;color:#d9f4ff;font-size:9px;font-weight:900; }
+.inventory-list-meta__total strong { color:#fff;font-size:17px;font-weight:900; }
+.inventory-movement-summary .table-danger {
+  color: #97253a;
+  background: #ffe2e7;
+}
+@media (max-width: 767px) {
+  .inventory-product-search__bar {
+    display: none;
+  }
+  .inventory-search-help {
+    display: none;
+  }
+  .inventory-cart-table {
+    border-radius: 12px;
+  }
+  .inventory-cart > .col-md-3,
+  .inventory-cart > .col-md-4 {
+    padding: 8px 0;
+  }
+}
+@media (max-width: 1100px) {
+  .inventory-product-search__bar .autocomplete ul {
+    width: calc(100vw - 70px);
+    min-width: 0;
+  }
+  .inventory-suggestion {
+    grid-template-columns: 58px minmax(210px, 1fr) minmax(150px, .8fr) 92px 44px;
+  }
+  .inventory-suggestion__location {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .mostrarMovil .autocomplete {
+    position: relative;
+    width: 100%;
+  }
+  .mostrarMovil .autocomplete ul {
+    left: 0;
+    width: calc(100vw - 48px);
+    max-height: 330px;
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid #cfe0ee;
+    border-radius: 15px;
+    background: #f7fbff;
+    box-shadow: 0 18px 38px rgba(8, 39, 76, .22);
+  }
+  .inventory-suggestion {
+    grid-template-columns: 54px minmax(0, 1fr) 86px 42px;
+    gap: 9px;
+    min-height: 64px;
+    padding: 8px;
+  }
+  .inventory-suggestion__tags,
+  .inventory-suggestion__location {
+    display: none;
+  }
+  .inventory-suggestion__main strong {
+    font-size: 12px;
+  }
+  .inventory-suggestion__main small {
+    font-size: 9px;
+  }
+  .inventory-suggestion__price strong {
+    font-size: 12px;
+  }
 }
 </style>

@@ -39,7 +39,9 @@ const webpackConfig = merge(baseWebpackConfig, {
         }
       },
       sourceMap: config.build.productionSourceMap,
-      parallel: true
+      // En Windows, esta versión antigua de Uglify puede dejar workers
+      // bloqueados sin emitir el paquete. Un solo proceso es más estable.
+      parallel: false
     }),
     // extract css into its own file
     new ExtractTextPlugin({

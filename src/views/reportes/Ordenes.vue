@@ -1,14 +1,14 @@
 <template>
-    <div>
-      <br>
-        <b-container fluid style="width: calc(100% - 20px)" class="bv-example-row">
-          <b-row class="text-center">
+    <div class="ops-page">
+        <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-clipboard-list"></i></div><div><small>ABASTECIMIENTO</small><h1>Órdenes de compra</h1><p>Consulta, edita, exporta y controla el estado de las órdenes registradas.</p></div><span><i class="fas fa-history"></i> Historial de órdenes</span></header>
+        <b-container fluid class="ops-card">
+          <b-row class="text-center d-none">
             <b-col>
               <h3>Registro de Ordenes de Compra</h3>
             </b-col>
           </b-row>
           <hr>
-          <b-row>
+          <b-row class="ops-results">
             <b-col md="2" class="my-1">
               <b-form-group>
                 <label><b>Estado:</b></label>

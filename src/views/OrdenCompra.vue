@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="ops-page">
         <Menu v-if="false"></Menu>
 
-        <br />
-        <b-container class="bv-example-row">
+        <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-file-signature"></i></div><div><small>ABASTECIMIENTO</small><h1>Nueva orden de compra</h1><p>Selecciona almacén, proveedor y productos para generar una nueva orden.</p></div><span><i class="fas fa-shopping-cart"></i> Nueva operación</span></header>
+        <b-container fluid class="ops-card">
             <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
                 <b-row>
                     <b-col md="10">

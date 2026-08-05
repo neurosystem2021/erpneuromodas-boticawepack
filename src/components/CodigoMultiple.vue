@@ -1,80 +1,125 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="primary">Códigos Múltiples</b-button>
+        <b-button @click="show=true" variant="primary" class="product-catalog-multiple__button">
+            <i class="fas fa-barcode"></i>
+            <span>Códigos múltiples</span>
+        </b-button>
         
         <b-form @submit="imprimirCodigoMulti"> 
             <b-modal id="modalCodigoMulti" 
-                title="Codigos de Barras Múltiples" 
                 size="lg" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark"
+                modal-class="barcode-multi-modal"
+                dialog-class="barcode-multi-dialog"
+                content-class="barcode-multi-content"
+                header-class="barcode-multi-header"
+                body-class="barcode-multi-body"
+                footer-class="barcode-multi-footer"
                 no-close-on-backdrop>
-                
-                <b-row>
-                    <b-col md="12">
-                        <b-form-group>
-                            <label>Agregar Productos:</label>
-                            <b-input-group>
-                            <autocomplete
-                                ref="autocompleteProductoCode"
-                                :url="API + 'productos'"
+
+                <template slot="modal-title">
+                    <div class="barcode-multi-title">
+                        <span class="barcode-multi-title__icon"><i class="fas fa-barcode"></i></span>
+                        <span>
+                            <strong>Códigos de barras múltiples</strong>
+                            <small>Prepara e imprime varias etiquetas en una sola operación</small>
+                        </span>
+                    </div>
+                </template>
+
+                <section class="barcode-multi-search">
+                    <div class="barcode-multi-section-title">
+                        <span class="barcode-multi-section-title__icon"><i class="fas fa-search"></i></span>
+                        <span>
+                            <strong>Agregar productos</strong>
+                            <small>Busca por nombre, código, modelo, marca o presentación</small>
+                        </span>
+                    </div>
+                    <div class="barcode-multi-autocomplete">
+                             <autocomplete
+                                 ref="autocompleteProductoCode"
+                                 :url="API + 'productos'"
                                 :onShouldRenderChild="renderChild"
                                 :customParams="{sortBy: 'IdProducto', sortDesc: 0}"
                                 anchor="Producto"
                                 label="writer"
-                                placeholder="Agregar Producto"
-                                :on-select="agregarPro"
-                                :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoCode')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                            </b-input-group>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row>
-                    <b-col md="12">
-                        <table class="table table-striped b-table table-sm">
+                                 placeholder="Agregar Producto"
+                                 :on-select="agregarPro"
+                                 :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoCode')"
+                                 :classes="{input: 'form-control'}">
+                             </autocomplete>
+                    </div>
+                </section>
+
+                <section class="barcode-multi-list">
+                    <div class="barcode-multi-list__heading">
+                        <div>
+                            <strong>Productos seleccionados</strong>
+                            <small>Ajusta la cantidad de etiquetas antes de imprimir</small>
+                        </div>
+                        <span class="barcode-multi-count">{{ productos.length }} {{ productos.length === 1 ? 'producto' : 'productos' }}</span>
+                    </div>
+
+                    <div class="barcode-multi-table-wrap" v-if="productos.length">
+                        <table class="barcode-multi-table">
                             <thead>
                                 <tr>
-                                    <th style="width:6%">CANTIDAD</th>
-                                    <th class="text-center">PRODUCTO</th>
-                                    <th class="text-center">MARCA</th>
-                                    <th class="text-center">MODELO</th>
-                                    <th class="text-center">COLOR</th>
-                                    <th class="text-center">TALLA</th>
-                                    <th class="text-center">GENERO</th>
-                                    <th class="text-center">PRECIO</th>
-                                    <th></th>
+                                    <th>Cantidad</th>
+                                    <th>Producto</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Color</th>
+                                    <th>Talla</th>
+                                    <th>Género</th>
+                                    <th>Precio</th>
+                                    <th aria-label="Acciones"></th>
                                 </tr>
-                                
                             </thead>
                             <tbody>
                                 <tr v-for="(prod, index) in productos" :key="index">
-                                    <td style="width:6%"><input required min="1" type="number" class="form-control" v-model="prod.cantidad"/></td>
-                                    <td class="text-center">{{prod.Producto}}</td>
-                                    <td class="text-center">{{prod.ProductoMarca}}</td>
-                                    <td class="text-center">{{prod.ProductoModelo}}</td>
-                                    <td class="text-center">{{prod.Color}}</td>
-                                    <td class="text-center">{{prod.ProductoTalla}}</td>
-                                    <td class="text-center">{{prod.Genero}}</td>
-                                    <td class="text-center">{{prod.PrecioContado>0?prod.PrecioContado:0}}</td>
-                                    <td><b-button variant="danger" size="sm" @click="quitarProducto(index)"><i class="fas fa-times fa-lg"></i></b-button></td>
+                                    <td>
+                                        <div class="barcode-multi-quantity">
+                                            <button type="button" @click="prod.cantidad > 1 && prod.cantidad--" aria-label="Disminuir cantidad">−</button>
+                                            <input required min="1" type="number" v-model="prod.cantidad"/>
+                                            <button type="button" @click="prod.cantidad++" aria-label="Aumentar cantidad">+</button>
+                                        </div>
+                                    </td>
+                                    <td><strong class="barcode-multi-product">{{prod.Producto}}</strong></td>
+                                    <td>{{prod.ProductoMarca}}</td>
+                                    <td>{{prod.ProductoModelo}}</td>
+                                    <td>{{prod.Color}}</td>
+                                    <td>{{prod.ProductoTalla}}</td>
+                                    <td>{{prod.Genero}}</td>
+                                    <td><span class="barcode-multi-price">S/ {{prod.PrecioContado>0?prod.PrecioContado:0}}</span></td>
+                                    <td>
+                                        <button type="button" class="barcode-multi-delete" @click="quitarProducto(index)" aria-label="Eliminar producto">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-                    </b-col>
-                </b-row>
-                <b-row>
-                    <b-col md="12" class="text-center">
-                        <b-button :disabled="productos.length==0" variant="success" type="submit">Imprimir Códigos de Barra</b-button>
-                    </b-col>
-                </b-row>
-                <div slot="modal-footer" >
-                    <b-btn size="sm" variant="secondary" @click="show=false">
-                        Cerrar
-                    </b-btn>
+                    </div>
+
+                    <div class="barcode-multi-empty" v-else>
+                        <span class="barcode-multi-empty__icon"><i class="fas fa-barcode"></i></span>
+                        <strong>Aún no agregaste productos</strong>
+                        <small>Usa el buscador superior para preparar tus etiquetas.</small>
+                    </div>
+                </section>
+
+                <div class="barcode-multi-actions">
+                    <button class="barcode-multi-print" :disabled="productos.length==0" type="submit">
+                        <i class="fas fa-print"></i>
+                        <span>Imprimir códigos de barra</span>
+                        <small v-if="productos.length">{{ productos.length }} seleccionados</small>
+                    </button>
+                </div>
+
+                <div slot="modal-footer" class="barcode-multi-footer__inner">
+                    <span><i class="fas fa-shield-alt"></i> Verifica las cantidades antes de imprimir</span>
+                    <button type="button" class="barcode-multi-close" @click="show=false">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
                 </div>
             </b-modal>
         </b-form>
@@ -134,8 +179,4 @@ import config from '@/store/config.js'
         }
     }
 </script>
-<style>
-    #modalCodigoMulti .modal-dialog{
-    width: 85% !important;
-  }
-</style>
+<style></style>

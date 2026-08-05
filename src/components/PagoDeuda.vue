@@ -3,16 +3,36 @@
         <b-button @click="show=true" variant="primary" class="btn-pos btn-accion"><i class="fas fa-money-bill-wave mr-2"></i>Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
-            <b-modal id="modalConfigVenta" 
-                title="Cobrar deuda cliente" 
-                size="lg" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">
-                
+            <b-modal id="modalConfigVenta"
+                size="lg" centered v-model="show"
+                modal-class="debt-payment-modal"
+                dialog-class="debt-payment-dialog"
+                content-class="debt-payment-content">
+                <template slot="modal-title">
+                    <span class="debt-title-icon"><i class="fas fa-hand-holding-usd"></i></span>
+                    <span class="debt-title-copy">
+                        <small>GESTIÓN DE CUENTAS POR COBRAR</small>
+                        <strong>Cobrar deuda del cliente</strong>
+                    </span>
+                </template>
+
+                <div class="debt-modal-intro">
+                    <div>
+                        <span><i class="fas fa-shield-alt"></i></span>
+                        <div>
+                            <strong>Registro seguro de cobranza</strong>
+                            <small>Selecciona un cliente y distribuye el importe entre sus documentos pendientes.</small>
+                        </div>
+                    </div>
+                    <div class="debt-stats">
+                        <span><b>{{ documentos.length }}</b><small>Documentos</small></span>
+                        <span><b>{{ pagos.length }}</b><small>Pagos</small></span>
+                    </div>
+                </div>
+
+                <div class="debt-form-card">
                 <b-row class="mb-1">
-                    <b-col><label for="input-cliente">Cliente:</label>
+                    <b-col><label for="input-cliente"><i class="fas fa-user"></i> Cliente</label>
                         <b-input-group>
                             <autocomplete
                                 required="required"
@@ -20,7 +40,7 @@
                                 :url="API + 'clientes'"
                                 anchor="ClienteDniRuc"
                                 label="writer"
-                                placeholder=""
+                                placeholder="Buscar por nombre o documento"
                                 :onInput="(val) => newDniRuc = val"
                                 :on-select="cargarDeuda" 
                                 :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
@@ -30,16 +50,16 @@
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
-                    <b-col><label for="input-fecha">Fecha:</label>
+                    <b-col cols="12" md="6"><label for="input-fecha"><i class="fas fa-calendar-alt"></i> Fecha</label>
                         <b-form-input v-model="cajaBanco.FechaDoc"
                             required
                             id="input-fecha"
                             type="date"
                             placeholder=""></b-form-input>
                     </b-col>
-                    <b-col>
+                    <b-col cols="12" md="6">
                         <b-form-group>
-                            <label>Vendedor:</label>
+                            <label><i class="fas fa-user-tie"></i> Vendedor</label>
                             <autocomplete
                                 required
                                 ref="inputVendedor"
@@ -54,23 +74,29 @@
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
-                    <b-col><label for="input-concepto">Concepto:</label>
+                    <b-col><label for="input-concepto"><i class="fas fa-file-signature"></i> Concepto</label>
                         <b-form-input v-model="cajaBanco.Concepto"
                             id="input-concepto"
                             required
                             type="text"
-                            placeholder=""></b-form-input>
+                            placeholder="Detalle o referencia del pago"></b-form-input>
                     </b-col>
                 </b-row>
-                <br>
-                <b-row class="mb-1">
+                </div>
+
+                <b-row class="mb-1 debt-tables">
                     <b-col>
-                        <table class="table b-table table-sm">
+                        <div class="debt-section-heading">
+                            <span><i class="fas fa-file-invoice-dollar"></i></span>
+                            <div><strong>Documentos pendientes</strong><small>Ingresa cuánto aplicar a cada deuda</small></div>
+                        </div>
+                        <div class="table-responsive debt-table-wrap">
+                        <table class="table b-table table-sm debt-table debt-documents-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha</th>
-                                    <th>FechaVen</th>
+                                    <th>Vencimiento</th>
                                     <th>Correlativo</th>
                                     <th>Total</th>
                                     <th>Aplicado</th>
@@ -94,22 +120,25 @@
                                             min="0"
                                             class="form-control"
                                             placeholder="0"/>
+                                     </td>
+                                 </tr>
+                                <tr v-if="!documentos.length" class="debt-empty-row">
+                                    <td colspan="8">
+                                        <i class="fas fa-search-dollar"></i>
+                                        <b>Selecciona un cliente</b>
+                                        <small>Sus documentos pendientes aparecerán aquí.</small>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <br>
-                        <div class="float-right">
-                            <b-btn size="sm" variant="success" type="submit">
-                                Guardar
-                            </b-btn>
-                            <b-btn size="sm" variant="secondary" @click="show=false">
-                                Cerrar
-                            </b-btn>
                         </div>
-                        <hr>
-                        <br><br>
-                        <table class="table b-table table-sm">
+
+                        <div class="debt-section-heading debt-history-heading">
+                            <span><i class="fas fa-history"></i></span>
+                            <div><strong>Historial de pagos</strong><small>Movimientos registrados para el cliente</small></div>
+                        </div>
+                        <div class="table-responsive debt-table-wrap">
+                        <table class="table b-table table-sm debt-table debt-history-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -125,14 +154,23 @@
                                     <td>{{ pago.FechaDoc }}</td>
                                     <td>{{ pago.Concepto }}</td>
                                     <td>{{ pago.Importe }}</td>
-                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                                    <td><b-btn size="sm" variant="success" class="debt-print-button" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank"><i class="fas fa-print"></i> Imprimir</b-btn></td>
+                                </tr>
+                                <tr v-if="!pagos.length" class="debt-empty-row debt-empty-compact">
+                                    <td colspan="5"><i class="fas fa-receipt"></i><b>Sin pagos registrados</b></td>
                                 </tr>
                             </tbody>
                         </table>
+                        </div>
                     </b-col>
                 </b-row>
-                <div slot="modal-footer" >
-                    
+                <div slot="modal-footer" class="debt-modal-actions">
+                    <b-btn variant="secondary" @click="show=false">
+                        <i class="fas fa-times"></i> Cerrar
+                    </b-btn>
+                    <b-btn variant="success" type="submit">
+                        <i class="fas fa-save"></i> Guardar pago
+                    </b-btn>
                 </div>
             
             </b-modal>

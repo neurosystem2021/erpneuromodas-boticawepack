@@ -3,14 +3,29 @@
     <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
-      <b-row>
-        <b-col md="12" style="margin-top: -10px; margin-bottom: -10px;">
-            <b-btn v-if="showNew" variant="success" size="md" @click="eliminaId"><b>Nuevo</b></b-btn>    
-            <hr style="margin-top: 5px;"/> 
+    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" id="modalProducto" size="xl"
+      ref="productoForm" v-model="show" modal-class="product-form-modal"
+      dialog-class="product-form-dialog" content-class="product-form-content"
+      body-class="product-form-body" footer-class="product-form-footer">
+      <template slot="modal-title">
+        <span class="product-form-title-icon"><i class="fas fa-box-open"></i></span>
+        <span class="product-form-title-copy">
+          <small>GESTIÓN DE INVENTARIO</small>
+          <strong>{{ title }}</strong>
+        </span>
+      </template>
+      <b-row class="product-form-grid">
+        <b-col md="12" class="product-form-toolbar">
+            <div>
+              <span class="product-form-state"><i class="fas fa-pen"></i> Ficha del producto</span>
+              <small>Actualiza la información comercial y de inventario</small>
+            </div>
+            <b-btn v-if="showNew" class="product-form-new" size="md" @click="eliminaId">
+              <i class="fas fa-plus"></i><b>Nuevo producto</b>
+            </b-btn>
         </b-col>
 
-        <b-col md="6">
+        <b-col md="6" class="product-form-column product-form-column-primary">
         <b-form-group>
           <label>Código barra:</label>
             <b-form-input 
@@ -155,7 +170,7 @@
           </b-form-group>
         </b-col>
 
-        <b-col md="6">
+        <b-col md="6" class="product-form-column product-form-column-secondary">
           <b-form-group>
             <label>Medición:</label>
             <autocomplete
@@ -235,10 +250,12 @@
               />
           </b-form-group>
 
-          <b-form-group v-if="true">
+          <b-form-group v-if="true" class="product-form-image-field">
             <label>Imagen:</label>
-            <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-            <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            <div class="product-form-image-upload">
+              <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
+              <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+            </div>
           </b-form-group>
           
         </b-col>

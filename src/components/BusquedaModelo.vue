@@ -6,25 +6,26 @@
 
         <!-- MODAL PRINCIPAL -->
         <b-modal v-model="mostrarModal" size="xl" hide-footer title="BÚSQUEDA POR MODELO" @hidden="resetear"
-            :no-enforce-focus="true">
-            <b-container fluid>
-                <b-row>
-                <b-col cols="12" class="my-1 d-flex align-items-center">
+            :no-enforce-focus="true" modal-class="model-search-modal"
+            dialog-class="model-search-dialog" content-class="model-search-content"
+            body-class="model-search-body">
+            <b-container fluid class="model-search-layout">
+                <b-row class="model-search-grid">
+                <b-col cols="12" class="my-1 d-flex align-items-center model-client-search">
                     <autocomplete required="required" ref="inputCliente" :url="API + 'clientes'"
                         anchor="ClienteDniRuc" label="writer" placeholder="Buscar Cliente"
                         :onInput="(val) => newDniRuc = val"
                         :on-select="setCliente"
-                        :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                        :classes="{ input: 'form-control', wrapper: 'flex-grow-1' }">
+                        :classes="{ input: 'form-control', wrapper: 'flex-grow-1 model-client-autocomplete' }">
                     </autocomplete>
                     <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                 </b-col>
-                    <b-col cols="12" md="4" class="my-1">
-                        <b-input-group>
+                    <b-col cols="12" md="4" class="my-1 model-search-column">
+                        <b-input-group class="model-search-control">
                             <autocomplete :url="API + 'productos/modelos'" ref="inputModeloModal"
                                 anchor="ProductoModelo" placeholder="Buscar Modelo" label="writer"
                                 :customParams="{ limit: 10 }" :on-select="setModelo"
-                                :classes="{ input: 'form-control' }">
+                                :classes="{ input: 'form-control', wrapper: 'model-model-autocomplete' }">
                             </autocomplete>
                             <b-button variant="warning" :class="microActivado ? 'btn-parpadeante' : ''"
                                 @click="startRecognition">
@@ -33,8 +34,8 @@
                         </b-input-group>
                     </b-col>
 
-                    <b-col cols="12" md="4" class="my-1">
-                        <b-input-group>
+                    <b-col cols="12" md="4" class="my-1 model-search-column">
+                        <b-input-group class="model-search-control">
                             <input v-model="codeBarModelo" type="text" class="form-control"
                                 placeholder="Codigo de Barra Modelo" @keypress.enter="buscarPorCodeBarModelo" />
                             <b-button variant="primary" @click="buscarPorCodeBarModelo">
@@ -43,8 +44,8 @@
                         </b-input-group>
                     </b-col>
 
-                    <b-col cols="12" md="4" class="my-1">
-                        <b-input-group>
+                    <b-col cols="12" md="4" class="my-1 model-search-column">
+                        <b-input-group class="model-search-control model-barcode-control">
                             <input v-model="loadCode" type="text" class="form-control" placeholder="Codigo de Barra"
                                 @keypress.enter="buscarPorCodeBar" />
                             <b-button variant="success" @click="buscarPorCodeBar">
@@ -57,9 +58,10 @@
                     </b-col>
 
                     <!-- CARRITO -->
-                    <b-col cols="12" class="mt-3">
-                        <div style="max-height:320px; overflow-y:auto;">
-                            <b-table :items="carrito" :fields="fieldsCarrito" small striped hover>
+                    <b-col cols="12" class="mt-3 model-cart-section">
+                        <div class="model-cart-scroll">
+                            <b-table :items="carrito" :fields="fieldsCarrito" small responsive
+                                class="model-cart-table">
                                 <template slot="Imagen" slot-scope="data">
                                     <b-img style="border-radius:6px;width:40px;" fluid
                                         :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen"
@@ -99,7 +101,7 @@
 
                     <!-- TOTALES -->
                     <b-col cols="12" md="6" class="mt-3">
-                        <table class="table table-sm table-bordered">
+                        <table class="table table-sm model-search-totals">
                             <tr>
                                 <td class="table-warning"><b>SubTotal</b></td>
                                 <td>{{ subTotal }}</td>
@@ -115,7 +117,7 @@
                         </table>
                     </b-col>
                     <b-col cols="12" md="6" class="mt-3 d-flex align-items-center justify-content-center">
-                        <b-button variant="success" class="btnAction" style="min-width:220px;"
+                        <b-button variant="success" class="model-add-cart"
                             :disabled="!carrito.length" @click="agregarAlCarrito">
                             <i class="fas fa-cart-plus"></i> Agregar al Carrito
                         </b-button>
@@ -125,40 +127,72 @@
         </b-modal>
 
         <!-- SUB-MODAL FUERA DEL PRINCIPAL — igual que el módulo original que funciona -->
-        <b-modal v-model="modalProductos" size="xl" hide-footer :title="`MODELO: ${modelo.ProductoModelo || ''}`"
+        <b-modal v-model="modalProductos" size="xl" hide-footer
+            modal-class="model-products-modal" dialog-class="model-products-dialog"
+            content-class="model-products-content" body-class="model-products-body"
             :no-enforce-focus="true">
+            <template slot="modal-title">
+                <span class="model-products-title-icon"><i class="fas fa-layer-group"></i></span>
+                <span class="model-products-title-copy">
+                    <small>CATÁLOGO POR MODELO</small>
+                    <strong>{{ modelo.ProductoModelo || 'Productos' }}</strong>
+                </span>
+            </template>
 
-            <!-- DEBUG TEMPORAL -->
-            <p>Total productos: {{ productosModelo.length }}</p>
-            <b-table :items="productosModelo" :fields="fieldsModelo" small :per-page="perPage"
-                :current-page="currentPage" id="tbl-modelo">
+            <div class="model-products-toolbar">
+                <div>
+                    <span class="model-products-count">{{ productosModelo.length }}</span>
+                    <span><strong>productos disponibles</strong><small>Selecciona el artículo exacto para añadirlo a la venta</small></span>
+                </div>
+                <span class="model-products-status"><i class="fas fa-check-circle"></i> Stock actualizado</span>
+            </div>
+            <div class="model-products-selection">
+                <b-form-checkbox :checked="todosSeleccionados" @change="seleccionarTodos">Seleccionar todos</b-form-checkbox>
+                <span>{{ seleccionadosModelo.length }} seleccionados</span>
+                <b-button class="model-add-selected" :disabled="!seleccionadosModelo.length" @click="agregarSeleccionados">
+                    <i class="fas fa-cart-plus"></i> Agregar seleccionados
+                </b-button>
+            </div>
+            <div class="model-products-list">
+            <b-table :items="productosModelo" :fields="fieldsModelo" small responsive
+                :per-page="perPage" :current-page="currentPage" id="tbl-modelo"
+                class="model-products-table">
+                <template slot="seleccionar" slot-scope="data">
+                    <b-form-checkbox :value="data.item.IdProducto" v-model="seleccionadosModelo" @click.stop></b-form-checkbox>
+                </template>
                 <template slot="stock" slot-scope="data">
-                    <b-badge :variant="data.item.stock > 0 ? 'success' : 'danger'" style="font-size:0.85rem;">
+                    <b-badge :variant="data.item.stock > 0 ? 'success' : 'danger'" class="model-stock-badge">
                         {{ data.item.stock }}
                     </b-badge>
                 </template>
                 <template slot="Imagen" slot-scope="data">
-                    <b-img style="border-radius:6px;width:40px;" fluid
-                        :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen"
-                        @error="setAltImg" />
+                    <span class="model-products-image">
+                        <b-img fluid
+                            :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen"
+                            @error="setAltImg" />
+                    </span>
                 </template>
                 <template slot="Producto" slot-scope="data">
-                    {{ data.item.Producto }} - {{ data.item.CodigoBarra }}
+                    <strong class="model-products-name">{{ data.item.Producto }}</strong>
+                    <small class="model-products-code">{{ data.item.CodigoBarra }}</small>
                 </template>
                 <template slot="action" slot-scope="data">
-                    <b-button size="sm" variant="info" @click="agregarProducto(data.item)">
-                        <i class="fa fa-cart-arrow-down"></i>
+                    <b-button size="sm" class="model-product-add" @click="agregarProducto(data.item)">
+                        <i class="fa fa-cart-plus"></i><span>Agregar</span>
                     </b-button>
                 </template>
             </b-table>
-            <b-row>
-                <b-col cols="10">
+            </div>
+            <b-row class="model-products-footer" align-v="center">
+                <b-col cols="12" md="9">
                     <b-pagination v-model="currentPage" :total-rows="productosModelo.length" :per-page="perPage"
                         aria-controls="tbl-modelo" />
                 </b-col>
-                <b-col cols="2">
+                <b-col cols="12" md="3" class="model-products-page-size">
+                    <span>Mostrar</span>
                     <b-form-select v-model="perPage"
                         :options="[{ value: 10, text: '10' }, { value: 20, text: '20' }, { value: 50, text: '50' }]" />
+                    <span>por página</span>
                 </b-col>
             </b-row>
         </b-modal>
@@ -179,6 +213,7 @@ export default {
             API: config.API,
             modelo: {},
             productosModelo: [],
+            seleccionadosModelo: [],
             carrito: [],
             modalProductos: false,
             microActivado: false,
@@ -207,6 +242,7 @@ export default {
                 { key: 'action', label: '' }
             ],
             fieldsModelo: [
+                { key: 'seleccionar', label: '' },
                 { key: 'action', label: '' },
                 { key: 'stock' },
                 { key: 'Producto' },
@@ -228,6 +264,9 @@ export default {
         },
         total() {
             return parseFloat(this.carrito.reduce((a, b) => a + (b.cantidad * b.precio - (b.descuento || 0)), 0)).toFixed(2);
+        },
+        todosSeleccionados() {
+            return this.productosModelo.length > 0 && this.seleccionadosModelo.length === this.productosModelo.length;
         }
     },
     components: {
@@ -243,6 +282,7 @@ export default {
             if (this.modalProductos) return; // No resetear si sub-modal está abierto
             this.carrito = [];
             this.productosModelo = [];
+            this.seleccionadosModelo = [];
             this.modelo = {};
             this.loadCode = '';
             this.codeBarModelo = '';
@@ -280,6 +320,7 @@ export default {
             this.modelo = { ProductoModelo };
             this.currentPage = 1;
             this.productosModelo = [];
+            this.seleccionadosModelo = [];
 
             try {
                 const res = await this.axios.get(this.API + 'productos_modelo', {
@@ -319,6 +360,23 @@ export default {
             setTimeout(() => {
                 this.mostrarModal = true;
             }, 300);
+        },
+
+        seleccionarTodos(valor) {
+            this.seleccionadosModelo = valor ? this.productosModelo.map(item => item.IdProducto) : [];
+        },
+
+        agregarSeleccionados() {
+            const seleccionados = this.productosModelo.filter(item => this.seleccionadosModelo.includes(item.IdProducto));
+            seleccionados.forEach(item => {
+                if (!this.carrito.some(producto => producto.IdProducto == item.IdProducto)) {
+                    this.carrito.push({ ...item, cantidad: 1, precio: item.PrecioContado, descuento: 0 });
+                }
+            });
+            this.seleccionadosModelo = [];
+            this.modalProductos = false;
+            setTimeout(() => { this.mostrarModal = true; }, 300);
+            this.$toasted.success(`${seleccionados.length} producto(s) agregados`);
         },
 
         focusAutocomplete(ref) {   // ← AGREGAR ESTE MÉTODO

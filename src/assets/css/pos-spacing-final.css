@@ -1,0 +1,237 @@
+/* Ajustes finales cargados después del tema consolidado. */
+@media (min-width: 768px) {
+  .pos-modern.pos-modern .pos-shell > .card-header {
+    min-height: 45px !important;
+    padding-bottom: 2px !important;
+  }
+
+  .pos-modern.pos-modern .pos-shell > .tab-content {
+    margin-top: -9px !important;
+  }
+
+  .pos-modern.pos-modern .tab-pane > .container-fluid {
+    padding-top: 1px !important;
+  }
+}
+
+/* Monto visible dentro del CTA principal de cobro. */
+.pos-modern.pos-modern .pos-pay-row {
+  display: flex !important;
+  width: 100%;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  justify-content: center !important;
+}
+
+.pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn {
+  display: grid !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: calc(100% - 24px) !important;
+  min-height: 58px;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  padding: 8px 10px 8px 13px !important;
+  grid-template-columns: 44px minmax(125px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn > i {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  font-size: 1rem;
+}
+
+.pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-label {
+  position: static !important;
+  display: block !important;
+  padding-left: 4px;
+  font-weight: 900;
+  font-size: 1.28rem;
+  letter-spacing: .08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-amount {
+  position: static !important;
+  display: block !important;
+  min-width: 108px;
+  padding: 9px 13px;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, .38);
+  border-radius: 0;
+  color: #fff;
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.02em;
+  font-weight: 900;
+  letter-spacing: .025em;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 40, 25, .28);
+  white-space: nowrap;
+}
+
+.pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-spacer {
+  display: block;
+  width: 44px;
+  min-width: 44px;
+  height: 1px;
+}
+
+@media (max-width: 575px) {
+  .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn {
+    width: calc(100% - 24px) !important;
+    min-width: 0 !important;
+    grid-template-columns: 36px 1fr auto;
+    gap: 9px;
+  }
+
+  .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn > i {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-amount {
+    min-width: 92px;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-spacer {
+    width: 36px;
+    min-width: 36px;
+  }
+}
+.pos-item-discount {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.pos-item-discount-percent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 2px 9px;
+  border: 1px solid rgba(245, 158, 11, .28);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7df, #ffedd0);
+  color: #b45309;
+  font-size: .68rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: .02em;
+  box-shadow: 0 3px 9px rgba(180, 83, 9, .10);
+}
+
+/* Identidad NeuroModas: acento fosforescente del punto de venta.
+   Este archivo se carga al final para que el acabado no sea sustituido
+   por las reglas históricas incluidas dentro de Ventas.vue. */
+.pos-modern.pos-modern {
+  --pos-neon: #c8ff18;
+  --pos-neon-deep: #96d600;
+  --pos-neon-soft: rgba(200, 255, 24, .22);
+}
+
+.pos-modern.pos-modern .pos-shell.card {
+  border: 1px solid rgba(200, 255, 24, .72) !important;
+  border-left: 0 !important;
+  border-top-width: 3px !important;
+  box-shadow:
+    0 18px 42px rgba(4, 29, 58, .18),
+    0 0 0 1px rgba(200, 255, 24, .16),
+    inset 3px 0 0 rgba(200, 255, 24, .56),
+    inset -3px 0 0 rgba(200, 255, 24, .56) !important;
+}
+
+.pos-modern.pos-modern .pos-shell > .card-header {
+  border-bottom: 1px solid rgba(200, 255, 24, .28) !important;
+  background: linear-gradient(90deg, #062752 0%, #073b68 55%, #075277 100%) !important;
+}
+
+.pos-modern.pos-modern .nav-pills .nav-link {
+  border: 1px solid rgba(200, 255, 24, .42) !important;
+  color: #eefbd2 !important;
+  background: linear-gradient(135deg, #082c55, #0a466b) !important;
+  box-shadow: 0 6px 14px rgba(4, 27, 56, .24), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+
+.pos-modern.pos-modern .nav-pills .nav-link:hover {
+  border-color: var(--pos-neon) !important;
+  color: #071b34 !important;
+  background: linear-gradient(135deg, #ddff4b, var(--pos-neon)) !important;
+  box-shadow: 0 9px 20px rgba(166, 226, 0, .34), 0 0 0 3px var(--pos-neon-soft) !important;
+}
+
+.pos-modern.pos-modern .nav-pills .nav-link.active,
+.pos-modern.pos-modern .nav-pills .nav-link.active:hover {
+  border-color: #e9ff8c !important;
+  color: #071b34 !important;
+  background: linear-gradient(135deg, #dfff3f 0%, var(--pos-neon) 55%, #a8ed00 100%) !important;
+  box-shadow: 0 10px 24px rgba(159, 220, 0, .38), 0 0 0 4px rgba(200, 255, 24, .13), inset 0 1px 0 rgba(255,255,255,.62) !important;
+}
+
+.pos-modern.pos-modern .nav-pills .nav-link.active .pos-tab-icon,
+.pos-modern.pos-modern .nav-pills .nav-link:hover .pos-tab-icon {
+  color: #082d50 !important;
+  background: rgba(255,255,255,.48) !important;
+  box-shadow: inset 0 0 0 1px rgba(7,35,69,.12), 0 0 0 3px rgba(255,255,255,.2) !important;
+}
+
+.pos-modern.pos-modern .nav-pills .nav-link.active .pos-tab-icon b,
+.pos-modern.pos-modern .nav-pills .nav-link:hover .pos-tab-icon b {
+  border-color: #7fb900 !important;
+  color: #082d50 !important;
+  background: #f8ffe1 !important;
+}
+
+.pos-modern.pos-modern .pos-search-strip {
+  border-top: 1px solid rgba(200, 255, 24, .42) !important;
+  border-bottom: 1px solid rgba(200, 255, 24, .42) !important;
+  box-shadow: 0 8px 20px rgba(74, 112, 0, .08) !important;
+}
+
+.pos-modern.pos-modern .pos-product-search {
+  border: 1px solid rgba(200, 255, 24, .66) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 0 0 3px rgba(200, 255, 24, .10), 0 9px 22px rgba(10, 43, 76, .10) !important;
+}
+
+.pos-modern.pos-modern .pos-product-search:focus-within {
+  border-color: var(--pos-neon) !important;
+  box-shadow: 0 0 0 4px rgba(200, 255, 24, .22), 0 12px 25px rgba(111, 161, 0, .16) !important;
+}
+
+.pos-modern.pos-modern .pos-product-autocomplete .form-control,
+.pos-modern.pos-modern .pos-barcode-input {
+  border-color: transparent !important;
+}
+
+.pos-modern.pos-modern .pos-cart {
+  border-color: rgba(200, 255, 24, .48) !important;
+  box-shadow: 0 13px 28px rgba(9, 42, 72, .10), inset 0 0 0 1px rgba(200, 255, 24, .08) !important;
+}
+
+@media (max-width: 767px) {
+  .pos-modern.pos-modern .pos-shell.card {
+    border-width: 2px 1px 1px !important;
+    box-shadow: 0 12px 28px rgba(4,29,58,.16), inset 2px 0 0 rgba(200,255,24,.45), inset -2px 0 0 rgba(200,255,24,.45) !important;
+  }
+}

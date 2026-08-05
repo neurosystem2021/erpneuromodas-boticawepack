@@ -4,22 +4,26 @@
        <b-col cols="12">
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
-        <b-col cols="3">
-            Fecha
+        <b-col cols="12" md="2">
+            Fecha inicial
             <input type="date" class="form-control" v-model="fechaInicio">
         </b-col>
-        <b-col cols="3">
-            Fecha
+        <b-col cols="12" md="2">
+            Fecha final
             <input type="date" class="form-control" v-model="fechaFin">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="12" md="2">
             Almacén
             <b-form-select v-model="almacen" 
                  value-field="IdAlmacen"
                  text-field="Almacen"
                 :options="lstAlmances"></b-form-select>
         </b-col>
-        <b-col cols="1"  class="py-4">
+        <b-col cols="12" md="2">
+            Tipo de documento
+            <b-form-select v-model="tipoDocumento" :options="tiposDocumento"></b-form-select>
+        </b-col>
+        <b-col cols="12" md="1" class="py-4">
           <b-form-checkbox
             id="checkbox-1"
             v-model="declarado"
@@ -30,7 +34,7 @@
             Declarado
           </b-form-checkbox>
         </b-col>
-        <b-col cols="2" class="pt-4">
+        <b-col cols="12" md="3" class="pt-4 report-actions">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
@@ -132,6 +136,13 @@ export default {
       API: config.API,
       lstReporte: [],
       declarado: 1,
+      tipoDocumento: "",
+      tiposDocumento: [
+        { value: "", text: "TODOS" },
+        { value: "03", text: "BOLETAS" },
+        { value: "01", text: "FACTURAS" },
+        { value: "12", text: "NOTAS DE VENTA" }
+      ],
       title: "Detalle Reg. Ventas:",
       items: [
         {
@@ -233,7 +244,8 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipoDocumento: this.tipoDocumento
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
@@ -252,7 +264,8 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        tipoDocumento: this.tipoDocumento
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params
@@ -320,6 +333,11 @@ export default {
   overflow-y: auto;
   position: relative;
 }
+
+.report-actions { display: flex; align-items: center; gap: 10px; }
+.report-actions .btn { flex: 1; white-space: nowrap; }
+table { font-size: 0.92rem; }
+tbody td { font-weight: 500; }
 
 /* Hace que el thead y tfoot se mantengan fijos */
 thead th,

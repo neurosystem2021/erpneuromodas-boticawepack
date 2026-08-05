@@ -1,6 +1,7 @@
 <template>
-  <b-container fluid class="px-5 mb-5">
-    <b-row>
+  <b-container fluid class="ops-page">
+    <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-file-invoice"></i></div><div><small>SUNAT · SIRE</small><h1>SIRE de compras</h1><p>Revisa movimientos declarados y genera el archivo oficial para SUNAT.</p></div><span><i class="fas fa-shield-alt"></i> Registro electrónico</span></header>
+    <b-row class="ops-card">
         <b-col cols="2">
             Fecha Desde:
             <input type="date" class="form-control" v-model="fechaInicio">
@@ -22,7 +23,7 @@
           </b-form-checkbox>
 
         </b-col>
-        <b-col cols="6" class="pt-4">
+        <b-col cols="6" class="pt-4 ops-actions">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-refresh" aria-hidden="true"></i> RECARGAR </b-button>
             <!-- <b-button variant="success" :disabled="activarBotones" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Excel</b-button> -->
             <!-- <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button> -->
@@ -31,7 +32,7 @@
               <img  src="static/sire.png" style="width: 120px;cursor: pointer; "/>
             </button>
         </b-col>
-        <b-col cols="12" class="mt-4">
+        <b-col cols="12" class="mt-4 ops-results">
             <table ref="miTabla" class="table table-hover table-striped ">
                 <thead>
                     <tr>
@@ -82,7 +83,7 @@
                 </tbody>
             </table>
         </b-col>
-        <b-col cols="3" offset="9">
+        <b-col cols="3" offset="9" class="ops-summary">
             <b-row>
               <b-col cols="6"> <b>Sub Total(PEN)</b> <input type="number" class="form-control" v-model="SubTotalPEN" readonly name="" id=""></b-col>
               <b-col cols="6"> <b>Sub Total(USD)</b> <input type="number" class="form-control" v-model="SubTotalUSD" readonly name="" id=""></b-col>

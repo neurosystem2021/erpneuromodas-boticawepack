@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="outline-success">Ver Cierres</b-button>
+        <b-button class="btn-ver-cierres" @click="show=true" variant="success">Ver Cierres</b-button>
 
         <b-form >
             <b-modal id="modalCierres"
@@ -50,6 +50,16 @@
 import config from '@/store/config.js'
 
     export default {
+        props: {
+          esAdministrador: {
+            type: Boolean,
+            default: false
+          },
+          usuarioActual: {
+            type: String,
+            default: ''
+          }
+        },
         mounted () {
 
         },
@@ -81,10 +91,14 @@ import config from '@/store/config.js'
             myProvider (ctx) {
                 // Here we don't set isBusy prop, so busy state will be handled by table itself
                 // this.isBusy = true
-                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+ctx.filter + '&sortBy=IdCierreCaja&sortDesc=1')
+                const filtroSeguro = this.esAdministrador ? ctx.filter : this.usuarioActual
+                let promise = this.axios.get(this.API + 'cierrecaja?limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter='+encodeURIComponent(filtroSeguro || '') + '&sortBy=IdCierreCaja&sortDesc=1')
 
                 return promise.then((result) => {
-                this.items = result.data
+                const items = Array.isArray(result.data) ? result.data : []
+                this.items = this.esAdministrador
+                  ? items
+                  : items.filter(item => String(item.UsuarioReg || '').toLowerCase() === String(this.usuarioActual || '').toLowerCase())
                 //this.totalRows = this.items.length
                 // Here we could override the busy state, setting isBusy to false
                 // this.isBusy = false
@@ -100,5 +114,24 @@ import config from '@/store/config.js'
     }
 </script>
 <style>
-
+.btn-ver-cierres,
+.btn-ver-cierres:visited {
+    background-color: #20a943 !important;
+    border-color: #20a943 !important;
+    color: #ffffff !important;
+}
+.btn-ver-cierres:hover {
+    background-color: #168a35 !important;
+    border-color: #168a35 !important;
+    color: #ffffff !important;
+}
+.btn-ver-cierres:focus,
+.btn-ver-cierres.focus,
+.btn-ver-cierres:active,
+.btn-ver-cierres.active {
+    background-color: #106f2b !important;
+    border-color: #106f2b !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(32, 169, 67, .22) !important;
+}
 </style>

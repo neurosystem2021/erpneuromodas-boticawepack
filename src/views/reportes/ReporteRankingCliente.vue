@@ -1,8 +1,8 @@
 <template>
-  <b-container fluid>
-    <h4>Ranking de Cliente</h4>
-    <b-row>
-        <b-col cols="3">
+  <b-container fluid class="ops-page">
+    <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-chart-bar"></i></div><div><small>ANÁLISIS COMERCIAL</small><h1>Compras por cliente</h1><p>Consulta productos adquiridos, cantidades e importe acumulado por cliente.</p></div><span><i class="fas fa-file-excel"></i> Reporte exportable</span></header>
+    <b-row class="ops-card">
+        <b-col cols="3" class="ops-actions">
             Cliente
             <autocomplete
                 required="required"
@@ -29,7 +29,7 @@
             <b-button class="mx-1 mt-3" @click="getRanking()" variant="success">Generar</b-button>
             <b-button class="mx-1 mt-3" @click="exportarReporte()" variant="info">Excel</b-button>
         </b-col>
-        <b-col cols="12" class="mb-2">
+        <b-col cols="12" class="ops-summary mb-2">
             <b-row>
                 <b-col cols="3" offset="3">
                     Producto Más Vendido:
@@ -45,7 +45,7 @@
                 </b-col>
             </b-row>
         </b-col>
-        <b-col cols="12">
+        <b-col cols="12" class="ops-results">
             <b-table 
             striped
             hover
@@ -93,6 +93,10 @@ export default {
       producto: "",
       cantidad: 0
     };
+  },
+  mounted() {
+    this.fechaInicio = this.$moment().startOf("month").format("YYYY-MM-DD");
+    this.fechaFin = this.$moment().endOf("month").format("YYYY-MM-DD");
   },
   methods: {
     focusAutocomplete(ref) {

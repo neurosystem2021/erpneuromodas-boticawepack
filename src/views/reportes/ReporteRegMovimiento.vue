@@ -1,6 +1,7 @@
 <template>
-  <b-container fluid class="px-5 mb-5">
-    <b-row>
+  <b-container fluid class="movement-report-page">
+    <header class="movement-report-hero"><div class="movement-report-hero__icon"><i class="fas fa-exchange-alt"></i></div><div><small>CONTROL DE INVENTARIO</small><h1>Registro de movimientos</h1><p>Consulta ingresos y salidas, revisa importes y genera reportes del periodo.</p></div><span><i class="fas fa-chart-line"></i> Reporte operativo</span></header>
+    <b-row class="movement-filter-card">
        <b-col cols="12">
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
@@ -34,7 +35,9 @@
             <b-button variant="success" :disabled="activarBotones" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Excel</b-button>
             <b-button variant="secondary" :disabled="activarBotones" @click="exportarXls()"><i class="fa fa-file" aria-hidden="true"></i> Text</b-button>
         </b-col>
-        <b-col cols="12" class="mt-4">
+        <b-col cols="12" class="movement-table-card">
+          <div class="movement-section-title"><div><small>RESULTADOS</small><h2>Movimientos encontrados</h2></div><span>{{ lstReporte.length }} registros</span></div>
+          <div class="movement-table-scroll">
             <table ref="miTabla" class="table table-hover table-striped ">
                 <thead>
                     <tr>
@@ -84,9 +87,10 @@
                     </tr>
                 </tbody>
             </table>
+          </div>
         </b-col>
-        <b-col cols="3" offset="9">
-            <b-row>
+        <b-col cols="12" class="movement-totals-card">
+            <b-row class="justify-content-end">
               <b-col cols="6"> <b>Sub Total(PEN)</b> <input type="number" class="form-control" v-model="SubTotalPEN" readonly name="" id=""></b-col>
               <b-col cols="6"> <b>Sub Total(USD)</b> <input type="number" class="form-control" v-model="SubTotalUSD" readonly name="" id=""></b-col>
               <b-col cols="6"> <b>IGV(PEN)</b> <input type="number" class="form-control" v-model="IgvlPEN" readonly name="" id=""></b-col>
@@ -96,7 +100,7 @@
             </b-row>
         </b-col>
     </b-row>
-    <b-modal v-model="detalleMovimiento" id="modalxl"  size="lg" no-close-on-backdrop no-close-on-esc hide-footer>
+    <b-modal v-model="detalleMovimiento" id="modalxl" modal-class="movement-detail-modal" size="lg" no-close-on-backdrop no-close-on-esc hide-footer title="Detalle del movimiento">
         <b-row>
           <b-col cols="6">
             <b-input-group>
@@ -270,7 +274,7 @@ export default {
     },
     async exportarReporte() {
       await await this.axios(
-        `${this.API}reporte/movimientos?fechaIni=${this.fechaInicio}&fechaFin=${
+        `${this.API}reporte/movimientos?fechaInicio=${this.fechaInicio}&fechaFin=${
           this.fechaFin
         }&descripcion=${this.descripcion}&declarado=${this.declarado}`
       ).then(res => {
@@ -422,8 +426,10 @@ export default {
 </script>
 
 <style>
-.modal-dialog {
-  max-width: 60% !important;
-  width: 60% !important;
-}
+.movement-report-page{min-height:100vh;padding:14px 24px 34px!important;color:#173451;background:linear-gradient(145deg,#f3f8fc,#eaf3f9 60%,#f8fbfd)}
+.movement-report-hero{display:flex;align-items:center;gap:14px;min-height:92px;margin-bottom:14px;padding:16px 22px;color:#fff;border-radius:20px;background:linear-gradient(112deg,#083562,#0b5787 65%,#078bac);box-shadow:0 14px 32px rgba(11,68,111,.18)}.movement-report-hero__icon{display:grid;width:52px;height:52px;place-items:center;flex:0 0 52px;color:#9fe9ff;border:1px solid rgba(255,255,255,.22);border-radius:15px;background:rgba(255,255,255,.1);font-size:20px}.movement-report-hero small{color:#a9eaff;font-size:10px;font-weight:900;letter-spacing:1.4px}.movement-report-hero h1{margin:0;font-size:27px;font-weight:900}.movement-report-hero p{margin:2px 0 0;color:#d8edf8;font-size:12px}.movement-report-hero>span{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(0,35,67,.2);font-size:11px;font-weight:800}.movement-report-hero>span i{margin-right:6px;color:#67e0ab}
+.movement-filter-card{margin:0;padding:16px 12px 0;border:1px solid #d7e5ef;border-radius:19px;background:#fff;box-shadow:0 10px 28px rgba(28,70,105,.08)}.movement-filter-card>.col-12:first-child{display:none}.movement-filter-card>.col-2,.movement-filter-card>.col-3{margin-bottom:16px;color:#29465f;font-size:12px;font-weight:850}.movement-filter-card .form-control{min-height:46px;margin-top:5px;color:#173451;border:1px solid #cedeea;border-radius:11px;background:#fbfdff;font-weight:700;box-shadow:none}.movement-filter-card .form-control:focus{border-color:#168fc7;box-shadow:0 0 0 4px rgba(22,143,199,.12)}.movement-filter-card .custom-checkbox{padding-top:12px;font-size:13px}.movement-filter-card>.col-3.pt-4{display:flex;align-items:end;gap:7px;padding-top:23px!important}.movement-filter-card>.col-3.pt-4 .btn{min-height:46px;margin:0;border:0;border-radius:11px;font-size:12px;font-weight:900;box-shadow:0 7px 16px rgba(20,80,118,.14)}.movement-filter-card>.col-3.pt-4 .btn-info{background:linear-gradient(135deg,#0a5b8c,#0889b2)}.movement-filter-card>.col-3.pt-4 .btn-success{background:linear-gradient(135deg,#078653,#18b46f)}
+.movement-table-card{overflow:hidden;margin-top:2px;padding:0!important;border-top:1px solid #dfebf2}.movement-section-title{display:flex;align-items:center;padding:15px 15px 12px}.movement-section-title small{color:#0785bd;font-size:9px;font-weight:900;letter-spacing:1.3px}.movement-section-title h2{margin:0;color:#153b5b;font-size:19px;font-weight:900}.movement-section-title>span{margin-left:auto;padding:7px 12px;color:#0b638e;border-radius:999px;background:#e7f5fb;font-size:10px;font-weight:900}.movement-table-scroll{overflow:auto}.movement-table-card table{min-width:1550px;margin:0!important}.movement-table-card thead th{position:sticky;top:0;padding:12px 10px;color:#fff;border:0;background:#0b5787;white-space:nowrap;font-size:11px}.movement-table-card tbody td{padding:11px 10px;vertical-align:middle;border-color:#e2ebf1;font-size:11px}.movement-table-card tbody tr{cursor:pointer}.movement-table-card tbody tr:hover{background:#eaf7fc!important}.movement-table-card tbody .btn{width:34px;height:34px;padding:0;border:0;border-radius:9px}.movement-totals-card{padding:16px 14px 18px;border-top:1px solid #deebf2;background:#f7fafc}.movement-totals-card .col-6{max-width:16.666%;flex:0 0 16.666%;color:#36536b;font-size:10px}.movement-totals-card .form-control{min-height:42px;color:#0a5c86;background:#fff;font-size:13px;font-weight:900}.movement-detail-modal .modal-dialog{max-width:90%!important;width:90%!important}.movement-detail-modal .modal-content{overflow:hidden;border:0;border-radius:20px;box-shadow:0 25px 65px rgba(7,39,70,.3)}.movement-detail-modal .modal-header{color:#fff;border:0;background:linear-gradient(110deg,#083562,#0b6d9b)}.movement-detail-modal .modal-title{font-weight:900}.movement-detail-modal .modal-body{padding:18px;background:#f6f9fc}.movement-detail-modal table thead th{color:#fff;background:#0b5787;white-space:nowrap}.movement-detail-modal .modal-body>.row>.col-12{overflow:auto}
+@media(max-width:991px){.movement-report-page{padding:10px!important}.movement-report-hero>span{display:none}.movement-filter-card>.col-2,.movement-filter-card>.col-3{max-width:50%;flex:0 0 50%}.movement-totals-card .col-6{max-width:33.333%;flex:0 0 33.333%}}
+@media(max-width:575px){.movement-report-hero p{display:none}.movement-report-hero h1{font-size:21px}.movement-filter-card>.col-2,.movement-filter-card>.col-3{max-width:100%;flex:0 0 100%}.movement-totals-card .col-6{max-width:50%;flex:0 0 50%}}
 </style>

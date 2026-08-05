@@ -3,7 +3,8 @@
       <b-button-group>
         <b-button @click="promptPassword" variant="primary" class="btn-pos btn-accion"><i class="fas fa-shopping-cart mr-2"></i>Caja/Banco</b-button>
       </b-button-group>
-      <b-modal v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito">
+      <b-modal v-model="showMovimientoModal" size="lg" title="Caja y banco" ref="modalCarrito"
+        hide-footer centered modal-class="cash-modal">
         <b-tabs content-class="mt-3">
           <b-tab title="Gasto">
             <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
@@ -38,7 +39,7 @@
             </div>
             <template>
               <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+              <b-btn variant="secondary" @click="showMovimientoModal=false">Cerrar</b-btn>
             </template>
           </b-form>
         </b-tab>
@@ -76,7 +77,7 @@
             </div>
             <template>
               <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+              <b-btn variant="secondary" @click="showMovimientoModal=false">Cerrar</b-btn>
             </template>
           </b-form>
         </b-tab>
@@ -113,7 +114,7 @@
             </div>
             <template>
               <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+              <b-btn variant="secondary" @click="showMovimientoModal=false">Cerrar</b-btn>
             </template>
           </b-form>
         </b-tab>
@@ -150,7 +151,7 @@
             </div>
             <template>
               <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+              <b-btn variant="secondary" @click="showMovimientoModal=false">Cerrar</b-btn>
             </template>
           </b-form>
         </b-tab>
@@ -194,6 +195,9 @@ export default {
   },
   methods: {
     async promptPassword() {
+      this.showMovimientoModal = true;
+      return;
+
       // this.$swal.fire("golsss");
       /** await swal
         .fire({
@@ -455,5 +459,374 @@ h6 {
   margin-bottom: 0;
   text-align: left;
   font-size: 1rem;
+}
+
+/deep/ .cash-modal .modal-dialog {
+  max-width: 820px;
+}
+
+/deep/ .cash-modal .modal-content {
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, .35);
+  border-radius: 24px;
+  background: linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%);
+  box-shadow: 0 28px 70px rgba(2, 26, 65, .35), 0 0 0 5px rgba(255, 255, 255, .25);
+}
+
+/deep/ .cash-modal .modal-header {
+  min-height: 82px;
+  align-items: center;
+  padding: 18px 26px;
+  border: 0;
+  color: #fff;
+  background: linear-gradient(120deg, #071e48 0%, #084d8c 62%, #0798c7 100%);
+}
+
+/deep/ .cash-modal .modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+
+/deep/ .cash-modal .modal-title::before {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .15);
+  content: "\f555";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .25);
+}
+
+/deep/ .cash-modal .close {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, .13);
+  opacity: 1;
+  text-shadow: none;
+  transition: .2s ease;
+}
+
+/deep/ .cash-modal .close:hover {
+  background: #ef4444;
+  transform: rotate(8deg);
+}
+
+/deep/ .cash-modal .modal-body {
+  padding: 24px 26px 26px;
+}
+
+/deep/ .cash-modal .nav-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  padding: 6px;
+  border: 1px solid #d7e5f4;
+  border-radius: 16px;
+  background: #edf4fb;
+}
+
+/deep/ .cash-modal .nav-tabs .nav-link {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 11px;
+  color: #425773;
+  background: transparent;
+  font-size: .93rem;
+  font-weight: 800;
+  text-align: center;
+  transition: .22s ease;
+}
+
+/deep/ .cash-modal .nav-tabs .nav-link:hover {
+  color: #075a9f;
+  background: rgba(255, 255, 255, .78);
+  transform: translateY(-1px);
+}
+
+/deep/ .cash-modal .nav-tabs .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, #0b3c78, #087dc2);
+  box-shadow: 0 8px 18px rgba(8, 85, 154, .25);
+}
+
+/deep/ .cash-modal .tab-content {
+  margin-top: 18px !important;
+  padding: 22px;
+  border: 1px solid #dce8f5;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 12px 30px rgba(15, 54, 93, .08);
+}
+
+/deep/ .cash-modal .tab-pane .my-3 {
+  margin: 0 !important;
+}
+
+/deep/ .cash-modal .tab-pane .col-md-4 {
+  flex: 0 0 100%;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 10px 14px;
+  align-items: center;
+}
+
+/deep/ .cash-modal .tab-pane label {
+  margin: 0;
+  color: #334762;
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+/deep/ .cash-modal .tab-pane br {
+  display: none;
+}
+
+/deep/ .cash-modal .tab-pane .form-group {
+  margin: 0;
+}
+
+/deep/ .cash-modal .tab-pane .form-control {
+  min-height: 48px;
+  border: 1px solid #cbdcec;
+  border-radius: 12px;
+  background: #f9fbfe;
+  color: #12233f;
+  font-weight: 700;
+  box-shadow: inset 0 1px 2px rgba(14, 47, 82, .03);
+  transition: .2s ease;
+}
+
+/deep/ .cash-modal .tab-pane .form-control:focus {
+  border-color: #1d9fe0;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(29, 159, 224, .13);
+}
+
+/deep/ .cash-modal .autocomplete,
+/deep/ .cash-modal .autocomplete-wrapper {
+  position: relative;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/deep/ .cash-modal .autocomplete ul,
+/deep/ .cash-modal .autocomplete-results {
+  position: absolute !important;
+  z-index: 10600 !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-height: 230px !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid rgba(31, 136, 203, .28) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, .98) !important;
+  box-shadow: 0 18px 38px rgba(8, 39, 78, .22), 0 0 0 4px rgba(56, 189, 248, .08) !important;
+  list-style: none !important;
+  transform-origin: top center;
+  animation: cashDropdownOpen .18s ease-out;
+  backdrop-filter: blur(16px);
+}
+
+/deep/ .cash-modal .autocomplete ul::before,
+/deep/ .cash-modal .autocomplete-results::before {
+  position: static !important;
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  padding: 5px 10px 9px;
+  border: 0 !important;
+  color: #7690ac;
+  content: "CUENTAS DISPONIBLES";
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+/deep/ .cash-modal .autocomplete ul li {
+  margin: 3px 0;
+  padding: 0 !important;
+  border: 0 !important;
+  list-style: none !important;
+}
+
+/deep/ .cash-modal .autocomplete ul li > a,
+/deep/ .cash-modal .autocomplete-results > div,
+/deep/ .cash-modal .autocomplete .trDetails {
+  position: relative;
+  display: flex !important;
+  width: 100% !important;
+  min-height: 46px;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 14px 10px 45px !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  color: #1d334f !important;
+  background: transparent !important;
+  font-size: .9rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+  text-align: left;
+  text-decoration: none !important;
+  transition: .18s ease;
+}
+
+/deep/ .cash-modal .autocomplete-anchor-text {
+  display: block;
+  color: inherit;
+  font-size: .91rem;
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+
+/deep/ .cash-modal .autocomplete-anchor-label {
+  display: block;
+  margin-top: 2px !important;
+  color: #7690ac !important;
+  font-size: .72rem !important;
+  font-weight: 700;
+}
+
+/deep/ .cash-modal .autocomplete ul li > a::before,
+/deep/ .cash-modal .autocomplete-results > div::before,
+/deep/ .cash-modal .autocomplete .trDetails::before {
+  position: absolute;
+  left: 11px;
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #087bbd;
+  background: #e4f5ff;
+  content: "\f19c";
+  font-family: "Font Awesome 5 Free";
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+/deep/ .cash-modal .autocomplete ul li > a:hover,
+/deep/ .cash-modal .autocomplete ul li.focus-list > a,
+/deep/ .cash-modal .autocomplete-results > div:hover,
+/deep/ .cash-modal .autocomplete .trDetails:hover {
+  border-color: rgba(56, 189, 248, .28) !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #0b4e91, #0798c7) !important;
+  box-shadow: 0 7px 15px rgba(7, 92, 155, .20);
+  transform: translateX(3px);
+}
+
+/deep/ .cash-modal .autocomplete ul li > a:hover::before,
+/deep/ .cash-modal .autocomplete ul li.focus-list > a::before,
+/deep/ .cash-modal .autocomplete-results > div:hover::before,
+/deep/ .cash-modal .autocomplete .trDetails:hover::before {
+  color: #fff;
+  background: rgba(255, 255, 255, .17);
+}
+
+/deep/ .cash-modal .autocomplete ul li > a:hover .autocomplete-anchor-label,
+/deep/ .cash-modal .autocomplete ul li.focus-list > a .autocomplete-anchor-label {
+  color: rgba(255, 255, 255, .78) !important;
+}
+
+/deep/ .cash-modal .autocomplete ul::-webkit-scrollbar {
+  width: 7px;
+}
+
+/deep/ .cash-modal .autocomplete ul::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: #edf5fb;
+}
+
+/deep/ .cash-modal .autocomplete ul::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: linear-gradient(#1478bd, #16b6d4);
+}
+
+@keyframes cashDropdownOpen {
+  from { opacity: 0; transform: translateY(-6px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/deep/ .cash-modal .tab-pane form > .btn {
+  width: auto !important;
+  min-width: 150px;
+  min-height: 48px;
+  margin-top: 20px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 13px;
+  font-size: .92rem;
+  font-weight: 900;
+  letter-spacing: .02em;
+  box-shadow: 0 8px 18px rgba(15, 61, 105, .18);
+  transition: .2s ease;
+}
+
+/deep/ .cash-modal .tab-pane form > .btn-success {
+  float: right;
+  margin-left: 10px;
+  background: linear-gradient(135deg, #08a66c, #20c875);
+}
+
+/deep/ .cash-modal .tab-pane form > .btn-secondary {
+  float: right;
+  color: #34465e;
+  background: #e7eef6;
+}
+
+/deep/ .cash-modal .tab-pane form > .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 61, 105, .24);
+}
+
+/deep/ .cash-modal .tab-pane form::after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+@media (max-width: 767px) {
+  /deep/ .cash-modal .modal-dialog {
+    margin: 10px;
+  }
+  /deep/ .cash-modal .nav-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /deep/ .cash-modal .tab-pane .col-md-4 {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  /deep/ .cash-modal .tab-pane form > .btn {
+    width: calc(50% - 6px) !important;
+    min-width: 0;
+  }
 }
 </style>

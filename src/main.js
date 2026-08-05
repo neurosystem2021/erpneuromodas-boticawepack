@@ -26,6 +26,10 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "../static/vue2-autocomplete.css";
 import "../static/styles.css";
+import "./assets/css/pos-premium.css";
+import "./assets/css/pos-spacing-final.css";
+import "./assets/css/operations-modern.css";
+import "./assets/css/reports-suite-modern.css";
 
 Vue.prototype.$browser = detect();
 

@@ -386,35 +386,52 @@ function imprimirPantalla() {
 #invoice-container {
   max-width: 960px;
   margin: 1.5rem auto;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid #d9e5f1;
+  border-radius: 18px;
   overflow: hidden;
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 13px;
   color: #222;
+  box-shadow: 0 22px 55px rgba(8, 35, 72, .15);
 }
 
 .inv-header__brand {
   background: #fff;
-  border-radius: 8px;
-  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 14px;
+  padding: 8px 14px;
   display: inline-flex;
   align-items: center;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .2);
 }
 
 .accent-bar {
-  height: 5px;
-  background: linear-gradient(to right, #010067 65%, #fd8100 100%);
+  height: 6px;
+  background: linear-gradient(90deg, #05b8e2, #2563eb 48%, #ff8a00 100%);
 }
 
 /* ─── ENCABEZADO ─────────────────────────────────────── */
 .inv-header {
-  background: #010067;
-  padding: 1.25rem 2rem;
+  position: relative;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(24, 172, 221, .23), transparent 29%),
+    linear-gradient(120deg, #071d4a, #0a3974 58%, #075b91);
+  padding: 1.45rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.inv-header::after {
+  position: absolute;
+  right: 26%;
+  bottom: -70px;
+  width: 210px;
+  height: 150px;
+  border: 1px solid rgba(111, 213, 245, .16);
+  border-radius: 50%;
+  content: "";
 }
 
 .inv-header__logo {
@@ -424,11 +441,15 @@ function imprimirPantalla() {
 }
 
 .inv-header__badge {
-  background: #fd8100;
-  border-radius: 8px;
-  padding: 10px 22px;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #ff7a00, #ff9f0a);
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 14px;
+  padding: 11px 24px;
   text-align: center;
   min-width: 140px;
+  box-shadow: 0 12px 24px rgba(255, 122, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .3);
 }
 
 .inv-header__badge-type {
@@ -440,7 +461,7 @@ function imprimirPantalla() {
 
 .inv-header__badge-num {
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 800;
   color: #fff;
   line-height: 1.2;
 }
@@ -449,24 +470,42 @@ function imprimirPantalla() {
 .inv-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid #ebebeb;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5edf5;
+  background: #f6f9fc;
 }
 
 .inv-details__col {
-  padding: 1.25rem 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e0eaf3;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 7px 18px rgba(13, 53, 89, .06);
 }
 
 .inv-details__col:first-child {
-  border-right: 1px solid #ebebeb;
+  border-right: 1px solid #e0eaf3;
 }
 
 .inv-details__col-title {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #888;
-  font-weight: 600;
+  color: #0876b9;
+  font-weight: 800;
   margin-bottom: 10px;
+}
+
+.inv-details__col-title::before {
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+  margin-right: 7px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
+  content: "";
+  vertical-align: middle;
 }
 
 .inv-info-table {
@@ -489,7 +528,8 @@ function imprimirPantalla() {
 }
 
 .inv-info-table__val {
-  color: #222;
+  color: #102c4d;
+  font-weight: 600;
   text-transform: uppercase;
   font-size: 12px;
 }
@@ -531,7 +571,7 @@ function imprimirPantalla() {
 }
 
 .inv-table thead tr {
-  background: #010067;
+  background: linear-gradient(90deg, #071d4a, #0b4c87 65%, #087aa7);
 }
 
 .inv-table thead th {
@@ -561,7 +601,15 @@ function imprimirPantalla() {
 }
 
 .inv-table tbody tr:nth-child(even) {
-  background: #fafafa;
+  background: #f6faff;
+}
+
+.inv-table tbody tr {
+  transition: background .16s ease;
+}
+
+.inv-table tbody tr:hover {
+  background: #edf7ff;
 }
 
 .inv-table tbody td {
@@ -643,7 +691,7 @@ function imprimirPantalla() {
   padding: 12px 8px;
   font-size: 15px;
   font-weight: 700;
-  background: #010067 !important;
+  background: linear-gradient(90deg, #071d4a, #075e9f) !important;
   color: #fff !important;
   border: none;
 }
@@ -670,9 +718,10 @@ function imprimirPantalla() {
 }
 
 .banco-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid #dce8f2;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 8px 18px rgba(12, 48, 82, .08);
 }
 
 .banco-header {
@@ -682,11 +731,11 @@ function imprimirPantalla() {
 }
 
 .bcp-header {
-  background: #010067;
+  background: linear-gradient(120deg, #071d4a, #172f85);
 }
 
 .bbva-header {
-  background: #004a97;
+  background: linear-gradient(120deg, #064f91, #078dc1);
 }
 
 .banco-nombre {
@@ -718,11 +767,13 @@ function imprimirPantalla() {
 }
 
 .banco-lbl--red {
-  background: #cc0000;
+  background: #e8f1fa;
+  color: #153858;
 }
 
 .banco-lbl--gray {
-  background: #888;
+  background: #f2f6fa;
+  color: #52677d;
 }
 
 .banco-val {
@@ -789,23 +840,63 @@ function imprimirPantalla() {
   text-align: center;
   padding: 1.25rem 2rem;
   border-top: 1px solid #ebebeb;
+  background: #f5f9fc;
 }
 
 .btn-imprimir {
-  background: #010067;
+  margin: 4px;
+  background: linear-gradient(135deg, #0b3974, #078bc1);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 11px;
   padding: 10px 32px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.3px;
-  transition: background 0.2s;
+  box-shadow: 0 8px 18px rgba(7, 74, 127, .18);
+  transition: transform .18s ease, box-shadow .18s ease;
 }
 
 .btn-imprimir:hover {
-  background: #fd8100;
+  background: linear-gradient(135deg, #075e9f, #06a7ce);
+  box-shadow: 0 11px 22px rgba(7, 91, 147, .25);
+  transform: translateY(-2px);
+}
+
+.inv-print-row .btn-success {
+  margin: 4px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #059669, #22c55e);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(5, 150, 105, .2);
+}
+
+@media (max-width: 700px) {
+  #invoice-container {
+    margin: 8px;
+    border-radius: 13px;
+  }
+
+  .inv-header {
+    padding: 16px;
+  }
+
+  .inv-header__logo {
+    max-width: 190px;
+  }
+
+  .inv-details {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .cuentas-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ─── PRINT ──────────────────────────────────────────── */

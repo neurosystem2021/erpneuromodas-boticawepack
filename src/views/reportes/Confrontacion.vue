@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="ops-page">
     <Menu v-if="false"></Menu>
-    <br />
+    <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-balance-scale"></i></div><div><small>CONTROL DE EXISTENCIAS</small><h1>Confrontación de inventario</h1><p>Compara el stock físico con el sistema y genera los ajustes correspondientes.</p></div><span><i class="fas fa-check-double"></i> Verificación física</span></header>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated Target="_blank">
-        <b-container fluid class="bv-example-row">
-          <b-row>
+        <b-container fluid class="ops-card">
+          <b-row class="confront-filter-row">
               <b-col md="4">
                     <b-form-group>
                       <label>Almacen a Confrontar:</label>
@@ -22,28 +22,26 @@
                       </autocomplete>
                     </b-form-group>
               </b-col>
-              <b-col md="4" v-if="almacen.IdAlmacen">
-                <b-button variant="success" :href="'/api/index.php/reporte/confrontacion/total?idAlmacen=' + almacen.IdAlmacen" target="_blank">Confrontar Todo ({{almacen.Almacen}})</b-button>
-                <hr>
-                
+              <b-col md="4" v-if="almacen.IdAlmacen" class="ops-actions confront-export-all">
+                <b-button variant="success" :href="'/api/index.php/reporte/confrontacion/total?idAlmacen=' + almacen.IdAlmacen" target="_blank"><i class="fas fa-file-excel"></i> Reporte completo</b-button>
               </b-col>
           </b-row>
-          <hr>
-          <b-row>
-            <b-col></b-col>
-            <b-col></b-col>
-            <b-col>
+          <b-row class="confront-category-row">
+            <b-col md="4">
               <b-form-group>
                 <label>Agregar por categoria:</label>
                 <b-form-select v-model="idCategoria" :options="categoriasSelect" v-on:change="setCategoria($event)" class="mb-3" size="md"/>
               </b-form-group>
+            </b-col>
+            <b-col md="4" v-if="idCategoria" class="confront-active-category">
+              <small>CATEGORÍA EN PROCESO</small><strong><i class="fas fa-tag"></i> {{ categoriaActual }}</strong>
             </b-col>
           </b-row>
           <b-row>  
             <b-col  md="12">
               <carrito-confrontacion 
                 ref="carritoc"
-                tipo="mov" :fields="carrito.fields" :ordenNormal="true"></carrito-confrontacion>
+                tipo="mov" :idAlmacen="almacen.IdAlmacen" :fields="carrito.fields" :ordenNormal="true"></carrito-confrontacion>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">
@@ -79,6 +77,7 @@ export default {
           //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: "CodigoBarra", label: "Codigo" },
           { key: "Producto" },
+          { key: "ProductoCategoria", label: "Categoria" },
           { key: "cantidad", label: "Cantidad Fisica" },
           { key: "acciones", label: "" }
         ]
@@ -89,6 +88,10 @@ export default {
     };
   },
   computed: {
+    categoriaActual() {
+      const categoria = this.categoriasSelect.find(item => Number(item.value) === Number(this.idCategoria));
+      return categoria ? categoria.text : "";
+    },
     ...mapState({
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
@@ -224,6 +227,7 @@ export default {
         .post(this.API + "reporte/preconfrontacion", {
           Productos: this.productos.map(p => ({
             Producto: p.Producto,
+            ProductoCategoria: p.ProductoCategoria,
             CodigoBarra: p.CodigoBarra,
             cantidad: p.cantidad > 0 ? p.cantidad : 0
           })),

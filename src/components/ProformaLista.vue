@@ -4,20 +4,27 @@
         <b-form>
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
-                class="modalOrdenCompra"
-                size="lg" v-model="show"
+                class="modalOrdenCompra proforma-modal"
+                dialog-class="proforma-modal-dialog"
+                content-class="proforma-modal-content"
+                body-class="proforma-modal-body"
+                size="xl" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
                 body-text-variant="dark">     
-                <b-tabs pills card>
+                <b-tabs pills card class="proforma-tabs">
                   <b-tab title="Proformas" active>
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                    <b-input-group class="proforma-search">
+                      <b-input-group-prepend is-text><i class="fas fa-search"></i></b-input-group-prepend>
+                      <b-form-input v-model="filter" placeholder="Buscar por cliente, documento, número o empleado" @input="currentPage = 1" />
+                    </b-input-group>
                     <b-table 
                         v-if="show"
                         id="table-proformas" 
                         ref="tableProformas"
-                        striped hover 
+                        striped hover responsive="sm"
+                        class="proforma-table"
                         :busy.sync="isBusy" 
                         :filter="filter"
                         :items="myProvider" 
@@ -30,11 +37,11 @@
                         <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                       </template>
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button class="proforma-action proforma-action-edit" @click="selectProformas(data.item)" variant="success" title="Cargar y editar"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button class="proforma-action proforma-action-view" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank"><i class="fas fa-eye"></i><span>Ver</span></b-button>
                       </template>
 
                       <template slot="Total" slot-scope="data">
@@ -42,11 +49,11 @@
                       </template>
 
                       <template slot="Anular" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
+                        <b-button class="proforma-action proforma-action-delete" @click="eliminarProf(data.item)" variant="danger" title="Eliminar proforma"><i class="fas fa-trash-alt"></i></b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button class="proforma-action proforma-action-ticket" :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank"><i class="fas fa-receipt"></i><span>Ticket</span></b-button>
                       </template>
 
                     </b-table>
@@ -66,7 +73,8 @@
                   </b-tab>
 
                   <b-tab title="Proformas Favoritas">
-                    <b-input-group prepend="Buscar..." class="mt-2">
+                    <b-input-group class="mt-2 proforma-search">
+                      <b-input-group-prepend is-text><i class="fas fa-search"></i></b-input-group-prepend>
                       <input class="form-control" v-model="search" />
                       </b-input-group>
                     <b-form-group>
@@ -79,18 +87,20 @@
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"
                         :per-page="5"
-                        :current-page="currentPageFav"
+                       :current-page="currentPageFav"
+                       responsive="sm"
+                       class="proforma-table"
                        >
                        <!-- <template slot="EsFavoritoFlag" slot-scope="data">
                         <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
                         <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                       </template> -->
                       <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                        <b-button class="proforma-action proforma-action-edit" @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
                       </template>
 
                       <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        <b-button class="proforma-action proforma-action-view" :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank"><i class="fas fa-eye"></i><span>Ver</span></b-button>
                       </template>
 
                       <template slot="Total" slot-scope="data">
@@ -98,11 +108,11 @@
                       </template>
 
                       <template slot="Anular" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
+                        <b-button class="proforma-action proforma-action-delete" @click="eliminarProf(data.item)" variant="danger" title="Eliminar proforma"><i class="fas fa-trash-alt"></i></b-button>
                       </template>
 
                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                        <b-button class="proforma-action proforma-action-ticket" :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank"><i class="fas fa-receipt"></i><span>Ticket</span></b-button>
                       </template>
 
                     </b-table>

@@ -5,7 +5,7 @@
         class="form-control txtBuscar" 
         v-model="text"  
         @input="buscar"
-        @focus="buscar"
+        @focus="handleFocus"
         @click="$event.target.select()"
       />
       <div>
@@ -26,6 +26,10 @@ export default {
     value: {
       type: String,
       default: ""
+    },
+    touchEnabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -66,6 +70,17 @@ export default {
     document.removeEventListener("keydown", this.handleKeyDown);
   },
   methods: {
+    handleFocus() {
+      if (this.touchEnabled) {
+        this.$emit("touch-focus", this.text);
+        return;
+      }
+      this.buscar();
+    },
+    setTextAndSearch(value) {
+      this.text = value == null ? "" : String(value);
+      this.$nextTick(() => this.buscar());
+    },
     handleOutsideClick() {
       this.listado = [];
     },
