@@ -363,28 +363,37 @@
           />
         </template>
         <template slot="subtotal" slot-scope="data">
-  <input
-    class="form-control"
-    :disabled="
-      productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
-        ? true
-        : false ||
-          esDelivery ||
-          (productos[data.index].EsObsequio == 1 && tipoMov == 0
-            ? true
-            : false)
-    "
-    :value="subtotalEditando === data.index ? subtotalTemp : productos[data.index].subtotal"
-    style="width: 105px"
-    type="number"
-    step="0.00001"
-    min="0"
-    @focus="onSubtotalFocus(data.index)"
-    @input="val => actualizarSubtotalEnVivo(data.index, val.target.value)"
-    @blur="onSubtotalBlur(data.index)"
-    @keydown.enter.prevent="onSubtotalBlur(data.index)"
-  />
-</template>
+            <input
+              v-if="isVentas"
+              class="form-control"
+              :value="getSubtotal(data.index)"
+              disabled
+              style="width: 105px"
+            />
+
+            <input
+              v-else
+              class="form-control"
+              :disabled="
+                productos[data.index].disabled || bloquearInput || bloquearPrecioSolo
+                  ? true
+                  : false ||
+                    esDelivery ||
+                    (productos[data.index].EsObsequio == 1 && tipoMov == 0
+                      ? true
+                      : false)
+              "
+              :value="subtotalEditando === data.index ? subtotalTemp : productos[data.index].subtotal"
+              style="width: 105px"
+              type="number"
+              step="0.00001"
+              min="0"
+              @focus="onSubtotalFocus(data.index)"
+              @input="val => actualizarSubtotalEnVivo(data.index, val.target.value)"
+              @blur="onSubtotalBlur(data.index)"
+              @keydown.enter.prevent="onSubtotalBlur(data.index)"
+            />
+          </template>
         <template slot="igv" slot-scope="data">
           <b-form-checkbox
             v-model="productos[data.index].TieneIgv"
