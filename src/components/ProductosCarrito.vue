@@ -461,7 +461,7 @@
             placeholder="Descripción"></b-form-input>
         </template>-->
 
-        <template
+        <!-- <template
           slot="movimiento"
           slot-scope="data"
           v-if="(movTipo != 0 && movTipo != undefined) || isVentas"
@@ -482,7 +482,7 @@
             <div>
               {{ productos[data.index].FechaVen }}
             </div>
-          </div>
+          </div> -->
           <!--<b-form-select v-if="!isNota"
             style="width: 135px;"
             :disabled="bloquearInput?true:false"
@@ -496,7 +496,7 @@
 
           <div v-if="!isNota" v-html="productos[data.index].fechaVenMovimiento"></div>-->
 
-          <div
+          <!-- <div
             style="
               display: flex;
               justify-content: space-evenly;
@@ -535,7 +535,7 @@
               ></div>
             </div>
           </div>
-        </template>
+        </template>-->
 
         <template slot="fechavencimiento" slot-scope="data">
           <b-form-input

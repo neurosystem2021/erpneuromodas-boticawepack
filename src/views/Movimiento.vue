@@ -673,7 +673,7 @@ export default {
           faltaLlenar = true;
         }
 
-        if (prod.stock <= 0 || parseFloat(prod.cantidad) > prod.stock) {
+        if (prod.EsPadre != 1 && (prod.stock <= 0 || parseFloat(prod.cantidad) > prod.stock)) {
           faltaStock = true;
         }
 
@@ -704,14 +704,17 @@ export default {
           igualProducto = true;
         }
 
-        if (this.movimiento.movimientoTipo.Tipo != 0) {
-          if (
-            prod.stock <= 0 ||
-            parseFloat(prod.cantidad) > prod.stockMovimiento
-          ) {
-            faltaStock = true;
-          }
-        }
+        // if (this.movimiento.movimientoTipo.Tipo != 0) {
+        //   if (prod.EsPadre != 1) {
+        //     if (
+        //       stockActual <= 0 || 
+        //       Number(stockActual.toFixed(2)) < Number(cantidadPedida.toFixed(2)) || 
+        //       prod.stock === undefined
+        //     ) {
+        //       sinStock++;
+        //     }
+        //   }
+        // }
 
         if (!(prod.cantidad > 0)) {
           faltaCantidad = true;

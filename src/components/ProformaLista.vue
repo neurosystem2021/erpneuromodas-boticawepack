@@ -16,7 +16,6 @@
                   <b-tab title="Proformas" active>
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
                     <b-table 
-                        v-if="show"
                         id="table-proformas" 
                         ref="tableProformas"
                         striped hover 
@@ -66,7 +65,74 @@
                     </b-btn>
                 </div>
                   </b-tab>
+                  <b-tab title="Proformas Facturadas">
+                    <b-row class="align-items-center mb-2">
+                      <b-col cols="8">
+                        <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFav = 1" />
+                      </b-col>
+                      <b-col cols="4">
+                        <b-input-group prepend="Mostrar">
+                          <b-form-select
+                            v-model="perPageFav"
+                            :options="opcionesPorPagina"
+                            @change="currentPageFav = 1"
+                          />
+                        </b-input-group>
+                      </b-col>
+                    </b-row>
 
+                    <div class="tablaScroll">
+                      <b-table
+                        v-if="show"
+                        id="table-proformas-facturadas"
+                        ref="tableProformasFacturadas"
+                        striped hover
+                        :busy.sync="isBusyFav"
+                        :filter="filterFav"
+                        :items="myProviderFacturadas"
+                        :fields="fieldsFacturadas"
+                        :per-page="perPageFav"
+                        :current-page="currentPageFav">
+
+                        <template slot="ver" slot-scope="data">
+                          <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        </template>
+
+                        <template slot="Total" slot-scope="data">
+                          <b>{{ data.item.Total | moneda }}</b>
+                        </template>
+
+                        <template slot="verTicket" slot-scope="data">
+                          <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                        </template>
+                        <template slot="Estado" slot-scope="data">
+                          <b-button variant="danger" target="_blank">Facturado</b-button>
+                        </template>
+                        <template slot="Facturado" slot-scope="data">
+                          <template v-if="parseVentas(data.item.IdDocVenta).length">
+                            <b-button
+                              v-for="id in parseVentas(data.item.IdDocVenta)"
+                              :key="id"
+                              :href="'/imprimir/index.php?IdDocVenta=' + id"
+                              variant="info"
+                              size="sm"
+                              class="mr-1 mb-1"
+                              target="_blank"
+                            >
+                              <i class="fas fa-file-invoice"></i> Venta #{{ id }}
+                            </b-button>
+                          </template>
+                          <span v-else class="text-muted">Sin comprobante</span>
+                        </template>
+                      </b-table>
+                    </div>
+
+                    <b-pagination
+                      v-model="currentPageFav"
+                      :total-rows="totalRowsFav"
+                      :per-page="perPageFav"
+                    ></b-pagination>
+                  </b-tab>
                   <b-tab title="Proformas Favoritas">
                     <b-input-group prepend="Buscar..." class="mt-2">
                       <input class="form-control" v-model="search" />
@@ -149,8 +215,10 @@ export default {
       search: "",
       lstProformasFavoritas: [],
       filter: "",
+      filterFav: "",
       items: [],
       isBusy: false,
+      isBusyFav: false,
       fields: [
         { key: "EsFavoritoFlag", label: "Favorito" },
         { key: "IdProforma", label: "Id" },
@@ -184,9 +252,26 @@ export default {
         ,
         "Anular"
       ],
+      fieldsFacturadas: [
+        { key: "IdProforma", label: "Id" },
+        { key: "Anio", label: "Año" },
+        { key: "Numero", label: "Numero" },
+        { key: "Cliente", label: "Cliente" },
+        { key: "DniRuc", label: "Documento" },
+        { key: "FechaReg", label: "Fecha Reg" },
+        { key: "UsuarioReg", label: "Empleado" },
+        { key: "Total", label: "Total" },
+        { key: "ver", label: "Ver" },
+        { key: "verTicket", label: "Ver Ticket" },
+        { key: "Facturado", label: "Comprobante" },
+        { key: "Estado", label: "Estado" }
+      ],
       currentPageFav: 1,
       totalRows: 50,
+      totalRowsFav: 0,
       perPage: 5,
+      perPageFav: 5,
+      opcionesPorPagina: [5, 10, 25, 50],
       currentPage: 1
     };
   },
@@ -247,6 +332,37 @@ export default {
           this.limpiarCarrito();
         });
     },
+
+    myProviderFacturadas(ctx) {
+      let promise = this.axios.get(
+        this.API +
+          "proformas/facturadas?limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          (ctx.filter || "")
+      );
+
+      return promise
+        .then(result => {
+          this.axios.get(this.API + "proformas/facturadas/count").then(res => {
+            this.totalRowsFav = res.data.total;
+          });
+          return result.data;
+        })
+        .catch(() => []);
+    },
+
+    parseVentas(idDocVenta) {
+      if (!idDocVenta) return [];
+      try {
+        const parsed = JSON.parse(idDocVenta);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    },
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
       // this.isBusy = true
@@ -279,7 +395,6 @@ export default {
     },
     eliminarProf(data) {
       this.$swal({
-        target: document.getElementById("conten"),
         title:
           "Se anulará la proforma: <strong>" +
           data.Anio +

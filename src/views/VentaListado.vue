@@ -277,6 +277,16 @@
                 <div class="divCarrito">
                   <b-row class="mt-2 clsCarrito">
                     <b-table striped hover :fields="headerTable" :items="venta.productos" class="tblCarrito">
+                      <template slot="stock" slot-scope="data">
+                        <img
+                          v-if="data.item.EsPadre"
+                          src="static/box.png"
+                          style="width: 24px"
+                        />
+                        <span v-else>
+                          {{ data.item.stock }}
+                        </span>
+                      </template>
                       <template slot="pres" slot-scope="data">
                         <b-button v-if="data.item.tienePresentacion" size="sm" variant="info"
                           @click="showPresentacion(data.item, data.index)" style="margin-top:2px;">
@@ -428,6 +438,10 @@
                     <b-row class="centrado d-flex justify-content-center my-2">
                       <b-button block class="mx-1 btnAction" variant="primary" @click="guardarProforma()"> Crear
                         Proforma</b-button>
+                      <busqueda-modelo
+                        :idAlmacen="venta.almacen.IdAlmacen"
+                        @onAgregarProductos="cargarProductosDeModelo">
+                      </busqueda-modelo>
                       <b-button v-if="mostrarVentaFlag()" block class="mx-1 btnAction" :disabled="inProgress"
                         variant="success" @click="guardarVenta()"> <i class="fas fa-shopping-cart"></i> PAGAR</b-button>
                       <b-button block variant="warning" class="btnAction" @click="anadirVentana()"> Nueva
@@ -876,6 +890,7 @@ Vue.use(VueQuagga);
 // import PagoDeuda from "@/components/PagoDeuda";
 // import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
+import BusquedaModelo from "@/components/BusquedaModelo.vue";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import DeliveryModal from "@/components/DeliveryModal.vue";
@@ -892,6 +907,7 @@ export default {
     PagoDeuda,
     Movimiento,
     PreOrdenLista,
+    BusquedaModelo,
     DeliveryModal,
     ConfigVenta,
     ConfigVenta,
@@ -965,6 +981,7 @@ export default {
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         // { key: "CodigoBarra" },
         { key: "Producto" },
+        { key: "ProductoModelo", label: "Modelo" },
         { key: "Anaquel", class: "d-none d-md-table-cell" },
         { key: "pres", label: "" },
         { key: "Descripcion", label: "Presentacion" },
@@ -1700,6 +1717,7 @@ export default {
           data.CodigoBarra
         }</b></td>
                 <td style="width: 100px">${data.ProductoCategoria}</td>
+                <td style="width: 100px">${data.ProductoModelo}</td>
                 <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
@@ -1852,6 +1870,40 @@ export default {
       this.ventas[this.ventaActiva].tipoVenta = obj;
       this.getNumeroVenta();
     },
+
+    async cargarProductosDeModelo(productos) {
+      for (const item of productos) {
+        const existe = this.ventas[this.ventaActiva].productos
+          .some(v => v.IdProducto == item.IdProducto);
+
+        if (existe) {
+          this.ventas[this.ventaActiva].productos
+            .find(v => v.IdProducto == item.IdProducto).cantidad += parseFloat(item.cantidad);
+          continue;
+        }
+
+        let prod = await this.obtenerStockBuscador(item.IdProducto);
+        let pres = [];
+        if (prod.PreciosPorProducto) {
+          pres = JSON.parse(prod.PreciosPorProducto).filter(v => v.cantidad > 0);
+        }
+        prod.PreciosPorProducto = pres;
+        prod.presentacion      = prod.ProductoPresentacion || 'UNIDAD';
+        prod.ProductoPresentacion = prod.ProductoPresentacion || 'UNIDAD';
+        prod.cantidad          = parseFloat(item.cantidad) || 1;
+        prod.precio            = parseFloat(item.precio)   || prod.PrecioContado;
+        prod.descuento         = parseFloat(item.descuento) || 0;
+        prod.tienePresentacion = pres.some(v => v.cantidad > 0);
+        prod.bloquearInputPrecio = false;
+        prod.CantidadPresentacion = 1;
+        prod.esPresentacion    = false;
+        prod.pres              = '';
+        this.ventas[this.ventaActiva].productos.unshift(prod);
+      }
+      this.metodoPagoCambio(1);
+      this.reaplicarDescuentoVigente();
+    },
+
     async getNumeroVenta() {
       // await setTimeout(() => {
       this.$nextTick(async () => {

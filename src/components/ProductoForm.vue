@@ -83,8 +83,8 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="false">
-              <label>Modelo/Color:</label>
+            <b-form-group>
+              <label>Modelo:</label>
               <b-input-group>
                 <autocomplete
                   :url="API + 'productos/modelos'"
@@ -347,6 +347,8 @@
                 step="0.00001"
                 type="number"
                 class="form-control"
+                :disabled="producto.EsPadre == 1"
+                :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
             </b-form-group>
           </b-col>
@@ -370,6 +372,8 @@
                 step="0.01"
                 class="form-control"
                 @input="actualizarPorcentajeUtilidad"
+                :disabled="producto.EsPadre == 1"
+                :style="producto.EsPadre == 1 ? 'background-color:#e9ecef; cursor:not-allowed;' : ''"
               />
               <!-- <b-form-text v-if="producto.precioContadoNormal">
                 Original - {{ producto.precioContadoNormal | redondear }}
@@ -698,7 +702,7 @@ export default {
             this.producto.IdProducto = newVal.IdProducto;
             this.producto.EsPadre = newVal.EsPadre;
             this.loadAlmacen(1);
-            Vue.nextTick(() => {
+            this.$nextTick(() => {
               if (this.$refs.productoDet)
                 this.$refs.productoDet.show = parseInt(newVal.EsPadre);
             });
@@ -711,7 +715,7 @@ export default {
             this.producto.StockMinimo = newVal.StockMinimo;
             this.producto.StockPorMayor = newVal.StockPorMayor;
             this.producto.CodigoBarra = newVal.CodigoBarra;
-            //this.producto.ProductoModelo        = newVal.ProductoModelo
+            this.producto.ProductoModelo        = newVal.ProductoModelo
             this.producto.ProductoDesc = newVal.ProductoDesc;
             this.producto.ProductoDesc2 = newVal.ProductoDesc2;
             this.producto.ProductoDesc3 = newVal.ProductoDesc3;
@@ -830,15 +834,14 @@ export default {
       let sumatoriaContado = 0;
       prodDetalles.forEach(prod => {
         if (prod.Cantidad) {
-          sumatoriaCosto += prod.PrecioCosto * prod.Cantidad;
-          sumatoriaContado += prod.PrecioContado * prod.Cantidad;
+          sumatoriaCosto   += parseFloat(prod.PrecioCosto   || 0) * parseFloat(prod.Cantidad || 0);
+          sumatoriaContado += parseFloat(prod.PrecioContado || 0) * parseFloat(prod.Cantidad || 0);
         }
       });
-      sumatoriaCosto = this.$options.filters.redondear(sumatoriaCosto);
+      sumatoriaCosto    = this.$options.filters.redondear(sumatoriaCosto);
       sumatoriaContado = this.$options.filters.redondear(sumatoriaContado);
-
-      Vue.set(this.producto, "PrecioCosto", sumatoriaCosto);
-      Vue.set(this.producto, "PrecioContado", sumatoriaContado);
+      Vue.set(this.producto, 'PrecioCosto',    sumatoriaCosto);
+      Vue.set(this.producto, 'PrecioContado',  sumatoriaContado);
       this.actualizarPorcentajeUtilidad();
     },
     /*eliminarProducto (producto) {
@@ -1043,6 +1046,7 @@ export default {
         // Genero: '',
         categoria: {},
         marca: {},
+        ProductoModelo: "",
         // modelo: {},
         //talla: {},
         medicion: {

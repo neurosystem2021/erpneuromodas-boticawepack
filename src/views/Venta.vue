@@ -128,9 +128,13 @@
               <b-row style="position: relative;max-height: 40vh;">
                 <b-table striped hover :fields="headerTable"  :items="venta.productos" width="100%"> 
                   <template slot="stock" slot-scope="data">
-                    <span style="font-weight: bold; font-size: 0.75rem">
+                    <img
+                      v-if="data.item.EsPadre"
+                      src="static/box.png"
+                      style="width: 24px"
+                    />
+                    <span v-else style="font-weight: bold; font-size: 0.75rem">
                       {{ data.item.stock }}
-
                     </span>
                   </template>
                   <template slot="Producto" slot-scope="data">
@@ -352,7 +356,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="manual blur focus" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
@@ -425,7 +429,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="manual blur focus" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -1029,7 +1033,7 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "Producto", thStyle: { width: "53%" } },
+        { key: "Producto", thStyle: { width: "25%" } },
         { key: "pres", label: "", thStyle: { width: "5%" } },
         {
           key: "presentacion",
@@ -1053,7 +1057,7 @@ export default {
           class: "text-center",
           thStyle: { width: "5%" }
         },
-        { key: "acciones", label: "", thStyle: { width: "5%" } }
+        { key: "acciones", label: "", thStyle: { width: "7%" } }
       ],
       ventaSinStock: 0,
       busqueda: "",
@@ -1823,6 +1827,7 @@ export default {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
+      prod.EsPadre = prod.EsPadre || 0;
       prod.cantidad = producto.cantidad ? producto.cantidad : 1;
       prod.precio = producto.precio ? producto.precio : producto.PrecioContado;
       prod.descuento = 0;
@@ -1902,7 +1907,7 @@ export default {
               .IdDocVentaPuntoVenta
           }
         })
-        .then(response => {
+        .then(async response => {
           this.axios
             .get(this.API + "cliente", {
               params: {
@@ -1932,14 +1937,25 @@ export default {
               console.log(error);
             });
 
-          let producto = [];
-          response.data.forEach(element => {
-            console.log(element);
-            producto.push({ ...element, Descripcion: element.Presentacion });
-          });
+          let producto = await Promise.all(
+            response.data.map(async element => {
+              const stockInfo = await this.obtenerStockBuscador(element.IdProducto);
+              return {
+                ...element,
+                Descripcion: element.Presentacion,
+                stock: stockInfo ? stockInfo.stock : 0
+              };
+            })
+          );
+
           this.ventas[this.ventaActiva].NotaIdMotivo = null;
           this.ventas[this.ventaActiva].productos = producto;
           this.$forceUpdate();
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.metodoPagoCambio(1);
+            }, 100);
+          });
         });
     },
     someMethod(text) {
@@ -2295,15 +2311,18 @@ export default {
         this.inProgress = false;
         return;
       }
+      
+      const esNotaCredito = venta.tipoVenta.CodSunat == "07";
+      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+      const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
+      const sinStock = productos.some(v => {
+        if (v.EsPadre == 1) return false;
+        const cantReal = parseFloat(v.cantidad) * (v.CantidadPresentacion ? v.CantidadPresentacion : 1);
+        const stockActual = parseFloat(v.stock) || 0;
+        return cantReal > stockActual;
+      });
 
-      if (
-        productos.some(
-          v =>
-            v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
-            v.stock
-        ) &&
-        this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
-      ) {
+      if (!esNotaCredito && sinStock) {
         this.$toasted.show("No se puede vender un producto sin stock");
         // this.$swal({
         //   position: "center",
@@ -2325,6 +2344,40 @@ export default {
         this.inProgress = false;
         return;
       }
+
+      if (!esNotaCredito) {
+        for (const v of productos) {
+          if (v.EsPadre != 1) continue;
+
+          const resHijos = await this.axios.get(this.API + "productosdet", {
+            params: { idProducto: v.IdProducto }
+          });
+
+          const hijos = resHijos.data;
+          if (!hijos || hijos.length === 0) continue;
+
+          for (const hijo of hijos) {
+            const cantNecesaria = parseFloat(hijo.Cantidad) * parseFloat(v.cantidad);
+
+            const resStockHijo = await this.axios.get(
+              this.API + "productos/puntoventa/stock",
+              { params: { idProductos: [hijo.IdProductoDet], idAlmacen } }
+            );
+
+            const stockHijo = resStockHijo.data && resStockHijo.data[0]
+              ? parseFloat(resStockHijo.data[0].stock) || 0
+              : 0;
+
+            if (cantNecesaria > stockHijo) {
+              this.$toasted.show(
+                `Stock insuficiente: "${hijo.Producto}" necesita ${cantNecesaria} unid. y solo hay ${stockHijo}`
+              );
+              return;
+            }
+          }
+        }
+      }
+
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       venta.puntosAplicados = this.puntosAplicados || 0;
@@ -2630,6 +2683,7 @@ export default {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        prod.EsPadre = prod.EsPadre || 0;
         productos.push(prod);
       });
       // console.log(proforma.productos);

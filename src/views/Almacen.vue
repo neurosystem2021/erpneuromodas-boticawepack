@@ -269,7 +269,8 @@
               :current-page="currentPage">
 
                 <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                  <img v-if="data.item.EsPadre" src="static/box.png" style="width: 24px" />
+                  <div v-else :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
                     {{ getStock(data.item.IdProducto) }}
                   </div>
                 </template>
