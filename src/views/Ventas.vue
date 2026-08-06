@@ -1193,6 +1193,18 @@
         </div>
       </b-modal>
 
+    <button
+      v-if="ultimaVentaId"
+      type="button"
+      class="pos-last-ticket"
+      title="Reimprimir la última venta"
+      aria-label="Reimprimir la última venta"
+      @click="reimprimirUltimaVenta"
+    >
+      <i class="fas fa-receipt"></i>
+      <span>Último ticket</span>
+    </button>
+
   </b-container>
 </template>
 <script>
@@ -1250,6 +1262,7 @@ export default {
         "code_93_reader"
       ],
       inProgress: false,
+      ultimaVentaId: window.localStorage.getItem("ultimaVentaId") || null,
       mostrarNav: true,
       isNota: [],
       itemsMotivoNota: [
@@ -1583,12 +1596,29 @@ beforeDestroy() {
     window.clearInterval(this._barcodeFocusTimer);
   },
   methods: {
-  ...mapActions({
+    ...mapActions({
     aplicarDescuento: 'aplicarDescuentoGeneral',
     limpiarCart: 'limpiarCarrito',
     obtenerStok: 'obtenerStock',
     add:'agregarProducto'
-  }),
+    }),
+    abrirTicket(idVenta) {
+      if (!idVenta) return;
+      const ticketWidth = 460;
+      const ticketHeight = Math.min(760, window.screen.availHeight - 80);
+      const ticketLeft = Math.max(0, window.screenX + (window.outerWidth - ticketWidth) / 2);
+      const ticketTop = Math.max(0, window.screenY + (window.outerHeight - ticketHeight) / 2);
+      const ticketWindow = window.open(
+        "/imprimir/index.php?IdDocVenta=" + encodeURIComponent(idVenta) + "&preview=1&popup=1",
+        "ticket_impresion",
+        "popup=yes,width=" + ticketWidth + ",height=" + ticketHeight + ",left=" + Math.round(ticketLeft) + ",top=" + Math.round(ticketTop) + ",resizable=yes,scrollbars=yes,status=no,location=no,toolbar=no,menubar=no"
+      );
+      if (ticketWindow) ticketWindow.focus();
+      else this.$toasted.error("Permita las ventanas emergentes para imprimir el ticket");
+    },
+    reimprimirUltimaVenta() {
+      this.abrirTicket(this.ultimaVentaId);
+    },
     togglePaymentPopover(index) {
       this.ventaActiva = index;
       this.paymentPopoverIndex = this.paymentPopoverIndex === index ? null : index;
@@ -3124,12 +3154,9 @@ beforeDestroy() {
 
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
-          window.open(
-            "/imprimir/index.php?IdDocVenta=" +
-              response.data.insertId +
-              "&preview=1",
-            "_blank"
-          );
+    this.ultimaVentaId = response.data.insertId;
+    window.localStorage.setItem("ultimaVentaId", String(response.data.insertId));
+    this.abrirTicket(response.data.insertId);
 
           this.$toasted.success("Venta realizada con exito");
           venta.productos.map(pro => {
@@ -3839,6 +3866,66 @@ beforeDestroy() {
 .pagocon .input-group-text {
   font-size: 0.8rem;
   font-weight: bold;
+}
+</style>
+
+<style scoped>
+.pos-last-ticket {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 1040;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0b3d6e, #0796bd);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(4, 52, 91, 0.26);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.pos-last-ticket:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 13px 28px rgba(4, 52, 91, 0.34);
+  filter: brightness(1.06);
+}
+
+.pos-last-ticket:focus {
+  outline: 3px solid rgba(28, 176, 220, 0.28);
+  outline-offset: 2px;
+}
+
+.pos-last-ticket i {
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .pos-last-ticket {
+    left: 10px;
+    bottom: 10px;
+    width: 42px;
+    height: 42px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .pos-last-ticket span {
+    display: none;
+  }
+}
+
+@media print {
+  .pos-last-ticket {
+    display: none !important;
+  }
 }
 </style>
 <style>
