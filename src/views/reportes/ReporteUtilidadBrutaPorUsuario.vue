@@ -10,7 +10,7 @@
         Hasta:
         <input type="date" v-model="fechaFin" class="form-control" />
       </b-col>
-      <b-col cols="3">
+      <b-col cols="2">
         Usuario:
         <b-select
           :options="lstUsuario"
@@ -19,7 +19,12 @@
           v-model="usuarioReg"
         />
       </b-col>
-      <b-col cols="3">
+      <b-col cols="2" class="pt-4">
+        <b-form-checkbox v-model="agrupado" switch>
+          Agrupar por producto
+        </b-form-checkbox>
+      </b-col>
+      <b-col cols="2" class="pt-4">
         <b-button variant="success" @click="getReporteUtilidadPorUsuario()"
           >Generar</b-button
         >
@@ -35,39 +40,42 @@
             <th>Total Venta</th>
             <th>Total Costo</th>
             <th>Utilidad Bruta</th>
+            <th>% Utilidad</th>
           </thead>
           <tbody>
             <tr v-for="(reporte, index) in lstReporte" :key="index">
               <td>{{ reporte.IdProducto }}</td>
               <td>{{ reporte.Producto }}</td>
-              <td>{{ reporte.Cantidad }}</td>
-              <td>{{ reporte.PrecioCosto }}</td>
-              <td>{{ reporte.PrecioVenta }}</td>
-              <td>{{ reporte.TotalVenta }}</td>
-              <td>{{ reporte.TotalCosto }}</td>
               <td>
-                {{
-                  parseFloat(
-                    (100 * (reporte.TotalVenta - reporte.TotalCosto)) /
-                      reporte.TotalCosto
-                  ).toFixed(2)
-                }} %
+                <span v-if="agrupadoAplicado || reporte.Descripcion === 'UNIDAD'">
+                  {{ reporte.Cantidad }}
+                </span>
+                <span v-else>
+                  {{ reporte.CantidadVenta }} ({{ reporte.Cantidad }} unid.)
+                </span>
               </td>
+              <td>{{ parseFloat(reporte.PrecioCosto).toFixed(2) }}</td>
+              <td>{{ parseFloat(reporte.PrecioVenta).toFixed(2) }}</td>
+              <td>{{ parseFloat(reporte.TotalVenta).toFixed(2) }}</td>
+              <td>{{ parseFloat(reporte.TotalCosto).toFixed(2) }}</td>
+              <td>{{ parseFloat(reporte.UtilidadBruta).toFixed(2) }}</td>
+              <td>{{ parseFloat(reporte.PorcentajeUti).toFixed(2) }} %</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="5">Sumatoria</td>
               <td>
-                <strong class="sumTotalVenta">
-                  {{ totalCompras }}
-                </strong>
+                <strong class="sumTotalVenta">{{ totalVentas }}</strong>
               </td>
               <td>
-                <strong class="sumTotalCosto">{{ totalVentas }} </strong>
+                <strong class="sumTotalCosto">{{ totalCompras }}</strong>
               </td>
               <td>
-                <strong class="sumUtilidadBruta"> {{ Porcentaje }} %</strong>
+                <strong class="sumUtilidadBruta">{{ utilidadBruta }}</strong>
+              </td>
+              <td>
+                <strong>{{ Porcentaje }} %</strong>
               </td>
             </tr>
           </tfoot>
@@ -88,8 +96,11 @@ export default {
       fechaFin: "",
       usuarioReg: "",
       lstUsuario: [],
+      agrupado: false,
+      agrupadoAplicado: false, // controla el formato mostrado, solo cambia al Generar
       totalCompras: 0,
       totalVentas: 0,
+      utilidadBruta: 0,
       Porcentaje: 0,
     };
   },
@@ -110,6 +121,7 @@ export default {
           fechaInicio: this.fechaInicio,
           fechaFin: this.fechaFin,
           usuarioReg: this.usuarioReg,
+          agrupado: this.agrupado ? 1 : 0,
         },
       };
       await this.axios
@@ -117,6 +129,7 @@ export default {
         .then((response) => {
           if (response.data) {
             this.lstReporte = response.data;
+            this.agrupadoAplicado = this.agrupado; // recién aquí se refleja el cambio visual
             this.calcularTotales(response.data);
           }
         });
@@ -130,6 +143,7 @@ export default {
       });
       this.totalCompras = parseFloat(totalCompras).toFixed(2);
       this.totalVentas = parseFloat(totalVentas).toFixed(2);
+      this.utilidadBruta = parseFloat(totalVentas - totalCompras).toFixed(2);
       this.Porcentaje = parseFloat(
         (100 * (totalVentas - totalCompras)) / totalCompras
       ).toFixed(2);

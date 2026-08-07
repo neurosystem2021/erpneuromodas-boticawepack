@@ -128,7 +128,7 @@
                   </div>
                 </div>
               </td>
-              <td class="center">{{ getPresentacion(prod) }}</td>
+              <td class="center">{{ prod.Descripcion }}</td>
               <td class="center">{{ prod.ProductoMedicion }}</td>
               <td class="right precio">S/. {{ prod.Precio | moneda }}</td>
               <td class="right precio">
@@ -298,14 +298,14 @@ export default {
       var new_date = moment(actual).add(dias, "days");
       return new_date.format("YYYY-MM-DD");
     },
-    getPresentacion(prod) {
-      if (prod.presentacion) {
-        let presentacion = JSON.parse(prod.presentacion);
-        return presentacion.nombre;
-      } else {
-        return prod.ProductoMedicion;
-      }
-    },
+    // getPresentacion(prod) {
+    //   if (prod.presentacion) {
+    //     let presentacion = JSON.parse(prod.presentacion);
+    //     return presentacion.nombre;
+    //   } else {
+    //     return prod.ProductoMedicion;
+    //   }
+    // },
     getEmpresa() {
       this.axios.get(API + "empresa/id/" + 1).then(res => {
         this.empresa = res.data;

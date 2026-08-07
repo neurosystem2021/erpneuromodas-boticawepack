@@ -1716,7 +1716,8 @@ export default {
       });
     },
     eliminarVentana() {
-      this.mostrarMetodo.splice(this.ventaActiva, 1);
+      this.$delete(this.mostrar, this.ventaActiva);
+      this.$delete(this.mostrarOp, this.ventaActiva);
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -2649,11 +2650,25 @@ export default {
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
     },
-    cargarProforma(proforma) {
+    async cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = { ...this.venta };
+
+      await this.axios
+        .get(this.API + "/usuarios/" + proforma.UsuarioReg)
+        .then(response => {
+          if (response.data) {
+            venta.UsuarioProforma = response.data.Usuario;
+          }
+        });
+
       venta.cliente = proforma;
       venta.vendedor = { Usuario: proforma.UsuarioReg };
+      venta.verCliente = true;
+
+      venta.idProforma = proforma.IdProforma;
+      venta.anioNumeroProforma = proforma.Anio + "-" + proforma.Numero;
+
       let productos = [];
       proforma.productos.forEach(async producto => {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
@@ -2672,9 +2687,8 @@ export default {
         prod.cantidad = 1;
         prod.precio = producto.PrecioContado;
         prod.descuento = 0;
-        prod.tienePresentacion = prod.PreciosPorProducto.some(
-          v => v.cantidad > 0
-        );
+        prod.tienePresentacion = prod.TienePresentacion == 1 && 
+        (prod.PreciosPorProducto || []).some(v => v.cantidad > 0);
         prod.bloquearInputPrecio = false;
         prod.CantidadPresentacion = null;
         prod.ProductoPresentacion = producto.Descripcion;
@@ -2684,6 +2698,29 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         prod.EsPadre = prod.EsPadre || 0;
+
+        if (producto.Presentacion) {
+          try {
+            let presObj =
+              typeof producto.Presentacion === "string"
+                ? JSON.parse(producto.Presentacion)
+                : producto.Presentacion;
+            prod.CantidadPresentacion = presObj.cantidad
+              ? parseFloat(presObj.cantidad)
+              : null;
+            prod.bloquearInputPrecio = true;
+            prod.presentacion = producto.Presentacion;
+          } catch (e) {
+            prod.CantidadPresentacion = null;
+            prod.bloquearInputPrecio = false;
+            prod.presentacion = null;
+          }
+        } else {
+          prod.CantidadPresentacion = null;
+          prod.bloquearInputPrecio = false;
+          prod.presentacion = null;
+        }
+
         productos.push(prod);
       });
       // console.log(proforma.productos);

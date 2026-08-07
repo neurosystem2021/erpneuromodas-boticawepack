@@ -5,21 +5,26 @@
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
         <b-col cols="3">
-            Fecha
+            Fecha Inicio
             <input type="date" class="form-control" v-model="fechaInicio">
         </b-col>
         <b-col cols="3">
-            Fecha
+            Fecha Fin
             <input type="date" class="form-control" v-model="fechaFin">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Almacén
             <b-form-select v-model="almacen" 
                  value-field="IdAlmacen"
                  text-field="Almacen"
                 :options="lstAlmances"></b-form-select>
         </b-col>
-        <b-col cols="3" class="pt-4">
+        <b-col cols="2" class="pt-4">
+            <b-form-checkbox v-model="agrupado" switch>
+                Agrupar por producto
+            </b-form-checkbox>
+        </b-col>
+        <b-col cols="2" class="pt-4">
             <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
@@ -42,7 +47,14 @@
                     <tr v-for="(reporte,index) in lstReporte" :key="index">
                         <td style="text-align: center;">{{reporte.IdProducto}}</td>
                         <td>{{reporte.Producto}}</td>
-                        <td style="text-align: center;">{{reporte.Cantidad}}</td>
+                        <td style="text-align: center;">
+                            <span v-if="agrupadoAplicado || reporte.Descripcion === 'UNIDAD'">
+                                {{reporte.Cantidad}}
+                            </span>
+                            <span v-else>
+                                {{reporte.CantidadVenta}} ({{reporte.Cantidad}} unid.)
+                            </span>
+                        </td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
@@ -58,9 +70,7 @@
                         <td style="text-align: center;">{{ parseFloat(footer.TotalVenta).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(footer.TotalCosto).toFixed(2)}}</td>
                         <td style="text-align: center;">{{ parseFloat(footer.UtilidadBruta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{ parseFloat(
-                          100*(footer.TotalVenta - footer.TotalCosto)/footer.TotalCosto
-                        ).toFixed(2)}}</td>
+                        <td style="text-align: center;">{{ parseFloat(footer.PorcentajeUti).toFixed(2)}}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -87,6 +97,8 @@ export default {
       almacen: 0,
       API: config.API,
       lstReporte: [],
+      agrupado: false,
+      agrupadoAplicado: false,
       items: [
         {
           text: "VENTAS",
@@ -163,7 +175,8 @@ export default {
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
-        almacen: this.almacen
+        almacen: this.almacen,
+        agrupado: this.agrupado ? 1 : 0
       };
       await this.axios(`${this.API}reporte/utilidadbruta/excel`, {
         params: params
@@ -191,7 +204,8 @@ export default {
       let params = {
         fechaInicio: this.fechaInicio,
         fechaFin: this.fechaFin,
-        almacen: this.almacen
+        almacen: this.almacen,
+        agrupado: this.agrupado ? 1 : 0
       };
       await this.axios(`${this.API}reporte/utlidadbruta`, {
         params: params
@@ -199,13 +213,13 @@ export default {
         if (res.data) {
           let data = res.data;
           this.lstReporte = data;
+          this.agrupadoAplicado = this.agrupado;
           let Cantidad = 0;
           let PrecioCosto = 0;
           let PrecioVenta = 0;
           let TotalVenta = 0;
           let TotalCosto = 0;
           let UtilidadBruta = 0;
-          let PorcentajeUti = 0;
           data.forEach(element => {
             Cantidad += element.Cantidad;
             PrecioCosto += element.PrecioCosto;
@@ -213,8 +227,8 @@ export default {
             TotalVenta += element.TotalVenta;
             TotalCosto += element.TotalCosto;
             UtilidadBruta += element.UtilidadBruta;
-            PorcentajeUti += element.PorcentajeUti;
           });
+          let PorcentajeUti = TotalCosto > 0 ? (UtilidadBruta / TotalCosto) * 100 : 0;
           this.footer = {
             Producto: "TOTAL",
             Cantidad: parseFloat(Cantidad).toFixed(2),
