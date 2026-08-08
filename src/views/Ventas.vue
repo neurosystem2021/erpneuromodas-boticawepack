@@ -975,18 +975,25 @@ export default {
     },
     guardarVenta(evt) {
       evt.preventDefault();
+
+      // Evita doble click
+      if (this.inProgress) {
+        return;
+      }
+
+      this.inProgress = true;
+
       if (this.venta.tipoVenta.IdTipoDoc != 3) {
         if (this.productos.some(v => v.NotaVenta == 1)) {
           this.validarEsNota = true;
+          this.inProgress = false; // vuelve a habilitar
         } else {
-          // this.validarEsNota = true;
           this.continuarGuardarVenta();
         }
-        // this.continuarGuardarVenta();
-      } else {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+      } else {
         this.continuarGuardarVenta();
       }
-    },
+  },
     continuarGuardarVenta() {
     if (
       this.venta.tipoVenta.CodSunat !== "07" &&
@@ -1007,7 +1014,6 @@ export default {
     }
 
   this.validarEsNota = false;
-  this.inProgress = true;
   let totalPagos = 0;
   totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
     ? 0
