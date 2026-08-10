@@ -71,7 +71,87 @@
                     </b-btn>
                 </div>
                   </b-tab>
+                  <b-tab title="Proformas Facturadas">
+                    <b-row class="align-items-center mb-2">
+                      <b-col cols="8">
+                        <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFav = 1" />
+                      </b-col>
+                      <b-col cols="4">
+                        <b-input-group prepend="Mostrar">
+                          <b-form-select
+                            v-model="perPageFav"
+                            :options="opcionesPorPagina"
+                            @change="currentPageFav = 1"
+                          />
+                        </b-input-group>
+                      </b-col>
+                    </b-row>
 
+                    <div class="tablaScroll">
+                      <b-table
+                        v-if="show"
+                        id="table-proformas-facturadas"
+                        ref="tableProformasFacturadas"
+                        striped hover
+                        :busy.sync="isBusyFav"
+                        :filter="filterFav"
+                        :items="myProviderFacturadas"
+                        :fields="fieldsFacturadas"
+                        :per-page="perPageFav"
+                        :current-page="currentPageFacturadas">
+
+                        <template slot="ver" slot-scope="data">
+                          <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                        </template>
+
+                        <template slot="Total" slot-scope="data">
+                          <b>{{ data.item.Total | moneda }}</b>
+                        </template>
+
+                        <template slot="verTicket" slot-scope="data">
+                          <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                        </template>
+                        <template slot="Estado" slot-scope="data">
+                          <b-button variant="danger" target="_blank">Facturado</b-button>
+                        </template>
+                        <template slot="Facturado" slot-scope="data">
+                        <template v-if="parseVentas(data.item.IdDocVenta).length">
+                          <b-button
+                            v-for="id in ventasVisibles(data.item)"
+                            :key="id"
+                            :href="'/imprimir/index.php?IdDocVenta=' + id"
+                            variant="info"
+                            size="sm"
+                            class="mr-1 mb-1"
+                            target="_blank"
+                          >
+                            <i class="fas fa-file-invoice"></i> Venta #{{ id }}
+                          </b-button>
+
+                          <b-button
+                            v-if="parseVentas(data.item.IdDocVenta).length > 2"
+                            size="sm"
+                            variant="secondary"
+                            class="mb-1"
+                            @click="toggleExpand(data.item.IdProforma)"
+                          >
+                            <i :class="expandedRows[data.item.IdProforma] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                            {{ expandedRows[data.item.IdProforma]
+                                ? 'Ver menos'
+                                : '+' + (parseVentas(data.item.IdDocVenta).length - 2) + ' más' }}
+                          </b-button>
+                        </template>
+                        <span v-else class="text-muted">Sin comprobante</span>
+                      </template>
+                      </b-table>
+                    </div>
+
+                    <b-pagination
+                      v-model="currentPageFacturadas"
+                      :total-rows="totalRowsFav"
+                      :per-page="perPageFav"
+                    ></b-pagination>
+                  </b-tab>
                   <b-tab title="Proformas Favoritas">
                     <b-input-group prepend="Buscar..." class="mt-2">
                       <input class="form-control" v-model="search" />
@@ -195,7 +275,29 @@ export default {
       currentPageFav: 1,
       totalRows: 50,
       perPage: 5,
-      currentPage: 1
+      currentPage: 1,
+      filterFav: "",
+      perPageFav: 10,
+      currentPageFacturadas: 1,
+      totalRowsFav: 0,
+      isBusyFav: false,
+      opcionesPorPagina: [10, 20, 50, 100],
+      expandedRows: {},
+      fieldsFacturadas: [
+        { key: "ver",           label: "Ver" },
+        { key: "verTicket",     label: "Ticket" },
+        { key: "Facturado",     label: "Comprobantes" },
+        { key: "Estado",        label: "Estado" },
+        { key: "Total",         label: "Total" },
+        { key: "Cliente",       label: "Cliente" },
+        { key: "Descripcion",   label: "Desc." },
+        { key: "IdProforma",    label: "Id" },
+        { key: "Anio",          label: "Año" },
+        { key: "Numero",        label: "Número" },
+        { key: "DniRuc",        label: "Documento" },
+        { key: "FechaReg",      label: "Fecha" },
+        { key: "UsuarioReg",    label: "Empleado" }
+      ]
     };
   },
   props: ["idAlmacen"],
@@ -257,6 +359,53 @@ export default {
           this.$emit("onSelectProforma", proforma);
           this.limpiarCarrito();
         });
+    },
+    myProviderFacturadas(ctx) {
+      let promise = this.axios.get(
+        this.API +
+          "proformas/facturadas?limit=" +
+          ctx.perPage +
+          "&page=" +
+          ctx.currentPage +
+          "&filter=" +
+          encodeURIComponent(ctx.filter || "")
+      );
+
+      return promise
+        .then(result => {
+          // el conteo depende del filtro, así que va aparte (ver punto 2)
+          this.axios
+            .get(this.API + "proformas/facturadas/count", {
+              params: { filter: ctx.filter || "" }
+            })
+            .then(res => {
+              this.totalRowsFav = res.data.total;
+            });
+          return result.data;
+        })
+        .catch(() => {
+          return [];
+        });
+    },
+
+    parseVentas(idDocVenta) {
+      if (!idDocVenta) return [];
+      try {
+        const parsed = JSON.parse(idDocVenta);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    },
+
+    ventasVisibles(item) {
+      const ventas = this.parseVentas(item.IdDocVenta);
+      return this.expandedRows[item.IdProforma] ? ventas : ventas.slice(0, 2);
+    },
+
+    toggleExpand(idProforma) {
+      // this.$set porque expandedRows es un objeto al que le agregas keys dinámicamente (Vue2 no detecta eso solo)
+      this.$set(this.expandedRows, idProforma, !this.expandedRows[idProforma]);
     },
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
