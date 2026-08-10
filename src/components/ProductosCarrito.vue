@@ -1153,6 +1153,9 @@ export default {
       // this.productos[index].nuevoPrecioContado = nuevoPrecio
       // return nuevoPrecio
     },
+    redondearADecimo(valor) {
+      return Math.round(valor * 10) / 10;
+    },
     getSubtotal(index) {
       let subtotal = this.$options.filters.redondear(
         this.productos[index].cantxPrecio * this.productos[index].precio
@@ -1179,11 +1182,20 @@ export default {
       if (this.productos[index].FLETE) {
         total += parseFloat(this.productos[index].FLETE);
       }
+
       if (this.productos[index].TieneIgv) {
         total += parseFloat(this.productos[index].igv);
       }
-      if (this.productos[index].descuento) {
-        total -= parseFloat(this.productos[index].descuento);
+
+      let descuento = parseFloat(this.productos[index].descuento || 0);
+
+      descuento = this.redondearADecimo(descuento);
+
+      Vue.set(this.productos[index], "descuento", descuento);
+
+      // Solo cambia estas líneas
+      if (descuento > 0) {
+        total -= descuento;
       }
 
       if (total <= 0) {
@@ -1193,7 +1205,7 @@ export default {
 
       total = this.$options.filters.redondear(total);
       Vue.set(this.productos[index], "total", total);
-      // this.productos[index].total = total
+
       return total;
     },
     getData(value) {
