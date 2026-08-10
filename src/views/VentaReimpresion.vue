@@ -61,6 +61,9 @@
                   <b-button class="action-button whatsapp-button" @click="enviarWhatsApp(data.item)">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                   </b-button>
+                  <b-button class="action-button email-button" @click="enviarCorreo(data.item)">
+                    <i class="fas fa-envelope"></i> Correo
+                  </b-button>
                   <b-button class="action-button guide-button" @click="irGuiaRemision(data.item)">
                     <i class="fas fa-truck"></i> GUÍA REMISIÓN
                   </b-button>
@@ -122,13 +125,22 @@ export default {
       return this.API + "descargarxml/" + item.idDocVenta;
     },
     async enviarWhatsApp(item) {
+      const telefonoCliente = String(item.Telefono || "")
+        .replace(/\D/g, "")
+        .replace(/^51(?=9\d{8}$)/, "");
       const resultado = await this.$swal({
         title: "Enviar comprobante por WhatsApp",
-        text: "Ingresa el celular del cliente",
+        text: "Ingresa o confirma el celular del cliente",
         input: "text",
         inputPlaceholder: "Ejemplo: 987654321",
+        inputValue: telefonoCliente,
+        inputAttributes: {
+          inputmode: "numeric",
+          maxlength: 12,
+          autocomplete: "tel"
+        },
         showCancelButton: true,
-        confirmButtonText: "Enviar",
+        confirmButtonText: "Abrir WhatsApp",
         cancelButtonText: "Cancelar",
         inputValidator: value => {
           const telefono = String(value || "").replace(/\D/g, "");
@@ -154,8 +166,41 @@ export default {
         enlacePdf;
       window.open(
         "https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje),
-        "_blank"
+        "_blank",
+        "noopener"
       );
+    },
+    async enviarCorreo(item) {
+      const resultado = await this.$swal({
+        title: "Enviar comprobante por correo",
+        text: "Ingresa o confirma el correo del cliente",
+        input: "email",
+        inputValue: item.Email || "",
+        inputPlaceholder: "cliente@correo.com",
+        showCancelButton: true,
+        confirmButtonText: "Enviar PDF",
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: email => {
+          return this.axios
+            .post(this.API + "correo/comprobante", {
+              idDocVenta: item.idDocVenta,
+              email: email
+            })
+            .then(response => response.data)
+            .catch(error => {
+              const mensaje = error.response && error.response.data && error.response.data.error
+                ? error.response.data.error
+                : "No se pudo enviar el comprobante";
+              this.$swal.showValidationMessage(mensaje);
+            });
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      });
+
+      if (resultado.value) {
+        this.$swal("Enviado", "El comprobante fue enviado por correo.", "success");
+      }
     },
     rowClick(item, index) {
       this.productoSelect = item;
@@ -201,8 +246,7 @@ export default {
         });
     },
     irGuiaRemision(item) {
-      console.log(item);
-      this.$router.push({
+      const ruta = this.$router.resolve({
         name: "RemisionVer",
         params: {
           idDocVenta: item.idDocVenta,
@@ -210,6 +254,7 @@ export default {
           Numero: item.Numero
         }
       });
+      window.open(ruta.href, "_blank", "noopener");
     }
   },
   components: {}
@@ -272,7 +317,7 @@ export default {
 
 .document-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   min-width: 560px;
 }
@@ -297,6 +342,7 @@ export default {
 .pdf-button { background: linear-gradient(135deg, #d93649, #ef5562); }
 .xml-button { background: linear-gradient(135deg, #dc8c08, #f3a91e); }
 .whatsapp-button { background: linear-gradient(135deg, #1aa957, #25d366); }
+.email-button { background: linear-gradient(135deg, #147fc0, #24a5d8); }
 .guide-button { background: linear-gradient(135deg, #0787b1, #13a7c5); }
 
 @media (max-width: 767px) {

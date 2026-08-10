@@ -1295,6 +1295,80 @@
   font-size: 12px;
 }
 
+.product-form-image-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.product-form-image-slot {
+  position: relative;
+  min-width: 0;
+  padding: 7px;
+  border: 1px dashed #9ecbe4;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #f5fbff, #edf8fd);
+  text-align: center;
+}
+
+.product-form-image-preview {
+  position: relative;
+  display: grid;
+  height: 82px;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 11px;
+  color: #1592c5;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #d7e8f2;
+}
+
+.product-form-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-form-image-preview span i { font-size: 24px; }
+.product-form-image-preview b {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #6d3de1, #16a9d4);
+  font-size: 10px;
+}
+
+.product-form-image-select {
+  display: block;
+  margin: 7px 0 0 !important;
+  padding: 6px 4px;
+  border-radius: 9px;
+  color: #fff !important;
+  background: linear-gradient(135deg, #087eb5, #11a9d5);
+  cursor: pointer;
+}
+
+.product-form-image-slot input[type=file] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.product-form-image-help {
+  display: block;
+  margin-top: 7px;
+  color: #698096;
+  font-weight: 650;
+}
+
 .product-form-modal .product-form-footer {
   position: relative;
   min-height: 76px;
@@ -6044,24 +6118,32 @@ body.modal-open .pos-modern.pos-modern .trDetails {
 
 .pos-modern.pos-modern .pos-row-actions {
   display: flex;
-  min-width: 86px;
+  min-width: 68px;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 5px;
 }
 
 .pos-modern.pos-modern .pos-row-actions .btn {
   display: inline-flex;
-  width: 40px;
-  height: 40px;
+  width: 31px;
+  height: 31px;
+  min-width: 31px;
+  min-height: 31px;
   padding: 0;
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(255,255,255,.34);
-  border-radius: 50% !important;
+  border-radius: 9px !important;
   color: #fff;
-  box-shadow: 0 7px 14px rgba(15,35,65,.16),inset 0 1px 0 rgba(255,255,255,.26);
+  box-shadow: 0 4px 9px rgba(15,35,65,.16),inset 0 1px 0 rgba(255,255,255,.26);
   transition: transform .16s ease,box-shadow .16s ease,filter .16s ease;
+}
+
+.pos-modern.pos-modern .pos-row-actions .btn i {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .pos-modern.pos-modern .pos-row-delete {

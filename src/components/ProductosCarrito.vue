@@ -99,12 +99,15 @@
       </div>
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
-        <div class="d-block text-center">
-          <h3 style="text-decoration: underline;">{{productoNombre}}</h3>
-        </div>
-        <b-row style="display:flex; justify-content:center; align-items:center">
+        <div class="pos-image-gallery-title"><i class="fas fa-images"></i><h3>{{productoNombre}}</h3></div>
+        <div class="pos-image-gallery-stage">
+          <button v-if="productoUrls.length > 1" type="button" @click="cambiarImagen(-1)"><i class="fas fa-chevron-left"></i></button>
           <b-img :src="productoUrl" class="imagenGrande"></b-img>
-        </b-row>
+          <button v-if="productoUrls.length > 1" type="button" @click="cambiarImagen(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="pos-image-gallery-thumbs" v-if="productoUrls.length > 1">
+          <button v-for="(url, imageIndex) in productoUrls" :key="url" type="button" :class="{active:imageIndex===productoImagenActiva}" @click="seleccionarImagen(imageIndex)"><b-img :src="url"></b-img></button>
+        </div>
       </b-modal>
 
       <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
@@ -124,7 +127,7 @@
       <b-table class="inventory-cart-table" small responsive hover :items="productos" :fields="fields" ref="tablaCarrito">
         <template slot="eventPres" slot-scope="data">
           <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
-          <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+          <b-button @click="abrirImagen(productos[data.index])" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
           <b-popover  placement="right" :target="'popover-imagen' + productos[data.index].IdProducto" :title="productos[data.index].Producto" triggers="hover">
             <div style="text-align:center">
               <b-img style="border-radius: 10px; width:200px" fluid :src="productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen" alt="" @error="setAltImg" ></b-img>	
@@ -347,6 +350,8 @@ export default {
       productoSelect: {},
       productoNombre: "",
       productoUrl: "",
+      productoUrls: [],
+      productoImagenActiva: 0,
       modalAbiertCode: false
     };
   },
@@ -520,9 +525,20 @@ export default {
         inputElement.dispatchEvent(event);
       }, 100);
     },
-    abrirImagen(producto, url) {
-      this.productoNombre = producto;
-      this.productoUrl = url;
+    seleccionarImagen(index) {
+      this.productoImagenActiva = (index + this.productoUrls.length) % this.productoUrls.length;
+      this.productoUrl = this.productoUrls[this.productoImagenActiva];
+    },
+    cambiarImagen(delta) {
+      this.seleccionarImagen(this.productoImagenActiva + delta);
+    },
+    abrirImagen(producto) {
+      this.productoNombre = producto.Producto;
+      this.productoUrls = [producto.Imagen, producto.Imagen2, producto.Imagen3]
+        .filter(Boolean)
+        .map(imagen => "/resources/images/productos/" + encodeURIComponent(imagen));
+      if (!this.productoUrls.length) this.productoUrls = ["static/no-photo.png"];
+      this.seleccionarImagen(0);
       this.$refs["modalImagen"].show();
     },
     abrirCodigoBarra() {

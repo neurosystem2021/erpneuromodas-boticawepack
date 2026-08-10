@@ -410,7 +410,7 @@
                     </div>
                   </div>
                   <div class="card-footer">
-                    <b-button :disabled="lstAplicado.length==0" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
+                    <b-button :disabled="!puedeGuardarMovimiento" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
                     <b-button variant="warning">Cancelar</b-button>
                   </div>
               </b-col>
@@ -738,6 +738,14 @@ export default {
       });
     },
     async GuardarMovimiento() {
+      if (!this.puedeGuardarMovimiento) {
+        this.$swal({
+          icon: "warning",
+          title: "Datos incompletos",
+          text: "Seleccione una cuenta y complete la fecha, el concepto y el importe."
+        });
+        return;
+      }
       let data = {
         IdTipoCajaBanco: this.IdTipoCajaBanco,
         IdCuenta: this.IdCuenta,
@@ -750,10 +758,33 @@ export default {
         IdProveedor: this.Proveedor ? this.Proveedor.IdProveedor : null,
         User: sessionStorage.getItem("User")
       };
-      await this.axios.post(`${this.API}movimiento/guardarMovimiento`, data);
-      this.cargarOperaciones();
-      this.modalRegistro = false;
-      this.limpiarLuegoPago();
+      try {
+        const res = await this.axios.post(
+          `${this.API}movimiento/guardarMovimiento`,
+          data
+        );
+        if (!res.data) {
+          throw new Error("No se recibió la confirmación del movimiento.");
+        }
+        await this.cargarOperaciones();
+        this.modalRegistro = false;
+        this.limpiarLuegoPago();
+        this.$swal({
+          icon: "success",
+          title: "Movimiento registrado",
+          text: "La operación de caja/banco se guardó correctamente."
+        });
+      } catch (error) {
+        this.$swal({
+          icon: "error",
+          title: "No se pudo guardar",
+          text:
+            (error.response && error.response.data &&
+              (error.response.data.error || error.response.data[0])) ||
+            error.message ||
+            "Revise los datos e inténtelo nuevamente."
+        });
+      }
     },
     limpiarLuegoPago() {
       this.bloquearAplicar = false;
@@ -989,6 +1020,23 @@ export default {
     }
   },
   computed: {
+    puedeGuardarMovimiento() {
+      const datosCompletos =
+        !!this.IdCuenta &&
+        !!this.IdTipoCajaBanco &&
+        !!this.FechaDoc &&
+        !!String(this.Concepto || "").trim() &&
+        parseFloat(this.Importe) > 0;
+
+      if (!datosCompletos) return false;
+
+      // Pago a proveedor y pago de cliente requieren un documento aplicado.
+      // Los vales de egreso/ingreso son movimientos directos y no lo requieren.
+      const requiereDocumento =
+        String(this.IdTipoCajaBanco) === "1" ||
+        String(this.IdTipoCajaBanco) === "2";
+      return !requiereDocumento || this.lstAplicado.length > 0;
+    },
     mostrarProveedor() {
       if (this.IdTipoCajaBanco) {
         return this.lstTipoOpe.some(

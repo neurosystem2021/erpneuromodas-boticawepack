@@ -1,12 +1,18 @@
 <template>
   <b-container fluid class="ancho px-0 py-0 pos-modern" id="conten">
-    <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
-      <div class="d-block text-center">
-        <h3 style="text-decoration: underline;">{{ productoNombre }}</h3>
-      </div>
-      <b-row style="display:flex; justify-content:center; align-items:center">
+    <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header modal-class="pos-image-gallery-modal">
+      <div class="pos-image-gallery-title"><i class="fas fa-images"></i><h3>{{ productoNombre }}</h3></div>
+      <div class="pos-image-gallery-stage">
+        <button v-if="productoUrls.length > 1" type="button" @click="cambiarImagen(-1)" aria-label="Imagen anterior"><i class="fas fa-chevron-left"></i></button>
         <b-img :src="productoUrl" class="imagenGrande"></b-img>
-      </b-row>
+        <button v-if="productoUrls.length > 1" type="button" @click="cambiarImagen(1)" aria-label="Imagen siguiente"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div class="pos-image-gallery-thumbs" v-if="productoUrls.length > 1">
+        <button v-for="(url, imageIndex) in productoUrls" :key="url" type="button"
+          :class="{ active: imageIndex === productoImagenActiva }" @click="seleccionarImagen(imageIndex)">
+          <b-img :src="url"></b-img>
+        </button>
+      </div>
     </b-modal>
     <b-row id="header">
       <b-col cols="12" class="py-0 mt-0">
@@ -279,7 +285,7 @@
                             <i class="fas fa-list"></i>
                           </b-button>
                           <b-button
-                            @click="abrirImagen(data.item.Producto, data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen)"
+                            @click="abrirImagen(data.item)"
                             class="pos-product-image-button" :id="'popover-imagen' + data.index.IdProducto" variant="success"
                             size="sm"><i class="fas fa-image"></i></b-button>
                         </div>
@@ -1193,6 +1199,18 @@
         </div>
       </b-modal>
 
+    <b-modal ref="modalDocumentosVenta" id="modalDocumentosVenta" size="xl" hide-footer centered
+      title="Comprobantes emitidos" modal-class="pos-documents-modal" dialog-class="pos-documents-dialog">
+      <iframe class="pos-documents-frame"
+        src="/nuevo/reimpresion-documentos.html?v=20260806-pos-modal-1#/reimpresion"
+        title="Listado de comprobantes emitidos" frameborder="0"></iframe>
+    </b-modal>
+
+    <div class="pos-floating-documents">
+    <button type="button" class="pos-documents-button" title="Ver comprobantes y reimpresiones"
+      aria-label="Abrir reimpresiÃ³n y envÃ­o de comprobantes" @click="$refs.modalDocumentosVenta.show()">
+      <i class="fas fa-file-invoice"></i>
+    </button>
     <button
       v-if="ultimaVentaId"
       type="button"
@@ -1204,6 +1222,7 @@
       <i class="fas fa-receipt"></i>
       <span>Último ticket</span>
     </button>
+    </div>
 
   </b-container>
 </template>
@@ -1280,6 +1299,8 @@ export default {
       ],
       productoNombre: "",
       productoUrl: "",
+      productoUrls: [],
+      productoImagenActiva: 0,
       isVentas: true,
       initValueCliente: "00000000 CLIENTE VARIOS",
       touchHab: true,
@@ -3779,9 +3800,24 @@ beforeDestroy() {
         // this.venta.DireccionEntrega = obj.Direccion;
       }
     },
-    abrirImagen(producto, url) {
-      this.productoNombre = producto;
-      this.productoUrl = url;
+    imagenesProducto(producto) {
+      return [producto.Imagen, producto.Imagen2, producto.Imagen3]
+        .filter(Boolean)
+        .map(imagen => "/resources/images/productos/" + encodeURIComponent(imagen));
+    },
+    seleccionarImagen(index) {
+      if (!this.productoUrls.length) return;
+      this.productoImagenActiva = (index + this.productoUrls.length) % this.productoUrls.length;
+      this.productoUrl = this.productoUrls[this.productoImagenActiva];
+    },
+    cambiarImagen(delta) {
+      this.seleccionarImagen(this.productoImagenActiva + delta);
+    },
+    abrirImagen(producto) {
+      this.productoNombre = producto.Producto;
+      this.productoUrls = this.imagenesProducto(producto);
+      if (!this.productoUrls.length) this.productoUrls = ["static/no-photo.png"];
+      this.seleccionarImagen(0);
       this.$refs["modalImagen"].show();
     }
   },
@@ -3870,18 +3906,26 @@ beforeDestroy() {
 </style>
 
 <style scoped>
-.pos-last-ticket {
+.pos-floating-documents {
   position: fixed;
   left: 18px;
   bottom: 18px;
   z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pos-documents-button,
+.pos-last-ticket {
   display: inline-flex;
+  width: 42px;
+  height: 42px;
   align-items: center;
-  gap: 7px;
-  min-height: 40px;
-  padding: 0 14px;
+  justify-content: center;
+  padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 999px;
+  border-radius: 50%;
   background: linear-gradient(135deg, #0b3d6e, #0796bd);
   color: #fff;
   box-shadow: 0 10px 24px rgba(4, 52, 91, 0.26);
@@ -3892,41 +3936,67 @@ beforeDestroy() {
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
+.pos-documents-button {
+  background: linear-gradient(135deg, #087f5b, #13b981);
+  box-shadow: 0 10px 24px rgba(5, 125, 86, 0.28);
+}
+
+.pos-last-ticket {
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, #1688f0, #075dcc) !important;
+  box-shadow: 0 8px 20px rgba(7, 93, 204, 0.42), 0 0 0 3px rgba(22, 136, 240, 0.16);
+}
+
+.pos-last-ticket i {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.pos-documents-button span,
+.pos-last-ticket span { display: none; }
+
+.pos-documents-button:hover,
 .pos-last-ticket:hover {
   transform: translateY(-2px);
   box-shadow: 0 13px 28px rgba(4, 52, 91, 0.34);
   filter: brightness(1.06);
 }
 
+.pos-documents-button:focus,
 .pos-last-ticket:focus {
   outline: 3px solid rgba(28, 176, 220, 0.28);
   outline-offset: 2px;
 }
 
+.pos-documents-button i,
 .pos-last-ticket i {
   font-size: 14px;
 }
 
 @media (max-width: 767px) {
-  .pos-last-ticket {
+  .pos-floating-documents {
     left: 10px;
     bottom: 10px;
-    width: 42px;
-    height: 42px;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .pos-last-ticket span {
-    display: none;
   }
 }
 
 @media print {
+  .pos-floating-documents,
+  .pos-documents-button,
   .pos-last-ticket {
     display: none !important;
   }
 }
+</style>
+<style>
+.pos-documents-dialog { width:calc(100% - 36px);max-width:1510px!important;margin:18px auto; }
+.pos-documents-modal .modal-content { overflow:hidden;border:0;border-radius:20px; }
+.pos-documents-modal .modal-body { padding:0;background:#eef5fa; }
+.pos-documents-heading { display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f5faff;color:#173b60; }
+.pos-documents-heading__icon { display:grid;width:36px;height:36px;place-items:center;border-radius:10px;color:#078b62;background:#dff7ec; }
+.pos-documents-heading strong,.pos-documents-heading small { display:block; }
+.pos-documents-heading small { color:#60758b;font-size:12px; }
+.pos-documents-frame { display:block;width:100%;height:calc(100vh - 125px);min-height:620px;border:0; }
 </style>
 <style>
 /* Header sizing correction: prevent Bootstrap columns from collapsing inside CSS Grid. */
@@ -6814,4 +6884,15 @@ canvas {
     flex: 1;
   }
 }
+
+.pos-image-gallery-title { display:flex;align-items:center;gap:10px;padding:4px 4px 12px;color:#12375f; }
+.pos-image-gallery-title i { display:grid;width:38px;height:38px;place-items:center;border-radius:12px;color:#fff;background:linear-gradient(135deg,#6d3de1,#12a8d2); }
+.pos-image-gallery-title h3 { margin:0;font-size:1.1rem;font-weight:900;text-transform:uppercase; }
+.pos-image-gallery-stage { display:grid;grid-template-columns:46px minmax(0,1fr) 46px;align-items:center;gap:8px;min-height:360px;padding:10px;border-radius:18px;background:radial-gradient(circle,#fff,#edf6fc); }
+.pos-image-gallery-stage > button { display:grid;width:42px;height:42px;padding:0;place-items:center;border:0;border-radius:50%;color:#fff;background:linear-gradient(135deg,#123c70,#0d94c5);box-shadow:0 7px 16px rgba(8,62,111,.24); }
+.pos-image-gallery-stage .imagenGrande { max-width:100%;max-height:62vh;margin:auto;object-fit:contain; }
+.pos-image-gallery-thumbs { display:flex;padding:12px 0 2px;justify-content:center;gap:9px; }
+.pos-image-gallery-thumbs button { width:62px;height:62px;padding:3px;overflow:hidden;border:2px solid transparent;border-radius:12px;background:#eaf3f9; }
+.pos-image-gallery-thumbs button.active { border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.14); }
+.pos-image-gallery-thumbs img { width:100%;height:100%;border-radius:8px;object-fit:cover; }
 </style>

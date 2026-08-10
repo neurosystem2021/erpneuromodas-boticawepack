@@ -75,6 +75,16 @@
               :value="producto.Producto"
               ></b-form-input>
           </b-form-group>
+          <b-form-group>
+            <label>Descripción corta:</label>
+            <b-form-input v-model="producto.ProductoDescCorto" maxlength="255"
+              placeholder="Resumen visible en el listado y punto de venta"></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Descripción detallada:</label>
+            <b-form-textarea v-model="producto.ProductoDesc" :rows="3" :max-rows="5"
+              placeholder="Material, características, uso, contenido u otros detalles"></b-form-textarea>
+          </b-form-group>
           
           <b-form-group>
             <label>Anaquel:</label>
@@ -250,12 +260,23 @@
               />
           </b-form-group>
 
-          <b-form-group v-if="true" class="product-form-image-field">
-            <label>Imagen:</label>
-            <div class="product-form-image-upload">
-              <b-img :src="'/resources/images/productos/' + producto.Imagen" fluid alt=""></b-img>
-              <input type="file" id="file" ref="file" @change="handleFileUpload()"/>
+          <b-form-group class="product-form-image-field">
+            <label>Galería del producto <small>(hasta 3 imágenes)</small>:</label>
+            <div class="product-form-image-gallery">
+              <div v-for="slot in 3" :key="slot" class="product-form-image-slot">
+                <div class="product-form-image-preview">
+                  <b-img v-if="imagePreview(slot)" :src="imagePreview(slot)" :alt="'Imagen ' + slot"></b-img>
+                  <span v-else><i class="fas fa-camera"></i></span>
+                  <b>{{ slot }}</b>
+                </div>
+                <label :for="'product-image-' + slot" class="product-form-image-select">
+                  <i class="fas fa-upload"></i> {{ imagePreview(slot) ? 'Cambiar' : 'Subir' }}
+                </label>
+                <input :id="'product-image-' + slot" type="file" accept="image/jpeg,image/png,image/gif,image/webp"
+                  @change="handleFileUpload($event, slot)" />
+              </div>
             </div>
+            <small class="product-form-image-help">La imagen 1 será la portada. Las tres se podrán ampliar en los puntos de venta.</small>
           </b-form-group>
           
         </b-col>
@@ -444,7 +465,8 @@ export default {
       productosDet: [],
       precioLiquidacion: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
-      file: "",
+      files: [null, null, null],
+      imagePreviews: [null, null, null],
       manterproducto: {
         default: false,
         type: Boolean
@@ -518,6 +540,8 @@ export default {
         this.producto.Producto = newVal.Producto.split("-")
           .slice(0, -1)
           .join();
+        this.producto.ProductoDesc = newVal.ProductoDesc || "";
+        this.producto.ProductoDescCorto = newVal.ProductoDescCorto || "";
         this.producto.IdProducto = newVal.IdProducto;
         this.producto.Genero = newVal.Genero;
         this.producto.Botapie = newVal.Botapie;
@@ -533,6 +557,10 @@ export default {
         this.producto.PrecioContado = newVal.PrecioContado;
         this.TienePresentacion = Boolean(newVal.TienePresentacion);
         this.producto.Imagen = newVal.Imagen;
+        this.producto.Imagen2 = newVal.Imagen2;
+        this.producto.Imagen3 = newVal.Imagen3;
+        this.files = [null, null, null];
+        this.imagePreviews = [null, null, null];
         this.producto.PorcentajeLiquidacion = newVal.PorcentajeLiquidacion;
         this.actualizarLiquidacion();
         if (newVal.PreciosPorProducto) {
@@ -592,8 +620,43 @@ export default {
           });
       }
     },
-    handleFileUpload() {
-      this.file = this.$refs.file.files[0];
+    imagePreview(slot) {
+      const preview = this.imagePreviews[slot - 1];
+      if (preview) return preview;
+      const field = slot === 1 ? "Imagen" : `Imagen${slot}`;
+      return this.producto[field]
+        ? `/resources/images/productos/${encodeURIComponent(this.producto[field])}`
+        : "";
+    },
+    handleFileUpload(event, slot) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!/^image\/(jpeg|png|gif|webp)$/i.test(file.type)) {
+        this.$toasted.show("Seleccione una imagen JPG, PNG, GIF o WEBP.");
+        event.target.value = "";
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        this.$toasted.show("Cada imagen debe pesar menos de 8 MB.");
+        event.target.value = "";
+        return;
+      }
+      this.$set(this.files, slot - 1, file);
+      this.$set(this.imagePreviews, slot - 1, URL.createObjectURL(file));
+    },
+    uploadProductImages(idProducto) {
+      const uploads = this.files.map((file, index) => {
+        if (!file) return Promise.resolve();
+        const formData = new FormData();
+        formData.append("imagen", file);
+        return this.axios({
+          method: "post",
+          url: `${this.API}producto/imagen/${idProducto}/${index + 1}`,
+          data: formData,
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      });
+      return Promise.all(uploads);
     },
     eliminaId() {
       delete this.producto.IdProducto;
@@ -661,6 +724,8 @@ export default {
       this.initForm();
     },
     initForm() {
+      this.files = [null, null, null];
+      this.imagePreviews = [null, null, null];
       this.producto = {
         Anulado: 0,
         IdProductoMarca: null,
@@ -670,6 +735,8 @@ export default {
         IdProductoBotapie: null,
         IdProductoTalla: "",
         Producto: "",
+        ProductoDesc: "",
+        ProductoDescCorto: "",
         CodigoBarra: "",
         CodeBarModelo: "",
         Color: "",
@@ -684,6 +751,8 @@ export default {
         categoria: {},
         marca: {},
         Imagen: null,
+        Imagen2: null,
+        Imagen3: null,
         precios: [
           { nombre: "PRECIO 1", cantidad: 0, precio: 0, precioc: 0 },
           { nombre: "PRECIO 2", cantidad: 0, precio: 0, precioc: 0 },
@@ -745,7 +814,7 @@ export default {
           ...this.producto,
           PreciosPorProducto: this.producto.precios
         })
-        .then(response => {
+        .then(async response => {
           this.$emit("productoactualizado", response.data.insertId);
           if (this.cbGuardar) {
             this.cbGuardar(response.data.insertId);
@@ -753,24 +822,13 @@ export default {
           if (response.data.error) {
             this.$toasted.show(response.data.error);
           } else {
+            await this.uploadProductImages(response.data.insertId);
             this.$toasted.success("Producto guardado correctamente");
             // this.initForm()
             //this.producto.talla = {}
             //this.$refs.inputTalla.setValue('')
             this.$refs.productoForm.hide();
           }
-
-          //INSERTANDO IMAGEN
-          let formData = new FormData();
-          formData.append("imagen", this.file);
-          this.axios({
-            method: "post",
-            url: this.API + "producto/imagen/" + response.data.insertId,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" }
-          }).then(res => {
-            // console.log(res);
-          });
 
           this.$refs.productoForm.hide();
         })
