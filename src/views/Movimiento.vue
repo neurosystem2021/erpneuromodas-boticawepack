@@ -68,7 +68,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue="PRINCIPAL-1"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -86,7 +86,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue="PRINCIPAL-1"
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -217,6 +217,19 @@ import config from '@/store/config.js'
 
 export default {
   mounted () {
+  this.axios.get(this.API + 'almacenes', {
+      params: {
+        q: 'PRINCIPAL-1'
+      }
+    }).then((res) => {
+      if (res.data.length) {
+        this.movimiento.almacenDestino = res.data[0];
+        this.movimiento.almacenOrigen = res.data[0];
+
+        this.$refs.inputAlmacenDestino.setValue(res.data[0].Almacen);
+        this.$refs.inputAlmacenOrigen.setValue(res.data[0].Almacen);
+      }
+    });
   },
   data () {
     return {
@@ -296,16 +309,16 @@ return false
     setTipoMovimiento (obj) {
       if (obj.Tipo == 0) {
         this.movimiento.almacenOrigen = { IdAlmacen: -1 }
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-      }else if (obj.Tipo == 1) {
+        this.movimiento.almacenDestino = { IdAlmacen: 3 }
+      } else if (obj.Tipo == 1) {
         this.movimiento.almacenDestino = { IdAlmacen: -1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
-      }else {
-        this.movimiento.almacenDestino = { IdAlmacen: 1 }
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 }
+        this.movimiento.almacenOrigen = { IdAlmacen: 3 }
+      } else {
+        this.movimiento.almacenDestino = { IdAlmacen: 3 }
+        this.movimiento.almacenOrigen = { IdAlmacen: 3 }
       }
-      this.movimiento.movimientoTipo = obj
 
+      this.movimiento.movimientoTipo = obj
       this.cargarNumero()
     },
     setProveedor (obj) {
