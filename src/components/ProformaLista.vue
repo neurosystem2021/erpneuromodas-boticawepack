@@ -1,134 +1,170 @@
 <template>
-    <div>
-        <b-button @click="show=true" variant="primary" size="sm" class="btnAction">Ver Proformas</b-button>
-        
-        <b-form ref="formProformaModal" >    
-            
+  <div>
+    <b-button @click="show = true" variant="primary" size="sm" class="btnAction">Ver Proformas</b-button>
 
-            <b-modal id="modalProformas" 
-                title="Buscar Proforma"
-                class="mdlProforma"
-                v-model="show"
-                size="xl"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">     
-                <b-tabs pills card>
-                  <b-tab title="Proformas" active>
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <div class="table-responsive table-proforma-scroll">
-                      <b-table 
-                          :key="tableKey"
-                          v-if="show"
-                          id="table-proformas" 
-                          ref="tableProformas"
-                          striped hover 
-                          :busy.sync="isBusy" 
-                          :filter="filter"
-                          :items="myProvider" 
-                          :fields="fields"
-                          :per-page="100"
-                          :current-page="currentPage">
+    <b-form ref="formProformaModal">
 
-                        <template slot="EsFavoritoFlag" slot-scope="data">
-                          <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
-                          <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
-                        </template>
-                        <template slot="update" slot-scope="data">
-                          <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
-                        </template>
 
-                        <template slot="ver" slot-scope="data">
-                          <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
-                        </template>
+      <b-modal id="modalProformas" title="Buscar Proforma" class="mdlProforma" v-model="show" size="xl"
+        header-bg-variant="dark" headerTextVariant="light" body-bg-variant="light" body-text-variant="dark">
+        <b-tabs pills card>
+          <b-tab title="Proformas" active>
+            <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+            <div class="table-responsive table-proforma-scroll">
+              <b-table :key="tableKey" v-if="show" id="table-proformas" ref="tableProformas" striped hover
+                :busy.sync="isBusy" :filter="filter" :items="myProvider" :fields="fields" :per-page="100"
+                :current-page="currentPage">
 
-                        <template slot="Total" slot-scope="data">
-                          <b>{{ data.item.Total | moneda }}</b>
-                        </template>
+                <template slot="EsFavoritoFlag" slot-scope="data">
+                  <i @click="cambiarFavorito(data.item, 0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;"
+                    aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
+                  <i @click="cambiarFavorito(data.item, 1)" class="far fa-star" style="cursor: pointer;"
+                    aria-hidden="true" v-else></i>
+                </template>
+                <template slot="update" slot-scope="data">
+                  <b-button @click="selectProformas(data.item)" variant="success"><i
+                      class="fas fa-pencil-alt"></i></b-button>
+                </template>
 
-                        <template slot="Anular" slot-scope="data">
-                          <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
-                        </template>
+                <template slot="ver" slot-scope="data">
+                  <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver</b-button>
+                </template>
 
-                        <template slot="verTicket" slot-scope="data">
-                          <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
-                        </template>
+                <template slot="Total" slot-scope="data">
+                  <b>{{ data.item.Total | moneda }}</b>
+                </template>
 
-                      </b-table>
-                    </div>
-                    <b-row>
-                    <b-col md="6" class="my-1">
-                        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                    </b-col>
-                    </b-row>
-                <div slot="modal-footer" >
-                    <!--<b-btn size="sm" variant="success" type="submit">
+                <template slot="Anular" slot-scope="data">
+                  <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
+                </template>
+
+                <template slot="verTicket" slot-scope="data">
+                  <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver Ticket</b-button>
+                </template>
+
+              </b-table>
+            </div>
+            <b-row>
+              <b-col md="6" class="my-1">
+                <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+            </b-row>
+            <div slot="modal-footer">
+              <!--<b-btn size="sm" variant="success" type="submit">
                         Guardar
                     </b-btn>-->
-                    <b-btn size="sm" variant="secondary" @click="show=false">
-                        Cerrar
-                    </b-btn>
-                </div>
-                  </b-tab>
+              <b-btn size="sm" variant="secondary" @click="show = false">
+                Cerrar
+              </b-btn>
+            </div>
+          </b-tab>
+          <b-tab title="Proformas Facturadas">
+            <b-row class="align-items-center mb-2">
+              <b-col cols="8">
+                <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFav = 1" />
+              </b-col>
+              <b-col cols="4">
+                <b-input-group prepend="Mostrar">
+                  <b-form-select v-model="perPageFav" :options="opcionesPorPagina" @change="currentPageFav = 1" />
+                </b-input-group>
+              </b-col>
+            </b-row>
 
-                  <b-tab title="Proformas Favoritas">
-                    <b-input-group prepend="Buscar..." class="mt-2">
-                      <input class="form-control" v-model="search" />
-                      </b-input-group>
-                    <b-form-group>
-                    </b-form-group>
-                    <div class="table-responsive table-proforma-scroll">
-                     <b-table 
-                        v-if="show"
-                        id="table-proformas" 
-                        ref="tableProformas"
-                       :filter="filter"
-                        :items="filteredItems" 
-                        :fields="fieldsFavoritas"
-                        :per-page="100"
-                        :current-page="currentPageFav"
-                       >
-                       <!-- <template slot="EsFavoritoFlag" slot-scope="data">
+            <div class="tablaScroll">
+              <b-table v-if="show" id="table-proformas-facturadas" ref="tableProformasFacturadas" striped hover
+                :busy.sync="isBusyFav" :filter="filterFav" :items="myProviderFacturadas" :fields="fieldsFacturadas"
+                :per-page="perPageFav" :current-page="currentPageFacturadas">
+
+                <template slot="ver" slot-scope="data">
+                  <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver</b-button>
+                </template>
+
+                <template slot="Total" slot-scope="data">
+                  <b>{{ data.item.Total | moneda }}</b>
+                </template>
+
+                <template slot="verTicket" slot-scope="data">
+                  <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver Ticket</b-button>
+                </template>
+                <template slot="Estado" slot-scope="data">
+                  <b-button variant="danger" target="_blank">Facturado</b-button>
+                </template>
+                <template slot="Facturado" slot-scope="data">
+                  <template v-if="parseVentas(data.item.IdDocVenta).length">
+                    <b-button v-for="id in ventasVisibles(data.item)" :key="id"
+                      :href="'/imprimir/index.php?IdDocVenta=' + id" variant="info" size="sm" class="mr-1 mb-1"
+                      target="_blank">
+                      <i class="fas fa-file-invoice"></i> Venta #{{ id }}
+                    </b-button>
+
+                    <b-button v-if="parseVentas(data.item.IdDocVenta).length > 2" size="sm" variant="secondary"
+                      class="mb-1" @click="toggleExpand(data.item.IdProforma)">
+                      <i :class="expandedRows[data.item.IdProforma] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                      {{ expandedRows[data.item.IdProforma]
+                        ? 'Ver menos'
+                        : '+' + (parseVentas(data.item.IdDocVenta).length - 2) + ' más' }}
+                    </b-button>
+                  </template>
+                  <span v-else class="text-muted">Sin comprobante</span>
+                </template>
+              </b-table>
+            </div>
+
+            <b-pagination v-model="currentPageFacturadas" :total-rows="totalRowsFav"
+              :per-page="perPageFav"></b-pagination>
+          </b-tab>
+          <b-tab title="Proformas Favoritas">
+            <b-input-group prepend="Buscar..." class="mt-2">
+              <input class="form-control" v-model="search" />
+            </b-input-group>
+            <b-form-group>
+            </b-form-group>
+            <div class="table-responsive table-proforma-scroll">
+              <b-table v-if="show" id="table-proformas" ref="tableProformas" :filter="filter" :items="filteredItems"
+                :fields="fieldsFavoritas" :per-page="100" :current-page="currentPageFav">
+                <!-- <template slot="EsFavoritoFlag" slot-scope="data">
                         <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
                         <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                       </template> -->
-                      <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
-                      </template>
+                <template slot="update" slot-scope="data">
+                  <b-button @click="selectProformas(data.item)" variant="success"><i
+                      class="fas fa-pencil-alt"></i></b-button>
+                </template>
 
-                      <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
-                      </template>
+                <template slot="ver" slot-scope="data">
+                  <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver</b-button>
+                </template>
 
-                      <template slot="Total" slot-scope="data">
-                        <b>{{ data.item.Total | moneda }}</b>
-                      </template>
+                <template slot="Total" slot-scope="data">
+                  <b>{{ data.item.Total | moneda }}</b>
+                </template>
 
-                      <template slot="Anular" slot-scope="data">
-                        <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
-                      </template>
+                <template slot="Anular" slot-scope="data">
+                  <b-button @click="eliminarProf(data.item)" variant="danger"><i class="fas fa-times"></i></b-button>
+                </template>
 
-                      <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
-                      </template>
+                <template slot="verTicket" slot-scope="data">
+                  <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary"
+                    target="_blank">Ver Ticket</b-button>
+                </template>
 
-                    </b-table>
-                    </div>
-                    <b-pagination
-                      v-model="currentPageFav"
-                      :total-rows="filteredItems.length"
-                      :per-page="5"
-                      aria-controls="my-table"
-                    ></b-pagination>
-                  </b-tab>
-                </b-tabs>      
-                    
-            
-            </b-modal>
-          
-        </b-form>
-    </div>
+              </b-table>
+            </div>
+            <b-pagination v-model="currentPageFav" :total-rows="filteredItems.length" :per-page="5"
+              aria-controls="my-table"></b-pagination>
+          </b-tab>
+        </b-tabs>
+
+
+      </b-modal>
+
+    </b-form>
+  </div>
 </template>
 <script>
 import config from "@/store/config.js";
@@ -161,36 +197,36 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-        { key: "ver",           label: "Ver",       thStyle: { width: "60px" } },
-        { key: "verTicket",     label: "Ticket",    thStyle: { width: "90px" } },
-        { key: "update",        label: "Editar",    thStyle: { width: "70px" } },
-        { key: "Total",         label: "Total",     thStyle: { width: "90px" } },
-        { key: "Cliente",       label: "Cliente",   thStyle: { width: "180px" } },
-        { key: "Descripcion",   label: "Desc.",     thStyle: { width: "150px" }, tdClass: "td-descripcion"},
-        { key: "EsFavoritoFlag",label: "Favorito",  thStyle: { width: "80px" } },
-        { key: "IdProforma",    label: "Id",        thStyle: { width: "60px" } },
-        { key: "Anio",          label: "Año",       thStyle: { width: "60px" } },
-        { key: "Numero",        label: "Número",    thStyle: { width: "80px" } },
-        { key: "DniRuc",        label: "Documento", thStyle: { width: "110px" } },
-        { key: "FechaReg",      label: "Fecha",     thStyle: { width: "100px" } },
-        { key: "UsuarioReg",    label: "Empleado",  thStyle: { width: "120px" } },
-        { key: "Anular",        label: "Anular",    thStyle: { width: "70px" } }
+        { key: "ver", label: "Ver", thStyle: { width: "60px" } },
+        { key: "verTicket", label: "Ticket", thStyle: { width: "90px" } },
+        { key: "update", label: "Editar", thStyle: { width: "70px" } },
+        { key: "Total", label: "Total", thStyle: { width: "90px" } },
+        { key: "Cliente", label: "Cliente", thStyle: { width: "180px" } },
+        { key: "Descripcion", label: "Desc.", thStyle: { width: "150px" }, tdClass: "td-descripcion" },
+        { key: "EsFavoritoFlag", label: "Favorito", thStyle: { width: "80px" } },
+        { key: "IdProforma", label: "Id", thStyle: { width: "60px" } },
+        { key: "Anio", label: "Año", thStyle: { width: "60px" } },
+        { key: "Numero", label: "Número", thStyle: { width: "80px" } },
+        { key: "DniRuc", label: "Documento", thStyle: { width: "110px" } },
+        { key: "FechaReg", label: "Fecha", thStyle: { width: "100px" } },
+        { key: "UsuarioReg", label: "Empleado", thStyle: { width: "120px" } },
+        { key: "Anular", label: "Anular", thStyle: { width: "70px" } }
       ],
       fieldsFavoritas: [
         // { key: "EsFavoritoFlag", label: "Favorito" },
-        { key: "ver",           label: "Ver",       thStyle: { width: "60px" } },
-        { key: "verTicket",     label: "Ticket",    thStyle: { width: "90px" } },
-        { key: "update",        label: "Editar",    thStyle: { width: "70px" } },
-        { key: "Total",         label: "Total",     thStyle: { width: "90px" } },
-        { key: "Cliente",       label: "Cliente",   thStyle: { width: "180px" } },
-        { key: "Descripcion",   label: "Desc.",     thStyle: { width: "150px" }, tdClass: "td-descripcion"},
-        { key: "IdProforma",    label: "Id",        thStyle: { width: "60px" } },
-        { key: "Anio",          label: "Año",       thStyle: { width: "60px" } },
-        { key: "Numero",        label: "Número",    thStyle: { width: "80px" } },
-        { key: "DniRuc",        label: "Documento", thStyle: { width: "110px" } },
-        { key: "FechaReg",      label: "Fecha",     thStyle: { width: "100px" } },
-        { key: "UsuarioReg",    label: "Empleado",  thStyle: { width: "120px" } },
-        { key: "Anular",        label: "Anular",    thStyle: { width: "70px" } }
+        { key: "ver", label: "Ver", thStyle: { width: "60px" } },
+        { key: "verTicket", label: "Ticket", thStyle: { width: "90px" } },
+        { key: "update", label: "Editar", thStyle: { width: "70px" } },
+        { key: "Total", label: "Total", thStyle: { width: "90px" } },
+        { key: "Cliente", label: "Cliente", thStyle: { width: "180px" } },
+        { key: "Descripcion", label: "Desc.", thStyle: { width: "150px" }, tdClass: "td-descripcion" },
+        { key: "IdProforma", label: "Id", thStyle: { width: "60px" } },
+        { key: "Anio", label: "Año", thStyle: { width: "60px" } },
+        { key: "Numero", label: "Número", thStyle: { width: "80px" } },
+        { key: "DniRuc", label: "Documento", thStyle: { width: "110px" } },
+        { key: "FechaReg", label: "Fecha", thStyle: { width: "100px" } },
+        { key: "UsuarioReg", label: "Empleado", thStyle: { width: "120px" } },
+        { key: "Anular", label: "Anular", thStyle: { width: "70px" } }
       ],
       currentPageFav: 1,
       totalRows: 50,
@@ -263,12 +299,12 @@ export default {
       // this.isBusy = true
       let promise = this.axios.get(
         this.API +
-          "proformas?limit=" +
-          ctx.perPage +
-          "&page=" +
-          ctx.currentPage +
-          "&filter=" +
-          ctx.filter
+        "proformas?limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        ctx.filter
       );
 
       return promise
@@ -340,7 +376,9 @@ export default {
 };
 </script>
 <style>
-css/* ── Modal: ocupa toda la ventana ── */
+css
+
+/* ── Modal: ocupa toda la ventana ── */
 #modalProformas .modal-dialog {
   max-width: 85vw !important;
   width: 98vw !important;
@@ -433,7 +471,7 @@ css/* ── Modal: ocupa toda la ventana ── */
 }
 
 /* ── Tabla con layout fijo para respetar anchos de cabeceras ── */
-.table-proforma-scroll > table,
+.table-proforma-scroll>table,
 .table-proforma-scroll .table {
   min-width: 1100px !important;
   width: 100% !important;
