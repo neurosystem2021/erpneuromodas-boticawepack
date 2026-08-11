@@ -228,6 +228,27 @@ export default {
         { key: "UsuarioReg", label: "Empleado", thStyle: { width: "120px" } },
         { key: "Anular", label: "Anular", thStyle: { width: "70px" } }
       ],
+      fieldsFacturadas: [
+        { key: "ver", label: "Ver", thStyle: { width: "60px" } },
+        { key: "verTicket", label: "Ticket", thStyle: { width: "90px" } },
+        { key: "Estado", label: "Estado", thStyle: { width: "100px" } },
+        { key: "Facturado", label: "Comprobante", thStyle: { width: "200px" } },
+        { key: "Total", label: "Total", thStyle: { width: "90px" } },
+        { key: "Cliente", label: "Cliente", thStyle: { width: "180px" } },
+        { key: "IdProforma", label: "Id", thStyle: { width: "60px" } },
+        { key: "Anio", label: "Año", thStyle: { width: "60px" } },
+        { key: "Numero", label: "Número", thStyle: { width: "80px" } },
+        { key: "DniRuc", label: "Documento", thStyle: { width: "110px" } },
+        { key: "FechaReg", label: "Fecha", thStyle: { width: "100px" } },
+        { key: "UsuarioReg", label: "Empleado", thStyle: { width: "120px" } }
+      ],
+      filterFav: "",
+      isBusyFav: false,
+      perPageFav: 10,
+      opcionesPorPagina: [10, 25, 50, 100],
+      currentPageFacturadas: 1,
+      totalRowsFav: 0,
+      expandedRows: {},
       currentPageFav: 1,
       totalRows: 50,
       perPage: 5,
@@ -293,6 +314,50 @@ export default {
           this.$emit("onSelectProforma", proforma);
           this.limpiarCarrito();
         });
+    },
+    myProviderFacturadas(ctx) {
+      let promise = this.axios.get(
+        this.API +
+        "proformas/facturadas?limit=" +
+        ctx.perPage +
+        "&page=" +
+        ctx.currentPage +
+        "&filter=" +
+        (ctx.filter || "")
+      );
+
+      return promise
+        .then(result => {
+          this.actualizarTotalFacturadas(ctx.filter || "");
+          return result.data;
+        })
+        .catch(error => {
+          console.log(error);
+          return [];
+        });
+    },
+    actualizarTotalFacturadas(filter) {
+      this.axios
+        .get(this.API + "proformas/facturadas/count?filter=" + (filter || ""))
+        .then(response => {
+          this.totalRowsFav = response.data.total;
+        });
+    },
+    parseVentas(idDocVenta) {
+      if (!idDocVenta) return [];
+      try {
+        const parsed = typeof idDocVenta === "string" ? JSON.parse(idDocVenta) : idDocVenta;
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    },
+    ventasVisibles(item) {
+      const ventas = this.parseVentas(item.IdDocVenta);
+      return this.expandedRows[item.IdProforma] ? ventas : ventas.slice(0, 2);
+    },
+    toggleExpand(idProforma) {
+      this.$set(this.expandedRows, idProforma, !this.expandedRows[idProforma]);
     },
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself
