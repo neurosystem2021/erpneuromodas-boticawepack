@@ -1,160 +1,266 @@
 <template>
   <div class="fondo">
-    <h2 align-h="center" class="text-center" >Reporte Ranking de Clientes</h2>
-      <b-container class="bv-example-row">
+    <h2 align-h="center" class="text-center">Reporte Ranking de Clientes</h2>
+    <b-container class="bv-example-row">
+      <b-row>
+        <b-col md="3" class="my-1">
+          <b-form-group>
+            <label>Buscar (DNI/RUC/Cliente):</label>
+            <b-input-group>
+              <b-form-input v-model="filtro" placeholder="Buscar" @keyup.enter="generarReporte" />
+              <b-input-group-append>
+                <b-btn :disabled="!filtro" @click="limpiarFiltro">Limpiar</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label>Desde:</label>
+            <b-form-input type="date" v-model="fechaInicio" />
+          </b-form-group>
+        </b-col>
+
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label>Hasta:</label>
+            <b-form-input type="date" v-model="fechaFin" />
+          </b-form-group>
+        </b-col>
+
+        <b-col md="3">
+          <b-form-group>
+            <label>Almacen:</label>
+            <autocomplete
+                v-if="almacenInicialCargado"
+                required="required"
+                ref="inputAlmacen"
+                :url="API + 'almacenes'"
+                anchor="Almacen"
+                :initValue="almacen.writer || ''"
+                label="writer"
+                placeholder=""
+                :on-select="setAlmacen"
+                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                :classes="{input: 'form-control'}">
+            </autocomplete>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="2" class="my-1 d-flex align-items-end">
+          <b-form-group class="w-100">
+            <label>Mostrar:</label>
+            <b-form-select :options="pageOptions" v-model="perPage" @input="onPerPageChange" />
+          </b-form-group>
+        </b-col>
+      </b-row>
+
+      <b-row align-h="center" class="text-center my-2">
+        <b-col cols="3">
+          <b-button variant="primary" size="lg" block @click="generarReporte" :disabled="isBusy || !almacenInicialCargado">
+            <b-spinner small v-if="isBusy"></b-spinner>
+            {{ isBusy ? 'Generando...' : 'Generar' }}
+          </b-button>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-table small
+          ref="tablaProductos"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          striped
+          hover
+          id="my-table"
+          :busy.sync="isBusy"
+          :items="myProvider"
+          :fields="fields"
+          :per-page="perPage"
+          :current-page="currentPage">
+          <template #table-busy>
+            <div class="text-center text-primary my-2">
+              <b-spinner class="align-middle"></b-spinner>
+              <strong> Cargando...</strong>
+            </div>
+          </template>
+          <template #empty>
+            <div class="text-center text-muted my-3">
+              {{ buscado ? 'No se encontraron resultados.' : 'Presiona "Generar" para ver el reporte.' }}
+            </div>
+          </template>
+        </b-table>
         <b-row>
-          <b-col md="4" class="my-1">
-            <b-form-group>
-                  <label>Buscar:</label>
-              
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
+          <b-col md="6" class="my-1">
+            <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" @input="refrescar" />
           </b-col>
-          <b-col md="4">
-            <b-form-group>
-                  <label>Almacen:</label>
-                  <autocomplete
-                      required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      initValue=""
-                      label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
-                </b-form-group>
-          </b-col>
-          <b-col md="4" class="my-1">
-            <b-row>
-            <b-col md="8">
-
-              <b-form-group>
-                  <label>Mostrar:</label>
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
-            </b-row>
-          </b-col>
-
-          <b-table small
-            ref="tablaProductos"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage"></b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
         </b-row>
-        <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
-            </b-col>
-        </b-row>
-        <br /><br />
-      </b-container>
+      </b-row>
+
+      <b-row align-h="center" class="text-center">
+        <b-col cols="4">
+          <b-button variant="success" size="lg" :disabled="!buscado" :href="urlExportar" target="_blank">Exportar</b-button>
+        </b-col>
+      </b-row>
+      <br /><br />
+    </b-container>
   </div>
 </template>
 
 <script>
 import config from '@/store/config.js'
-// import ProductoForm from '@/components/ProductoForm'
 
 export default {
   mounted() {
-    this.axios.get(this.API + 'ranking/clientes/count?idalmacen=' + this.almacen.IdAlmacen ).then((response) => {
-      console.log(response)
-      this.totalRows = response.data.total
-    })
+    this.inicializarFechasPorDefecto()
+    this.cargarAlmacenPorDefecto()
   },
   data() {
     return {
       API: config.API,
-      pageOptions: [ 5, 10, 15, 50, 100 ],
-      filter: '',
+      pageOptions: [5, 10, 15, 50, 100],
+      filtro: '',
+      fechaInicio: '',
+      fechaFin: '',
+      // valores realmente aplicados a la consulta (solo cambian al presionar "Generar")
+      filtroAplicado: '',
+      fechaInicioAplicada: '',
+      fechaFinAplicada: '',
+      // controla si ya se generó al menos un reporte, evita que la tabla
+      // cargue datos automáticamente al entrar al módulo
+      buscado: false,
+      // evita mostrar/usar el autocomplete y el botón Generar hasta tener
+      // el almacén por defecto cargado
+      almacenInicialCargado: false,
       sortBy: 'Total',
       sortDesc: false,
       items: [],
       isBusy: false,
       fields: [
-            { key: 'DniRuc', label: 'DNI / RUC', sortable: true },
-            { key: 'Cliente', label: 'Cliente', sortable: true },
-            { key: 'Direccion', label: 'Direccion', sortable: true },
-            { key: 'CantidadCompras', label: 'Compras', sortable: true },
-            { key: 'PromedioCompra', label: 'Promedio', sortable: true },
-            { key: 'UltimaCompra', label: 'Última Compra', sortable: true },
-            { key: 'Puntos', label: 'Puntos', sortable: true },
-            { key: 'Total', label: 'Total', sortable: true},
+        { key: 'DniRuc', label: 'DNI / RUC', sortable: true },
+        { key: 'Cliente', label: 'Cliente', sortable: true },
+        { key: 'Direccion', label: 'Direccion', sortable: true },
+        { key: 'CantidadCompras', label: 'Compras', sortable: true },
+        { key: 'PromedioCompra', label: 'Promedio', sortable: true },
+        { key: 'UltimaCompra', label: 'Última Compra', sortable: true },
+        { key: 'Puntos', label: 'Puntos', sortable: true },
+        { key: 'Total', label: 'Total', sortable: true },
       ],
-      totalRows: 50,
+      totalRows: 0,
       perPage: 10,
       currentPage: 1,
       almacen: {
-        IdAlmacen: 1
+        IdAlmacen: '',
+        writer: ''
       }
     }
   },
+  computed: {
+    urlExportar() {
+      let url = this.API + 'reporte/rankingclientes?idalmacen=' + this.almacen.IdAlmacen
+      url += '&q=' + encodeURIComponent(this.filtroAplicado || '')
+      if (this.fechaInicioAplicada) url += '&fechaInicio=' + this.fechaInicioAplicada
+      if (this.fechaFinAplicada) url += '&fechaFin=' + this.fechaFinAplicada
+      return url
+    }
+  },
   methods: {
-    focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
+    inicializarFechasPorDefecto() {
+      const hoy = new Date()
+      const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1)
+
+      this.fechaFin = this.formatearFecha(hoy)
+      this.fechaInicio = this.formatearFecha(primerDiaMes)
+    },
+    formatearFecha(fecha) {
+      const year = fecha.getFullYear()
+      const month = String(fecha.getMonth() + 1).padStart(2, '0')
+      const day = String(fecha.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    },
+    cargarAlmacenPorDefecto() {
+      this.axios.get(this.API + 'almacenes').then((response) => {
+        const almacenes = response.data
+        if (almacenes && almacenes.length > 0) {
+          this.almacen = almacenes[0]
+        }
+        this.almacenInicialCargado = true
+      }).catch(() => {
+        // si falla la carga, igual habilitamos el módulo para que el
+        // usuario pueda seleccionar manualmente desde el autocomplete
+        this.almacenInicialCargado = true
+      })
+    },
+    focusAutocomplete(ref) {
       this.$refs[ref].handleDoubleClick()
     },
-    setAlmacen (obj) {
+    setAlmacen(obj) {
       this.almacen = obj
-      Vue.nextTick(() => this.$refs.tablaProductos.refresh())
+      // no auto-refresca: espera a que el usuario presione "Generar"
     },
-    myProvider (ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      // console.log(ctx.filter)
-      // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
-      // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+    limpiarFiltro() {
+      this.filtro = ''
+    },
+    generarReporte() {
+      // aquí "congelamos" los valores de los inputs hacia la consulta real
+      this.filtroAplicado = this.filtro
+      this.fechaInicioAplicada = this.fechaInicio
+      this.fechaFinAplicada = this.fechaFin
+      this.buscado = true
+      this.currentPage = 1
+      this.actualizarConteo()
+      this.refrescar()
+    },
+    onPerPageChange() {
+      this.currentPage = 1
+      this.refrescar()
+    },
+    refrescar() {
+      if (this.$refs.tablaProductos) {
+        this.$refs.tablaProductos.refresh()
+      }
+    },
+    actualizarConteo() {
+      let url = this.API + 'ranking/clientes/count?idalmacen=' + this.almacen.IdAlmacen
+      url += '&q=' + encodeURIComponent(this.filtroAplicado || '')
+      if (this.fechaInicioAplicada) url += '&fechaInicio=' + this.fechaInicioAplicada
+      if (this.fechaFinAplicada) url += '&fechaFin=' + this.fechaFinAplicada
+
+      this.axios.get(url).then((response) => {
+        this.totalRows = response.data.total
+      })
+    },
+    myProvider(ctx) {
+      // Bloquea la carga automática al montar el componente o al mover
+      // per-page/paginación antes de que el usuario presione "Generar"
+      if (!this.buscado) {
+        return []
+      }
+
+      let url = this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen
+      url += '&q=' + encodeURIComponent(this.filtroAplicado || '')
+      url += '&limit=' + ctx.perPage
+      url += '&page=' + ctx.currentPage
+
+      if (this.fechaInicioAplicada) url += '&fechaInicio=' + this.fechaInicioAplicada
+      if (this.fechaFinAplicada) url += '&fechaFin=' + this.fechaFinAplicada
+
+      let promise = this.axios.get(url)
 
       return promise.then((response) => {
-        console.log(response)
         this.items = response.data
-        //this.totalRows = this.items.length
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        return(this.items)
+        return this.items
       }).catch(error => {
-        // Here we could override the busy state, setting isBusy to false
-        // this.isBusy = false
-        // Returning an empty array, allows table to correctly handle busy state in case of error
         return []
       })
     }
   },
-  components: {
-      // ProductoForm
-  }
+  components: {}
 }
 </script>
 
 <style>
 .fondo {
-  background:#EFF9FF;
+  background: #EFF9FF;
 }
 </style>

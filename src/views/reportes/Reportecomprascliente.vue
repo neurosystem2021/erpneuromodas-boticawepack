@@ -293,7 +293,7 @@ export default {
         Cliente: ''
       },
       rango: {
-        fechaDesde: this.$moment().format('YYYY-01-01'),
+        fechaDesde: this.$moment().format('YYYY-MM-01'),
         fechaHasta: this.$moment().format('YYYY-MM-DD')
       },
       totalGeneral: 0
@@ -454,6 +454,10 @@ export default {
   margin-bottom: 20px;
   overflow: hidden;
 }
+.filtros-card {
+  overflow: visible;
+}
+
 .card-section-header {
   display: flex;
   align-items: center;

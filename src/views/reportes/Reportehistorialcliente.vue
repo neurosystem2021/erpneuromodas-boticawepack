@@ -234,6 +234,7 @@
         + '?idCliente=' + cliente.IdCliente
         + '&cliente=' + encodeURIComponent(cliente.Cliente)
         + '&idalmacen=' + almacen.IdAlmacen
+        + '&almacen=' + encodeURIComponent(almacen.Almacen || 'TODOS')
         + '&q=' + encodeURIComponent(filter)
         + '&fechaDesde=' + rango.fechaDesde
         + '&fechaHasta=' + rango.fechaHasta
@@ -294,7 +295,7 @@ export default {
         Cliente: ''
       },
       rango: {
-        fechaDesde: this.$moment().format('YYYY-01-01'),
+        fechaDesde: this.$moment().format('YYYY-MM-01'),
         fechaHasta: this.$moment().format('YYYY-MM-DD')
       },
       totalGeneral: 0
@@ -454,6 +455,9 @@ export default {
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   margin-bottom: 20px;
   overflow: hidden;
+}
+.filtros-card {
+  overflow: visible;
 }
 .card-section-header {
   display: flex;
