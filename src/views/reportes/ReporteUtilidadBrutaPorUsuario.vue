@@ -3,7 +3,7 @@
     <!-- Encabezado -->
     <div class="ub-hero">
       <p class="ub-eyebrow">Reportes · Ventas</p>
-      <h1 class="ub-title">Utilidad Bruta de Ventas</h1>
+      <h1 class="ub-title">Utilidad Bruta de Ventas por Usuario</h1>
     </div>
 
     <!-- Filtros -->
@@ -153,10 +153,10 @@
         <tfoot>
           <tr>
             <td colspan="5" class="ub-total-label">Sumatoria</td>
-            <td class="ub-num ub-total-value sumTotalVenta">S/ {{ formatNum(totalVenta) }}</td>
-            <td class="ub-num ub-total-value sumTotalCosto">S/ {{ formatNum(totalCosto) }}</td>
-            <td class="ub-num ub-total-value sumUtilidadBruta">S/ {{ formatNum(utilidadBruta) }}</td>
-            <td class="ub-total-value">{{ margenPromedio }}%</td>
+            <td class="ub-num ub-total-value sumTotalVenta" style="text-align: left;">S/ {{ formatNum(totalVenta) }}</td>
+            <td class="ub-num ub-total-value sumTotalCosto" style="text-align: left;">S/ {{ formatNum(totalCosto) }}</td>
+            <td class="ub-num ub-total-value sumUtilidadBruta" style="text-align: left;">S/ {{ formatNum(utilidadBruta) }}</td>
+            <td class="ub-total-value" style="text-align: left;">{{ margenPromedio }}%</td>
           </tr>
         </tfoot>
       </table>
@@ -568,7 +568,7 @@ export default {
   font-weight: 500;
 }
 .ub-num {
-  text-align: right;
+  text-align: left;
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
