@@ -257,7 +257,7 @@
                       <template slot="cantidad" slot-scope="data">
                         <input v-model="data.item.cantidad" type="number"
                           style="text-align:center; font-weight:bold; width: 90px;" autocomplete="false"
-                          :id="`input${data.index}`" :disabled="data.item.esPresentacion" @input="metodoPagoCambio(1)"
+                          :id="`input${data.index}`" @input="metodoPagoCambio(1)"
                           @focus="abrirModalTouch(data.index, 1)" class="form-control"
                           @keydown.enter="irBusquedaProducto" />
                         <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;"
@@ -299,12 +299,10 @@
 
                       </template>
                       <template slot="cantxPrecio" slot-scope="data">
-                        <b-form-input v-if="data.item.esPresentacion" v-model="data.item.CantidadPresentacion"
-                          type="text" style="text-align:center; font-weight:bold; width: 100px;" autocomplete="false"
-                          @input="metodoPagoCambio(1)"></b-form-input>
-                        <!-- {{data.item.esPresentacion}} -->
-                        <!-- esPresentacion -->
-
+                        <b-form-input v-if="data.item.esPresentacion"
+                          :value="'x' + data.item.CantidadPresentacion + ' unid.'"
+                          type="text" style="text-align:center; font-weight:bold; width: 100px;"
+                          disabled></b-form-input>
                       </template>
 
                     </b-table>
@@ -2116,26 +2114,11 @@ export default {
       return res;
     },
     getSubTotalDetalle(prod) {
-      let subtotal = 0;
-
-      if (prod.esPresentacion) {
-        subtotal = prod.CantidadPresentacion * prod.cantidad * prod.precio;
-      } else {
-        subtotal = prod.cantidad * prod.precio;
-        // console.log(prod);
-      }
+      let subtotal = prod.cantidad * prod.precio;
       return parseFloat(subtotal).toFixed(2);
     },
     getTotalDetalle(prod) {
-      let total = 0;
-      if (prod.esPresentacion) {
-        total =
-          prod.CantidadPresentacion * prod.cantidad * prod.precio -
-          prod.descuento;
-      } else {
-        total = prod.cantidad * prod.precio - prod.descuento;
-      }
-
+      let total = prod.cantidad * prod.precio - prod.descuento;
       return parseFloat(total).toFixed(2);
     },
     getSubTotal(ventaIndex = null) {
@@ -2143,11 +2126,7 @@ export default {
       let prod = [...this.ventas[idx].productos];
       if (prod.length == 0) return 0;
       let subtotal = prod.reduce((total, prod) => {
-        if (prod.esPresentacion) {
-          return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio).toFixed(2);
-        } else {
-          return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
-        }
+        return total + parseFloat(prod.cantidad * prod.precio);
       }, 0);
       return parseFloat(subtotal).toFixed(2);
     },
@@ -2165,11 +2144,7 @@ export default {
       let prod = [...this.ventas[idx].productos];
       if (prod.length == 0) return 0;
       let subtotal = prod.reduce((total, prod) => {
-        if (prod.esPresentacion) {
-          return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio - prod.descuento);
-        } else {
-          return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
-        }
+        return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
       }, 0);
       return parseFloat(subtotal).toFixed(2);
     },
@@ -2848,11 +2823,7 @@ export default {
 
         // Calcular el total directamente sobre los productos sin depender de getTotal()
         const totalVenta = productos.reduce((total, prod) => {
-          if (prod.esPresentacion) {
-            return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio - prod.descuento);
-          } else {
-            return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
-          }
+          return total + parseFloat(prod.cantidad * prod.precio - prod.descuento);
         }, 0);
 
         // Asignar el pago directamente sobre el objeto venta ANTES de hacer push
@@ -2891,8 +2862,8 @@ export default {
       if (esPresentacion) {
         producto.presentacion = obj.nombre;
         producto.pres = JSON.stringify(obj);
-        producto.CantidadPresentacion = 1;
-        producto.cantidad = obj.cantidad;
+        producto.CantidadPresentacion = obj.cantidad;
+        producto.cantidad = 1;
         producto.bloquearInputPrecio = true;
         producto.precio = obj.precio;
         producto.esPresentacion = esPresentacion;
