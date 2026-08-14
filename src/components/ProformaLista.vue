@@ -75,8 +75,8 @@
                     </b-form-group>
                      <b-table 
                         v-if="show"
-                        id="table-proformas" 
-                        ref="tableProformas"
+                        id="table-proformas-favoritas" 
+                        ref="tableProformasFavoritas"
                        :filter="filter"
                         :items="filteredItems" 
                         :fields="fieldsFavoritas"

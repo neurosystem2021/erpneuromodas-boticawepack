@@ -2516,7 +2516,7 @@ export default {
       // this.cargando = true;
       for (let index = 0; index < proforma.productos.length; index++) {
         const producto = proforma.productos[index];
-        const prod = proforma.productos[index];
+        let prod = await this.obtenerStockBuscador(producto.IdProducto);
 
         // }
         // proforma.productos.forEach(async producto => {
