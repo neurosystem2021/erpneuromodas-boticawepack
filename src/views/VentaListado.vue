@@ -2521,6 +2521,8 @@ export default {
     async cargarProforma(proforma) {
       const clienteBackup = { ...proforma };
       const productosBackup = [...(proforma.productos || [])];
+      const usuarioVendedor =
+    proforma.UsuarioReg || sessionStorage.getItem("User");
 
       let venta = {
         ...this.venta,
@@ -2538,7 +2540,7 @@ export default {
 
       await Promise.all([
         this.getNumeroVenta(),
-        this.axios.get(this.API + "usuarios/info/" + sessionStorage.getItem("User"))
+        this.axios.get(this.API + "usuarios/info/" + usuarioVendedor)
           .then(res => {
             this.ventas[this.ventaActiva].vendedor = res.data;
           }).catch(() => {})

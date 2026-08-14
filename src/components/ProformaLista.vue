@@ -283,6 +283,11 @@ export default {
 
         proforma.productos = productosEnriquecidos;
 
+        proforma.vendedorProforma = {
+        Usuario: proforma.UsuarioReg,
+        NombreUsuario: proforma.UsuarioReg
+      };
+
         this.filter = "";
         this.show = false;
 
