@@ -904,7 +904,11 @@ export default {
       obtenerStok: "obtenerStock"
     }),
     recalcularSubTotal(item) {
-      item.subtotal = item.PrecioContado * item.cantidad;
+      if (this.isVentas) {
+        item.subtotal = item.PrecioContado * item.cantidad;
+      } else {
+        item.subtotal = item.PrecioCosto * item.cantidad;
+      }
       // $emit("onInputCantidad", item.cantidad);
       this.$forceUpdate();
     },
