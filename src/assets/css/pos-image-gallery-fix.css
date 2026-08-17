@@ -1,0 +1,68 @@
+/* Visor de imágenes exclusivo del Punto de Venta. */
+.pos-image-gallery-modal .modal-dialog {
+  width: min(920px, calc(100vw - 32px));
+  max-width: min(920px, calc(100vw - 32px)) !important;
+  margin: 24px auto;
+}
+
+.pos-image-gallery-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 22px;
+  box-shadow: 0 26px 70px rgba(4, 27, 54, 0.34);
+}
+
+.pos-image-gallery-modal .modal-body {
+  padding: 22px;
+}
+
+.pos-image-gallery-modal .pos-image-gallery-stage {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+  align-items: center;
+  min-height: min(58vh, 520px);
+  padding: 14px;
+}
+
+.pos-image-gallery-modal .pos-image-gallery-stage .imagenGrande {
+  grid-column: 2;
+  display: block;
+  width: 100% !important;
+  height: min(58vh, 520px) !important;
+  max-width: 100% !important;
+  max-height: min(58vh, 520px) !important;
+  margin: 0 auto;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+.pos-image-gallery-modal .pos-image-gallery-stage > button:first-child {
+  grid-column: 1;
+}
+
+.pos-image-gallery-modal .pos-image-gallery-stage > button:last-child {
+  grid-column: 3;
+}
+
+@media (max-width: 640px) {
+  .pos-image-gallery-modal .modal-dialog {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px) !important;
+    margin: 8px auto;
+  }
+
+  .pos-image-gallery-modal .modal-body {
+    padding: 14px;
+  }
+
+  .pos-image-gallery-modal .pos-image-gallery-stage {
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    min-height: 52vh;
+    padding: 8px;
+  }
+
+  .pos-image-gallery-modal .pos-image-gallery-stage .imagenGrande {
+    height: 52vh !important;
+    max-height: 52vh !important;
+  }
+}

@@ -51,13 +51,16 @@
               <b-input-group class="supplier-modal__search">
                 <b-form-input
                   v-model="proveedor.Ruc"
+                  type="text"
                   inputmode="numeric"
+                  maxlength="11"
+                  @input="normalizarRuc"
                   placeholder="Ingresa los 11 dígitos del RUC"
                 ></b-form-input>
                 <b-input-group-append>
-                  <b-btn class="supplier-modal__search-button" @click="consultarRUC">
-                    <i class="fa fa-search"></i>
-                    Consultar RUC
+                  <b-btn class="supplier-modal__search-button" :disabled="consultandoDocumento" @click="consultarRUC">
+                    <i :class="consultandoDocumento ? 'fa fa-spinner fa-spin' : 'fa fa-search'"></i>
+                    {{ consultandoDocumento ? 'Consultando...' : 'Consultar RUC' }}
                   </b-btn>
                 </b-input-group-append>
               </b-input-group>
@@ -134,6 +137,7 @@ export default {
     return {
       API: config.API,
       show: false,
+      consultandoDocumento: false,
       proveedor: {
         Proveedor: "",
         Ruc: "",
@@ -146,6 +150,9 @@ export default {
   },
   props: ["newRuc"],
   methods: {
+    normalizarRuc(valor) {
+      this.proveedor.Ruc = String(valor || "").replace(/\D/g, "").slice(0, 11);
+    },
     shownProveedorForm() {
       this.proveedor.Ruc = this.$parent.$parent.newRuc;
       this.proveedor.Direccion = "";
@@ -153,6 +160,12 @@ export default {
       this.proveedor.Telefono = "";
     },
     consultarRUC() {
+      this.normalizarRuc(this.proveedor.Ruc);
+      if (this.proveedor.Ruc.length !== 11) {
+        this.$toasted.error("El RUC debe contener exactamente 11 dígitos.");
+        return;
+      }
+      this.consultandoDocumento = true;
       this.axios
         .get(this.API + "consultarRUC", {
           params: {
@@ -161,14 +174,21 @@ export default {
           }
         })
         .then(response => {
-          this.$toasted.show("Proveedor encontrado, se llenarán sus datos");
           var data = response.data;
+          if (!data || data.success === false || !data.razonSocial) {
+            throw new Error((data && data.message) || "No se encontraron datos para este RUC.");
+          }
           this.proveedor.Proveedor = data.razonSocial;
-          this.proveedor.Direccion = data.direccion;
+          this.proveedor.Direccion = data.direccion || "";
+          this.$toasted.success("RUC encontrado. Se completaron los datos.");
         })
         .catch(error => {
-          this.$toasted.show("No se encontró el RUC");
+          const data = error.response && error.response.data;
+          this.$toasted.error((data && data.message) || error.message || "No se pudo consultar el RUC.");
           console.log(error);
+        })
+        .then(() => {
+          this.consultandoDocumento = false;
         });
     },
     guardarProveedor() {

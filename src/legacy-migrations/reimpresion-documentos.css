@@ -1,0 +1,354 @@
+:root {
+  --nm-reprint-blue: #075f94;
+  --nm-reprint-blue-dark: #064a79;
+  --nm-reprint-line: #dce9f1;
+}
+
+body.nm-reprint-dedicated {
+  background: #f1f7fb !important;
+}
+
+body.nm-reprint-dedicated #app > div > .container-fluid {
+  width: calc(100% - 40px);
+  margin: 24px auto 40px;
+  padding: 22px 18px 26px !important;
+  overflow: hidden;
+  border: 1px solid #d8e6ef;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(15,65,101,.11);
+}
+
+body.nm-reprint-dedicated table thead,
+body.nm-reprint-dedicated table thead tr {
+  color: #fff !important;
+  background: var(--nm-reprint-blue) !important;
+  background-image: none !important;
+}
+
+body.nm-reprint-dedicated table thead th,
+body.nm-reprint-dedicated table thead td {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.16) !important;
+  background: var(--nm-reprint-blue) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+body.nm-reprint-dedicated table {
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 14px;
+}
+
+body.nm-reprint-dedicated table thead th {
+  padding: 15px 13px !important;
+  font-size: 12px;
+  font-weight: 800 !important;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+
+body.nm-reprint-dedicated table tbody td {
+  padding: 14px 13px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--nm-reprint-line) !important;
+}
+
+body.nm-reprint-dedicated table tbody tr:nth-child(odd) { background: #f5fafd !important; }
+body.nm-reprint-dedicated table tbody tr:nth-child(even) { background: #e9f6fb !important; }
+body.nm-reprint-dedicated table tbody tr:hover { background: #d9f0f8 !important; }
+
+body.nm-reprint-dedicated table thead th:first-child { border-radius: 14px 0 0 0; }
+body.nm-reprint-dedicated table thead th:last-child { border-radius: 0 14px 0 0; }
+
+body.nm-reprint-dedicated table thead th::before,
+body.nm-reprint-dedicated table thead th::after {
+  color: rgba(255,255,255,.7) !important;
+}
+
+body.nm-reprint-dedicated .document-actions {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 520px;
+}
+
+body.nm-reprint-dedicated .document-actions .btn {
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 20px;
+  white-space: nowrap;
+  box-shadow: 0 5px 12px rgba(12,74,109,.16);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+body.nm-reprint-dedicated .document-actions .btn:hover {
+  filter: brightness(.96);
+  transform: translateY(-1px);
+  box-shadow: 0 7px 15px rgba(12,74,109,.22);
+}
+
+body.nm-reprint-dedicated .document-actions .btn-success { background: linear-gradient(135deg,#079b69,#10ba79) !important; }
+body.nm-reprint-dedicated .document-actions .btn-danger { background: linear-gradient(135deg,#d93649,#ef5562) !important; }
+body.nm-reprint-dedicated .document-actions .btn-warning { background: linear-gradient(135deg,#dc8c08,#f3a91e) !important; }
+body.nm-reprint-dedicated .document-actions .btn-primary { background: linear-gradient(135deg,#0787b1,#13a7c5) !important; }
+body.nm-reprint-dedicated .document-actions .whatsapp-button { background: linear-gradient(135deg,#1aa957,#25d366) !important; }
+body.nm-reprint-dedicated .document-actions .email-button { background: linear-gradient(135deg,#147fc0,#24a5d8) !important; }
+
+body.nm-reprint-dedicated .document-actions .btn i { margin-right: 5px; }
+
+.nm-whatsapp-pdf-modal { position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:18px;background:rgba(3,25,45,.66);backdrop-filter:blur(4px); }
+.nm-whatsapp-pdf-card { position:relative;width:min(460px,100%);padding:28px;border:1px solid rgba(255,255,255,.7);border-radius:22px;background:#fff;box-shadow:0 30px 80px rgba(0,20,36,.36);font-family:Arial,sans-serif; }
+.nm-whatsapp-pdf-close { position:absolute;top:13px;right:14px;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#eef5f8;color:#385467;font-size:24px;line-height:30px;cursor:pointer; }
+.nm-whatsapp-pdf-icon { display:grid;width:64px;height:64px;margin:0 auto 14px;place-items:center;border-radius:20px;background:linear-gradient(145deg,#16a85b,#25d366);color:#fff;box-shadow:0 12px 28px rgba(27,174,91,.3);font-size:31px; }
+.nm-whatsapp-pdf-copy { text-align:center; }.nm-whatsapp-pdf-label { color:#168653;font-size:10px;font-weight:900;letter-spacing:1.4px; }.nm-whatsapp-pdf-copy h3 { margin:5px 0 7px;color:#092f4e;font-size:23px;font-weight:900; }.nm-whatsapp-pdf-copy p { margin:0 0 20px;color:#607586;font-size:13px;line-height:1.45; }
+.nm-whatsapp-pdf-card>label { display:block;margin:0 0 7px;color:#173d58;font-size:12px;font-weight:900; }.nm-whatsapp-phone { display:flex;height:52px;overflow:hidden;border:2px solid #c8dae5;border-radius:12px;background:#fff;transition:border-color .15s,box-shadow .15s; }.nm-whatsapp-phone:focus-within { border-color:#20b86a;box-shadow:0 0 0 4px rgba(32,184,106,.12); }.nm-whatsapp-phone span { display:flex;padding:0 14px;align-items:center;background:#edf7f2;color:#147c4b;font-size:14px;font-weight:900; }.nm-whatsapp-phone input { min-width:0;flex:1;padding:0 14px;border:0;outline:0;color:#15364d;font-size:17px;font-weight:800;letter-spacing:.5px; }
+.nm-whatsapp-hint { display:flex;margin-top:10px;align-items:center;gap:7px;color:#667d8e;font-size:11px; }.nm-whatsapp-hint i { color:#e23d4f; }.nm-whatsapp-error { min-height:18px;margin-top:7px;color:#d43245;font-size:11px;font-weight:800; }
+.nm-whatsapp-pdf-actions { display:flex;margin-top:10px;gap:10px; }.nm-whatsapp-pdf-actions button { min-height:46px;border:0;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer; }.nm-whatsapp-cancel { width:110px;background:#e9f0f4;color:#486273; }.nm-whatsapp-send { flex:1;background:linear-gradient(135deg,#159b56,#24c96d);color:#fff;box-shadow:0 9px 20px rgba(24,169,91,.24); }.nm-whatsapp-send:disabled { cursor:wait;opacity:.75; }
+@media(max-width:520px){.nm-whatsapp-pdf-card{padding:24px 18px 18px}.nm-whatsapp-pdf-actions{flex-direction:column-reverse}.nm-whatsapp-cancel{width:100%}}
+
+/* Botones agregados por la versión desplegada. */
+body.nm-reprint-dedicated .nm-document-downloads {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+body.nm-reprint-dedicated .nm-download-button {
+  display: inline-flex;
+  min-width: 78px;
+  height: 38px;
+  padding: 0 14px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: .15px;
+  box-shadow: 0 7px 15px rgba(28,50,76,.18), inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+body.nm-reprint-dedicated .nm-download-pdf {
+  background: linear-gradient(135deg, #bd2034 0%, #e43d4f 55%, #f25b67 100%);
+}
+
+body.nm-reprint-dedicated .nm-download-xml {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 58%, #ffb62e 100%);
+}
+body.nm-reprint-dedicated .nm-share-whatsapp{background:linear-gradient(135deg,#078c59,#20c981)}
+body.nm-reprint-dedicated .nm-share-email{background:linear-gradient(135deg,#175cb7,#20a0d2)}
+.nm-reprint-email-modal{position:fixed;z-index:2147483647;inset:0;display:grid;padding:18px;place-items:center;background:rgba(8,25,42,.76);backdrop-filter:blur(6px)}.nm-reprint-email-card{position:relative;width:min(430px,100%);padding:24px;border-radius:21px;color:#263b4c;background:linear-gradient(145deg,#fff,#f4faff);box-shadow:0 24px 70px rgba(0,0,0,.36);text-align:center}.nm-email-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border:0;border-radius:11px;color:#fff;background:#d92b48;font-size:20px}.nm-email-icon{display:grid;width:58px;height:58px;margin:0 auto 10px;place-items:center;border-radius:17px;color:#fff;background:linear-gradient(135deg,#1765bd,#20a8ca);font-size:24px}.nm-reprint-email-card h3{margin:0;font-size:21px}.nm-reprint-email-card p{margin:6px 0 16px;color:#728494;font-size:12px}.nm-reprint-email-card label{display:block;margin:0 0 6px;text-align:left;font-size:11px;font-weight:850}.nm-reprint-email-card input{width:100%;height:48px;padding:10px 12px;border:1px solid #c9deea;border-radius:12px;font-size:14px;outline:0}.nm-email-send{width:100%;height:49px;margin-top:12px;border:0;border-radius:13px;color:#fff;background:linear-gradient(135deg,#078d65,#20cb8e);font-weight:900}.nm-reprint-toast{position:fixed;z-index:2147483647;right:18px;bottom:20px;max-width:380px;padding:13px 17px;border-radius:13px;color:#fff;background:#087c5a;box-shadow:0 12px 28px rgba(0,0,0,.28);font-weight:800}.nm-reprint-toast.error{background:#bd2642}
+
+body.nm-reprint-dedicated .nm-download-button:hover {
+  color: #fff;
+  filter: brightness(1.04);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(28,50,76,.24), inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+body.nm-reprint-dedicated .nm-download-button:active { transform: translateY(0) scale(.98); }
+body.nm-reprint-dedicated .nm-download-button i { font-size: 15px; }
+
+@media (max-width: 767px) {
+  body.nm-reprint-dedicated #app > div > .container-fluid {
+    width: calc(100% - 20px);
+    margin-top: 12px;
+    padding: 14px 10px 20px !important;
+  }
+}
+
+/* Refinamiento visual 2026: cabecera, filtros y tabla de comprobantes. */
+body.nm-reprint-dedicated {
+  color: #163b58;
+  background:
+    radial-gradient(circle at 8% 0, rgba(16,153,190,.12), transparent 30rem),
+    linear-gradient(145deg,#f4f9fc,#eaf3f8 62%,#f8fbfd) !important;
+}
+
+body.nm-reprint-dedicated #app > div > .container-fluid {
+  width: min(1720px, calc(100% - 48px));
+  margin-top: 30px;
+  padding: 0 0 24px !important;
+  border: 1px solid #d5e5ee;
+  border-radius: 22px;
+  box-shadow: 0 22px 55px rgba(12,57,91,.13);
+}
+
+body.nm-reprint-dedicated .reprint-header {
+  position: relative;
+  min-height: 146px;
+  margin: 0;
+  padding: 30px 34px;
+  overflow: hidden;
+  border-radius: 21px 21px 0 0;
+  background: linear-gradient(112deg,#062f5d 0%,#07658d 62%,#0ba2b6 100%) !important;
+  box-shadow: none;
+}
+
+body.nm-reprint-dedicated .reprint-header::after {
+  content: "";
+  position: absolute;
+  right: -55px;
+  bottom: -90px;
+  width: 270px;
+  height: 270px;
+  border: 42px solid rgba(255,255,255,.07);
+  border-radius: 50%;
+}
+
+body.nm-reprint-dedicated .reprint-header h1 {
+  position: relative;
+  z-index: 1;
+  margin: 5px 0 7px;
+  color: #fff !important;
+  font-size: clamp(24px,2vw,31px);
+  font-weight: 900;
+  letter-spacing: -.45px;
+}
+
+body.nm-reprint-dedicated .reprint-header p {
+  position: relative;
+  z-index: 1;
+  color: rgba(255,255,255,.82) !important;
+  font-size: 14px;
+}
+
+body.nm-reprint-dedicated .reprint-eyebrow {
+  color: #8cecff !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+body.nm-reprint-dedicated .document-counter {
+  position: relative;
+  z-index: 1;
+  min-height: 58px;
+  padding: 11px 16px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 16px;
+  color: #fff !important;
+  background: rgba(3,43,76,.28);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter: blur(5px);
+}
+
+body.nm-reprint-dedicated .document-counter i { color: #83efff; font-size: 20px; }
+body.nm-reprint-dedicated .document-counter strong { color: #fff; font-size: 18px; }
+
+body.nm-reprint-dedicated .reprint-card > .row {
+  margin: 0;
+  padding: 20px 16px 0;
+}
+
+body.nm-reprint-dedicated .filter-column { padding: 0 9px 18px; }
+body.nm-reprint-dedicated .filter-control { margin: 0; }
+body.nm-reprint-dedicated .filter-control legend,
+body.nm-reprint-dedicated .filter-control > label {
+  margin: 0 0 7px;
+  padding: 0;
+  color: #31526b;
+  border: 0;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .75px;
+  text-transform: uppercase;
+}
+
+body.nm-reprint-dedicated .filter-control .input-group-text {
+  width: 48px;
+  justify-content: center;
+  border: 1px solid #c9dce8;
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+  color: #087ca4;
+  background: #edf7fb;
+}
+
+body.nm-reprint-dedicated .filter-control .form-control,
+body.nm-reprint-dedicated .filter-control .custom-select {
+  height: 50px;
+  border: 1px solid #c9dce8;
+  color: #173d5a;
+  background-color: #fbfdfe;
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: none;
+}
+
+body.nm-reprint-dedicated .filter-control .form-control:focus,
+body.nm-reprint-dedicated .filter-control .custom-select:focus {
+  border-color: #1498be;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(20,152,190,.12);
+}
+
+body.nm-reprint-dedicated .clear-button {
+  min-width: 112px;
+  border: 0;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(135deg,#607587,#435b6d);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+body.nm-reprint-dedicated .table-panel {
+  padding: 0 0 5px;
+  overflow-x: auto;
+  border: 1px solid #d7e6ef;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(16,67,101,.07);
+}
+
+body.nm-reprint-dedicated table { margin: 0; border-radius: 15px; }
+body.nm-reprint-dedicated table thead,
+body.nm-reprint-dedicated table thead tr,
+body.nm-reprint-dedicated table thead th,
+body.nm-reprint-dedicated table thead td {
+  background: linear-gradient(135deg,#075b8b,#087ba4) !important;
+}
+
+body.nm-reprint-dedicated table thead th { height: 56px; padding: 14px 12px !important; font-size: 10px; letter-spacing: .55px; }
+body.nm-reprint-dedicated table tbody td { padding: 12px !important; color: #23445c; font-size: 12px; line-height: 1.35; }
+body.nm-reprint-dedicated table tbody tr:nth-child(odd) { background: #fbfdfe !important; }
+body.nm-reprint-dedicated table tbody tr:nth-child(even) { background: #f0f7fb !important; }
+body.nm-reprint-dedicated table tbody tr:hover { background: #e4f4fa !important; }
+
+body.nm-reprint-dedicated .document-actions { gap: 6px; min-width: 690px; }
+body.nm-reprint-dedicated .document-actions .btn {
+  min-height: 38px;
+  padding: 8px 11px !important;
+  border-radius: 10px !important;
+  font-size: 10px;
+  letter-spacing: .1px;
+  box-shadow: 0 6px 13px rgba(12,74,109,.15);
+}
+
+body.nm-reprint-dedicated .pagination { margin: 16px 0 0; gap: 5px; }
+body.nm-reprint-dedicated .page-link { min-width: 38px; height: 38px; padding: 9px; border: 0; border-radius: 9px !important; color: #27607f; background: #eaf4f9; text-align: center; font-weight: 850; }
+body.nm-reprint-dedicated .page-item.active .page-link { color: #fff; background: linear-gradient(135deg,#0876a5,#0aa8b8); box-shadow: 0 6px 13px rgba(8,118,165,.23); }
+
+@media (max-width: 767px) {
+  body.nm-reprint-dedicated #app > div > .container-fluid { width: calc(100% - 14px); margin: 7px auto 18px; }
+  body.nm-reprint-dedicated .reprint-header { min-height: 0; padding: 22px 19px; }
+  body.nm-reprint-dedicated .reprint-card > .row { padding: 14px 7px 0; }
+  body.nm-reprint-dedicated .clear-button { min-width: 48px; font-size: 0; }
+  body.nm-reprint-dedicated .clear-button i { font-size: 12px; }
+}

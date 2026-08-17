@@ -1,0 +1,7 @@
+.va-card.va-movement-register-card{background:linear-gradient(135deg,#760c2c,#b91843 58%,#ef4b48)}
+.va-movement-register-panel{padding:0!important;overflow:hidden}
+.va-movement-register-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(135deg,#760c2c,#c51d49);color:#fff}
+.va-movement-register-toolbar button{display:grid;width:42px;height:42px;place-items:center;border:1px solid rgba(255,255,255,.28);border-radius:13px;color:#fff;background:rgba(255,255,255,.12)}
+.va-movement-register-toolbar strong{font-size:14px;letter-spacing:.04em}
+.va-movement-register-frame{display:block;width:100%;height:calc(100vh - 190px);min-height:650px;border:0;background:#f4f9fc}
+@media(max-width:700px){.va-movement-register-frame{height:calc(100vh - 105px);min-height:720px}}

@@ -1,0 +1,158 @@
+.caja-bancos-modern{min-height:100vh;color:#123253;background:linear-gradient(145deg,#f4f9fd,#eaf3f9 58%,#f9fcfe);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.caja-bancos-modern #app{padding:16px 20px 34px}
+.caja-bancos-modern .cb-hero{display:flex;align-items:center;gap:16px;min-height:104px;margin:0 0 14px;padding:18px 24px;color:#fff;border-radius:22px;background:linear-gradient(115deg,#082c58,#075c8c 66%,#0997b3);box-shadow:0 17px 38px rgba(8,55,94,.2)}
+.caja-bancos-modern .cb-hero__icon{display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;color:#8ce8ff;font-size:24px;border:1px solid rgba(255,255,255,.24);border-radius:17px;background:rgba(255,255,255,.11)}
+.caja-bancos-modern .cb-hero small{display:block;margin-bottom:2px;color:#8deaff;font-size:10px;font-weight:900;letter-spacing:1.7px}
+.caja-bancos-modern .cb-hero h1{margin:0;font-size:28px;font-weight:900;letter-spacing:-.5px}
+.caja-bancos-modern .cb-hero p{margin:3px 0 0;color:rgba(255,255,255,.78);font-size:12px}
+.caja-bancos-modern .cb-hero__status{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(2,34,64,.24);font-size:11px;font-weight:800}
+.caja-bancos-modern .cb-hero__status i{margin-right:6px;color:#5ee7b4}
+.caja-bancos-modern .cb-breadcrumb{margin:0 0 14px!important;padding:0 5px!important;color:#688199!important;background:transparent!important;border:0!important;font-size:12px!important;font-weight:800;letter-spacing:.35px}
+.caja-bancos-modern .cb-tabs{display:flex!important;align-items:center;gap:8px;margin:0 0 16px!important;padding:8px!important;overflow-x:auto;border:1px solid #d8e6f0!important;border-radius:16px!important;background:rgba(255,255,255,.92)!important;box-shadow:0 9px 25px rgba(25,68,103,.07)}
+.caja-bancos-modern .cb-tabs a,.caja-bancos-modern .cb-tabs button{min-height:43px;padding:0 18px!important;color:#526d85!important;border:0!important;border-radius:11px!important;background:transparent!important;font-size:13px!important;font-weight:800;white-space:nowrap;transition:.2s ease}
+.caja-bancos-modern .cb-tabs a:hover,.caja-bancos-modern .cb-tabs button:hover{color:#087bab!important;background:#edf7fc!important;transform:translateY(-1px)}
+.caja-bancos-modern .cb-tabs .active{color:#fff!important;background:linear-gradient(135deg,#0b5689,#0796ba)!important;box-shadow:0 7px 17px rgba(9,105,153,.24)}
+.caja-bancos-modern .cb-filter-card{margin:0!important;padding:20px!important;border:1px solid #d6e5ef!important;border-radius:19px!important;background:#fff!important;box-shadow:0 14px 34px rgba(27,70,105,.09)!important}
+.caja-bancos-modern .cb-filter-card label{margin-bottom:6px;color:#294a68;font-size:12px;font-weight:850}
+.caja-bancos-modern .cb-filter-card input,.caja-bancos-modern .cb-filter-card select{min-height:48px;color:#173652;border:1px solid #ccdeea!important;border-radius:12px!important;background:#fbfdff;box-shadow:none!important;font-size:13px;font-weight:700}
+.caja-bancos-modern .cb-filter-card input:focus,.caja-bancos-modern .cb-filter-card select:focus{border-color:#1396c7!important;box-shadow:0 0 0 4px rgba(19,150,199,.12)!important}
+.caja-bancos-modern .cb-filter-card button,.caja-bancos-modern .cb-filter-card a{min-height:46px;padding:0 17px;border:0!important;border-radius:12px!important;font-size:12px;font-weight:900;box-shadow:0 8px 18px rgba(23,74,108,.14);transition:.18s ease}
+.caja-bancos-modern .cb-filter-card button:hover,.caja-bancos-modern .cb-filter-card a:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.caja-bancos-modern .cb-btn-export{color:#fff!important;background:linear-gradient(135deg,#07945b,#19bd78)!important}
+.caja-bancos-modern .cb-btn-new{color:#fff!important;background:linear-gradient(135deg,#0b68a0,#0a9dc0)!important}
+.caja-bancos-modern .cb-btn-generate{color:#fff!important;background:linear-gradient(135deg,#0875a9,#0eb4c5)!important;box-shadow:0 9px 20px rgba(8,117,169,.24)!important}
+.caja-bancos-modern .cb-report-filter{display:grid!important;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr) auto auto;gap:14px 18px!important;align-items:end;margin:0 0 18px!important;padding:20px!important;border:1px solid #d4e4ee!important;border-radius:20px!important;background:rgba(255,255,255,.96)!important;box-shadow:0 14px 35px rgba(20,65,98,.09)!important}
+.caja-bancos-modern .cb-report-filter label{display:block;margin-bottom:6px;color:#294a68;font-size:12px;font-weight:850}.caja-bancos-modern .cb-report-filter input,.caja-bancos-modern .cb-report-filter select{width:100%!important;min-height:48px;padding:0 14px;color:#173652;border:1px solid #caddea!important;border-radius:12px!important;background:#fbfdff!important;box-shadow:none!important}.caja-bancos-modern .cb-report-filter button,.caja-bancos-modern .cb-report-filter a{min-height:46px;padding:0 18px!important;border:0!important;border-radius:12px!important;font-weight:850!important}
+.caja-bancos-modern .cb-report-table-card{position:relative;min-height:300px;overflow:hidden;border:1px solid #d4e3ee!important;border-radius:20px!important;background:#fff!important;box-shadow:0 16px 38px rgba(24,67,99,.1)!important}.caja-bancos-modern .cb-report-table{width:100%!important;margin:0!important;border-collapse:separate!important;border-spacing:0!important}.caja-bancos-modern .cb-report-table thead th{padding:15px 14px!important;color:#fff!important;border:0!important;background:linear-gradient(105deg,#083e70,#078eae)!important;font-size:11px!important;font-weight:900!important;text-transform:uppercase}.caja-bancos-modern .cb-report-table tbody td{padding:14px!important;color:#294a63;border-color:#e1ecf2!important;font-size:12px}.caja-bancos-modern .cb-report-table tbody tr:nth-child(even){background:#f4f9fc}.caja-bancos-modern .cb-report-table tbody tr:hover{background:#e9f6fb}
+.caja-bancos-modern .cb-table-card{position:relative;margin:0!important;min-height:260px;overflow:hidden;border:1px solid #d4e3ee!important;border-radius:19px!important;background:#fff!important;box-shadow:0 14px 34px rgba(27,70,105,.09)!important}
+.caja-bancos-modern .cb-table{width:100%;margin:0!important;border:0!important;border-collapse:separate;border-spacing:0}
+.caja-bancos-modern .cb-table thead th{padding:14px 15px!important;color:#fff!important;border:0!important;border-right:1px solid rgba(255,255,255,.14)!important;background:#0c658f!important;font-size:11px!important;font-weight:900!important;letter-spacing:.45px;text-transform:uppercase}
+.caja-bancos-modern .cb-table thead tr:first-child th{background:linear-gradient(105deg,#083b6d,#087fa4)!important;font-size:13px!important;text-transform:none}
+.caja-bancos-modern .cb-table tbody td{padding:13px 15px;border-color:#e5eef4;color:#294a63;font-size:12px}
+.caja-bancos-modern .cb-table tbody tr:nth-child(even){background:#f5fafc}
+.caja-bancos-modern .cb-table tbody tr:hover{background:#eaf6fb}
+.caja-bancos-modern .cb-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:175px;color:#7a91a5;text-align:center}
+.caja-bancos-modern .cb-empty i{display:grid;place-items:center;width:52px;height:52px;margin-bottom:10px;color:#1686b2;font-size:20px;border-radius:15px;background:#e8f5fa}
+.caja-bancos-modern .cb-empty strong{color:#31536d;font-size:14px}.caja-bancos-modern .cb-empty span{margin-top:3px;font-size:11px}
+@media(min-width:900px){
+.caja-bancos-modern .cb-main-layout{display:grid!important;grid-template-columns:minmax(320px,430px) minmax(0,1fr)!important;gap:18px!important;align-items:start!important;width:100%!important;max-width:none!important}
+.caja-bancos-modern .cb-main-layout__filter,.caja-bancos-modern .cb-main-layout__table{float:none!important;width:100%!important;max-width:none!important;margin:0!important;padding-left:0!important;padding-right:0!important}
+.caja-bancos-modern .cb-main-layout__filter .cb-filter-card,.caja-bancos-modern .cb-main-layout__table .cb-table-card,.caja-bancos-modern .cb-main-layout>.cb-filter-card,.caja-bancos-modern .cb-main-layout>.cb-table-card{width:100%!important;max-width:none!important;margin:0!important}
+}
+@media(max-width:899px){.caja-bancos-modern #app{padding:10px}.caja-bancos-modern .cb-hero{padding:15px;border-radius:17px}.caja-bancos-modern .cb-hero__status{display:none}.caja-bancos-modern .cb-hero p{display:none}.caja-bancos-modern .cb-filter-card,.caja-bancos-modern .cb-table-card{width:100%!important;margin:0 0 12px!important}.caja-bancos-modern .cb-table-card{overflow-x:auto}.caja-bancos-modern .cb-table{min-width:720px}}
+@media(max-width:899px){.caja-bancos-modern .cb-report-filter{grid-template-columns:1fr!important}.caja-bancos-modern .cb-report-table-card{overflow-x:auto}.caja-bancos-modern .cb-report-table{min-width:850px!important}}
+.caja-bancos-modern .cb-operation-modal{padding:18px!important;background:rgba(3,22,41,.62)!important;backdrop-filter:blur(5px)}
+.caja-bancos-modern .cb-operation-modal .modal-dialog{width:min(1180px,96vw)!important;max-width:none!important;margin:18px auto!important}.caja-bancos-modern .cb-operation-modal .modal-content{overflow:hidden;border:1px solid #9bcde7!important;border-radius:24px!important;background:#f8fbfd!important;box-shadow:0 30px 80px rgba(1,24,46,.35)!important}
+.caja-bancos-modern .cb-operation-modal .modal-header{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:94px;padding:18px 24px!important;color:#fff!important;border:0!important;background:linear-gradient(110deg,#082e5d,#076a96 70%,#0a9db8)!important}.caja-bancos-modern .cb-modal-heading{display:flex;align-items:center;gap:14px}.caja-bancos-modern .cb-modal-heading>span{display:grid;place-items:center;width:52px;height:52px;border:1px solid rgba(255,255,255,.25);border-radius:15px;background:rgba(255,255,255,.12);font-size:21px}.caja-bancos-modern .cb-modal-heading small{display:block;color:#8cecff;font-size:10px;font-weight:900;letter-spacing:1.5px}.caja-bancos-modern .cb-modal-heading strong{display:block;font-size:23px}.caja-bancos-modern .cb-modal-heading p{margin:3px 0 0;color:rgba(255,255,255,.78);font-size:11px}.caja-bancos-modern .cb-modal-close{display:grid;place-items:center;width:42px;height:42px;color:#fff;border:1px solid rgba(255,255,255,.25)!important;border-radius:13px!important;background:rgba(255,255,255,.12)!important}.caja-bancos-modern .cb-modal-close:hover{background:#ef476f!important}
+.caja-bancos-modern .cb-operation-modal .modal-body{padding:24px!important}.caja-bancos-modern .cb-operation-modal .modal-body>.container{width:100%!important;padding:0!important}.caja-bancos-modern .cb-operation-modal label{display:block!important;margin:0 0 7px!important;color:#244866;font-size:12px!important;font-weight:850!important}.caja-bancos-modern .cb-operation-modal input,.caja-bancos-modern .cb-operation-modal select{width:100%!important;height:50px!important;padding:0 15px!important;color:#143753;border:1px solid #c9ddea!important;border-radius:13px!important;background-color:#fff!important;box-shadow:none!important;font-size:13px!important}.caja-bancos-modern .cb-operation-modal select{appearance:none!important;padding-right:44px!important;background-image:linear-gradient(45deg,transparent 50%,#167da8 50%),linear-gradient(135deg,#167da8 50%,transparent 50%)!important;background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px!important;background-size:6px 6px,6px 6px!important;background-repeat:no-repeat!important;cursor:pointer}.caja-bancos-modern .cb-operation-modal input:focus,.caja-bancos-modern .cb-operation-modal select:focus{border-color:#0d94be!important;outline:0!important;box-shadow:0 0 0 4px rgba(13,148,190,.13)!important}
+.caja-bancos-modern .cb-operation-modal .form-inline{display:block!important}.caja-bancos-modern .cb-modal-panel{margin:16px 0 20px!important;overflow:hidden;border:1px solid #d3e3ed!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 27px rgba(28,72,105,.08)!important}.caja-bancos-modern .cb-modal-panel .panel-heading{padding:14px 17px!important;color:#fff!important;border:0!important;background:linear-gradient(105deg,#0a4d7e,#098dad)!important;font-size:13px!important;font-weight:900!important}.caja-bancos-modern .cb-modal-panel .panel-body{padding:0!important;overflow-x:auto}.caja-bancos-modern .cb-operation-modal table{min-width:760px;margin:0!important;border:0!important}.caja-bancos-modern .cb-operation-modal table th{padding:13px 12px!important;color:#fff!important;border-color:rgba(255,255,255,.14)!important;background:#0b668e!important;font-size:11px!important;text-transform:uppercase}.caja-bancos-modern .cb-operation-modal table td{padding:12px!important;color:#244762;border-color:#e2edf3!important;font-size:12px}.caja-bancos-modern .cb-operation-modal table tbody tr:nth-child(even){background:#f3f9fc}.caja-bancos-modern .cb-operation-modal table tfoot td{font-weight:900!important;background:#e4f3fa!important}
+.caja-bancos-modern .cb-operation-modal .modal-footer{padding:16px 24px!important;border-top:1px solid #dbe8f0!important;background:#fff!important}.caja-bancos-modern .cb-operation-modal .modal-footer .btn{min-width:135px;height:46px;border:0!important;border-radius:13px!important;font-size:12px;font-weight:900;box-shadow:0 8px 18px rgba(17,65,96,.15)}.caja-bancos-modern .cb-operation-modal .btn-success{background:linear-gradient(135deg,#07945b,#19bd78)!important}.caja-bancos-modern .cb-operation-modal .btn-danger{background:linear-gradient(135deg,#e83655,#f05e73)!important}
+@media(max-width:767px){.caja-bancos-modern .cb-operation-modal{padding:4px!important}.caja-bancos-modern .cb-operation-modal .modal-dialog{width:100%!important;margin:4px auto!important}.caja-bancos-modern .cb-operation-modal .modal-content{border-radius:17px!important}.caja-bancos-modern .cb-operation-modal .modal-header,.caja-bancos-modern .cb-operation-modal .modal-body{padding:15px!important}.caja-bancos-modern .cb-modal-heading p{display:none}.caja-bancos-modern .cb-modal-heading strong{font-size:18px}.caja-bancos-modern .cb-operation-modal .row>[class*=col-]{width:100%!important}.caja-bancos-modern .cb-operation-modal .modal-footer{display:flex}.caja-bancos-modern .cb-operation-modal .modal-footer .btn{flex:1;min-width:0}}
+
+/* Blue visual system and modern account selectors. */
+.caja-bancos-modern{
+  --cb-blue-950:#082b58;
+  --cb-blue-800:#07518a;
+  --cb-blue-650:#087fc0;
+  --cb-blue-500:#139fe0;
+  --cb-blue-100:#e8f5ff;
+}
+.caja-bancos-modern .cb-hero,
+.caja-bancos-modern .cb-operation-modal .modal-header{
+  background:linear-gradient(120deg,var(--cb-blue-950),var(--cb-blue-800) 62%,var(--cb-blue-500))!important;
+}
+.caja-bancos-modern .cb-tabs .active,
+.caja-bancos-modern .cb-btn-export,
+.caja-bancos-modern .cb-btn-new,
+.caja-bancos-modern .cb-btn-generate,
+.caja-bancos-modern .cb-operation-modal .btn-success{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0868ad,#159fdf)!important;
+  box-shadow:0 8px 20px rgba(8,104,173,.26)!important;
+}
+.caja-bancos-modern .cb-account-field{
+  position:relative;
+}
+.caja-bancos-modern .cb-account-field::before{
+  position:absolute;
+  z-index:3;
+  left:14px;
+  bottom:16px;
+  color:#087fc0;
+  content:"\f02d";
+  font-family:"Font Awesome 5 Free";
+  font-size:15px;
+  font-weight:900;
+  pointer-events:none;
+}
+.caja-bancos-modern .cb-account-field select,
+.caja-bancos-modern .cb-account-field .form-control{
+  height:52px!important;
+  padding-left:42px!important;
+  border:1px solid #bcd9ec!important;
+  border-radius:14px!important;
+  color:#123b62!important;
+  background-color:#f8fcff!important;
+  box-shadow:0 7px 18px rgba(8,81,138,.08)!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.caja-bancos-modern .cb-account-field select:focus,
+.caja-bancos-modern .cb-account-field .form-control:focus{
+  border-color:#159fdf!important;
+  background:#fff!important;
+  box-shadow:0 0 0 4px rgba(21,159,223,.14),0 10px 22px rgba(8,81,138,.11)!important;
+}
+.caja-bancos-modern .cb-account-field .autocomplete{
+  position:relative!important;
+  overflow:visible!important;
+}
+.caja-bancos-modern .cb-account-field .autocomplete ul{
+  position:absolute!important;
+  z-index:1060!important;
+  top:calc(100% + 7px)!important;
+  right:0!important;
+  left:0!important;
+  max-height:275px!important;
+  margin:0!important;
+  padding:7px!important;
+  overflow-y:auto!important;
+  border:1px solid #c7dfee!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  box-shadow:0 18px 42px rgba(8,43,88,.2)!important;
+}
+.caja-bancos-modern .cb-account-field .autocomplete li,
+.caja-bancos-modern .cb-account-field .autocomplete li a{
+  display:flex!important;
+  min-height:44px!important;
+  padding:10px 12px!important;
+  align-items:center!important;
+  border:0!important;
+  border-radius:10px!important;
+  color:#234967!important;
+  background:#fff!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  transition:.15s ease!important;
+}
+.caja-bancos-modern .cb-account-field .autocomplete li:hover,
+.caja-bancos-modern .cb-account-field .autocomplete li:hover a,
+.caja-bancos-modern .cb-account-field .autocomplete li.active,
+.caja-bancos-modern .cb-account-field .autocomplete li.active a{
+  color:#07518a!important;
+  background:var(--cb-blue-100)!important;
+  transform:translateX(2px);
+}
+.caja-bancos-modern .cb-table tbody tr{
+  transition:background .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.caja-bancos-modern .cb-table tbody tr:hover{
+  background:#e8f5ff!important;
+  box-shadow:inset 4px 0 0 #159fdf;
+}
+.caja-bancos-modern .cb-table tbody td:nth-child(4){color:#0877b7;font-weight:900;}
+.caja-bancos-modern .cb-table tbody td:nth-child(5){color:#d2455f;font-weight:900;}
+.caja-bancos-modern .cb-table .btn-danger{
+  display:inline-grid;width:34px;height:34px;padding:0;place-items:center;border:0;border-radius:10px;
+}

@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'pe.neurosoft.jobi'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'pe.neurosoft.jobi'
+        minSdk 24
+        targetSdk 35
+        versionCode 5
+        versionName '1.0.4'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}

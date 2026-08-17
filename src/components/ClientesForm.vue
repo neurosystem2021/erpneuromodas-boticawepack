@@ -38,10 +38,11 @@
               <b-form-input 
                 required="required"
                 placeholder="Ingresa 8 u 11 dígitos"
-                v-model="cliente.DniRuc" type="number"></b-form-input>
+                v-model="cliente.DniRuc" type="text" inputmode="numeric" maxlength="11"
+                @input="normalizarDocumento"></b-form-input>
               <b-input-group-append>
-                <b-btn variant="info" @click="consultarDNIRUC">
-                  <i class="fas fa-search"></i><span>Buscar</span>
+                <b-btn variant="info" :disabled="consultandoDocumento" @click="consultarDNIRUC">
+                  <i :class="consultandoDocumento ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i><span>{{ consultandoDocumento ? 'Consultando...' : 'Buscar' }}</span>
                 </b-btn>
               </b-input-group-append>
             </b-input-group>
@@ -133,6 +134,7 @@ export default {
     return {
       API: config.API,
       show: false,
+      consultandoDocumento: false,
       cliente: {
         Cliente: "",
         DniRuc: "",
@@ -177,6 +179,9 @@ export default {
   //   }
   // },
   methods: {
+    normalizarDocumento(valor) {
+      this.cliente.DniRuc = String(valor || "").replace(/\D/g, "").slice(0, 11);
+    },
     abrirClienteForm() {
       this.show = true;
     },
@@ -200,14 +205,15 @@ export default {
       }
     },
     consultarDNIRUC() {
-      var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc));
-      if (!esNumerico) {
-        this.$toasted.show("El DNI/RUC debe ser numérico, editar cliente.");
+      this.normalizarDocumento(this.cliente.DniRuc);
+      if (![8, 11].includes(this.cliente.DniRuc.length)) {
+        this.$toasted.error("Ingrese un DNI de 8 dígitos o un RUC de 11 dígitos.");
         return;
       }
 
-      let tipo = this.cliente.DniRuc.length > 8 ? "RUC" : "DNI";
+      let tipo = this.cliente.DniRuc.length === 11 ? "RUC" : "DNI";
 
+      this.consultandoDocumento = true;
       this.axios
         .get(this.API + "consultarRUC", {
           params: {
@@ -216,30 +222,33 @@ export default {
           }
         })
         .then(response => {
-          if (response.data) {
-            this.$toasted.show("Cliente encontrado, se llenarán sus datos");
-            var data = response.data;
-
-            if (tipo == "DNI") {
-              this.cliente.Cliente =
-                data.nombres +
-                " " +
-                data.apellidoPaterno +
-                " " +
-                data.apellidoMaterno;
-              this.cliente.Direccion = "";
-            } else {
-              this.cliente.Cliente = data.razonSocial;
-              this.cliente.Direccion = data.direccion;
-              // this.cliente.Telefono = data.Telefono
-            }
-          } else {
-            this.$toasted.show("No se encontró el Usuario");
+          var data = response.data;
+          if (!data || data.success === false) {
+            throw new Error((data && data.message) || "No se encontraron datos para este documento.");
           }
+
+          if (tipo == "DNI") {
+            const nombreCompleto = [data.nombres, data.apellidoPaterno, data.apellidoMaterno]
+              .filter(Boolean)
+              .join(" ")
+              .trim();
+            if (!nombreCompleto) throw new Error("El servicio no devolvió el nombre del DNI.");
+            this.cliente.Cliente = nombreCompleto;
+            this.cliente.Direccion = "";
+          } else {
+            if (!data.razonSocial) throw new Error("El servicio no devolvió la razón social del RUC.");
+            this.cliente.Cliente = data.razonSocial;
+            this.cliente.Direccion = data.direccion || "";
+          }
+          this.$toasted.success(`${tipo} encontrado. Se completaron los datos.`);
         })
         .catch(error => {
-          this.$toasted.show("No se encontró el Usuario");
+          const data = error.response && error.response.data;
+          this.$toasted.error((data && data.message) || error.message || "No se pudo consultar el documento.");
           console.log(error);
+        })
+        .then(() => {
+          this.consultandoDocumento = false;
         });
     },
     guardarCliente(evt) {

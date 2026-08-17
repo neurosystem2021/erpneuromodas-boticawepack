@@ -1,0 +1,97 @@
+/* Sistema visual común para submenús y pestañas de todos los módulos Vue. */
+#app .app-modern-submenu {
+  display: flex !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 7px !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap !important;
+  border: 1px solid #d7e5ee !important;
+  border-radius: 15px !important;
+  background-color: #f7fafc !important;
+  box-shadow: 0 8px 22px rgba(20, 63, 96, .08);
+  scrollbar-width: thin;
+  scrollbar-color: #9fc6d9 transparent;
+}
+
+#app .app-modern-submenu::-webkit-scrollbar { height: 5px; }
+#app .app-modern-submenu::-webkit-scrollbar-thumb { border-radius: 999px; background-color: #9fc6d9; }
+
+#app .app-modern-submenu > .nav-item {
+  min-width: max-content;
+  flex: 0 0 auto !important;
+}
+
+#app .app-modern-submenu .app-modern-submenu__link,
+#app .app-modern-submenu.nav-tabs .nav-link,
+#app .app-modern-submenu.nav-pills .nav-link {
+  display: inline-flex !important;
+  min-height: 44px;
+  padding: 9px 15px !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  color: #31536b !important;
+  background-color: transparent !important;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: none !important;
+  transition: color .18s ease, background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+#app .app-modern-submenu .app-modern-submenu__link i {
+  display: inline-grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  flex: 0 0 27px;
+  border-radius: 8px;
+  color: #0879a8;
+  background-color: #e2f2f8;
+  font-size: 12px;
+}
+
+#app .app-modern-submenu .app-modern-submenu__link:hover {
+  color: #07577c !important;
+  border-color: #c7e0eb !important;
+  background-color: #edf7fb !important;
+  transform: translateY(-1px);
+}
+
+#app .app-modern-submenu .app-modern-submenu__link.active,
+#app .app-modern-submenu .app-modern-submenu__link[aria-selected="true"] {
+  color: #fff !important;
+  border-color: #0879a8 !important;
+  background-color: #0879a8 !important;
+  box-shadow: 0 7px 16px rgba(8, 121, 168, .2) !important;
+}
+
+#app .app-modern-submenu .app-modern-submenu__link.active i,
+#app .app-modern-submenu .app-modern-submenu__link[aria-selected="true"] i {
+  color: #0879a8;
+  background-color: #fff;
+}
+
+#app .card > .card-header:has(.app-modern-submenu),
+#app .card-header:has(> .app-modern-submenu) {
+  padding: 8px !important;
+  border: 0 !important;
+  background-color: transparent !important;
+}
+
+@media (max-width: 700px) {
+  #app .app-modern-submenu { padding: 6px !important; }
+  #app .app-modern-submenu .app-modern-submenu__link,
+  #app .app-modern-submenu.nav-tabs .nav-link,
+  #app .app-modern-submenu.nav-pills .nav-link { min-height: 40px; padding: 7px 11px !important; font-size: 11px; }
+  #app .app-modern-submenu .app-modern-submenu__link i { width: 24px; height: 24px; flex-basis: 24px; }
+}

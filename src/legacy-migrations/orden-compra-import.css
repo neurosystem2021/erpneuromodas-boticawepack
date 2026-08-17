@@ -1,0 +1,35 @@
+.nm-order-import { display:inline-flex; min-height:44px; padding:0 16px; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.34); border-radius:13px; color:#fff; background:linear-gradient(135deg,#0aa466,#18c47b); box-shadow:0 8px 18px rgba(0,83,52,.23); font-size:12px; font-weight:850; cursor:pointer; white-space:nowrap; }
+.nm-order-import:hover { transform:translateY(-1px); filter:brightness(1.05); }
+.nm-order-import:disabled { opacity:.7; cursor:wait; transform:none; }
+.nm-order-import-status { display:none; margin:0 48px 14px; padding:12px 16px; border:1px solid #b9dfef; border-radius:12px; color:#24566f; background:#edf8fc; font-size:12px; font-weight:750; }
+.nm-order-import-status.is-visible { display:block; }
+.nm-order-import-status.is-success { border-color:#9ddfc0; color:#08794d; background:#effbf5; }
+.nm-order-import-status.is-error { border-color:#ffc0c8; color:#b52b42; background:#fff1f3; }
+@media(max-width:720px){.nm-order-import{width:100%;justify-content:center}.nm-order-import-status{margin:0 18px 12px}}
+.nm-replenish-reference { color:#b96900 !important; background:#fff4d9 !important; font-weight:900 !important; }
+.nm-new-product { display:inline-flex; margin:8px 0 14px; padding:11px 16px; align-items:center; gap:8px; border:0; border-radius:12px; color:#fff; background:linear-gradient(135deg,#1267c5,#078bb2); box-shadow:0 8px 18px rgba(13,101,161,.20); font-size:12px; font-weight:850; cursor:pointer; }
+.nm-new-product:hover { transform:translateY(-1px); filter:brightness(1.05); }
+.nm-order-confirm { display:grid; grid-template-columns:1fr auto; gap:8px 20px; margin:12px 0 16px; padding:14px 16px; text-align:left; border:1px solid #d7e7f1; border-radius:12px; background:#f5f9fc; }
+.nm-order-confirm span { color:#627b8d; }
+.nm-order-confirm b { color:#0b4f7d; text-align:right; }
+.nm-new-supplier { display:inline-flex; margin-top:7px; padding:8px 12px; align-items:center; gap:7px; border:1px solid #9ccfe3; border-radius:10px; color:#08749b; background:#edf8fc; font-size:10px; font-weight:850; cursor:pointer; }
+.nm-new-supplier:hover { color:#fff; background:#087da4; }
+.nm-supplier-modal { display:none; position:fixed; z-index:99999; inset:0; padding:25px; align-items:center; justify-content:center; background:rgba(4,31,54,.58); backdrop-filter:blur(3px); }
+.nm-supplier-modal.is-open { display:flex; }
+.nm-supplier-dialog { width:min(610px,100%); overflow:hidden; border-radius:20px; background:#fff; box-shadow:0 28px 70px rgba(0,28,50,.32); }
+.nm-supplier-dialog header { display:flex; padding:20px 22px; align-items:center; gap:12px; color:#fff; background:linear-gradient(120deg,#074b7d,#0797ad); }
+.nm-supplier-dialog header > span { display:grid; width:43px; height:43px; place-items:center; border-radius:12px; background:rgba(255,255,255,.15); font-size:18px; }
+.nm-supplier-dialog header small { color:#bdebf3; font-size:9px; font-weight:850; letter-spacing:.08em; }
+.nm-supplier-dialog h2 { margin:2px 0 0; color:#fff; font-size:21px; }
+.nm-supplier-dialog header button { margin-left:auto; border:0; color:#fff; background:transparent; font-size:18px; cursor:pointer; }
+.nm-supplier-body { display:grid; padding:22px; gap:7px; }
+.nm-supplier-body label { margin:7px 0 0; color:#244c65; font-size:11px; font-weight:850; }
+.nm-supplier-body input { width:100%; height:45px; padding:0 12px; border:1px solid #c7ddea; border-radius:11px; outline:0; }
+.nm-supplier-body input:focus { border-color:#078eaf; box-shadow:0 0 0 3px rgba(7,142,175,.11); }
+.nm-supplier-ruc { display:flex; }
+.nm-supplier-ruc input { border-radius:11px 0 0 11px; }
+.nm-supplier-ruc button { min-width:145px; border:0; border-radius:0 11px 11px 0; color:#fff; background:#087da4; font-size:11px; font-weight:800; }
+.nm-supplier-body > small { color:#708799; font-size:9px; }.nm-supplier-body > small.is-success{color:#078c59}.nm-supplier-body > small.is-error{color:#d7354d}
+.nm-supplier-dialog footer { display:flex; padding:15px 22px 20px; justify-content:flex-end; gap:9px; }
+.nm-supplier-dialog footer button { padding:11px 16px; border:1px solid #c8dae6; border-radius:11px; color:#526d80; background:#fff; font-weight:800; cursor:pointer; }
+.nm-supplier-dialog footer [data-save] { border:0; color:#fff; background:#0bb374; }

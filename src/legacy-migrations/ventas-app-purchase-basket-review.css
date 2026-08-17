@@ -1,0 +1,2 @@
+.va-purchase-cart-review{display:none}
+@media(max-width:700px){.va-purchase-cart-review{position:fixed;z-index:3;right:0;bottom:0;left:0;display:grid;padding:9px;border-top:1px solid #ecc9d4;background:#fff;box-shadow:0 -10px 26px rgba(84,12,33,.14);grid-template-columns:1fr 1.35fr;gap:7px}.va-purchase-cart-review button{min-height:49px;border:0;border-radius:13px;font-size:10px;font-weight:900}.va-purchase-cart-review button:first-child{color:#74142d;background:#f8e9ee}.va-purchase-cart-review button:last-child{color:#fff;background:linear-gradient(135deg,#087e58,#11b879)}}

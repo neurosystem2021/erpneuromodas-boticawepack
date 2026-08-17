@@ -1,12 +1,12 @@
 <template>
-  <b-row class="inventory-cart">
+  <b-row class="inventory-cart" :class="{ 'inventory-cart--movement': tipo === 'mov' }">
     <b-col md="12">
-      <div class="inventory-list-meta" v-if="productos.length">
+      <div class="inventory-list-meta" v-if="productos.length || tipo === 'mov'">
         <div>
           <span class="inventory-list-meta__icon"><i class="fas fa-box-open"></i></span>
           <span>
-            <strong>Productos agregados</strong>
-            <small>Revisa cantidades, costos e importes del movimiento</small>
+            <strong>{{ productos.length ? 'Productos agregados' : 'Detalle del movimiento' }}</strong>
+            <small>{{ productos.length ? 'Revisa cantidades, costos e importes del movimiento' : 'Agrega productos para registrar el movimiento' }}</small>
           </span>
         </div>
         <div v-if="tipo === 'mov'" class="inventory-list-meta__actions">
@@ -21,7 +21,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
-            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '25' }"
+            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '30' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -63,7 +63,7 @@
           <autocomplete
             ref="autocompleteProducto2"
             :url="API + 'productos'"
-            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '25' }"
+            :customParams="{ sortBy: 'stock', sortDesc: 1, limit: '30' }"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
             label="writer"
@@ -98,7 +98,7 @@
       </b-form-group>
       </div>
 
-      <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
+      <b-modal id="modalImagenCarrito" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="pos-image-gallery-title"><i class="fas fa-images"></i><h3>{{productoNombre}}</h3></div>
         <div class="pos-image-gallery-stage">
           <button v-if="productoUrls.length > 1" type="button" @click="cambiarImagen(-1)"><i class="fas fa-chevron-left"></i></button>
@@ -650,8 +650,10 @@ export default {
     },
     editarProducto(datos) {
       this.productoSelect = datos;
-      this.$refs.productoFormEdit.show = true;
-      this.$refs.productoFormEditAnt.show = true;
+      const formulario = window.matchMedia("(max-width: 767px)").matches
+        ? this.$refs.productoFormEditAnt
+        : this.$refs.productoFormEdit;
+      if (formulario) formulario.show = true;
     },
     setProducto(obj) {
       this.$refs.autocompleteProducto.setValue("");
@@ -784,6 +786,8 @@ export default {
       `;
     },
     renderChild(data) {
+      return this.renderSuggestion(data);
+
       // if (this.idAlmacen) {
       let styleStock = "";
       if (data.stock <= 0) {
@@ -957,12 +961,32 @@ fieldset {
 .table-responsive {
   width: 100% !important;
 }
-#modalImagen .modal-dialog {
-  max-width: 75% !important;
-}
 .imagenGrande {
   width: 100%;
 }
+#modalImagenCarrito .modal-dialog {
+  max-width: min(760px, calc(100vw - 32px)) !important;
+}
+#modalImagenCarrito .modal-content { overflow:hidden;border:0;border-radius:18px;box-shadow:0 24px 70px rgba(7,35,65,.32); }
+#modalImagenCarrito .modal-body { padding:20px; }
+#modalImagenCarrito .pos-image-gallery-title { display:flex;margin-bottom:14px;align-items:center;gap:12px;color:#12375f; }
+#modalImagenCarrito .pos-image-gallery-title i { display:grid;width:42px;height:42px;place-items:center;border-radius:12px;color:#fff;background-color:#0879a8; }
+#modalImagenCarrito .pos-image-gallery-title h3 { margin:0;font-size:20px;font-weight:900; }
+#modalImagenCarrito .pos-image-gallery-stage { display:grid;min-height:390px;padding:18px;place-items:center;grid-template-columns:44px minmax(0,1fr) 44px;gap:10px;border-radius:16px;background-color:#eef6fb; }
+#modalImagenCarrito .pos-image-gallery-stage > button { display:grid;width:40px;height:40px;padding:0;place-items:center;border:0;border-radius:50%;color:#fff;background-color:#0879a8; }
+#modalImagenCarrito .imagenGrande {
+  display:block;
+  width:auto !important;
+  max-width:100% !important;
+  height:auto !important;
+  max-height:58vh !important;
+  margin:auto;
+  object-fit:contain;
+}
+#modalImagenCarrito .pos-image-gallery-thumbs { display:flex;padding-top:12px;justify-content:center;gap:8px; }
+#modalImagenCarrito .pos-image-gallery-thumbs button { width:58px;height:58px;padding:3px;overflow:hidden;border:2px solid transparent;border-radius:10px;background-color:#eaf3f9; }
+#modalImagenCarrito .pos-image-gallery-thumbs button.active { border-color:#0879a8; }
+#modalImagenCarrito .pos-image-gallery-thumbs img { width:100%;height:100%;object-fit:cover; }
 #modalCodigoBarra {
   padding: 0 !important;
 }
@@ -1090,11 +1114,17 @@ canvas {
   box-shadow: 0 22px 48px rgba(8, 39, 76, .22);
   backdrop-filter: blur(14px);
 }
+.inventory-cart--movement .inventory-product-search__bar .autocomplete ul {
+  width: calc(100vw - 84px);
+  max-width: 1780px;
+  max-height: none;
+  overflow-y: visible;
+}
 .inventory-product-search__bar .autocomplete ul::before {
   display: none;
 }
 .inventory-product-search__bar .autocomplete ul li {
-  margin: 0 0 7px;
+  margin: 0 0 4px;
   padding: 0;
   border: 0;
 }
@@ -1121,8 +1151,8 @@ canvas {
   grid-template-columns: 78px minmax(360px, 2.7fr) minmax(285px, 1.7fr) 92px 125px 58px;
   align-items: center;
   gap: 0;
-  min-height: 78px;
-  padding: 0 10px;
+  min-height: 62px;
+  padding: 0 8px;
   border: 1px solid #dbe7f1;
   border-radius: 14px;
   color: #16314f;
@@ -1189,8 +1219,8 @@ canvas {
 .inventory-suggestion__tags,
 .inventory-suggestion__location,
 .inventory-suggestion__price {
-  min-height: 58px;
-  padding: 8px 13px;
+  min-height: 48px;
+  padding: 6px 11px;
   justify-content: center;
   border-left: 1px solid #e3edf5;
 }
@@ -1253,8 +1283,8 @@ canvas {
 .inventory-suggestion__photo {
   position: relative;
   order: 6;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   overflow: hidden;
   border: 1px solid #cfe1ef;
   color: #1684c5;

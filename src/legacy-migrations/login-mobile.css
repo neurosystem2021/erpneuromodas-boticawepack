@@ -1,0 +1,101 @@
+/* Login móvil de NeuroModas. Fuente maestra: publicar también en boticav1. */
+@media (max-width: 700px) {
+  html, body { min-height: 100%; background: #fff7f8; }
+  body { overflow-x: hidden; }
+  .page { display: block; min-height: 100dvh; }
+  .showcase { display: none; }
+  .access {
+    min-height: 100dvh;
+    padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+    justify-content: center;
+    background:
+      radial-gradient(circle at 92% 8%, rgba(255, 96, 71, .24), transparent 31%),
+      radial-gradient(circle at 6% 88%, rgba(145, 15, 55, .12), transparent 34%),
+      linear-gradient(150deg, #fffafa 0%, #fff1f3 48%, #fff8f2 100%);
+  }
+  .access::before {
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #730b2c, #cf2143, #ff6047);
+    animation: none;
+  }
+  .access-top {
+    position: absolute;
+    top: max(16px, env(safe-area-inset-top));
+    right: 16px;
+    z-index: 4;
+    margin: 0;
+    padding: 7px 10px;
+    border-color: rgba(130, 15, 45, .09);
+    color: #72636a;
+    font-size: 10px;
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(12px);
+  }
+  .access-top .status-dot { width: 7px; height: 7px; }
+  .system-time { display: none; }
+  .login-wrap {
+    width: 100%; max-width: 430px;
+    margin: auto;
+    padding: 30px 22px 25px;
+    border: 1px solid rgba(132, 15, 47, .12);
+    border-radius: 28px;
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 22px 55px rgba(91, 12, 37, .13), 0 2px 9px rgba(91, 12, 37, .06);
+    transform: none !important;
+  }
+  .login-wrap::before { height: 5px; background: linear-gradient(90deg, #6f0c2c, #c9183d, #ff6047); animation: none; }
+  .login-wrap::after { content: "JOBI"; color: rgba(124, 10, 45, .025); font-size: 76px; }
+  .card-corner.top-left { border-color: #d42145; }
+  .card-corner.bottom-right { border-color: #82102f; }
+  .client-brand { margin: 3px 0 20px; padding-bottom: 17px; }
+  .client-logo { width: min(54vw, 205px); height: 92px; margin: -8px 0 7px; }
+  .client-logo::before { background: rgba(207, 33, 67, .12); }
+  .client-brand-copy strong { color: #79102e; font-size: 13px; }
+  .client-brand-copy span { color: #ac3852; }
+  .login-kicker {
+    margin-bottom: 10px; padding: 6px 10px;
+    border-color: rgba(128, 13, 45, .12);
+    color: #8a1434; background: #fff0f3; box-shadow: none;
+  }
+  .login-kicker::before { background: #d92347; box-shadow: 0 0 0 4px rgba(217,35,71,.12); }
+  h2 { color: #2d111a; font-family: Inter, "Segoe UI", Arial, sans-serif; font-size: 32px; font-weight: 850; }
+  h2::after { height: 3px; background: linear-gradient(90deg,#991537,#ff6047); box-shadow: none; animation: none; }
+  .login-intro { margin: 14px 0 24px; color: #74656b; font-size: 13px; }
+  .trust-row { margin: -11px 0 20px; color: #8b737b; font-size: 8px; }
+  .trust-row i { background: #d92347; box-shadow: 0 0 0 3px rgba(217,35,71,.1); }
+  .field { margin-bottom: 15px; }
+  .field label { color: #4a2934; }
+  .field:focus-within label { color: #9b1638; }
+  .input-shell input {
+    height: 54px; min-height: 54px;
+    border-color: rgba(123, 17, 48, .16);
+    border-radius: 15px;
+    background: #fff9fa;
+    font-size: 16px;
+  }
+  .input-shell input:focus { border-color: #bd1e40; box-shadow: 0 0 0 4px rgba(201,24,61,.11); }
+  .input-shell svg { color: #a13a51; }
+  .error { min-height: 17px; margin-bottom: 7px; font-size: 12px; }
+  .submit {
+    width: 100%; height: 54px;
+    border: 0; border-radius: 15px;
+    color: #fff;
+    background: linear-gradient(135deg, #77102f, #c51d40 58%, #f35448);
+    box-shadow: 0 13px 27px rgba(159,20,54,.24);
+  }
+  .submit::before { display: none; }
+  .security-note { color: #76636a; font-size: 10px; }
+  .security-note svg { color: #b51c3d; }
+  .access-footer { display: none; }
+}
+
+@media (max-width: 700px) and (max-height: 680px) {
+  .access { justify-content: flex-start; padding-top: 44px; }
+  .access-top { top: 10px; }
+  .login-wrap { padding-top: 22px; padding-bottom: 18px; border-radius: 22px; }
+  .client-brand { margin-bottom: 13px; padding-bottom: 11px; }
+  .client-logo { height: 62px; margin-bottom: 3px; }
+  .client-brand-copy span { display: none; }
+  .login-intro { margin-bottom: 19px; }
+  .trust-row { display: none; }
+}

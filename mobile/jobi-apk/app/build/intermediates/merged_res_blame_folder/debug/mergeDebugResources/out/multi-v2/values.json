@@ -1,0 +1,84 @@
+{
+    "logs": [
+        {
+            "outputFile": "pe.neurosoft.jobi.app-mergeDebugResources-2:/values/values.xml",
+            "map": [
+                {
+                    "source": "C:\\xampp\\htdocs\\boticawebpack\\mobile\\jobi-apk\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "-1",
+                        "startColumns": "-1",
+                        "startOffsets": "-1"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "42",
+                        "endOffsets": "93"
+                    }
+                },
+                {
+                    "source": "C:\\xampp\\htdocs\\boticawebpack\\mobile\\jobi-apk\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "10",
+                        "endColumns": "12",
+                        "endOffsets": "581"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "98",
+                        "endLines": "11",
+                        "endColumns": "12",
+                        "endOffsets": "624"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "C:\\Users\\USER\\.gradle\\daemon\\8.7\\pe.neurosoft.jobi.app-mergeDebugResources-2:\\values\\values.xml",
+            "map": [
+                {
+                    "source": "C:\\xampp\\htdocs\\boticawebpack\\mobile\\jobi-apk\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "11",
+                        "startOffsets": "50",
+                        "endColumns": "49",
+                        "endOffsets": "88"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "42",
+                        "endOffsets": "93"
+                    }
+                },
+                {
+                    "source": "C:\\xampp\\htdocs\\boticawebpack\\mobile\\jobi-apk\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "9",
+                        "endColumns": "12",
+                        "endOffsets": "507"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "98",
+                        "endLines": "10",
+                        "endColumns": "12",
+                        "endOffsets": "550"
+                    }
+                }
+            ]
+        }
+    ]
+}

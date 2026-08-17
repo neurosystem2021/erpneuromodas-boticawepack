@@ -2,7 +2,17 @@
   <div>
     <h2 align-h="center" class="text-center" >Reporte Ranking de Clientes</h2>
       <b-container class="bv-example-row">
-        <b-row>
+        <b-row class="ranking-clientes-filtros">
+          <b-col md="3" class="my-1">
+            <b-form-group label="Desde:">
+              <b-form-input type="date" v-model="fechaInicio" @change="aplicarFechas" />
+            </b-form-group>
+          </b-col>
+          <b-col md="3" class="my-1">
+            <b-form-group label="Hasta:">
+              <b-form-input type="date" v-model="fechaFin" @change="aplicarFechas" />
+            </b-form-group>
+          </b-col>
           <b-col md="4" class="my-1">
             <b-form-group>
                   <label>Buscar:</label>
@@ -33,9 +43,9 @@
                   </autocomplete>
                 </b-form-group>
           </b-col>
-          <b-col md="4" class="my-1">
+          <b-col md="2" class="my-1">
             <b-row>
-            <b-col md="8">
+            <b-col md="12">
 
               <b-form-group>
                   <label>Mostrar:</label>
@@ -69,7 +79,7 @@
         </b-row>
         <b-row align-h="center" class="text-center">
             <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/rankingclientes?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+              <b-button variant="success" size="lg" :href="exportUrl" target="_blank"><i class="fa fa-file-excel-o"></i> Exportar</b-button>
             </b-col>
         </b-row>
         <br /><br />
@@ -82,12 +92,7 @@ import config from '@/store/config.js'
 // import ProductoForm from '@/components/ProductoForm'
 
 export default {
-  mounted() {
-    this.axios.get(this.API + 'ranking/clientes/count?idalmacen=' + this.almacen.IdAlmacen ).then((response) => {
-      console.log(response)
-      this.totalRows = response.data.total
-    })
-  },
+  mounted() { this.loadCount('') },
   data() {
     return {
       API: config.API,
@@ -107,18 +112,35 @@ export default {
       totalRows: 50,
       perPage: 10,
       currentPage: 1,
+      fechaInicio: this.firstDayOfMonth(),
+      fechaFin: this.today(),
       almacen: {
         IdAlmacen: 1
       }
     }
   },
   methods: {
+    today () {
+      const date = new Date(); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 10)
+    },
+    firstDayOfMonth () {
+      const date = new Date(); date.setDate(1); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 10)
+    },
+    loadCount (query) {
+      return this.axios.get(this.API + 'ranking/clientes/count', { params: { idalmacen: this.almacen.IdAlmacen, fechaInicio: this.fechaInicio, fechaFin: this.fechaFin, q: query || '' } }).then(response => { this.totalRows = Number(response.data.total || 0) })
+    },
+    aplicarFechas () {
+      if (this.fechaInicio > this.fechaFin) { const value = this.fechaInicio; this.fechaInicio = this.fechaFin; this.fechaFin = value }
+      this.currentPage = 1; this.loadCount(this.filter); this.$nextTick(() => this.$refs.tablaProductos.refresh())
+    },
     focusAutocomplete (ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick()
     },
     setAlmacen (obj) {
       this.almacen = obj
+      this.currentPage = 1
+      this.loadCount(this.filter)
       Vue.nextTick(() => this.$refs.tablaProductos.refresh())
     },
     myProvider (ctx) {
@@ -127,7 +149,8 @@ export default {
       // console.log(ctx.filter)
       // let url = this.API + 'productos/stock?idAlmacen='+this.almacen.IdAlmacen+'&limit='+ctx.perPage+'&page='+ctx.currentPage+'&filter[producto]='+ (ctx.filter||'')+'&filter[minimo]=1&sortBy='+ctx.sortBy
       // url += '&sortDesc='+(ctx.sortDesc ? 1 : 0 )
-      let promise = this.axios.get( this.API + 'ranking/clientes?idalmacen=' + this.almacen.IdAlmacen + '&q=' + ctx.filter + '&limit=' + ctx.perPage + '&page=' + ctx.currentPage )
+      this.loadCount(ctx.filter)
+      let promise = this.axios.get(this.API + 'ranking/clientes', { params: { idalmacen: this.almacen.IdAlmacen, q: ctx.filter || '', limit: ctx.perPage, page: ctx.currentPage, fechaInicio: this.fechaInicio, fechaFin: this.fechaFin } })
 
       return promise.then((response) => {
         console.log(response)
@@ -143,6 +166,9 @@ export default {
         return []
       })
     }
+  },
+  computed: {
+    exportUrl () { return '/api/index.php/reporte/rankingclientes?idalmacen=' + encodeURIComponent(this.almacen.IdAlmacen) + '&fechaInicio=' + encodeURIComponent(this.fechaInicio) + '&fechaFin=' + encodeURIComponent(this.fechaFin) }
   },
   components: {
       // ProductoForm

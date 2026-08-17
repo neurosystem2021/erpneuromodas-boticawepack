@@ -1,0 +1,239 @@
+/* Sistema unificado de listados para todos los módulos Vue. */
+#app .table-responsive,
+#app [class*="table-scroll"],
+#app [class*="table-card"] {
+  border: 1px solid #d7e4ed;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 10px 26px rgba(27, 68, 101, .08);
+}
+
+#app .table-responsive {
+  overflow: auto;
+}
+
+#app table.table,
+#app .table-responsive > table,
+#app [class*="table-card"] table {
+  width: 100%;
+  margin-bottom: 0;
+  color: #193a55;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff;
+  font-size: 12px;
+}
+
+#app table.table thead th,
+#app .table-responsive > table thead th,
+#app [class*="table-card"] table thead th {
+  padding: 13px 14px;
+  vertical-align: middle;
+  color: #fff !important;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, .13);
+  border-bottom: 1px solid #075378;
+  background-color: #0b7097 !important;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .25px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+#app table.table thead th:first-child,
+#app .table-responsive > table thead th:first-child {
+  border-top-left-radius: 14px;
+}
+
+#app table.table thead th:last-child,
+#app .table-responsive > table thead th:last-child {
+  border-top-right-radius: 14px;
+  border-right: 0;
+}
+
+#app table.table tbody td,
+#app .table-responsive > table tbody td,
+#app [class*="table-card"] table tbody td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  color: #29485f;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 1px solid #e1eaf0;
+  background-color: #fff;
+  line-height: 1.35;
+}
+
+#app table.table tbody tr:nth-child(even) td,
+#app .table-responsive > table tbody tr:nth-child(even) td,
+#app [class*="table-card"] table tbody tr:nth-child(even) td {
+  background-color: #f5f9fc;
+}
+
+#app table.table tbody tr:hover td,
+#app .table-responsive > table tbody tr:hover td,
+#app [class*="table-card"] table tbody tr:hover td {
+  background-color: #e9f5fa !important;
+}
+
+#app table.table tbody tr:last-child td,
+#app .table-responsive > table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Las celdas semánticas conservan su significado sin colores estridentes. */
+#app table.table td.table-success,
+#app table.table .table-success > td {
+  color: #087047 !important;
+  background-color: #def5e8 !important;
+  font-weight: 800;
+}
+
+#app table.table td.table-danger,
+#app table.table .table-danger > td {
+  color: #a82a40 !important;
+  background-color: #fde6ea !important;
+  font-weight: 800;
+}
+
+#app table.table td.table-warning,
+#app table.table .table-warning > td {
+  color: #8a5900 !important;
+  background-color: #fff1cf !important;
+  font-weight: 800;
+}
+
+#app table.table td.table-info,
+#app table.table .table-info > td,
+#app table.table td.table-primary,
+#app table.table .table-primary > td {
+  color: #09658a !important;
+  background-color: #dff1f8 !important;
+  font-weight: 800;
+}
+
+/* Botones de acción dentro de listados. */
+#app table .btn,
+#app [class*="table-card"] .btn {
+  min-width: 36px;
+  min-height: 36px;
+  margin: 2px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 9px;
+  box-shadow: 0 5px 12px rgba(22, 61, 91, .13);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#app table .btn:hover,
+#app [class*="table-card"] .btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+/* Ordenamiento de BootstrapVue más visible. */
+#app th[aria-sort] {
+  cursor: pointer;
+}
+
+#app th[aria-sort]::after {
+  margin-left: 7px;
+  color: #a9e8f4;
+  opacity: .9;
+}
+
+/* Paginación consistente. */
+#app .pagination {
+  display: flex;
+  margin: 14px 0 0;
+  gap: 5px;
+}
+
+#app .pagination .page-link {
+  display: grid;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 9px;
+  place-items: center;
+  color: #28617e;
+  border: 1px solid #d5e4ed;
+  border-radius: 9px !important;
+  background-color: #f4f9fc;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+#app .pagination .page-item.active .page-link {
+  color: #fff;
+  border-color: #0b7097;
+  background-color: #0b7097;
+}
+
+#app .pagination .page-item.disabled .page-link {
+  color: #9aabb7;
+  background-color: #eef3f6;
+  opacity: .7;
+}
+
+/* Autocompletados y selectores usados como filtros de listados. */
+#app .autocomplete {
+  position: relative;
+}
+
+#app .autocomplete > ul {
+  z-index: 1100 !important;
+  overflow: auto;
+  max-height: 360px;
+  margin-top: 6px !important;
+  padding: 6px !important;
+  border: 1px solid #cbdde8 !important;
+  border-radius: 12px !important;
+  background-color: #fff !important;
+  box-shadow: 0 16px 35px rgba(17, 55, 84, .18) !important;
+}
+
+#app .autocomplete > ul > li {
+  margin: 2px 0;
+  border: 0 !important;
+}
+
+#app .autocomplete > ul > li > a {
+  display: block;
+  padding: 9px 11px !important;
+  color: #26475f !important;
+  border-radius: 8px;
+  background-color: #fff !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#app .autocomplete > ul > li > a:hover,
+#app .autocomplete > ul > li.focus-list > a {
+  color: #fff !important;
+  background-color: #0b7097 !important;
+}
+
+/* El buscador de productos posee su propio diseño de tarjetas. */
+#app .inventory-product-search__bar .autocomplete > ul > li > a,
+#app .inventory-product-search__bar .autocomplete > ul > li > a:hover,
+#app .inventory-product-search__bar .autocomplete > ul > li.focus-list > a {
+  padding: 0 !important;
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+@media (max-width: 767px) {
+  #app table.table thead th,
+  #app table.table tbody td {
+    padding: 10px;
+  }
+
+  #app .table-responsive,
+  #app [class*="table-scroll"],
+  #app [class*="table-card"] {
+    border-radius: 12px;
+  }
+}

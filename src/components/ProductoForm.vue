@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-btn v-if="showButton" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+    <b-btn v-if="showButton" type="button" variant="primary" @click="show = true">Nuevo</b-btn>
     <!-- Modal Component -->
-    <b-form @submit="guardarProducto" @keydown.enter.prevent="()=>{}" >
-    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" id="modalProducto" size="xl"
+    <div @keydown.enter.prevent>
+    <b-modal :no-close-on-esc="true" :no-close-on-backdrop="true" :id="modalId" size="xl"
       ref="productoForm" v-model="show" modal-class="product-form-modal"
       dialog-class="product-form-dialog" content-class="product-form-content"
       body-class="product-form-body" footer-class="product-form-footer">
@@ -28,13 +28,21 @@
         <b-col md="6" class="product-form-column product-form-column-primary">
         <b-form-group>
           <label>Código barra:</label>
-            <b-form-input 
-              ref="inputCodigoBarra"
-              v-model="producto.CodigoBarra"
-              @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
-              type="text"
-              class="form-control upper"
-              ></b-form-input>
+            <b-input-group class="product-barcode-input">
+              <b-form-input 
+                ref="inputCodigoBarra"
+                v-model="producto.CodigoBarra"
+                @input="(val) => producto.CodigoBarra = val && val.toUpperCase()"
+                type="text"
+                class="form-control upper"
+                placeholder="Escriba o escanee el código"
+                ></b-form-input>
+              <b-input-group-append>
+                <b-btn class="product-barcode-scan" type="button" @click="scanProductBarcode" title="Escanear código de barras" aria-label="Escanear código de barras">
+                  <i class="fas fa-barcode"></i><span>Escanear</span>
+                </b-btn>
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <label>Código barra Modelo:</label>
             <b-form-group>
@@ -432,7 +440,7 @@
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
-        <b-btn  variant="primary" type="submit">
+        <b-btn variant="primary" type="button" :disabled="guardandoProducto" @click="guardarProducto">
            {{this.mensajeBtn}}
          </b-btn>
          <b-btn  variant="secondary" @click="show=false">
@@ -440,7 +448,7 @@
          </b-btn>
        </div>
     </b-modal>
-    </b-form>
+    </div>
   </div>
 </template>
 <script>
@@ -471,13 +479,19 @@ export default {
         default: false,
         type: Boolean
       },
-      TienePresentacion: false
+      TienePresentacion: false,
+      guardandoProducto: false
     };
   },
   beforeMount() {
     this.initForm();
   },
   props: ["showButton", "productoUpdate", "cbGuardar"],
+  computed: {
+    modalId() {
+      return `modalProducto-${this._uid}`;
+    }
+  },
   watch: {
     async show(val) {
       this.preproducto = { ...this.productoUpdate };
@@ -581,6 +595,14 @@ export default {
     }
   },
   methods: {
+    scanProductBarcode() {
+      const input = this.$refs.inputCodigoBarra && this.$refs.inputCodigoBarra.$el;
+      if (window.parent && typeof window.parent.openNewProductBarcodeScanner === "function") {
+        window.parent.openNewProductBarcodeScanner(input);
+        return;
+      }
+      this.$toasted.error("Abra este formulario desde Neuro App para usar la cámara.");
+    },
     actualizarPorcentajeUtilidad() {
       const costo = parseFloat(this.producto.PrecioCosto) || 0;
       const venta = parseFloat(this.producto.PrecioContado) || 0;
@@ -769,7 +791,10 @@ export default {
       };
     },
     guardarProducto(e) {
-      e.preventDefault();
+      if (e && typeof e.preventDefault === "function") {
+        e.preventDefault();
+      }
+      if (this.guardandoProducto) return;
 
       // filtro si esta ingresado correctamente
       if (
@@ -800,6 +825,19 @@ export default {
         this.producto.PorcentajeLiquidacion > 0
           ? this.producto.PorcentajeLiquidacion
           : 0;
+      // MySQL en modo estricto rechaza una cadena vacía en columnas numéricas.
+      // Los inputs de tipo number entregan "" cuando el usuario los deja vacíos.
+      const camposNumericos = [
+        "PorcentajeUtilidad",
+        "StockMinimo",
+        "PrecioCosto",
+        "PrecioContado",
+        "PorcentajeLiquidacion"
+      ];
+      camposNumericos.forEach(campo => {
+        const valor = Number(this.producto[campo]);
+        this.producto[campo] = Number.isFinite(valor) ? valor : 0;
+      });
       this.producto.TienePresentacion = this.TienePresentacion;
       this.producto.CodigoBarra = ("" + this.producto.CodigoBarra).trim();
       this.producto.CodeBarModelo = ("" + this.producto.CodeBarModelo).trim();
@@ -809,32 +847,39 @@ export default {
         this.producto.productosDet = this.$refs.productoDet.productos;
       }
 
+      this.guardandoProducto = true;
       this.axios
         .post(this.API + "productos", {
           ...this.producto,
           PreciosPorProducto: this.producto.precios
         })
         .then(async response => {
-          this.$emit("productoactualizado", response.data.insertId);
-          if (this.cbGuardar) {
-            this.cbGuardar(response.data.insertId);
-          }
           if (response.data.error) {
             this.$toasted.show(response.data.error);
+            return;
           } else {
             await this.uploadProductImages(response.data.insertId);
+            this.$emit("productoactualizado", response.data.insertId);
+            if (this.cbGuardar) {
+              this.cbGuardar(response.data.insertId);
+            }
             this.$toasted.success("Producto guardado correctamente");
             // this.initForm()
             //this.producto.talla = {}
             //this.$refs.inputTalla.setValue('')
             this.$refs.productoForm.hide();
           }
-
-          this.$refs.productoForm.hide();
         })
         .catch(error => {
           console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          const respuesta = error.response && error.response.data;
+          const mensaje =
+            (respuesta && (respuesta.error || respuesta.message)) ||
+            "No se pudo guardar el producto. Revise los datos e intente nuevamente.";
+          this.$toasted.show(mensaje);
+        })
+        .then(() => {
+          this.guardandoProducto = false;
         });
     },
     focusAutocomplete(ref) {
@@ -849,7 +894,7 @@ export default {
         this.axios
           .post(this.API + "categorias", categoria)
           .then(response => {
-            this.$toasted.show("Categoría guardada correctamente");
+            this.$toasted.success("Categoría guardada correctamente", { duration: 3500 });
             this.setCategoria({
               IdProductoCategoria: response.data.insertId,
               ProductoCategoria: response.data.ProductoCategoria
@@ -857,7 +902,11 @@ export default {
           })
           .catch(error => {
             console.log(error);
-            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+            const respuesta = error.response && error.response.data;
+            this.$toasted.error(
+              (respuesta && (respuesta.error || respuesta.message)) ||
+                "No se pudo guardar la categoría."
+            );
           });
       }
     },
@@ -869,7 +918,7 @@ export default {
         this.axios
           .post(this.API + "marcas", marca)
           .then(response => {
-            this.$toasted.show("Marca guardada correctamente");
+            this.$toasted.success("Marca guardada correctamente", { duration: 3500 });
             this.setMarca({
               IdProductoMarca: response.data.insertId,
               ProductoMarca: response.data.ProductoMarca
@@ -877,7 +926,11 @@ export default {
           })
           .catch(error => {
             console.log(error);
-            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+            const respuesta = error.response && error.response.data;
+            this.$toasted.error(
+              (respuesta && (respuesta.error || respuesta.message)) ||
+                "No se pudo guardar la marca."
+            );
           });
       }
     },
@@ -889,7 +942,7 @@ export default {
         this.axios
           .post(this.API + "tallas", talla)
           .then(response => {
-            this.$toasted.show("Talla guardada correctamente");
+            this.$toasted.success("Talla guardada correctamente", { duration: 3500 });
             this.setTalla({
               IdProductoTalla: response.data.insertId,
               ProductoTalla: response.data.ProductoTalla
@@ -897,12 +950,15 @@ export default {
           })
           .catch(error => {
             console.log(error);
-            this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+            const respuesta = error.response && error.response.data;
+            this.$toasted.error(
+              (respuesta && (respuesta.error || respuesta.message)) ||
+                "No se pudo guardar la talla."
+            );
           });
       }
     }
   },
-  computed: {},
   components: {
     CategoriaForm,
     MarcaForm,
@@ -911,4 +967,7 @@ export default {
 };
 </script>
 <style>
+.product-barcode-scan{min-width:112px!important;border:0!important;color:#fff!important;background:linear-gradient(135deg,#7a102c,#d82348)!important;font-weight:800!important}
+.product-barcode-scan span{margin-left:7px}
+@media(max-width:700px){.product-barcode-scan{min-width:54px!important}.product-barcode-scan span{display:none}}
 </style>

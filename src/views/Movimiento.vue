@@ -219,7 +219,6 @@
             </b-col>
           </b-row>
         </b-container>
-        <br><br>
     </b-form>
 
   </div>
@@ -409,7 +408,7 @@ export default {
     getAlmacenes(value) {
       this.buscarAlmacenes(value);
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
       const faltantes = [];
       const tipo = this.movimiento.movimientoTipo || {};
@@ -432,11 +431,8 @@ export default {
         return;
       }
 
-      this.inProgress = true;
-
       if (!this.productos.length) {
         this.$toasted.show("No ha seleccionado ningun producto");
-        this.inProgress = false;
         return;
       }
 
@@ -449,9 +445,58 @@ export default {
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
         this.$toasted.show("Falta llenar cantidad / precio");
-        this.inProgress = false;
         return;
       }
+
+      const totalMovimiento = this.productos.reduce((total, producto) => {
+        return total + Number(producto.total || 0);
+      }, 0);
+      const escaparResumen = valor => String(valor == null ? "" : valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+      const nombreProveedor = escaparResumen(proveedor.Proveedor || proveedor.RazonSocial || "Sin proveedor");
+      const documentoMovimiento = [this.movimiento.Serie, this.movimiento.Numero]
+        .filter(Boolean)
+        .join("-");
+      const monedaMovimiento = escaparResumen(this.movimiento.Moneda || "PEN");
+      const confirmacion = await this.$swal({
+        icon: "question",
+        title: "Confirmar movimiento",
+        html: `
+          <div class="inventory-confirm-copy">Revisa el resumen antes de registrar el movimiento.</div>
+          <div class="inventory-confirm-summary">
+            <div><span>Tipo</span><strong>${escaparResumen(tipo.TipoMovimiento || "Movimiento")}</strong></div>
+            <div><span>Documento</span><strong>${escaparResumen(documentoMovimiento || "Sin serie")}</strong></div>
+            <div class="inventory-confirm-summary__wide"><span>Proveedor</span><strong>${nombreProveedor}</strong></div>
+            <div><span>Productos</span><strong>${this.productos.length}</strong></div>
+            <div class="inventory-confirm-summary__total"><span>Total</span><strong>${monedaMovimiento} ${totalMovimiento.toFixed(2)}</strong></div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "Volver a revisar",
+        buttonsStyling: false,
+        customClass: {
+          popup: "inventory-confirm-popup",
+          icon: "inventory-confirm-icon",
+          title: "inventory-confirm-title",
+          content: "inventory-confirm-content",
+          actions: "inventory-confirm-actions",
+          confirmButton: "inventory-confirm-save",
+          cancelButton: "inventory-confirm-review"
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      });
+
+      if (!confirmacion.isConfirmed) {
+        return;
+      }
+
+      this.inProgress = true;
 
       this.axios
         .post(this.API + "movimientos", {
@@ -490,8 +535,8 @@ export default {
 </script>
 <style>
 .inventory-movement-page {
-  min-height: calc(100vh - 92px);
-  padding: 12px 22px 22px;
+  min-height: 100vh;
+  padding: 12px 22px 10px;
   color: #12233f;
   background:
     radial-gradient(circle at 7% 4%, rgba(20, 184, 226, .14), transparent 26%),
@@ -723,6 +768,108 @@ export default {
 .inventory-barcode-button { background: linear-gradient(135deg,#1557c8,#1599cf) !important; }
 .inventory-save-button i, .inventory-barcode-button i { margin-right: 10px; }
 .inventory-save-button:hover, .inventory-barcode-button:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+/* Confirmación final del movimiento. */
+.inventory-confirm-popup {
+  width: min(520px, calc(100vw - 28px)) !important;
+  overflow: hidden !important;
+  padding: 0 0 22px !important;
+  border: 1px solid #d8e6ef !important;
+  border-radius: 22px !important;
+  background-color: #fff !important;
+  box-shadow: 0 28px 75px rgba(5, 35, 64, .3) !important;
+}
+.inventory-confirm-popup::before {
+  display: block;
+  width: 100%;
+  height: 7px;
+  background-color: #0879a8;
+  content: "";
+}
+.inventory-confirm-icon {
+  width: 62px !important;
+  height: 62px !important;
+  margin: 22px auto 10px !important;
+  color: #0879a8 !important;
+  border-color: #9bcddd !important;
+}
+.inventory-confirm-icon .swal2-icon-content { font-size: 38px !important; }
+.inventory-confirm-title {
+  padding: 0 28px !important;
+  color: #12375a !important;
+  font-size: 25px !important;
+  font-weight: 900 !important;
+  letter-spacing: -.35px !important;
+}
+.inventory-confirm-content { margin: 8px 24px 0 !important; }
+.inventory-confirm-copy {
+  margin-bottom: 14px;
+  color: #62798c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.inventory-confirm-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  text-align: left;
+}
+.inventory-confirm-summary > div {
+  min-width: 0;
+  padding: 11px 13px;
+  border: 1px solid #dce8f0;
+  border-radius: 12px;
+  background-color: #f7fafc;
+}
+.inventory-confirm-summary__wide { grid-column: 1 / -1; }
+.inventory-confirm-summary > div span {
+  display: block;
+  margin-bottom: 3px;
+  color: #71869a;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+}
+.inventory-confirm-summary > div strong {
+  display: block;
+  overflow: hidden;
+  color: #173b59;
+  font-size: 13px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inventory-confirm-summary__total {
+  border-color: #b9e8d4 !important;
+  background-color: #e8f8f0 !important;
+}
+.inventory-confirm-summary__total strong { color: #087149 !important; font-size: 16px !important; }
+.inventory-confirm-actions {
+  display: flex !important;
+  width: calc(100% - 48px) !important;
+  margin: 18px 24px 0 !important;
+  gap: 9px !important;
+}
+.inventory-confirm-save,
+.inventory-confirm-review {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.inventory-confirm-save {
+  flex: 1;
+  color: #fff;
+  background-color: #0aa568;
+  box-shadow: 0 8px 18px rgba(10, 165, 104, .22);
+}
+.inventory-confirm-review { color: #415a70; background-color: #e9eff4; }
+.inventory-confirm-save:hover,
+.inventory-confirm-review:hover { filter: brightness(1.04); transform: translateY(-1px); }
 @media (max-width: 991px) {
   .inventory-movement-page { padding: 14px; }
   .inventory-heading { align-items: flex-start; }
@@ -744,5 +891,9 @@ export default {
   .inventory-supplier-control .input-group-append .supplier-create,
   .inventory-supplier-control .input-group-append .supplier-create__trigger { width: 100%; }
   .inventory-field .inventory-autocomplete-input { height: 52px; font-size: 14px; }
+  .inventory-confirm-summary { grid-template-columns: 1fr; }
+  .inventory-confirm-summary__wide { grid-column: auto; }
+  .inventory-confirm-actions { flex-direction: column; }
+  .inventory-confirm-save, .inventory-confirm-review { width: 100%; }
 }
 </style>

@@ -1,0 +1,90 @@
+:root { --nm-registro-blue: #086795; }
+
+body.nm-sales-register-page .breadcrumb,
+body.nm-sales-register-page .breadcrumb::before,
+body.nm-sales-register-page .breadcrumb::after {
+  color: #fff !important;
+  background: var(--nm-registro-blue) !important;
+  background-image: none !important;
+}
+
+body.nm-sales-register-page .breadcrumb-item,
+body.nm-sales-register-page .breadcrumb-item a,
+body.nm-sales-register-page .breadcrumb-item.active,
+body.nm-sales-register-page .breadcrumb-item + .breadcrumb-item::before {
+  color: #fff !important;
+}
+
+body.nm-sales-register-page .table-container table thead,
+body.nm-sales-register-page .table-container table thead tr,
+body.nm-sales-register-page .table-container table thead th {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.15) !important;
+  background: var(--nm-registro-blue) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+body.nm-sales-register-page .table-container table thead th { font-weight: 850 !important; }
+
+body.nm-sales-register-page .nm-sales-delete-icon {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  place-items: center;
+  color: #ef233c !important;
+  cursor: pointer;
+}
+
+body.nm-sales-register-page .nm-sales-delete-icon::before,
+body.nm-sales-register-page .nm-sales-delete-icon::after { display: none !important; content: none !important; }
+body.nm-sales-register-page .nm-sales-delete-icon svg { display: block; width: 23px; height: 23px; }
+
+/* Utilidad bruta por usuario: mismo azul en título y todas las columnas. */
+body.nm-gross-profit-user-page h1 { color: #086795 !important; }
+
+body.nm-gross-profit-user-page table thead,
+body.nm-gross-profit-user-page table thead tr,
+body.nm-gross-profit-user-page table thead th,
+body.nm-gross-profit-user-page table thead td {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.15) !important;
+  background: #086795 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Compatibilidad con la versión Vue que permanece abierta en pestañas antiguas. */
+.modern-report-page .breadcrumb,
+.modern-report-page .breadcrumb::before,
+.modern-report-page .breadcrumb::after {
+  color: #fff !important;
+  background: #086795 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.modern-report-page .breadcrumb .breadcrumb-item,
+.modern-report-page .breadcrumb .breadcrumb-item a,
+.modern-report-page .breadcrumb .breadcrumb-item.active,
+.modern-report-page .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: #fff !important;
+}
+
+.modern-report-page table thead,
+.modern-report-page table thead tr,
+.modern-report-page table thead th,
+.modern-report-page table thead td,
+.modern-report-page table thead th:nth-child(odd),
+.modern-report-page table thead th:nth-child(even),
+.modern-report-page table thead th:first-child,
+.modern-report-page table thead th:last-child {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.15) !important;
+  background: #086795 !important;
+  background-color: #086795 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}

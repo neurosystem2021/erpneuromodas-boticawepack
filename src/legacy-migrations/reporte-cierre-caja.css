@@ -1,0 +1,53 @@
+:root { --nm-cash-blue: #075f94; }
+
+body.nm-cash-report-dedicated .cash-report-hero,
+body.nm-cash-report-dedicated .cash-report-metrics .metric-main,
+body.nm-cash-report-dedicated .cash-report-table thead,
+body.nm-cash-report-dedicated .cash-report-table thead tr,
+body.nm-cash-report-dedicated .cash-report-table tfoot {
+  color: #fff !important;
+  background: var(--nm-cash-blue) !important;
+  background-image: none !important;
+}
+
+body.nm-cash-report-dedicated .cash-report-hero h1,
+body.nm-cash-report-dedicated .cash-report-hero small,
+body.nm-cash-report-dedicated .cash-report-hero p,
+body.nm-cash-report-dedicated .cash-report-metrics .metric-main small,
+body.nm-cash-report-dedicated .cash-report-metrics .metric-main strong {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+body.nm-cash-report-dedicated .cash-report-hero-icon,
+body.nm-cash-report-dedicated .cash-report-count,
+body.nm-cash-report-dedicated .cash-report-metrics .metric-main span {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.3) !important;
+  background: rgba(255,255,255,.14) !important;
+}
+
+body.nm-cash-report-dedicated .cash-report-filters .btn-primary,
+body.nm-cash-report-dedicated .cash-report-filters button.btn-primary {
+  border-color: var(--nm-cash-blue) !important;
+  background: var(--nm-cash-blue) !important;
+  background-image: none !important;
+}
+
+body.nm-cash-report-dedicated .cash-report-table thead th,
+body.nm-cash-report-dedicated .cash-report-table thead td,
+body.nm-cash-report-dedicated .cash-report-table tfoot td {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.17) !important;
+  background: var(--nm-cash-blue) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+body.nm-cash-report-dedicated .cash-report-table thead th:first-child { border-radius: 14px 0 0 0; }
+body.nm-cash-report-dedicated .cash-report-table thead th:last-child { border-radius: 0 14px 0 0; }
+
+body.nm-cash-report-dedicated .cash-report-table-heading > i,
+body.nm-cash-report-dedicated .cash-report-section-title > span {
+  color: var(--nm-cash-blue) !important;
+}

@@ -1,0 +1,68 @@
+/* Presentación exclusiva de JOBI Neuro App (WebView Android). */
+html.jobi-native body {
+  background: #fff7f8 !important;
+  overscroll-behavior-y: none;
+}
+
+html.jobi-native #navBar.navbar-style {
+  min-height: 66px !important;
+  padding: 6px 18px !important;
+  border-radius: 0 0 22px 22px !important;
+  background: linear-gradient(112deg,#710d2d 0%,#aa1838 54%,#ef5544 100%) !important;
+  box-shadow: 0 8px 24px rgba(90,10,35,.24) !important;
+}
+
+html.jobi-native #navBar .container-fluid,
+html.jobi-native #navBar .navbar-header {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  align-items: center !important;
+}
+
+html.jobi-native #navBar .navbar-header { justify-content: center !important; }
+html.jobi-native #navBar .navbar-toggle,
+html.jobi-native #navBar #myNavbar { display: none !important; }
+html.jobi-native #navBar .navbar-brand {
+  position: static !important;
+  display: flex !important;
+  height: 54px !important;
+  margin: 0 !important;
+  padding: 3px 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  float: none !important;
+}
+html.jobi-native #navBar .navbar-brand img {
+  width: 108px !important;
+  max-width: 108px !important;
+  max-height: 49px !important;
+  filter: drop-shadow(0 5px 9px rgba(43,2,16,.27)) !important;
+}
+
+html.jobi-native #ventasApp.va-app {
+  min-height: calc(100dvh - 66px) !important;
+  padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+  background:
+    radial-gradient(circle at 92% 4%,rgba(255,90,72,.12),transparent 26%),
+    radial-gradient(circle at 5% 52%,rgba(155,18,55,.08),transparent 28%),
+    linear-gradient(155deg,#fffafa,#fff3f5 55%,#fffaf4) !important;
+}
+
+html.jobi-native #ventasApp .va-shell { padding-top: 14px !important; }
+html.jobi-native #ventasApp .va-top { margin-top: 0 !important; }
+html.jobi-native #appBottomNav {
+  bottom: max(10px, env(safe-area-inset-bottom)) !important;
+  border-color: rgba(141,18,51,.1) !important;
+  background: rgba(255,255,255,.96) !important;
+  box-shadow: 0 14px 38px rgba(84,11,33,.2) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+@media (max-width: 430px) {
+  html.jobi-native #navBar.navbar-style { min-height: 62px !important; padding: 4px 14px !important; }
+  html.jobi-native #navBar .navbar-header,
+  html.jobi-native #navBar .container-fluid { min-height: 52px !important; }
+  html.jobi-native #navBar .navbar-brand { height: 52px !important; }
+  html.jobi-native #navBar .navbar-brand img { width: 101px !important; max-height: 46px !important; }
+}

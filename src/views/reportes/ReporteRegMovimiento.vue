@@ -58,7 +58,7 @@
                         <th style="text-align: center;">PERCEPCION</th>	
                         <th style="text-align: center;">MONEDA</th>	
                         <th style="text-align: center;">Total</th>
-                        <th></th>
+                        <th class="movement-actions-heading">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,9 +80,11 @@
                         <td style="text-align: center;">{{parseFloat(reporte.Percepcion).toFixed(2)}}</td>
                         <td style="text-align: center;">{{reporte.Moneda}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
-                        <td>
-                          <b-button size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                          <b-button size="sm" class="mx-1 my-1" @click="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
+                        <td class="movement-actions-cell">
+                          <div class="movement-row-actions">
+                            <b-button size="sm" title="Imprimir movimiento" aria-label="Imprimir movimiento" @click.stop="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
+                            <b-button size="sm" title="Eliminar movimiento" aria-label="Eliminar movimiento" @click.stop="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                          </div>
                         </td>
                     </tr>
                 </tbody>
@@ -318,11 +320,12 @@ export default {
         descripcion: this.descripcion,
         declarado: this.declarado
       };
-      await this.axios(`${this.API}reporte/listarregmov`, {
-        params: params
-      }).then(res => {
-        if (res.data) {
-          let data = res.data;
+      try {
+        const res = await this.axios(`${this.API}reporte/listarregmov`, {
+          params: params
+        });
+        if (Array.isArray(res.data)) {
+          const data = res.data;
           this.lstReporte = data;
           let SubTotalPEN = 0;
           let SubTotalUSD = 0;
@@ -349,7 +352,21 @@ export default {
           this.TotalPEN = parseFloat(TotalPEN).toFixed(2);
           this.TotalUSD = parseFloat(TotalUSD).toFixed(2);
         }
-      });
+      } catch (error) {
+        this.lstReporte = [];
+        this.SubTotalPEN = "0.00";
+        this.SubTotalUSD = "0.00";
+        this.IgvlPEN = "0.00";
+        this.IgvlUSD = "0.00";
+        this.TotalPEN = "0.00";
+        this.TotalUSD = "0.00";
+        console.error("Error al consultar el reporte de movimientos:", error);
+        this.$swal({
+          icon: "error",
+          title: "No se pudo generar el reporte",
+          text: "Ocurrió un error al consultar los movimientos. Inténtalo nuevamente."
+        });
+      }
     },
     async abrirDedetalle(reporte) {
       console.log(reporte);
@@ -430,6 +447,7 @@ export default {
 .movement-report-hero{display:flex;align-items:center;gap:14px;min-height:92px;margin-bottom:14px;padding:16px 22px;color:#fff;border-radius:20px;background:linear-gradient(112deg,#083562,#0b5787 65%,#078bac);box-shadow:0 14px 32px rgba(11,68,111,.18)}.movement-report-hero__icon{display:grid;width:52px;height:52px;place-items:center;flex:0 0 52px;color:#9fe9ff;border:1px solid rgba(255,255,255,.22);border-radius:15px;background:rgba(255,255,255,.1);font-size:20px}.movement-report-hero small{color:#a9eaff;font-size:10px;font-weight:900;letter-spacing:1.4px}.movement-report-hero h1{margin:0;font-size:27px;font-weight:900}.movement-report-hero p{margin:2px 0 0;color:#d8edf8;font-size:12px}.movement-report-hero>span{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(0,35,67,.2);font-size:11px;font-weight:800}.movement-report-hero>span i{margin-right:6px;color:#67e0ab}
 .movement-filter-card{margin:0;padding:16px 12px 0;border:1px solid #d7e5ef;border-radius:19px;background:#fff;box-shadow:0 10px 28px rgba(28,70,105,.08)}.movement-filter-card>.col-12:first-child{display:none}.movement-filter-card>.col-2,.movement-filter-card>.col-3{margin-bottom:16px;color:#29465f;font-size:12px;font-weight:850}.movement-filter-card .form-control{min-height:46px;margin-top:5px;color:#173451;border:1px solid #cedeea;border-radius:11px;background:#fbfdff;font-weight:700;box-shadow:none}.movement-filter-card .form-control:focus{border-color:#168fc7;box-shadow:0 0 0 4px rgba(22,143,199,.12)}.movement-filter-card .custom-checkbox{padding-top:12px;font-size:13px}.movement-filter-card>.col-3.pt-4{display:flex;align-items:end;gap:7px;padding-top:23px!important}.movement-filter-card>.col-3.pt-4 .btn{min-height:46px;margin:0;border:0;border-radius:11px;font-size:12px;font-weight:900;box-shadow:0 7px 16px rgba(20,80,118,.14)}.movement-filter-card>.col-3.pt-4 .btn-info{background:linear-gradient(135deg,#0a5b8c,#0889b2)}.movement-filter-card>.col-3.pt-4 .btn-success{background:linear-gradient(135deg,#078653,#18b46f)}
 .movement-table-card{overflow:hidden;margin-top:2px;padding:0!important;border-top:1px solid #dfebf2}.movement-section-title{display:flex;align-items:center;padding:15px 15px 12px}.movement-section-title small{color:#0785bd;font-size:9px;font-weight:900;letter-spacing:1.3px}.movement-section-title h2{margin:0;color:#153b5b;font-size:19px;font-weight:900}.movement-section-title>span{margin-left:auto;padding:7px 12px;color:#0b638e;border-radius:999px;background:#e7f5fb;font-size:10px;font-weight:900}.movement-table-scroll{overflow:auto}.movement-table-card table{min-width:1550px;margin:0!important}.movement-table-card thead th{position:sticky;top:0;padding:12px 10px;color:#fff;border:0;background:#0b5787;white-space:nowrap;font-size:11px}.movement-table-card tbody td{padding:11px 10px;vertical-align:middle;border-color:#e2ebf1;font-size:11px}.movement-table-card tbody tr{cursor:pointer}.movement-table-card tbody tr:hover{background:#eaf7fc!important}.movement-table-card tbody .btn{width:34px;height:34px;padding:0;border:0;border-radius:9px}.movement-totals-card{padding:16px 14px 18px;border-top:1px solid #deebf2;background:#f7fafc}.movement-totals-card .col-6{max-width:16.666%;flex:0 0 16.666%;color:#36536b;font-size:10px}.movement-totals-card .form-control{min-height:42px;color:#0a5c86;background:#fff;font-size:13px;font-weight:900}.movement-detail-modal .modal-dialog{max-width:90%!important;width:90%!important}.movement-detail-modal .modal-content{overflow:hidden;border:0;border-radius:20px;box-shadow:0 25px 65px rgba(7,39,70,.3)}.movement-detail-modal .modal-header{color:#fff;border:0;background:linear-gradient(110deg,#083562,#0b6d9b)}.movement-detail-modal .modal-title{font-weight:900}.movement-detail-modal .modal-body{padding:18px;background:#f6f9fc}.movement-detail-modal table thead th{color:#fff;background:#0b5787;white-space:nowrap}.movement-detail-modal .modal-body>.row>.col-12{overflow:auto}
+.movement-actions-heading{min-width:92px;text-align:center!important}.movement-actions-cell{width:92px;min-width:92px;padding-right:8px!important;padding-left:8px!important}.movement-row-actions{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:nowrap;white-space:nowrap}.movement-row-actions .btn{display:inline-flex!important;margin:0!important;align-items:center;justify-content:center;flex:0 0 34px}
 @media(max-width:991px){.movement-report-page{padding:10px!important}.movement-report-hero>span{display:none}.movement-filter-card>.col-2,.movement-filter-card>.col-3{max-width:50%;flex:0 0 50%}.movement-totals-card .col-6{max-width:33.333%;flex:0 0 33.333%}}
 @media(max-width:575px){.movement-report-hero p{display:none}.movement-report-hero h1{font-size:21px}.movement-filter-card>.col-2,.movement-filter-card>.col-3{max-width:100%;flex:0 0 100%}.movement-totals-card .col-6{max-width:50%;flex:0 0 50%}}
 </style>

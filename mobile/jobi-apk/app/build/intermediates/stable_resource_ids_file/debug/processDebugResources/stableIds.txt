@@ -1,0 +1,7 @@
+pe.neurosoft.jobi:xml/network_security_config = 0x7f060000
+pe.neurosoft.jobi:layout/activity_main = 0x7f030000
+pe.neurosoft.jobi:id/webView = 0x7f020001
+pe.neurosoft.jobi:id/progress = 0x7f020000
+pe.neurosoft.jobi:style/Theme.Jobi = 0x7f050000
+pe.neurosoft.jobi:mipmap/ic_launcher = 0x7f040000
+pe.neurosoft.jobi:color/jobi_red = 0x7f010000

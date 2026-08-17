@@ -45,14 +45,16 @@
                         </b-input-group>
                       </b-col>
                       <b-col lg="4" xl="4" cols="12" class="mostrarMovil">
-                        <b-input-group class="mt-2">
-                          <autocomplete required="required" :id="`inputTipoVenta${index}`" :url="API + 'ventas/tipos'"
-                            anchor="TipoDoc" initValue="BOLETA ELEC." class="font-weight-bold" label="writer"
-                            placeholder="" :on-select="setTipoVenta"
-                            :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
-                            :classes="{ input: 'form-control' }">
-                          </autocomplete>
-                        </b-input-group>
+                        <b-form-group label="Documento de venta" class="mt-2 pos-mobile-document-type">
+                          <b-form-select
+                            :value="ventas[index].tipoVenta.IdTipoDoc"
+                            @change="seleccionarTipoVentaMovil"
+                            required>
+                            <option v-for="tipo in tiposVentaMovil" :key="tipo.IdTipoDoc" :value="tipo.IdTipoDoc">
+                              {{ tipo.TipoDoc }}
+                            </option>
+                          </b-form-select>
+                        </b-form-group>
                       </b-col>
                       <b-col md="4" class="docInfo" v-if="isNota[index]">
                         <b-input-group prepend="Doc. Referenc" class="mt-2">
@@ -209,7 +211,7 @@
                         <b-input-group-append class="pos-product-lookup">
                           <autocomplete :ref="`autocompleteProducto${index}`" :id="`autocompleteProducto${index}`"
                             :url="APIProductos"
-                            :customParams="{ 'sortBy': isVentas ? 'stock' : 'IdProducto', 'sortDesc': 1, limit: '25' }"
+                            :customParams="{ 'sortBy': isVentas ? 'stock' : 'IdProducto', 'sortDesc': 1, limit: '30' }"
                             :onShouldRenderChild="renderChild" anchor="Producto" label="writer"
                             placeholder="Agregar Producto" :on-select="setProducto"
                             :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
@@ -286,11 +288,11 @@
                           </b-button>
                           <b-button
                             @click="abrirImagen(data.item)"
-                            class="pos-product-image-button" :id="'popover-imagen' + data.index.IdProducto" variant="success"
+                            class="pos-product-image-button" :id="'popover-imagen-' + data.index" variant="success"
                             size="sm"><i class="fas fa-image"></i></b-button>
                         </div>
-                        <b-popover placement="right" :target="'popover-imagen' + data.index.IdProducto"
-                          :title="data.index.Producto" triggers="hover">
+                        <b-popover placement="right" :target="'popover-imagen-' + data.index"
+                          :title="data.item.Producto" triggers="hover">
                           <div style="text-align:center">
                             <b-img style="border-radius: 10px; width:200px" fluid
                               :src="data.item.Imagen == null || data.item.Imagen == '' ? 'static/no-photo.png' : '/resources/images/productos/' + data.item.Imagen"
@@ -1182,8 +1184,8 @@
     </b-modal>
 
     <!-- MODALS TOUCH -->
-    <producto-form :cbGuardar="(id, pxp) => agregarObj(id, pxp)" ref="productoFormEdit" :producto-update="productoSelect"
-      @actualizarProducto="actualizarRegistro($event)"></producto-form>
+    <producto-form ref="productoFormEdit" :producto-update="productoSelect"
+      @productoactualizado="actualizarRegistro"></producto-form>
 
     <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
         <div class="d-block text-center">
@@ -1192,9 +1194,11 @@
               :onDetected="onBarcodeScanned"
               :readerSize="readerSize"
               :readerTypes="detecteds"
-              :patchSize="'medium'"
+              :patchSize="'large'"
               class="cameraBarra"
             ></v-quagga>
+            <div class="pos-camera-guide" aria-hidden="true"><span></span></div>
+            <p class="pos-camera-help">Centre el c&oacute;digo dentro del recuadro y mantenga la c&aacute;mara estable.</p>
           </div>
         </div>
       </b-modal>
@@ -1280,6 +1284,7 @@ export default {
         "2of5_reader",
         "code_93_reader"
       ],
+      tiposVentaMovil: [],
       inProgress: false,
       ultimaVentaId: window.localStorage.getItem("ultimaVentaId") || null,
       mostrarNav: true,
@@ -1500,6 +1505,7 @@ export default {
   },
 mounted() {
     console.log("componente montado");
+    this.cargarTiposVentaMovil();
     this.getVendedorInfo();
     this.getNumeroVenta();
     this.loadClienteVarios();
@@ -1773,13 +1779,29 @@ beforeDestroy() {
       );
     },
     async actualizarRegistro(event) {
-      let producto = { ...event };
-      let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod.PreciosPorProducto);
+      const idProducto = event && typeof event === "object"
+        ? event.IdProducto
+        : event;
+      if (!idProducto) return;
+
+      const productos = this.ventas[this.ventaActiva].productos;
+      const index = productos.findIndex(v => v.IdProducto == idProducto);
+      if (index < 0) return;
+
+      const productoActual = productos[index];
+      let prod = await this.obtenerStockBuscador(idProducto);
+      if (!prod || !prod.IdProducto) {
+        this.$toasted.show("No se pudo recargar el producto actualizado");
+        return;
+      }
       let pres = [];
       if (prod.PreciosPorProducto) {
-        let newPres = JSON.parse(prod.PreciosPorProducto);
-        pres = newPres.filter(v => v.cantidad > 0);
+        try {
+          let newPres = JSON.parse(prod.PreciosPorProducto);
+          pres = newPres.filter(v => v.cantidad > 0);
+        } catch (error) {
+          pres = [];
+        }
       }
       prod.PreciosPorProducto = pres;
       prod.presentacion = prod.ProductoPresentacion
@@ -1788,9 +1810,12 @@ beforeDestroy() {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
-      prod.cantidad = 1;
-      prod.precio = prod.PrecioContado;
-      prod.descuento = 0;
+      prod.cantidad = Number(productoActual.cantidad) || 1;
+      const precioActualizado = Number(prod.PrecioContado);
+      prod.precio = Number.isFinite(precioActualizado)
+        ? precioActualizado
+        : (Number(productoActual.precio) || 0);
+      prod.descuento = Number(productoActual.descuento) || 0;
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
@@ -1799,11 +1824,7 @@ beforeDestroy() {
       prod.esPresentacion = false;
       prod.pres = "";
 
-      let index = this.ventas[this.ventaActiva].productos.findIndex(
-        v => v.IdProducto == producto.IdProducto
-      );
-      console.log(index);
-      Vue.set(this.ventas[this.ventaActiva].productos, index, prod);
+      Vue.set(productos, index, prod);
     },
     ocultarNav() {
       this.mostrarNav = !this.mostrarNav;
@@ -2291,6 +2312,28 @@ beforeDestroy() {
       }
       const event = new MouseEvent("dblclick");
       element.dispatchEvent(event);
+    },
+    async cargarTiposVentaMovil() {
+      try {
+        const response = await this.axios.get(this.API + "ventas/tipos", {
+          params: { q: "" }
+        });
+        const payload = response && response.data;
+        this.tiposVentaMovil = Array.isArray(payload)
+          ? payload
+          : payload && Array.isArray(payload.data)
+            ? payload.data
+            : [];
+      } catch (error) {
+        console.error("No se pudieron cargar los documentos de venta", error);
+        this.tiposVentaMovil = [this.ventas[this.ventaActiva].tipoVenta];
+      }
+    },
+    seleccionarTipoVentaMovil(idTipoDoc) {
+      const tipo = this.tiposVentaMovil.find(
+        item => String(item.IdTipoDoc) === String(idTipoDoc)
+      );
+      if (tipo) this.setTipoVenta(tipo);
     },
     setVendedor(obj) {
       // if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);

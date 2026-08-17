@@ -1,0 +1,9 @@
+.proforma-empresa-datos{position:absolute!important;inset:0!important;z-index:50!important;display:flex!important;align-items:center!important;gap:28px!important;padding:28px 40px!important;color:#fff!important;background:linear-gradient(105deg,#082b5e,#087da9)!important;text-align:left!important}
+.proforma-cabecera-configurada{overflow:hidden!important;background:#082b5e!important}.proforma-cabecera-configurada>:not(.proforma-empresa-datos){visibility:hidden!important}.proforma-cabecera-configurada>.proforma-empresa-datos{visibility:visible!important;opacity:1!important}
+.proforma-logo-config{display:flex!important;align-items:center!important;justify-content:center!important;width:230px!important;height:134px!important;padding:10px!important;border-radius:18px!important;background:#fff!important;box-shadow:0 12px 28px rgba(0,0,0,.2)!important}
+.proforma-logo-config img{display:block!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+.proforma-identidad{display:flex!important;flex:1!important;flex-direction:column!important;gap:5px!important;font-size:14px!important;line-height:1.25!important}
+.proforma-identidad strong{font-size:23px!important}.proforma-identidad span{color:#fff!important;opacity:.96!important}
+.proforma-numero-config{min-width:170px!important;padding:14px 20px!important;border-radius:17px!important;background:#ff8500!important;text-align:center!important;box-shadow:0 10px 24px rgba(255,133,0,.3)!important}
+.proforma-numero-config small,.proforma-numero-config b{display:block!important;color:#fff!important}.proforma-numero-config b{font-size:25px!important}
+@media(max-width:900px){.proforma-empresa-datos{padding:20px!important}.proforma-logo-config{width:170px!important}.proforma-identidad strong{font-size:17px!important}.proforma-numero-config{display:none!important}}
