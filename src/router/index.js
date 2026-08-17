@@ -21,6 +21,7 @@ import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import Usuario from "@/views/Usuario.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import RemisionTransportista from "@/views/RemisionTransportista.vue";
+import AgenteChat from "@/views/AgenteChat.vue";
 
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
@@ -283,6 +284,11 @@ export default new Router({
       path: "/reportes/ReporteRegistroVentas",
       name: "ReporteRegistroVentas",
       component: ReporteRegistroVentas
+    },
+    {
+      path: "/AgenteChat",
+      name: "AgenteChat",
+      component: AgenteChat
     },
     {
       path: "/RemisionTransportista",
