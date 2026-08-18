@@ -1133,6 +1133,7 @@ export default {
             this.venta.IdPedido = this.$route.query.idPedido || null
             this.venta.nombreLlevar=this.venta.nombreLlevar.toUpperCase();
             this.venta.DireccionEntrega = this.venta.EsDelivery?(this.infoDelivery.Direccion || ''): '';
+            this.venta.requestId = Date.now() + '-' + Math.random();
             this.axios.post(this.API + 'ventas', this.venta)
             .then(async(response) => {
 
