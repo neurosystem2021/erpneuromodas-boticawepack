@@ -476,7 +476,7 @@
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==2" variant="info" style="font-size: 0.70rem;">TARJETA</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==3" variant="info" style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago==4" variant="info" style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual" placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="click blur focus" placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
                             <slot name="metodopago" style="width: 1200px;" >
                               <table class="table b-table border table-footer table-sm">
                                 <tbody>

@@ -352,7 +352,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="click blur focus" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
