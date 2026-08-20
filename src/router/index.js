@@ -21,6 +21,7 @@ import OrdenCompra from "@/views/OrdenCompra.vue";
 import VentaListado from "@/views/VentaListado.vue";
 import Confrontacion from "@/views/reportes/Confrontacion.vue";
 import BusquedaPorModelo from "@/views/BusquedaPorModelo.vue";
+import ConfrontacionRegistros from "@/views/ConfrontacionRegistros.vue";
 // Reportes
 import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -296,6 +297,11 @@ export default new Router({
       path: "/BusquedaPorModelo",
       name: "BusquedaPorModelo",
       component: BusquedaPorModelo
+    },
+    {
+      path: "/ConfrontacionRegistros",
+      name: "ConfrontacionRegistros",
+      component: ConfrontacionRegistros
     },
     {
       path: "/reportes/ReporteSireMovimiento",
