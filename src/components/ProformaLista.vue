@@ -92,26 +92,50 @@ import { mapActions } from 'vuex'
                 obtenerStok : 'obtenerStock',
                 limpiarCarrito: 'limpiarCarrito'
             }),
-            selectProformas (proforma) {
+            selectProformas(proforma) {
+                this.limpiarCarrito()   // limpiar ANTES de agregar los productos de la proforma
+
                 this.axios.get(this.API + 'proformas/detalle', {
                     params: {
                         idProforma: proforma.IdProforma
                     }
                 }).then((response) => {
-                    response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
-                        }, { precio: item.Precio, cantidad: item.Cantidad, proforma:true } ])
-
-                        this.filter = ''
-                        this.show = false
+                    response.data.forEach((item) => {
+                        this.add([item.IdProducto, () => { }, {
+                            precio: item.Precio,
+                            cantidad: item.Cantidad,
+                            proforma: true
+                        }])
                     })
-                    proforma.productos = response.data
-                    // console.log(proforma);
 
-                    // this.$emit('onSelectProforma', proforma.IdCliente, proforma)
-                    this.$emit('onSelectProforma', proforma)
-                    this.limpiarCarrito()
+                    this.filter = ''
+                    this.show = false
+                    proforma.productos = response.data
+
+                    // Una sola llamada a stock, luego de agregar TODOS los productos
+                    this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 })
+
+                    // Traer datos completos del cliente (incluye Direccion, Direccion2, Direccion3)
+                    this.axios.get(this.API + 'cliente', {
+                        params: {
+                            idCliente: proforma.IdCliente,
+                            dni: proforma.DniRuc
+                        }
+                    }).then((clienteRes) => {
+                        if (clienteRes.data) {
+                            proforma.IdCliente = clienteRes.data.IdCliente
+                            proforma.Direccion = clienteRes.data.Direccion
+                            proforma.Direccion2 = clienteRes.data.Direccion2
+                            proforma.Direccion3 = clienteRes.data.Direccion3
+                            proforma.Puntos = clienteRes.data.Puntos
+                            proforma.EsVIP = clienteRes.data.EsVIP
+                        }
+                        this.$emit('onSelectProforma', proforma)
+                    }).catch((error) => {
+                        console.log(error)
+                        // aun si falla la busqueda de direccion, emitimos igual para no bloquear la proforma
+                        this.$emit('onSelectProforma', proforma)
+                    })
                 })
             },
             myProvider (ctx) {
