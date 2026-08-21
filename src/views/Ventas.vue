@@ -403,7 +403,7 @@
                         <br />
                         <b-button type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
                         <b-button type="button" v-if="!this.$route.query.idPedido"  :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg" @click="preventDoubleClick">Efectuar Venta</b-button>
                         <b-button v-if="ultimaVenta" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?IdDocVenta=' + ultimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
@@ -895,6 +895,9 @@ export default {
             // this.$refs.inputVendedor.setValue('')
         },
         guardarProforma () {
+            if (this.inProgress) {
+                return
+            }
             this.inProgress = true
 
             if(!this.productos.length) {
@@ -939,7 +942,9 @@ export default {
         },
         guardarVenta (evt) {
             evt.preventDefault();
-
+            if (this.inProgress) {
+                return
+            }
             this.inProgress = true
             let totalPagos = 0
             totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)
@@ -1102,6 +1107,12 @@ export default {
         eliminarComisionista () {
             this.$refs.inputComisionista.setValue('')
             this.venta.comisionista = {}
+        },
+        preventDoubleClick (evt) {
+            if (this.inProgress) {
+                evt.preventDefault()
+                evt.stopPropagation()
+            }
         },
         onPagarDelivery(obj){
             this.$route.query.idPedido = obj.IdPedido
