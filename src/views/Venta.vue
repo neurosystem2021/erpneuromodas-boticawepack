@@ -609,7 +609,7 @@
               </b-col>
               <b-col md="6" class="text-left">
                 <h5>x1</h5>
-                <span><b>Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
+                <!-- <span><b>Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br> -->
                 <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
               </b-col>
             </b-row>
@@ -637,7 +637,7 @@
               </b-col>
               <b-col md="6" class="text-left">
                 <h5>x{{ pres.cantidad }}</h5>
-                <span><b>Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br>
+                <!-- <span><b>Precio C: </b>S/ {{ pres.precioc | redondear(2) }}</span><br> -->
                 <b>Precio V: </b>S/ {{ pres.precio | redondear(2) }}
               </b-col>
             </b-row>
