@@ -1,32 +1,45 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
-          </b-col>
-          <b-col md="6" class="my-1">
-            <b-row>
-            <b-col md="8">
+  <div class="pos-jobi">
+    <b-container class="bv-example-row pos-container" fluid>
+      <div class="pos-card">
 
-              <b-form-group horizontal label="Mostrar" class="mb-0">
+        <!-- ================= CABECERA: Buscar / Mostrar ================= -->
+        <div class="pos-panel pos-panel-header">
+          <b-row class="align-items-end pos-header-row">
+            <b-col md="6" class="pos-header-col-fields">
+              <b-form-group class="pos-field mb-0">
+                <label><i class="fas fa-search pos-label-icon"></i> Buscar</label>
+                <b-input-group class="pos-search-group">
+                  <span class="pos-cliente-pin"><i class="fas fa-file-invoice"></i></span>
+                  <b-form-input v-model="filter" placeholder="Buscar documento..." @input="currentPage = 1" />
+                  <b-input-group-append>
+                    <b-btn class="pos-btn-limpiar" :disabled="!filter" @click="filter = ''"><i class="fas fa-times"></i> Limpiar</b-btn>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="3" class="pos-header-col-fields">
+              <b-form-group class="pos-field mb-0">
+                <label><i class="fas fa-list-ol pos-label-icon"></i> Mostrar</label>
                 <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
               </b-form-group>
             </b-col>
-            <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Documentos</p>
-            </b-col>
-            </b-row>
-          </b-col>
 
+            <b-col md="3" class="d-flex align-items-center justify-content-end">
+              <div class="pos-stat-mini">
+                <div class="pos-stat-mini-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div>
+                  <div class="pos-stat-mini-num">{{ totalRows }}</div>
+                  <div class="pos-stat-mini-label">Documentos</div>
+                </div>
+              </div>
+            </b-col>
+          </b-row>
+        </div>
+
+        <!-- ================= TABLA ================= -->
+        <div class="pos-table-card">
           <b-table small
             ref="tablaVentas"
             :filter="filter"
@@ -34,27 +47,45 @@
             :sort-desc.sync="sortDesc"
             striped
             hover
+            responsive
             @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
+            id="my-table"
+            :busy.sync="isBusy"
+            :items="myProvider"
             :fields="fields"
             :per-page="perPage"
             :current-page="currentPage">
-          
-              <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-              </template>
+
+            <template slot="Reimprimir" slot-scope="data">
+                <a class="pos-btn-reimprimir" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">
+                  <i class="fas fa-print"></i> {{ data.item.TipoDoc }}
+                </a>
+            </template>
+
+            <template slot="table-busy">
+              <div class="pos-table-busy">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Cargando ventas...</span>
+              </div>
+            </template>
+
+            <template slot="empty">
+              <div class="pos-table-empty">
+                <i class="fas fa-file-invoice"></i>
+                <span>No se encontraron documentos de venta.</span>
+              </div>
+            </template>
           </b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
-        </b-row>
-        <br />
-        <br />
-      </b-container>
+
+          <b-row class="pos-pagination-row">
+            <b-col md="6" class="my-1">
+              <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+            </b-col>
+          </b-row>
+        </div>
+
+      </div>
+    </b-container>
   </div>
 </template>
 
@@ -132,6 +163,253 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+/* =========================================================
+   VentasLista.vue - mismo lenguaje visual JoBi que
+   ProductosLista.vue / Venta.vue / Movimiento.vue
+   ========================================================= */
+.pos-jobi {
+    --jobi-navy: #0B2A4A;
+    --jobi-navy-2: #123A63;
+    --jobi-teal: #0F9B8E;
+    --jobi-blue: #2F6FED;
+    --jobi-green: #17A554;
+    --jobi-red: #E5484D;
+    --jobi-orange: #F5A623;
+    --jobi-bg: #EEF3F8;
+    background: var(--jobi-bg);
+    min-height: 100vh;
+    padding-bottom: 10px !important;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    width: 100%;
+}
 
+.pos-container {
+    padding-top: 10px !important;
+    max-width: 100% !important;
+}
+
+.pos-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(11,42,74,.10);
+    padding: 12px 16px 16px !important;
+}
+
+/* -------- Panel de cabecera navy: Buscar / Mostrar / Total -------- */
+.pos-panel-header {
+    background: linear-gradient(135deg, var(--jobi-navy) 0%, var(--jobi-navy-2) 100%);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    color: #fff;
+}
+
+.pos-panel-header label {
+    color: rgba(255,255,255,.72);
+    font-size: .70rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pos-label-icon {
+    font-size: .82em;
+    opacity: .85;
+}
+
+.pos-field >>> input,
+.pos-field >>> select,
+.pos-field >>> .form-control {
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: var(--jobi-navy);
+    font-weight: 700;
+    height: 42px;
+    border: none !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,.15);
+}
+.pos-field >>> input:focus,
+.pos-field >>> .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(47,111,237,.30);
+}
+
+/* Buscador con pin/icono a la izquierda, estilo pill */
+.pos-search-group {
+    align-items: center;
+}
+.pos-cliente-pin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    margin-right: 6px;
+    font-size: 1.05rem;
+    flex: 0 0 auto;
+}
+.pos-btn-limpiar {
+    border-radius: 10px !important;
+    background: var(--jobi-red) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 700;
+    height: 42px;
+    margin-left: 6px;
+    box-shadow: 0 4px 10px rgba(229,72,77,.30);
+}
+.pos-btn-limpiar:disabled {
+    opacity: .45;
+}
+
+/* Mini tarjeta con el total de documentos */
+.pos-stat-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 12px;
+    padding: 8px 14px;
+}
+.pos-stat-mini-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #fff;
+    color: var(--jobi-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,.15);
+    flex: 0 0 auto;
+}
+.pos-stat-mini-num {
+    font-size: 1.15rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+}
+.pos-stat-mini-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: rgba(255,255,255,.65);
+    font-weight: 800;
+}
+
+/* -------- Tarjeta que envuelve la tabla -------- */
+.pos-table-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 4px 14px rgba(11,42,74,.06);
+    border: 1px solid #e7edf5;
+    overflow-x: auto;
+}
+
+.pos-table-card >>> table {
+    margin-bottom: 0;
+}
+
+.pos-table-card >>> thead th {
+    background: var(--jobi-navy);
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: .70rem;
+    letter-spacing: .03em;
+    font-weight: 800;
+    border: none !important;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 10px 8px;
+    cursor: pointer;
+}
+.pos-table-card >>> thead th:first-child { border-top-left-radius: 10px; }
+.pos-table-card >>> thead th:last-child { border-top-right-radius: 10px; }
+
+.pos-table-card >>> tbody td {
+    vertical-align: middle;
+    font-size: .84rem;
+    padding: 9px 8px;
+    border-color: #eef2f7;
+    cursor: pointer;
+}
+.pos-table-card >>> tbody tr:hover {
+    background-color: #f5f9ff !important;
+}
+
+.pos-table-busy,
+.pos-table-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 34px 16px;
+    color: #8296b0;
+    text-align: center;
+}
+.pos-table-busy i,
+.pos-table-empty i {
+    font-size: 1.9rem;
+    color: #c6d4e3;
+}
+.pos-table-busy span,
+.pos-table-empty span {
+    font-size: .85rem;
+    font-weight: 600;
+    max-width: 320px;
+}
+
+/* Botón "Reimprimir" dentro de la tabla */
+.pos-btn-reimprimir {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--jobi-green) !important;
+    color: #fff !important;
+    font-weight: 800;
+    font-size: .76rem;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(23,165,84,.30);
+    text-decoration: none !important;
+    cursor: pointer;
+}
+.pos-btn-reimprimir:hover {
+    background: #128a48 !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.pos-pagination-row {
+    padding: 10px 8px 4px;
+}
+.pos-pagination-row >>> .page-link {
+    border-radius: 8px !important;
+    margin: 0 2px;
+    border: 1.5px solid #dbe6f1 !important;
+    color: var(--jobi-navy);
+    font-weight: 700;
+}
+.pos-pagination-row >>> .page-item.active .page-link {
+    background: var(--jobi-blue) !important;
+    border-color: var(--jobi-blue) !important;
+    color: #fff !important;
+}
+
+@media (max-width: 767px) {
+    .pos-header-col-fields { margin-bottom: 10px; }
+}
 </style>

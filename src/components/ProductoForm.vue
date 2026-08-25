@@ -1,13 +1,24 @@
 <template>
-  <div>
-    <b-btn v-if="showButton"  @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary">Nuevo</b-btn>
+  <div class="pos-jobi-inline">
+    <b-btn v-if="showButton" class="pos-btn-nuevo" @click="()=>nuevo=true" v-b-modal.modalProducto variant="primary"><i class="fas fa-plus-circle"></i> Nuevo</b-btn>
     <!-- Modal Component -->
     <b-form @submit="guardarProducto" @keydown.enter="keyDownInput" >
-    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" size="lg" ref="productoForm" v-model="show" modal-class="pos-jobi-modal" hide-header-close>
+      <template slot="modal-header">
+        <div class="pos-modal-header">
+          <div class="pos-modal-header-icon"><i class="fas fa-box-open"></i></div>
+          <div>
+            <div class="pos-modal-header-title">{{ title }}</div>
+            <div class="pos-modal-header-sub">Completa los datos del producto</div>
+          </div>
+          <button type="button" class="pos-modal-close" @click="show=false"><i class="fas fa-times"></i></button>
+        </div>
+      </template>
+
       <b-row>
         <b-col md="6">
-          <b-form-group class="ocularMovil">
-            <label>Código barra:</label>
+          <b-form-group class="ocularMovil pos-field">
+            <label><i class="fas fa-barcode pos-label-icon"></i> Código barra</label>
             <b-form-input 
               ref="inputCodigoBarra"
               v-model="producto.CodigoBarra"
@@ -16,8 +27,8 @@
               class="form-control upper"
               ></b-form-input>
           </b-form-group>
-          <b-form-group>
-            <label>Categoría:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-tags pos-label-icon"></i> Categoría</label>
             <b-input-group>
               <autocomplete
                 required="required"
@@ -31,14 +42,14 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
+                <b-btn class="pos-btn-mini" @click="crearCategoria"><i class="fas fa-save"></i></b-btn>
                 <!--<categoria-form :showButton="true" :cbGuardar="setCategoria"></categoria-form>-->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
 
-           <b-form-group>
-            <label>Marca:</label>
+           <b-form-group class="pos-field">
+            <label><i class="fas fa-copyright pos-label-icon"></i> Marca</label>
             <b-input-group>
               <autocomplete
                 required="required"
@@ -52,14 +63,14 @@
                 :classes="{input: 'form-control upper'}">
               </autocomplete>
               <b-input-group-append>
-                <b-btn variant="primary" @click="crearMarca"><b>Guardar</b></b-btn>                
+                <b-btn class="pos-btn-mini" @click="crearMarca"><i class="fas fa-save"></i></b-btn>
                 <!--<marca-form :showButton="true" :cbGuardar="setMarca"></marca-form>-->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
 
-          <b-form-group class="ocularMovil">
-            <label>Cod. P.:</label>
+          <b-form-group class="ocularMovil pos-field">
+            <label><i class="fas fa-hashtag pos-label-icon"></i> Cod. P.</label>
             <b-input-group>
               <autocomplete
                 :url="API + 'productos/modelos'"
@@ -96,8 +107,8 @@
             </b-input-group> -->
           </b-form-group>
           
-          <b-form-group>
-            <label>Artículo:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-cube pos-label-icon"></i> Artículo</label>
             <b-form-input v-model="producto.Producto"
               ref="inputProducto"
               required="required"
@@ -108,8 +119,8 @@
           </b-form-group>
 
          
-          <b-form-group class="ocularMovil">
-            <label>Presentación:</label>
+          <b-form-group class="ocularMovil pos-field">
+            <label><i class="fas fa-box pos-label-icon"></i> Presentación</label>
             <autocomplete
                 :url="API + 'productos/presentaciones'"
                 ref="inputPresentacion"
@@ -151,8 +162,8 @@
 
         </b-col>
         <b-col md="6">
-          <b-form-group>
-            <label>Medición:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-ruler pos-label-icon"></i> Medición</label>
             <autocomplete
               required="required"
               :url="API + 'mediciones'"
@@ -166,8 +177,8 @@
               :classes="{input: 'form-control'}">
             </autocomplete>
           </b-form-group>
-          <b-form-group>
-            <label>Porcentaje Utilidad:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-percentage pos-label-icon"></i> Porcentaje Utilidad</label>
             <input
               v-model="producto.PorcentajeUtilidad"
               @input="actualizarPrecioContado"
@@ -197,8 +208,8 @@
               step="0.00001"
               />
           </b-form-group>
-          <b-form-group v-if="!producto.EsPadre">
-            <label>Stock Minimo:</label>
+          <b-form-group v-if="!producto.EsPadre" class="pos-field">
+            <label><i class="fas fa-boxes pos-label-icon"></i> Stock Minimo</label>
             <input   
               v-model="producto.StockMinimo"
               type="number"
@@ -207,22 +218,26 @@
               />
           </b-form-group>
           <b-form-group>
-            <b-form-checkbox
-                   v-model="producto.ControlaStock"
-                   :value="1"
-                   :unchecked-value="0">
-              Controla Stock
-            </b-form-checkbox>
+            <div class="pos-mini-row-check">
+              <b-form-checkbox
+                     v-model="producto.ControlaStock"
+                     :value="1"
+                     :unchecked-value="0">
+                <i class="fas fa-warehouse pos-label-icon"></i> Controla Stock
+              </b-form-checkbox>
+            </div>
           </b-form-group>
           <b-form-group>
-            <label>Activar SubProductos:</label>
-            <b-form-checkbox
-                     v-model="producto.EsPadre"
-                     :value="1"
-                     :unchecked-value="0"
-                     @input="checkIsHijo">
-              Seleccione esta opción si el producto contiene mas productos
-            </b-form-checkbox>
+            <label class="pos-check-title"><i class="fas fa-layer-group pos-label-icon"></i> Activar SubProductos</label>
+            <div class="pos-mini-row-check">
+              <b-form-checkbox
+                       v-model="producto.EsPadre"
+                       :value="1"
+                       :unchecked-value="0"
+                       @input="checkIsHijo">
+                Seleccione esta opción si el producto contiene mas productos
+              </b-form-checkbox>
+            </div>
           </b-form-group>
           <b-form-group  v-if="false">
             <label>Activar Proyecto:</label>
@@ -234,7 +249,7 @@
               Seleccione esta opción si es un proyecto
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group v-if="producto.EsHabitacion">
+          <b-form-group v-if="producto.EsHabitacion" class="pos-field">
             <label>Lugar:</label>
             <b-form-select required="required" v-model="producto.Piso" :options="[{value: 1, text: 'Huánuco'}, {value:2, text: 'Pucallpa'}]" class="mb-3" />
           </b-form-group>
@@ -252,11 +267,11 @@
         </b-col>
       </b-row>
 
-      <hr/>
+      <div class="pos-section-title pos-section-title-navy"><i class="fas fa-coins"></i> Precios</div>
       <b-row >
         <b-col md="6">
-          <b-form-group>
-            <label>Precio de Costo:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-money-bill-wave pos-label-icon"></i> Precio de Costo</label>
             <input
               v-model="producto.PrecioCosto"
               step="0.01"
@@ -277,8 +292,8 @@
           </b-form-group>
         </b-col>
         <b-col md="6">
-          <b-form-group>
-            <label>Precio Público:</label>
+          <b-form-group class="pos-field">
+            <label><i class="fas fa-tag pos-label-icon"></i> Precio Público</label>
             <input v-model="producto.PrecioContado"
               type="number"
               step="0.01"
@@ -302,12 +317,13 @@
         </b-col>
       </b-row>
 
-      <hr>
+      <div class="pos-section-title pos-section-title-teal"><i class="fas fa-layer-group"></i> Presentaciones por cantidad</div>
       <b-row>
         <b-col md="3" v-for="i in 4" :key="i.id">
-          <b-card border-variant="light" :header="producto.precios[i-1].nombre" class="text-center">
-            <b-form-group>
-              <label>Cantidad:</label>
+          <b-card border-variant="light" class="text-center pos-precio-card">
+            <div class="pos-precio-card-title">{{ producto.precios[i-1].nombre }}</div>
+            <b-form-group class="pos-field">
+              <label>Cantidad</label>
               <input
                 v-model="producto.precios[i-1].cantidad"
                 type="number"
@@ -316,8 +332,8 @@
                 />
             </b-form-group>
             
-            <b-form-group>
-              <label>Precio:</label>
+            <b-form-group class="pos-field mb-2">
+              <label>Precio</label>
               <input 
                 v-model="producto.precios[i-1].precio"
                 type="number"
@@ -325,14 +341,11 @@
                 class="form-control"
                 />
             </b-form-group>
-            <b-form-group>
-              <label>Total: {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</label>
-            </b-form-group>
+            <div class="pos-precio-card-total">Total: S/ {{(producto.precios[i-1].precio*producto.precios[i-1].cantidad) | redondear}}</div>
           </b-card>
         </b-col>
       </b-row>
 
-      <hr />
       <b-row>
         <b-col>
           <producto-form-det 
@@ -344,8 +357,8 @@
         </b-col>
       </b-row>
 
-      <div slot="modal-footer" >
-        <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
+      <div slot="modal-footer" class="pos-modal-footer">
+        <div class="pos-cod-barra" v-if="producto.IdProducto">
           <b-input-group>
             <b-form-input
               v-model="cantidadCodigoBarra"
@@ -353,22 +366,24 @@
               style="width:80px;"
             ></b-form-input>
             <b-input-group-append>
-              <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+              <b-btn class="pos-btn-cod-barra" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + producto.IdProducto + '&cantidad=' + cantidadCodigoBarra "><i class="fas fa-barcode"></i> Código de barra</b-btn>
             </b-input-group-append>
           </b-input-group>
         </div>
-       <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
-          Anular
-        </b-btn>
-        <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
-          Limpiar
-        </b-btn>
-        <b-btn  variant="primary" type="submit">
-           Guardar
-         </b-btn>
-         <b-btn  variant="secondary" @click="show=false">
-           Close
-         </b-btn>
+        <div class="pos-modal-actions">
+          <b-btn class="pos-btn-anular" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+            <i class="fas fa-ban"></i> Anular
+          </b-btn>
+          <b-btn class="pos-btn-limpiar-modal" @click="clearForm" v-if="!producto.IdProducto">
+            <i class="fas fa-eraser"></i> Limpiar
+          </b-btn>
+          <b-btn class="pos-btn-guardar" type="submit">
+            <i class="fas fa-save"></i> Guardar
+          </b-btn>
+          <b-btn class="pos-btn-cerrar-modal" @click="show=false">
+            <i class="fas fa-times"></i> Cerrar
+          </b-btn>
+        </div>
        </div>
     </b-modal>
     </b-form>
@@ -786,7 +801,232 @@ export default {
 }
 </script>
 <style scoped>
-  @media only screen and (max-width: 700px) {
+/* =========================================================
+   ProductoForm.vue - mismo lenguaje visual JoBi que el resto
+   de los módulos (modal navy, campos con icono, tarjetas de
+   precios, acciones en píldora).
+   ========================================================= */
+.pos-jobi-inline {
+    --jobi-navy: #0B2A4A;
+    --jobi-navy-2: #123A63;
+    --jobi-teal: #0F9B8E;
+    --jobi-blue: #2F6FED;
+    --jobi-purple: #7C3AED;
+    --jobi-green: #17A554;
+    --jobi-red: #E5484D;
+    --jobi-orange: #F5A623;
+}
+
+.pos-btn-nuevo {
+    border-radius: 999px !important;
+    border: none !important;
+    background: var(--jobi-green) !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-size: .78rem;
+    padding: 8px 18px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 6px 14px rgba(23,165,84,.30);
+}
+.pos-btn-nuevo:hover { transform: translateY(-1px); }
+
+/* -------- Cabecera del modal -------- */
+.pos-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--jobi-navy) 0%, var(--jobi-navy-2) 100%);
+    color: #fff;
+    padding: 14px 18px;
+    margin: -1px -1px 0 -1px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+}
+.pos-modal-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex: 0 0 auto;
+}
+.pos-modal-header-title {
+    font-weight: 900;
+    font-size: 1.05rem;
+}
+.pos-modal-header-sub {
+    font-size: .74rem;
+    color: rgba(255,255,255,.65);
+}
+.pos-modal-close {
+    margin-left: auto;
+    background: rgba(255,255,255,.14);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.pos-modal-close:hover { background: rgba(255,255,255,.24); }
+
+/* -------- Campos -------- */
+.pos-field label {
+    color: var(--jobi-navy);
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.pos-check-title {
+    color: var(--jobi-navy);
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.pos-label-icon {
+    font-size: .82em;
+    color: var(--jobi-teal);
+}
+.pos-field >>> input,
+.pos-field >>> .form-control,
+.pos-field input.form-control {
+    border-radius: 10px !important;
+    border: 1.5px solid #dbe6f1 !important;
+    height: 40px;
+    font-weight: 600;
+    color: var(--jobi-navy);
+}
+.pos-field >>> input:focus,
+.pos-field >>> .form-control:focus {
+    border-color: var(--jobi-blue) !important;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.14) !important;
+}
+
+.pos-btn-mini {
+    border-radius: 10px !important;
+    background: var(--jobi-purple) !important;
+    border: none !important;
+    color: #fff !important;
+    height: 40px;
+    box-shadow: 0 4px 10px rgba(124,58,237,.30);
+}
+
+.pos-mini-row-check {
+    background: #eef3f8;
+    border: 1px solid #dbe6f1;
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+/* -------- Títulos de sección -------- */
+.pos-section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-weight: 800;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin: 14px 0 10px;
+}
+.pos-section-title-navy { background: var(--jobi-navy); }
+.pos-section-title-teal { background: var(--jobi-teal); }
+
+/* -------- Tarjetas de precios -------- */
+.pos-precio-card {
+    border-radius: 12px !important;
+    border: 1.5px solid #e7edf5 !important;
+    box-shadow: 0 4px 12px rgba(11,42,74,.06);
+    margin-bottom: 12px;
+}
+.pos-precio-card-title {
+    font-weight: 800;
+    color: var(--jobi-navy);
+    text-transform: uppercase;
+    font-size: .78rem;
+    letter-spacing: .03em;
+    margin-bottom: 8px;
+}
+.pos-precio-card-total {
+    font-weight: 800;
+    color: var(--jobi-green);
+    font-size: .88rem;
+}
+
+/* -------- Pie del modal -------- */
+.pos-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.pos-cod-barra { flex: 1 1 auto; }
+.pos-btn-cod-barra {
+    border-radius: 0 10px 10px 0 !important;
+    background: var(--jobi-blue) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pos-modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+.pos-btn-anular,
+.pos-btn-limpiar-modal,
+.pos-btn-guardar,
+.pos-btn-cerrar-modal {
+    border-radius: 999px !important;
+    border: none !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-size: .76rem;
+    padding: 9px 18px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.pos-btn-anular { background: var(--jobi-red) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(229,72,77,.30); }
+.pos-btn-limpiar-modal { background: var(--jobi-orange) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(245,166,35,.30); }
+.pos-btn-guardar { background: var(--jobi-green) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(23,165,84,.30); }
+.pos-btn-cerrar-modal { background: #eef3f8 !important; color: var(--jobi-navy) !important; }
+.pos-btn-anular:hover,
+.pos-btn-limpiar-modal:hover,
+.pos-btn-guardar:hover,
+.pos-btn-cerrar-modal:hover { transform: translateY(-1px); }
+
+@media only screen and (max-width: 700px) {
   /* For desktop: */
     .ocularMovil{
         display: none;

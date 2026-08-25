@@ -3,13 +3,14 @@
         <b-button @click="show=true" variant="outline-primary">Configurar</b-button>
         
         <b-form @submit="guardarConfigVenta">    
-            <b-modal id="modalConfigVenta" 
+            <b-modal id="modalConfigVentaSetup" 
                 title="Configurar Venta" 
                 size="md" v-model="show"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">
+                body-text-variant="dark"
+                @hidden="resetFocus">
 
                 <b-row class="mb-1">
                     <b-col><label for="input-porcada">Por la compra de:</label></b-col>
@@ -96,6 +97,13 @@ import config from '@/store/config.js'
             }
         },
         methods: {
+            resetFocus () {
+                this.$nextTick(() => {
+                    if (document.activeElement && document.activeElement.blur) {
+                        document.activeElement.blur()
+                    }
+                })
+            },
             obtenerDescuento () {
                 this.axios.get(this.API + 'ventas/descuento')
                 .then((response) => {

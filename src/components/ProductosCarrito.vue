@@ -1,47 +1,49 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group>
-        <label>Agregar Productos:</label>
-        <b-row no-gutters>
-          <b-col cols="12" md="6" class="mx-0 pdr">
-              <b-input-group>
-              <autocomplete
-                id="autocompleteProducto"
-                ref="autocompleteProducto"
-                :url="APIProductos"
-                :customParams="{ limit: '25' }"
-                :onShouldRenderChild="renderChild"
-                anchor="Producto"
-                label="writer"
-                placeholder="Agregar Producto"
-                :on-select="setProducto"
-                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-                :classes="{input: 'form-control txtAutoComplete',}">
-              </autocomplete>
-                  <b-button variant="primary" @click="startRecognition">
-                    <i class="fas fa-microphone"></i>
-                  </b-button>
-              </b-input-group>
-          </b-col>
-          <b-col cols="12" md="6" class="mx-0 pdl">
-              <b-input-group>
-                <input v-model="loadCode"
-                    @keydown.enter.prevent="loadBarcode"
-                    type="text"
-                    class="form-control"
-                    ref="barcodeInput"
-                    placeholder="C. Barra" />
-                <b-input-group-append>
-                  <!--<proveedores-tabla></proveedores-tabla>-->
-                  <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-                  <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
-                </b-input-group-append>
-              </b-input-group>
-          </b-col>
-        </b-row>  
-        <b-badge v-if="isVentas && false" variant="danger">Productos sin stock</b-badge>
-      </b-form-group>
+      <div class="carrito-add-panel">
+        <b-form-group class="mb-0">
+          <label class="carrito-add-label"><i class="fas fa-plus-circle"></i> Agregar Productos</label>
+          <b-row no-gutters>
+            <b-col cols="12" md="6" class="mx-0 pdr">
+                <b-input-group class="carrito-input-group">
+                <autocomplete
+                  id="autocompleteProducto"
+                  ref="autocompleteProducto"
+                  :url="APIProductos"
+                  :customParams="{ limit: '25' }"
+                  :onShouldRenderChild="renderChild"
+                  anchor="Producto"
+                  label="writer"
+                  placeholder="Agregar Producto"
+                  :on-select="setProducto"
+                  :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                  :classes="{input: 'form-control txtAutoComplete',}">
+                </autocomplete>
+                    <b-button variant="primary" class="btn-mic" @click="startRecognition" title="Buscar por voz">
+                      <i class="fas fa-microphone"></i>
+                    </b-button>
+                </b-input-group>
+            </b-col>
+            <b-col cols="12" md="6" class="mx-0 pdl">
+                <b-input-group class="carrito-input-group">
+                  <input v-model="loadCode"
+                      @keydown.enter.prevent="loadBarcode"
+                      type="text"
+                      class="form-control carrito-barcode-input"
+                      ref="barcodeInput"
+                      placeholder="C. Barra" />
+                  <b-input-group-append>
+                    <!--<proveedores-tabla></proveedores-tabla>-->
+                    <b-button variant="primary" class="btn-buscar-barra" @click="loadBarcode" title="Buscar"><i class="fas fa-search"></i></b-button>
+                    <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect" ></producto-form>
+                  </b-input-group-append>
+                </b-input-group>
+            </b-col>
+          </b-row>  
+          <b-badge v-if="isVentas && false" variant="danger" class="carrito-badge-stock">Productos sin stock</b-badge>
+        </b-form-group>
+      </div>
 
       <b-modal ref="modalCant" size="xl" id="modalCantidad" hide-footer hide-header>
         <div class="d-block text-center">
@@ -91,7 +93,7 @@
           </b-col>
         </b-row>
       </b-modal>
-      <div class="clsTable">
+      <div class="clsTable carrito-table-card">
         <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
           <template slot="eventPres" slot-scope="data" v-if="productos[data.index].TienePresentacionFlag">
             <b-button :disabled="bloquearInput?true:false" size="sm" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>
@@ -267,8 +269,8 @@ let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cant
             />
           </template>
           <template slot="acciones" slot-scope="data">
-            <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" @click="quitarProducto(data.index)"><i class="fas fa-times fa-lg"></i></b-button>
-            <b-button  style="margin-top:5px" :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt fa-sm"></i></b-button>
+            <b-button :disabled="bloquearInput?true:false" variant="danger" size="sm" class="carrito-btn-accion" @click="quitarProducto(data.index)"><i class="fas fa-times"></i></b-button>
+            <b-button :disabled="bloquearInput?true:false"  v-if="(idPerfil == 1) ? true : false" variant="primary" size="sm" class="carrito-btn-accion" @click="editarProducto(productos[data.index])"><i class="fas fa-pencil-alt"></i></b-button>
           </template>
 
           <template slot="show_details" slot-scope="row">
@@ -283,8 +285,20 @@ let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cant
             <div v-if="!data.item.EsPadre">{{data.item.stock? Number.isInteger(data.item.stock)?data.item.stock:data.item.stock.toFixed(2):data.item.stock }}</div>
           </template>
         </b-table>
+        <div v-if="!productos.length" class="carrito-empty">
+          <i class="fas fa-shopping-basket"></i>
+          <span>Aún no agregaste productos. Búscalos arriba o escanea el código de barra.</span>
+        </div>
       </div>
     </b-col>
+
+    <!-- ===== Acciones principales: Efectuar Venta / Crear Proforma =====
+         Se pinta a todo el ancho, justo debajo de la tabla del carrito
+         y arriba de Opciones / Método de pago. -->
+    <b-col md="12" class="col-acciones-superior">
+      <slot name="acciones-superior"></slot>
+    </b-col>
+
     <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
@@ -399,7 +413,7 @@ export default {
     fields: {
       default () {
         return [
-          { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          // { key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
           { key: 'CodigoBarra', label: 'Código'},
           // { key: 'ProductoCategoria', label: 'Categoria'},
           { key: 'Producto', label: 'Artículo' }, 
@@ -942,6 +956,223 @@ export default {
 </script>
 
 <style scoped>
+  /* Reutiliza la misma paleta JoBi; si el padre (.pos-jobi) ya define estas
+     variables, se heredan por cascada normal de CSS (los scoped styles de
+     Vue no bloquean la herencia de variables). Se redefinen aquí también
+     para que este componente luzca bien aunque se use fuera de ese padre. */
+  :root, .clsTable, .carrito-add-panel {
+    --jobi-navy: #0B2A4A;
+    --jobi-navy-2: #123A63;
+    --jobi-teal: #0F9B8E;
+    --jobi-blue: #2F6FED;
+    --jobi-green: #17A554;
+    --jobi-red: #E5484D;
+    --jobi-orange: #F5A623;
+  }
+
+  /* -------- Panel "Agregar Productos" -------- */
+  .carrito-add-panel {
+    background: #fff;
+    border: 1px solid #e7edf5;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(11,42,74,.06);
+  }
+
+  .carrito-add-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--jobi-navy);
+    margin-bottom: 8px;
+  }
+  .carrito-add-label i {
+    color: var(--jobi-teal);
+  }
+
+  .pdr { padding-right: 6px; }
+  .pdl { padding-left: 6px; }
+  @media (max-width: 767px) {
+    .pdr, .pdl { padding-right: 0; padding-left: 0; }
+    .pdl { margin-top: 8px; }
+  }
+
+  /* Input-group en forma de píldora, coherente con el resto del POS.
+     IMPORTANTE: este contenedor NUNCA debe llevar "overflow: hidden".
+     El listado de sugerencias del autocomplete se renderiza como un
+     elemento posicionado justo debajo del <input>, dentro de este mismo
+     contenedor — "overflow: hidden" lo recorta por completo y la lista
+     desaparece aunque los datos sí lleguen. Por eso el look de "píldora"
+     se logra redondeando cada elemento (input / botones) por separado,
+     en vez de recortar el contenedor que los envuelve. */
+  .carrito-input-group {
+    box-shadow: 0 2px 8px rgba(11,42,74,.08);
+    border-radius: 10px;
+  }
+  .carrito-input-group >>> input,
+  .carrito-input-group >>> .form-control {
+    border: none !important;
+    background: #f6f9fc !important;
+    height: 44px;
+    font-weight: 600;
+    color: var(--jobi-navy);
+    border-radius: 10px 0 0 10px !important;
+  }
+  .carrito-input-group >>> input:focus,
+  .carrito-input-group >>> .form-control:focus {
+    box-shadow: none;
+    background: #fff !important;
+  }
+  .carrito-input-group .btn-mic,
+  .carrito-input-group .btn-buscar-barra {
+    border: none !important;
+    background: var(--jobi-teal) !important;
+    width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 !important;
+  }
+  .carrito-input-group .btn-mic:hover,
+  .carrito-input-group .btn-buscar-barra:hover {
+    background: #0c8578 !important;
+  }
+  /* Redondea la esquina derecha del ÚLTIMO control visible del grupo
+     (el micrófono en la fila de arriba; en la fila del código de barra
+     puede ser el botón de búsqueda o el botón que agrega producto-form,
+     según lo que se muestre al final). */
+  .carrito-input-group .btn-mic:last-child,
+  .carrito-input-group .btn-buscar-barra:last-child,
+  .carrito-input-group >>> .input-group-append:last-child > *:last-child,
+  .carrito-input-group >>> .input-group-append:last-child .btn:last-child {
+    border-radius: 0 10px 10px 0 !important;
+  }
+
+  .carrito-badge-stock {
+    margin-top: 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    padding: 5px 12px;
+  }
+
+  /* -------- Tarjeta que envuelve la tabla del carrito -------- */
+  .carrito-table-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 4px 14px rgba(11,42,74,.06);
+    border: 1px solid #e7edf5;
+    overflow-x: auto;
+  }
+
+  .carrito-table-card >>> table {
+    margin-bottom: 0;
+  }
+
+  .carrito-table-card >>> thead th {
+    background: var(--jobi-navy);
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: .70rem;
+    letter-spacing: .03em;
+    font-weight: 800;
+    border: none !important;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 10px 8px;
+  }
+
+  .carrito-table-card >>> thead th:first-child { border-top-left-radius: 10px; }
+  .carrito-table-card >>> thead th:last-child { border-top-right-radius: 10px; }
+
+  .carrito-table-card >>> tbody td {
+    vertical-align: middle;
+    font-size: .84rem;
+    padding: 8px;
+    border-color: #eef2f7;
+  }
+
+  .carrito-table-card >>> tbody tr:hover {
+    background-color: #f5f9ff !important;
+  }
+
+  /* Celdas del cuerpo (subtotal / total) más suaves, estilo pill */
+  .carrito-table-card >>> td.table-success {
+    background-color: #e6f7ef !important;
+    color: #0f6b3f;
+    font-weight: 700;
+  }
+  .carrito-table-card >>> td.table-danger {
+    background-color: #fdeceb !important;
+    color: #a3231f;
+    font-weight: 700;
+  }
+  .carrito-table-card >>> td.table-info {
+    background-color: #e7f1fd !important;
+    color: var(--jobi-blue);
+  }
+
+  /* Encabezados (th) de esas mismas columnas: se mantienen oscuros
+     igual que el resto de la cabecera, en vez de heredar el color suave */
+  .carrito-table-card >>> th.table-success,
+  .carrito-table-card >>> th.table-danger,
+  .carrito-table-card >>> th.table-info {
+    background-color: var(--jobi-navy) !important;
+    color: #fff !important;
+    font-weight: 800;
+  }
+
+  .carrito-table-card >>> input.form-control,
+  .carrito-table-card >>> textarea.form-control {
+    border-radius: 8px !important;
+    border: 1.5px solid #dbe6f1 !important;
+    font-weight: 600;
+    color: var(--jobi-navy);
+    padding: 4px 8px;
+  }
+  .carrito-table-card >>> input.form-control:focus,
+  .carrito-table-card >>> textarea.form-control:focus {
+    border-color: var(--jobi-blue) !important;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.12) !important;
+  }
+
+  .carrito-table-card >>> .txtArea {
+    min-height: 38px;
+    resize: vertical;
+  }
+
+  .carrito-btn-accion {
+    border-radius: 8px !important;
+    margin: 0 2px;
+  }
+
+  /* Mensaje cuando el carrito está vacío */
+  .carrito-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 34px 16px;
+    color: #8296b0;
+    text-align: center;
+  }
+  .carrito-empty i {
+    font-size: 1.9rem;
+    color: #c6d4e3;
+  }
+  .carrito-empty span {
+    font-size: .85rem;
+    font-weight: 600;
+    max-width: 320px;
+  }
+
+  /* -------- Reglas originales, sin cambios funcionales -------- */
   .contentCard {
     cursor: pointer;
   }
@@ -957,6 +1188,10 @@ export default {
   }
   .form-check-input {
     margin-left: -0.2rem !important;
+  }
+  .col-acciones-superior {
+    display: flex;
+    justify-content: center;
   }
   @media only screen and (max-width: 700px) {
   /* For desktop: */

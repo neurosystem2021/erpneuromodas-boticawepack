@@ -19,6 +19,7 @@ import DeudaProveedores from '@/views/reportes/DeudaProveedores.vue'
 import RankingClientes from '@/views/reportes/RankingClientes.vue'
 import CierreCaja from '@/views/reportes/CierreCaja.vue'
 import ReporteCierreCaja from '@/views/reportes/ReporteCierreCaja.vue'
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
 import Proforma from '@/views/reportes/Proforma.vue'
 import Kardex from '@/views/reportes/Kardex.vue'
 import RegistroHuespedes from '@/views/reportes/RegistroHuespedes.vue'
@@ -114,6 +115,11 @@ export default new Router({
       path: '/reportes/deudaproveedores',
       name: 'DeudaProveedores',
       component: DeudaProveedores
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
     },
     {
       path: '/reportes/rankingclientes',
