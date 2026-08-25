@@ -274,11 +274,6 @@ export default new Router({
       component: RemisionVer
     },
     {
-      path: "/remision-lista",
-      name: "RemisionLista",
-      component: RemisionLista
-    },
-    {
       path: "/reportes/reporte_utilidad_bruta",
       name: "ReporteUtilidadBrutaPorUsuario",
       component: ReporteUtilidadBrutaPorUsuario

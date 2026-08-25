@@ -1613,47 +1613,69 @@ export default {
       // }, 1000);
     },
     async setProducto(producto) {
-      let productos = this.ventas[this.ventaActiva].productos;
-      if (productos.some(v => v.IdProducto == producto.IdProducto)) {
-        productos.filter(
-          v => v.IdProducto == producto.IdProducto
-        )[0].cantidad += parseFloat(1);
+      const ventaIndex = this.ventaActiva; // fijamos el índice ANTES del await, por si cambia de pestaña
+      let productos = this.ventas[ventaIndex].productos;
+      let existente = productos.find(v => v.IdProducto == producto.IdProducto);
+
+      if (existente) {
+        existente.cantidad = parseFloat(existente.cantidad) + 1;
         this.$nextTick(() => {
           this.metodoPagoCambio(1);
           this.irTxtLoadBarcode();
         });
-
         return false;
       }
-      // console.log("producto", producto);
+
+      // Reserva temporal (sin stock real todavía, se completa abajo)
+      let prodTemp = {
+        IdProducto: producto.IdProducto,
+        Producto: producto.Producto,
+        cantidad: 1,
+        precio: producto.PrecioContado || 0,
+        descuento: 0,
+        stock: 0, // valor por defecto mientras carga, nunca undefined
+        Descripcion: "UNIDAD",
+        ProductoPresentacion: "UNIDAD",
+        presentacion: null,
+        tienePresentacion: false,
+        bloquearInputPrecio: false,
+        CantidadPresentacion: null,
+        _cargando: true
+      };
+      productos.unshift(prodTemp);
+      this.metodoPagoCambio(1);
+
+      // Trae el detalle real, incluyendo stock
       let prod = await this.obtenerStockBuscador(producto.IdProducto);
-      // console.log("prod", prod.PreciosPorProducto);
+
+      // Defensivo: garantiza que stock nunca quede undefined/null
+      prod.stock = (prod.stock === undefined || prod.stock === null) ? 0 : prod.stock;
+
       let pres = [];
       if (prod.PreciosPorProducto) {
         let newPres = JSON.parse(prod.PreciosPorProducto);
         pres = newPres.filter(v => v.cantidad > 0);
       }
       prod.PreciosPorProducto = pres;
-      prod.Descripcion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.ProductoPresentacion = prod.ProductoPresentacion
-        ? prod.ProductoPresentacion
-        : "UNIDAD";
-      prod.cantidad = 1;
+      prod.Descripcion = prod.ProductoPresentacion || "UNIDAD";
+      prod.ProductoPresentacion = prod.ProductoPresentacion || "UNIDAD";
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
       prod.presentacion = null;
-      prod.tienePresentacion = prod.PreciosPorProducto.some(
-        v => v.cantidad > 0
-      );
+      prod.tienePresentacion = prod.PreciosPorProducto.some(v => v.cantidad > 0);
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
-      productos.unshift(prod);
 
-      // this.$nextTick(() => {
-      //   this.irTxtLoadBarcode();
-      // });
+      // Usa el array del índice fijado, no this.ventaActiva actual
+      let arrDestino = this.ventas[ventaIndex].productos;
+      let idx = arrDestino.findIndex(v => v.IdProducto == producto.IdProducto && v._cargando);
+      if (idx >= 0) {
+        prod.cantidad = arrDestino[idx].cantidad; // conserva cantidad acumulada
+        arrDestino.splice(idx, 1, prod);
+      } else {
+        arrDestino.unshift(prod);
+      }
+
       this.metodoPagoCambio(1);
     },
     irAlPrimerProducto(event) {
