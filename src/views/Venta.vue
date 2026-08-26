@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row id="header">
-      <b-col md="8" style="border-right: 3px solid #C0C0C0; background: white">
+      <b-col md="7" style="border-right: 3px solid #C0C0C0; background: white">
         <b-card no-body>
           <b-tabs v-model="ventaActiva" content-class="mt-3" pills card class="mt-2 px-0" align="center">
             <b-tab v-for="(venta, index) in ventas" :key="index" :title="`Venta ${index + 1}`"
@@ -465,7 +465,7 @@
         </b-row> -->
         </b-card>
       </b-col>
-      <b-col md="4">
+      <b-col md="5">
         <b-row class="headerInfo" style="background: #f4f4f4">
           <b-col md="5">
             <b-input-group prepend="Vendedor" class="mt-2">
