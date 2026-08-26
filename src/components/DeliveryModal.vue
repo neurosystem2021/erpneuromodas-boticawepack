@@ -190,7 +190,7 @@ export default {
   mounted() {
     // ✅ Cambio: Configurar listeners ANTES de conectar
     this.setupSocketListeners();
-    this.getEmpresaDatos();
+    //this.getEmpresaDatos();
   },
 
   beforeDestroy() {
