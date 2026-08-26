@@ -2059,6 +2059,15 @@ export default {
       const stock = Number(producto.stock || producto.Stock || 0);
       const cantidad = Number(producto.cantidad || 0);
 
+      if (cantidad <= 0) {
+            this.$toasted.show(
+                `El producto "${producto.Producto}" debe tener una cantidad mayor a 0`
+            );
+            this.inProgress = false;
+            this.loading = false;
+            return;
+        }
+
       if (stock <= 0) {
           this.$toasted.show(`El producto "${producto.Producto}" no tiene stock disponible`);
           this.inProgress = false;
