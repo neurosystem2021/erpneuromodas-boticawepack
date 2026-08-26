@@ -1277,6 +1277,14 @@ export default {
         return;
       }
 
+      if (esEmpresa && this.venta.tipoVenta.CodSunat == "03") {
+        this.$toasted.show(
+          "Una boleta no puede ser emitida a una empresa (RUC), debe usar factura."
+        );
+        this.inProgress = false;
+        return;
+      }
+
       //Nota de Creadito
       if (
         this.venta.tipoVenta.CodSunat == "07" ||

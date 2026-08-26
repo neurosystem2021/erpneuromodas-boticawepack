@@ -572,7 +572,14 @@
             ></producto-form-det>
         </b-col>
       </b-row>
-
+      <div v-if="producto.IdProducto && producto.FechaMod" class="text-left mb-2">
+        <span class="badge-modificacion">
+          <span class="icono-reloj">🕒</span>
+          Última modificación: {{ fechaModFormato }}
+          <span class="separador">|</span>
+          Usuario: {{ producto.UsuarioMod || 'N/D' }}
+        </span>
+      </div>
       <div slot="modal-footer" >
         <div style="left: 1rem;position: absolute;" v-if="producto.IdProducto">
           <b-input-group>
@@ -761,6 +768,8 @@ export default {
             this.producto.CodigoFrabricante = newVal.CodigoFrabricante;
             this.producto.CodigoSunat = newVal.CodigoSunat;
             this.producto.Flete = newVal.Flete;
+            this.producto.FechaMod = newVal.FechaMod;
+            this.producto.UsuarioMod = newVal.UsuarioMod;
             if (newVal.PreciosPorProducto) {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto);
             }
@@ -1063,6 +1072,8 @@ export default {
           { id: null, nombre: "" },
           { id: null, nombre: "" }
         ],
+        FechaMod: null,
+        UsuarioMod: "",
         Anaquel: ""
       };
     },
@@ -1132,7 +1143,8 @@ export default {
           PreciosPorProducto: this.producto.precios,
           // Anaqueles: this.producto.anaqueles,
           Anaquel: this.producto.Anaquel,
-          ProductoReempleazo: this.ProductoReempleazo
+          ProductoReempleazo: this.ProductoReempleazo,
+          UsuarioMod: sessionStorage.getItem("User")
         })
         .then(response => {
           if (this.cbGuardar) {
@@ -1310,7 +1322,17 @@ export default {
       }
     }
   },
-  computed: {},
+  computed: {
+    infoModificacion() {
+      if (!this.producto.FechaMod) return "";
+      let fecha = this.$moment(this.producto.FechaMod).format("DD/MM/YYYY HH:mm");
+      return `Modificado por ${this.producto.UsuarioMod || "N/D"} el ${fecha}`;
+    },
+    fechaModFormato() {                                                    // <-- AGREGAR
+      if (!this.producto.FechaMod) return "Sin registro";
+      return this.$moment(this.producto.FechaMod).format("DD/MM/YYYY HH:mm:ss");
+    }
+  },
   components: {
     CategoriaForm,
     MarcaForm,
@@ -1335,7 +1357,22 @@ export default {
 #modalProducto .modal-dialog {
   min-width: 80% !important;
 }
-
+.badge-modificacion {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.badge-modificacion .icono-reloj {
+  margin-right: 4px;
+}
+.badge-modificacion .separador {
+  margin: 0 6px;
+  opacity: 0.7;
+}
 /* .modal-dialog {
   min-width: 80% !important;
 } */
