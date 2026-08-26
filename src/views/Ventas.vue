@@ -557,7 +557,7 @@
                    
   
                     <b-col cols="12" class="text-left">
-                      <table class="table b-table border table-footer table-sm">
+                              <table class="table b-table border table-footer table-sm">
                                 <tbody>
                                   <tr>
                                     <td>Efectivo</td>
@@ -566,9 +566,14 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.efectivo.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input v-model="ventas[ventaActiva].pago.efectivo.monto" min="0" step="0.01" type="number" placeholder="S/." class="form-control"/>
+                                      <input
+                                        v-model="ventas[ventaActiva].pago.efectivo.monto"
+                                        min="0" step="0.01" type="number" placeholder="S/."
+                                        class="form-control"
+                                        @input="actualizarPago('efectivo', $event.target.value)"
+                                      />
                                     </td>
-                                   </tr>
+                                  </tr>
                                   <tr>
                                     <td>Tarjeta</td>
                                     <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(2)"><i class="fas fa-check"></i></b-button></td>
@@ -576,7 +581,12 @@
                                       <b-form-input v-model="ventas[ventaActiva].pago.visa.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                     </td>
                                     <td>
-                                      <input class="form-control" v-model="ventas[ventaActiva].pago.visa.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"/>
+                                      <input
+                                        class="form-control"
+                                        v-model="ventas[ventaActiva].pago.visa.monto"
+                                        min="0" step="0.01" type="number" placeholder="S/."
+                                        @input="actualizarPago('visa', $event.target.value)"
+                                      />
                                     </td>
                                     </tr>
                                     <tr>
@@ -586,7 +596,12 @@
                                         <b-form-input v-model="ventas[ventaActiva].pago.mastercard.descripcion" type="text" placeholder="Descripcion" ></b-form-input>
                                       </td>
                                       <td>
-                                        <input class="form-control" v-model="ventas[ventaActiva].pago.mastercard.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                        <input
+                                          class="form-control"
+                                          v-model="ventas[ventaActiva].pago.mastercard.monto"
+                                          min="0" step="0.01" type="number" placeholder="S/."
+                                          @input="actualizarPago('mastercard', $event.target.value)"
+                                        />
                                       </td>
                                     </tr>
                                     <tr>
@@ -597,12 +612,16 @@
                                       </td>
                                       <td>
                                         <input
-                                          class="form-control" v-model="ventas[ventaActiva].pago.delivery.monto" min="0" step="0.01" type="number" placeholder="S/." @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"/>
+                                          class="form-control"
+                                          v-model="ventas[ventaActiva].pago.delivery.monto"
+                                          min="0" step="0.01" type="number" placeholder="S/."
+                                          @input="actualizarPago('delivery', $event.target.value)"
+                                        />
                                       </td>
                                     </tr>
                                   </tbody>
                               </table>
-                    </b-col>
+                            </b-col>
                     <b-col md="12" v-if="ventas[ventaActiva].selectOpcionVenta > 0">
                       <b-form-group>
                         <label style="font-weight:bold">Nombre:</label>
@@ -2377,6 +2396,23 @@ export default {
     },
     obtenerMonto(valor) {
       return isNaN(parseFloat(valor)) ? 0 : parseFloat(valor);
+    },
+    actualizarPago(metodoModificado, valor) {
+      const venta = this.ventas[this.ventaActiva];
+      const total = parseFloat(this.getTotal()) || 0;
+
+      venta.pago[metodoModificado].monto = this.obtenerMonto(valor);
+
+      // Si el usuario modifica Tarjeta, Yape/Plin o Transferencia,
+      // Efectivo se recalcula como el restante real (total - suma de los otros 3)
+      if (metodoModificado !== "efectivo") {
+        const sumaOtros =
+          this.obtenerMonto(venta.pago.visa.monto) +
+          this.obtenerMonto(venta.pago.mastercard.monto) +
+          this.obtenerMonto(venta.pago.delivery.monto);
+
+        venta.pago.efectivo.monto = parseFloat((total - sumaOtros).toFixed(2));
+      }
     },
     cargarProforma(proforma) {
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;

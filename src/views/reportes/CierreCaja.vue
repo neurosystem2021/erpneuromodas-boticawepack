@@ -780,12 +780,15 @@ export default {
         this.$toasted.show('Seleccione un Turno')
         return
       }
+      if (!sessionStorage.getItem('User')) {
+        this.$toasted.show('No se identificó al usuario. Vuelva a iniciar sesión.')
+        return
+      }
       let r = confirm('¿Está seguro de cerrar la caja?')
       if (r) {
         this.axios.post(this.API + 'cierrecaja', {
           idTurno:      this.turno,
-          user: sessionStorage.getItem("User"),
-          //user:         this.vendedor.Usuario,
+          user:         sessionStorage.getItem('User'),
           ingresos:     this.totalIngresos.toFixed(2),
           salidas:      this.totalSalidas,
           total:        this.granTotal,
@@ -793,7 +796,10 @@ export default {
         }).then(res => {
           this.loadData()
           this.$toasted.show('¡Caja cerrada!')
-          // console.log(res)
+        }).catch(err => {
+          this.$toasted.show(err.response && err.response.data && err.response.data.error
+            ? err.response.data.error
+            : 'No se pudo cerrar la caja')
         })
       }
     },
@@ -822,7 +828,8 @@ export default {
     },
     getVentas () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        usuario: sessionStorage.getItem('User')
       }
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -841,7 +848,8 @@ export default {
     },
     getIngresos () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        usuario: sessionStorage.getItem('User')
       }
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -858,7 +866,8 @@ export default {
     },
     getSalidas () {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        usuario: sessionStorage.getItem('User')
       }
       if (this.vendedor.Usuario) {
         //params.usuario = this.vendedor.Usuario
@@ -875,7 +884,8 @@ export default {
     },
     getAdelantos() {
         let params = {
-          idDocVentas: this.ventas.map(v => v.idDocVenta)
+          idDocVentas: this.ventas.map(v => v.idDocVenta),
+          usuario: sessionStorage.getItem('User')
         }
         this.axios.get(this.API + 'cierrecaja/ingresos/adelantos', {
           params: params
