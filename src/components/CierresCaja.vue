@@ -28,7 +28,7 @@
                       </template>
                       <template slot="ver" slot-scope="data">
                         <b-button :href="'/views/ve_cierreform.php?idCierre=' + data.item.IdCierreCaja + '&empresa=' + empresa" variant="primary" target="_blank">Ver</b-button>
-                        <b-button :href="'/api/index.php/cierrecaja/pdfresumen/' + data.item.IdCierreCaja +'?empresa=' + empresa" variant="success" >PDF Resumen</b-button>
+                        <b-button :href="'/api/index.php/cierrecaja/pdfresumen/' + data.item.IdCierreCaja +'?empresa=' + empresa"  target="_blank" variant="success" >PDF Resumen</b-button>
                       </template>
 
                     </b-table>
