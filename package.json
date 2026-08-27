@@ -29,7 +29,8 @@
     "vue-sweetalert2": "^5.0.2",
     "vue-toasted": "^1.1.24",
     "vue2-autocomplete-js": "^0.2.2",
-    "vuex": "^2.0.0"
+    "vuex": "^2.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
