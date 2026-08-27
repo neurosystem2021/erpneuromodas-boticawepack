@@ -446,6 +446,9 @@
                                     <proformas></proformas>
                                 </b-col>
                                 <b-col md="12" class="mt-1">
+                                    <reimprimir-documentos></reimprimir-documentos>
+                                </b-col>
+                                <b-col md="12" class="mt-1">
                                     <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
                                 </b-col>        
                             </b-collapse>
@@ -486,7 +489,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
-
+import ReimprimirDocumentos from '@/components/ReimprimirDocumentos.vue'
 
 export default {
     beforeMount () {
@@ -1359,7 +1362,8 @@ export default {
         ConfigVenta,
         Proformas,
         PagoDeuda,
-        PreOrdenLista
+        PreOrdenLista,
+        ReimprimirDocumentos
     }
 }
 </script>
