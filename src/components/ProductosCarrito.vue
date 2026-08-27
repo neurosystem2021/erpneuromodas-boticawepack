@@ -463,7 +463,7 @@
 
       <b-popover
           target="popover-metodopago"
-          triggers="click"
+          triggers="focus"
           placement="top"
           :style="{ minWidth:'600px' }">
 
