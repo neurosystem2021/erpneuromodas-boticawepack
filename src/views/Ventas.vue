@@ -6,25 +6,15 @@
 
         <br />
         <b-container fluid class="ancho mt-0" >
-            <div>
-                <div class="float-right">
-                    <b-button-group size="sm">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
-                        <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente" ></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm" v-show="false">
-                        <pre-orden-lista 
-                            v-show="!this.$route.query.idPreOrden"
-                            :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
-                            @onPreOrden="selectPreOrden"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm" v-if="idPerfil==1">
-                        <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                    </b-button-group>
-                </div>
+            <div class="acciones-superiores">
+                <pago-deuda></pago-deuda>
+                <reimprimir-documentos></reimprimir-documentos>
+                <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
+                <pre-orden-lista v-show="false" :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
+                  @onPreOrden="selectPreOrden"></pre-orden-lista>
+                <config-venta v-if="idPerfil == 1" @onUpdateConfig="eliminarCliente"
+                  @onUpdateConfigComision="eliminarComisionista">
+                </config-venta>
             </div>
             <br /><br />
             <b-form @submit="guardarVenta" @keydown.enter="prevent">
@@ -440,6 +430,7 @@ import ConfigVenta from "@/components/ConfigVenta";
 import PagoDeuda from "@/components/PagoDeuda";
 import PreOrdenLista from "@/components/PreOrdenLista.vue";
 import Proformas from "@/components/ProformaLista.vue";
+import ReimprimirDocumentos from '@/components/ReimprimirDocumentos.vue'
 import { onMounted, onUnmounted } from "vue";
 
 export default {
@@ -1547,7 +1538,8 @@ export default {
     ConfigVenta,
     PagoDeuda,
     PreOrdenLista,
-    Proformas
+    Proformas,
+    ReimprimirDocumentos
   }
 };
 </script>
@@ -1560,6 +1552,17 @@ export default {
 }
 .big-text {
   font-size: 30px;
+}
+.acciones-superiores {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.acciones-superiores > * {
+    margin: 0 !important;
 }
 </style>
 <style>
