@@ -1943,6 +1943,48 @@ export default {
         return;
       }  
 
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        this.inProgress = false;
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        this.inProgress = false;
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
+        this.inProgress = false;
+        return;
+      }
       if (!venta.cliente.DniRuc) {
         //this.$toasted.show('Debe seleccionar un cliente.')
         this.$swal({
@@ -2166,6 +2208,57 @@ export default {
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        this.$toasted.show(
+          `El producto "${errores[0].Producto}" tiene precio inválido`
+        );
+        return;
+      }
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
         );
         return;
       }
