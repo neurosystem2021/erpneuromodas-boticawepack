@@ -1227,7 +1227,7 @@ export default {
       );
       if (medicion) {
         this.producto.precios[index].IdProductoMedicion = medicion.IdProductoMedicion;
-        this.producto.precios[index].ProductoMedicion = medicion.Codigo || medicion.ProductoMedicion;
+        this.producto.precios[index].ProductoMedicion = medicion.ProductoMedicion;
       }
     },
     checkIsHijo(val) {
