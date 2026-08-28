@@ -6,26 +6,19 @@
 
         <b-container fluid class="ancho"  id="conten">
             <div>
-                <div class="float-right">
-                    <b-button-group size="sm" class="ocularMovil">
-                        <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
-                        <pago-deuda></pago-deuda>
-                    </b-button-group>
-                    <b-button-group size="sm">
+                <div class="acciones-superiores">
+                        <delivery-modal class="ocularMovil" ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
+                        <pago-deuda class="ocularMovil"></pago-deuda>
+                        <reimprimir-documentos></reimprimir-documentos>
                         <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="setCliente"></proformas>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil" v-if="false">
                         <pre-orden-lista 
+                            class="ocularMovil"
+                            v-if="false"
                             v-show="!this.$route.query.idPreOrden"
                             :idAlmacen="venta.almacen.IdAlmacen" @onSelectPreOrden="setCliente"
                             @onPreOrden="selectPreOrden"></pre-orden-lista>
-                    </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil" v-if="idPerfil==1">
                         <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-                        <config-venta @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
-                    </b-button-group>
+                        <config-venta class="ocularMovil" v-if="idPerfil==1" @onUpdateConfig="eliminarCliente" @onUpdateConfigComision="eliminarComisionista"></config-venta>
                 </div>
             </div>
             <br /><br />
@@ -445,6 +438,7 @@ import ConfigVenta from '@/components/ConfigVenta'
 import PagoDeuda from '@/components/PagoDeuda'
 import PreOrdenLista from '@/components/PreOrdenLista.vue'
 import Proformas from '@/components/ProformaLista.vue'
+import ReimprimirDocumentos from '@/components/ReimprimirDocumentos.vue'
 import DeliveryModal from '@/components/DeliveryModal.vue'
 import Swal from 'sweetalert2'
 export default {
@@ -1274,6 +1268,7 @@ export default {
         PagoDeuda,
         PreOrdenLista,
         Proformas,
+        ReimprimirDocumentos,
         DeliveryModal,
     }
 }
@@ -1288,6 +1283,19 @@ export default {
 .big-text {
     font-size: 30px;
 }
+
+.acciones-superiores {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.acciones-superiores > * {
+    margin: 0 !important;
+}
+
 @media only screen and (max-width: 700px) {
   /* For desktop: */
     .ocularMovil{
