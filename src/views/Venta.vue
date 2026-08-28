@@ -352,7 +352,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="click blur focus" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
@@ -425,7 +425,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="click blur focus" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -2141,6 +2141,57 @@ export default {
         return;
       }
 
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        this.$toasted.show(
+          `El producto "${errores[0].Producto}" tiene precio inválido`
+        );
+        return;
+      }
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
+        return;
+      }
       if (!venta.cliente.DniRuc) {
         this.$toasted.show("Debe seleccionar un cliente.");
         // this.$swal({
@@ -2396,6 +2447,62 @@ export default {
         return;
       }
 
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        errores.forEach(p => {
+          this.$toasted.show(`El producto "${p.Producto}" tiene precio inválido`);
+        });
+
+        this.bloquearVenta = false;
+        return;
+      }  
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        this.bloquearVenta = false;
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        this.bloquearVenta = false;
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
+        this.bloquearVenta = false;
+        return;
+      }
       if (!venta.cliente.DniRuc) {
         //this.$toasted.show('Debe seleccionar un cliente.')
         this.$swal({
