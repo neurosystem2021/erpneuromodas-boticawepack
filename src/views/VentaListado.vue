@@ -131,7 +131,7 @@
                           <b-input-group-append>
                             <clientes-form :newDniRuc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
                           </b-input-group-append>
-                           <b-button
+                          <b-button
                             v-show="venta.cliente.TotalDeuda > 0"
                             :id="`popover-deudas${index}`"
                             variant="danger"
@@ -300,6 +300,7 @@
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
                                 :url="APIProductos"
+                                :debounce="500"
                                 :customParams="{ 'sortBy':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
                                 anchor="Producto"
@@ -1270,7 +1271,7 @@ export default {
     });
   },
   methods: {
-    async actualizarDeudaActual() {
+        async actualizarDeudaActual() {
 
         const cliente =
           this.ventas[this.ventaActiva].cliente;
@@ -2079,7 +2080,7 @@ export default {
           // inputCliente.setValue(obj.Cliente);
         }
         this.ventas[this.ventaActiva].cliente = obj;
-        this.cargarResumenDeudaCliente(
+          this.cargarResumenDeudaCliente(
             obj.IdCliente
           ).then(total => {
 
@@ -2089,7 +2090,7 @@ export default {
               total
             );
 
-        });
+          });
         this.ventas[this.ventaActiva].CampoDireccion = obj.Direccion;
         if (obj.DniRuc !== "00000000") {
           // inputCliente.$refs.input.disabled = false;
@@ -2291,6 +2292,63 @@ export default {
       }
       if (totalPagos <= 0) {
         this.$toasted.show("Debe seleccionar un método de pago");
+        this.bloquearVenta = false;
+        return;
+      }
+
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        errores.forEach(p => {
+          this.$toasted.show(`El producto "${p.Producto}" tiene precio inválido`);
+        });
+
+        this.bloquearVenta = false;
+        return;
+      }  
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        this.bloquearVenta = false;
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        this.bloquearVenta = false;
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
         this.bloquearVenta = false;
         return;
       }
@@ -2520,6 +2578,58 @@ export default {
           "El metodo de pago Yape o Plin no puede ser negativo"
         );
         this.bloquearVenta = false;
+        return;
+      }
+
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        this.$toasted.show(
+          `El producto "${errores[0].Producto}" tiene precio inválido`
+        );
+        return;
+      }
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
         return;
       }
 
