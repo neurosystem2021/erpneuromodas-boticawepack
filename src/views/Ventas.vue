@@ -1050,6 +1050,7 @@ export default {
         CodSunatModifica: "",
         NotaIdMotivo: "",
         NotaDescMotivo: "",
+        FechaRegModifica: null,
         EsCreditoProforma: 0,
         FechaCreditoProforma: this.$moment().format("YYYY-MM-DD"),
         EsDescripcion: 0,
@@ -1111,6 +1112,7 @@ export default {
           CodSunatModifica: "",
           NotaIdMotivo: "",
           NotaDescMotivo: "",
+          FechaRegModifica: null,
           IdPreOrden: null,
           CampoDireccion: "",
           EsDelivery: false,
@@ -1428,6 +1430,10 @@ export default {
             });
 
           this.ventas.productos = [];
+
+          //guardar la fecha del documento original afectado
+          this.ventas[this.ventaActiva].FechaRegModifica =
+            response.data[0] ? response.data[0].FechaDocOriginal : null;
 
           response.data.forEach(element => {
             this.setProducto(element, true);
