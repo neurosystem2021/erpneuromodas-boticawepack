@@ -201,7 +201,7 @@
                           <Movimiento></Movimiento>
                           <proformas></proformas>
                           <config-venta @onUpdateConfig="eliminarCliente"></config-venta>
-                          <pre-orden-lista :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista>
+                          <!-- <pre-orden-lista :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen" @onSelectPreOrden="setCliente"></pre-orden-lista> -->
                         <b-button v-if="ultimasVentas[index]" class="btnAction" target="_blank" variant="info" size="lg"
                           :href="'/imprimir/index.php?IdDocVenta=' + ultimasVentas[index]">
                           Imprimir Comprobante

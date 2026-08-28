@@ -26,7 +26,7 @@
 
         </b-col>
         <b-col cols="3">
-          Buscar detalle del movimiento (buscar serie)
+           <strong>Ingrese el nombre del proveedor</strong>
             <input type="text" class="form-control" v-model="descripcion">
         </b-col>
         <b-col cols="3" class="pt-4">
