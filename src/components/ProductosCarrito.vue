@@ -1035,7 +1035,7 @@ export default {
       obj = this.onSetProducto(obj);
 
       if (index !== null && index !== undefined) {
-        this.$store.state.cart.productos[index] = obj;
+        Vue.set(this.$store.state.cart.productos, index, obj);
         this.$refs["modalCant"].hide();
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
@@ -1087,7 +1087,7 @@ export default {
       obj = this.onSetProducto(obj, prod.cantidad, prod.precio);
       console.log("prod", obj);
       if (index !== null && index !== undefined) {
-        this.$store.state.cart.productos[index] = obj;
+        Vue.set(this.$store.state.cart.productos, index, obj);
         this.$refs["modalCant"].hide();
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
         this.mostrarTablaProductos = !this.mostrarTablaProductos;
