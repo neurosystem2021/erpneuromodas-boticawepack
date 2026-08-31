@@ -752,14 +752,14 @@
             >
 
            
-              <delivery-modal
+              <!-- <delivery-modal
                 class="ocularMovil"
                 ref="deliveryModal"
                 @onPagarDelivery="onPagarDelivery"
-              ></delivery-modal>
+              ></delivery-modal> -->
            
             
-              <pago-deuda />
+              <!-- <pago-deuda /> -->
             
           
           
@@ -773,10 +773,10 @@
             </b-button-group> -->
             <!-- <b-button-group size="sm" class="ocularMovil"> -->
               <!--<config-venta @onUpdateConfig="eliminarCliente"></config-venta>-->
-              <config-venta
+              <!-- <config-venta
                 @onUpdateConfig="eliminarCliente"
                 @onUpdateConfigComision="eliminarComisionista"
-              ></config-venta>
+              ></config-venta> -->
             <!-- </b-button-group> -->
           </b-col>
           <b-col cols="4">
@@ -2026,7 +2026,14 @@ export default {
     },
     async guardarVenta(evt) {
     evt.preventDefault();
+
+    // ===== CANDADO 1: freno real contra multi-clic =====
+    if (this.inProgress) {
+        return; // ya hay una venta en proceso, ignoramos este clic extra
+    }
     this.inProgress = true;
+    // ===== FIN CANDADO 1 =====
+
     this.loading = true;
 
     // 1. Cálculo de montos de pago de forma limpia
@@ -2155,6 +2162,10 @@ export default {
     let ventasGeneradas = [];
     let errores = [];
 
+    // ===== CANDADO 2 (parte frontend): un solo código por todo este intento de pago =====
+    const requestIdBase = Date.now() + '-' + Math.random().toString(36).substring(2);
+    // ===== FIN =====
+
     try {
         for (const element of this.$store.state.empresas) {
             try {
@@ -2170,6 +2181,10 @@ export default {
 
                     // CLONAMOS el objeto venta para cada empresa
                     let objetoVenta = JSON.parse(JSON.stringify(this.venta));
+
+                    // ===== CANDADO 2: código único por empresa dentro del mismo intento =====
+                    objetoVenta.requestId = `${requestIdBase}-emp${element.IDEMPRESA}`;
+                    // ===== FIN =====
 
                     // LIMPIEZA DE PRODUCTOS
                     objetoVenta.productos = productosEmpresa.map(pro => {
