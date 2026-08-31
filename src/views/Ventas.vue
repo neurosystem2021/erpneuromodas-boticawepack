@@ -706,7 +706,7 @@
               > 
                 <i class="fa fa-shopping-cart" aria-hidden="true"></i> Pagar 
             </b-button>
-            <b-button
+            <!-- <b-button
               type="button"
               v-if="!this.$route.query.idPedido && idPerfil == 1"
               :disabled="inProgress"
@@ -716,23 +716,23 @@
               class="btnAction"
               >
                 Crear Proforma
-              </b-button>
+              </b-button> -->
 
-              <proformas
+              <!-- <proformas
                 :idAlmacen="venta.almacen.IdAlmacen"
                 :empresa="empresa"
                 @onSelectProforma="setCliente"
-              />
+              /> -->
 
             
-            <b-button
+            <!-- <b-button
               type="button"
               @click="anularPagoDelivery"
               variant="danger"
               v-if="this.$route.query.idPedido"
               >Anular Pago Delivery</b-button
-            >
-            <Movimiento :empresa="empresa" v-if="idPerfil == 1 || idPerfil == 14"/>
+            > -->
+            <!-- <Movimiento :empresa="empresa" v-if="idPerfil == 1 || idPerfil == 14"/> -->
               <!-- style="background: #004D40;" -->
             
               <!-- -->

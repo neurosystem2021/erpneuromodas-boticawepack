@@ -128,18 +128,18 @@
         </b-row>
       </b-modal>
 
-      <b-table
-        small
-        responsive
-        striped
-        hover
-        :items="productos"
-        :fields="fields"
-        ref="tablaCarrito"
-        style="margin-top: -12px"
-        v-if="mostrarTablaProductos"
-        class="tblCarrrito"
-      >
+       <b-table
+          small
+          responsive
+          striped
+          hover
+          :items="productos"
+          :fields="fields"
+          ref="tablaCarrito"
+          style="margin-top: -12px"
+          v-if="mostrarTablaProductos"
+          class="tblCarrrito"
+        >
         <template slot="eventPres" slot-scope="data">
           <b-button
             size="sm"
@@ -2479,10 +2479,11 @@ export default {
   border-right: 2px solid #dc3545;
 }
 .tblCarrrito {
-  min-height: 380px !important ;
-  max-height: 380px !important ;
-  overflow-y: auto;
-  overflow-x: auto;
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
   border: 1px solid #bdbdbd !important;
   background: #ffffff !important;
 }
