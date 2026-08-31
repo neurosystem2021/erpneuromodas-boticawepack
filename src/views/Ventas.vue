@@ -384,12 +384,12 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.transferencia.monto - venta.pago.plin.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Yape / Plin</td>
+                                            <td>Yape</td>
                                             <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(3)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
@@ -408,13 +408,13 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.transferencia.monto - venta.pago.plin.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
                                         <tr>
-                                        <td style="vertical-align: middle !important;">Transferencia</td>
-                                        <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
+                                         <td style="vertical-align: middle !important;">Transferencia</td>
+                                          <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(4)"><i class="fas fa-check"></i></b-button></td>
                                             <td>
                                                 <b-form-input
                                                     v-model="venta.pago.transferencia.descripcion"
@@ -432,7 +432,31 @@
                                                     step="0.01"
                                                     type="number"
                                                     placeholder="S/."
-                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - venta.pago.visa.monto - venta.pago.plin.monto - $event.target.value)"
+                                                />
+                                            </td>
+                                        </tr>
+                                                                                <tr>
+                                            <td>Plin</td>
+                                            <td><b-button variant="info" size="sm" class="mt-1" @click="metodoPagoCambio(5)"><i class="fas fa-check"></i></b-button></td>
+                                            <td>
+                                                <b-form-input
+                                                    v-model="venta.pago.plin.descripcion"
+                                                    :disabled="bloquearInput?true:false"
+                                                    type="text"
+                                                    placeholder="Descripcion"
+                                                ></b-form-input>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control"
+                                                    v-model="venta.pago.plin.monto"
+                                                    :disabled="bloquearInput?true:false"
+                                                    min="0"
+                                                    step="0.01"
+                                                    type="number"
+                                                    placeholder="S/."
+                                                    @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - venta.pago.transferencia.monto - $event.target.value)"
                                                 />
                                             </td>
                                         </tr>
@@ -581,7 +605,7 @@ export default {
     },
     watch: {
         totalCart (newVal) {
-                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto))).toFixed(2);
+                this.venta.pago.efectivo.monto = parseFloat(newVal - (parseFloat(this.venta.pago.visa.monto) + parseFloat(this.venta.pago.mastercard.monto) + parseFloat(this.venta.pago.transferencia.monto) + parseFloat(this.venta.pago.plin.monto))).toFixed(2);
         }
     },
     computed: {
@@ -706,7 +730,8 @@ export default {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
                     mastercard: { IdMetodoPago: 3, monto: 0 },
-                    transferencia: { IdMetodoPago: 4, monto: 0 }
+                    transferencia: { IdMetodoPago: 4, monto: 0 },
+                    plin: { IdMetodoPago: 5, monto: 0 }
                 },
                 IdPreOrden: [],
                 CampoDireccion: 'Direccion',
@@ -1051,6 +1076,7 @@ export default {
             totalPagos += isNaN(parseFloat(this.venta.pago.visa.monto))?0:parseFloat(this.venta.pago.visa.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)
             totalPagos += isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)
+            totalPagos += isNaN(parseFloat(this.venta.pago.plin.monto))?0:parseFloat(this.venta.pago.plin.monto)
             if((isNaN(parseFloat(this.venta.pago.efectivo.monto))?0:parseFloat(this.venta.pago.efectivo.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago efectivo no puede ser negativo')
                 this.inProgress = false            
@@ -1062,13 +1088,19 @@ export default {
                 return  
             }
             if((isNaN(parseFloat(this.venta.pago.mastercard.monto))?0:parseFloat(this.venta.pago.mastercard.monto)).toFixed(2)<0){
-                this.$toasted.show('El metodo de pago Yape o Plin no puede ser negativo')
+                this.$toasted.show('El metodo de pago Yape no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
 
             if((isNaN(parseFloat(this.venta.pago.transferencia.monto))?0:parseFloat(this.venta.pago.transferencia.monto)).toFixed(2)<0){
                 this.$toasted.show('El metodo de pago Transferencia no puede ser negativo')
+                this.inProgress = false            
+                return  
+            }
+
+              if((isNaN(parseFloat(this.venta.pago.plin.monto))?0:parseFloat(this.venta.pago.plin.monto)).toFixed(2)<0){
+                this.$toasted.show('El metodo de pago Plin no puede ser negativo')
                 this.inProgress = false            
                 return  
             }
@@ -1226,6 +1258,7 @@ export default {
             this.venta.pago.visa.monto = 0;
             this.venta.pago.mastercard.monto = 0;
             this.venta.pago.transferencia.monto = 0;
+            this.venta.pago.plin.monto = 0;
 
             switch (tipo) {
                 case 1:
@@ -1242,6 +1275,10 @@ export default {
 
                 case 4:
                 this.venta.pago.transferencia.monto = this.totalCart;
+                break;
+
+                case 5:
+                this.venta.pago.plin.monto = this.totalCart;
                 break;
             }
         },
