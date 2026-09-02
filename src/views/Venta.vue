@@ -227,8 +227,10 @@
                 </div>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">
                   <b-col md="4" cols="12" style="display: flex; align-items: center; justify-content: center;"
-                    class="mb-3">
-                    <b-row>
+                    class="mb-3 col-acciones">
+
+                    <!-- VERSIÓN COMPLETA: visible en desktop, oculta en responsive <=1024px -->
+                    <b-row class="acciones-full w-100">
                       <b-col md="12" class="mt-1">
                         <b-button class="btnAction" block
                           style="background: #B71C1C; color: #fff; font-weight: bold; font-size: 1.2rem"
@@ -252,18 +254,30 @@
                           @onSelectProforma="cargarProforma"></proformas>
                       </b-col>
                       <b-col md="12" class="mt-1">
-                        <!-- <b-button variant="secondary" block @click="probarImpresora()"><i class="fas fa-print fa-sm"></i> Probar Impresora</b-button> -->
-                      </b-col>
-                      <b-col md="12" class="mt-1">
                         <pago-deuda></pago-deuda>
                       </b-col>
                       <b-col md="12" class="mt-1">
                         <Movimiento></Movimiento>
                       </b-col>
                     </b-row>
+
+                    <!-- VERSIÓN COMPACTA: solo visible en responsive <=1024px -->
+                    <b-row class="acciones-compact w-100">
+                      <b-col md="12" class="mt-1">
+                        <b-button class="btnAction" block
+                          style="background: #B71C1C; color: #fff; font-weight: bold; font-size: 1.2rem"
+                          @click="anadirVentana()"> Nueva Ventana</b-button>
+                      </b-col>
+                      <b-col md="12" class="mt-1">
+                        <b-button class="btnAction" block v-if="ventas.length > 1" variant="dark"
+                          style="font-weight: bold; font-size: 1.2rem" @click="eliminarVentana()"> Cancelar
+                          Venta</b-button>
+                      </b-col>
+                    </b-row>
+
                   </b-col>
 
-                  <b-col md="4" cols="12" class="mb-3">
+                  <b-col md="4" cols="12" class="mb-3 col-proforma">
                     <b-col md="12" class="text-left px-0">
                       <div class="my-1">
                         <b-button class="btnAction mb-2" block variant="primary" @click="guardarProforma()"
@@ -304,16 +318,16 @@
                     </b-col>
                   </b-col>
 
-                  <b-col md="4" cols="12">
+                  <b-col md="4" cols="12" class="col-pago">
                     <table class="table b-table border table-footer" style="font-size:0.85rem">
                       <tbody>
                         <tr>
                           <td>
-                            <b-button class="p-1 ml-1 mt-1" :id="`popover-metodopago${index}`" tabindex="0"
+                          <div style="display: flex; align-items: center; gap: 4px;">
+                            <b-button class="p-1" :id="`popover-metodopago${index}`" tabindex="0"
                               variant="success" @click="togglePopover(index)">
                               <i class="fas fa-credit-card"></i>
                             </b-button>
-                            <br>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 1" variant="success"
                               style="font-size: 0.70rem;">EFECTIVO</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 2" variant="info"
@@ -322,6 +336,7 @@
                               style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 4" variant="info"
                               style="font-size: 0.70rem;">TRANSF.</b-badge>
+                          </div>
 
                             <b-popover :target="`popover-metodopago${index}`" title="Método de Pago" placement="top"
                               triggers="manual" :show.sync="mostrar[index]" :style="{ minWidth: '600px' }">
@@ -382,8 +397,8 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-success" style="font-size: 20px; font-weight: bold;">SubTotal</td>
-                          <td class="table-success" style="font-size: 20px; font-weight: bold;">{{ getSubTotal() }}</td>
+                          <td class="table-success" style="font-size: 16px; font-weight: bold;">SubTotal</td>
+                          <td class="table-success" style="font-size: 23px; font-weight: bold;">{{ getSubTotal() }}</td>
                         </tr>
                         <tr>
                           <td>
@@ -430,11 +445,11 @@
                               </slot>
                             </b-popover>
                           </td>
-                          <td class="table-danger" style="font-size: 20px; font-weight: bold;">Descuento</td>
+                          <td class="table-danger" style="font-size: 16px; font-weight: bold;">Descuento</td>
                           <td class="table-danger" style="font-size: 20px; font-weight: bold;">{{ getDescuento() }}</td>
                         </tr>
                         <tr>
-                          <td colspan="1"><b style="font-size: 20px; font-weight: bold; margin-left: 38px;">TOTAL</b></td>
+                          <td colspan="1"><b style="font-size: 16px; font-weight: bold;">TOTAL</b></td>
                           <td colspan="2" class="table-success" style="font-size: 40px; font-weight: bold; text-align: center;">{{ getTotal() }}</td>
                         </tr>
                         <tr>
@@ -585,6 +600,41 @@
         </b-row>
       </b-col>
     </b-row>
+    <div class="fab-container">
+      <div v-if="fabOpen" class="fab-backdrop" @click="fabOpen = false"></div>
+      <transition name="fab-fade">
+        <div v-if="fabOpen" class="fab-menu">
+          <div class="fab-menu-item">
+            <b-button block style="background: #B71C1C; color: #fff; font-weight: bold;"
+              @click="anadirVentana(); fabOpen = false"> Nueva Ventana</b-button>
+          </div>
+          <div class="fab-menu-item" v-if="ventas.length > 1">
+            <b-button block variant="dark" style="font-weight: bold;"
+              @click="eliminarVentana(); fabOpen = false"> Cancelar Venta</b-button>
+          </div>
+          <div class="fab-menu-item">
+            <Movimiento></Movimiento>
+          </div>
+          <div class="fab-menu-item">
+            <pago-deuda></pago-deuda>
+          </div>
+          <div class="fab-menu-item">
+            <proformas :idAlmacen="ventas[ventaActiva].almacen.IdAlmacen"
+              @onSelectProforma="cargarProforma"></proformas>
+          </div>
+          <div class="fab-menu-item">
+            <b-button block :variant="touchHab ? 'danger' : 'success'" style="font-weight: bold;"
+              @click="activarModalTouch()">
+              <i :class="touchHab ? 'fas fa-desktop' : 'fas fa-keyboard'"></i>
+              {{ touchHab ? 'Deshabilitar Touch' : 'Habilitar Touch' }}
+            </b-button>
+          </div>
+        </div>
+      </transition>
+      <b-button class="fab-main-btn" :class="{ 'fab-open': fabOpen }" @click="fabOpen = !fabOpen">
+        <i class="fas fa-plus"></i>
+      </b-button>
+    </div>
     <b-modal v-model="modalPresentacion" size="lg" hide-footer>
       <center>
         <h3 style="text-decoration: underline;">{{ producto.Producto }}</h3>
@@ -983,6 +1033,7 @@ export default {
       bloquearInput: false,
       precioHabilitado: false,
       touchHab: false,
+      fabOpen: false,
       opcionesVenta: [
         { text: "Normal", value: 0 },
         { text: "Delivery", value: 2 }
@@ -3064,6 +3115,97 @@ async setProducto(producto) {
   }
 }
 
+.acciones-full {
+  display: flex;
+}
+.acciones-compact {
+  display: none;
+}
+.fab-container {
+  display: none;
+}
+@media (max-width: 1524px) {
+  .col-acciones {
+    align-items: flex-start !important;
+  }
+}
+/* Responsive <=1024px (tablets tipo 1024x768, y hacia abajo) */
+@media (max-width: 1524px) {
+  .col-acciones {
+    display: none !important;
+  }
+  .fab-container {
+    display: flex !important;
+  }
+}
+
+/* Solo en el rango tablet (768px-1024px) las columnas usan col-md-4 (33%);
+   las expandimos a 50% para ocupar el espacio que dejó la columna oculta.
+   Por debajo de 768px, cols="12" ya las pone al 100% automáticamente. */
+@media (min-width: 768px) and (max-width: 1524px) {
+  .col-proforma,
+  .col-pago {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 1050;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.fab-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040; /* debajo del fab-menu (que puede quedar en 1050+) */
+  background: transparent;
+}
+.fab-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1045;
+}
+.fab-menu-item {
+  min-width: 220px;
+}
+.fab-main-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #B71C1C;
+  color: #fff;
+  font-size: 1.4rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.fab-main-btn.fab-open {
+  transform: rotate(45deg);
+  background: #424242;
+}
+.fab-fade-enter-active,
+.fab-fade-leave-active {
+  transition: all 0.2s ease;
+}
+.fab-fade-enter,
+.fab-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.table-footer td {
+  padding: 0.4rem 0.5rem !important;
+  vertical-align: middle !important;
+}
 .alert {
   margin-bottom: 0;
 }
