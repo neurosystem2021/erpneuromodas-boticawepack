@@ -13,16 +13,16 @@
                   v-model="producto.CodigoBarra"
                   @input="(val) => producto.CodigoBarra = val && val.toUpperCase()" type="text"
                   class="form-control upper"></b-form-input>
-                <b-input-group-append>
+                <!-- <b-input-group-append>
                   <b-btn variant="outline-primary" @click="agregarFilaCodigo">
                     <b>+</b>
                   </b-btn>
-                </b-input-group-append>
+                </b-input-group-append> -->
               </b-input-group>
-              <b-form-text>Código principal de la tabla Gen_Producto</b-form-text>
+              <b-form-text>Dejar en blanco para generar el codigo de barra</b-form-text>
             </b-form-group>
 
-            <div v-if="listaExtras.length > 0" class="mb-2 p-2 border rounded bg-light">
+            <!-- <div v-if="listaExtras.length > 0" class="mb-2 p-2 border rounded bg-light">
               <b-row class="small font-weight-bold text-center mb-1">
                 <b-col md="5">Código adicional</b-col>
                 <b-col md="4">Peso</b-col>
@@ -60,7 +60,7 @@
                   </b-col>
                 </b-row>
               </div>
-            </div>
+            </div> -->
           <b-form-group>
             <label>Categoría:</label>
             <b-input-group>
