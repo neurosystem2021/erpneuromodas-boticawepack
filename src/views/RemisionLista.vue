@@ -119,8 +119,7 @@
               <div class="d-flex align-items-center flex-wrap acciones-estado">
                 <span
                   v-if="data.item.Estado == 2"
-                  v-b-tooltip.hover
-                  :title="data.item.Msj_sunat"
+                  v-b-tooltip="{ title: data.item.Msj_sunat, boundary: 'window', container: 'body', placement: 'left', trigger: 'hover' }"
                   class="estado-badge estado-ok">
                   <i class="fas fa-check-circle"></i> Emitido
                 </span>
