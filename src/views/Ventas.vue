@@ -17,7 +17,7 @@
                 </config-venta>
             </div>
             <br /><br />
-            <b-form @submit="guardarVenta" @keydown.enter="prevent">
+            <div>
                 <b-row>
                     <b-col md="7">
                         <b-row>
@@ -411,13 +411,13 @@
                     <b-col cols="8">
                         <br />
                         <b-button class="btnAction" type="button" :disabled="inProgress" variant="primary" size="md" @click="guardarProforma">Crear Proforma</b-button>
-                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg">Efectuar Venta</b-button>
+                        <b-button class="btnAction" type="submit" :disabled="inProgress" variant="success" size="lg" @click="guardarVenta">Efectuar Venta</b-button>
                         <b-button class="btnAction" v-if="ultimaVenta" target="_blank" variant="info" size="lg" @click="imprimirUltimaVenta">Imprimir última Venta</b-button>
                         <br />
                         <br />
                     </b-col>
                 </b-row>
-            </b-form>
+            </div>
         </b-container>
     </div>
 </template>
@@ -1526,11 +1526,11 @@ export default {
         this.venta.comisionista = {};
       }
     },
-    realizarVenta(event) {
-      if (event.key === "Enter") {
-        this.guardarVenta(event)
-      }
-    }
+    // realizarVenta(event) {
+    //   if (event.key === "Enter") {
+    //     this.guardarVenta(event)
+    //   }
+    // }
   },
   components: {
     ProductosCarrito,
