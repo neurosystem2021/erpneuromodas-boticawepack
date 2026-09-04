@@ -3,8 +3,6 @@
     <b-col md="12">
       <b-form-group>
         <b-input-group>
-          <b-button @click="abrirModaProductos" v-if="isVentas" variant="info" class="mx-2 btnResponsive">Agregar Productos
-          </b-button>
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
@@ -50,7 +48,149 @@
           </b-input-group-append>
         </b-input-group>
         <span class="ml">Búsqueda Avanzanda (Producto,Categoría,Marca)</span>
+        <br>
+        <br>
+
+        <div v-if="isVentas" class="toolbarProductos d-flex align-items-center flex-wrap mb-2">
+          <b-form-checkbox
+            switch
+            v-model="panelProductosActivo"
+            class="switchMultiempresa mr-3"
+          >
+            <b>Búsqueda multiempresa</b>
+          </b-form-checkbox>
+          <small class="text-muted" v-if="panelProductosActivo">
+            Haz clic en "Búsqueda Producto" para ver el listado desplegable
+          </small>
+        </div>
       </b-form-group>
+
+      <!--
+        BÚSQUEDA MULTIEMPRESA — estilo dropdown/autocomplete.
+        Antes era un <b-modal>, luego un panel estático embebido.
+        Ahora: la barra de búsqueda queda fija en el POS, y el listado
+        de resultados se muestra como un panel flotante (dropdown) que
+        aparece al enfocar/escribir en el input y se cierra al hacer
+        clic fuera, con Esc, o con el botón de cerrar.
+      -->
+      <div
+        v-if="panelProductosActivo"
+        class="productosDropdownWrapper"
+        ref="panelProductosWrapper"
+        @keydown.esc="mostrarDropdownProductos = false"
+      >
+        <b-input-group class="quickSearchBar">
+          <input
+            ref="inputProducto"
+            v-model="searchProducto"
+            @input="onSearchProducto(); mostrarDropdownProductos = true;"
+            @focus="onFocusBusquedaProductos"
+            placeholder="Búsqueda Producto (multiempresa)"
+            class="form-control inputResponsive"
+            id="searchProducto"
+          >
+          <b-button v-if="searchProducto" @click="limpiarBuscar" variant="warning"> X </b-button>
+          <b-input-group-append>
+            <b-button @click="startRecognition()" variant="info">
+              <i class="fas fa-microphone"></i>
+            </b-button>
+          </b-input-group-append>
+          <input
+            v-model="searchSoloBarras"
+            @input="onSearchBarras(); mostrarDropdownProductos = true;"
+            @focus="onFocusBusquedaProductos"
+            placeholder="Buscar por Codigo de Barra"
+            class="form-control"
+          />
+          <input
+            v-model="CodigoBarra"
+            @input="onInputCodigoBarra"
+            @focus="onFocusBusquedaProductos"
+            type="text"
+            class="form-control ml-2 inputResponsive"
+            placeholder="Busqueda rápida por Codigo de Barra"
+            v-on:keyup.enter="anadirProductos"
+          />
+          <b-input-group-append>
+            <b-button
+              variant="primary"
+              @click="buscarProductosCodigoBarrasModal"
+              ><i class="fas fa-search"></i
+            ></b-button>
+          </b-input-group-append>
+        </b-input-group>
+
+        <transition name="fade-slide">
+          <div v-show="mostrarDropdownProductos" class="productosDropdownPanel">
+            <div class="productosDropdownHeader">
+              <span><i class="fas fa-boxes"></i> Productos multiempresa ({{ lstProductosRapido.length }})</span>
+              <b-button size="sm" variant="link" class="closeDropdownBtn" @click="mostrarDropdownProductos = false">
+                <i class="fas fa-times"></i>
+              </b-button>
+            </div>
+            <div class="tblModalInline">
+              <table class="table table-hover table-sm mb-0" width="100%">
+                <thead>
+                  <tr>
+                    <th class="py-1"></th>
+                    <th class="py-1">Códpreferencial</th>
+                    <th class="py-1">Producto</th>
+                    <th class="py-1">Marca</th>
+                    <th class="py-1">Categoria</th>
+                    <th class="py-1">Empresa</th>
+                    <th class="py-1">Precio</th>
+                    <th class="py-1">Por Mayor</th>
+                    <th class="py-1">Por Volumen</th>
+                    <th class="py-1">Imagen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(prod,index) in lstProductosRapido" :key="index"
+                    :class="[
+                      selectedProducto && selectedProducto.IdProducto === prod.IdProducto ? 'fila-activa' : ''
+                    ]"
+                    @click="seleccionarProducto(prod)"
+                    @dblclick="agregarDirecto(prod)"
+                  >
+                    <td class="py-1">
+                      <b-button size="sm" variant="success" class="btnAddProd" @click.stop="anadirarProductosSeleccionado(prod,true)">
+                        <i class="fas fa-plus"></i>
+                      </b-button>
+                    </td>
+                    <td class="py-1">{{ prod.CodigoBarra }}</td>
+                    <td class="py-1">{{ prod.Producto }}</td>
+                    <td class="py-1">{{ prod.ProductoMarca }}</td>
+                    <td class="py-1">{{ prod.ProductoCategoria }}</td>
+                    <td class="py-1"><span :class="`${getSyle(prod.Empresa)} empresaChip`">{{ prod.NombreEmpresa }}</span></td>
+                    <td class="py-1 text-center font-weight-bold">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
+                    <td class="py-1 text-center">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
+                    <td class="py-1 text-center">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
+                    <td class="py-1">
+                      <img
+                      :src="
+                         prod.Imagen == null ||  prod.Imagen == ''
+                          ? 'static/no-photo.png'
+                          : `/resources/images/productos/${ prod.Imagen}`
+                      "
+                      class="imagen"
+                    />
+                    </td>
+                  </tr>
+                  <tr v-if="lstProductosRapido.length === 0">
+                    <td colspan="10" class="text-center text-muted py-4">
+                      Sin resultados. Escribe para buscar…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="productosDropdownFooter">
+              <span>Stock Total Por Empresa</span>
+              <b>{{ lstProductoStock.reduce((sum,prod)=>{return sum + parseFloat(prod.stock)},0) }}</b>
+            </div>
+          </div>
+        </transition>
+      </div>
 
       <b-modal size="lg" ref="modalCant" hide-footer hide-header>
         <div class="d-block text-center">
@@ -325,21 +465,6 @@
             <div>{{ getIgv(data.index) }}</div>
           </b-form-checkbox>
         </template>
-        <!--<template slot="flete" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].FLETE"
-            type="number"
-            min="0"
-            placeholder="Flete"></b-form-input>
-        </template>-->
-
-        <!--<template slot="lote" slot-scope="data">
-          <b-form-input
-            v-model="productos[data.index].IdLote"
-            type="text"
-            min="0"
-            placeholder="Lote"></b-form-input>
-        </template>-->
 
         <template slot="manoobra" slot-scope="data">
           <input
@@ -441,10 +566,6 @@
             style="width: 150px"
             v-model="productos[data.index].Descripcion"
           ></textarea>
-          <!--<b-form-input
-            v-model="productos[data.index].Descripcion"
-            type="text"
-            placeholder="Descripción"></b-form-input>-->
         </template>
 
         <template slot="total" slot-scope="data">
@@ -491,7 +612,6 @@
             >></b-button
           >
         </template>
-        <!-- <template slot="row-details" slot-scope="row"> </template> -->
 
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.CodigoBarra == 'COSTODELIVERY'">
@@ -517,9 +637,6 @@
     <b-col md="3">
       <!-- <slot name="totalEmpresa"  v-if="mostrarTablaProductos"></slot> -->
     </b-col>
-    <!-- <b-col md="2">
-      <slot name="adicional"></slot>
-    </b-col> -->
     <b-col md="3" >
       <table class="table b-table border table-footer " v-if="mostraTotales">
         <tbody>
@@ -567,183 +684,6 @@
       </table>
     </b-col>
     <br /><br />
-    <b-modal
-      size="xl"
-      v-model="modalNuevoProductos"
-      title="Selección Productos"
-      class="modalSelectProduct modal-xl"
-      ref="modalSelectProduct"
-      id="modalSelectProduct"
-      hide-footer
-    >
-      <b-row>
-        <b-col cols="12">
-          <b-input-group>
-            <input
-              ref="inputProducto"
-              v-model="searchProducto"
-              @input="onSearchProducto()"
-              placeholder="Búsqueda Producto"
-              class="form-control inputResponsive"
-              id="searchProducto"
-              label="Búsqueda Producto"
-            >
-            <!-- <input
-              v-model="searchProductoDesc"
-              placeholder="Filtrar Por Descripción"
-              class="form-control inputResponsive"
-              @input="cargarListadoProductos(2)"
-              id="searchProducto"
-            > -->
-            <b-button  @click="limpiarBuscar" variant="warning"> X </b-button>
-            <b-input-group-append>
-              <b-button @click="startRecognition()" variant="info">
-                <i class="fas fa-microphone"></i>
-              </b-button>
-            </b-input-group-append>
-            <input
-              v-model="searchSoloBarras"
-              @input="onSearchBarras()"
-              placeholder="Buscar por Codigo de Barra"
-              class="form-control"
-            />
-            <input
-              v-model="CodigoBarra"
-              @input="onInputCodigoBarra"
-              type="text"
-              class="form-control ml-2  inputResponsive"
-              placeholder="Busqueda rápida por Codigo de Barra"
-              v-on:keyup.enter="anadirProductos"
-            />
-            <b-input-group-append>
-              <!--<proveedores-tabla></proveedores-tabla>-->
-              <b-button
-                variant="primary"
-                @click="buscarProductosCodigoBarrasModal"
-                ><i class="fas fa-search"></i
-              ></b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-col>
-        <b-col cols="12" class="mt-3">
-          <div class="tblModal">
-            <table class="table table-hover" width="100%">
-              <thead>
-                <tr>
-                  <th class="py-0"></th>
-                  <th class="py-0">Códpreferencial</th>
-                  <th class="py-0">Producto</th>
-                  <!-- <th class="py-0">Modelo</th> -->
-                  <th class="py-0">Marca</th>
-                  <!-- <th class="py-0">Procedencia</th> -->
-                  <th class="py-0">Categoria</th>
-                  <!-- <th class="py-0">U.M.</th> -->
-                  <th class="py-0">Empresa</th>
-                  <!-- <th class="py-0">Stock</th> -->
-                  <!-- <th>Minimo</th> -->
-                  <th class="py-0">Precio</th>
-                  <th class="py-0">Por Mayor</th>
-                  <th class="py-0">Por Volumen</th>
-                  <th class="py-0">Imagen</th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(prod,index) in lstProductosRapido" :key="index" 
-                :class="[
-                    prod.Empresa,
-                    selectedProducto && selectedProducto.IdProducto === prod.IdProducto ? 'fila-activa' : ''
-                  ]"
-                @click="seleccionarProducto(prod)"
-                @dblclick="agregarDirecto(prod)"
-                >
-                  <td class="py-0"> <b-button variant="success" @click="anadirarProductosSeleccionado(prod,true)"> + </b-button></td>
-                  <td class="py-0">{{ prod.CodigoBarra }}</td>
-                  <td class="py-0">{{ prod.Producto }}</td>
-                  <!-- <td class="py-0">{{prod.ProductoModelo }} </td> -->
-                  <td class="py-0">{{prod.ProductoMarca }} </td>
-                  <!-- <td class="py-0">{{prod.ProductoDesc3 }} </td> -->
-                  <td class="py-0">{{prod.ProductoCategoria }} </td>
-                  <!-- <td class="py-0">{{prod.ProductoMedicion }} </td> -->
-                  <td class="py-0">{{ prod.NombreEmpresa }}</td>
-                  <!-- <td class="py-0" style="text-align: center; font-weight: bold;"  :class="bgStock(prod)">{{ parseFloat(prod.stock?prod.stock:0).toFixed(0) }}</td> -->
-                  <!-- <td style="text-align: center; font-weight: bold;">{{ parseFloat(prod.StockMinimo?prod.StockMinimo:0).toFixed(0) }}</td> -->
-                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.PrecioContado?prod.PrecioContado : 0).toFixed(2) }}</td>
-                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioConvenio?prod.precioConvenio : 0).toFixed(2) }}</td>
-                  <td class="py-0" style="text-align: center; font-weight: bold;">{{ parseFloat(prod.precioBloque?prod.precioBloque : 0).toFixed(2) }}</td>
-                  <td class="py-0">
-                    <img
-                    :src="
-                       prod.Imagen == null ||  prod.Imagen == ''
-                        ? 'static/no-photo.png'
-                        : `/resources/images/productos/${ prod.Imagen}`
-                    "
-                    class="imagen"
-                  />
-                  </td>
-                  
-                 
-                </tr>
-              </tbody>
-          </table>
-
-          
-          </div>
-
-          <div class="mt-2">            <hr>
-          </div>
-
-          <b-row class="mt-2">
-            <b-col cols="5">
-              <!-- <b-button variant="success" :disabled="lstProductoStock.length==0" @click="anadirProductoSeleccionado()">
-                <i class="fa fa-check" aria-hidden="true"></i> Aceptar
-              </b-button> -->
-            </b-col>
-            <b-col cols="0">
-                <!--
-              -- MOSTRAR STOCK POR ALMACENES
-                <table class="table table-hover tblModal" width="100%">
-                    <thead>
-                      <tr class="" >
-                        <th>Código</th>
-                        <th>Producto</th>
-                        <th>Tienda/ Almacén</th>
-                        <th>Stock</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(p,index) in lstProductoStock" :key="index">
-                        <td>{{ p.CodigoBarra }}</td>
-                        <td>{{ p.Producto }}</td>
-                        <td>{{ p.Almacen }}</td>
-                        <td>{{ p.stock }}</td>
-                      </tr>
-                      <tr v-for="n in 3" :key="n">
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                          <td></td>
-                      </tr>
-                    </tbody>
-                </table> -->
-            </b-col>
-            <b-col cols="2" class="stock-box">
-                <div class="stock-title">
-                  Stock Total Por Empresa
-                </div>
-                <input
-                type="text"
-                class="form-control stock-input"  
-                disabled 
-                :value="lstProductoStock.reduce((sum,prod)=>{return sum + parseFloat(prod.stock)},0)">
-            </b-col>
-          </b-row>
-           
-        
-        </b-col>
-      </b-row>
-      
-    </b-modal>
 
     <b-modal id="modal-1" :title="`${itemProducto.Producto}`"
      hide-footer v-model="modalPresentaciones"
@@ -923,6 +863,17 @@ export default {
   },
   async mounted() {
     let vm = this;
+
+    // Carga inicial de la lista de productos multiempresa (solo si el
+    // interruptor "Búsqueda multiempresa" está activo), para que el
+    // dropdown ya tenga datos listos apenas el cajero haga foco/clic.
+    if (this.panelProductosActivo) {
+      await this.cargarListadoProductos(4);
+    }
+
+    // Cierra el dropdown al hacer clic fuera del panel de búsqueda.
+    document.addEventListener("mousedown", this.handleClickOutsideProductos);
+
     // vm.lstProductos = [];
     // for (const empresa of vm.$store.state.empresas) {
     //   let url = `${
@@ -949,6 +900,9 @@ export default {
     //   });
     // }
   },
+  beforeDestroy() {
+    document.removeEventListener("mousedown", this.handleClickOutsideProductos);
+  },
   data() {
     return {
       selectedProducto: null,
@@ -968,7 +922,13 @@ export default {
       IdProducto: "",
       CodigoBarra: "",
       errorMessage: "",
-      modalNuevoProductos: false,
+      // Interruptor: activa/desactiva por completo la búsqueda rápida
+      // multiempresa. Se recuerda entre sesiones vía localStorage.
+      panelProductosActivo: localStorage.getItem("pos_panelProductosActivo") !== "false",
+      // Controla si el panel flotante (dropdown) de resultados está
+      // visible en este momento (se abre al enfocar/escribir, se cierra
+      // al hacer clic fuera, con Esc o con el botón de cerrar).
+      mostrarDropdownProductos: false,
       lstProductos: [],
       busqueda: "",
       searchSoloBarras: "",
@@ -1073,6 +1033,14 @@ export default {
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
+    },
+    panelProductosActivo(val) {
+      localStorage.setItem("pos_panelProductosActivo", val);
+      if (val) {
+        this.cargarListadoProductos(4);
+      } else {
+        this.mostrarDropdownProductos = false;
+      }
     }
   },
   props: {
@@ -1136,34 +1104,6 @@ export default {
       filtrados: state => state.cart.productosFiltrados,
       totalCart: state => state.cart.totalCart
     }),
-    // totalPages() {
-    //   let productosFiltrados = this.lstProductos.filter(
-    //     listadoProducto =>
-    //       !this.$store.state.cart.productos.some(
-    //         producto =>
-    //           producto.IdProducto == listadoProducto.IdProducto &&
-    //           producto.Empresa == listadoProducto.Empresa
-    //       )
-    //   );
-
-    //   if (this.searchProducto) {
-    //     productosFiltrados = productosFiltrados.filter(
-    //       p =>
-    //         p.Producto.toLowerCase().includes(
-    //           this.searchProducto.toLowerCase()
-    //         ) || !!p.Selected
-    //     );
-    //   }
-
-    //   if (this.IdProducto) {
-    //     productosFiltrados = productosFiltrados.filter(
-    //       v => v.CodigoBarra == this.IdProducto
-    //     );
-    //   }
-
-    //   const perPage = parseInt(this.perPageModal) || productosFiltrados.length;
-    //   return Math.ceil(productosFiltrados.length / perPage);
-    // },
     isLastPage() {
       return this.currentPage >= this.totalPages;
     },
@@ -1225,6 +1165,18 @@ export default {
     }
   },
   methods: {
+    onFocusBusquedaProductos() {
+      this.mostrarDropdownProductos = true;
+      if (this.lstProductosRapido.length === 0) {
+        this.cargarListadoProductos(4);
+      }
+    },
+    handleClickOutsideProductos(event) {
+      const wrapper = this.$refs.panelProductosWrapper;
+      if (wrapper && !wrapper.contains(event.target)) {
+        this.mostrarDropdownProductos = false;
+      }
+    },
     async onInputCodigoBarra() {
       if (!this.CodigoBarra) return;
 
@@ -1345,8 +1297,6 @@ export default {
       let prod = { ...this.productos[index] };
       prod.precio = parseFloat(prod.subtotal / prod.cantidad);
       this.productos[index] = prod;
-      // this.mostrarTablaProductos = !this.mostrarTablaProductos;
-      // this.mostrarTablaProductos = !this.mostrarTablaProductos;
     },
     onSearchProducto() {
       clearTimeout(this.searchTimeout);
@@ -1441,14 +1391,10 @@ export default {
       this.recalcularTotalPorItem(prod, index);
 
       this.$nextTick(() => {
-        //   Vue.set(this.productos, index, prod);
         let totalCart = this.productos.reduce((a, b) => {
           return a + parseFloat(b.total);
         }, 0);
         this.$store.state.cart.totalCart = parseFloat(totalCart).toFixed(2);
-        // });
-        // this.$nextTick(() => {
-        //   this.actualizarProd(prod);
       });
     },
     cambiarPrecioConvenioBloque(index, item) {
@@ -1769,7 +1715,7 @@ export default {
               <tr style="padding:0; margin:0">
                 <td style="width: 60px" class="${styleStock}"><b>${
           data.EsPadre == 1
-            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60850bueyzYxaHZNKEz1PJzt77W+vf61/bcESv/q94aq4TBl0keQQ2SWGIZayselck7lucs3obP24eXxv14HUAeeppcQV9ywJcOOFBmuruSszUx3n+Udf/Tr9ev7e/xXAQcxPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCval27oc4h+69ZWfBazwyGX3vDS/GGxBoukT+553kbf7XvYakLZXyIvZ2XkG+seITGvs6+jku55zvHj1DdTdVEf96mpW1FWjWULqKE7OdU/rgchXy9bu3iME8k9gCZD8fl/M05hRdAtUSSbnUMi6OJkZ5vMJMjnQPR1N0cnqKkpQJ6CDcHzskEUmkyeXyqAiSV+cCt+x41C6DHDu6HNRDT9R0kwRZFIJBD7R2hZCtolmaiiVJn6hwMWRSWZnk8xMzpLPpVGEgYqP0LzS/9T8lH3/9sOZMsDI50/HXEPMoIBXkFi2jm4KUsks0hFIIQmaUXr6uvFcH1MXqLqG0LWSFroARwoUoZBJjZttO7/MlwGKRS3k3GRxUfqS5tUrUTWFUx19WIEA4GGFK+g904uhKUhFB99FVRR0ReAWPKQorqsUun402147Ww7obH8yKqSXKGbgFnxC0Qi1LY30ff8TdiwMLtgVMXp6T2KqCqAQDGmMT2cxdJ2unimuX7cc1fMZOTlkbH+jwynLoPPglqhjBko1wINcIUO64FNlBxG6ipSSSLiKzr4OLKGhWTpzqQITM3niF6ZZv66J+lqbmYsew2c7zJ3/zODowS1RTRG/AwBVgOv7KJqB9NyibkRCFZzs7Ua1LGJWkM7+cUIhlfh4Cicnufn6OnxHJd13ytr65nCuLIMj7z4cMbLMlpml2MB/dHMxA9uupO9MB1bAZj6bJ530iNaYSM1lcrRAa0MVWc9lvL8rtOudiQXjlXzQ2b4lOjY2n0Au+KPcmD6YtkXPmT7Clo0S0BgcThC1A6QzHlWVOrGQjueq5DOz0e37OxYuWwLs2Liq6q7bWqelXGz2SQKWzeDAIKZloesqiWQW35cELZWArpUk1RWFd9r76471Ti1M2dKJlkXDey/cf8H1vFKQLBqn7C2SmFaEoaF+9IABUqAqothM+O7vWqqqgqYInth7vCEL8bIaACv3P35tf+NlYUXTDTxf4Pgeng9CFoFgGgYD538l+Ie5inxVCDRNQZOSgpNjJD7vv3xoeBUw+E+ABdy9crn52FXNFevXXlkVbVgeEaGggY9CruCjKQYj8QlMS8e2QHoF5lIO5+Mp2TeUTAzG88dHk94B4BhQ7CJ/sXEdAW6rjaibm+tDd9y8prqmtTkimppijJ6fYHIyw9mxOflz99zU+Wnnm2SOt4EfgIX58/cOudSjrwLrDY2NTTXmA9l8Xh1LyI9cn7eAgb8aefGn5zdfsxo3JM8ArgAAAABJRU5ErkJggg==" style="width: 24px" />'
+            ? '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAE8ElEQVRIS62VW2xUVRSGv31uc86cmelMW1pLG3uBKkGJIQpqvCfeUmOEB6LBF5AHNET0QYIkJvqgIIkxGhMSfcG7UaI1onh7gGgUDWlaWlpoS6UFp3c60800/l+r+SqbUNOsK9pfd4Fk7Ov9r8mo+2Jf5vXVv8vAJAyPHvo4u9yM0bZjw5GZA3P3/T+A5zA4hsIwfNH9cbYiHGTDpgc/mhZzmxlmGScYvxTo3yW6k9sf2fbM0Vuva6GxsYZ27QMibgX93iifbj58wWn3Lv9vACC2KVahta5I5m/5BVrnUBuiZPYnT+efdVdf6vBFizz07e4KQ/o1lbHq9426YOPcxHz1slf2CL9Fsq3lCund53CIH6ptbaxbXV3ycTv0F9C8dv0F1AhI+DKcAAAAABJRU5ErkJggg==" style="width: 24px" />'
             : data.stock
               ? Number.isInteger(parseFloat(data.stock))
                 ? parseInt(data.stock)
@@ -1792,11 +1738,6 @@ export default {
                       : "/resources/images/productos/" + data.Imagen
                   }" class="imagen">
                 </td>
-                <!--<td style="width: 20px" class="text-center"><b>${
-                  data.VentaEstrategica == 1
-                    ? '<i class="fas fa-star" style="color:yellow !important" ></i>'
-                    : ""
-                }</b></td>-->
               </tr>
             </tbody>
           </table>   
@@ -1841,8 +1782,6 @@ export default {
       );
       this.getSubtotal(index);
 
-      // this.productos[index].nuevoPrecioContado = nuevoPrecio
-      // return nuevoPrecio
       this.updateManoDeObraNeta(index);
       this.mostrarTablaProductos = !false;
       this.actualizarDescu(index);
@@ -1865,7 +1804,6 @@ export default {
         this.productos[index].cantidad * this.productos[index].precio
       );
       Vue.set(this.productos[index], "subtotal", subtotal);
-      // this.productos[index].subtotal = subtotal
       return subtotal;
     },
     getIgv(index) {
@@ -1877,7 +1815,6 @@ export default {
       }
 
       Vue.set(this.productos[index], "igv", igv);
-      // this.productos[index].igv = igv
       return igv;
     },
     getTotal(index) {
@@ -1895,7 +1832,6 @@ export default {
 
       total = this.$options.filters.redondear(total);
       Vue.set(this.productos[index], "total", total);
-      // this.productos[index].total = total
       return total;
     },
     getData(value) {
@@ -1930,16 +1866,6 @@ export default {
           break;
       }
     },
-    // ZURITA
-    async abrirModaProductos() {
-      this.modalNuevoProductos = !this.modalNuevoProductos;
-      this.CodigoBarra = "";
-      await this.cargarListadoProductos(4);
-       this.$nextTick(() => {
-          this.forzarFocusPersistente();
-        });
-    },
-
     async cargarListadoPorBarras() {
       let IdProductos = this.productos.map(v => v.IdProducto);
       
@@ -2074,7 +2000,9 @@ export default {
       return productoSerie;
     },
     async anadirarProductosSeleccionado(item, abrirModal = false) {
+      this.mostrarDropdownProductos = false;
       item.stockMax = item.stock;
+
       if (this.productos.some(v => v.IdProducto == item.IdProducto)) {
         let index = this.productos.findIndex(
           v => v.IdProducto == item.IdProducto
@@ -2100,16 +2028,12 @@ export default {
         return;
       }
       this.abrirModal = abrirModal;
-      this.modalNuevoProductos = false;
       let PreciosPorProducto = JSON.parse(item.PreciosPorProducto);
       let productoSerie = await this.obtenerSeriePorProducto(
         item.IdProducto,
         item.Empresa
       );
-      // let productoSerie = [];
       delete item._rowVariant;
-      // itemProducto.backgroundColor =
-      // this.itemProducto._rowVariant = this.variantPorEmpresa(item.Empresa);
       item.productoSerie = productoSerie;
 
       this.itemProducto = { ...item };
@@ -2141,9 +2065,6 @@ export default {
         this.itemProducto.descuento = 0;
 
         this.$store.state.cart.productos.unshift(this.itemProducto);
-        setTimeout(() => {
-          this.modalNuevoProductos = abrirModal;
-        }, 500);
       }
     },
 
@@ -2183,7 +2104,6 @@ export default {
       delete prod._rowVariant;
       this.$store.state.cart.productos.unshift(prod);
       this.modalPresentaciones = false;
-      this.modalNuevoProductos = this.abrirModal;
     },
     guardarItemPorUnidad() {
       let empresa = sessionStorage.getItem("empresa")
@@ -2214,7 +2134,6 @@ export default {
       delete prod._rowVariant;
       this.$store.state.cart.productos.unshift(prod);
       this.modalPresentaciones = false;
-      this.modalNuevoProductos = this.abrirModal;
     },
 
     showPresentacion(obj, index) {
@@ -2269,15 +2188,11 @@ export default {
       let prod = this.itemProducto;
       prod.tipo = "UNIDAD";
       prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
-      // prod.cantidadPres = 0;
-      // prod.bloquearInput = false;
       prod.cantxPrecio = this.monto;
       prod.cantidad = this.monto;
       if (this.itemProducto.PreciosPorProducto.length > 0) {
          prod.precio = this.isVentas ? prod.PrecioContado : prod.PrecioCosto;
           prod.total = this.monto * prod.precio;
-
-        // prod.estadoPxP = false;
       }
 
       this.$store.state.cart.productos[this.index] = prod;
@@ -2307,10 +2222,6 @@ export default {
             await this.guardaProductosEnLaTablaFinal(item);
           }
         });
-
-      this.modalNuevoProductos = false;
-      //
-      //this.productos =
     },
     async guardaProductosEnLaTablaFinal(item) {
       this.objProd.cantxPrecio = 1;
@@ -2427,16 +2338,12 @@ export default {
       this.producto = Producto;
     },
     async anadirProductoSeleccionado() {
-      this.modalNuevoProductos = false;
       await this.setProducto(this.producto);
-      // setTimeout(async () => {
       await this.cargarListadoProductos(4);
-      this.modalNuevoProductos = true;
       this.lstProductoStock = [];
       this.producto = {};
       this.searchProducto = "";
       this.searchProductoDesc = "";
-      // }, 1000);
     }
   },
   components: {
@@ -2521,6 +2428,115 @@ export default {
   background: #ff3d00;
   color: #ffffff;
 }
+
+/* ===== Toolbar (interruptor de búsqueda multiempresa) ===== */
+.toolbarProductos {
+  gap: 8px;
+}
+.switchMultiempresa {
+  background: #e0e0e0 !important;
+  border: 1px solid #bdbdbd !important;
+  border-radius: 20px !important;
+  padding: 8px 16px 8px 46px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  overflow: hidden !important;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.switchMultiempresa .custom-control-label {
+  font-weight: 600;
+  cursor: pointer;
+  color: #0b6bca;
+  margin-bottom: 0 !important;
+}
+.switchMultiempresa .custom-control-input:checked ~ .custom-control-label {
+  color: #1a237e;
+}
+.switchMultiempresa:has(.custom-control-input:checked) {
+  background: #92dffb !important;
+  border-color: #4fc3f7 !important;
+}
+
+/* ===== Búsqueda multiempresa estilo dropdown ===== */
+.productosDropdownWrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+.quickSearchBar {
+  margin-bottom: 0;
+}
+.productosDropdownPanel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e3e6f0;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.productosDropdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: linear-gradient(90deg, #1a237e, #283593);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.productosDropdownHeader i {
+  margin-right: 6px;
+}
+.closeDropdownBtn {
+  color: #ffffff !important;
+  padding: 0 4px;
+  line-height: 1;
+}
+.closeDropdownBtn:hover {
+  color: #ffcdd2 !important;
+}
+.productosDropdownFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #f4f6fb;
+  border-top: 1px solid #e3e6f0;
+  font-size: 0.85rem;
+}
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.fade-slide-enter,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.empresaChip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.btnAddProd {
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tblModal {
   height: 70vh;
   overflow-y: auto;
@@ -2531,13 +2547,33 @@ export default {
   border-collapse: collapse;
   width: 100%;
 }
-.tblModal thead th {
+.tblModalInline {
+  height: 42vh;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.tblModalInline table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.tblModalInline table thead th {
   position: sticky;
   top: 0;
-  background: #1a237e;
-  color: #ffffff;
+  background: #f4f6fb;
+  color: #1a237e;
+  font-size: 0.78rem;
   z-index: 2;
+  border-bottom: 2px solid #d8dcee;
 }
+.tblModalInline table td {
+  font-size: 0.82rem;
+  vertical-align: middle;
+}
+.tblModalInline tbody tr:hover {
+  background: #f0f4ff;
+  cursor: pointer;
+}
+
 .modasm {
   background: #eff9ff;
   font-size: 0.9rem;
@@ -2561,9 +2597,6 @@ export default {
 .vChip {
   font-weight: bold;
   padding: 10px 5px;
-  /* border-radius: 100% !important; */
-  /* height: 20px;
-  width: 20px; */
 }
 .popover {
   max-width: 420px !important;
@@ -2587,8 +2620,10 @@ export default {
   justify-items: center;
 }
 .imagen {
-  width: 40px !important;
-  height: 40px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 6px;
+  object-fit: cover;
 }
 .imagen:hover {
   transform: scale(2.5);
@@ -2603,13 +2638,13 @@ export default {
   background-color: #f2f2f2;
   position: sticky;
   top: 0;
-  z-index: 1; /* Para asegurarse de que el encabezado esté por encima de las filas */
+  z-index: 1;
 }
 
 .tblProductosModal tbody {
   display: block;
-  max-height: 800px; /* Establece la altura máxima para el tbody */
-  overflow-y: auto; /* Permite el desplazamiento vertical */
+  max-height: 800px;
+  overflow-y: auto;
   width: 100%;
 }
 
@@ -2618,13 +2653,6 @@ export default {
   display: table;
   width: 100%;
   table-layout: fixed;
-}
-.modalSelectProduct.modal-xl .modal-dialog {
-  max-width: 100%;
-  min-height: 50vh; /*define la altura del contenido de modal en general*/
-}
-#modalSelectProduct .modal-dialog {
-  max-width: 100%;
 }
 
 .optionSelect {
@@ -2664,13 +2692,10 @@ export default {
   border: 1px solid #6a1b9a !important;
 }
 @media only screen and (max-width: 700px) {
-  /* For desktop: */
   .ocularMovil {
     display: none;
   }
-  .modalSelectProduct.modal-xl .modal-dialog {
-    background: red !important;
-    max-width: 100%;
+  .productosDropdownPanel {
     font-size: 0.6rem;
   }
   .btnResponsive {
