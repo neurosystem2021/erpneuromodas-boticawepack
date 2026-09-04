@@ -184,6 +184,7 @@
                             <autocomplete
                                 :ref="`autocompleteProducto${index}`"
                                 :id="`autocompleteProducto${index}`"
+                                :debounce="500"
                                 :url="APIProductos"
                                 :customParams="{ 'sortBy':'stock', 'sortDesc': 1 ,limit: '25' }"
                                 :onShouldRenderChild="renderChild"
