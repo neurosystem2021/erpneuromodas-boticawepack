@@ -43,6 +43,34 @@
             <b-button variant="info" @click="currentPage = 1; generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
             <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
         </b-col>
+
+        <!-- Búsqueda rápida por Serie / Número -->
+        <b-col cols="2" class="mt-2">
+            Serie
+            <input
+              type="text"
+              class="form-control"
+              v-model="serieBusqueda"
+              placeholder="Ej: B157"
+              @keyup.enter="currentPage = 1; generarReporte()"
+            >
+        </b-col>
+        <b-col cols="2" class="mt-2">
+            Número
+            <input
+              type="text"
+              class="form-control"
+              v-model="numeroBusqueda"
+              placeholder="Ej: 23091"
+              @keyup.enter="currentPage = 1; generarReporte()"
+            >
+        </b-col>
+        <b-col cols="2" class="mt-2 pt-4">
+            <b-button variant="secondary" @click="limpiarBusqueda">
+              <i class="fa fa-times" aria-hidden="true"></i> Limpiar búsqueda
+            </b-button>
+        </b-col>
+
         <b-col cols="12" class="mt-4 table-container">
 
           <div class="sticky-paginacion">
@@ -203,6 +231,9 @@ export default {
       API: config.API,
       lstReporte: [],
       declarado: 1,
+      // NUEVO: filtros de búsqueda rápida
+      serieBusqueda: "",
+      numeroBusqueda: "",
       title: "Detalle Reg. Ventas:",
       items: [
         {
@@ -249,6 +280,13 @@ export default {
     // NO GENERAR AUTOMÁTICAMENTE
   },
   methods: {
+    // NUEVO: limpia la búsqueda por Serie/Número y vuelve a generar con el rango de fechas normal
+    limpiarBusqueda() {
+      this.serieBusqueda = "";
+      this.numeroBusqueda = "";
+      this.currentPage = 1;
+      this.generarReporte();
+    },
     async abrirModalDetalle(item) {
       this.title = `Detalle Reg. Ventas: ${item.Serie}-${item.Numero}`;
       await this.axios(`${this.API}reporte/ListarRegVenta/detalle`, {
@@ -320,7 +358,10 @@ export default {
           horaFin: this.horaFin,
           declarado: this.declarado,
           almacen: this.almacen,
-          empresa: sessionStorage.getItem("empresa")
+          empresa: sessionStorage.getItem("empresa"),
+          // NUEVO: filtros de búsqueda
+          serie: this.serieBusqueda,
+          numero: this.numeroBusqueda
       };
       await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
         params: params
@@ -355,7 +396,10 @@ export default {
         almacen: this.almacen,
         empresa: sessionStorage.getItem("empresa"),
         page: this.currentPage,
-        limit: this.perPage
+        limit: this.perPage,
+        // NUEVO: filtros de búsqueda por Serie / Número
+        serie: this.serieBusqueda,
+        numero: this.numeroBusqueda
       };
       await this.axios(`${this.API}reporte/ListarRegVenta`, {
         params: params
