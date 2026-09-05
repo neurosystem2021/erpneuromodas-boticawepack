@@ -2298,13 +2298,35 @@ export default {
                             `Empresa ${element.IDEMPRESA}: Venta ${objetoVenta.Serie}-${objetoVenta.Numero}`
                         );
                     } else {
-                        errores.push(`Empresa ${element.IDEMPRESA}: no devolvió insertId`);
+                        // Si el backend respondió 200 pero con un error de negocio (ej: validación) en vez de insertId
+                        const msjNegocio = (response.data && response.data.error)
+                            ? response.data.error
+                            : `Empresa ${element.IDEMPRESA}: no devolvió insertId`;
+                        this.$swal({
+                            icon: "warning",
+                            title: "No se pudo generar el comprobante",
+                            text: msjNegocio,
+                            confirmButtonText: "Entendido"
+                        });
+                        errores.push(msjNegocio);
                     }
                 }
 
             } catch (errEmpresa) {
                 console.error("Error empresa:", element.IDEMPRESA, errEmpresa);
-                errores.push(`Empresa ${element.IDEMPRESA}`);
+
+                // Mensaje real del backend (ej: "Ya existe una Nota de Crédito activa para el comprobante...")
+                const msjBackend = errEmpresa.response && errEmpresa.response.data && errEmpresa.response.data.error
+                    ? errEmpresa.response.data.error
+                    : `Empresa ${element.IDEMPRESA}: error desconocido`;
+
+                this.$swal({
+                    icon: "warning",
+                    title: "No se pudo generar el comprobante",
+                    text: msjBackend,
+                    confirmButtonText: "Entendido"
+                });
+                errores.push(msjBackend);
             }
         }
 
@@ -2313,7 +2335,7 @@ export default {
 
         if (errores.length > 0) {
             console.error("Errores detectados:", errores);
-            this.$toasted.error(`Fallaron ${errores.length} empresas. No se imprimió.`);
+            this.$toasted.error(errores.join(' | '));
             this.inProgress = false;
             this.loading = false;
             return;
@@ -2380,7 +2402,7 @@ export default {
     }
 
     if (errores.length > 0) {
-    this.$toasted.error(`Fallaron ${errores.length} empresas. No se imprimió.`);
+    this.$toasted.error(errores.join(' | '));
     return;
     }
   },
