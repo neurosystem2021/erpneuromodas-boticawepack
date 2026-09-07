@@ -26,7 +26,7 @@
                 </b-col>
 
                 <b-col md="4">
-                    <b-form-group class="pos-field pos-field-alm mb-2">
+                    <b-form-group class="pos-field pos-field-alm mb-2 ocularMovil">
                         <label><i class="fas fa-warehouse pos-label-icon"></i> Alm.</label>
                         <autocomplete required="required" ref="inputAlmacen" :url="API + 'almacenes'" anchor="Almacen" initValue="HUANUCO" label="writer" placeholder="" :on-select="setAlmacen" :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')" :classes="{input: 'form-control'}"></autocomplete>
                     </b-form-group>
@@ -80,7 +80,7 @@
         </b-col>
         <!-- Espacio Central: Comprobante Actual -->
         <b-col md="4" class="ocularMovil d-flex align-items-stretch justify-content-center pos-header-col">
-            <div class="pos-stat-card pos-stat-comprobante w-100 my-2">
+            <div class="pos-stat-card pos-stat-comprobante ocularMovil w-100 my-2">
                 <div class="pos-stat-icon"><i class="fas fa-receipt"></i></div>
                 <div class="pos-stat-body text-center">
                     <div class="pos-stat-label">Comprobante actual</div>
@@ -133,8 +133,13 @@
                                         variant="success"
                                         size="lg">
                                         <i class="fas fa-credit-card pos-btn-icon"></i>
-                                        <span>Efectuar Venta</span>
+                                        <span>Pagar</span>
                                     </b-button>
+
+                                    <div class="pos-venta-total">
+                                        <span class="pos-venta-total-label">Total a pagar</span>
+                                        <span class="pos-venta-total-value">S/ {{ totalCart | redondear }}</span>
+                                    </div>
 
                                     <b-button
                                         type="button"
@@ -300,7 +305,38 @@
                                                 step="0.01"
                                                 type="number"
                                                 placeholder="S/."
-                                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.mastercard.monto - $event.target.value)"
+                                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.tarjeta.monto - venta.pago.mastercard.monto - $event.target.value)"
+                                            />
+                                        </div>
+
+                                        <div class="pos-pay-row-v2" :class="{ 'is-selected': metodoPagoSeleccionado === 'tarjeta' }">
+                                            <div class="pos-pay-badge pos-pay-badge-pink">
+                                                <span class="pos-pay-badge-icon"><i class="fas fa-credit-card"></i></span>
+                                                <span class="pos-pay-badge-label">Tarjeta</span>
+                                            </div>
+                                            <button type="button"
+                                                class="pos-pay-check pos-pay-check-pink"
+                                                :class="{ 'active': metodoPagoSeleccionado === 'tarjeta' }"
+                                                :disabled="bloquearInput ? true : false"
+                                                @click="seleccionarMetodoPago('tarjeta')">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <input
+                                                :disabled="bloquearInput ? true : false"
+                                                v-model="venta.pago.tarjeta.descripcion"
+                                                type="text"
+                                                placeholder="Operación"
+                                                class="form-control pos-pay-input-ref"
+                                            />
+                                            <input
+                                                :disabled="bloquearInput ? true : false"
+                                                class="form-control pos-pay-input-monto"
+                                                v-model="venta.pago.tarjeta.monto"
+                                                min="0"
+                                                step="0.01"
+                                                type="number"
+                                                placeholder="S/."
+                                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.mastercard.monto - $event.target.value)"
                                             />
                                         </div>
 
@@ -331,8 +367,7 @@
                                                 step="0.01"
                                                 type="number"
                                                 placeholder="S/."
-                                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - $event.target.value)"
-                                            />
+                                                @input="venta.pago.efectivo.monto = $options.filters.redondear(totalCart - venta.pago.visa.monto - venta.pago.tarjeta.monto - $event.target.value)"                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -459,6 +494,8 @@ export default {
                 this.venta.pago.visa.monto = total
             } else if (this.metodoPagoSeleccionado === 'mastercard') {
                 this.venta.pago.mastercard.monto = total
+            } else if (this.metodoPagoSeleccionado === 'tarjeta') {
+                this.venta.pago.tarjeta.monto = total
             }
         }
     },
@@ -590,7 +627,8 @@ export default {
                 pago: {
                     efectivo: { IdMetodoPago: 1, monto: 0 },
                     visa: { IdMetodoPago: 2, monto: 0 },
-                    mastercard: { IdMetodoPago: 3, monto: 0 }
+                    mastercard: { IdMetodoPago: 3, monto: 0 },
+                    tarjeta: { IdMetodoPago: 4, monto: 0 }
                 },
                 idProductos:[],
                 NroComprobanteModifica: '',
@@ -932,6 +970,7 @@ export default {
             totalPagos += parseFloat(this.venta.pago.efectivo.monto)
             totalPagos += parseFloat(this.venta.pago.visa.monto)
             totalPagos += parseFloat(this.venta.pago.mastercard.monto)
+            totalPagos += parseFloat(this.venta.pago.tarjeta.monto)
 
             if (!this.venta.EsCredito) {
                 if (this.totalCart != totalPagos) {
@@ -1111,8 +1150,8 @@ export default {
    =========================================================*/
 
 .pos-jobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-purple: #7C3AED;
@@ -1530,6 +1569,7 @@ export default {
 .pos-pay-badge-green .pos-pay-badge-icon { background: var(--jobi-green); }
 .pos-pay-badge-purple .pos-pay-badge-icon { background: var(--jobi-purple); }
 .pos-pay-badge-orange .pos-pay-badge-icon { background: var(--jobi-orange); }
+.pos-pay-badge-pink .pos-pay-badge-icon { background: var(--jobi-pink); }
 
 .pos-pay-check {
     flex: 0 0 auto;
@@ -1559,6 +1599,7 @@ export default {
 .pos-pay-check-green { background: var(--jobi-green); }
 .pos-pay-check-purple { background: var(--jobi-purple); }
 .pos-pay-check-orange { background: var(--jobi-orange); }
+.pos-pay-check-pink { background: var(--jobi-pink); }
 
 .pos-pay-check:disabled {
     cursor: not-allowed;
@@ -1693,6 +1734,44 @@ export default {
 
 .pos-main-actions .btn {
     margin: 0 !important;
+}
+
+.pos-venta-total {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background: #fff;
+    border: 2px solid var(--jobi-green);
+    border-radius: 14px;
+    padding: 6px 18px;
+    min-height: 52px;
+    box-shadow: 0 6px 14px rgba(23,165,84,.18);
+}
+
+.pos-venta-total-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 800;
+    color: #6b85a3;
+}
+
+.pos-venta-total-value {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--jobi-navy);
+    line-height: 1.1;
+}
+
+@media (max-width: 900px) {
+    .pos-venta-total {
+        display: flex;
+        order: -1;
+        width: 100%;
+        align-items: center;
+        text-align: center;
+    }
 }
 
 .pos-btn-proforma,
@@ -1937,5 +2016,128 @@ export default {
 .pos-quick-label >>> i,
 .pos-quick-label >>> svg {
     display: none !important;
+}
+
+/* ===== Dropdown del autocomplete (Doc. Venta, Cliente, Almacén, Vendedor, etc.) ===== */
+
+.pos-field,
+.pos-stat-body-full {
+    position: relative;
+}
+
+/* Contenedor de la lista */
+.pos-field >>> ul,
+.pos-field >>> [role="listbox"],
+.pos-field >>> [class*="result-list"],
+.pos-stat-body-full >>> ul,
+.pos-stat-body-full >>> [role="listbox"],
+.pos-stat-body-full >>> [class*="result-list"] {
+    background: #fff !important;
+    border: 1px solid #eef2f7 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 14px 28px rgba(11,42,74,.22), 0 2px 6px rgba(11,42,74,.08) !important;
+    padding: 5px !important;
+    margin-top: 6px !important;
+    max-height: 240px;
+    overflow-y: auto;
+    list-style: none !important;
+    z-index: 40;
+    animation: posDropdownIn .12s ease-out;
+}
+
+@keyframes posDropdownIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.pos-field >>> ul::-webkit-scrollbar,
+.pos-stat-body-full >>> ul::-webkit-scrollbar {
+    width: 5px;
+}
+.pos-field >>> ul::-webkit-scrollbar-thumb,
+.pos-stat-body-full >>> ul::-webkit-scrollbar-thumb {
+    background: #cfe0ea;
+    border-radius: 999px;
+}
+
+/* Cada opción — mucho más compacta */
+.pos-field >>> ul li,
+.pos-field >>> [role="option"],
+.pos-field >>> [class*="result"],
+.pos-stat-body-full >>> ul li,
+.pos-stat-body-full >>> [role="option"],
+.pos-stat-body-full >>> [class*="result"] {
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    margin-bottom: 1px !important;
+    font-weight: 700;
+    font-size: .8rem;
+    letter-spacing: .01em;
+    line-height: 1.2 !important;
+    color: #33475b;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 0 !important;
+    height: auto !important;
+    transition: background .12s ease, color .12s ease;
+}
+
+.pos-field >>> ul li:last-child,
+.pos-stat-body-full >>> ul li:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Punto indicador, más pequeño */
+.pos-field >>> ul li::before,
+.pos-field >>> [role="option"]::before,
+.pos-stat-body-full >>> ul li::before,
+.pos-stat-body-full >>> [role="option"]::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #d8e3ec;
+    flex: 0 0 auto;
+    transition: background .12s ease, transform .12s ease;
+}
+
+/* Hover */
+.pos-field >>> ul li:hover,
+.pos-field >>> [role="option"]:hover,
+.pos-stat-body-full >>> ul li:hover,
+.pos-stat-body-full >>> [role="option"]:hover {
+    background: #EAF3FC !important;
+    color: var(--jobi-navy) !important;
+}
+.pos-field >>> ul li:hover::before,
+.pos-stat-body-full >>> ul li:hover::before {
+    background: var(--jobi-navy);
+}
+
+/* Opción resaltada/seleccionada — máxima especificidad para vencer el azul por defecto */
+.pos-field >>> ul li[aria-selected="true"],
+.pos-field >>> [role="option"][aria-selected="true"],
+.pos-field >>> ul li.active,
+.pos-field >>> ul li[class*="active"],
+.pos-field >>> [class*="result"].active,
+.pos-field >>> [class*="result"][aria-selected="true"],
+.pos-stat-body-full >>> ul li[aria-selected="true"],
+.pos-stat-body-full >>> [role="option"][aria-selected="true"],
+.pos-stat-body-full >>> ul li.active,
+.pos-stat-body-full >>> ul li[class*="active"] {
+    background: linear-gradient(120deg, var(--jobi-navy), #00b39c) !important;
+    background-color: var(--jobi-navy) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(0,148,129,.30);
+}
+.pos-field >>> ul li[aria-selected="true"]::before,
+.pos-field >>> ul li.active::before,
+.pos-stat-body-full >>> ul li[aria-selected="true"]::before,
+.pos-stat-body-full >>> ul li.active::before {
+    background: #fff;
+    transform: scale(1.3);
 }
 </style>

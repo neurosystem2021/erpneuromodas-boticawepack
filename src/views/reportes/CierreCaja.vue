@@ -98,7 +98,7 @@
           <div class="pos-stat-card pos-stat-purple">
             <div class="pos-stat-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="pos-stat-body">
-              <div class="pos-stat-label">Tarjeta</div>
+              <div class="pos-stat-label">Yape/Plin</div>
               <div class="pos-stat-value">S/. {{ totalVentasVisa | redondear }}</div>
             </div>
           </div>
@@ -107,6 +107,13 @@
             <div class="pos-stat-body">
               <div class="pos-stat-label">Transferencia</div>
               <div class="pos-stat-value">S/. {{ totalVentasMastercard | redondear }}</div>
+            </div>
+          </div>
+          <div class="pos-stat-card pos-stat-pink">
+            <div class="pos-stat-icon"><i class="fas fa-credit-card"></i></div>
+            <div class="pos-stat-body">
+              <div class="pos-stat-label">Tarjeta</div>
+              <div class="pos-stat-value">S/. {{ totalVentasTarjeta | redondear }}</div>
             </div>
           </div>
         </div>
@@ -319,6 +326,76 @@
                   <td colspan="4"></td>
                   <td class="total"><b>Total Transferencia</b></td>
                   <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <!-- ================= VENTAS TARJETA ================= -->
+        <div class="pos-section">
+          <div class="pos-section-title pos-section-title-pink"><i class="fas fa-credit-card"></i> Ventas Tarjeta</div>
+          <div class="pos-table-card">
+            <table class="table b-table table-sm">
+              <thead>
+                <tr>
+                    <th>Recibo</th><th>Fecha</th>
+                    <th v-if="$route.query.noDetalle">Cliente</th>
+                    <th v-else>Productos</th>
+                    <th>Detalle</th><th>Estado</th><th>Pagado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in ventasTarjeta" :key="index" :class="{anulado: item.Anulado}">
+                  <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                  <td>{{ item.FechaDoc }}</td>
+                  <td>
+
+                      <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                      <thead>
+                        <tr>
+                          <th>Codigo</th>
+                          <th>Producto</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                          <th>Descuento</th>
+                          <th v-if="item.TieneIgv">Subtotal</th>
+                          <th v-if="item.TieneIgv">IGV</th>
+                          <th>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(prod, index) in item.productos" :key="index">
+                          <td>{{ prod.CodigoBarra }}</td>
+                          <td class="detalle-producto">{{ prod.Producto }}</td>
+                          <td>{{ prod.Cantidad }}</td>
+                          <td>{{ prod.Precio }}</td>
+                          <td>{{ prod.Descuento }}</td>
+                          <td v-if="item.TieneIgv">
+                            {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                          </td>
+                          <td v-if="item.TieneIgv">
+                            {{ prod.Subtotal * 0.18 | redondear}}
+                          </td>
+                          <td>{{ prod.Subtotal | redondear }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div><i><small>
+                    <b v-if="$route.query.noDetalle"></b>
+                    <b v-else>Cliente:</b>
+                    {{ item.Cliente }}</small></i></div>
+
+                  </td>
+                  <td>{{ item.TarjetaDesc }}</td>
+                  <td>{{ estadoVenta(item) }}</td>
+                  <td>S/. {{ item.Tarjeta | redondear }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4"></td>
+                  <td class="total"><b>Total Tarjeta</b></td>
+                  <td class="total"><b>S/. {{ totalVentasTarjeta | redondear }}</b></td>
                 </tr>
               </tfoot>
             </table>
@@ -583,6 +660,7 @@
           <div class="ticket-dato"><span>Efectivo ({{ cantidadEfectivo }})</span><span>S/. {{ totalVentasEfectivo | redondear }}</span></div>
           <div class="ticket-dato"><span>Yape/Plin ({{ cantidadVisa }})</span><span>S/. {{ totalVentasVisa | redondear }}</span></div>
           <div class="ticket-dato"><span>Transferencia ({{ cantidadMastercard }})</span><span>S/. {{ totalVentasMastercard | redondear }}</span></div>
+          <div class="ticket-dato"><span>Tarjeta ({{ cantidadTarjeta }})</span><span>S/. {{ totalVentasTarjeta | redondear }}</span></div>
           <div class="ticket-dato"><span>Credito ({{ cantidadCredito }})</span><span>S/. {{ totalVentasCredito | redondear }}</span></div>
 
           <div class="ticket-linea"></div>
@@ -661,13 +739,13 @@ export default {
       //return this.$route.params.id ? 
     },
     granTotal () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTarjeta + this.totalIngresos - this.totalSalidas - this.totalAdelantosActivos
     },
     granTotalSinPagoCliente () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard  - this.totalSalidas
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTarjeta  - this.totalSalidas
     },
     totalVentas () {
-      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard
+      return this.totalVentasEfectivo + this.totalVentasVisa + this.totalVentasMastercard + this.totalVentasTarjeta
     },
     totalSalidas () {
       let total = 0
@@ -742,6 +820,18 @@ export default {
       });
       return total
     },
+    totalVentasTarjeta () {
+      let total = 0
+      this.ventasTarjeta.forEach(venta => {
+        if (!venta.Anulado) total += venta.Tarjeta
+      });
+      return total
+    },
+    ventasTarjeta () {
+      return this.ventas.filter(venta => {
+        return venta.Tarjeta > 0  && !venta.EsCredito
+      })
+    },
     ventasMastercard () {
       return this.ventas.filter(venta => {
         return venta.Mastercard > 0  && !venta.EsCredito
@@ -768,6 +858,9 @@ export default {
     },
     cantidadMastercard () {
       return this.ventasMastercard.filter(v => !v.Anulado).length
+    },
+    cantidadTarjeta () {
+      return this.ventasTarjeta.filter(v => !v.Anulado).length
     },
     cantidadCredito () {
       return this.ventasCredito.filter(v => !v.Anulado).length
@@ -967,14 +1060,15 @@ export default {
    se siga imprimiendo limpio y en blanco y negro.
    ========================================================= */
 .pos-jobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-purple: #7C3AED;
     --jobi-green: #17A554;
     --jobi-red: #E5484D;
     --jobi-orange: #F5A623;
+    --jobi-pink: #F43F7E;
     --jobi-bg: #EEF3F8;
     background: var(--jobi-bg);
     min-height: 100vh;
@@ -1148,6 +1242,7 @@ export default {
 .pos-stat-green  { background: var(--jobi-green); }
 .pos-stat-purple { background: var(--jobi-purple); }
 .pos-stat-blue   { background: var(--jobi-blue); }
+.pos-stat-pink   { background: var(--jobi-pink); }
 
 @media (max-width: 991px) {
     .pos-summary-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1179,6 +1274,7 @@ export default {
 .pos-section-title-orange { background: var(--jobi-orange); }
 .pos-section-title-teal   { background: var(--jobi-teal); }
 .pos-section-title-red    { background: var(--jobi-red); }
+.pos-section-title-pink   { background: var(--jobi-pink); }
 
 .pos-table-card {
     background: #fff;

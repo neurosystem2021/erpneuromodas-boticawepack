@@ -70,7 +70,7 @@
           </b-form-group>
 
           <b-form-group class="ocularMovil pos-field">
-            <label><i class="fas fa-hashtag pos-label-icon"></i> Cod. P.</label>
+            <label><i class="fas fa-hashtag pos-label-icon"></i> Modelo</label>
             <b-input-group>
               <autocomplete
                 :url="API + 'productos/modelos'"
@@ -105,6 +105,21 @@
                 <modelo-form :showButton="true" :cbGuardar="setModelo"></modelo-form>
               </b-input-group-append>
             </b-input-group> -->
+          </b-form-group>
+          <b-form-group class="ocularMovil pos-field">
+            <label><i class="fas fa-hashtag pos-label-icon"></i> Código Producto Sunat:</label>
+            <b-input-group>
+              <autocomplete
+                :url="API + 'codigoproductosunat'"
+                ref="inputCodigoSunat"
+                anchor="busqueda_label"
+                label="writer"
+                :placeholder.sync="producto.codigoSunat.busqueda_label"
+                :on-select="setCodigoSunat"
+                :onFocus="focusAutocomplete.bind(null, 'inputCodigoSunat')"
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+            </b-input-group>
           </b-form-group>
           
           <b-form-group class="pos-field">
@@ -480,6 +495,17 @@ export default {
           // this.producto.Genero = newVal.Genero
           // this.producto.Botapie = newVal.Botapie
           // this.producto.Color = newVal.Color
+          this.producto.CodigoProductoSunat = newVal.CodigoSunat || '00000000'
+          this.producto.codigoSunat = {
+            codigo: newVal.CodigoSunat || '00000000',
+            busqueda_label: newVal.CodigoSunatDescripcion
+              ? (newVal.CodigoSunat + ' - ' + newVal.CodigoSunatDescripcion)
+              : '00000000 - NO REGISTRADO / COMODÍN GENÉRICO'
+          }
+          
+          if (this.$refs.inputCodigoSunat) {
+            this.$refs.inputCodigoSunat.setValue(this.producto.codigoSunat.busqueda_label)
+          }
           this.producto.PorcentajeUtilidad    = newVal.PorcentajeUtilidad
           this.producto.PrecioPorMayor        = newVal.PrecioPorMayor
           this.producto.StockMinimo           = newVal.StockMinimo
@@ -635,6 +661,11 @@ export default {
         categoria: {},
         marca: {},
         // modelo: {},
+        CodigoProductoSunat: '00000000',
+        codigoSunat: {
+          codigo: '00000000',
+          busqueda_label: '00000000 - NO REGISTRADO / COMODÍN GENÉRICO'
+        },
         //talla: {},
         medicion: {
           IdProductoMedicion:1,
@@ -712,9 +743,30 @@ export default {
         this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
     },
-    focusAutocomplete (ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick()
+    focusAutocomplete(refName) {
+      this.$nextTick(() => {
+        const component = this.$refs[refName]
+        if (!component) return
+
+        // 1. Seleccionar todo el texto del input
+        const inputEl = component.$el ? component.$el.querySelector('input') : null
+        if (inputEl) {
+          inputEl.select()
+        }
+
+        // 2. Restaurar el comportamiento original: forzar apertura de la lista
+        if (typeof component.handleDoubleClick === 'function') {
+          component.handleDoubleClick()
+        }
+      })
+    },
+
+    setCodigoSunat(obj) {
+      this.producto.codigoSunat = obj;
+      this.producto.CodigoProductoSunat = obj.CodigoSunat;
+      if (this.$refs.inputCodigoSunat) {
+        this.$refs.inputCodigoSunat.setValue(obj.busqueda_label);
+      }
     },
     crearCategoria () {
       if (this.$refs.inputCategoria.type) {
@@ -807,8 +859,8 @@ export default {
    precios, acciones en píldora).
    ========================================================= */
 .pos-jobi-inline {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-purple: #7C3AED;

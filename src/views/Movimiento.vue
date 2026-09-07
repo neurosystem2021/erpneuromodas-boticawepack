@@ -508,8 +508,8 @@ export default {
    ========================================================= */
 
 .movjobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-purple: #7C3AED;

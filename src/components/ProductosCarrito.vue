@@ -309,7 +309,7 @@ let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cant
       <slot name="adicional"></slot>
     </b-col>
     <b-col md="3">
-          <table class="table b-table border table-footer">
+          <table class="table b-table border table-footer table-resumen-jobi">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
                 <td class="table-success">SubTotal</td>
@@ -799,49 +799,115 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
-        let styleStock = "";
-        if (data.stock <= 0) {
-          styleStock = "table-danger";
-        } else {
-          styleStock = "table-success";
-        }
+        let sinStock = data.stock <= 0;
+
         return `
         <style>
           #table-render {
-            font-size: 13px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-          }
-          #table-render td, #table-render th {
-            border: 1px solid #eaeaea;
-          }
-          #table-render td, #table-render th {
-            color: #000000 !important;
-          }
-          .imagen{
+            font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            border-collapse: separate;
+            border-spacing: 0;
             width: 100%;
-            heigth: 100%;
+            margin: 0;
           }
-          .imagen:hover{
-            width: 250px;
-            heigth: 250px;
+          #table-render td {
+            border: none;
+            padding: 0;
+            vertical-align: middle;
+          }
+          /* Tarjeta blanca opaca propia por fila: independientemente del
+             color que la librería de autocomplete le ponga a la fila
+             (hover/selección suele venir en azul fuerte, controlado por
+             ella y fuera de nuestro alcance), el texto SIEMPRE se lee
+             sobre este fondo blanco propio con buen contraste. */
+          #table-render .jr-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid #e7edf5;
+            border-radius: 10px;
+            padding: 9px 12px;
+            margin: 3px 2px;
+            box-shadow: 0 2px 6px rgba(11,42,74,.08);
+          }
+          #table-render .jr-stock-dot {
+            flex: 0 0 auto;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #17A554;
+          }
+          #table-render .jr-stock-dot.sin-stock {
+            background: #E5484D;
+          }
+          #table-render .jr-info {
+            flex: 1 1 auto;
+            min-width: 0;
+          }
+          #table-render .jr-nombre {
+            font-weight: 800;
+            font-size: 13.5px;
+            line-height: 1.25;
+            color: #0B2A4A !important;
+            white-space: normal;
+          }
+          #table-render .jr-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+          }
+          #table-render .jr-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .02em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #EEF3F8;
+            color: #33465F !important;
+            white-space: nowrap;
+          }
+          #table-render .jr-badge.marca {
+            background: #DCEBFD;
+            color: #1D4ED8 !important;
+          }
+          #table-render .jr-precio-cell {
+            flex: 0 0 auto;
+          }
+          #table-render .jr-precio {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+            color: #ffffff !important;
+            background: #0F9B8E;
+            border-radius: 999px;
+            padding: 5px 12px;
+            white-space: nowrap;
           }
         </style>
         <div>
-          <table id="table-render" class="tblProductos" style="text-align: center;padding:0; margin:0">
+          <table id="table-render">
             <tbody>
               <tr>
-                <td style="width: 300px"><b>${data.Producto} 
-        </b></td>
-                <td class="ocultarMovil" style="width: 100px">${
-                  data.ProductoCategoria
-                }</td>
-                <td class="ocultarMovil" style="width: 100px">${
-                  data.ProductoMarca
-                }</td>
-                <td  style="width: 65px" class="table-primary"><b>${
-                  data.PrecioContado
-                }</b></td>
+                <td>
+                  <div class="jr-card">
+                    <span class="jr-stock-dot${sinStock ? ' sin-stock' : ''}" title="${sinStock ? 'Sin stock' : 'Con stock'}"></span>
+                    <div class="jr-info">
+                      <div class="jr-nombre">${data.Producto}</div>
+                      <div class="jr-badges ocultarMovil">
+                        <span class="jr-badge">${data.ProductoCategoria}</span>
+                        <span class="jr-badge marca">${data.ProductoMarca}</span>
+                      </div>
+                    </div>
+                    <div class="jr-precio-cell"><span class="jr-precio">S/ ${data.PrecioContado}</span></div>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>   
@@ -849,9 +915,32 @@ export default {
         `;
       }
       return `
-         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
-        data.ProductoMarca
-      } / ${data.ProductoModelo}
+        <style>
+          #table-render-simple {
+            font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            border: 1px solid #e7edf5;
+            border-radius: 10px;
+            padding: 9px 12px;
+            margin: 3px 2px;
+            box-shadow: 0 2px 6px rgba(11,42,74,.08);
+          }
+          #table-render-simple .jr-nombre {
+            font-weight: 800;
+            font-size: 13.5px;
+            color: #0B2A4A;
+          }
+          #table-render-simple .jr-sub {
+            font-size: 11.5px;
+            color: #5b6b82;
+            font-weight: 700;
+            margin-top: 2px;
+          }
+        </style>
+        <div id="table-render-simple">
+          <div class="jr-nombre">${data.Producto}</div>
+          <div class="jr-sub">${data.ProductoCategoria} · ${data.ProductoMarca} · ${data.ProductoModelo}</div>
+        </div>
       `;
     },
     // setCantidad (index, val) {
@@ -961,13 +1050,69 @@ export default {
      Vue no bloquean la herencia de variables). Se redefinen aquí también
      para que este componente luzca bien aunque se use fuera de ese padre. */
   :root, .clsTable, .carrito-add-panel {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-green: #17A554;
     --jobi-red: #E5484D;
     --jobi-orange: #F5A623;
+  }
+
+  .table-resumen-jobi {
+    background: #fff;
+    border-radius: 14px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(11,42,74,.06);
+    border: 1px solid #e7edf5 !important;
+  }
+
+  .table-resumen-jobi tbody tr td {
+    border-color: #eef2f7 !important;
+    padding: 18px 20px !important;
+    vertical-align: middle;
+    font-size: 1.35rem;
+  }
+
+  .table-resumen-jobi td.table-success {
+    background-color: #e6f7ef !important;
+    color: #0f6b3f !important;
+    font-weight: 700;
+  }
+
+  .table-resumen-jobi td.table-danger {
+    background-color: #fdeceb !important;
+    color: #a3231f !important;
+    font-weight: 700;
+  }
+
+  .table-resumen-jobi tr:last-of-type td.table-danger {
+    background-color: var(--jobi-green) !important;
+    color: #fff !important;
+    font-size: 1.5rem;
+    font-weight: 900;
+    padding: 22px 20px !important;
+  }
+
+  .table-resumen-jobi >>> input.form-control {
+    border-radius: 999px !important;
+    border: 1.5px solid #e3ebf4 !important;
+    height: 52px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--jobi-navy);
+  }
+
+  .table-resumen-jobi label {
+    font-size: .92rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #6b85a3;
+  }
+
+  .table-resumen-jobi tr:last-child td b {
+    font-size: 1.3rem;
   }
 
   /* -------- Panel "Agregar Productos" -------- */
@@ -1051,6 +1196,23 @@ export default {
   .carrito-input-group >>> .input-group-append:last-child > *:last-child,
   .carrito-input-group >>> .input-group-append:last-child .btn:last-child {
     border-radius: 0 10px 10px 0 !important;
+  }
+
+  /* -------- Dropdown de sugerencias del autocomplete de productos --------
+     El componente de autocomplete inyecta su propio contenedor de
+     sugerencias justo debajo del input; le damos aquí la misma tarjeta
+     redondeada/con sombra que el resto del POS, ya que el HTML interno
+     de cada fila (renderChild) no puede controlar el contenedor externo. */
+  .carrito-input-group >>> .autocomplete-list,
+  .carrito-input-group >>> .autocomplete-results,
+  .carrito-input-group >>> ul[class*="autocomplete"] {
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 30px rgba(11,42,74,.16) !important;
+    border: 1px solid #e7edf5 !important;
+    margin-top: 6px !important;
+    overflow: hidden;
+    padding: 4px !important;
   }
 
   .carrito-badge-stock {

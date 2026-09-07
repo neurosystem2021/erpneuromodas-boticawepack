@@ -556,7 +556,7 @@ import config from '@/store/config.js'
 }
 
 #modalPagoDeuda .modal-header {
-    background: linear-gradient(135deg, #0B2A4A 0%, #123A63 100%) !important;
+    background: linear-gradient(135deg, #00666A 0%, #00666A 100%) !important;
     border-bottom: none;
 }
 
@@ -566,8 +566,8 @@ import config from '@/store/config.js'
 }
 
 .pd-jobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-purple: #7C3AED;

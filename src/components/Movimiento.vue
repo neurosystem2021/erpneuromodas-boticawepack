@@ -1439,8 +1439,8 @@ export default {
 
 :root {
 
-  --jobi-navy: #0B2A4A;
-  --jobi-navy-2: #123A63;
+  --jobi-navy: #00666A;
+  --jobi-navy-2: #00666A;
 
   --jobi-teal: #0F9B8E;
   --jobi-blue: #2F6FED;
@@ -1569,8 +1569,8 @@ export default {
   background:
     linear-gradient(
       135deg,
-      #0B2A4A 0%,
-      #123A63 100%
+      #00666A 0%,
+      #00666A 100%
     ) !important;
 
   color: #FFFFFF !important;
@@ -1871,7 +1871,7 @@ export default {
 
   font-size: .92rem;
 
-  color: #0B2A4A !important;
+  color: #00666A !important;
 
   margin-bottom: 14px;
 
@@ -1941,7 +1941,7 @@ export default {
 
   font-weight: 600;
 
-  color: #0B2A4A !important;
+  color: #00666A !important;
 
   background: #FFFFFF !important;
 
@@ -1971,7 +1971,7 @@ export default {
 
 .movjobi-input-monto .input-group-text {
 
-  background: #0B2A4A !important;
+  background: #00666A !important;
 
   color: #FFFFFF !important;
 

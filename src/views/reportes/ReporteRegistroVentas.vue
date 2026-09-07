@@ -355,7 +355,7 @@ export default {
 }
 
 .modalRegVentaDetalle .modal-header {
-  background: linear-gradient(135deg, #0B2A4A 0%, #123A63 100%);
+  background: linear-gradient(135deg, #00666A 0%, #00666A 100%);
   color: #fff;
   border: none;
 }
@@ -377,8 +377,8 @@ export default {
    con thead/tfoot pegajosos).
    ========================================================= */
 .pos-jobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-green: #17A554;

@@ -62,6 +62,33 @@
                 </a>
             </template>
 
+            <template slot="Ticket" slot-scope="data">
+                <a
+                    class="jobi-pill-btn jobi-btn-ticket"
+                    title="Regenerar ticket"
+                    @click.prevent="reimprimir(data.item.idDocVenta)">
+                    <i class="fas fa-receipt"></i> Ticket
+                </a>
+            </template>
+
+            <template slot="Pdf" slot-scope="data">
+                <a
+                    class="jobi-pill-btn jobi-btn-pdf"
+                    title="Regenerar PDF"
+                    @click="regenerarPDF(data.item)">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+            </template>
+
+            <template slot="XML" slot-scope="data">
+                <a
+                    class="jobi-pill-btn jobi-btn-xml"
+                    title="Descargar XML"
+                    @click="descargarXML(data.item)">
+                    <i class="fas fa-file-code"></i> XML
+                </a>
+            </template>
+
             <template slot="table-busy">
               <div class="pos-table-busy">
                 <i class="fas fa-spinner fa-spin"></i>
@@ -116,7 +143,10 @@ export default {
             { key: 'TipoDoc', sortable: true },
             { key: 'Cliente', sortable: true },
             { key: 'Total', sortable: true },
-            { key: 'Reimprimir' }
+            { key: 'Reimprimir' },
+            { key: 'Ticket' },
+            { key: 'Pdf' },
+            { key: 'XML' },
       ],
       totalRows: 50,
       perPage: 10,
@@ -137,6 +167,103 @@ export default {
           this.$refs.productoForm.show = true
 
       },
+      async regenerarPDF(doc) {
+            // Tolerante a ambos casings del ID, según venga de este listado (idDocVenta)
+            // o del módulo de Reimpresión (IdDocVenta).
+            const id = doc.idDocVenta !== undefined ? doc.idDocVenta : doc.IdDocVenta;
+
+            if (id === undefined || id === null) {
+                this.$toasted.error("Id de venta no disponible");
+                return;
+            }
+
+            const nombreArchivo = doc.NroComprobante || doc.Correlativo || id;
+
+            this.loading = true;
+            try {
+                const res = await this.axios.get(
+                    this.API + "imprimirpdf/" + id,
+                    { responseType: 'blob' }
+                );
+
+                const url = window.URL.createObjectURL(
+                    new Blob([res.data], { type: 'application/pdf' })
+                );
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${nombreArchivo}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+
+                this.$toasted.success("El PDF fue generado nuevamente", { duration: 7000 });
+            } catch (err) {
+                console.error(err);
+                this.$toasted.error("No se pudo generar el PDF", { duration: 7000 });
+            } finally {
+                this.loading = false;
+            }
+      },
+
+    reimprimir(idDocVenta) {
+      if (idDocVenta === undefined || idDocVenta === null) {
+        this.$toasted.error("Id de venta no disponible");
+        return;
+      }
+      const url = '/imprimir/index.php?IdDocVenta=' + idDocVenta + '&preview=1'
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'absolute'
+      iframe.style.width = '0px'
+      iframe.style.height = '0px'
+      iframe.style.border = 'none'
+      iframe.src = url
+      iframe.onload = function () {
+        iframe.contentWindow.print()
+        setTimeout(() => document.body.removeChild(iframe), 1000)
+      }
+      document.body.appendChild(iframe)
+    },
+    descargarXML: function (doc) {
+      const id = doc.idDocVenta !== undefined ? doc.idDocVenta : doc.IdDocVenta;
+
+      if (id === undefined || id === null) {
+        this.$toasted.error("Id de venta no disponible");
+        return;
+      }
+
+      this.axios.post(this.API + 'emitirelectronico', {
+        generarXml: true,
+        docVenta: doc
+      })
+        .then(function (response) {
+          if (response.data.success) {
+            this.$toasted.success(response.data.msj_sunat || "XML generado correctamente");
+
+            this.axios.get(this.API + 'imprimirxml/' + id)
+              .then(function (res) {
+                if (res.data.success && res.data.xmlBase64) {
+                  var blob = new Blob(
+                    [Uint8Array.from(atob(res.data.xmlBase64), c => c.charCodeAt(0))],
+                    { type: 'application/xml' }
+                  );
+                  var link = document.createElement('a');
+                  link.href = window.URL.createObjectURL(blob);
+                  link.download = res.data.nombreArchivo; // ← nombre exacto del backend
+                  link.click();
+                } else {
+                  this.$toasted.error("No se pudo obtener el XML");
+                }
+              }.bind(this));
+          } else {
+            this.$toasted.error(response.data.msj_sunat || "Error generando XML");
+          }
+        }.bind(this))
+        .catch(function (error) {
+          console.error(error);
+          this.$toasted.error("Error en la petición");
+        }.bind(this));
+    },
       myProvider (ctx) {
         // Here we don't set isBusy prop, so busy state will be handled by table itself
         // this.isBusy = true
@@ -169,13 +296,14 @@ export default {
    ProductosLista.vue / Venta.vue / Movimiento.vue
    ========================================================= */
 .pos-jobi {
-    --jobi-navy: #0B2A4A;
-    --jobi-navy-2: #123A63;
+    --jobi-navy: #00666A;
+    --jobi-navy-2: #00666A;
     --jobi-teal: #0F9B8E;
     --jobi-blue: #2F6FED;
     --jobi-green: #17A554;
     --jobi-red: #E5484D;
     --jobi-orange: #F5A623;
+    --jobi-purple: #8B5CF6;
     --jobi-bg: #EEF3F8;
     background: var(--jobi-bg);
     min-height: 100vh;
@@ -370,27 +498,82 @@ export default {
     max-width: 320px;
 }
 
-/* Botón "Reimprimir" dentro de la tabla */
+/* Botón "Reimprimir" dentro de la tabla — mismo estilo pill que
+   Ticket/PDF/XML y que el modulo de Reimpresión */
 .pos-btn-reimprimir {
+    border: none;
+    border-radius: 999px;
+    color: #fff !important;
+    height: 32px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    background: var(--jobi-green) !important;
-    color: #fff !important;
-    font-weight: 800;
-    font-size: .76rem;
-    text-transform: uppercase;
-    letter-spacing: .02em;
-    padding: 6px 12px;
-    border-radius: 999px;
-    box-shadow: 0 4px 10px rgba(23,165,84,.30);
+    padding: 0 14px;
+    font-size: .78rem;
+    font-weight: 600;
     text-decoration: none !important;
     cursor: pointer;
+    white-space: nowrap;
+    background: var(--jobi-green) !important;
+    transition: box-shadow .2s ease;
 }
 .pos-btn-reimprimir:hover {
-    background: #128a48 !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,.25);
     color: #fff !important;
-    transform: translateY(-1px);
+    text-decoration: none !important;
+}
+
+/* =========================================================
+   Botones de acción Ticket / PDF / XML — mismo estilo "pill"
+   usado en el modulo de Reimpresión (jobi-pill-btn), para que
+   ambos módulos se vean consistentes.
+   ========================================================= */
+.jobi-pill-btn {
+    border: none;
+    border-radius: 999px;
+    color: #fff !important;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: box-shadow .2s ease;
+}
+.jobi-pill-btn:hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,.25);
+    color: #fff !important;
+    text-decoration: none !important;
+}
+.jobi-pill-btn i {
+    font-size: .82em;
+}
+
+/* Ticket -> teal, igual que en el modulo de Reimpresión */
+.jobi-btn-ticket {
+    background: var(--jobi-teal) !important;
+}
+
+/* PDF -> naranja, igual que en el modulo de Reimpresión */
+.jobi-btn-pdf {
+    background: var(--jobi-orange) !important;
+}
+
+/* XML -> púrpura, para mantenerlo diferenciado (no existe en el otro módulo) */
+.jobi-btn-xml {
+    background: var(--jobi-purple) !important;
+}
+
+/* Las celdas de acciones se agrupan sin salto de línea y centradas */
+.pos-table-card >>> td:has(.jobi-pill-btn) {
+    white-space: nowrap;
 }
 
 .pos-pagination-row {
