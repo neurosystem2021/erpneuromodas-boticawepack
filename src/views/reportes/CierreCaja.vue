@@ -332,6 +332,12 @@
             </b-col>
           </b-row>
         </b-row>
+        <b-col cols="12" v-if="this.$route.params.id && cierre.UsuarioReg" class="mb-2">
+          <div class="cierre-usuario-info">
+            <i class="fas fa-user-circle"></i>
+            Cierre de: <b>{{ cierre.UsuarioReg }}</b>
+          </div>
+        </b-col>
         <div class="summary-panel">
 
           <div class="summary-card summary-card--main">
@@ -681,7 +687,9 @@ export default {
     },
     totalVentasEfectivo() {
       return this.ventasEfectivo
-        .filter(v => !v.Anulado && v.CodSunat != "07")
+        .filter(v =>
+          // !v.Anulado &&
+          v.CodSunat != "07")
         .reduce((t, v) => t + v.Efectivo, 0);
     },
     ventasEfectivo() {
@@ -689,7 +697,7 @@ export default {
     },
     totalVentasVisa() {
       return this.ventasVisa
-        .filter(v => !v.Anulado)
+        // .filter(v => !v.Anulado)
         .reduce((t, v) => t + v.Visa, 0);
     },
     ventasVisa() {
@@ -697,13 +705,13 @@ export default {
     },
     totalVentasVisaTransferencia() {
       const visa = this.ventasVisa
-        .filter(v => !v.Anulado)
+        // .filter(v => !v.Anulado)
         .reduce((t, v) => t + v.Visa, 0);
       return visa + this.totalVentasMastercardNeto;
     },
     totalVentasTransferencia() {
       return this.ventasTransferencia
-        .filter(v => !v.Anulado)
+        // .filter(v => !v.Anulado)
         .reduce((t, v) => t + v.Transferencia, 0);
     },
     ventasTransferencia() {
@@ -735,7 +743,7 @@ export default {
     },
     totalVentasMastercard() {
       return this.ventasMastercard
-        .filter(v => !v.Anulado)
+        // .filter(v => !v.Anulado)
         .reduce((t, v) => t + v.Mastercard, 0);
     },
     ventasMastercard() {
@@ -1391,6 +1399,21 @@ export default {
   font-variant-numeric: tabular-nums;
 }
 
+.cierre-usuario-info {
+  background: #eef1fb;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: var(--c-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cierre-usuario-info i {
+  font-size: 1.1rem;
+}
 .tableResumenSimple .fila-espaciadora td { padding: 10px 0 0 0; }
 .fila-gran-total-simple td { border-top: 2px solid #000 !important; padding-top: 10px; }
 
