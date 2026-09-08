@@ -224,6 +224,7 @@ import { mapState, mapActions } from 'vuex'
 import config from '@/store/config.js'
 export default {
   mounted () {
+    this.getUsuario()
   },
   data () {
     return {
@@ -271,6 +272,10 @@ return false
         console.log(error)
         // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
+    },
+    getUsuario () {
+      let usuario = sessionStorage.getItem("User")
+      this.movimiento.usuario = { Usuario: usuario } // objeto simple, no necesitas el fetch completo si solo usas el nombre
     },
     initMovimiento () {
       let currentMonth = this.$moment().month() + 1
