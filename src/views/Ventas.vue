@@ -10,7 +10,7 @@
                     <b-button-group size="sm" class="ocularMovil">
                         <delivery-modal ref="deliveryModal" @onPagarDelivery="onPagarDelivery"></delivery-modal>
                     </b-button-group>
-                    <b-button-group size="sm" class="ocularMovil">
+                    <b-button-group size="sm" class="ocularMovil" v-if="idPerfil != '3'">
                         <pago-deuda></pago-deuda>
                     </b-button-group>
                     <b-button-group size="sm">
@@ -559,6 +559,7 @@ export default {
       bloquearInput: false,
       diasValidosProf: 1,
       adelantosPreOrden: [],
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },

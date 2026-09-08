@@ -103,6 +103,19 @@
                     </b-col>
                 </b-row>
                 <b-row>
+                    <b-col md="12">
+                        <b-form-group>
+                            <label>Observación:</label>
+                            <b-form-textarea
+                                v-model="movimiento.Observacion"
+                                rows="2"
+                                max-rows="4"
+                                placeholder="Observaciones de la orden (opcional)">
+                            </b-form-textarea>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <b-row>
                     <b-col>
                         <productos-carrito
                             @onAddProducto="onAddProducto"
@@ -265,7 +278,8 @@ export default {
         proveedor: { IdProveedor: 0 },
         movimientoTipo: {},
         almacen: { IdAlmacen: 0 },
-        user: sessionStorage.getItem("User")
+        user: sessionStorage.getItem("User"),
+        Observacion: ""
       };
     },
     onSetProducto(obj) {
