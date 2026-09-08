@@ -158,6 +158,14 @@
                                                 </b-col>
                                             </b-row>
                                         </div>
+                                        <b-input-group prepend="Orden Compra.">
+                                        <textarea v-model="venta.OrdenCompra"
+                                                type="text"
+                                                rows="1"
+                                                style="text-transform:uppercase;"
+                                                class="form-control"
+                                                placeholder="Nro de orden"></textarea>
+                                        </b-input-group>
                                     </b-col>
                                     
                                     <b-col md="8">
