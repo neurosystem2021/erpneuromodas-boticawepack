@@ -996,11 +996,12 @@ export default {
   },
     continuarGuardarVenta() {
     if (
-      this.venta.tipoVenta.CodSunat !== "07" &&
-      this.productos.some(p =>
-        Number(p.cantidad) > Number(p.stockMovimiento || p.stock || 0)
-      )
-    ) {
+        this.venta.tipoVenta.CodSunat !== "07" &&
+        this.productos.some(p =>
+          Number(p.cantidad) * Number(p.cantidadPress || 1) >
+          Number(p.stockMovimiento || p.stock || 0)
+        )
+      ) {
       this.$swal({
         position: "center",
         icon: "info",
@@ -1010,6 +1011,7 @@ export default {
         target: document.getElementById("conten"),
         confirmButtonColor: "#0275d8"
       });
+       this.inProgress = false; 
       return;
     }
 

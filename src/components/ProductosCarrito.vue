@@ -346,6 +346,7 @@
       <slot name="accionesventa"></slot>
     </b-col>
     <b-col
+        v-if="isVentas"
         md="1"
         class="text-center"
         style="padding-top:25px;">
@@ -369,7 +370,7 @@
             <slot name="metodopago"></slot>
         </b-popover>
     </b-col>
-    <b-col md="4">
+    <b-col v-if="isVentas"  md="4">
           <table class="table border table-footer resumen-venta">
             <tbody>
               <tr>
