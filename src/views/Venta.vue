@@ -389,7 +389,7 @@
                             :target="`popover-metodopago${index}`" 
                             title="Método de Pago" 
                             placement="top" 
-                            triggers="manual" 
+                            triggers="manual blur focus" 
                             :show.sync="mostrar[index]" 
                             :style="{ minWidth: '600px' }"
                           >
@@ -458,7 +458,7 @@
                           <b-popover 
                             :target="`popover-opciones${index}`" 
                             title="Opciones" 
-                            triggers="manual" 
+                            triggers="manual blur focus" 
                             placement="top" 
                             :show.sync="mostrarOp[index]" 
                             :style="{ minWidth: '600px' }"
@@ -1861,7 +1861,7 @@ export default {
     anadirVentana() {
       this.initValueCliente = "00000000 CLIENTE VARIOS";
 
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.productos = [];
       this.ventas.push(venta);
       this.$nextTick(() => {
@@ -2460,6 +2460,25 @@ export default {
         this.$toasted.show("Debe seleccionar un cliente.");
         return;
       }
+
+      const sumaRealProductos = productos.reduce((total, prod) => {
+          return total + (parseFloat(prod.cantidad) * parseFloat(prod.precio) - parseFloat(prod.descuento || 0));
+      }, 0);
+
+      const totalCalculado = parseFloat(sumaRealProductos).toFixed(2);
+      const totalExhibido = parseFloat(this.getTotal()).toFixed(2);
+
+      if (totalCalculado !== totalExhibido) {
+          this.$toasted.show("¡ERROR!: El total no coincide con la suma de productos. Recargue la página.");
+          return;
+      }
+
+      const totalPagado = parseFloat(totalPagos).toFixed(2);
+
+      if (totalPagado !== totalExhibido) {
+          this.$toasted.show(`¡ERROR!: El monto pagado (S/ ${totalPagado}) debe ser igual al total (S/ ${totalExhibido})`);
+          return;
+      }
       var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
       if (!esNumerico) {
         this.$swal.close();
@@ -2856,7 +2875,7 @@ export default {
     cargarProforma(proforma) {
       console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
-      let venta = { ...this.venta };
+      let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
       let productos = [];
       proforma.productos.forEach(async producto => {

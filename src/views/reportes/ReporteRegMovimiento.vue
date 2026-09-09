@@ -59,8 +59,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(reporte,index) in lstReporte" :key="index" @click="abrirDedetalle(reporte)">
-                        <td style="text-align: center;">{{reporte.IdMovimiento}}</td>
+                    <tr
+                      v-for="(reporte,index) in lstReporte"
+                      :key="index"
+                      @click="abrirDedetalle(reporte)"
+                      :class="{ 'fila-anulada': reporte.Anulado == 1 }"
+                    >
+                        <td style="text-align: center;">
+                          {{reporte.IdMovimiento}}
+                          <span v-if="reporte.Anulado == 1" class="badge badge-danger ml-1">ANULADO</span>
+                        </td>
                         <td>{{reporte.UsuarioReg}}</td>
                         <td>{{reporte.AlmacenOrigen}}</td>
                         <td>{{reporte.AlmacenDestino}}</td>
@@ -78,8 +86,19 @@
                         <td style="text-align: center;">{{reporte.Moneda}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
                         <td>
-                          <b-button size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                          <b-button size="sm" class="mx-1 my-1" @click="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
+                          <b-button
+                            size="sm"
+                            class="mx-1 my-1"
+                            @click.stop="anularRegistro(reporte)"
+                            variant="danger"
+                            :disabled="reporte.Anulado == 1"
+                            :title="reporte.Anulado == 1 ? 'Movimiento ya anulado' : 'Anular movimiento'"
+                          >
+                            <i class="fa fa-ban" aria-hidden="true"></i>
+                          </b-button>
+                          <b-button size="sm" class="mx-1 my-1" @click.stop="imprimirMovimiento(reporte)" variant="info">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                          </b-button>
                         </td>
                     </tr>
                 </tbody>
@@ -265,52 +284,54 @@ export default {
       );
     },
 
-    elimimnarRegistro(item) {
+    anularRegistro(item) {
+      if (item.Anulado == 1) {
+        this.$toasted.error("Este movimiento ya se encuentra anulado.");
+        return;
+      }
       this.$swal({
-        icon: "question",
-        title: "Eliminar",
-        text: `¿Desea eliminar el registro ${item.Serie}-${item.Numero}?`,
+        icon: "warning",
+        title: "Anular movimiento",
+        text: `¿Desea anular el movimiento ${item.Serie}-${item.Numero}? Esta acción revertirá el stock pero conservará el registro.`,
         allowOutsideClick: false,
         allowEscapeKey: false,
         allowEnterKey: false,
         showCancelButton: true,
         cancelButtonColor: "#d33",
-        confirmButtonText: "Si, Eliminar",
+        confirmButtonText: "Si, Anular",
         cancelButtonText: "Cancelar"
       }).then(async (respuesta) => {
         if (respuesta.isConfirmed) {
-      try {
-        // Ejecutamos la eliminación
-          const res = await this.axios.post(`${this.API}movimiento/eliminar`, {
-            idMov: item.IdMovimiento
-          });
+          try {
+            await this.axios.post(`${this.API}movimiento/anular`, {
+              idMov: item.IdMovimiento
+            });
 
-            // Verificamos si el servidor respondió con éxito
-            // (Asumiendo que tu API devuelve success: true o similar)
-            
             this.$swal({
               icon: "success",
-              title: "¡Eliminado!",
-              text: "El movimiento fue eliminado correctamente",
-              timer: 2500, // Se cierra solo en 2.5 segundos
+              title: "¡Anulado!",
+              text: "El movimiento fue anulado correctamente",
+              timer: 2500,
               showConfirmButton: false
             });
 
-            // Refrescamos la tabla para que ya no aparezca el registro
-          this.generarReporte();
+            // Refrescamos la tabla; el registro ahora aparece pintado, no eliminado
+            this.generarReporte();
 
           } catch (error) {
             console.error(error);
             this.$swal({
               icon: "error",
               title: "Error",
-              text: "No se pudo eliminar el registro. Intente de nuevo."
+              text: error.response && error.response.data && error.response.data.error
+                ? error.response.data.error
+                : "No se pudo anular el registro. Intente de nuevo."
             });
           }
         }
       });
-      // console.log(item);
     },
+
     async generarReporte() {
       let params = {
         fechaInicio: this.fechaInicio,
@@ -429,5 +450,18 @@ export default {
 .modal-dialog {
   max-width: 60% !important;
   width: 60% !important;
+}
+
+.fila-anulada {
+  background-color: rgba(220, 53, 69, 0.08) !important;
+  border-left: 5px solid #dc3545;
+}
+
+.fila-anulada td {
+  color: #6c757d;
+}
+
+.fila-anulada:hover {
+  background-color: rgba(220, 53, 69, 0.15) !important;
 }
 </style>

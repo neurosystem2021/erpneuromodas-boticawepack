@@ -481,9 +481,9 @@
             </b-input-group-append>
           </b-input-group>
         </div>
-        <!--<b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
+        <b-btn  variant="danger" @click="eliminarProducto(producto)" v-if="producto.IdProducto">
           Anular
-        </b-btn>-->
+        </b-btn>
         <b-btn  variant="warning" @click="clearForm" v-if="!producto.IdProducto">
           Limpiar
         </b-btn>
@@ -762,7 +762,7 @@ export default {
 
       this.actualizarPorcentajeUtilidad();
     },
-    /*eliminarProducto (producto) {
+    eliminarProducto (producto) {
       // NO eliminar porque no distinque movimientos ni ventas
       let r = confirm('¿Esta seguro de Anular este producto?')
       if (r) {
@@ -778,7 +778,7 @@ export default {
           }
         })
       }
-    },*/
+    },
     esAlmacen1() {
       return this.almacen && this.almacen.IdAlmacen == 1;
     },
