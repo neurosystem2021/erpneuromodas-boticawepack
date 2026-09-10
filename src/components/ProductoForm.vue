@@ -493,6 +493,29 @@
                     type="number"
                     class="form-control"
                     step="0.00001"
+                    @input="onPrecioCostoInput(i - 1)"
+                  />
+                </b-form-group>
+
+                <b-form-group class="text-left">
+                  <label>Flete:</label>
+                  <input
+                    v-model="producto.precios[i - 1].flete"
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    class="form-control"
+                    @input="onFleteInput(i - 1)"
+                  />
+                </b-form-group>
+
+                <b-form-group class="text-left">
+                  <label>% Utilidad (calculado):</label>
+                  <input
+                    v-model="producto.precios[i - 1].porcentajeUtilidad"
+                    type="number"
+                    class="form-control"
+                    disabled
                   />
                 </b-form-group>
 
@@ -503,6 +526,7 @@
                     type="number"
                     class="form-control"
                     step="0.00001"
+                    @input="onPrecioVentaInput(i - 1)"
                   />
                 </b-form-group>
               </b-card>
@@ -745,7 +769,10 @@ export default {
               this.producto.precios = JSON.parse(newVal.PreciosPorProducto).map(p => ({
                 ...p,
                 IdProductoMedicion: p.IdProductoMedicion || 1,
-                ProductoMedicion: p.ProductoMedicion || "UND"
+                ProductoMedicion: p.ProductoMedicion || "UND",
+                flete: p.flete || 0,
+                porcentajeUtilidad: p.porcentajeUtilidad || 0,
+                precioSinFlete: (parseFloat(p.precio) || 0) - (parseFloat(p.flete) || 0)
               }));
             } else {
               this.producto.precios = [
@@ -1066,12 +1093,41 @@ export default {
         },
         Imagen: null,
         precios: [
-          { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
-          { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
-          { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
-          { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" }
+          { nombre: "NOMBRE 1", cantidad: 0, precioc: 0, precio: 0, precioSinFlete: 0, flete: 0, porcentajeUtilidad: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 2", cantidad: 0, precioc: 0, precio: 0, precioSinFlete: 0, flete: 0, porcentajeUtilidad: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 3", cantidad: 0, precioc: 0, precio: 0, precioSinFlete: 0, flete: 0, porcentajeUtilidad: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" },
+          { nombre: "NOMBRE 4", cantidad: 0, precioc: 0, precio: 0, precioSinFlete: 0, flete: 0, porcentajeUtilidad: 0, IdProductoMedicion: 1, ProductoMedicion: "UND" }
         ]
       };
+    },
+    onPrecioVentaInput(index) {
+      const p = this.producto.precios[index];
+      const flete = parseFloat(p.flete) || 0;
+      p.precioSinFlete = (parseFloat(p.precio) || 0) - flete;
+      this.actualizarUtilidadPresentacion(index);
+    },
+
+    // Se dispara al escribir en Flete: suma el flete a la base, no al precio ya inflado
+    onFleteInput(index) {
+      const p = this.producto.precios[index];
+      const base = parseFloat(p.precioSinFlete) || 0;
+      const flete = parseFloat(p.flete) || 0;
+      p.precio = parseFloat((base + flete).toFixed(2));
+      this.actualizarUtilidadPresentacion(index);
+    },
+
+    // Se dispara al escribir en Precio Costo
+    onPrecioCostoInput(index) {
+      this.actualizarUtilidadPresentacion(index);
+    },
+
+    // % Utilidad: SIEMPRE calculado, nunca editado a mano
+    actualizarUtilidadPresentacion(index) {
+      const p = this.producto.precios[index];
+      const precioCosto = parseFloat(p.precioc) || 0;
+      const precioVenta = parseFloat(p.precio) || 0;
+      const utilidad = precioVenta ? 100 * (1 - precioCosto / precioVenta) : 0;
+      p.porcentajeUtilidad = parseFloat(utilidad).toFixed(2);
     },
     keyDownInput(e) {
       if (e.target.tagName != "TEXTAREA") {
