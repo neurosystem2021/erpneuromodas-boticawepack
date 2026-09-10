@@ -370,7 +370,7 @@
             <slot name="metodopago"></slot>
         </b-popover>
     </b-col>
-    <b-col v-if="isVentas"  md="4">
+    <b-col md="4">
           <table class="table border table-footer resumen-venta">
             <tbody>
               <tr>

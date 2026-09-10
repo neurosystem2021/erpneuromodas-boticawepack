@@ -561,11 +561,11 @@ export default {
             variant: "success",
             class: "text-center stocksize"
           },
-          {
-            key: "descuento",
-            label: "Descuento",
-            class: "text-center stocksize stocksize2th"
-          },
+          // {
+          //   key: "descuento",
+          //   label: "Descuento",
+          //   class: "text-center stocksize stocksize2th"
+          // },
           {
             key: "total",
             label: "Total",
