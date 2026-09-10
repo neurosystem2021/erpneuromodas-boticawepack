@@ -1972,7 +1972,7 @@ export default {
           this.metodoPagoCambio(1);
           this.reaplicarDescuentoVigente();
         });
-
+        this.$toasted.success("Producto agregado correctamente", { duration: 1500 });
         return false;
       }
 
@@ -2016,6 +2016,7 @@ export default {
         this.reaplicarDescuentoVigente();
       });
       this.metodoPagoCambio(1);
+      this.$toasted.success("Producto agregado correctamente", { duration: 1500 }); // <-- NUEVA LÍNEA
     },
     quitarProducto(index) {
       this.ventas[this.ventaActiva].productos.splice(index, 1);
