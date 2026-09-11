@@ -1882,6 +1882,7 @@ export default {
       });
     },
     eliminarVentana() {
+      if (this.ventas[this.ventaActiva].enviando) return;
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -2120,6 +2121,7 @@ export default {
       }
     },
     quitarProducto(index) {
+      if (this.ventas[this.ventaActiva].enviando) return;
       this.ventas[this.ventaActiva].productos.splice(index, 1);
       this.$nextTick(() => {
         this.metodoPagoCambio(1);
@@ -2619,6 +2621,13 @@ export default {
         };
       });
 
+      // RE-VALIDACIÓN FINAL: por si el usuario vació el carrito durante los await anteriores
+      if (!venta.productos.length) {
+        this.$swal.close();
+        this.$toasted.show("El carrito quedó vacío antes de guardar, no se puede procesar la venta");
+        return;
+      }
+
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
@@ -2872,13 +2881,14 @@ export default {
         let n = parseFloat(valor);
         return isNaN(n) ? 0 : n;
     },
-    cargarProforma(proforma) {
+    async cargarProforma(proforma) {
       console.log(proforma);
       this.initValueCliente = proforma.DniRuc + " " + proforma.Cliente;
       let venta = JSON.parse(JSON.stringify(this.venta));
       venta.cliente = proforma;
       let productos = [];
-      proforma.productos.forEach(async producto => {
+
+      for (const producto of proforma.productos) {
         let prod = await this.obtenerStockBuscador(producto.IdProducto);
         let pres = [];
         if (prod.PreciosPorProducto) {
@@ -2907,35 +2917,18 @@ export default {
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
         productos.push(prod);
-        // prod.precio = prod.Precio;
-        // productos.push({
-        //   ProductoPresentacion: element.Descripcion
-        //     ? element.Descripcion
-        //     : "UNIDAD",
-        //   : element.Descripcion ? element.Descripcion : "UNIDAD",
-        //   Producto: prod.Producto,
-        //   Producto: prod.Producto,
-        //   cantidad: element.Cantidad,
-        //   precio: element.Precio,
-        //   tienePresentacion: element.Descuento ? element.Descuento : 0,
-        //   descuento: element.Descuento ? element.Descuento : 0,
-        //   stock: prod.stock
-        //   // CantidadPresentacion: element.Descripcion
-        // });
-      });
-      // console.log(proforma.productos);
+      }
+
       venta.productos = productos;
       this.ventas.push(venta);
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
         this.getVendedorInfo();
-        // this.loadClienteVarios();
       });
       this.ventas[this.ventaActiva].cliente = proforma;
       this.$nextTick(() => {
         setTimeout(() => {
-          console.log("llegó");
           this.metodoPagoCambio(1);
         }, 1000);
       });
