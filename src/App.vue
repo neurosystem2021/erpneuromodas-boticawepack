@@ -1,24 +1,31 @@
 <template>
-  <div id="app" class="mt-0 pt-0">
-    <router-view/>
+  <div id="app" class="neuroferre-app mt-0 pt-0">
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: "App"
+  name: "App",
+  watch: {
+    $route: {
+      immediate: true,
+      handler(route) {
+        const section = route && route.name ? route.name : "Sistema";
+        document.title = "Neuroferre | " + section.replace(/([a-z])([A-Z])/g, "$1 $2");
+      }
+    }
+  }
 };
 </script>
 
 <style>
 .btnAction {
   margin: 2px 0;
-  border-radius: 25px !important;
-  -webkit-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  box-shadow: 5px 5px 5px -1px rgba(0, 0, 0, 0.75);
-  font-size: 1.2rem;
-  font-weight: bold;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 18px rgba(15, 35, 52, 0.18);
+  font-size: 1rem;
+  font-weight: 800;
   text-transform: uppercase;
 }
 .btn .bnt-sire {
@@ -109,13 +116,13 @@ canvas {
 }
 
 .headerTable {
-  background: #1a237e !important;
-  color: #ffff;
+  background: #17384f !important;
+  color: #ffffff;
   border: 1px solid #ffffff !important;
 }
 .headerSubTitle {
-  background: #7986cb !important;
-  color: #ffff;
+  background: #42677d !important;
+  color: #ffffff;
   border: 1px solid #ffffff !important;
 }
 </style>
