@@ -1206,7 +1206,7 @@
     <b-modal ref="modalDocumentosVenta" id="modalDocumentosVenta" size="xl" hide-footer centered
       title="Comprobantes emitidos" modal-class="pos-documents-modal" dialog-class="pos-documents-dialog">
       <iframe class="pos-documents-frame"
-        src="/nuevo/reimpresion-documentos.html?v=20260806-pos-modal-1#/reimpresion"
+        src="/nuevo/index.html?v=20260912-pos-documentos-2#/reimpresion"
         title="Listado de comprobantes emitidos" frameborder="0"></iframe>
     </b-modal>
 

@@ -1,5 +1,50 @@
 :root { --nm-registro-blue: #086795; }
 
+/* Selector previo a la exportación del registro de ventas. */
+body.nm-modal-open { overflow: hidden !important; }
+.nm-export-modal { position: fixed; inset: 0; z-index: 10050; display: none; align-items: center; justify-content: center; padding: 22px; }
+.nm-export-modal.is-open { display: flex; }
+.nm-export-backdrop { position: absolute; inset: 0; background: rgba(3,23,49,.72); backdrop-filter: blur(7px); }
+.nm-export-dialog { position: relative; width: min(720px, 96vw); overflow: hidden; border: 1px solid rgba(255,255,255,.65); border-radius: 24px; background: #fff; box-shadow: 0 30px 85px rgba(0,26,61,.36); animation: nmExportEnter .24s ease-out; }
+.nm-export-dialog::before { position: absolute; top: 0; left: 0; width: 100%; height: 6px; content: ""; background: linear-gradient(90deg,#082e63,#0788b7 48%,#20c878); }
+.nm-export-dialog header { display: flex; gap: 16px; align-items: center; padding: 27px 30px 21px; color: #fff; background: linear-gradient(120deg,#072d60,#075d91 68%,#078aaa); }
+.nm-export-icon { display: grid; flex: 0 0 58px; height: 58px; place-items: center; border: 1px solid rgba(255,255,255,.28); border-radius: 17px; color: #fff; background: rgba(255,255,255,.13); font-size: 25px; }
+.nm-export-dialog header small { display: block; margin-bottom: 3px; color: #8fe8ff; font-size: 10px; font-weight: 900; letter-spacing: 2px; }
+.nm-export-dialog header h2 { margin: 0; font-size: 25px; font-weight: 900; }
+.nm-export-dialog header p { margin: 4px 0 0; color: rgba(255,255,255,.78); font-size: 13px; }
+.nm-export-close { position: absolute; top: 18px; right: 20px; border: 0; color: #fff; background: transparent; font-size: 31px; line-height: 1; opacity: .72; cursor: pointer; }
+.nm-export-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 13px; padding: 25px 28px 15px; }
+.nm-export-option { position: relative; display: flex; min-height: 110px; gap: 11px; align-items: center; margin: 0; padding: 17px 13px; border: 2px solid #dce7f0; border-radius: 17px; cursor: pointer; background: #f8fbfd; transition: transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease; }
+.nm-export-option:hover { transform: translateY(-3px); border-color: #7ebbd8; box-shadow: 0 12px 25px rgba(7,58,104,.13); }
+.nm-export-option input { position: absolute; opacity: 0; pointer-events: none; }
+.nm-export-option .nm-check { position: absolute; top: 9px; right: 9px; display: grid; width: 24px; height: 24px; place-items: center; border: 2px solid #c8d7e3; border-radius: 8px; color: transparent; background: #fff; }
+.nm-export-option input:checked ~ .nm-check { border-color: #12ae6c; color: #fff; background: #12ae6c; box-shadow: 0 4px 10px rgba(18,174,108,.28); }
+.nm-export-option:has(input:checked) { border-color: #18bb75; background: linear-gradient(145deg,#fff,#effcf6); box-shadow: 0 10px 23px rgba(18,174,108,.13); }
+.nm-doc-icon { display: grid; flex: 0 0 42px; height: 42px; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg,#07599a,#0b9bc0); font-size: 18px; }
+.nm-export-option.is-invoice .nm-doc-icon { background: linear-gradient(145deg,#6235c9,#8c51e9); }
+.nm-export-option.is-note .nm-doc-icon { background: linear-gradient(145deg,#e58a08,#ffb817); }
+.nm-export-option b,.nm-export-option small { display: block; }
+.nm-export-option b { color: #092e5c; font-size: 15px; }
+.nm-export-option small { margin-top: 3px; color: #718196; font-size: 11px; }
+.nm-export-selection { display: flex; align-items: center; justify-content: space-between; padding: 4px 29px 21px; color: #5b6f85; font-size: 12px; font-weight: 700; }
+.nm-export-selection button { border: 0; color: #0769a3; background: transparent; font-weight: 800; cursor: pointer; }
+.nm-export-dialog footer { display: flex; justify-content: flex-end; gap: 11px; padding: 18px 28px 24px; border-top: 1px solid #e3ebf1; background: #f7fafc; }
+.nm-export-dialog footer button { min-width: 135px; padding: 13px 19px; border: 0; border-radius: 13px; font-weight: 900; cursor: pointer; transition: transform .16s ease,box-shadow .16s ease; }
+.nm-export-cancel { color: #476078; background: #e6edf3; }
+.nm-export-confirm { min-width: 190px !important; color: #fff; background: linear-gradient(110deg,#079b5d,#16cf7d); box-shadow: 0 9px 20px rgba(7,155,93,.28); }
+.nm-export-confirm:hover { transform: translateY(-2px); box-shadow: 0 13px 26px rgba(7,155,93,.36); }
+.nm-export-confirm:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.nm-export-modal.is-loading .nm-export-confirm { pointer-events: none; opacity: .8; }
+.nm-export-modal.is-loading .nm-export-confirm i { animation: nmExportSpin .8s linear infinite; }
+@keyframes nmExportEnter { from { opacity: 0; transform: translateY(15px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes nmExportSpin { to { transform: rotate(360deg); } }
+@media (max-width: 680px) {
+  .nm-export-options { grid-template-columns: 1fr; padding: 18px 20px 12px; }
+  .nm-export-dialog { max-height: 92vh; overflow-y: auto; }
+  .nm-export-dialog header { padding: 24px 22px 18px; }
+  .nm-export-option { min-height: 78px; }
+}
+
 body.nm-sales-register-page .breadcrumb,
 body.nm-sales-register-page .breadcrumb::before,
 body.nm-sales-register-page .breadcrumb::after {

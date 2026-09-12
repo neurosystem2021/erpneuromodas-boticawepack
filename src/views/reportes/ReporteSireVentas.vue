@@ -311,6 +311,7 @@ export default {
       }
     },
     async exportarReporte(tipo) {
+      const ventanaDescarga = window.open("", "_blank");
       let params = {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
@@ -318,16 +319,29 @@ export default {
         almacen: this.almacen,
         tipo: tipo
       };
-      await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
-        params: params
-      }).then(res => {
-        let url = res.data;
-        url = url.replace(/\\/g, "");
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          url = "https://" + url; // O "https://" si es necesario
+      try {
+        const res = await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
+          params: params
+        });
+        let url = typeof res.data === "string" ? res.data.replace(/\\/g, "") : "";
+        if (!url) {
+          throw new Error((res.data && (res.data.errorr || res.data.message)) || "El servidor no devolviÃ³ el archivo Excel.");
         }
-        window.open(url, "_blank");
-      });
+        if (!/^https?:\/\//i.test(url)) {
+          url = url.charAt(0) === "/"
+            ? window.location.origin + url
+            : window.location.protocol + "//" + url;
+        }
+        if (ventanaDescarga && !ventanaDescarga.closed) {
+          ventanaDescarga.location.replace(url);
+        } else {
+          window.location.assign(url);
+        }
+      } catch (error) {
+        if (ventanaDescarga && !ventanaDescarga.closed) ventanaDescarga.close();
+        const data = error.response && error.response.data;
+        this.$toasted.error((data && (data.errorr || data.message)) || error.message || "No se pudo generar el Excel.");
+      }
     },
     async generarReporte() {
       this.lstReporte = [];

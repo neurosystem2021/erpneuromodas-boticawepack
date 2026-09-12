@@ -384,16 +384,25 @@
       var vm = findReportVm(document.getElementById('app').__vue__);
       var codes = Array.prototype.map.call(modal.querySelectorAll('input[name="nm-export-type"]:checked'), function (box) { return box.value; });
       if (!vm || !codes.length) return;
+      var downloadWindow = window.open('', '_blank');
       modal.classList.add('is-loading');
       var params = { fechaIni: vm.fechaInicio, fechaFin: vm.fechaFin, declarado: vm.declarado, almacen: vm.almacen, tipoDocumento: codes.join(',') };
       vm.axios(vm.API + 'reporte/ListarRegVenta/excel', { params: params }).then(function (res) {
         var url = String(res.data || '').replace(/\\/g, '');
-        if (url) window.open(url, '_blank');
+        if (!url || url === '[object Object]') throw new Error('El servidor no devolvi\u00f3 el archivo Excel.');
+        if (!/^https?:\/\//i.test(url)) {
+          url = url.charAt(0) === '/' ? window.location.origin + url : window.location.protocol + '//' + url;
+        }
+        if (downloadWindow && !downloadWindow.closed) downloadWindow.location.replace(url);
+        else window.location.assign(url);
         closeModal();
         if (vm.$toasted) vm.$toasted.success('Reporte generado con los comprobantes seleccionados');
-      }).catch(function () {
+      }).catch(function (error) {
+        if (downloadWindow && !downloadWindow.closed) downloadWindow.close();
         modal.classList.remove('is-loading');
-        if (vm.$toasted) vm.$toasted.error('No se pudo generar el reporte. Intente nuevamente.');
+        var data = error.response && error.response.data;
+        var message = (data && (data.errorr || data.message)) || error.message || 'No se pudo generar el reporte. Intente nuevamente.';
+        if (vm.$toasted) vm.$toasted.error(message);
       });
     });
     return modal;
