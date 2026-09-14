@@ -951,7 +951,7 @@ export default {
       this.venta.productos = this.productos;
 
       this.axios
-        .post(this.API + "proformas", this.ventas)
+        .post(this.API + "proformas", this.venta)
         .then(response => {
           this.$toasted.show("Proforma Guardada con exito");
           this.inProgress = false;

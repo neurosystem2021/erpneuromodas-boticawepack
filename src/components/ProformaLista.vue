@@ -112,19 +112,21 @@ import { mapActions } from 'vuex'
                 this.limpiar()
 
                 this.axios.get(this.API + 'proforma/detalle', {
-                    params: {
-                        idProforma: item.IdProforma
-                    }
+                    params: { idProforma: item.IdProforma }
                 }).then((response) => {
-                    response.data.map((item) => {
-                        this.add([item.IdProducto, () => {
-                            this.obtenerStok({ IdAlmacen: this.idAlmacen })
-                        }, { setPrecio: true, cantidad: item.Cantidad } ])
+                    response.data.forEach((prod) => {
+                        // Aseguramos que traiga lo que el carrito necesita
+                        prod.cantxPrecio = prod.cantidad || prod.Cantidad || 1
+                        prod.cantidadPress = prod.cantidadPress || prod.CantidadPresentacion || 1
+                        prod.descuento = prod.descuento || 0
+                        prod.nuevoPrecioContado = 0
 
-                        this.filter = ''
-                        this.show = false
+                        this.add([prod, () => {}, false])
                     })
 
+                    this.obtenerStok({ IdAlmacen: this.idAlmacen })
+                    this.filter = ''
+                    this.show = false
                     this.$emit('onSelectProforma', item.IdCliente)
                 })
             },
