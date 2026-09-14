@@ -226,6 +226,8 @@
               <thead>
                 <tr>
                   <th>Producto</th>
+                  <th class="text-center">Costo Promedio</th>
+                  <th class="text-center">Último Costo Compra</th>
                   <th class="text-center">Precio de compra</th>
                   <th class="text-center">Precio de venta</th>
                   <th class="text-center">Stock</th>
@@ -234,6 +236,8 @@
               <tbody>
                 <tr>
                   <td>{{ productoSelect.Producto }}</td>
+                  <td class="text-center">{{ productoSelect.CostoPromedio | redondear }}</td>
+                  <td class="text-center">{{ productoSelect.UltimoCostoCompra | redondear }}</td>
                   <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioContado }}</td>
                   <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>

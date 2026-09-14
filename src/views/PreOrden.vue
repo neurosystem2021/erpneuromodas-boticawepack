@@ -416,6 +416,7 @@ export default {
       obj.Cantidad = 1;
       obj.descuento = 0;
       obj.precio = obj.PrecioContado;
+      obj.stock = prod.stock;
       obj.Descripcion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
@@ -449,26 +450,26 @@ export default {
       this.loadCode = "";
     },
     renderChild(data) {
+      const stock = Number(data.stock);
+      const precio = Number(data.PrecioContado);
+
       if (this.idAlmacen) {
         let style = "ss";
-        if (data.stock <= 0) {
+        if (stock <= 0) {
           style = "danger";
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (data.stock > 0) {
+        if (stock > 0) {
           style = "success";
         }
         return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
-          data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
+        <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
+          !isNaN(stock)
+            ? Number.isInteger(stock)
+              ? stock
+              : stock.toFixed(2)
             : data.stock
         }</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${
-          data.PrecioContado
-            ? data.PrecioContado.toFixed(2)
-            : data.PrecioContado
+          !isNaN(precio) ? precio.toFixed(2) : data.PrecioContado
         }</b> 
       `;
       }

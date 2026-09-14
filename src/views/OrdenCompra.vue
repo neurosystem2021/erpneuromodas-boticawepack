@@ -63,6 +63,8 @@
                             :bloquearInput="false"
                             :fields="carrito.fields"
                             :idAlmacen="movimiento.almacen.IdAlmacen"
+                            :almacenDestino="movimiento.almacen.IdAlmacen"
+                            :movTipo="0"
                             :onSetProducto="onSetProducto">
 
                         </productos-carrito>

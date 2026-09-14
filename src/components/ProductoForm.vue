@@ -223,6 +223,25 @@
           </b-form-group>
           <b-form-group>
             <b-form-checkbox
+                     v-model="producto.ControlaStockMaximo"
+                     :value="1"
+                     :unchecked-value="0"
+                     >
+              Activar stock maximo
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="!producto.EsPadre">
+            <label>Stock Maximo:</label>
+            <input   
+              required="required"
+              v-model="producto.StockMaximo"
+              type="number"
+              class="form-control"
+              step="0.001"
+              />
+          </b-form-group>
+          <b-form-group>
+            <b-form-checkbox
                    v-model="producto.MasMovido"
                    :value="1"
                    :unchecked-value="0">
@@ -616,6 +635,8 @@ export default {
             this.producto.PrecioPorMayor = newVal.PrecioPorMayor;
             this.producto.ControlaStockMinimo = newVal.ControlaStockMinimo;
             this.producto.StockMinimo = newVal.StockMinimo;
+            this.producto.ControlaStockMaximo = newVal.ControlaStockMaximo;
+            this.producto.StockMaximo = newVal.StockMaximo;
             this.producto.StockPorMayor = newVal.StockPorMayor;
             this.producto.CodigoBarra = newVal.CodigoBarra;
             //this.producto.ProductoModelo        = newVal.ProductoModelo
@@ -935,6 +956,8 @@ export default {
         ControlaStockMinimo: 0,
         MasMovido: 0,
         StockMinimo: 0,
+        ControlaStockMaximo: 0,
+        StockMaximo: 0,
         TienePresentacion: 0,
         StockPorMayor: 0,
         PrecioCosto: 0,

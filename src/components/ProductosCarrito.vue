@@ -1173,32 +1173,32 @@ export default {
     },
     renderChild(data) {
       if (this.idAlmacen) {
+        let stockNum = data.stock !== null && data.stock !== undefined ? parseFloat(data.stock) : null;
+        let precioNum = data.PrecioContado !== null && data.PrecioContado !== undefined ? parseFloat(data.PrecioContado) : null;
+
         let style = "ss";
-        if (data.stock <= 0) {
+        if (stockNum <= 0) {
           style = "danger";
         }
-        // cambiar color los que faltan 4 meses por vencer
-        if (data.stock > 0) {
+        if (stockNum > 0) {
           style = "success";
         }
         return `
-         <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
-          data.stock
-            ? Number.isInteger(data.stock)
-              ? data.stock
-              : data.stock.toFixed(2)
-            : data.stock
+        <b class="bg-${style}" style="color: #fff; padding: 0 6px">${
+          stockNum !== null && !isNaN(stockNum)
+            ? Number.isInteger(stockNum)
+              ? stockNum
+              : stockNum.toFixed(2)
+            : (data.stock || 0)
         }</b> | <b>${data.Producto} - ${data.ProductoMarca}</b> | <b>S/ ${
-          data.PrecioContado
-            ? data.PrecioContado.toFixed(2)
-            : data.PrecioContado
+          precioNum !== null && !isNaN(precioNum)
+            ? precioNum.toFixed(2)
+            : (data.PrecioContado || 0)
         }</b> 
       `;
       }
       return `
-        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${
-        data.ProductoMarca
-      }
+        <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}
       `;
     },
     // setCantidad (index, val) {
