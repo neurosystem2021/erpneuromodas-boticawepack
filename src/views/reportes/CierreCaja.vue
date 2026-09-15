@@ -2394,21 +2394,22 @@ th {
     top:0!important;
     color:#111;
     font-family:Arial,sans-serif;
-    font-size:10.5px;
+    font-size:14px;
+    font-weight:600;
   }
   .ticket-print-summary header{text-align:center;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:7px}
-  .ticket-print-summary h1{font-size:17px;margin:0 0 4px;font-weight:900}
-  .ticket-print-summary header p{margin:2px 0}
-  .ticket-products{width:100%;margin:0 auto;border-collapse:collapse;table-layout:fixed;font-size:10px}
-  .ticket-products th,.ticket-products td{padding:6px 2px;border-bottom:1px dotted #666;overflow-wrap:anywhere;vertical-align:middle}
-  .ticket-products th{padding-top:8px;padding-bottom:8px;font-size:8.5px;text-transform:uppercase;text-align:center;border-top:2px solid #111;border-bottom:2px solid #111}
+  .ticket-print-summary h1{font-size:22px;margin:0 0 5px;font-weight:900}
+  .ticket-print-summary header p{margin:3px 0;font-size:13px}
+  .ticket-products{width:100%;margin:0 auto;border-collapse:collapse;table-layout:fixed;font-size:13px;font-weight:600}
+  .ticket-products th,.ticket-products td{padding:7px 3px;border-bottom:1px dotted #666;overflow-wrap:anywhere;vertical-align:middle;line-height:1.25}
+  .ticket-products th{padding-top:9px;padding-bottom:9px;font-size:11px;text-transform:uppercase;text-align:center;border-top:2px solid #111;border-bottom:2px solid #111}
   .ticket-products th:nth-child(1){width:38%;text-align:left}.ticket-products th:nth-child(2){width:22%;text-align:left}
   .ticket-products th:nth-child(3){width:17%;text-align:center}.ticket-products th:nth-child(4){width:23%;text-align:right}
   .ticket-products td:nth-child(3){text-align:center}.ticket-products td:nth-child(4){text-align:right;white-space:nowrap}
-  .ticket-products tfoot td{padding:10px 3px 8px;border-top:3px solid #111;border-bottom:5px double #111;font-size:13px;font-weight:900}
+  .ticket-products tfoot td{padding:11px 3px 9px;border-top:3px solid #111;border-bottom:5px double #111;font-size:15px;font-weight:900}
   .ticket-products tfoot td:last-child{text-align:right}
   .ticket-products .ticket-empty{text-align:center;padding:10px 2px}
-  .products-print h1{text-align:center;font:900 20px Arial,sans-serif;margin:0 0 14px;letter-spacing:.2px}
+  .products-print h1{text-align:center;font:900 22px Arial,sans-serif;margin:0 0 15px;letter-spacing:.2px}
   .products-print-pdf{page:products-pdf;display:block!important;width:100%!important;max-width:none!important;color:#111}
   .products-pdf-table{width:100%;margin:0 auto;border-collapse:collapse;table-layout:fixed;font-size:7.5px}
   .products-pdf-table th,.products-pdf-table td{padding:5px 3px;border-bottom:1px solid #dbe5eb;overflow-wrap:anywhere;text-align:left;vertical-align:middle}
@@ -2430,26 +2431,26 @@ th {
   .yape-pdf-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9px}
   .yape-pdf-table th,.yape-pdf-table td{border:1px solid #ccd5dd;padding:4px;overflow-wrap:anywhere}
   .yape-pdf-table th{background:#174f78!important;color:#fff!important}.yape-pdf-table td:last-child{text-align:right;white-space:nowrap}
-  .yape-print-ticket{page:ticket;display:block!important;position:absolute!important;left:0!important;top:0!important;width:78mm!important;min-width:78mm!important;max-width:78mm!important;box-sizing:border-box!important;margin:0!important;padding:4mm 1.2mm 3mm!important;border:1px solid #ddd;border-radius:7mm;color:#111;font-family:Arial,sans-serif}
-  .yape-ticket-list h1{text-align:center;font-size:19px;font-weight:900;margin:0 0 14px}
-  .yape-ticket-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10px}
-  .yape-ticket-table th,.yape-ticket-table td{padding:6px 3px;border-bottom:1px dotted #666;overflow-wrap:anywhere;vertical-align:middle}
-  .yape-ticket-table th{padding-top:8px;padding-bottom:8px;border-top:2px solid #111;border-bottom:2px solid #111;font-size:8.5px;text-align:left;text-transform:uppercase}
+  .yape-print-ticket{page:ticket;display:block!important;position:absolute!important;left:0!important;top:0!important;width:78mm!important;min-width:78mm!important;max-width:78mm!important;box-sizing:border-box!important;margin:0!important;padding:4mm 1.2mm 3mm!important;border:1px solid #ddd;border-radius:7mm;color:#111;font-family:Arial,sans-serif;font-size:13px;font-weight:600}
+  .yape-ticket-list h1{text-align:center;font-size:22px;font-weight:900;margin:0 0 15px}
+  .yape-ticket-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;font-weight:600}
+  .yape-ticket-table th,.yape-ticket-table td{padding:7px 3px;border-bottom:1px dotted #666;overflow-wrap:anywhere;vertical-align:middle;line-height:1.25}
+  .yape-ticket-table th{padding-top:9px;padding-bottom:9px;border-top:2px solid #111;border-bottom:2px solid #111;font-size:11px;text-align:left;text-transform:uppercase}
   .yape-ticket-table th:nth-child(1){width:38%}.yape-ticket-table th:nth-child(2){width:34%;text-align:center}.yape-ticket-table th:nth-child(3){width:28%;text-align:right}
   .yape-ticket-table td:nth-child(2){text-align:center}.yape-ticket-table td:nth-child(3){text-align:right;white-space:nowrap}
-  .yape-print-total{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding:7px 4px;font-size:12px;font-weight:900}
-  .yape-print-ticket .yape-print-total{margin-top:0;padding:10px 3px 8px;border-top:3px solid #111;border-bottom:5px double #111;font-size:13px}
-  .yape-print-total strong{font-size:15px}.yape-print footer{text-align:center;margin-top:10px;font-size:8px;letter-spacing:.5px}
-  .ticket-print-summary h2{text-align:center;font-size:13px;margin:10px 0 5px;padding:5px 0;border-top:1px dashed #333;border-bottom:1px dashed #333}
-  .ticket-line,.ticket-detail,.ticket-grand,.ticket-final{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
-  .ticket-line{font-size:11px;border-bottom:1px dotted #aaa}
-  .ticket-detail{font-size:9px;padding-left:5px;color:#333}
+  .yape-print-total{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding:8px 4px;font-size:14px;font-weight:900}
+  .yape-print-ticket .yape-print-total{margin-top:0;padding:11px 3px 9px;border-top:3px solid #111;border-bottom:5px double #111;font-size:15px}
+  .yape-print-total strong{font-size:17px}.yape-print footer{text-align:center;margin-top:10px;font-size:10px;letter-spacing:.5px}
+  .ticket-print-summary h2{text-align:center;font-size:15px;margin:12px 0 6px;padding:6px 0;border-top:1px dashed #333;border-bottom:1px dashed #333}
+  .ticket-line,.ticket-detail,.ticket-grand,.ticket-final{display:flex;justify-content:space-between;gap:8px;padding:4px 0;line-height:1.25}
+  .ticket-line{font-size:13.5px;border-bottom:1px dotted #aaa}
+  .ticket-detail{font-size:12px;padding-left:5px;color:#222}
   .ticket-detail span{max-width:48mm}
-  .ticket-grand,.ticket-final{margin:7px 0;padding:7px 4px;border-top:2px solid #111;border-bottom:2px solid #111;font-size:13px;font-weight:900}
+  .ticket-grand,.ticket-final{margin:8px 0;padding:9px 4px;border-top:2px solid #111;border-bottom:2px solid #111;font-size:15px;font-weight:900}
   .ticket-out{margin-top:5px}
-  .ticket-print-summary footer{text-align:center;margin-top:10px;padding-top:5px;border-top:1px dashed #333;font-size:8px}
+  .ticket-print-summary footer{text-align:center;margin-top:11px;padding-top:6px;border-top:1px dashed #333;font-size:10px}
   .ticket-doc-summary{width:100%;margin:8px 0 12px;break-inside:avoid}
-  .ticket-doc-summary .ticket-line{border-bottom:0;padding:2px 1px}
+  .ticket-doc-summary .ticket-line{border-bottom:0;padding:3px 1px}
   .ticket-doc-summary .ticket-doc-total{margin-top:2px;border-top:1px solid #111;border-bottom:3px double #111;font-weight:900}
   .cash-close-modern.ticket-mode{
     position:absolute!important;
