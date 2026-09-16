@@ -1647,9 +1647,9 @@ export default {
         element.value = "";
         element.dispatchEvent(new Event("input", { bubbles: true }));
       }
-
-      const event = new MouseEvent("dblclick");
-      element.dispatchEvent(event);
+      
+      // const event = new MouseEvent("dblclick");
+      // element.dispatchEvent(event);
     },
     setVendedor(obj) {
       if (obj.IdTipoDoc) this.getTipoDoc(obj.IdTipoDoc);
