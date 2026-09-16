@@ -2163,7 +2163,12 @@ export default {
         return;
       }
       console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+      
+      const esNotaCreditoDebito =
+        venta.tipoVenta.CodSunat == "07" || venta.tipoVenta.CodSunat == "08";
+
       if (
+        !esNotaCreditoDebito &&
         productos.some(
           v =>
             v.cantidad * (v.CantidadPresentacion ? v.CantidadPresentacion : 1) >
@@ -2172,14 +2177,6 @@ export default {
         this.ventas[this.ventaActiva].almacen.IdAlmacen != 2
       ) {
         this.$toasted.show("No se puede vender un producto sin stock");
-        // this.$swal({
-        //   position: "center",
-        //   icon: "info",
-        //   showConfirmButton: true,
-        //   confirmButtonText: "Entiendo",
-        //   target: document.getElementById("conten"),
-        //   confirmButtonColor: "#0275d8"
-        // });
         return;
       }
 
