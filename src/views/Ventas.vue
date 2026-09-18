@@ -1072,6 +1072,7 @@ export default {
             this.venta.PagoCon = this.$refs.carrito.pagocon
             this.venta.idProductos = this.productos.map(prod => prod.IdProducto)
             this.venta.NombreOrganizacion = (''+this.venta.NombreOrganizacion).trim().toUpperCase()
+            this.venta.requestId = Date.now() + '-' + Math.random();
             this.axios.post(this.API + 'ventas', this.venta)
             .then((response) => {
 

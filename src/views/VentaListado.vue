@@ -2506,6 +2506,7 @@ export default {
       venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
         .toUpperCase()
         .trim();
+        venta.requestId = Date.now() + '-' + Math.random();
       await this.axios.post(this.API + "ventas", venta).then(response => {
         if (response.data.insertId) {
           this.$toasted.success("Venta realizada con exito");
