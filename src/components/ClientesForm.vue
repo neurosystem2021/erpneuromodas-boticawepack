@@ -98,13 +98,13 @@
         </b-col>
       </b-row>
       <div slot="modal-footer" >
-        <b-btn  variant="primary" type="submit">
-           Guardar
-         </b-btn>
-         <b-btn  variant="secondary" @click="show=false">
-           Close
-         </b-btn>
-       </div>
+        <b-btn v-if="idPerfil == 1" variant="primary" type="submit">
+          Guardar
+        </b-btn>
+        <b-btn  variant="secondary" @click="show=false">
+          Close
+        </b-btn>
+      </div>
     </b-modal>
     </b-form>
   </div>
@@ -117,6 +117,7 @@ export default {
       API: config.API,
       show: false,
       usuariosActivos: [],
+      idPerfil: sessionStorage.getItem("IdPerfil"),
       cliente: {
         Cliente: '',
         DniRuc: '',
