@@ -673,6 +673,7 @@ export default {
       this.initForm();
     },
     initForm() {
+      this.file = "";
       this.producto = {
         TienePresentacion: 0,
         EsPadre: 0,
@@ -780,6 +781,7 @@ export default {
           // this.$refs.inputTalla.setValue('')
 
           //INSERTANDO IMAGEN
+          if (this.file) {
           let formData = new FormData();
           formData.append("imagen", this.file);
 
@@ -789,8 +791,9 @@ export default {
             data: formData,
             headers: { "Content-Type": "multipart/form-data" }
           }).then(res => {
-            // console.log(res);
+            this.resetFileInput();
           });
+        }
 
           this.$refs.productoForm.hide();
           this.$emit("productoactualizado", response.data.insertId);
@@ -803,6 +806,12 @@ export default {
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
+    },
+    resetFileInput() {
+      this.file = "";
+      if (this.$refs.file) {
+        this.$refs.file.value = "";
+      }
     },
     crearCategoria() {
       if (this.$refs.inputCategoria.type) {
