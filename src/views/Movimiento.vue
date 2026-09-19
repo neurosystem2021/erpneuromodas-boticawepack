@@ -309,7 +309,7 @@ return false
     },
     onSetProducto (obj,presentacion) {
         if(presentacion){
-            obj.cantidad = presentacion.cantidad || 1
+            obj.cantidad = 1
             obj.nuevoPrecioContado = presentacion.precioventa || 0
             obj.precio = presentacion.preciocosto || 0
             return obj

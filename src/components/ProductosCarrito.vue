@@ -99,8 +99,32 @@
           </b-col>
         </b-row>
       </b-modal>
+      <b-modal size="md" ref="modalPromos" hide-footer title="Seleccione la promoción a aplicar">
+        <div class="d-block text-center mb-3">
+          <h5>{{ objProdPromo.Producto }}</h5>
+          <small class="text-muted">Este producto tiene más de una promoción vigente para esta presentación</small>
+        </div>
+        <b-card
+          v-for="promo in promosCandidatas"
+          :key="promo.IdPromocion"
+          class="mb-2 contentCard"
+          @click="() => confirmarPromoYAgregar(promo)">
+          <b-row>
+            <b-col cols="8">
+              <b>Compra {{ promo.CantidadCompra }}</b> → lleva <b>{{ promo.CantidadRegalo }}</b> de
+              <span class="text-success">{{ promo.ProductoRegaloNombre }}</span> gratis
+            </b-col>
+            <b-col cols="4" class="text-right">
+              <i class="fas fa-chevron-right"></i>
+            </b-col>
+          </b-row>
+        </b-card>
+        <b-button block variant="outline-secondary" @click="confirmarPromoYAgregar(null)">
+          No aplicar ninguna promoción
+        </b-button>
+      </b-modal>
       <div class="contenedor-carrito">
-      <b-table small class="tabla-carrito" responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito">
+      <b-table small class="tabla-carrito" responsive  striped hover :items="productosTabla" :fields="fields" ref="tablaCarrito">
         <template slot="stock" slot-scope="data">
           <div v-if="data.item.ControlaStock" style="font-size:17px; font-weight:bold">
             {{ (data.item.stock/(data.item.cantidadPress || 1)).toFixed(2) }}
@@ -117,11 +141,13 @@
             style="width: 100px"
             step="1"
             min="0"
+            :disabled="productos[data.index].EsRegalo"
             @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
             placeholder="Cantidad"
             class="form-control"/>
             <div class="text-left ml-1">
               <b>x{{productos[data.index].cantidadPress}} Uni.</b>
+              <b-badge v-if="productos[data.index].EsRegalo" variant="warning" class="ml-1">🎁 GRATIS</b-badge>
             </div>
         </template>
         <template slot="eventPres" slot-scope="data">
@@ -148,7 +174,7 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput?true:false"
+            :disabled="bloquearInput || productos[data.index].EsRegalo ? true : false"
             type="number"
             style="width: 110px"
             min="0"
@@ -222,7 +248,7 @@
                 <b-form-select v-if="!isNota"
                   style="width: 100%; text-align: left !important;"
                   :disabled="bloquearInput?true:false"
-                  @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index)"
+                  @change="(val) => changeMovimiento(val, data.item.IdProducto, data.index, true)"
                   v-model="productos[data.index].hashMovimiento" :options="movimientoLotes[data.item.IdProducto]">
                 </b-form-select>
                 <br>
@@ -326,7 +352,11 @@
           <div style="font-size:17px">{{ getTotal(data.index) }}</div>
         </template>
         <template slot="acciones" slot-scope="data">
-          <b-button variant="danger" size="sm" :disabled="bloquearInput?true:false" @click="quitarProducto(data.index)">X</b-button>
+          <b-button
+            variant="danger"
+            size="sm"
+            :disabled="(bloquearInput || productos[data.index].EsRegalo)?true:false"
+            @click="quitarProducto(data.index)">X</b-button>
         </template>
 
         <template slot="show_details" slot-scope="row">
@@ -363,7 +393,7 @@
 
         <b-popover
             target="popover-metodopago"
-            triggers="click"
+            triggers="click blur focus"
             placement="top"
             custom-class="popover-metodos">
 
@@ -451,6 +481,10 @@ export default {
       productosCaja: {},
       items: [],
       handleKeyDown: false,
+      objProdPromo: {},
+      promosCandidatas: [],
+      objPendiente: null,
+      presentacionPendiente: false,
       vuelto: 0,
       pagocon: 0,
       idPerfil: sessionStorage.getItem("IdPerfil"),
@@ -556,6 +590,12 @@ export default {
         return this.API + "productos";
       }
     },
+    productosTabla () {
+      return this.productos.map(p => ({
+        ...p,
+        _rowVariant: p.EsRegalo ? 'warning' : ''
+      }))
+    },
     sumatoriaSubTotal() {
       let sumatoria = 0;
       if (this.igvTotal) {
@@ -606,7 +646,8 @@ export default {
       buscar: "buscarProductos",
       eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
-      actualizarProd: "actualizarProducto"
+      actualizarProd: "actualizarProducto",
+      recalcular: "recalcularPromociones"
     }),
     startRecognition() {
       if (!("webkitSpeechRecognition" in window)) {
@@ -681,7 +722,7 @@ export default {
         this.actualizarProd({ Producto: prod, Pos: index });
       });
     },
-    changeMovimiento(hash, idProducto, index) {
+    changeMovimiento(hash, idProducto, index, manual = false) {
       if (hash) {
         // Stock
         let stock = this.movimientoLotes[idProducto].find(m => m.value === hash)
@@ -761,6 +802,12 @@ export default {
             Vue.set(this.productos[index], "fechaVenMovimiento", "");
           });
         }
+        if (manual) {
+          this.$nextTick(() => {
+            Vue.set(this.productos[index], "LoteManual", true);
+          });
+        }
+        this.$nextTick(() => this.recalcular());
         // return `<small class='venci ${style}'>Venci: ${fechaVen}</small>`
       }
     },
@@ -778,30 +825,34 @@ export default {
                 ? this.almacenDestino
                 : this.almacenOrigen)
         )
-        .then(response => {
+                .then(response => {
           if (response.data.length > 0) {
             let indexProducto = this.productos.findIndex(
-              p => p.IdProducto === $idProducto
+              p => p.IdProducto === $idProducto && !p.EsRegalo
             );
-            // Cargar por defecto lote próximo a vencer.
-            let primeroVencer = response.data.reduce((a, b) => {
+            // Cargar por defecto lote próximo a vencer, PERO solo entre los que sí tienen stock
+            let lotesConStock = response.data.filter(l => Number(l.Stock) > 0);
+            let candidatos = lotesConStock.length > 0 ? lotesConStock : response.data;
+            let primeroVencer = candidatos.reduce((a, b) => {
               return a.FechaVen && new Date(a.FechaVen) < new Date(b.FechaVen)
                 ? a
                 : b;
             });
 
-            this.$nextTick(() => {
-              Vue.set(
-                this.productos[indexProducto],
-                "hashMovimiento",
-                primeroVencer.hashMovimiento
-              );
-              this.changeMovimiento(
-                primeroVencer.hashMovimiento,
-                $idProducto,
-                indexProducto
-              );
-            });
+            if (indexProducto !== -1) {
+              this.$nextTick(() => {
+                Vue.set(
+                  this.productos[indexProducto],
+                  "hashMovimiento",
+                  primeroVencer.hashMovimiento
+                );
+                this.changeMovimiento(
+                  primeroVencer.hashMovimiento,
+                  $idProducto,
+                  indexProducto
+                );
+              });
+            }
 
             this.movimientoLotes[$idProducto] = response.data.map(l => ({
               value: l.hashMovimiento,
@@ -960,16 +1011,59 @@ export default {
         obj.PrecioCostoF = obj.PrecioCosto || 0;
       }
       this.$refs.autocompleteProducto.setValue("");
-      //obj.FLETE = 0
-      console.log(obj);
+          //obj.FLETE = 0
+          console.log(obj);
       obj.precio = this.isVentas ? 0 : obj.PrecioCosto;
       obj.cantidad = 0;
-      //obj.IdLote = 0
-      //obj.TieneIgv = 0
+          //obj.IdLote = 0
+          //obj.TieneIgv = 0
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
       obj.Registro = "";
       obj = this.onSetProducto(obj, presentacion);
+      obj.PromoId = null;
+      obj.PromoCantidadCompra = null;
+      obj.PromoCantidadRegalo = null;
+      obj.PromoIdProductoRegalo = null;
+      obj.PromoUnidad = null;
+      obj.PromoProductoRegalo = null;
+
+      const candidatas = (obj.Promociones || []).filter(
+        (p) => p.Unidad === obj.Presentacion
+      );
+
+      if (candidatas.length > 1) {
+        this.objProdPromo = obj;
+        this.promosCandidatas = candidatas;
+        this.objPendiente = obj;
+        this.$refs["modalPromos"].show();
+        return;
+      }
+
+      if (candidatas.length === 1) {
+        this.aplicarPromoAObjeto(obj, candidatas[0]);
+      }
+
+      this.agregarObjetoAlCarrito(obj);
+    },
+    confirmarPromoYAgregar(promoElegida) {
+      const obj = this.objPendiente;
+      if (promoElegida) {
+        this.aplicarPromoAObjeto(obj, promoElegida);
+      }
+      this.$refs["modalPromos"].hide();
+      this.agregarObjetoAlCarrito(obj);
+      this.objPendiente = null;
+    },
+    aplicarPromoAObjeto(obj, promo) {
+      obj.PromoId = promo.IdPromocion;
+      obj.PromoCantidadCompra = promo.CantidadCompra;
+      obj.PromoCantidadRegalo = promo.CantidadRegalo;
+      obj.PromoIdProductoRegalo = promo.IdProductoRegalo;
+      obj.PromoUnidad = promo.Unidad;
+      obj.PromoProductoRegalo = promo.ProductoRegaloNombre;
+    },
+    agregarObjetoAlCarrito(obj) {
       if (this.indexProdSelect == null) {
         this.add([
           obj,
@@ -983,7 +1077,7 @@ export default {
         this.actualizarProd({ Producto: obj, Pos: this.indexProdSelect });
         this.indexProdSelect = null;
       }
-      // Vue.set(this.productos, obj.IdProducto, obj)
+          // Vue.set(this.productos, obj.IdProducto, obj)
       this.$refs["modalCant"].hide();
       this.loadCode = "";
       this.$refs.barcodeInput.focus();
@@ -1200,7 +1294,8 @@ export default {
 
       if (total <= 0) {
         Vue.set(this.productos[index], "descuento", 0);
-        return;
+        Vue.set(this.productos[index], "total", 0);
+        return 0;
       }
 
       total = this.$options.filters.redondear(total);

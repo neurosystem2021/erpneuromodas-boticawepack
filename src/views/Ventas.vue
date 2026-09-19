@@ -501,13 +501,13 @@ export default {
         { value: "01", text: "ANULACION DE LA OPERACION" },
         { value: "02", text: "ANULACION POR ERROR EN EL RUC" },
         { value: "03", text: "CORRECION POR ERROR EN LA DESCRIPCION" },
-        { value: "04", text: "DESCUENTO GLOBAL" },
-        { value: "05", text: "DESCUENTO POR ITEM" },
+        //{ value: "04", text: "DESCUENTO GLOBAL" },
+        //{ value: "05", text: "DESCUENTO POR ITEM" },
         { value: "06", text: "DEVOLUCION TOTAL" },
         { value: "07", text: "DEVOLUCION POR ITEM" },
-        { value: "08", text: "BONIFICACION" },
-        { value: "09", text: "DISMINUCION EN EL VALOR" },
-        { value: "10", text: "OTROS CONCEPTOS" }
+        //{ value: "08", text: "BONIFICACION" },
+        //{ value: "09", text: "DISMINUCION EN EL VALOR" },
+        //{ value: "10", text: "OTROS CONCEPTOS" }
       ],
       carrito: {
         fields: [
@@ -856,7 +856,7 @@ export default {
     },
     onSetProducto(obj, presentacion) {
       if (presentacion) {
-        obj.cantidad = presentacion.cantidad || 1;
+        obj.cantidad = 1;
         obj.precio = presentacion.precioventa || 0;
         return obj;
       }
@@ -995,25 +995,46 @@ export default {
       }
   },
     continuarGuardarVenta() {
-    if (
-        this.venta.tipoVenta.CodSunat !== "07" &&
-        this.productos.some(p =>
-          Number(p.cantidad) * Number(p.cantidadPress || 1) >
-          Number(p.stockMovimiento || p.stock || 0)
-        )
-      ) {
-      this.$swal({
-        position: "center",
-        icon: "info",
-        title: "No se puede vender un producto sin stock suficiente.",
-        showConfirmButton: true,
-        confirmButtonText: "Entiendo",
-        target: document.getElementById("conten"),
-        confirmButtonColor: "#0275d8"
-      });
-       this.inProgress = false; 
-      return;
-    }
+      if (this.venta.tipoVenta.CodSunat !== "07") {
+        // Demanda por producto + lote (incluye regalos), en unidades base
+        const demanda = {};
+        this.productos.forEach(p => {
+          // Regalo sin info de lote/stock (otro producto): no se puede validar aquí
+          if (p.EsRegalo && p.stockMovimiento === undefined) return;
+
+          const key = p.IdProducto + "|" + (p.hashMovimiento || "sin-lote");
+          if (!demanda[key]) {
+            demanda[key] = {
+              nombre: p.Producto.replace(" (REGALO)", ""),
+              stock: Number(p.stockMovimiento || p.stock || 0),
+              total: 0
+            };
+          }
+          demanda[key].total +=
+            Number(p.cantxPrecio || 0) * Number(p.cantidadPress || 1);
+        });
+
+        const faltantes = Object.values(demanda).filter(d => d.total > d.stock);
+
+        if (faltantes.length) {
+          const detalle = faltantes
+            .map(d => `${d.nombre}: necesita ${d.total} und. y el lote tiene ${d.stock}`)
+            .join("<br>");
+
+          this.$swal({
+            position: "center",
+            icon: "info",
+            title: "Stock insuficiente en el lote",
+            html: detalle + "<br><small>Elige otro lote o reduce la cantidad.</small>",
+            showConfirmButton: true,
+            confirmButtonText: "Entiendo",
+            target: document.getElementById("conten"),
+            confirmButtonColor: "#0275d8"
+          });
+          this.inProgress = false;
+          return;
+        }
+      }
 
   this.validarEsNota = false;
   let totalPagos = 0;
@@ -1098,6 +1119,10 @@ export default {
   let precioBajo = 0;
   let totalCero = 0;
   this.productos.forEach(pro => {
+    if (pro.EsRegalo) return
+    // En una Nota de Crédito las líneas reflejan exactamente lo que ya se vendió
+    // (incluidas líneas a S/0, como regalos): no se debe re-validar como venta nueva.
+    if (this.isNota) return
     if (parseFloat(pro.cantidad * pro.precio) <= 0) {
       this.$toasted.error("No se puede vender productos con total cero");
       totalCero += 1;
@@ -1105,6 +1130,7 @@ export default {
 
     let lote = this.productos.filter(
       p =>
+        !p.EsRegalo &&
         p.hashMovimiento == pro.hashMovimiento &&
         p.IdProducto == pro.IdProducto
     ).length;
@@ -1173,8 +1199,27 @@ export default {
     this.inProgress = false;
     return;
   }
+  this.productos.forEach(pro => {
+    pro.cantidad = pro.cantxPrecio;
+  });
 
-  this.venta.productos = this.productos;
+  this.venta.productos = this.productos.map(pro => {
+    if (!pro.EsRegalo) return pro;
+
+    const origen = this.productos.find(p => p.uid === pro.IdLineaOrigen);
+    // Solo hereda si el regalo es el mismo producto que se compró
+    if (!origen || origen.IdProducto != pro.IdProducto) return pro;
+
+    const costoUnitario = parseFloat(origen.PrecioCostoF || 0) / parseFloat(origen.cantidadPress || 1);
+
+    return Object.assign({}, pro, {
+      FechaVen: origen.FechaVen || null,
+      hashMovimiento: origen.hashMovimiento || null,
+      Lote: origen.Lote || null,
+      Registro: origen.Registro || null,
+      PrecioCostoF: costoUnitario > 0 ? costoUnitario : null
+    });
+  });
   this.venta.puntosAplicados = this.puntosAplicados || 0;
   this.venta.totalCart = this.totalCart || 0;
   this.venta.PagoCon = this.$refs.carrito.pagocon;

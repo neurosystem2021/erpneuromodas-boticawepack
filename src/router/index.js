@@ -11,6 +11,7 @@ import VentaEstrategica from "@/views/VentaEstrategica.vue";
 import VentaReimpresion from "@/views/VentaReimpresion.vue";
 import ProductosSimilares from "@/views/ProductosSimilares.vue";
 import Configuraciones from "@/views/Configuraciones.vue";
+import Promociones from "@/views/Promociones";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -30,6 +31,7 @@ import ReporteUtilidadBruta from "@/views/reportes/ReporteUtilidadBruta.vue";
 import CajaBancos from "@/views/CajaBancos.vue";
 import BuscadorCajaBanco from "@/views/BuscadorCajaBanco.vue";
 import ProductoVencido from "@/views/reportes/ProductoVencido";
+import ReporteDetallado from "@/views/reportes/ReporteDetallado";
 Vue.use(Router);
 
 export default new Router({
@@ -175,6 +177,16 @@ export default new Router({
       path: "/ProductoVencido",
       name: "ProductoVencido",
       component: ProductoVencido
+    },
+    {
+      path: "/Promociones",
+      name: "Promociones",
+      component: Promociones
+    },
+    {
+      path: "/reportes/ReporteDetallado",
+      name: "ReporteDetallado",
+      component: ReporteDetallado
     }
   ]
 });

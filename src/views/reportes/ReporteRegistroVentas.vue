@@ -63,7 +63,7 @@
                         <td style="text-align: center;">{{reporte.Serie}}</td>
                         <td style="text-align: center;">{{reporte.Numero}}</td>
                         <td style="text-align: center;">{{reporte.SubTotal}}</td>
-                        <td style="text-align: center;">{{reporte.Igv}}</td>
+                        <td style="text-align: center;">{{parseFloat(reporte.Igv).toFixed(2)}}</td>
                         <td style="text-align: center;">{{reporte.Total}}</td>
                         <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
                     </tr>
@@ -177,6 +177,15 @@ export default {
       this.dialogDetalle = true;
     },
     eliminarReg(item) {
+      if (item.ExisteNota == 1) {
+        this.$swal({
+          icon: "error",
+          title: "Restricción de eliminación",
+          text: "Existe una Nota de Crédito vinculada a este registro. "
+        });
+        return;
+      }
+
       this.$swal({
         icon: "question",
         title: "",
@@ -194,7 +203,7 @@ export default {
             idDocVenta: item.idDocVenta
           };
           await this.axios
-            .put(`${this.API}/reporte/ListarRegVenta/anular`, data)
+            .put(`${this.API}reporte/ListarRegVenta/anular`, data)
             .then(res => {
               console.log(res);
               this.generarReporte();
@@ -322,7 +331,8 @@ tfoot td {
 
 thead th {
   top: 0;
-  background: #f8f9fa; /* color del encabezado */
+  background: #1a237e; /* color del encabezado */
+  color: #ffffff;
   z-index: 2;
 }
 

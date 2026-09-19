@@ -10,6 +10,9 @@ const state = {
 
 const mutations = {
   AGREGAR_PRODUCTO ({ productos }, item) {
+    if (!item.uid) {
+      item.uid = 'p_' + Date.now() + '_' + Math.floor(Math.random() * 100000)
+    }
     if (item.setSuma) {
       let index = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
       if (index < 0) {
@@ -19,7 +22,7 @@ const mutations = {
       }
     } else {
       //if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.unshift(item)
+      productos.unshift(item)
       //}
     }
   },
@@ -39,8 +42,8 @@ const mutations = {
       cantidadTotal += parseFloat(prod.cantidad)
     })
     state.productos = state.productos.map(prod => {
-      // prod.descuento = ((descuento / cantidadTotal) * prod.cantidad).toFixed(2)
-      prod.descuento = ((descuento / 100) * (prod.precio*prod.cantidad)).toFixed(2)
+      if (prod.EsRegalo) return prod // no se descuenta sobre líneas de regalo
+      prod.descuento = ((descuento / 100) * (prod.precio * prod.cantidad)).toFixed(2)
       return prod
     })
   },
@@ -53,17 +56,99 @@ const mutations = {
   },
   OBTENER_STOCK (state, items) {
     state.productos = state.productos.map((prod) => {
-      let index = items.findIndex((item => item.IdProducto == prod.IdProducto));
+      let index = items.findIndex((item => item.IdProducto == prod.IdProducto))
       prod.stock = items[index] && items[index].stock
       return prod
     })
-    //state.productos[index].stock = item.stock
-    // Vue.set(state.productos[index], 'stock', item.stock)
+  },
+
+  // ================================================================
+  // PROMOCIONES: recalcula todas las líneas de regalo desde cero,
+  // en base a las cantidades actuales de las líneas "pagadas".
+  // ================================================================
+  RECALCULAR_PROMOCIONES (state) {
+    const lineasPagadas = state.productos.filter(p => !p.EsRegalo)
+    const nuevasLineas = [...lineasPagadas]
+
+    lineasPagadas.forEach(p => {
+      if (!p.PromoId || !p.PromoCantidadCompra) return
+
+      // La promoción SOLO aplica si la línea se vendió exactamente con la
+      // presentación configurada en la promo (ej: promo "por CAJA" no debe
+      // activarse si el cliente compró la misma cantidad en UNIDAD suelta)
+      if ((p.Presentacion || '') !== (p.PromoUnidad || '')) return
+
+      // El umbral (CantidadCompra) está expresado en unidades base
+      // (ej: CAJA x100 -> CantidadCompra=100), así que convertimos
+      // cantxPrecio (N° de paquetes comprados) a unidades base antes de comparar
+      const unidadesBaseCompradas = parseFloat(p.cantxPrecio || 0) * parseFloat(p.cantidadPress || 1)
+      const vecesCumplidas = Math.floor(unidadesBaseCompradas / p.PromoCantidadCompra)
+      const cantidadGratis = vecesCumplidas * (p.PromoCantidadRegalo || 1)
+
+      if (cantidadGratis > 0) {
+        const uidRegalo = 'r_' + p.uid
+        const regaloExistente = state.productos.find(r => r.uid === uidRegalo)
+        const mismoProducto = p.IdProducto == p.PromoIdProductoRegalo
+
+        let heredado = {}
+
+        if (regaloExistente && regaloExistente.LoteManual) {
+          // El usuario ya eligió el lote a mano: NO lo tocamos
+          heredado = {
+            hashMovimiento: regaloExistente.hashMovimiento,
+            IdLote: regaloExistente.IdLote,
+            Lote: regaloExistente.Lote,
+            Registro: regaloExistente.Registro,
+            FechaVen: regaloExistente.FechaVen,
+            stockMovimiento: regaloExistente.stockMovimiento,
+            SerieNumero: regaloExistente.SerieNumero,
+            fechaVenMovimiento: regaloExistente.fechaVenMovimiento,
+            LoteManual: true
+          }
+        } else if (mismoProducto) {
+          // Sigue sincronizado con el principal (comportamiento por defecto)
+          heredado = {
+            hashMovimiento: p.hashMovimiento,
+            IdLote: p.IdLote,
+            Lote: p.Lote,
+            Registro: p.Registro,
+            FechaVen: p.FechaVen,
+            stockMovimiento: p.stockMovimiento,
+            SerieNumero: p.SerieNumero,
+            fechaVenMovimiento: p.fechaVenMovimiento
+          }
+        }
+
+        nuevasLineas.push(Object.assign({
+          uid: 'r_' + p.uid,
+          IdLineaOrigen: p.uid,
+          IdProducto: p.PromoIdProductoRegalo,
+          Producto: (p.PromoProductoRegalo || 'Producto') + ' (REGALO)',
+          Presentacion: 'UNIDAD',
+          ProductoMarca: p.ProductoMarca || '',
+          ProductoFormaFarmaceutica: p.ProductoFormaFarmaceutica || '',
+          stock: null,
+          ControlaStock: false,
+          cantxPrecio: cantidadGratis,
+          cantidad: cantidadGratis,
+          cantidadPress: 1,
+          precio: 0,
+          descuento: 0,
+          subtotal: 0,
+          total: 0,
+          TieneIgv: 0,
+          EsRegalo: 1,
+          NotaVenta: 0
+        }, heredado))
+      }
+    })
+
+    state.productos = nuevasLineas
   }
 }
 
 const actions = {
-  agregarProducto ({ commit }, [producto, cb, obje, isBarCode]) {
+  agregarProducto ({ commit, dispatch }, [producto, cb, obje, isBarCode]) {
     let setPrecio = false
     let cantidad = false
     let setSuma = false
@@ -75,20 +160,16 @@ const actions = {
       setPrecioCosto = obje.setPrecioCosto
     }
 
-    if(typeof producto === 'object') {
-      if (setPrecioCosto) {
-        //producto.precio = producto.PrecioCosto
-        //producto.nuevoPrecioContado = producto.PrecioContado
-      }
-
+    if (typeof producto === 'object') {
       commit('AGREGAR_PRODUCTO', producto)
+      dispatch('recalcularPromociones')
       if (cb) cb(producto)
     } else {
       let params = {}
 
       if (isBarCode) {
         params = {codigoBarra: producto}
-      } 
+      }
 
       axios.get(API + 'productos/id/' + producto, {params: params}).then((response) => {
         if (response.data) {
@@ -96,11 +177,11 @@ const actions = {
 
           if(setPrecio) {
             obj.cantidad = cantidad || 1
-            
+
             if (obj.cantidad >= obj.StockPorMayor && obj.StockPorMayor !== 0) {
-                obj.precio = obj.PrecioPorMayor
+              obj.precio = obj.PrecioPorMayor
             } else {
-                obj.precio = obj.PrecioContado || 0
+              obj.precio = obj.PrecioContado || 0
             }
 
           } else {
@@ -126,16 +207,24 @@ const actions = {
 
           obj.descuento = 0
           obj.nuevoPrecioContado = 0
+          obj.cantxPrecio = obj.cantxPrecio || obj.cantidad || 1
           commit('AGREGAR_PRODUCTO', obj)
-          if (cb) cb(obj)   
+          dispatch('recalcularPromociones')
+          if (cb) cb(obj)
         } else {
           if (cb) cb(false)
         }
       })
     }
   },
-  eliminarProducto ({ commit }, index) {
+  eliminarProducto ({ commit, dispatch, state }, index) {
+    const item = state.productos[index]
+
+    // No permitir borrar una línea de regalo manualmente: se gestiona sola
+    if (item && item.EsRegalo) return
+
     commit('ELIMINAR_PRODUCTO', index)
+    dispatch('recalcularPromociones')
   },
   buscarProductos ({ commit }, search) {
     axios.get(API + 'productos?limit=10&q=' + search).then((response) => {
@@ -151,29 +240,33 @@ const actions = {
   actualizarTotalCart ({ commit }, total) {
     commit('ACTUALIZAR_TOTAL', total)
   },
-  actualizarProducto ({ commit }, obj) {
+  actualizarProducto ({ commit, dispatch }, obj) {
     commit('ACTUALIZAR_PRODUCTO', obj)
+    dispatch('recalcularPromociones')
   },
-  obtenerStock({ commit, state }, obj) {
+  obtenerStock ({ commit, state }, obj) {
     axios.get(API + 'productos/puntoventa/stock', {
       params: {
-        idProductos: state.productos.map(prod => prod.IdProducto),
+        idProductos: state.productos.filter(p => !p.EsRegalo).map(prod => prod.IdProducto),
         idAlmacen: obj.IdAlmacen,
-        noLimit: 1 
+        noLimit: 1
       }
     }).then((response) => {
-        if(response.data){
-          commit('OBTENER_STOCK', response.data)
-        }
+      if (response.data) {
+        commit('OBTENER_STOCK', response.data)
+      }
     })
-    .catch((error) => {
-      console.log(error)
-    })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+  recalcularPromociones ({ commit }) {
+    commit('RECALCULAR_PROMOCIONES')
   }
 }
 
 export default {
-    state,
-    mutations,
-    actions
+  state,
+  mutations,
+  actions
 }

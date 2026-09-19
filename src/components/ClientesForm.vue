@@ -70,6 +70,24 @@
           </b-col>
       </b-row>
       <b-row>
+        <b-col md="12">
+          <b-form-group>
+            <label>Usuario Responsable: <span class="text-danger">*</span></label>
+            <b-form-select
+              required
+              v-model="cliente.IdUsuarioAsignado">
+              <option value="" disabled>-- Seleccione un usuario --</option>
+              <option
+                v-for="u in usuariosActivos"
+                :key="u.IdUsuarioAsignado"
+                :value="u.IdUsuarioAsignado">
+                {{ u.NombreUsuario || u.Usuario }}
+              </option>
+            </b-form-select>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
         <b-col>
           <b-form-checkbox id="checkbox1"
                      v-model="cliente.EsVIP"
@@ -98,6 +116,7 @@ export default {
     return {
       API: config.API,
       show: false,
+      usuariosActivos: [],
       cliente: {
         Cliente: '',
         DniRuc: '',
@@ -105,24 +124,31 @@ export default {
          Direccion2: '',
         Direccion3: '',
         Telefono: '',
-        Email: ''
+        Email: '',
+        IdUsuarioAsignado: ''
       }
     }
   },
   props: ['idModal', 'newDniRuc', 'editCliente', 'txtButton'],
   methods: {
     shownClienteForm () {
+      this.cargarUsuariosActivos()
       // this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       // this.cliente.Direccion = ''
       // this.cliente.Cliente = ''
       // this.cliente.NombreComercial = ''
       // this.cliente.Telefono = ''
       // this.cliente.Email = ''
-       if (this.editCliente && this.editCliente.IdCliente) {
+      if (this.editCliente && this.editCliente.IdCliente) {
         this.cliente = this.editCliente
       } else {
         this.cliente.DniRuc = this.$parent.$parent.newDniRuc
       }
+    },
+    cargarUsuariosActivos () {
+      this.axios.get(this.API + 'usuarios-activos')
+        .then((response) => { this.usuariosActivos = response.data })
+        .catch((error) => { console.log(error) })
     },
     consultarDNIRUC () {
       var esNumerico = Number.isInteger(parseInt(this.cliente.DniRuc))
@@ -173,6 +199,10 @@ export default {
       var esDocumento = this.cliente.DniRuc.length > 7 && this.cliente.DniRuc.length <= 11? true : false
       if (!esDocumento) {
           this.$toasted.show('El Número de Documento es de 8 ó 11 digitos')
+          return
+      }
+      if (!this.cliente.IdUsuarioAsignado) {
+          this.$toasted.show('Debe seleccionar el Usuario responsable de este cliente')
           return
       }
 
