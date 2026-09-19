@@ -14,6 +14,7 @@ import Impresoras from "@/views/Impresoras.vue";
 import Proveedores from "@/views/Proveedores.vue";
 import PuntoRevisionProducto from "@/views/PuntoRevisionProducto.vue";
 import Usuario from "@/views/Usuario.vue";
+import Mantenimiento from "@/views/Mantenimiento.vue";
 
 // Reportes
 import ReporteVentas from "@/views/reportes/Ventas.vue";
@@ -263,6 +264,11 @@ export default new Router({
       name: "Usuario",
       component: Usuario,
       meta: { muestraComboEmpresa: true }
+    },
+        {
+      path: "/mantenimiento",
+      name: "Mantenimiento",
+      component: Mantenimiento,
     },
     {
       path: "/reportes/proformaticket/:id",
