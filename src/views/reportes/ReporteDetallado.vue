@@ -11,6 +11,7 @@
             <small class="subtitulo-reporte">{{ tituloTabActivo }}</small>
           </div>
         </div>
+        <ReporteDeuda class="mr-2" :almacenes="almacenes" :id-almacen="idAlmacen" />
         <b-badge v-if="cargando" class="badge-generando">
           <span class="spinner-border spinner-border-sm mr-2" role="status" />Generando...
         </b-badge>
@@ -246,6 +247,7 @@
 <script>
 import config from '@/store/config.js'
 import TablaReporte from '@/components/TablaReporte'
+import ReporteDeuda from '@/components/ReporteDeuda'
 
 // Estado "sin resultados"
 const EstadoVacio = {
@@ -409,7 +411,13 @@ function unificarFilas (filas, camposClave, campoCantidad) {
 }
 
 export default {
-  components: { TablaReporte, EstadoVacio, CargaOverlay, TablaVentasVendedor },
+  components: {
+    TablaReporte,
+    EstadoVacio,
+    CargaOverlay,
+    TablaVentasVendedor,
+    ReporteDeuda 
+  },
   mounted () {
     this.getAlmacenes()
     this.getTiposVendedor()

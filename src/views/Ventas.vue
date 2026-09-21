@@ -387,6 +387,21 @@
                                           </td>
                                       </tr>
 
+                                      <!-- NUEVO: switch Efectivo Parcial -->
+                                      <tr>
+                                          <td colspan="4" class="text-center py-2">
+                                              <b-form-checkbox
+                                                  v-model="venta.EfectivoParcial"
+                                                  :value="1"
+                                                  :unchecked-value="0"
+                                                  :disabled="isNota"
+                                                  switch
+                                                  size="lg">
+                                                  <i class="fas fa-coins"></i> <b>EFECTIVO PARCIAL</b>
+                                              </b-form-checkbox>
+                                          </td>
+                                      </tr>
+
                                   </tbody>
                                 </table>
                             </template>
@@ -579,6 +594,10 @@ export default {
     };
   },
   watch: {
+    // NUEVO: si se marca crédito, se desmarca efectivo parcial (son excluyentes)
+    "venta.EsCredito"(val) {
+      if (val) this.venta.EfectivoParcial = 0;
+    },
     totalCart(newVal) {
       this.venta.pago.efectivo.monto = parseFloat(
         newVal -
@@ -635,6 +654,7 @@ export default {
     initForm() {
       this.venta = {
         EsCredito: 0,
+        EfectivoParcial: 0, // NUEVO
         Serie: "",
         Numero: "",
         cliente: {},
@@ -690,6 +710,7 @@ export default {
         // 07 - nota de credito, 08 - Nota de debito
         this.limpiarCart();
         this.isNota = true;
+        this.venta.EfectivoParcial = 0; // NUEVO
       }
 
       if (obj.TieneIgv) {

@@ -79,9 +79,12 @@
                                     <th>Aplicado</th>
                                     <th>Apli. Nota</th>
                                     <th>Saldo</th>
-                                    <th>Aplicar</th>
+                                    <th class="text-center">Aplicar</th>
+                                    <th class="text-center">Metodo</th>
+                                    <th class="text-center">Cuenta</th>
                                 </tr>
                             </thead>
+
                             <tbody v-for="(item, index) in documentos" :key="index">
                                 <tr class="table-info">
                                     <td class="text-center">{{ item.IdDocVenta }}</td>
@@ -103,6 +106,12 @@
                                             class="form-control"
                                             placeholder="0"/>
                                     </td>   
+                                    <td>
+                                        <b-form-select v-model="item.metodoparcial" :options="metodoparcial" class="mb-3" size="md"/>
+                                    </td>
+                                    <td>
+                                        <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
+                                    </td>   
                                 </tr>
                                 <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
                                     <td class="text-right">{{ item2.IdDocVenta }}</td>
@@ -117,7 +126,7 @@
                         </table>
                         <br>
                         <div class="float-right">
-                            <b-btn size="sm" variant="success" type="submit" :disabled="isLoading">
+                            <b-btn size="sm" variant="success" type="submit">
                                 Guardar
                             </b-btn>
                             <b-btn size="sm" variant="secondary" @click="show=false">
@@ -125,12 +134,32 @@
                             </b-btn>
                         </div>
                         <hr>
-                        <br><br>
+                        <b-row class="mb-1 align-items-end">
+                            <b-col cols="5">
+                                <label for="input-fecha-inicio-pagos">Fecha inicio:</label>
+                                <b-form-input v-model="fechaInicioPagos"
+                                    id="input-fecha-inicio-pagos"
+                                    type="date"></b-form-input>
+                            </b-col>
+                            <b-col cols="5">
+                                <label for="input-fecha-fin-pagos">Fecha fin:</label>
+                                <b-form-input v-model="fechaFinPagos"
+                                    id="input-fecha-fin-pagos"
+                                    type="date"></b-form-input>
+                            </b-col>
+                            <b-col cols="2">
+                                <b-btn size="sm" variant="primary" @click="generarPagos">
+                                    Generar
+                                </b-btn>
+                            </b-col>
+                        </b-row>
+                        <br>
                         <table class="table b-table table-sm">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha Pago</th>
+                                    <th>Cuenta</th>
                                     <th>Concepto</th>
                                     <th>Importe</th>
                                     <th></th>
@@ -140,8 +169,9 @@
                                 <tr v-for="(pago, index) in pagos" :key="index">
                                     <td>{{ pago.IdCajaBanco }}</td>
                                     <td>{{ pago.FechaDoc }}</td>
+                                    <td>{{ pago.Cuenta }}</td>
                                     <td>{{ pago.Concepto }}</td>
-                                    <td>{{ pago.Importe }}</td>
+                                    <td>{{ pago.Importe.toFixed(2) }}</td>
                                     <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
                                 </tr>
                             </tbody>
@@ -172,7 +202,10 @@ import config from '@/store/config.js'
                 cajaBanco: {},
                 vendedor: {},
                 show: false,
-                isLoading: false
+                cuentas:[{ value: null, text: '-- SELECCIONE CUENTA --' }],
+                fechaInicioPagos: '',
+                fechaFinPagos: '',
+                clienteActual: null,
             }
         },
         methods: {
@@ -180,10 +213,15 @@ import config from '@/store/config.js'
                 this.vendedor = {}
                 this.documentos = []
                 this.pagos = []
+                this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
                 this.cajaBanco = {
                     FechaDoc: this.$moment().format("YYYY-MM-DD")
                 }
+                this.fechaInicioPagos = this.$moment().subtract(1, 'months').format("YYYY-MM-DD")
+                this.fechaFinPagos = this.$moment().format("YYYY-MM-DD")
+                this.clienteActual = null
                 this.$refs.inputCliente.setValue('')
+                this.getVendedor()
             },
             getVendedor () {
                 let usuario = sessionStorage.getItem('User')
@@ -191,7 +229,7 @@ import config from '@/store/config.js'
                 .then((response) => {
                     this.setVendedor(response.data)
                     this.$refs.inputVendedor.setValue(response.data.NombreUsuario)
-                    this.$refs.inputVendedor.$refs.input.disabled = true
+                    // this.$refs.inputVendedor.$refs.input.disabled = true
                 })
                 .catch((error) => {
                     console.log(error)
@@ -207,10 +245,35 @@ import config from '@/store/config.js'
             cargarDeuda (cliente) {
                 this.cajaBanco.cliente = cliente
 
-                this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
-                .then((response) => {
-                    response.data.map(data=>data.NotasCredito=JSON.parse(data.NotasCredito) )
-                    this.documentos = response.data
+                Promise.all([
+                    this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente),
+                    this.axios.get(this.API + 'cuentas'),
+                    this.axios.get(this.API + 'metodoparcial')
+                ])
+                .then(([resDeudas, resCuentas, resMetodo]) => {
+                    // Cuentas
+                    this.cuentas = [{ value: null, text: '-- SELECCIONE CUENTA --' }]
+                    resCuentas.data.map(c => {
+                        this.cuentas.push({ value: c.IdCuenta, text: c.Cuenta })
+                    })
+
+                    // Métodos
+                    this.metodoparcial = [{ value: null, text: '-- SELECCIONE METODO --' }]
+                    resMetodo.data.map(c => {
+                        this.metodoparcial.push({ value: c.IdTipoCajaBanco, text: c.TipoCajaBanco })
+                    })
+
+                    // Buscar los valores por defecto según texto
+                    const cuentaDefault = this.cuentas.find(c => c.text.trim().toUpperCase() === 'CAJA PRINCIPAL')
+                    const metodoDefault = this.metodoparcial.find(m => m.text.trim().toUpperCase() === 'EFECTIVO')
+
+                    // Documentos
+                    resDeudas.data.map(data => data.NotasCredito = JSON.parse(data.NotasCredito))
+                    this.documentos = resDeudas.data
+                    this.documentos.map(d => {
+                        d.cuenta = cuentaDefault ? cuentaDefault.value : null
+                        d.metodoparcial = metodoDefault ? metodoDefault.value : null
+                    })
                 })
                 .catch((error) => {
                     console.log(error)
@@ -219,9 +282,28 @@ import config from '@/store/config.js'
 
                 this.cargarPagos(cliente)
             },
+            cargarCuentas(){
+                 this.axios.get(this.API + 'cuentas')
+                .then((response) => {
+                   this.cuentas=[{ value: null, text: '-- SELECCIONE CUENTA --' }]
+                   response.data.map(c=>{
+                       this.cuentas.push({value:c.IdCuenta,text:c.Cuenta})
+                       })
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                })
+            },
             cargarPagos (cliente) {
-                let usuario = sessionStorage.getItem('User')
-                this.axios.get(this.API + 'cliente/pagos?idCliente=' + cliente.IdCliente)
+                this.clienteActual = cliente
+                this.axios.get(this.API + 'cliente/pagos', {
+                    params: {
+                        idCliente: cliente.IdCliente,
+                        fechaInicio: this.fechaInicioPagos,
+                        fechaFin: this.fechaFinPagos
+                    }
+                })
                 .then((response) => {
                    this.pagos = response.data
                 })
@@ -230,10 +312,21 @@ import config from '@/store/config.js'
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             },
+            generarPagos () {
+                if (!this.clienteActual) {
+                    this.$toasted.show('Error: primero seleccione un cliente')
+                    return
+                }
+                if (!this.fechaInicioPagos || !this.fechaFinPagos) {
+                    this.$toasted.show('Error: seleccione fecha inicio y fin')
+                    return
+                }
+                this.cargarPagos(this.clienteActual)
+            },
             guardarPago (evt) {
-                this.isLoading = true;
                 evt.preventDefault()
                 let importe = 0
+                let cuentaSelec= true
                 this.documentos.map(doc => {
                     if (doc.aplicar > 0) {
                         importe += doc.aplicar
@@ -246,31 +339,53 @@ import config from '@/store/config.js'
                     return;
                 }
 
-                for (let index = 0; index < this.documentos.length; index++) {
-                    if (this.documentos[index].aplicar>this.documentos[index].Saldo){
-                        this.isLoading = false;
-                        this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo');
+               for (let index = 0; index < this.documentos.length; index++) {
+                    const aplicar = Math.round(parseFloat(this.documentos[index].aplicar) * 100) / 100
+                    const saldo = Math.round(parseFloat(this.documentos[index].Saldo) * 100) / 100
+                    if (aplicar > saldo) {
+                        this.isLoading = false
+                        this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo')
                         return;
                     }
                     
+                } 
+
+                this.documentos.map(doc => {
+                    if(parseFloat(doc.aplicar)>0 && doc.cuenta == null){
+                        cuentaSelec = false
+                    }
+                });
+
+                if(!cuentaSelec){
+                        this.$toasted.show('Error: Seleccione la cuenta para completar el pago');
+                        this.isLoading = false;
+                        return
                 }
+
+
+                let cuentasId =[]
+                this.cuentas.map(c=>{
+                        if(c.value!==null){                        
+                        cuentasId.push(c.value)
+                        }
+                })
 
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
                     documentos: this.documentos,
-                    vendedor: this.vendedor
+                    vendedor: this.vendedor,
+                    cuentas: cuentasId
                 })
                 .then((response) => {
                     console.log(response.data)
                     this.$toasted.show('Se pagó la deuda del cliente.')
+                    this.$emit('deuda-actualizada')
                     this.show = false
                     this.initForm()
-                    this.isLoading = false;
                     window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {
                     console.log(error)
-                    this.isLoading = false;
                     this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
                 })
             }
@@ -282,10 +397,22 @@ import config from '@/store/config.js'
     background:#12B8D0 !important;
     border:1px solid #12B8D0 !important;
     color:#fff !important;
+    font-weight: bold;
 }
 
 .btn-accion:hover{
     background:#0DA6BC !important;
     border-color:#0DA6BC !important;
+}
+</style>
+<style>
+#modalConfigVenta .modal-dialog{
+    max-width: 90% !important;
+    width: 1300px !important;
+}
+
+#modalConfigVenta .modal-body{
+    max-height: 80vh;
+    overflow-y: auto;
 }
 </style>
