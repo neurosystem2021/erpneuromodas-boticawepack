@@ -11,7 +11,7 @@
                   <b-col md="5" class="docInfo">
                     <b-input-group prepend="Doc. Venta">
                       <autocomplete required="required" :id="`inputTipoVenta${index}`" :url="API + 'ventas/tipos'"
-                        anchor="TipoDoc" initValue="NOTA DE VENTA" class="font-weight-bold" label="writer" placeholder=""
+                        anchor="TipoDoc" initValue="BOLETA ELEC." class="font-weight-bold" label="writer" placeholder=""
                         :on-select="setTipoVenta" :onFocus="focusAutocomplete.bind(null, `inputTipoVenta${index}`)"
                         :classes="{ input: 'form-control' }">
                       </autocomplete>
@@ -934,10 +934,10 @@ export default {
         Observacion: "",
         comisionista: {},
         tipoVenta: {
-          IdTipoDoc: 3,
-          TipoDoc: "NOTA DE VENTA",
+          IdTipoDoc: 7,
+          TipoDoc: "BOLETA ELEC.",
           LimitItems: 0,
-          CodSunat: "12"
+          CodSunat: "03"
         },
         almacen: {
           IdAlmacen: 1,
@@ -988,10 +988,10 @@ export default {
           cliente: {},
           comisionista: {},
           tipoVenta: {
-            IdTipoDoc: 3,
-            TipoDoc: "NOTA DE VENTA",
+            IdTipoDoc: 7,
+            TipoDoc: "BOLETA ELEC.",
             LimitItems: 0,
-            CodSunat: "12"
+            CodSunat: "03"
           },
           almacen: {
             IdAlmacen: 1,
