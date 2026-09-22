@@ -65,7 +65,7 @@
                         <td style="text-align: center;">{{reporte.SubTotal}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.Igv).toFixed(2)}}</td>
                         <td style="text-align: center;">{{reporte.Total}}</td>
-                        <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
+                        <td> <i v-if="reporte.Anulado ==0 && idPerfil != 3" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -151,7 +151,8 @@ export default {
         UtilidadBruta: 0,
         PorcentajeUti: 0
       },
-      detalle: []
+      detalle: [],
+      idPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   mounted() {

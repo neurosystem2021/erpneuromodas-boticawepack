@@ -78,7 +78,7 @@
                         <td style="text-align: center;">{{reporte.Moneda}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
                         <td>
-                          <b-button size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                          <b-button v-if="idPerfil != 3" size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
                           <b-button size="sm" class="mx-1 my-1" @click="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
                         </td>
                     </tr>
@@ -197,7 +197,8 @@ export default {
       TotalPEN: 0,
       TotalUSD: 0,
       FechaPeriodoTributario: "",
-      IdMovimiento: ""
+      IdMovimiento: "",
+      idPerfil: sessionStorage.getItem("IdPerfil")
     };
   },
   mounted() {

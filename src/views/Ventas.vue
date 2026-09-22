@@ -177,7 +177,7 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                   <tbody>
-                                    <div class="acciones-pos">
+                                    <div class="acciones-pos" v-if="idPerfil != 3">
                                         <div class="fila-botones">
 
                                             <pago-deuda></pago-deuda>
@@ -208,7 +208,7 @@
                                         <tr>
                                             <td  class="text-center">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0">
+                                        <tr v-if="puntosAplicados == 0 && idPerfil != 3">
                                             <td>
                                                 <b-input-group prepend="%" append="Descuento">
                                                     <input
@@ -590,7 +590,7 @@ export default {
           { key: "acciones", label: "", class: "stocksize" }
         ]
       },
-      idPerfil: sessionStorage.getItem("idPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
     };
   },
   watch: {

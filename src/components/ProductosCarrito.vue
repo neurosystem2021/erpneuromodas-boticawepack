@@ -372,7 +372,7 @@
     <b-col md="3">
       <slot name="operaciones"></slot>
     </b-col>
-    <b-col md="4" style="padding-left: 95px;">
+    <b-col md="4" class="accionesventa-col">
       <slot name="accionesventa"></slot>
     </b-col>
     <b-col
@@ -1478,6 +1478,23 @@ td.vertical {
   .popover{
     max-width: 400px !important;
     width: 400px !important;
+}
+
+.accionesventa-col {
+    padding-left: 95px;
+}
+
+/* Tablet y celular */
+@media (max-width: 991px) {
+    .accionesventa-col {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        width: 100% !important;
+    }
+
+    .accionesventa-col > * {
+        width: 100% !important;
+    }
 }
 
 </style>
