@@ -4,20 +4,28 @@
        <b-col cols="12">
         <b-breadcrumb :items="items"></b-breadcrumb>
        </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Fecha
             <input type="date" class="form-control" v-model="fechaInicio">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Fecha
             <input type="date" class="form-control" v-model="fechaFin">
         </b-col>
-        <b-col cols="3">
+        <b-col cols="2">
             Almacén
             <b-form-select v-model="almacen" 
                  value-field="IdAlmacen"
                  text-field="Almacen"
                 :options="lstAlmances"></b-form-select>
+        </b-col>
+        <b-col cols="2">
+            Usuario
+            <b-form-select v-model="usuarioSel"
+                value-field="Usuario"
+                text-field="Usuario"
+                :options="lstUsuarios"
+                :disabled="idPerfil == 3"></b-form-select>
         </b-col>
         <b-col cols="1"  class="py-4">
           <b-form-checkbox
@@ -152,17 +160,17 @@ export default {
         PorcentajeUti: 0
       },
       detalle: [],
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: sessionStorage.getItem("IdPerfil"),
+      usuarioReg: sessionStorage.getItem("User"),
+      usuarioSel: sessionStorage.getItem("User"),
+      lstUsuarios: []
     };
   },
   mounted() {
-    this.fechaInicio = this.$moment()
-      .startOf("month")
-      .format("YYYY-MM-DD");
-    this.fechaFin = this.$moment()
-      .endOf("month")
-      .format("YYYY-MM-DD");
+    this.fechaInicio = this.$moment().startOf("month").format("YYYY-MM-DD");
+    this.fechaFin = this.$moment().endOf("month").format("YYYY-MM-DD");
     this.obtenerAlmance();
+    this.obtenerUsuarios();
     this.generarReporte();
   },
   methods: {
@@ -229,16 +237,31 @@ export default {
       console.log(total);
       return parseFloat(total).toFixed(2);
     },
+    async obtenerUsuarios() {
+      if (this.idPerfil == 3) {
+        this.lstUsuarios = [{ Usuario: this.usuarioReg }];
+        this.usuarioSel = this.usuarioReg;
+        return;
+      }
+
+      await this.axios(`${this.API}usuarios`, { params: { idPerfil: 3 } }).then(res => {
+        if (res.data) {
+          this.lstUsuarios = res.data;
+          this.lstUsuarios.unshift({ Usuario: "---TODOS---" });
+          this.usuarioSel = "---TODOS---";
+        }
+      });
+    },
     async exportarReporte() {
       let params = {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        idPerfil: this.idPerfil,
+        usuarioReg: this.idPerfil == 3 ? this.usuarioReg : (this.usuarioSel === "---TODOS---" ? "" : this.usuarioSel)
       };
-      await this.axios(`${this.API}reporte/ListarRegVenta/excel`, {
-        params: params
-      }).then(res => {
+      await this.axios(`${this.API}reporte/ListarRegVenta/excel`, { params: params }).then(res => {
         let url = res.data;
         url = url.replace(/\\/g, "");
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -253,11 +276,11 @@ export default {
         fechaIni: this.fechaInicio,
         fechaFin: this.fechaFin,
         declarado: this.declarado,
-        almacen: this.almacen
+        almacen: this.almacen,
+        idPerfil: this.idPerfil,
+        usuarioReg: this.idPerfil == 3 ? this.usuarioReg : (this.usuarioSel === "---TODOS---" ? "" : this.usuarioSel)
       };
-      await this.axios(`${this.API}reporte/ListarRegVenta`, {
-        params: params
-      }).then(res => {
+      await this.axios(`${this.API}reporte/ListarRegVenta`, { params: params }).then(res => {
         if (res.data) {
           let data = res.data;
           this.lstReporte = data;
