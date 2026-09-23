@@ -77,6 +77,15 @@
                   <i v-else class="fas fa-search mr-2"></i>
                   Mostrar
                 </b-button>
+                <b-button
+                  class="btn-accion btn-excel"
+                  :disabled="cargando || cantidadRegistrosActivo === 0 || generandoExcel"
+                  @click="exportarExcel"
+                >
+                  <span v-if="generandoExcel" class="spinner-border spinner-border-sm mr-2" role="status" />
+                  <i v-else class="fas fa-file-excel mr-2"></i>
+                  Excel
+                </b-button>
                 <b-button class="btn-accion btn-imprimir" :disabled="cargando || cantidadRegistrosActivo === 0" @click="imprimirReporte">
                   <i class="fas fa-print mr-2"></i>Imprimir
                 </b-button>
@@ -343,15 +352,16 @@ const TablaVentasVendedor = {
 }
 
 // Configuración de cada sub-reporte: se generan TODOS de una sola vez al presionar "Mostrar".
+// excelPath: endpoint backend que genera el .xlsx de ese sub-reporte (ver reporte_ventas_excel.php)
 const REPORTES = [
-  { path: 'reporte/ventas/cliente', dataKey: 'dataVentasCliente', camposKey: 'camposVentasCliente', titulo: 'Ventas por Cliente' },
-  { path: 'reporte/ranking/cliente', dataKey: 'dataRankingCliente', camposKey: 'camposRankingCliente', titulo: 'Ranking por Cliente' },
-  { path: 'reporte/ventas/vendedor', dataKey: 'dataVentasVendedor', camposKey: null, titulo: 'Ventas por Vendedor' },
-  { path: 'reporte/ventas/vendedor-producto', dataKey: 'dataVentasVendedorProducto', camposKey: 'camposVentasVendedorProducto', titulo: 'Ventas por Vendedor y Producto' },
-  { path: 'reporte/ventas/producto', dataKey: 'dataVentasProducto', camposKey: 'camposVentasProducto', titulo: 'Ventas por Producto' },
-  { path: 'reporte/ventas/proveedor', dataKey: 'dataVentasProveedor', camposKey: 'camposVentasProveedor', titulo: 'Ventas por Proveedor' },
-  { path: 'reporte/ventas/proveedor-producto', dataKey: 'dataVentasProveedorProducto', camposKey: 'camposVentasProveedorProducto', titulo: 'Ventas por Proveedor y Producto' },
-  { path: 'reporte/ranking/producto', dataKey: 'dataRankingProducto', camposKey: 'camposRankingProducto', titulo: 'Ranking por Producto' }
+  { path: 'reporte/ventas/cliente', excelPath: 'reporte/ventas/cliente/excel', dataKey: 'dataVentasCliente', camposKey: 'camposVentasCliente', titulo: 'Ventas por Cliente' },
+  { path: 'reporte/ranking/cliente', excelPath: 'reporte/ranking/cliente/excel', dataKey: 'dataRankingCliente', camposKey: 'camposRankingCliente', titulo: 'Ranking por Cliente' },
+  { path: 'reporte/ventas/vendedor', excelPath: 'reporte/ventas/vendedor/excel', dataKey: 'dataVentasVendedor', camposKey: null, titulo: 'Ventas por Vendedor' },
+  { path: 'reporte/ventas/vendedor-producto', excelPath: 'reporte/ventas/vendedor-producto/excel', dataKey: 'dataVentasVendedorProducto', camposKey: 'camposVentasVendedorProducto', titulo: 'Ventas por Vendedor y Producto' },
+  { path: 'reporte/ventas/producto', excelPath: 'reporte/ventas/producto/excel', dataKey: 'dataVentasProducto', camposKey: 'camposVentasProducto', titulo: 'Ventas por Producto' },
+  { path: 'reporte/ventas/proveedor', excelPath: 'reporte/ventas/proveedor/excel', dataKey: 'dataVentasProveedor', camposKey: 'camposVentasProveedor', titulo: 'Ventas por Proveedor' },
+  { path: 'reporte/ventas/proveedor-producto', excelPath: 'reporte/ventas/proveedor-producto/excel', dataKey: 'dataVentasProveedorProducto', camposKey: 'camposVentasProveedorProducto', titulo: 'Ventas por Proveedor y Producto' },
+  { path: 'reporte/ranking/producto', excelPath: 'reporte/ranking/producto/excel', dataKey: 'dataRankingProducto', camposKey: 'camposRankingProducto', titulo: 'Ranking por Producto' }
 ]
 
 // Campos que se consideran "montos" (se formatean como moneda)
@@ -429,6 +439,7 @@ export default {
       API: config.API,
       tabActive: 3, // "Ventas por vendedor y producto"
       cargando: false,
+      generandoExcel: false,
       modalFiltrosVisible: false,
 
       idAlmacen: 0,
@@ -781,6 +792,31 @@ export default {
     imprimirReporte () {
       window.print()
     },
+
+    // ---- exporta a Excel el sub-reporte de la pestaña activa ----
+    // Llama al endpoint .../excel correspondiente (backend, PhpSpreadsheet) con
+    // los mismos filtros que están aplicados en el reporte, y abre el archivo
+    // .xlsx que devuelve.
+    async exportarExcel () {
+      const cfg = REPORTES[this.tabActive]
+      if (!cfg) return
+
+      this.generandoExcel = true
+      try {
+        const { data: url } = await this.axios.get(this.endpoint(cfg.excelPath), { params: this.paramsComunes() })
+        if (url) {
+          window.open('//' + url, '_blank')
+        } else {
+          this.notificar('No se pudo generar el archivo Excel. Intente nuevamente.')
+        }
+      } catch (e) {
+        console.error(e)
+        this.notificar(`No se pudo exportar "${cfg.titulo}" a Excel. Intente nuevamente.`)
+      } finally {
+        this.generandoExcel = false
+      }
+    },
+
     formatoValor (key, valor) {
       return CAMPOS_MONEDA.includes(key) ? this.formatoMoneda(valor) : this.formatoNumero(valor)
     },
@@ -838,6 +874,7 @@ export default {
   --rv-accent-ink: #7a5417;
   --rv-danger: #c4523a;
   --rv-success: #1f8a63;
+  --rv-excel: #1d6f42;
   --rv-radius: 16px;
   --rv-radius-sm: 10px;
   font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -974,6 +1011,16 @@ export default {
   background: #cf931f;
   border-color: #cf931f;
   color: #3f2b08;
+}
+.btn-excel {
+  background: var(--rv-surface);
+  border: 1px solid var(--rv-excel);
+  color: var(--rv-excel);
+}
+.btn-excel:hover:not(:disabled) {
+  background: #e9f5ee;
+  border-color: var(--rv-excel);
+  color: var(--rv-excel);
 }
 .btn-imprimir {
   background: var(--rv-surface);

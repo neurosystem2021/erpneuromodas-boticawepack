@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="idPerfil == 1">
    <b-btn v-b-modal="idModal || 'modal1'" variant="primary">{{ txtButton || 'Nuevo' }}</b-btn>
     <!-- Modal Component -->
   <b-form @submit="guardarCliente" ref="form">

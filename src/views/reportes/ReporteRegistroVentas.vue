@@ -74,7 +74,7 @@
                         <td style="text-align: center;">{{reporte.SubTotal}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.Igv).toFixed(2)}}</td>
                         <td style="text-align: center;">{{reporte.Total}}</td>
-                        <td> <i v-if="reporte.Anulado ==0 && idPerfil != 3" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
+                        <td> <i v-if="reporte.Anulado ==0 && idPerfil == 1" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop="eliminarReg(reporte)"></i> </td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -88,35 +88,81 @@
           
         </b-col>
     </b-row>
-    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" :title="title">
-        
-          <table class="table table-hover table-striped">
-            <thead>
-              <th>IdDocVenta</th>
+
+    <!-- MODAL DETALLE -->
+    <b-modal
+      v-model="dialogDetalle"
+      size="xl"
+      scrollable
+      hide-footer
+      modal-class="modalRegVentaDetalle"
+    >
+      <template #modal-header="{ close }">
+        <div class="detalle-header">
+          <div>
+            <div class="detalle-subtitulo">Detalle de registro de ventas</div>
+            <h5 class="detalle-titulo">
+              <i class="fa fa-file-invoice"></i> {{ tituloDetalle }}
+            </h5>
+          </div>
+          <button type="button" class="detalle-cerrar" @click="close()">&times;</button>
+        </div>
+      </template>
+
+      <div class="detalle-wrapper">
+        <table class="detalle-table">
+          <thead>
+            <tr>
+              <th class="text-center">Id</th>
               <th>Cod. Barra</th>
               <th>Producto</th>
               <th>Marca</th>
               <th>Medición</th>
-              <th>Cantidad</th>
-              <th>Precio</th>
-              <th>Descuento</th>
-              <th>Total</th>
-            </thead>
-            <tbody>
-              <tr v-for="(det,index) in detalle" :key="index" >
-                <td>{{ det.IdDocVenta }}</td>
-                <td>{{ det.CodigoBarra }}</td>
-                <td>{{ det.Producto }}</td>
-                <td>{{ det.ProductoMarca }}</td>
-                <td>{{ det.ProductoMedicion }}</td>
-                <td>{{ det.Cantidad }}</td>
-                <td>{{ det.Precio }}</td>
-                <td>{{ det.Descuento }}</td>
-                <td>{{ obtenerTotal(det) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        
+              <th>Presentación</th>
+              <th class="text-right">Cantidad</th>
+              <th class="text-right">Unidades</th>
+              <th class="text-right">Precio</th>
+              <th class="text-right">Descuento</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(det, index) in detalle" :key="index">
+              <td class="text-center text-muted">{{ det.IdDocVenta }}</td>
+              <td class="text-mono">{{ det.CodigoBarra }}</td>
+              <td class="fw-600">{{ det.Producto }}</td>
+              <td>{{ det.ProductoMarca }}</td>
+              <td>{{ det.ProductoMedicion }}</td>
+              <td>
+                <span class="badge-pres">
+                  {{ det.Presentacion }}
+                  <span v-if="det.CantidadPresentacion > 1">(x{{ det.CantidadPresentacion }})</span>
+                </span>
+              </td>
+              <td class="text-right">{{ det.Cantidad }}</td>
+              <td class="text-right">{{ obtenerUnidades(det) }}</td>
+              <td class="text-right">{{ Number(det.Precio).toFixed(2) }}</td>
+              <td class="text-right">{{ Number(det.Descuento || 0).toFixed(2) }}</td>
+              <td class="text-right fw-600">{{ obtenerTotal(det) }}</td>
+            </tr>
+            <tr v-if="!detalle.length">
+              <td colspan="11" class="text-center text-muted py-4">Sin registros</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="10" class="text-right">TOTAL</td>
+              <td class="text-right">{{ detalleTotal }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="detalle-acciones">
+        <b-button variant="secondary" @click="dialogDetalle = false">
+          <i class="fa fa-times"></i> Cerrar
+        </b-button>
+      </div>
     </b-modal>
   </b-container>
 </template>
@@ -133,7 +179,7 @@ export default {
       API: config.API,
       lstReporte: [],
       declarado: 1,
-      title: "Detalle Reg. Ventas:",
+      tituloDetalle: "",
       items: [
         {
           text: "VENTAS",
@@ -176,7 +222,8 @@ export default {
   },
   methods: {
     async abrirModalDetalle(item) {
-      this.title = `${this.title} ${item.Serie}-${item.Numero}`;
+      this.tituloDetalle = `${item.TipoDoc} ${item.Serie}-${item.Numero}`;
+      this.detalle = [];
       await this.axios(`${this.API}reporte/ListarRegVenta/detalle`, {
         params: { idDocVenta: item.idDocVenta }
       }).then(res => {
@@ -235,7 +282,6 @@ export default {
     obtenerTotal(item) {
       let total =
         item.Cantidad * item.Precio - (item.Descuento ? item.Descuento : 0);
-      console.log(total);
       return parseFloat(total).toFixed(2);
     },
     async obtenerUsuarios() {
@@ -290,6 +336,11 @@ export default {
         }
         window.open(url, "_blank");
       });
+    },
+    obtenerUnidades(item) {
+      const cant = parseFloat(item.Cantidad) || 0;
+      const pres = parseFloat(item.CantidadPresentacion) || 1;
+      return cant * pres;
     },
     async generarReporte() {
       this.lstReporte = [];
@@ -347,19 +398,20 @@ export default {
         }, 0);
       }
       return parseFloat(total).toFixed(2);
+    },
+    detalleTotal() {
+      const total = this.detalle.reduce((s, d) => {
+        return s + (d.Cantidad * d.Precio - (d.Descuento ? d.Descuento : 0));
+      }, 0);
+      return total.toFixed(2);
     }
   }
 };
 </script>
 
+<!-- Estilos de la pantalla principal (scoped) -->
 <style scoped>
-.modalRegVentaDetalle .modal-dialog {
-  max-width: 90% !important;
-  width: 90% !important;
-}
-
 .clsAnulado {
-  /* background: red !important; */
   background: #ffcdd2 !important;
 }
 
@@ -369,25 +421,170 @@ export default {
   position: relative;
 }
 
-/* Hace que el thead y tfoot se mantengan fijos */
-thead th,
-tfoot td {
+/* Hace que el thead y tfoot de la tabla principal se mantengan fijos */
+.table-container thead th,
+.table-container tfoot td {
   position: sticky;
   background: white;
   z-index: 1;
 }
 
-thead th {
+.table-container thead th {
   top: 0;
   background: #1a237e; /* color del encabezado */
   color: #ffffff;
   z-index: 2;
 }
 
-tfoot td {
+.table-container tfoot td {
   bottom: 0;
   background: #006064;
   color: white;
   font-weight: bold;
+}
+</style>
+
+<!-- Estilos del modal (SIN scoped, porque el modal se renderiza fuera del componente) -->
+<style>
+/* Tamaño del modal: ancho ~1070px, alto ~625px (arriba de la pantalla) */
+.modalRegVentaDetalle .modal-dialog {
+  max-width: 1070px !important;
+  width: 92% !important;
+  margin: 15px auto !important;
+}
+.modalRegVentaDetalle .modal-content {
+  min-height: 625px;
+  max-height: calc(100vh - 30px);
+}
+.modalRegVentaDetalle .modal-body {
+  flex: 1 1 auto;
+}
+.modalRegVentaDetalle .modal-content {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+.modalRegVentaDetalle .modal-header {
+  padding: 0;
+  border: none;
+  display: block;
+}
+.modalRegVentaDetalle .modal-body {
+  padding: 20px 24px 8px;
+  background: #f5f6fa;
+}
+
+/* Cabecera */
+.detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #1a237e, #283593 60%, #006064);
+  color: #fff;
+}
+.detalle-subtitulo {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.detalle-titulo {
+  margin: 2px 0 0;
+  font-weight: 700;
+}
+.detalle-titulo i {
+  margin-right: 6px;
+  opacity: 0.85;
+}
+.detalle-cerrar {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.detalle-cerrar:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Tabla */
+.detalle-wrapper {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+.detalle-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13.5px;
+}
+.detalle-table thead th {
+  position: static;
+  background: #eef0fa;
+  color: #1a237e;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 12px 14px;
+  border-bottom: 2px solid #c5cae9;
+  white-space: nowrap;
+}
+.detalle-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eceff1;
+  vertical-align: middle;
+}
+.detalle-table tbody tr:hover {
+  background: #f3f5ff;
+}
+.detalle-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.detalle-table tfoot td {
+  background: #006064;
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+/* Utilidades */
+.detalle-table .text-right {
+  text-align: right;
+}
+.detalle-table .text-center {
+  text-align: center;
+}
+.text-mono {
+  font-family: Consolas, monospace;
+  color: #546e7a;
+}
+.fw-600 {
+  font-weight: 600;
+}
+.badge-pres {
+  display: inline-block;
+  background: #e0f2f1;
+  color: #00695c;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.detalle-acciones {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0 12px;
 }
 </style>

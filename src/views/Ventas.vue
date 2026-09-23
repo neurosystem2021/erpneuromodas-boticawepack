@@ -86,6 +86,7 @@
                                             required="required"
                                             ref="inputCliente"
                                             :url="API + 'clientes'"
+                                            :customParams="{ usuarioReg: usuarioReg }"
                                             anchor="ClienteDniRuc"
                                             label="writer"
                                             placeholder=""
@@ -177,7 +178,7 @@
                             <template slot="operaciones">
                                 <table class="table b-table border table-footer">
                                   <tbody>
-                                    <div class="acciones-pos" v-if="idPerfil != 3">
+                                    <div class="acciones-pos" v-if="idPerfil == 1">
                                         <div class="fila-botones">
 
                                             <pago-deuda></pago-deuda>
@@ -208,7 +209,7 @@
                                         <tr>
                                             <td  class="text-center">Opciones</td>
                                         </tr>
-                                        <tr v-if="puntosAplicados == 0 && idPerfil != 3">
+                                        <!-- <tr v-if="puntosAplicados == 0 && idPerfil != 3">
                                             <td>
                                                 <b-input-group prepend="%" append="Descuento">
                                                     <input
@@ -228,7 +229,7 @@
                                                     Descuento general a toda la venta.
                                                 </b-form-text>
                                             </td>
-                                        </tr>
+                                        </tr> -->
                                         <tr>
                                             <td>
                                                 <b-form-checkbox 
@@ -591,6 +592,7 @@ export default {
         ]
       },
       idPerfil: sessionStorage.getItem("IdPerfil"),
+      usuarioReg: sessionStorage.getItem("User")
     };
   },
   watch: {

@@ -159,6 +159,8 @@
       size="xl"
       scrollable
       hide-footer
+      ref="modalResultado"
+      @shown="ajustarAnchoModal"
     >
       <div class="d-flex align-items-start justify-content-between flex-wrap mb-3">
         <div class="rd-cabecera">
@@ -173,7 +175,17 @@
           <b-button size="sm" variant="outline-secondary" class="mr-2" @click="volverAFiltros">
             <i class="fas fa-sliders-h mr-1"></i>Cambiar filtros
           </b-button>
-
+          <b-button
+            size="sm"
+            variant="outline-secondary"
+            class="mr-2"
+            :disabled="generandoExcel || !datos.length"
+            @click="exportarExcel()"
+          >
+            <span v-if="generandoExcel" class="spinner-border spinner-border-sm mr-1" role="status" />
+            <i v-else class="fas fa-file-excel mr-1"></i>
+            {{ generandoExcel ? 'Generando...' : 'Excel' }}
+          </b-button>
           <!-- Orientación de la hoja A4: se elige aquí, justo antes de generar el PDF -->
           <div class="rd-orientacion mr-2" role="group" aria-label="Orientación de la hoja A4">
             <button
@@ -273,7 +285,7 @@ export default {
     almacenes: { type: Array, default: () => [{ value: 0, text: 'TODOS' }] },
     // Sucursal que se preselecciona al abrir el reporte
     idAlmacen: { type: Number, default: 0 },
-    textoBoton: { type: String, default: 'Pedidos por pagar' },
+    textoBoton: { type: String, default: 'Cuentas por cobrar' },
     // 'cabecera' = translúcido para fondos oscuros; 'primario' = sólido para fondos claros
     variante: { type: String, default: 'cabecera' }
   },
@@ -286,6 +298,7 @@ export default {
       modalResultado: false,
       cargando: false,
       generandoPdf: false,
+      generandoExcel: false,
       catalogosCargados: false,
 
       filtros: crearFiltros(this.idAlmacen, this.$moment),
@@ -610,6 +623,36 @@ export default {
       } finally {
         this.generandoPdf = false
       }
+    },
+    async exportarExcel () {
+      if (!this.ultimosParams || this.generandoExcel) return
+      this.generandoExcel = true
+      try {
+        const { data: url } = await this.axios.get(
+          this.endpoint('reporte/pedidos/por-pagar/excel'),
+          { params: this.ultimosParams }
+        )
+        if (url) {
+          window.open('//' + url, '_blank')
+        } else {
+          this.notificar('No se pudo generar el archivo Excel. Intente nuevamente.')
+        }
+      } catch (e) {
+        console.error(e)
+        this.notificar('No se pudo exportar el reporte a Excel. Intente nuevamente.')
+      } finally {
+        this.generandoExcel = false
+      }
+      },
+    ajustarAnchoModal () {
+      this.$nextTick(() => {
+        const raiz = this.$refs.modalResultado && this.$refs.modalResultado.$el
+        if (!raiz) return
+        const dialog = raiz.querySelector('.modal-dialog')
+        if (!dialog) return
+        dialog.style.setProperty('max-width', '1400px', 'important')
+        dialog.style.setProperty('width', '95vw', 'important')
+      })
     }
   }
 }
@@ -1033,5 +1076,16 @@ export default {
 .rd-vacio-titulo {
   font-weight: 600;
   color: #14231f;
+}
+</style>
+<style>
+.rd-modal-ancho {
+  max-width: 1400px !important;
+  width: 95vw !important;
+}
+@media (max-width: 1500px) {
+  .rd-modal-ancho {
+    max-width: 95vw !important;
+  }
 }
 </style>

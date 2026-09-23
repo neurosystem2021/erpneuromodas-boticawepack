@@ -1811,7 +1811,7 @@ export default {
     totalVentasEfectivo() {
       let total = 0;
       this.ventasEfectivo.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Efectivo;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Efectivo;
       });
       return total;
     },
@@ -1823,7 +1823,7 @@ export default {
     totalVentasVisa() {
       let total = 0;
       this.ventasVisa.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Visa;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Visa;
       });
       console.log("totalVentasVisa", total);
       return total;
@@ -1836,7 +1836,7 @@ export default {
     totalVentasMastercard() {
       let total = 0;
       this.ventasMastercard.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Mastercard;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Mastercard;
       });
       console.log("totalVentasMastercard", total);
 
@@ -1850,7 +1850,7 @@ export default {
     totalVentasTransferencia() {
       let total = 0;
       this.ventasTransferencia.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Transferencia;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Transferencia;
       });
       console.log("totalVentasTransferencia", total);
       return total;
@@ -1863,7 +1863,7 @@ export default {
     totalVentasCredito() {
       let total = 0;
       this.ventasCredito.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Total;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Total;
       });
       return total;
     },
@@ -1875,7 +1875,7 @@ export default {
     totalEfectivoParcial() {
       let total = 0;
       this.ventasParcial.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Total;
+        if (!venta.Anulado && !this.esNotaCredito(venta)) total += venta.Total;
       });
       return total;
     },
@@ -1887,6 +1887,15 @@ export default {
     
   },
   methods: {
+    esNotaCredito(venta) {
+      // Excluye por completo las notas de crédito de cualquier método de pago:
+      // no deben sumar ni restar en ningún total del cierre de caja.
+      // Ajusta esta condición si el backend expone un flag booleano
+      // (p.ej. venta.EsNotaCredito) en vez de venir sólo en TipoDoc.
+      if (venta.EsNotaCredito) return true;
+      const tipo = (venta.TipoDoc || "").toUpperCase();
+      return tipo.includes("NOTA DE CREDITO") || tipo.includes("NOTA DE CRÉDITO");
+    },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
       this.$refs[ref].handleDoubleClick();
@@ -1940,7 +1949,7 @@ export default {
     generarReporte() {
       let productos = [];
       this.ventas
-        .filter((ventas) => !ventas.Anulado)
+        .filter((ventas) => !ventas.Anulado && !this.esNotaCredito(ventas))
         .forEach((venta) => {
           if (!venta.productos) return;
           venta.productos.forEach((producto) => {

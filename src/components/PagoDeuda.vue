@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-button @click="show=true" variant="primary" class="btn-pos btn-accion">
-            <i class="fas fa-money-bill-wave mr-2"></i>
+            <i class="fas fa-money-bill-wave mr-2" ></i>
             Pago Deuda</b-button>
         
         <b-form @submit="guardarPago">    
@@ -59,7 +59,6 @@
                     <b-col><label for="input-concepto">Concepto:</label>
                         <b-form-input v-model="cajaBanco.Concepto"
                             id="input-concepto"
-                            required
                             type="text"
                             placeholder=""></b-form-input>
                     </b-col>
@@ -99,13 +98,23 @@
                                     <td>{{(item.NotaCreApli).toFixed(2)}}</td>
                                     <td>{{ (item.Saldo).toFixed(2) }}</td>
                                     <td>
+                                    <b-input-group>
                                         <input v-model="item.aplicar"
                                             type="number"
                                             step="0.01"
                                             min="0"
                                             class="form-control"
                                             placeholder="0"/>
-                                    </td>   
+                                            <b-input-group-append>
+                                                <b-btn size="sm" 
+                                                    :variant="item.seleccionado ? 'primary' : 'outline-primary'"
+                                                    title="Aplicar saldo completo"
+                                                    @click="aplicarSaldoTotal(item)">
+                                                    <i class="fas fa-check"></i>
+                                                </b-btn>
+                                            </b-input-group-append>
+                                        </b-input-group>
+                                    </td>
                                     <td>
                                         <b-form-select v-model="item.metodoparcial" :options="metodoparcial" class="mb-3" size="md"/>
                                     </td>
@@ -206,6 +215,7 @@ import config from '@/store/config.js'
                 fechaInicioPagos: '',
                 fechaFinPagos: '',
                 clienteActual: null,
+      idPerfil: sessionStorage.getItem("IdPerfil"),
             }
         },
         methods: {
@@ -269,11 +279,13 @@ import config from '@/store/config.js'
 
                     // Documentos
                     resDeudas.data.map(data => data.NotasCredito = JSON.parse(data.NotasCredito))
-                    this.documentos = resDeudas.data
-                    this.documentos.map(d => {
+                    resDeudas.data.map(d => {
                         d.cuenta = cuentaDefault ? cuentaDefault.value : null
                         d.metodoparcial = metodoDefault ? metodoDefault.value : null
+                        d.aplicar = null
+                        d.seleccionado = false
                     })
+                    this.documentos = resDeudas.data
                 })
                 .catch((error) => {
                     console.log(error)
@@ -323,56 +335,58 @@ import config from '@/store/config.js'
                 }
                 this.cargarPagos(this.clienteActual)
             },
+            aplicarSaldoTotal (item) {
+                item.seleccionado = !item.seleccionado
+                if (item.seleccionado) {
+                    item.aplicar = parseFloat(item.Saldo.toFixed(2))
+                } else {
+                    item.aplicar = null
+                }
+            },
             guardarPago (evt) {
                 evt.preventDefault()
-                let importe = 0
-                let cuentaSelec= true
-                this.documentos.map(doc => {
-                    if (doc.aplicar > 0) {
-                        importe += doc.aplicar
-                    }
-                })
 
-                if(importe === 0) {
-                    this.$toasted.show('Error: no ha ingresado ningun importe');
-                    this.isLoading = false;
-                    return;
+                const documentosAPagar = this.documentos.filter(doc => parseFloat(doc.aplicar) > 0)
+
+                if (documentosAPagar.length === 0) {
+                    this.$toasted.show('Error: no ha ingresado ningun importe')
+                    this.isLoading = false
+                    return
                 }
 
-               for (let index = 0; index < this.documentos.length; index++) {
-                    const aplicar = Math.round(parseFloat(this.documentos[index].aplicar) * 100) / 100
-                    const saldo = Math.round(parseFloat(this.documentos[index].Saldo) * 100) / 100
+                for (let index = 0; index < documentosAPagar.length; index++) {
+                    const aplicar = Math.round(parseFloat(documentosAPagar[index].aplicar) * 100) / 100
+                    const saldo = Math.round(parseFloat(documentosAPagar[index].Saldo) * 100) / 100
                     if (aplicar > saldo) {
                         this.isLoading = false
                         this.$toasted.show('Error: No puede ingresar un monto mayor al Saldo')
-                        return;
-                    }
-                    
-                } 
-
-                this.documentos.map(doc => {
-                    if(parseFloat(doc.aplicar)>0 && doc.cuenta == null){
-                        cuentaSelec = false
-                    }
-                });
-
-                if(!cuentaSelec){
-                        this.$toasted.show('Error: Seleccione la cuenta para completar el pago');
-                        this.isLoading = false;
                         return
+                    }
                 }
 
+                let cuentaSelec = true
+                documentosAPagar.forEach(doc => {
+                    if (doc.cuenta == null) {
+                        cuentaSelec = false
+                    }
+                })
 
-                let cuentasId =[]
-                this.cuentas.map(c=>{
-                        if(c.value!==null){                        
+                if (!cuentaSelec) {
+                    this.$toasted.show('Error: Seleccione la cuenta para completar el pago')
+                    this.isLoading = false
+                    return
+                }
+
+                let cuentasId = []
+                this.cuentas.map(c => {
+                    if (c.value !== null) {
                         cuentasId.push(c.value)
-                        }
+                    }
                 })
 
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
-                    documentos: this.documentos,
+                    documentos: documentosAPagar,
                     vendedor: this.vendedor,
                     cuentas: cuentasId
                 })
