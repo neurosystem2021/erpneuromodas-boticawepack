@@ -106,11 +106,11 @@ export default {
             item.descuento = item.descuento ? item.descuento : 0;
             item.nuevoPrecioContado = 0;
             item.indicacion = "";
-            // item.Presentacion = item.Presentacion
-            //   ? item.Presentacion
-            //   : item.ProductoMedicion;
-            item.CantidadPresentacion = 1;
-            item.EsPresentacion = !!item.Presentacion;
+
+            item.CantidadPresentacion = item.CantidadPresentacion
+              ? parseFloat(item.CantidadPresentacion)
+              : 1;
+
             let res = await this.axios(
               `${this.API}/productos/puntoventa/stock`,
               {
@@ -126,9 +126,12 @@ export default {
             item.Producto = producto.Producto;
             item.PreciosPorProducto = producto.PreciosPorProducto;
             item.ProductoMedicion = producto.ProductoMedicion;
+
             item.Presentacion = item.Descripcion
               ? item.Descripcion
               : producto.ProductoMedicion;
+
+            item.EsPresentacion = item.CantidadPresentacion > 1 ? 1 : 0;
             this.$store.state.cart.productos.unshift(item);
             // this.add([item.IdProducto, () => {
             //     this.obtenerStok(item)
