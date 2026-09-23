@@ -235,8 +235,7 @@
                       <b-input-group>
                         <b-input-group-append>
                           <autocomplete :ref="`autocompleteProducto${index}`" :id="`autocompleteProducto${index}`"
-                            :url="APIProductos" :customParams="{ 'sortBy': 'stock', 'sortDesc': 1, limit: '25' }"
-                            :onShouldRenderChild="renderChild" anchor="Producto" label="writer"
+                            :url="APIProductos" :debounce="500" :customParams="{ 'sortBy': 'stock', 'sortDesc': 1, limit: '25' }"                            :onShouldRenderChild="renderChild" anchor="Producto" label="writer"
                             placeholder="Agregar Producto" :on-select="setProducto"
                             :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
                             :classes="{ input: 'form-control', root: 'formResponsive' }"
@@ -463,8 +462,7 @@
                               style="font-size: 0.70rem;">YAPE/PLIN</b-badge>
                             <b-badge v-if="ventas[ventaActiva].idMetodoPago == 4" variant="info"
                               style="font-size: 0.70rem;">TRANSF.</b-badge>
-                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="manual"
-                              placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
+                            <b-popover :target="`popover-metodopago${index}`" title="Método de pago" triggers="click blur focus"                              placement="bottom" :show.sync="mostrarMetodo[index]" :style="{ minWidth: '600px' }">
                               <slot name="metodopago" style="width: 1200px;">
                                 <table class="table b-table border table-footer table-sm">
                                   <tbody>
@@ -538,8 +536,7 @@
                               <i class="fas fa-tags"></i>
                             </b-button>
 
-                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="manual"
-                              placement="top" :show.sync="mostrarOp[index]" :style="{ minWidth: '600px' }">
+                            <b-popover :target="`popover-opciones${index}`" title="Opciones" triggers="click blur focus"                              placement="top" :show.sync="mostrarOp[index]" :style="{ minWidth: '600px' }">
                               <slot :name="`opciones${ventaActiva}`">
                                 <table class="table b-table border table-footer">
                                   <tbody>
@@ -2155,6 +2152,46 @@ export default {
         return;
       }  
 
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
+        );
+        return;
+      }
+
       if (!venta.cliente.DniRuc) {
         //this.$toasted.show('Debe seleccionar un cliente.')
         this.$swal({
@@ -2368,6 +2405,59 @@ export default {
       if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
         this.$toasted.show(
           "El metodo de pago Yape o Plin no puede ser negativo"
+        );
+        return;
+      }
+
+
+      let errores = productos.filter(p => {
+        const precio = parseFloat(p.precio);
+        return isNaN(precio) || precio <= 0;
+      });
+
+      if (errores.length) {
+        this.$toasted.show(
+          `El producto "${errores[0].Producto}" tiene precio inválido`
+        );
+        return;
+      }
+
+      let errorescantidad = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad);
+        return isNaN(cantidad) || cantidad <= 0;
+      });
+
+      if (errorescantidad.length) {
+        this.$toasted.show(
+          `El producto "${errorescantidad[0].Producto}" tiene cantidad inválida`
+        );
+        return;
+      }
+
+      let erroresDescuento = productos.filter(p => {
+        const descuento = parseFloat(p.descuento);
+        return isNaN(descuento) || descuento < 0;
+      });
+
+      if (erroresDescuento.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuento[0].Producto}" tiene un descuento inválido (no puede ser negativo)`
+        );
+        return;
+      }
+
+      let erroresDescuentoExcesivo = productos.filter(p => {
+        const cantidad = parseFloat(p.cantidad) || 0;
+        const precio = parseFloat(p.precio) || 0;
+        const descuento = parseFloat(p.descuento) || 0;
+        const factor = p.CantidadPresentacion ? parseFloat(p.CantidadPresentacion) : 1;
+        const subtotal = cantidad * precio * factor;
+        return descuento > subtotal;
+      });
+
+      if (erroresDescuentoExcesivo.length) {
+        this.$toasted.show(
+          `El producto "${erroresDescuentoExcesivo[0].Producto}" tiene un descuento mayor al subtotal`
         );
         return;
       }
