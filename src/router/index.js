@@ -31,7 +31,7 @@ import Articulosmovimientos from '@/views/reportes/Articulosmovimientos.vue'
 import PorEntregar from '@/views/reportes/PorEntregar.vue'
 import Estadisticas from '@/views/reportes/Estadisticas.vue'
 import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
-import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
+import ReporteRegMovimientos from "@/views/reportes/ReporteRegMovimientos.vue";
 
 Vue.use(Router)
 
@@ -144,9 +144,9 @@ export default new Router({
       component: ReporteRegistroVentas
     },
     {
-      path: "/reporte/reporteregmovimiento",
-      name: "ReporteRegMovimiento",
-      component: ReporteRegMovimiento
+      path: "/reporte/reporteregmovimientos",
+      name: "ReporteRegMovimientos",
+      component: ReporteRegMovimientos
     },
     {
       path: '/facturacion',
