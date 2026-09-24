@@ -6,6 +6,7 @@
           <autocomplete
             ref="autocompleteProducto"
             :url="APIProductos"
+            debounce="500"
             :customParams="{
               sortBy: isVentas ? 'stock' : 'IdProducto',
               sortDesc: 1,
@@ -573,6 +574,7 @@
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
 import config from "@/store/config.js";
+import debounce from 'lodash';
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
