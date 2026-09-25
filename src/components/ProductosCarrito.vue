@@ -127,13 +127,19 @@
 
       </b-table>
     </b-col>
+    <b-col md="12">
+      <slot name="pagar"></slot>
+    </b-col>
     <b-col md="3">
+      <slot name="acciones"></slot>
+    </b-col>
+    <b-col md="2">
       <slot name="operaciones"></slot>
     </b-col>
     <b-col md="4">
       <slot name="metodopago"></slot>
     </b-col>
-    <b-col md="3" offset-md="2" v-if="!noSubtotal">
+    <b-col md="3" v-if="!noSubtotal">
           <table class="table b-table border table-footer">
             <tbody>
               <tr v-if="sumatoriaDescuento > 0">
