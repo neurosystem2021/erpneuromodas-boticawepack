@@ -272,7 +272,13 @@
 
           <b-row>
             <b-col>
-              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true"></productos-carrito>
+              <productos-carrito
+                ref="carrito"
+                tipo="mov"
+                :fields="carrito.fields"
+                :productosLocales="productos"
+                :noSubtotal="true">
+              </productos-carrito>
             </b-col>
           </b-row>
           <b-row align-h="center" class="text-center">

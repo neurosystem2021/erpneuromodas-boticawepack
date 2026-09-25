@@ -536,7 +536,7 @@ getSumaStock () {
         let filter = ''
         for (var k in this.filters) {
           if (this.filters[k]) {
-            filter += '&filter[' + k + ']=' + this.filters[k]
+            filter += '&filter[' + k + ']=' + encodeURIComponent(this.filters[k])
             if (k == 'stock' || k == 'minimo') {
               this.APISTOCK = 'productos/stock'
             }
