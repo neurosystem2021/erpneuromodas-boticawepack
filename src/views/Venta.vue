@@ -2637,6 +2637,7 @@ export default {
             "noopener"
           );
         }
+        venta.enviando = false;
 
         if (this.ventas.length == 1) {
           window.location.reload();
