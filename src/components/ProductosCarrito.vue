@@ -92,8 +92,12 @@
             v-model="productos[data.index].cantxPrecio"
             type="number"
             style="width: 75px"
-            step="0.001"
+            step="any"
             min="0"
+
+            @keydown.up.prevent="productos[data.index].cantidad = Math.floor(Number(productos[data.index].cantidad || 0) + 1)"
+            @keydown.down.prevent="productos[data.index].cantidad = Math.max(0, Math.ceil(Number(productos[data.index].cantidad || 0) - 1))"
+
             :disabled="bloquearInput?true:false"
             @input="(val) => changeCant(val.target.value, productos[data.index])"
             placeholder="Cantidad"
@@ -108,8 +112,11 @@
             type="number"
             style="width: 90px"
             min="0"
-            step="0.001"
+            step="any"
             class="form-control"
+
+            @keydown.up.prevent="productos[data.index].cantidad = Math.floor(Number(productos[data.index].cantidad || 0) + 1)"
+            @keydown.down.prevent="productos[data.index].cantidad = Math.max(0, Math.ceil(Number(productos[data.index].cantidad || 0) - 1))"
             @input="(val) => {
               $emit('onInputCantidad', val.target.value)
              /* if(!productos[data.index].PreciosPorProducto) {
