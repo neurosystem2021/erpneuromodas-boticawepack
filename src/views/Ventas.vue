@@ -1588,6 +1588,7 @@ export default {
     async guardarVenta(evt) {
       evt.preventDefault();
 
+      if (this.inProgress) return;
       this.inProgress = true;
       if (this.venta.Separado == 1 && this.venta.ConsumoId == 0) {
         this.$toasted.show("Debe seleccionar una venta consumo...");
@@ -1800,124 +1801,47 @@ export default {
       this.venta.DireccionEntrega = this.venta.EsDelivery
         ? this.infoDelivery.Direccion || ""
         : "";
-      // ------------------------- aqui paga
-      this.loading = true;
-      await this.$store.state.empresas.forEach(async element => {
+            // ------------------------- aqui paga
+      try {
         let data = { ...this.venta };
-        let serie = await this.obtenerSerie(element.value);
-        let almacen = await this.obtenerAlmacen(element.value);
-        let empresa = await this.obtenerDatosEmpresa(element.value);
-        let impresora = await this.obtenerDatosImpresora(element.value);
-        let total = data.productos
-          .filter(v => v.Empresa == element.value)
-          .reduce((total, prod) => {
-            return total + parseFloat(prod.total);
-          }, 0);
-        let tipoPago = "";
-        for (const k in this.venta.pago) {
-          if (this.venta.pago[k].monto > 0) {
-            tipoPago = k;
-          }
-        }
-        let dataImprimir = {
-          NombreOrganizacion: this.venta.NombreOrganizacion,
-          vendedor: this.venta.vendedor.NombreUsuario,
-          tipoPago: tipoPago,
-          numero: this.venta.Numero,
-          serie: this.venta.Serie,
-          CodSunat: this.venta.tipoVenta.CodSunat,
-          IdTipoDoc: this.venta.tipoVenta.IdTipoDoc,
-          LimitItems: this.venta.tipoVenta.LimitItems,
-          TipoDoc: this.venta.tipoVenta.TipoDoc,
-          empresa: element.value,
-          nombre_comercial: empresa.razoncial,
-          documento: empresa.ruc,
-          direccion: empresa.direccion,
-          cliente: data.cliente.Cliente,
-          documento_client: data.cliente.DniRuc,
-          direccion_cliente: data.cliente.Direccion,
-          total: total,
-          impresora: impresora,
-          productos: data.productos.filter(v => v.Empresa == element.value)
-        };
-        data.almacen = almacen;
+        data.almacen = await this.obtenerAlmacen(this.empresa);
+        let serie = await this.obtenerSerie(this.empresa);
         data.Numero = serie.numero;
         data.Serie = serie.serie;
 
-        if (data.productos.some(v => v.Empresa == element.value)) {
-          let productos = data.productos.filter(
-            v => v.Empresa == element.value
-          );
-          let totalCarr = productos.reduce((total, pr) => {
-            return parseFloat(total) + parseFloat(pr.total);
-          }, 0);
+        const response = await this.axios.post(
+          this.API + "ventas?id_empresa=" + this.empresa,
+          data,
+          { timeout: 12000 }
+        );
 
-          data.productos = productos;
-          data.totalCart = totalCarr;
+        this.emitirauto(response.data.insertId, this.empresa);
+        window.open(
+          "/imprimir/index.php?IdDocVenta=" +
+            response.data.insertId +
+            "&preview=1&id_empresa=" + this.empresa,
+          "_blank",
+          "noopener"
+        );
 
-          //if (data.pago.efectivo.monto != 0) {
-          //  data.pago.efectivo.monto = totalCarr;
-          //} else if (data.pago.mastercard.monto != 0) {
-          //  data.pago.mastercard.monto = totalCarr;
-          //} else if (data.pago.transferencia.monto != 0) {
-          //  data.pago.transferencia.monto = totalCarr;
-          //} else if (data.pago.visa.monto != 0) {
-          //  data.pago.visa.monto = totalCarr;
-          //}
-          // data.pago.forEach((element) => {
-          //   if (element.monto != 0) {
-          //     element.monto = totalCarr;
-          //   }
-          // });
-          let comandaJson = JSON.stringify(dataImprimir);
-          console.log("dddd");
+        this.$toasted.success("Venta realizada con exito");
 
-          await this.axios
-            .post(this.API + "ventas?id_empresa=" + element.value, data)
-            .then(async response => {
-              /** --------RECUERDA ESTA PARTE  */
-              this.emitirauto(response.data.insertId, element.value);
-              window.open(
-                "/imprimir/index.php?IdDocVenta=" +
-                  response.data.insertId +
-                  "&preview=1&id_empresa=imperiop2",
-                "_blank",
-                "noopener"
-              );
-              // -------------------------
-              // await fetch("http://localhost:5000/imprimir/getcmdped.php", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json"
-              //   },
-              //   mode: "cors",
-              //   cache: "default",
-              //   body: comandaJson
-              // }).catch(error => console.error("Error:", error));
-            })
-            .catch(error => {
-              console.error(error);
-              // this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
-              this.inProgress = false;
-            });
-
-          // await this.axios
-          //   .post("http://localhost:5000/imprimir/getcmdped.php", comandaJson, {
-          //     baseURL: ""
-          //   })
-          //   .catch(err => {
-          //     console.error(err);
-          //   });
-          this.$toasted.success("Venta realizada con exito");
-        }
-      });
-
-      // this.$toasted.success("Venta realizada con exito");
-
-      setTimeout(() => {
         this.inProgress = false;
         window.location.reload();
-      }, 3000);
+
+      } catch (error) {
+        console.error(error);
+        if (error.code === "ECONNABORTED") {
+          this.$toasted.error(
+            "El servidor tardó demasiado en responder. Revise si la venta ya se registró antes de volver a intentar."
+          );
+        } else {
+          this.$toasted.error(
+            "Ha ocurrido un error al guardar la venta. Intente nuevamente."
+          );
+        }
+        this.inProgress = false;
+      }
     },
     emitirauto(idDocVenta, id_empresa) {
       this.axios
