@@ -16,6 +16,7 @@
                                         required="required"
                                         ref="inputTipoVenta"
                                         :url="API + 'ventas/tipos'"
+                                        :customParams="{ idPerfil: idPerfil }"
                                         anchor="TipoDoc"
                                         initValue="BOLETA ELEC."
                                         label="writer"
