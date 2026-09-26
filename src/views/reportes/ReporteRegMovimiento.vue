@@ -128,6 +128,13 @@
             El valor debe ser AAAAMM
           </b-col>
           
+          <b-col cols="12" class="mt-2" v-if="reporteSeleccionado && reporteSeleccionado.Anulado == 1">
+            <div class="alert alert-danger py-2 mb-0">
+              <i class="fa fa-ban" aria-hidden="true"></i>
+              Anulado por <b>{{ reporteSeleccionado.UsuarioMod }}</b>
+              el <b>{{ reporteSeleccionado.FechaMod }}</b>
+            </div>
+          </b-col>
 
           <b-col cols="12" class="mt-2">
             <table class="table table-hover">
@@ -216,7 +223,9 @@ export default {
       TotalPEN: 0,
       TotalUSD: 0,
       FechaPeriodoTributario: "",
-      IdMovimiento: ""
+      IdMovimiento: "",
+      usuarioLogueado: sessionStorage.getItem("User"),
+      reporteSeleccionado: null,
     };
   },
   mounted() {
@@ -289,6 +298,10 @@ export default {
         this.$toasted.error("Este movimiento ya se encuentra anulado.");
         return;
       }
+      if (!this.usuarioLogueado) {
+        this.$toasted.error("No se pudo identificar al usuario logueado. Vuelva a iniciar sesión.");
+        return;
+      }
       this.$swal({
         icon: "warning",
         title: "Anular movimiento",
@@ -304,7 +317,8 @@ export default {
         if (respuesta.isConfirmed) {
           try {
             await this.axios.post(`${this.API}movimiento/anular`, {
-              idMov: item.IdMovimiento
+              idMov: item.IdMovimiento,
+              usuario: this.usuarioLogueado
             });
 
             this.$swal({
@@ -376,6 +390,7 @@ export default {
       console.log(reporte);
       this.FechaPeriodoTributario = reporte.FechaPeriodoTributario;
       this.IdMovimiento = reporte.IdMovimiento;
+      this.reporteSeleccionado = reporte;
       this.lstDetalle = [];
       let params = {
         IdMovimiento: reporte.IdMovimiento
