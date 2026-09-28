@@ -506,7 +506,7 @@ export default {
     //setInterval(this.updateTime, 1000)
     /* this.loadFirstAlmacen()
         this.loadFirstPuntoVenta() */
-    this.loadClienteVarios();
+    // this.loadClienteVarios();
   },
   data() {
     return {
