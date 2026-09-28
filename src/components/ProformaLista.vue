@@ -11,32 +11,34 @@
                 body-bg-variant="light"
                 body-text-variant="dark">           
                     <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <b-table 
-                        v-if="show"
-                        id="table-proformas" 
-                        striped hover 
-                        :busy.sync="isBusy" 
-                        :filter="filter"
-                        :items="myProvider" 
-                        :fields="fields"
-                        :per-page="perPage"
-                        :current-page="currentPage">
+                    <div class="table-responsive-proformas">
+                        <b-table 
+                            v-if="show"
+                            id="table-proformas" 
+                            striped hover 
+                            :busy.sync="isBusy" 
+                            :filter="filter"
+                            :items="myProvider" 
+                            :fields="fields"
+                            :per-page="perPage"
+                            :current-page="currentPage">
 
-                      <template slot="update" slot-scope="data">
-                        <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
-                      </template>
+                          <template slot="update" slot-scope="data">
+                            <b-button @click="selectProformas(data.item)" variant="success"><i class="fas fa-pencil-alt"></i></b-button>
+                          </template>
 
-                      <template slot="ver" slot-scope="data">
-                        <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
-                      </template>
+                          <template slot="ver" slot-scope="data">
+                            <b-button :href="'/nuevo/index.html#/reportes/proforma/' + data.item.IdProforma" variant="primary" target="_blank">Ver</b-button>
+                          </template>
 
-                       <template slot="verTicket" slot-scope="data">
-                        <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
-                      </template>
+                           <template slot="verTicket" slot-scope="data">
+                            <b-button :href="'/imprimir/proforma.php?IdProforma=' + data.item.IdProforma" variant="primary" target="_blank">Ver Ticket</b-button>
+                          </template>
 
-                    </b-table>
+                        </b-table>
+                    </div>
                     <b-row>
-                    <b-col md="6" class="my-1">
+                    <b-col cols="12" md="6" class="my-1 text-center-mobile">
                         <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
                     </b-col>
                     </b-row>
@@ -161,6 +163,31 @@ export default {
 </script>
 <style>
 #modalProformas .modal-dialog {
-  max-width: 65% !important;
+  max-width: 65%;
+}
+
+/* Contenedor con scroll horizontal para que la tabla nunca se aplaste */
+.table-responsive-proformas {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
+  width: 100%;
+}
+
+#table-proformas {
+  min-width: 700px; /* fuerza el scroll horizontal cuando la pantalla es más angosta */
+  margin-bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+  #modalProformas .modal-dialog {
+    max-width: 95vw;
+    width: 95vw;
+    margin: 10px auto;
+  }
+
+  .text-center-mobile {
+    display: flex;
+    justify-content: center;
+  }
 }
 </style>
