@@ -11,7 +11,12 @@
                         <b-row>
                             <b-col md="4">
                                 <b-form-group>
-                                    <label>Tipo de Venta:</label>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <label class="mb-1">Tipo de Venta:</label>
+                                        <span class="serie-movil mostrarMovil">
+                                          Correlativo  {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
+                                        </span>
+                                    </div>
                                     <autocomplete
                                         required="required"
                                         ref="inputTipoVenta"
@@ -42,7 +47,7 @@
                                     </autocomplete>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocultarMovil">
                                 <b-form-group>
                                     <label>Almacen:</label>
                                     <autocomplete
@@ -62,7 +67,7 @@
                                      <b-form-select v-model="venta.NotaIdMotivo" :options="itemsMotivoNota" v-on:change="setMotivo($event)" class="mb-3" size="md" required/>
                                 </b-form-group>
                             </b-col>
-                            <b-col md="4">
+                            <b-col md="4" class="ocultarMovil">
                                 <b-form-group>
                                     <label>Punto de Venta:</label>
                                     <autocomplete
@@ -80,7 +85,12 @@
                             </b-col>
                             <b-col md="12">
                                 <b-form-group>
-                                    <label>Cliente:</label>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <label class="mb-1">Cliente:</label>
+                                        <span class="vendedor-movil mostrarMovil">
+                                            Vendedor: <b>{{ venta.vendedor.NombreUsuario }}</b>
+                                        </span>
+                                    </div>
                                     <b-input-group>
                                              <clientes-form txtButton="Editar" v-if="venta.cliente.IdCliente && venta.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="venta.cliente"></clientes-form>
                                         <autocomplete
@@ -138,13 +148,13 @@
                         </div>
                     </b-col>
                     <b-col md="3" >
-                        <b-form-group class="text-center">
+                        <b-form-group class="text-center ocultarMovil">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group>
+                        <b-form-group  class="ocultarMovil">
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
@@ -206,7 +216,7 @@
                                     </div>
                                     </tbody>
 
-                                    <tbody>
+                                    <tbody class="ocultarMovil">
                                         <tr>
                                             <td  class="text-center">Opciones</td>
                                         </tr>
@@ -820,6 +830,14 @@ export default {
       this.$refs.inputPuntoVenta.setValue(obj.PuntoVenta);
       this.getNumeroVenta();
     },
+    ocultarNav() {
+      this.mostrarNav = !this.mostrarNav;
+      if (!this.mostrarNav) {
+        window.parent.document.getElementById("navBar").style.display = "none";
+      } else {
+        window.parent.document.getElementById("navBar").style.display = "block";
+      }
+    },
     getVendedor() {
       let usuario = sessionStorage.getItem("User");
       this.axios
@@ -1061,6 +1079,15 @@ export default {
       }
 
   this.validarEsNota = false;
+  if (
+  Number(this.idPerfil) === 3 &&
+  !this.venta.EfectivoParcial &&
+  !this.isNota
+  ) {
+    this.$toasted.error("Debe marcar EFECTIVO PARCIAL antes de efectuar la venta");
+    this.inProgress = false;
+    return;
+  }
   let totalPagos = 0;
   totalPagos += isNaN(parseFloat(this.venta.pago.efectivo.monto))
     ? 0
@@ -1318,6 +1345,20 @@ export default {
 };
 </script>
 <style>
+.serie-movil {
+    font-size: 15px;
+    font-weight: 500;
+    color: #0d2d4d;
+    white-space: nowrap;
+    background-color: yellow;
+}
+.vendedor-movil {
+    font-size: 15px;
+    font-weight: 500;
+    color: #0d2d4d;
+    white-space: nowrap;
+    background-color: yellow;
+}
 .puntos {
   font-size: 52px;
 }
@@ -1414,6 +1455,25 @@ export default {
 .btn-efectuar:hover{
     background:#23913d !important;
     border-color:#23913d !important;
+}
+
+
+@media (max-width: 1250px) {
+  .ocultarMovil {
+    display: none;
+  }
+  .mostrarMovil {
+    display: inline;
+  }
+}
+</style>
+
+<style>
+.ocultarMovil {
+  display: inline;
+}
+.mostrarMovil {
+  display: none;
 }
 
 </style>
