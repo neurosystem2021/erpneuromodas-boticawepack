@@ -233,127 +233,129 @@
 
                 <div class="">
                 <b-row class="mt-2 ">
-                  <div class="clsCart">
-                  <b-table striped hover :fields="headerTable"  :items="venta.productos" sticky-header="80vh">
-                    <template slot="pres" slot-scope="data">
-                      <b-button   
-                        v-if="data.item.tienePresentacion"
-                        size="sm"
-                        variant="info"
-                        @click="showPresentacion(data.item,data.index)" 
-                        style="margin-top:2px;"
-                        >
-                        <i class="fas fa-list"></i>
-                      </b-button>
-                      <b-button @click="abrirImagen(data.item.Producto,data.item.Imagen == null ||data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;"
-                       :id="'popover-imagen' +data.index.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
-                        <b-popover placement="right" :target="'popover-imagen' + data.index.IdProducto" :title="data.index.Producto" triggers="hover">
-                      <div style="text-align:center">
-                        <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
-                      </div>
-                    </b-popover>
+                  <b-col cols="12">
+                    <div class="clsCart">
+                      <b-table striped hover :fields="headerTable" :items="venta.productos">
+                        <template slot="pres" slot-scope="data">
+                          <b-button   
+                            v-if="data.item.tienePresentacion"
+                            size="sm"
+                            variant="info"
+                            @click="showPresentacion(data.item,data.index)" 
+                            style="margin-top:2px;"
+                            >
+                            <i class="fas fa-list"></i>
+                          </b-button>
+                          <b-button @click="abrirImagen(data.item.Producto,data.item.Imagen == null ||data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen)" style="margin-top:2px;"
+                           :id="'popover-imagen' +data.index.IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
+                            <b-popover placement="right" :target="'popover-imagen' + data.index.IdProducto" :title="data.index.Producto" triggers="hover">
+                          <div style="text-align:center">
+                            <b-img style="border-radius: 10px; width:200px" fluid :src="data.item.Imagen == null || data.item.Imagen==''?'static/no-photo.png': '/resources/images/productos/' + data.item.Imagen" alt="" @error="setAltImg" ></b-img>	
+                          </div>
+                        </b-popover>
                        
                        
-                    </template>
-                    <template slot="presentacion" slot-scope="data">
-                      <b-form-input
-                        v-model="data.item.presentacion"
-                        type="text"
-                        style="text-align:center; font-weight:bold; width: 120px;"
-                        autocomplete="false"
-                        disabled
-                        ></b-form-input>
+                        </template>
+                        <template slot="presentacion" slot-scope="data">
+                          <b-form-input
+                            v-model="data.item.presentacion"
+                            type="text"
+                            style="text-align:center; font-weight:bold; width: 120px;"
+                            autocomplete="false"
+                            disabled
+                            ></b-form-input>
                        
                        
-                    </template>
-                    <template slot="cantidad" slot-scope="data">
-                      <input
-                        v-model="data.item.cantidad"
-                        type="number"
-                        style="text-align:center; font-weight:bold; width: 90px;"
-                        autocomplete="false"
-                        :id="`input${data.index}${data.index}`"
-                        :disabled="data.item.esPresentacion"
-                        @input="metodoPagoCambio(1)"
-                        @focus="abrirModalTouch(data.index, 1)"
-                        class="form-control"
-                        @keydown.enter="irCodeBar"
-                        @keydown.tab.prevent="irCodeBar"
-                        />
-                        <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
-                        v-if="data.item.esPresentacion">
+                        </template>
+                        <template slot="cantidad" slot-scope="data">
+                          <input
+                            v-model="data.item.cantidad"
+                            type="number"
+                            style="text-align:center; font-weight:bold; width: 90px;"
+                            autocomplete="false"
+                            :id="`input${data.index}${data.index}`"
+                            :disabled="data.item.esPresentacion"
+                            @input="metodoPagoCambio(1)"
+                            @focus="abrirModalTouch(data.index, 1)"
+                            class="form-control"
+                            @keydown.enter="irCodeBar"
+                            @keydown.tab.prevent="irCodeBar"
+                            />
+                            <p style="color: rgb(0, 123, 255); text-align: center; font-weight: bold;padding:0;margin:0;" 
+                            v-if="data.item.esPresentacion">
                           
-                          {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
-                        </p>
-                    </template>
-                    <template slot="precio" slot-scope="data">
-                      <input
-                        :disabled="data.item.bloquearInputPrecio"
-                        v-model="data.item.precio"
-                        min="0"
-                        step="0.00001"
-                        type="text"
-                        style="text-align:center; font-weight:bold; width: 105px;"
-                        autocomplete="false"
-                        @input="metodoPagoCambio(1)"
-                         @focus="abrirModalTouch(data.index, 2)"
-                         class="form-control"
-                        >
+                              {{ data.item.CantidadPresentacion*data.item.cantidad }} unid.
+                            </p>
+                        </template>
+                        <template slot="precio" slot-scope="data">
+                          <input
+                            :disabled="data.item.bloquearInputPrecio"
+                            v-model="data.item.precio"
+                            min="0"
+                            step="0.00001"
+                            type="text"
+                            style="text-align:center; font-weight:bold; width: 105px;"
+                            autocomplete="false"
+                            @input="metodoPagoCambio(1)"
+                             @focus="abrirModalTouch(data.index, 2)"
+                             class="form-control"
+                            >
                        
-                    </template>
-                    <template slot="descuento" slot-scope="data">
-                      <input
-                        v-model="data.item.descuento"
-                        type="text"
-                        style="text-align:center; font-weight:bold; width: 100px;"
-                        autocomplete="false" 
-                        @input="metodoPagoCambio(1)"
-                         @focus="abrirModalTouch(data.index, 3)"
-                         class="form-control"
-                        />
+                        </template>
+                        <template slot="descuento" slot-scope="data">
+                          <input
+                            v-model="data.item.descuento"
+                            type="text"
+                            style="text-align:center; font-weight:bold; width: 100px;"
+                            autocomplete="false" 
+                            @input="metodoPagoCambio(1)"
+                             @focus="abrirModalTouch(data.index, 3)"
+                             class="form-control"
+                            />
                        
-                    </template>
-                    <template slot="subtotal" slot-scope="data">
-                    {{ getSubTotalDetalle(data.item) }}
+                        </template>
+                        <template slot="subtotal" slot-scope="data">
+                        {{ getSubTotalDetalle(data.item) }}
                        
-                    </template>
-                    <template slot="total" slot-scope="data">
-                    {{ getTotalDetalle(data.item) }}
+                        </template>
+                        <template slot="total" slot-scope="data">
+                        {{ getTotalDetalle(data.item) }}
                        
-                    </template>
-                    <template slot="acciones" slot-scope="data">
-                      <b-button 
-                        variant="danger"
-                        size="sm" 
-                        @click="quitarProducto(data.index)">
-                       <i class="fas fa-times fa-lg"></i>
-                      </b-button>
-            
-                      <b-button 
-                    class="mx-auto mt-1"
-                      variant="info"
-                      size="sm"
-                      v-if="mostrarEditarProducto()"
-                      @click="editarProducto(data.item,data.index)"
-                      >
-                     <i class="fas fa-pencil-alt fa-sm"></i>
-                    </b-button>
+                        </template>
+                        <template slot="acciones" slot-scope="data">
+                          <b-button 
+                            variant="danger"
+                            size="sm" 
+                            @click="quitarProducto(data.index)">
+                           <i class="fas fa-times fa-lg"></i>
+                          </b-button>
+                
+                          <b-button 
+                        class="mx-auto mt-1"
+                          variant="info"
+                          size="sm"
+                          v-if="mostrarEditarProducto()"
+                          @click="editarProducto(data.item,data.index)"
+                          >
+                         <i class="fas fa-pencil-alt fa-sm"></i>
+                        </b-button>
        
-                    </template>
-                    <template slot="cantxPrecio" slot-scope="data">
-                      <b-form-input
-                        v-if="data.item.esPresentacion"
-                        v-model="data.item.CantidadPresentacion"
-                        type="text"
-                        style="text-align:center; font-weight:bold; width: 100px;"
-                        autocomplete="false"
-                        @input="metodoPagoCambio(1)"
-                        ></b-form-input>
+                        </template>
+                        <template slot="cantxPrecio" slot-scope="data">
+                          <b-form-input
+                            v-if="data.item.esPresentacion"
+                            v-model="data.item.CantidadPresentacion"
+                            type="text"
+                            style="text-align:center; font-weight:bold; width: 100px;"
+                            autocomplete="false"
+                            @input="metodoPagoCambio(1)"
+                            ></b-form-input>
                     
-                    </template>
+                        </template>
   
-                  </b-table>
-                  </div>
+                      </b-table>
+                    </div>
+                  </b-col>
                 </b-row>
                 </div>
                 <b-row class="mt-4" style="border-top: 3px solid #C0C0C0">

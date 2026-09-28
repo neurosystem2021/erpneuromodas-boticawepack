@@ -1,11 +1,12 @@
 <template>
   <b-row>
     <b-col md="12">
-      <b-form-group class="ocultarMovil">
+      <b-form-group class="pcDesktop">
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
             ref="autocompleteProducto"
+            class="pcAuto"
             :url="APIProductos"
             :onShouldRenderChild="renderChild"
             anchor="Producto"
@@ -22,7 +23,7 @@
                   @keydown.enter.prevent="loadBarcode"
                   @keydown.prevent.tab="irAlPrimerProducto"
                   type="text"
-                  class="form-control"
+                  class="form-control pcBarcode"
                   id="loadBarcode"
                   placeholder="Codigo de Barra" 
                   
@@ -37,7 +38,7 @@
         </b-input-group>
       </b-form-group>
       <p>Búsqueda Avanzada: Producto ,Categoría, Marca , Modelo , Color</p>
-      <div class="mostrarMovil">
+      <div class="pcMovil">
       <b-form-group>
       <b-row>
         <b-col md="6">
@@ -884,6 +885,108 @@ canvas {
     display: none;
   }
   .mostrarMovil {
+    display: block;
+  }
+}
+@media only screen and (max-width: 375px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 700px) {
+  /* For desktop: */
+  .ocularMovil {
+    display: none;
+  }
+}
+.imgProducto {
+  width: 40px;
+}
+.imgProducto:hover {
+  width: 120px;
+}
+</style>
+<style>
+#modalImagen .modal-dialog {
+  max-width: 75% !important;
+}
+.imagenGrande {
+  width: 100%;
+}
+#modalCodigoBarra {
+  padding: 0 !important;
+}
+#modalCodigoBarra .modal-dialog {
+  max-width: 50vw !important;
+  max-height: 50vh !important;
+}
+#modalCodigoBarra .modal-body {
+  padding-bottom: 1px !important;
+  margin-bottom: 1px !important;
+}
+#codigoBarraStyle video,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+.cameraBarra {
+  height: 50vh;
+  width: auto;
+  margin: 0 auto;
+}
+
+/* Buscador escritorio / móvil (nombres propios para no chocar con otros componentes) */
+.pcDesktop {
+  display: block;
+  width: 100%;
+}
+.pcMovil {
+  display: none;
+}
+.pcDesktop .input-group {
+  flex-wrap: nowrap !important;
+}
+/* Repartir el ancho de la fila entre el buscador y el código de barra */
+.pcDesktop .input-group > .pcAuto {
+  flex: 1 1 60%;
+  min-width: 0;
+}
+.pcDesktop .input-group > .pcAuto input {
+  width: 100%;
+}
+.pcDesktop .input-group > .pcBarcode {
+  flex: 1 1 40%;
+  min-width: 0;
+}
+
+@media only screen and (max-width: 1440px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 50vw !important;
+    max-height: 50vh !important;
+  }
+  .cameraBarra {
+    height: 50vh;
+    width: auto;
+  }
+}
+@media only screen and (max-width: 750px) {
+  #modalCodigoBarra .modal-dialog {
+    max-width: 100vw !important;
+    max-height: 80vh !important;
+  }
+  .cameraBarra {
+    height: 80vh;
+    width: auto;
+  }
+  .pcDesktop {
+    display: none;
+  }
+  .pcMovil {
     display: block;
   }
 }

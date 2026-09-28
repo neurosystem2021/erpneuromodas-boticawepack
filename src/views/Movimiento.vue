@@ -3,7 +3,7 @@
     <Menu v-if="false"></Menu>
     <br />
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-        <b-container class="bv-example-row">
+        <b-container fluid class="bv-example-row px-4">
           <b-row>
               <b-col md="8">
 
@@ -43,7 +43,7 @@
 
                         <b-input-group-append>
                           <!--<proveedores-tabla></proveedores-tabla>-->
-                          <proveedores-form :ruc="newRuc"></proveedores-form>
+                          <proveedores-form :ruc="newRuc" @guardado="onProveedorGuardado"></proveedores-form>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
@@ -361,6 +361,17 @@ export default {
     },
     setProveedor(obj) {
       this.movimiento.proveedor = obj;
+    },
+    onProveedorGuardado(prov) {
+      this.setProveedor(prov);
+      this.$refs.inputProveedor.setValue(
+        prov.ProveedorRuc || (prov.Ruc + " - " + prov.Proveedor)
+      );
+      if (!prov.IdProveedor) {
+        console.warn(
+          "El POST /proveedores no devolvió IdProveedor; el movimiento no podrá guardarse con este proveedor."
+        );
+      }
     },
     setAlmacenOrigen(obj) {
       this.movimiento.almacenOrigen = obj;

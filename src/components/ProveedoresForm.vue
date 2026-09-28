@@ -56,10 +56,10 @@ export default {
       }
     }
   },
-  props: ['newRuc'],
+  props: ['ruc'],
   methods: {
     shownProveedorForm () {
-      this.proveedor.Ruc = this.$parent.$parent.newRuc
+      this.proveedor.Ruc = this.ruc || (this.$parent && this.$parent.$parent && this.$parent.$parent.newRuc) || ''
       this.proveedor.Direccion = ''
       this.proveedor.Proveedor = ''
     },
@@ -70,10 +70,18 @@ export default {
             numero: this.proveedor.Ruc
           }
       }).then((response) => {
-          this.$toasted.show('Proveedor encontrado, se llenarán sus datos')                  
-          var data = response.data.result
-          this.proveedor.Proveedor = data.RazonSocial
-          this.proveedor.Direccion = data.Direccion
+          var data = response.data.result || response.data
+          var razonSocial = data.razonSocial || data.RazonSocial || ''
+          var direccion = data.direccion || data.Direccion || ''
+
+          this.proveedor.Proveedor = razonSocial
+          this.proveedor.Direccion = direccion
+
+          if (razonSocial) {
+            this.$toasted.show('Proveedor encontrado, se llenarán sus datos')
+          } else {
+            this.$toasted.show('No se encontró el RUC')
+          }
       })
       .catch((error) => {
           this.$toasted.show('No se encontró el RUC')        
@@ -83,7 +91,13 @@ export default {
     guardarProveedor() {
       this.axios.post(this.API + 'proveedores', this.proveedor)
       .then((response) => {
+        console.log('POST proveedores:', response.data)
+        var res = response.data || {}
+        var id = res.IdProveedor || res.id || res.insertId ||
+                 (res.result && res.result.IdProveedor) || 0
+
         this.$toasted.show('Proveedor guardado correctamente')
+        this.$emit('guardado', Object.assign({}, this.proveedor, { IdProveedor: id }))
         this.$refs.proveedorForm.hide()
       })
       .catch((error) => {
