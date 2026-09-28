@@ -125,7 +125,7 @@
                             </b-col>
                         </b-row>
                     </b-col>
-                    <b-col md="3">
+                    <b-col md="2">
                         <div v-if="venta.cliente.Cliente && venta.cliente.EsVIP">
                             <b-form-group class="text-center" v-if="venta.cliente.Cliente">
                                 <div class="puntos">
@@ -147,14 +147,14 @@
                             </b-form-text>
                         </div>
                     </b-col>
-                    <b-col md="3" >
+                    <b-col md="4">
                         <b-form-group class="text-center ocultarMovil">
                             <div class="big-text">
                                 {{ venta.Serie }} - <b>{{ venta.Numero }}</b>
                             </div>
                             {{ venta.FechaDoc }}
                         </b-form-group>
-                        <b-form-group  class="ocultarMovil">
+                        <b-form-group  class="ocultarMovil" style="margin-left: 130px;">
                             <label>Vendedor:</label>
                             <autocomplete
                                 required="required"
@@ -186,81 +186,53 @@
                             :idAlmacen="venta.almacen.IdAlmacen"
                             :onSetProducto="onSetProducto">
 
-                            <template slot="operaciones">
-                                <table class="table b-table border table-footer">
-                                  <tbody>
-                                    <div class="acciones-pos" v-if="idPerfil == 1">
-                                        <div class="fila-botones">
+                          <template slot="operaciones">
+                              <div class="panel-operaciones">
 
-                                            <pago-deuda></pago-deuda>
+                                  <div class="acciones-pos" v-if="idPerfil == 1">
+                                      <div class="fila-botones">
+                                          <pago-deuda></pago-deuda>
 
-                                            <proformas
-                                                :idAlmacen="venta.almacen.IdAlmacen"
-                                                @onSelectProforma="setCliente">
-                                            </proformas>
+                                          <proformas
+                                              :idAlmacen="venta.almacen.IdAlmacen"
+                                              @onSelectProforma="setCliente">
+                                          </proformas>
+                                      </div>
 
-                                        </div>
+                                      <div class="fila-botones">
+                                          <pre-orden-lista
+                                              :idAlmacen="venta.almacen.IdAlmacen"
+                                              @onSelectPreOrden="setCliente">
+                                          </pre-orden-lista>
 
-                                        <div class="fila-botones">
+                                          <config-venta
+                                              @onUpdateConfig="eliminarCliente">
+                                          </config-venta>
+                                      </div>
+                                  </div>
 
-                                            <pre-orden-lista
-                                                :idAlmacen="venta.almacen.IdAlmacen"
-                                                @onSelectPreOrden="setCliente">
-                                            </pre-orden-lista>
+                                  <div class="opciones-box">
+                                      <div class="opciones-titulo">Opciones</div>
+                                      <div class="opciones-cuerpo">
+                                          <b-form-checkbox
+                                              v-model="venta.EsCredito"
+                                              :disabled="bloquearInput?true:false || isNota"
+                                              :value="1"
+                                              :unchecked-value="0">
+                                              Venta a credito
+                                          </b-form-checkbox>
+                                          <b-form-input
+                                              v-if="venta.EsCredito"
+                                              class="mt-2"
+                                              v-model="venta.FechaCredito"
+                                              :disabled="bloquearInput?true:false || isNota"
+                                              type="date">
+                                          </b-form-input>
+                                      </div>
+                                  </div>
 
-                                            <config-venta
-                                                @onUpdateConfig="eliminarCliente">
-                                            </config-venta>
-
-                                        </div>
-                                    </div>
-                                    </tbody>
-
-                                    <tbody class="ocultarMovil">
-                                        <tr>
-                                            <td  class="text-center">Opciones</td>
-                                        </tr>
-                                        <!-- <tr v-if="puntosAplicados == 0 && idPerfil != 3">
-                                            <td>
-                                                <b-input-group prepend="%" append="Descuento">
-                                                    <input
-                                                        v-model="descuentoGeneral"
-                                                        :disabled="bloquearInput?true:false"
-                                                        min="0"
-                                                        value="0"
-                                                        max="100"
-                                                        :readonly="(idPerfil == 3) ? true : false"
-                                                        @input="(val)=>{aplicarDescuentoGeneral(val.target.value)}"
-                                                        type="number"
-                                                        class="form-control"
-                                                        step="0.01"
-                                                    />
-                                                </b-input-group>
-                                                <b-form-text>
-                                                    Descuento general a toda la venta.
-                                                </b-form-text>
-                                            </td>
-                                        </tr> -->
-                                        <tr>
-                                            <td>
-                                                <b-form-checkbox 
-                                                    v-model="venta.EsCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
-                                                    :value="1"
-                                                    :unchecked-value="0">
-                                                    Venta a credito
-                                                </b-form-checkbox>
-                                                <b-form-input 
-                                                    v-if="venta.EsCredito"
-                                                    v-model="venta.FechaCredito"
-                                                    :disabled="bloquearInput?true:false || isNota"
-                                                    type="date">
-                                                </b-form-input>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </template>    
+                              </div>
+                          </template>
                             <template slot="metodopago" v-if="!venta.EsCredito">
                                 <table class="table b-table border table-footer table-sm">
                                     <tbody>
@@ -1363,13 +1335,21 @@ export default {
   font-size: 52px;
 }
 .big-text{
-    font-size:45px;
+    font-size:55px;
     font-weight:500;
     line-height:1;
 }
--- Diseños de los botones de acciones
+
+/* ===== Panel de operaciones (botones + opciones) ===== */
+.panel-operaciones{
+    width:100%;
+    padding:10px 0;
+}
+
 .acciones-pos{
-    padding:5px;
+    width:100%;
+    padding:0;
+    margin-bottom:10px;
 }
 
 .fila-botones{
@@ -1380,18 +1360,58 @@ export default {
 
 .fila-botones > *{
     flex:1;
+    min-width:0;
 }
 
-.acciones-pos{
+/* Que los botones de los componentes hijos llenen su mitad */
+.fila-botones .btn,
+.fila-botones button{
     width:100%;
-}
-
-.btn-pos{
-    min-width:218px;
     height:42px;
     border-radius:12px !important;
-    font-size:18px !important;
+    font-size:16px !important;
     font-weight:600 !important;
+}
+
+.opciones-box{
+    display:block;
+    width:100%;
+    border:1px solid #dee2e6;
+    border-radius:8px;
+    background:#fff;
+    overflow:hidden;
+}
+
+.opciones-titulo{
+    text-align:center;
+    padding:8px;
+    font-weight:600;
+    background:#f1f3f5;
+    border-bottom:1px solid #dee2e6;
+}
+
+.opciones-cuerpo{
+    padding:10px 12px;
+}
+
+@media (max-width: 1250px) {
+    .opciones-box{
+        display:none;
+    }
+}
+
+/* Serie y número centrados */
+.serie-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+.fecha-doc {
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
 }
 </style>
 
