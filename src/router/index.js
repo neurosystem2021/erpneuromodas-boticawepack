@@ -35,6 +35,8 @@ import ReporteSireMovimiento from "@/views/reportes/ReporteSireMovimiento.vue";
 import ReporteSireVentas from "@/views/reportes/ReporteSireVentas.vue";
 import Ordenes from "@/views/reportes/Ordenes.vue";
 import OrdenCompra from "@/views/OrdenCompra.vue";
+import ReporteRegistroVentas from "@/views/reportes/ReporteRegistroVentas.vue";
+import ReporteRegMovimiento from "@/views/reportes/ReporteRegMovimiento.vue";
 
 Vue.use(Router);
 
@@ -140,6 +142,16 @@ export default new Router({
       path: "/reportes/articulosmovimientos",
       name: "Articulosmovimientos",
       component: Articulosmovimientos
+    },
+    {
+      path: "/reportes/ReporteRegistroVentas",
+      name: "ReporteRegistroVentas",
+      component: ReporteRegistroVentas
+    },
+    {
+      path: "/reporte/reporteregmovimiento",
+      name: "ReporteRegMovimiento",
+      component: ReporteRegMovimiento
     },
     {
       path: "/facturacion",
