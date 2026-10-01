@@ -468,6 +468,7 @@
                 <thead>
                   <tr>
                     <th>Categoría</th>
+                    <th>Codigo</th>
                     <th>Producto</th>
                     <th>Stock</th>
                     <th>P. U.</th>
@@ -482,6 +483,7 @@
                         : 'default'
                       ">
                     <td>{{ producto.ProductoCategoria }}</td>
+                    <td>{{ producto.CodigoBarra }}</td>
                     <td>{{ producto.Producto }}</td>
                     <td>{{ producto.stock }}</td>
                     <td>{{ parseFloat(producto.PrecioContado).toFixed(2) }}</td>

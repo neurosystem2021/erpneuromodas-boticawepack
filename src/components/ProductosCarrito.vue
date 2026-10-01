@@ -1103,7 +1103,7 @@ export default {
             }
             this.loadCode = "";
           },
-          { setPrecio: this.setPrecio, setSuma: true },
+          { setPrecio: this.setPrecio, setSuma: false },
           { isBarCode: true }
         ]);
       }

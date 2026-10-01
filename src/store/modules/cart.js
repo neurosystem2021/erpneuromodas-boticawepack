@@ -18,9 +18,9 @@ const mutations = {
         productos[index].cantidad = Number(productos[index].cantidad)+1
       }
     } else {
-      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVentaNew) {        
-        productos.unshift(item)
-      }
+      if(!productos.find( producto => producto.IdProducto === item.IdProducto ) || !item.EsVentaNew || item.isBarCode) {         
+            productos.unshift(item) 
+          }
       else{
         /*let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
@@ -195,6 +195,7 @@ const actions = {
           obj.CantidadPresentacion = 1
           obj.EsPresentacion = 0
           obj.Presentacion = obj.ProductoMedicion
+          obj.isBarCode = isBarCode
           commit('AGREGAR_PRODUCTO', obj)
           if (cb) cb(obj)   
         } else {
