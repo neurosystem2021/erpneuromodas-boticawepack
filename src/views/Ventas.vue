@@ -869,14 +869,23 @@ export default {
       }
     },
     onSetProducto(obj, presentacion) {
+
       if (presentacion) {
+
         obj.cantidad = 1;
         obj.precio = presentacion.precioventa || 0;
+        obj.presentacionVenta = presentacion;
+
         return obj;
+
       }
+
       obj.cantidad = 1;
       obj.precio = obj.PrecioContado || 0;
+      obj.presentacionVenta = null;
+
       return obj;
+
     },
     onAddProducto(obj) {
       this.actualizarDescuento();
@@ -1161,12 +1170,40 @@ export default {
       igualLote += 1;
     }
 
-    if (parseFloat(pro.precio) < parseFloat(pro.PrecioContado)) {
+    let precioMinimo = parseFloat(pro.PrecioContado);
+
+    // Si el producto tiene una presentación seleccionada,
+    // buscar el precio de venta configurado para esa presentación
+    if (pro.Presentacion && pro.Presentaciones) {
+
+      let presentaciones = pro.Presentaciones;
+
+      if (typeof presentaciones === "string") {
+        try {
+          presentaciones = JSON.parse(presentaciones);
+        } catch (e) {
+          presentaciones = [];
+        }
+      }
+
+      if (Array.isArray(presentaciones)) {
+
+        const presentacionSeleccionada = presentaciones.find(
+          p => p.nombre == pro.Presentacion
+        );
+
+        if (presentacionSeleccionada) {
+          precioMinimo = parseFloat(presentacionSeleccionada.precioventa);
+        }
+      }
+    }
+
+    if (parseFloat(pro.precio) < precioMinimo) {
       this.$toasted.show(
         "El precio de venta del producto " +
           pro.Producto +
           " no debe ser menor al precio configurado en el sistema (" +
-          pro.PrecioContado +
+          precioMinimo +
           ")"
       );
       precioBajo += 1;
