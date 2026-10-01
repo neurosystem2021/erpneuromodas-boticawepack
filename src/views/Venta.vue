@@ -164,6 +164,46 @@
                      
                      
                   </template>
+                  <template slot="lote" slot-scope="data">
+                    <small v-if="data.item.EsPadre" class="text-muted">—</small>
+
+                    <!-- Nota de crédito: solo muestra el lote original de la venta -->
+                    <small v-else-if="isNota[index]">{{ data.item.Lote || '—' }}</small>
+
+                    <div v-else-if="(lotesPorProducto[claveLote(data.item)] || []).length" class="lote-wrap">
+                      <b-dropdown block size="sm" variant="light" class="lote-dd"
+                                  menu-class="lote-menu" boundary="window" no-flip>
+                        <template slot="button-content">
+                          <span class="lote-btn">
+                            <span class="lote-dot" :class="'lote-' + loteSeleccionado(data.item).estado"></span>
+                            <span class="lote-btn-text">{{ loteSeleccionado(data.item).titulo }}</span>
+                            <span class="lote-btn-stock">{{ loteSeleccionado(data.item).stockTxt }}</span>
+                          </span>
+                        </template>
+
+                        <b-dropdown-item v-for="o in opcionesLoteDetalle(data.item)"
+                                         :key="String(o.value)"
+                                         :disabled="o.disabled"
+                                         :active="o.value === data.item.IdProductoLote"
+                                         @click="data.item.IdProductoLote = o.value">
+                          <div class="lote-item" :class="'lote-bg-' + o.estado" :title="o.subtitulo">
+                            <span class="lote-dot" :class="'lote-' + o.estado"></span>
+                            <b class="lote-item-nombre">{{ o.titulo }}</b>
+                            <span class="lote-item-fecha">{{ o.fechaTxt }}</span>
+                            <span class="lote-item-stock">{{ o.stockTxt }}</span>
+                            <span class="lote-tag" :class="'lote-tag-' + o.estado" v-if="o.etiqueta">{{ o.etiqueta }}</span>
+                          </div>
+                        </b-dropdown-item>
+                      </b-dropdown>
+
+                      <b-button v-if="excedeLote(data.item)" size="sm" variant="warning" class="mt-1"
+                                style="font-size:0.7rem" @click="dividirLinea(data.item)">
+                        ✂ Dividir (lote + sin lote)
+                      </b-button>
+                    </div>
+
+                    <small v-else class="text-muted">—</small>
+                  </template>
                   <!-- <template slot="movimiento" slot-scope="data">
                       <b-button v-if="!data.item.EsPadre" style="border-radius: 100%; padding: 7px;" @click="abrirLotes(null)" :id="'popover-lote' + data.index" variant="primary" size="sm"></b-button>	
                       <b-popover  placement="right" :target="'popover-lote' + data.index" :title="data.item.Producto" triggers="focus">
@@ -874,7 +914,7 @@
       </b-row>
     </b-modal>
     <!-- MODAL TOUCH -->
-     <!-- MODALS TOUCH -->
+    <!-- MODALS TOUCH -->
 
      <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" title="Cantidad" hide-header-close>
           <label><b style="text-decoration: underline;">{{objProd.Producto}}</b></label>
@@ -1028,6 +1068,7 @@ export default {
       productosCategoria: [],
       isNota: [],
       tieneIgv: [],
+      lotesPorProducto: {},
       itemsMotivoNota: [
         { value: null, text: "-- SELECCIONE EL MOTIVO --" },
         { value: "01", text: "ANULACION DE LA OPERACION" },
@@ -1057,6 +1098,7 @@ export default {
           label: "Pres.",
           thStyle: { width: "5%" }
         },
+        { key: "lote", label: "Lote", thStyle: { width: "14%" } },
         { key: "cantidad", label: "Cant.", thStyle: { width: "7%" } },
         { key: "precio", label: "Precio", thStyle: { width: "5%" } },
         {
@@ -1136,13 +1178,11 @@ export default {
         {
           verCliente: true,
           pagocon: 0,
-          pagocon: 0,
           cliente: {},
           EsCredito: 0,
           Serie: "",
           Numero: "",
           Observacion: "",
-          cliente: {},
           comisionista: {},
           tipoVenta: {
             IdTipoDoc: 3,
@@ -1407,6 +1447,204 @@ export default {
     /**
      * ✅ NUEVO: Configurar todos los listeners
      */
+    claveLote(prod) {
+      return this.ventas[this.ventaActiva].almacen.IdAlmacen + "_" + prod.IdProducto;
+    },
+
+    // =====================  LOTES  =====================
+
+    async cargarLotes(prod) {
+      if (prod.EsPadre == 1) return;
+      const clave = this.claveLote(prod); // antes del await
+      const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
+      try {
+        const { data } = await this.axios.get(
+          `${this.API}productolotes/${prod.IdProducto}/${idAlmacen}`
+        );
+
+        // Orden: primero los que tienen stock (vencimiento más próximo), al final los agotados
+        const lotes = (data || []).slice().sort((a, b) => {
+          const aTiene = parseFloat(a.Stock) > 0 ? 0 : 1;
+          const bTiene = parseFloat(b.Stock) > 0 ? 0 : 1;
+          if (aTiene !== bTiene) return aTiene - bTiene;
+          const fa = a.FechaVen ? new Date(a.FechaVen).getTime() : Infinity;
+          const fb = b.FechaVen ? new Date(b.FechaVen).getTime() : Infinity;
+          return fa - fb;
+        });
+
+        this.$set(this.lotesPorProducto, clave, lotes);
+
+        // Autoseleccionar el primer lote CON stock (si no hay ninguno, queda sin lote)
+        const primeroConStock = lotes.find(l => parseFloat(l.Stock) > 0);
+        this.$set(
+          prod,
+          "IdProductoLote",
+          primeroConStock ? primeroConStock.IdProductoLote : null
+        );
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    opcionesLote(prod) {
+      const div = parseFloat(prod.CantidadPresentacion) || 1;
+      const cantReal = (parseFloat(prod.cantidad) || 0) * div;
+      const lotes = this.lotesPorProducto[this.claveLote(prod)] || [];
+      const hoy = this.$moment().startOf("day");
+
+      return [
+        { value: null, text: "SIN LOTE" },
+        ...lotes.map(l => {
+          const stock = parseFloat(l.Stock) || 0;
+          const fecha = l.FechaVen
+            ? this.$moment(l.FechaVen).format("DD/MM/YY")
+            : "s/f";
+          const vencido = l.FechaVen && this.$moment(l.FechaVen).isBefore(hoy);
+
+          let etiqueta = "";
+          if (stock <= 0) etiqueta = " ❌ AGOTADO";
+          else if (stock < cantReal) etiqueta = " ⚠ INSUF.";
+          else if (vencido) etiqueta = " ⛔ VENCIDO";
+
+          return {
+            value: l.IdProductoLote,
+            text: `${l.Lote} | ${fecha} | st ${(stock / div).toFixed(2)}${etiqueta}`,
+            disabled: stock <= 0 // visible pero no seleccionable
+          };
+        })
+      ];
+    },
+
+    // Stock que NO pertenece a ningún lote (en unidades base)
+    stockLibre(prod) {
+      const lotes = this.lotesPorProducto[this.claveLote(prod)] || [];
+      const enLotes = lotes.reduce(
+        (s, l) => s + Math.max(parseFloat(l.Stock) || 0, 0),
+        0
+      );
+      return Math.max((parseFloat(prod.stock) || 0) - enLotes, 0);
+    },
+
+    // Estado visual de un lote
+    estadoLote(l) {
+      const stock = parseFloat(l.Stock) || 0;
+      if (stock <= 0) return "agotado";
+      if (!l.FechaVen) return "sinfecha";
+      const hoy = this.$moment().startOf("day");
+      const fv = this.$moment(l.FechaVen);
+      if (fv.isBefore(hoy)) return "vencido";
+      if (fv.diff(hoy, "days") <= 120) return "porvencer"; // 4 meses
+      return "ok";
+    },
+
+    opcionesLoteDetalle(prod) {
+      const div = parseFloat(prod.CantidadPresentacion) || 1;
+      const cantReal = (parseFloat(prod.cantidad) || 0) * div;
+      const lotes = this.lotesPorProducto[this.claveLote(prod)] || [];
+      const hoy = this.$moment().startOf("day");
+
+      const libre = this.stockLibre(prod);
+      const opciones = [
+        {
+          value: null,
+          titulo: "SIN LOTE",
+          fechaTxt: "",
+          subtitulo:
+            libre < cantReal
+              ? "Stock libre insuficiente"
+              : "Stock que no está en lotes",
+          etiqueta: libre < cantReal ? "⚠ INSUF." : "",
+          stockTxt: "st " + (libre / div).toFixed(2),
+          estado: libre <= 0 ? "agotado" : "sinlote",
+          disabled: false
+        }
+      ];
+
+      lotes.forEach(l => {
+        const stock = parseFloat(l.Stock) || 0;
+        if (stock <= 0) return; // los lotes agotados no se listan
+        const estado = this.estadoLote(l);
+        let etiqueta = "";
+        let sub = l.FechaVen
+          ? "Vence: " + this.$moment(l.FechaVen).format("DD/MM/YYYY")
+          : "Sin fecha de vencimiento";
+
+        if (estado === "agotado") etiqueta = "AGOTADO";
+        else if (estado === "vencido") etiqueta = "VENCIDO";
+        else if (estado === "porvencer") {
+          const dias = this.$moment(l.FechaVen).diff(hoy, "days");
+          etiqueta = dias + " D";
+        } else if (stock < cantReal) etiqueta = "⚠ INSUF.";
+
+        opciones.push({
+          value: l.IdProductoLote,
+          titulo: l.Lote,
+          fechaTxt: l.FechaVen
+            ? this.$moment(l.FechaVen).format("DD/MM/YY")
+            : "s/f",
+          subtitulo: sub,
+          etiqueta,
+          stockTxt: "st " + (stock / div).toFixed(2),
+          estado,
+          disabled: stock <= 0
+        });
+      });
+      return opciones;
+    },
+
+    // Lo que se muestra en el botón cerrado
+    loteSeleccionado(prod) {
+      const ops = this.opcionesLoteDetalle(prod);
+      return ops.find(o => o.value === prod.IdProductoLote) || ops[0];
+    },
+
+    // ¿El producto tiene lotes pero todos están agotados?
+    todosLotesAgotados(prod) {
+      const lotes = this.lotesPorProducto[this.claveLote(prod)] || [];
+      return lotes.length > 0 && lotes.every(l => !(parseFloat(l.Stock) > 0));
+    },
+    // ¿La cantidad pedida excede el stock del lote elegido?
+    excedeLote(prod) {
+      if (!prod.IdProductoLote) return false;
+      const lote = (this.lotesPorProducto[this.claveLote(prod)] || []).find(
+        l => l.IdProductoLote === prod.IdProductoLote
+      );
+      if (!lote) return false;
+      const cantReal =
+        (parseFloat(prod.cantidad) || 0) *
+        (parseFloat(prod.CantidadPresentacion) || 1);
+      return cantReal > (parseFloat(lote.Stock) || 0);
+    },
+    // Divide la línea: lo que alcanza en el lote + el resto SIN LOTE
+    dividirLinea(prod) {
+      const productos = this.ventas[this.ventaActiva].productos;
+      const idx = productos.indexOf(prod);
+      const lotes = this.lotesPorProducto[this.claveLote(prod)] || [];
+      const lote = lotes.find(l => l.IdProductoLote === prod.IdProductoLote);
+      if (idx < 0 || !lote) return false;
+
+      const div = parseFloat(prod.CantidadPresentacion) || 1;
+      let disp = (parseFloat(lote.Stock) || 0) / div;
+      if (div > 1) disp = Math.floor(disp); // presentaciones: solo cantidades enteras
+
+      const cant = parseFloat(prod.cantidad) || 0;
+      const resto = parseFloat((cant - disp).toFixed(4));
+      if (resto <= 0) return false;
+
+      // Lote sin stock: solo pasa la línea completa a SIN LOTE
+      if (disp <= 0) {
+        prod.IdProductoLote = null;
+        return true;
+      }
+
+      const copia = { ...prod, cantidad: resto, IdProductoLote: null };
+      prod.cantidad = disp;
+      productos.splice(idx + 1, 0, copia);
+      this.metodoPagoCambio(1);
+      return true;
+    },
+
+    // =====================  SOCKETS  =====================
+
     setupSocketListeners() {
       // Evento: Conectado
       this.listeners.connect = () => {
@@ -1688,6 +1926,10 @@ export default {
     },
     setAlmacen(obj) {
       this.ventas[this.ventaActiva].almacen = obj;
+      this.ventas[this.ventaActiva].productos.forEach(p => {
+        this.$set(p, "IdProductoLote", null);
+        this.cargarLotes(p);
+      });
       this.$refs.inputAlmacen.setValue(obj.Almacen);
       this.getCategorias();
       if (this.$route.query.idPreOrden && this.$route.query.idCliente) {
@@ -1883,6 +2125,8 @@ export default {
     },
     eliminarVentana() {
       if (this.ventas[this.ventaActiva].enviando) return;
+      this.isNota.splice(this.ventaActiva, 1);
+      this.tieneIgv.splice(this.ventaActiva, 1);
       this.ventas.splice(this.ventaActiva, 1);
 
       this.$nextTick(() => {
@@ -2014,7 +2258,9 @@ export default {
       );
       prod.bloquearInputPrecio = false;
       prod.CantidadPresentacion = null;
+      prod.IdProductoLote = null;
       productos.unshift(prod);
+      this.cargarLotes(productos[0]);
 
       // this.$nextTick(() => {
       //   this.irTxtLoadBarcode();
@@ -2022,7 +2268,7 @@ export default {
       // this.loadMovimientoLotes(prod.IdProducto);
       this.metodoPagoCambio(1);
     },
-
+    
     async activarNocturno(id) {
       if (!id) return;
     
@@ -2073,6 +2319,7 @@ export default {
     
             // Recalcular precios
             this.ventas[this.ventaActiva].productos.forEach(p => {
+              if (!p.base) return;
               let b = parseFloat(p.base) || 0;
               let porcentaje = parseFloat(p.PrecioNocturno) || 0;
               let nuevoPrecio = (nuevoEstado == 1) 
@@ -2131,6 +2378,7 @@ export default {
       event.target.src = "static/no-photo.png";
     },
     setDocRef(obj) {
+      this.ventas[this.ventaActiva].productos = [];
       this.ventas[this.ventaActiva].CodSunatModifica = obj.CodSunat;
       this.ventas[this.ventaActiva].NroComprobanteModifica = obj.NroComprobante;
       if (
@@ -2195,25 +2443,26 @@ export default {
               console.log(error);
             });
 
-          this.ventas.productos = [];
+          const ventaIdx = this.ventaActiva;
 
-          response.data.forEach(async element => {
-            console.log("Presentacion", element.Presentacion);
-            element.Descripcion = element.Presentacion;
-            let productoStock = await this.obtenerStockBuscador(
-              element.IdProducto
-            );
-            element.stock =
-              Object.keys(productoStock).length > 0 ? productoStock.stock : 0;
-            this.ventas[this.ventaActiva].productos.push(element);
-            // this.setProducto(element);
-          });
-          this.ventas[this.ventaActiva].NotaIdMotivo = null;
-          this.$forceUpdate();
-          this.$nextTick(() => {
-            setTimeout(() => {
-              this.metodoPagoCambio(1);
-            }, 1000);
+          Promise.all(
+            response.data.map(async element => {
+              element.Descripcion = element.Presentacion;
+              const productoStock = await this.obtenerStockBuscador(
+                element.IdProducto
+              );
+              element.stock =
+                productoStock && Object.keys(productoStock).length > 0
+                  ? productoStock.stock
+                  : 0;
+              return element;
+            })
+          ).then(items => {
+            // Reemplaza todo el carrito de una vez (mantiene el orden)
+            this.$set(this.ventas[ventaIdx], "productos", items);
+            this.ventas[ventaIdx].NotaIdMotivo = null;
+            this.metodoPagoCambio(1);
+            this.$forceUpdate();
           });
         });
     },
@@ -2394,267 +2643,374 @@ export default {
     //   // console.log();
     // },
     async guardarVenta() {
-  let venta = this.ventas[this.ventaActiva];
+      let venta = this.ventas[this.ventaActiva];
 
-  //  Bloqueo síncrono contra doble clic / doble tap / doble venta
-  if (venta.enviando) {
-    return;
-  }
-  venta.enviando = true;
-
-  // Generar requestId UNA sola vez por venta (se reutiliza si hay reintento)
-  if (!venta.requestId) {
-    venta.requestId = Date.now() + '-' + Math.random();
-  }
-
-    this.$swal({
-      title: "Procesando venta...",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen: () => {
-        this.$swal.showLoading();
-      }
-    });
-
-    try {
-      let productos = venta.productos;
-      let totalPagos = 0;
-
-      totalPagos +=
-        this.obtenerMonto(venta.pago.efectivo.monto) +
-        this.obtenerMonto(venta.pago.visa.monto) +
-        this.obtenerMonto(venta.pago.mastercard.monto) +
-        this.obtenerMonto(venta.pago.delivery.monto);
-      if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
-        this.$swal.close();
-        this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+      //  Bloqueo síncrono contra doble clic / doble tap / doble venta
+      if (venta.enviando) {
         return;
       }
-      if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
-        this.$swal.close();
-        this.$toasted.show(
-          "El metodo de pago tarjeta/transferencia no puede ser negativo"
-        );
-        return;
-      }
-      if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
-        this.$swal.close();
-        this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
-        );
-        return;
-      }
-      if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
-        this.$swal.close();
-        this.$toasted.show(
-          "El metodo de pago Yape o Plin no puede ser negativo"
-        );
-        return;
-      }
-      if (totalPagos <= 0) {
-        this.$swal.close();
-        this.$toasted.show("Debe seleccionar un método de pago");
-        return;
+      venta.enviando = true;
+
+      // Generar requestId UNA sola vez por venta (se reutiliza si hay reintento)
+      if (!venta.requestId) {
+        venta.requestId = Date.now() + "-" + Math.random();
       }
 
-      if (!venta.cliente.DniRuc) {
-        this.$swal.close();
-        this.$toasted.show("Debe seleccionar un cliente.");
-        return;
-      }
-
-      const sumaRealProductos = productos.reduce((total, prod) => {
-          return total + (parseFloat(prod.cantidad) * parseFloat(prod.precio) - parseFloat(prod.descuento || 0));
-      }, 0);
-
-      const totalCalculado = parseFloat(sumaRealProductos).toFixed(2);
-      const totalExhibido = parseFloat(this.getTotal()).toFixed(2);
-
-      if (totalCalculado !== totalExhibido) {
-          this.$toasted.show("¡ERROR!: El total no coincide con la suma de productos. Recargue la página.");
-          return;
-      }
-
-      const totalPagado = parseFloat(totalPagos).toFixed(2);
-
-      if (totalPagado !== totalExhibido) {
-          this.$toasted.show(`¡ERROR!: El monto pagado (S/ ${totalPagado}) debe ser igual al total (S/ ${totalExhibido})`);
-          return;
-      }
-      var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
-      if (!esNumerico) {
-        this.$swal.close();
-        return;
-      }
-
-      var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
-      if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
-        this.$swal.close();
-        this.$toasted.show(
-          "Una factura debe ser emitida para una empresa, no un usuario común."
-        );
-        return;
-      }
-      if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
-        this.$swal.close();
-        this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
-        return;
-      }
-      if (
-        venta.tipoVenta.CodSunat == "07" ||
-        venta.tipoVenta.CodSunat == "08"
-      ) {
-        if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
-          this.$swal.close();
-          this.$toasted.show("Debe seleccionar un Documento de Referencia...");
-          return;
+      this.$swal({
+        title: "Procesando venta...",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          this.$swal.showLoading();
         }
-        if (!venta.NotaIdMotivo) {
-          this.$swal.close();
-          this.$toasted.show("Debe seleccionar un Motivo");
-          return;
-        }
-        if (venta.NroComprobanteModifica == "") {
-          this.$swal.close();
-          this.$toasted.show("Debe seleccionar un Documento de Referencia");
-          this.$refs.inputDocRef.focus();
-          return;
-        }
-        venta.NotaDescMotivo = this.itemsMotivoNota.filter(
-          item => item.value == venta.NotaIdMotivo
-        )[0].text;
-      }
-      if (!productos.length) {
-        this.$swal.close();
-        this.$toasted.show("No hay productos para vender");
-        return;
-      }
-      const esNotaCredito = venta.tipoVenta.CodSunat == "07";
-      console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
-      const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
-      const sinStock = productos.some(v => {
-        if (v.EsPadre == 1) return false;
-        if (idAlmacen == 2) return false;
-        const cantReal = parseFloat(v.cantidad) * (v.CantidadPresentacion ? v.CantidadPresentacion : 1);
-        const stockActual = parseFloat(v.stock) || 0;
-        return cantReal > stockActual;
       });
 
-      if (!esNotaCredito && sinStock) {
-        this.$swal.close();
-        this.$toasted.show("No se puede vender un producto sin stock");
-        return;
-      }
+      try {
+        let productos = venta.productos;
+        let totalPagos = 0;
 
-      if (!esNotaCredito) {
-        for (const v of productos) {
-          if (v.EsPadre != 1) continue;
+        totalPagos +=
+          this.obtenerMonto(venta.pago.efectivo.monto) +
+          this.obtenerMonto(venta.pago.visa.monto) +
+          this.obtenerMonto(venta.pago.mastercard.monto) +
+          this.obtenerMonto(venta.pago.delivery.monto);
+        if (this.obtenerMonto(venta.pago.efectivo.monto) < 0) {
+          this.$swal.close();
+          this.$toasted.show("El metodo de pago efectivo no puede ser negativo");
+          return;
+        }
+        if (this.obtenerMonto(venta.pago.visa.monto) < 0) {
+          this.$swal.close();
+          this.$toasted.show(
+            "El metodo de pago tarjeta/transferencia no puede ser negativo"
+          );
+          return;
+        }
+        if (this.obtenerMonto(venta.pago.mastercard.monto) < 0) {
+          this.$swal.close();
+          this.$toasted.show(
+            "El metodo de pago Yape o Plin no puede ser negativo"
+          );
+          return;
+        }
+        if (this.obtenerMonto(venta.pago.delivery.monto) < 0) {
+          this.$swal.close();
+          this.$toasted.show(
+            "El metodo de pago Yape o Plin no puede ser negativo"
+          );
+          return;
+        }
+        if (totalPagos <= 0) {
+          this.$swal.close();
+          this.$toasted.show("Debe seleccionar un método de pago");
+          return;
+        }
 
-          const resHijos = await this.axios.get(this.API + "productosdet", {
-            params: { idProducto: v.IdProducto }
+        if (!venta.cliente.DniRuc) {
+          this.$swal.close();
+          this.$toasted.show("Debe seleccionar un cliente.");
+          return;
+        }
+
+        const sumaRealProductos = productos.reduce((total, prod) => {
+          return (
+            total +
+            (parseFloat(prod.cantidad) * parseFloat(prod.precio) -
+              parseFloat(prod.descuento || 0))
+          );
+        }, 0);
+
+        const totalCalculado = parseFloat(sumaRealProductos).toFixed(2);
+        const totalExhibido = parseFloat(this.getTotal()).toFixed(2);
+
+        if (totalCalculado !== totalExhibido) {
+          this.$swal.close();
+          this.$toasted.show(
+            "¡ERROR!: El total no coincide con la suma de productos. Recargue la página."
+          );
+          return;
+        }
+
+        const totalPagado = parseFloat(totalPagos).toFixed(2);
+
+        if (totalPagado !== totalExhibido) {
+          this.$swal.close();
+          this.$toasted.show(
+            `¡ERROR!: El monto pagado (S/ ${totalPagado}) debe ser igual al total (S/ ${totalExhibido})`
+          );
+          return;
+        }
+        var esNumerico = Number.isInteger(parseInt(venta.cliente.DniRuc));
+        if (!esNumerico) {
+          this.$swal.close();
+          return;
+        }
+
+        var esEmpresa = venta.cliente.DniRuc.length > 9 ? true : false;
+        if (!esEmpresa && venta.tipoVenta.CodSunat == "01") {
+          this.$swal.close();
+          this.$toasted.show(
+            "Una factura debe ser emitida para una empresa, no un usuario común."
+          );
+          return;
+        }
+        if (esEmpresa && venta.tipoVenta.CodSunat == "03") {
+          this.$swal.close();
+          this.$toasted.show("Una boleta no debe ser emitida para una empresa.");
+          return;
+        }
+        if (
+          venta.tipoVenta.CodSunat == "07" ||
+          venta.tipoVenta.CodSunat == "08"
+        ) {
+          if (!venta.CodSunatModifica || !venta.NroComprobanteModifica) {
+            this.$swal.close();
+            this.$toasted.show("Debe seleccionar un Documento de Referencia...");
+            return;
+          }
+          if (!venta.NotaIdMotivo) {
+            this.$swal.close();
+            this.$toasted.show("Debe seleccionar un Motivo");
+            return;
+          }
+          if (venta.NroComprobanteModifica == "") {
+            this.$swal.close();
+            this.$toasted.show("Debe seleccionar un Documento de Referencia");
+            this.$refs.inputDocRef.focus();
+            return;
+          }
+          venta.NotaDescMotivo = this.itemsMotivoNota.filter(
+            item => item.value == venta.NotaIdMotivo
+          )[0].text;
+        }
+        if (!productos.length) {
+          this.$swal.close();
+          this.$toasted.show("No hay productos para vender");
+          return;
+        }
+        const esNotaCredito = venta.tipoVenta.CodSunat == "07";
+        console.log("IdAlmacen", this.ventas[this.ventaActiva].almacen.IdAlmacen);
+        const idAlmacen = this.ventas[this.ventaActiva].almacen.IdAlmacen;
+
+        // Stock total por producto (suma de todas sus líneas, por si se dividió)
+        const totalPorProducto = {};
+        productos.forEach(v => {
+          if (v.EsPadre == 1) return;
+          const cantReal =
+            parseFloat(v.cantidad) *
+            (v.CantidadPresentacion ? v.CantidadPresentacion : 1);
+          totalPorProducto[v.IdProducto] =
+            (totalPorProducto[v.IdProducto] || 0) + cantReal;
+        });
+        const sinStock =
+          idAlmacen != 2 &&
+          productos.some(v => {
+            if (v.EsPadre == 1) return false;
+            return totalPorProducto[v.IdProducto] > (parseFloat(v.stock) || 0);
           });
 
-          const hijos = resHijos.data;
-          if (!hijos || hijos.length === 0) continue;
+        if (!esNotaCredito && sinStock) {
+          this.$swal.close();
+          this.$toasted.show("No se puede vender un producto sin stock");
+          return;
+        }
+        
+        if (!esNotaCredito) {
+          const usadoPorLote = {};
+          for (const v of productos) {
+            if (v.EsPadre == 1 || !v.IdProductoLote) continue;
 
-          for (const hijo of hijos) {
-            const cantNecesaria = parseFloat(hijo.Cantidad) * parseFloat(v.cantidad);
+            const lotes = this.lotesPorProducto[this.claveLote(v)] || [];
+            const lote = lotes.find(l => l.IdProductoLote === v.IdProductoLote);
+            if (!lote) continue;
 
-            const resStockHijo = await this.axios.get(
-              this.API + "productos/puntoventa/stock",
-              { params: { idProductos: [hijo.IdProductoDet], idAlmacen } }
-            );
-
-            const stockHijo = resStockHijo.data && resStockHijo.data[0]
-              ? parseFloat(resStockHijo.data[0].stock) || 0
-              : 0;
-
-            if (cantNecesaria > stockHijo) {
+            // Lote agotado seleccionado
+            if (parseFloat(lote.Stock) <= 0) {
               this.$swal.close();
               this.$toasted.show(
-                `Stock insuficiente: "${hijo.Producto}" necesita ${cantNecesaria} unid. y solo hay ${stockHijo}`
+                `${v.Producto}: el lote ${lote.Lote} está agotado. Seleccione otro lote o "SIN LOTE".`
+              );
+              return;
+            }
+
+            const cantReal =
+              parseFloat(v.cantidad) *
+              (v.CantidadPresentacion ? parseFloat(v.CantidadPresentacion) : 1);
+            usadoPorLote[v.IdProductoLote] =
+              (usadoPorLote[v.IdProductoLote] || 0) + cantReal;
+
+            const stockLote = parseFloat(lote.Stock) || 0;
+            if (usadoPorLote[v.IdProductoLote] > stockLote) {
+              this.$swal.close();
+              this.$toasted.show(
+                `${v.Producto} (lote ${lote.Lote}): stock insuficiente. Disponible: ${stockLote} unid., solicitado: ${usadoPorLote[v.IdProductoLote]} unid.`
               );
               return;
             }
           }
         }
-      }
+        // ===== VALIDAR SIN LOTE: solo se puede vender lo que no está asignado a lotes =====
+        if (!esNotaCredito && idAlmacen != 2) {
+          const r2 = n => Number(parseFloat(n || 0).toFixed(2));
+          const sinLotePorProducto = {};
+          productos.forEach(v => {
+            if (v.EsPadre == 1 || v.IdProductoLote) return;
+            const cantReal =
+              (parseFloat(v.cantidad) || 0) *
+              (parseFloat(v.CantidadPresentacion) || 1);
+            sinLotePorProducto[v.IdProducto] =
+              (sinLotePorProducto[v.IdProducto] || 0) + cantReal;
+          });
 
-      venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
-      venta.puntosAplicados = this.puntosAplicados || 0;
-      venta.IdPreOrden = this.$route.query.idPreOrden || null;
-      venta.IdPedido = this.$route.query.idPedido || null;
-      venta.IdProyecto = this.$route.query.idProyecto || null;
-      venta.adelantosPreOrden = this.adelantosPreOrden;
-      if (venta.selectOpcionVenta != 2) {
-        venta.DireccionEntrega = venta.EsDelivery
-          ? this.infoDelivery.Direccion || ""
-          : "";
-      }
-      venta.PagoCon = venta.pagocon;
-      venta.totalCart = this.getTotal();
-      venta.Observacion = (venta.Observacion + "").toUpperCase();
-      venta.idProductos = productos.map(prod => prod.IdProducto);
-      if (venta.cliente.DniRuc != "00000000") {
-        venta.EsOrganizacion = 0;
-        venta.NombreOrganizacion = "";
-      }
-      if (venta.EsOrganizacion) {
-        venta.cliente.Cliente = venta.NombreOrganizacion;
-      }
-      venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
-        .toUpperCase()
-        .trim();
-      venta.productos = venta.productos.map(item => {
-        return {
-          ...item,
-          cantidad: item.cantidad,
-          CantidadPresentacion: item.CantidadPresentacion || 1,
-          Presentacion: (item.CantidadPresentacion && !item.EsPadre)
-            ? JSON.stringify({
-                nombre: item.Descripcion,
-                cantidad: item.CantidadPresentacion,
-                precio: item.precio,
-                precioc: item.PrecioCosto
-              })
-            : null
-        };
-      });
+          for (const id in sinLotePorProducto) {
+            const v = productos.find(p => p.IdProducto == id);
+            const lotes = this.lotesPorProducto[this.claveLote(v)] || [];
+            const enLotes = lotes.reduce(
+              (s, l) => s + Math.max(parseFloat(l.Stock) || 0, 0),
+              0
+            );
+            const libre = Math.max((parseFloat(v.stock) || 0) - enLotes, 0);
 
-      // RE-VALIDACIÓN FINAL: por si el usuario vació el carrito durante los await anteriores
-      if (!venta.productos.length) {
-        this.$swal.close();
-        this.$toasted.show("El carrito quedó vacío antes de guardar, no se puede procesar la venta");
-        return;
-      }
+            if (r2(sinLotePorProducto[id]) > r2(libre)) {
+              this.$swal.close();
+              this.$toasted.show(
+                `${v.Producto}: stock sin lote insuficiente. Disponible sin lote: ${r2(libre)} unid., solicitado: ${r2(sinLotePorProducto[id])} unid.`
+              );
+              return;
+            }
+          }
+        }
+        // ===== FIN VALIDAR SIN LOTE =====
+        if (!esNotaCredito) {
+          for (const v of productos) {
+            if (v.EsPadre != 1) continue;
 
-      await this.axios.post(this.API + "ventas", venta).then(response => {
-        if (response.data.insertId) {
-          this.$toasted.success("Venta realizada con exito");
-          window.open(
-            "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
-            "_blank",
-            "noopener"
+            const resHijos = await this.axios.get(this.API + "productosdet", {
+              params: { idProducto: v.IdProducto }
+            });
+
+            const hijos = resHijos.data;
+            if (!hijos || hijos.length === 0) continue;
+
+            for (const hijo of hijos) {
+              const cantNecesaria =
+                parseFloat(hijo.Cantidad) * parseFloat(v.cantidad);
+
+              const resStockHijo = await this.axios.get(
+                this.API + "productos/puntoventa/stock",
+                { params: { idProductos: [hijo.IdProductoDet], idAlmacen } }
+              );
+
+              const stockHijo =
+                resStockHijo.data && resStockHijo.data[0]
+                  ? parseFloat(resStockHijo.data[0].stock) || 0
+                  : 0;
+
+              if (cantNecesaria > stockHijo) {
+                this.$swal.close();
+                this.$toasted.show(
+                  `Stock insuficiente: "${hijo.Producto}" necesita ${cantNecesaria} unid. y solo hay ${stockHijo}`
+                );
+                return;
+              }
+            }
+          }
+        }
+
+        venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
+        venta.puntosAplicados = this.puntosAplicados || 0;
+        venta.IdPreOrden = this.$route.query.idPreOrden || null;
+        venta.IdPedido = this.$route.query.idPedido || null;
+        venta.IdProyecto = this.$route.query.idProyecto || null;
+        venta.adelantosPreOrden = this.adelantosPreOrden;
+        if (venta.selectOpcionVenta != 2) {
+          venta.DireccionEntrega = venta.EsDelivery
+            ? this.infoDelivery.Direccion || ""
+            : "";
+        }
+        venta.PagoCon = venta.pagocon;
+        venta.totalCart = this.getTotal();
+        venta.Observacion = (venta.Observacion + "").toUpperCase();
+        venta.idProductos = productos.map(prod => prod.IdProducto);
+        if (venta.cliente.DniRuc != "00000000") {
+          venta.EsOrganizacion = 0;
+          venta.NombreOrganizacion = "";
+        }
+        if (venta.EsOrganizacion) {
+          venta.cliente.Cliente = venta.NombreOrganizacion;
+        }
+        venta.NombreOrganizacion = ("" + venta.NombreOrganizacion)
+          .toUpperCase()
+          .trim();
+        venta.productos = venta.productos.map(item => {
+          return {
+            ...item,
+            cantidad: item.cantidad,
+            CantidadPresentacion: item.CantidadPresentacion || 1,
+            Presentacion:
+              item.CantidadPresentacion && !item.EsPadre
+                ? JSON.stringify({
+                    nombre: item.Descripcion,
+                    cantidad: item.CantidadPresentacion,
+                    precio: item.precio,
+                    precioc: item.PrecioCosto
+                  })
+                : null
+          };
+        });
+
+        // RE-VALIDACIÓN FINAL: por si el usuario vació el carrito durante los await anteriores
+        if (!venta.productos.length) {
+          this.$swal.close();
+          this.$toasted.show(
+            "El carrito quedó vacío antes de guardar, no se puede procesar la venta"
           );
+          return;
         }
+
+        await this.axios
+          .post(this.API + "ventas", venta)
+          .then(response => {
+            this.$swal.close(); // cierra el "Procesando venta..."
+
+            if (response.data.error) {
+              this.$swal.fire({
+                icon: "error",
+                title: "No se pudo registrar la venta",
+                text: response.data.msg
+              });
+              venta.productos.forEach(p => this.cargarLotes(p));
+              return;
+            }
+
+            if (response.data.insertId) {
+              this.$toasted.success("Venta realizada con exito");
+              window.open(
+                "/imprimir/index.php?IdDocVenta=" + response.data.insertId,
+                "_blank",
+                "noopener"
+              );
+            }
+            venta.enviando = false;
+
+            if (this.ventas.length == 1) {
+              window.location.reload();
+            } else {
+              this.eliminarVentana();
+              this.getVendedorInfo();
+            }
+          })
+          .catch(error => {
+            console.log(error);
+            this.$swal.close();
+            this.$toasted.show(
+              "Ocurrió un error al procesar la venta, intente nuevamente"
+            );
+          });
+      } finally {
         venta.enviando = false;
-
-        if (this.ventas.length == 1) {
-          window.location.reload();
-        } else {
-          this.eliminarVentana();
-          this.getVendedorInfo();
-        }
-      }).catch(error => {
-        console.log(error);
-        this.$toasted.show("Ocurrió un error al procesar la venta, intente nuevamente");
-      });
-
-      this.$swal.close();
-    } finally {
-      venta.enviando = false;
-    }
-  },
+      }
+    },
     async guardarProforma() {
       let venta = this.ventas[this.ventaActiva];
       let productos = venta.productos;
@@ -2917,11 +3273,18 @@ export default {
         prod.precio = producto.Precio;
         prod.descuento = producto.Descuento ? producto.Descuento : 0;
         prod.stock = prod.stock;
+        prod.IdProductoLote = null;
         productos.push(prod);
       }
 
       venta.productos = productos;
       this.ventas.push(venta);
+      this.$nextTick(() => {
+        this.ventaActiva = this.ventas.length - 1;
+        venta.productos.forEach(p => this.cargarLotes(p));
+        this.getNumeroVenta();
+        this.getVendedorInfo();
+      });
       this.$nextTick(() => {
         this.ventaActiva = this.ventas.length - 1;
         this.getNumeroVenta();
@@ -3262,5 +3625,50 @@ export default {
 }
 .hidden {
   display: none;
-} 
+}
+
+/* ====== LOTES ====== */
+.lote-dd .btn { text-align: left; border: 1px solid #ced4da; padding: 3px 6px; }
+.lote-dd .dropdown-toggle::after { margin-left: auto; }
+.lote-dd > .btn { display: flex; align-items: center; width: 190px; }
+.lote-btn { display: flex; align-items: center; gap: 5px; min-width: 0; flex: 1; }
+.lote-btn-text { font-size: 0.72rem; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.lote-btn-stock { font-size: 0.68rem; color: #555; white-space: nowrap; }
+
+.lote-menu { min-width: 340px !important; max-height: 260px; overflow-y: auto; padding: 3px; font-size: 0.8rem; }
+.lote-menu .dropdown-item { padding: 0; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; }
+.lote-menu .dropdown-item.active,
+.lote-menu .dropdown-item:active { background: transparent; outline: 2px solid #007bff; outline-offset: -2px; }
+.lote-menu .dropdown-item.disabled { opacity: .55; }
+
+.lote-item { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border-left: 4px solid transparent; line-height: 1.4; }
+.lote-item-nombre { font-size: 0.8rem; color: #212529; flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.lote-item-fecha { font-size: 0.76rem; color: #555; }
+.lote-item-stock { font-size: 0.78rem; font-weight: bold; color: #212529; white-space: nowrap; }
+
+/* punto de color */
+.lote-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.lote-ok        { background: #28a745; }
+.lote-porvencer { background: #ffc107; }
+.lote-vencido   { background: #dc3545; }
+.lote-agotado   { background: #adb5bd; }
+.lote-sinfecha  { background: #17a2b8; }
+.lote-sinlote   { background: #6c757d; }
+
+/* fondo de cada opción */
+.lote-bg-ok        { background: #e8f6ec; border-left-color: #28a745; }
+.lote-bg-porvencer { background: #fff6dd; border-left-color: #ffc107; }
+.lote-bg-vencido   { background: #fde8ea; border-left-color: #dc3545; }
+.lote-bg-agotado   { background: #ececec; border-left-color: #adb5bd; }
+.lote-bg-sinfecha  { background: #e3f4f7; border-left-color: #17a2b8; }
+.lote-bg-sinlote   { background: #f1f3f5; border-left-color: #6c757d; }
+
+/* etiquetas */
+.lote-tag { font-size: 0.6rem; font-weight: bold; padding: 0 5px; border-radius: 8px; color: #fff; white-space: nowrap; }
+.lote-tag-ok        { background: #28a745; }
+.lote-tag-porvencer { background: #e0a800; }
+.lote-tag-vencido   { background: #dc3545; }
+.lote-tag-agotado   { background: #6c757d; }
+.lote-tag-sinfecha  { background: #17a2b8; }
+.lote-tag-sinlote   { background: #e0a800; }
 </style>

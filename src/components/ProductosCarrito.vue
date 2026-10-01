@@ -400,6 +400,51 @@
             ></b-form-input>
         </template>
 
+
+        <template slot="loteOpc" slot-scope="data">
+          <b-form-input
+            v-if="movTipo == 0"
+            v-model="productos[data.index].Lote"
+            size="sm"
+            placeholder="Opcional"
+            autocomplete="off"
+            style="width:120px; text-transform:uppercase"
+            @input="onLoteTexto(productos[data.index])"/>
+          <b-form-select
+            v-else-if="(movTipo == 1 || movTipo == 2) && (lotesPorProducto[data.item.IdProducto] || []).length"
+            v-model="productos[data.index].IdProductoLote"
+            :options="opcionesLote(productos[data.index])"
+            size="sm"
+            style="width:190px; font-size:0.75rem"
+            @change="aplicarLote(productos[data.index])"/>
+          <small v-else class="text-muted">—</small>
+        </template>
+
+        <template slot="fechaVenOpc" slot-scope="data">
+          <b-form-input
+            v-if="movTipo == 0"
+            v-model="productos[data.index].FechaVen"
+            type="date"
+            size="sm"
+            :disabled="!(productos[data.index].Lote || '').trim()"/>
+          <small v-else-if="productos[data.index].IdProductoLote">
+            {{ productos[data.index].FechaVen || 's/f' }}
+          </small>
+        </template>
+
+        <template slot="registroOpc" slot-scope="data">
+          <b-form-input
+            v-if="movTipo == 0"
+            v-model="productos[data.index].Registro"
+            size="sm"
+            autocomplete="off"
+            :disabled="!(productos[data.index].Lote || '').trim()"/>
+          <small v-else-if="productos[data.index].IdProductoLote">
+            {{ productos[data.index].Registro || '—' }}
+          </small>
+        </template>
+        <!-- ===== FIN LOTES OPCIONALES ===== -->
+
         <template slot="total" slot-scope="data">
           <div style="display: flex; justify-content: space-evenly;">
             {{ getTotal(data.index) }}
@@ -517,7 +562,8 @@ export default {
       movimientoLotes: {},
       productoNombre: "",
       productoUrl: "",
-      indexPos: null
+      indexPos: null,
+      lotesPorProducto: {}
     };
   },
   watch: {
@@ -530,6 +576,15 @@ export default {
       if (pi >= 0 && !this.productos[pi].precioBruta) {
         this.productos[pi].precioBruta = this.productos[pi].precio;
       }
+      // NUEVO: carga los lotes de las filas nuevas (salida / traslado)
+      this.sincronizarLotes();
+    },
+    // NUEVO: al cambiar tipo de movimiento o almacen origen se reinician los lotes
+    movTipo() {
+      this.reiniciarLotes();
+    },
+    almacenOrigen() {
+      this.reiniciarLotes();
     }
   },
   props: {
@@ -668,6 +723,81 @@ export default {
       actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
+
+    // ===================== NUEVO: LOTES OPCIONALES =====================
+    // Solo actua cuando tipo == "mov" (pantalla de movimientos / compras).
+    limpiarCamposLote(obj) {
+      if (this.tipo !== "mov") return;
+      obj.IdProductoLote = undefined; // undefined = "aun no procesado"
+      obj.Lote = null;
+      obj.FechaVen = null;
+      obj.Registro = null;
+    },
+    reiniciarLotes() {
+      if (this.tipo !== "mov") return;
+      this.lotesPorProducto = {};
+      this.productos.forEach(p => this.limpiarCamposLote(p));
+      this.sincronizarLotes();
+    },
+    sincronizarLotes() {
+      if (this.tipo !== "mov" || (this.movTipo != 1 && this.movTipo != 2)) return;
+      this.productos.forEach(p => {
+        if (p.IdProductoLote !== undefined) return; // ya procesado
+        this.$set(p, "IdProductoLote", null); // sin lote por defecto
+        this.cargarLotes(p);
+      });
+    },
+    async cargarLotes(prod) {
+      const idAlmacen = this.almacenOrigen;
+      if (!idAlmacen || idAlmacen < 0) return;
+      try {
+        const { data } = await this.axios.get(
+          `${this.API}productolotes/${prod.IdProducto}/${idAlmacen}`
+        );
+        this.$set(this.lotesPorProducto, prod.IdProducto, data);
+        if (data.length) {
+          // FEFO: el que vence primero. Si no quiere lote, que elija "SIN LOTE"
+          this.$set(prod, "IdProductoLote", data[0].IdProductoLote);
+          this.aplicarLote(prod);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    opcionesLote(prod) {
+      const div = parseFloat(prod.CantidadPresentacion) || 1;
+      const lotes = this.lotesPorProducto[prod.IdProducto] || [];
+      return [
+        { value: null, text: "SIN LOTE" },
+        ...lotes.map(l => ({
+          value: l.IdProductoLote,
+          text: `${l.Lote} | ${
+            l.FechaVen ? this.$moment(l.FechaVen).format("DD/MM/YY") : "s/f"
+          } | st ${(l.Stock / div).toFixed(2)}`
+        }))
+      ];
+    },
+    aplicarLote(prod) {
+      const l = (this.lotesPorProducto[prod.IdProducto] || []).find(
+        x => x.IdProductoLote === prod.IdProductoLote
+      );
+      this.$set(prod, "Lote", l ? l.Lote : null);
+      this.$set(
+        prod,
+        "FechaVen",
+        l && l.FechaVen ? this.$moment(l.FechaVen).format("YYYY-MM-DD") : null
+      );
+      this.$set(prod, "Registro", l ? l.Registro : null);
+    },
+    onLoteTexto(prod) {
+      // Entrada: si borran el lote, se limpian vencimiento y registro
+      if (!(prod.Lote || "").trim()) {
+        this.$set(prod, "FechaVen", null);
+        this.$set(prod, "Registro", null);
+      }
+    },
+    // =================== FIN NUEVO: LOTES OPCIONALES ===================
+
     abrirImagen(producto, url) {
       this.productoNombre = producto;
       this.productoUrl = url;
@@ -758,22 +888,6 @@ export default {
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
-    // loadBarcode (e) {
-    //   e.preventDefault()
-    //   let idProducto = this.loadCode;
-
-    //   if (idProducto) {
-    //     this.add([idProducto, (obj) => {
-    //       if (obj) {
-    //         this.$emit('onAddProducto')
-    //         this.$toasted.show('Producto añadido correctamente')
-    //       } else {
-    //         this.$toasted.show('No se encontró ningun producto')
-    //       }
-    //       this.loadCode = ''
-    //     }, { setPrecio: this.setPrecio,  setSuma: true }, true])
-    //   }
-    // },
     changeMovimiento(hash, idProducto, index) {
       if (hash) {
         // Stock
@@ -932,35 +1046,6 @@ export default {
         ]);
       }
     },
-
-    /*alterarBuscadorProductos() {
-      this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
-
-      this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
-        console.log('paste')
-        this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
-      }
-
-      this.$refs.autocompleteProducto.handleKeyDown = (e) =>{
-        let key = e.keyCode;
-
-        if (key == 13) {
-          if(this.pasteCode) {
-            e.preventDefault()
-            let idProducto = this.pasteCode.substring(2, this.pasteCode.length -2);
-            this.add([idProducto, () => {
-              this.$emit('onAddProducto')
-            }])
-          } else {
-            e.preventDefault()
-            this.handleKeyDown(e) 
-          }   
-        } else {
-          this.handleKeyDown(e)
-        }
-        this.pasteCode = false
-      }
-    },*/
     focusAutocomplete(ref) {
       this.$refs[ref].type = "";
       this.$refs[ref].handleDoubleClick();
@@ -1059,13 +1144,15 @@ export default {
       obj.Presentacion = obj.ProductoMedicion;
       obj.CantidadPresentacion = 1;
       obj.EsPresentacion = 0;
+      this.limpiarCamposLote(obj); // NUEVO
       obj = this.onSetProducto(obj);
 
       this.add([
         obj,
         () => {
           this.$emit("onAddProducto", obj);
-          this.loadMovimientoLotes(obj.IdProducto);
+          // NUEVO: el sistema viejo de lotes solo corre fuera de movimientos
+          if (this.tipo != "mov") this.loadMovimientoLotes(obj.IdProducto);
           this.$toasted.success("Producto añadido correctamente");
         },
         { setSuma: false, setPrecioCosto: this.tipo == "mov" ? true : false },
@@ -1149,6 +1236,7 @@ export default {
       obj.Descripcion = prod.nombre;
       obj.descuento = 0;
       obj.nuevoPrecioContado = 0;
+      this.limpiarCamposLote(obj); // NUEVO: el clon puede traer el lote de otra fila
       obj = this.onSetProducto(obj, prod.precio, prod.precioc);
       this.add([
         obj,
@@ -1201,9 +1289,6 @@ export default {
         <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca}
       `;
     },
-    // setCantidad (index, val) {
-    //   this.$emit('onInputCantidad', val)
-    // },
     setNuevoPrecioContado(index) {
       // Añadir IGV si check IGV
       let precio = parseFloat(this.productos[index].precio);

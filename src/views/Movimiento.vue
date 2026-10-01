@@ -273,7 +273,9 @@ export default {
             class: "text-center centrarTd"
           },
           { key: "cantidad" },
-
+          { key: "loteOpc", label: "Lote (opcional)", class: "text-center" },
+          { key: "fechaVenOpc", label: "Vencim." },
+          { key: "registroOpc", label: "Reg. Sanit." },
           { key: "obsequio", label: "Obsequio", class: "thcenter" },
           { key: "precio", label: "P/U" },
           //{ key: 'utilidad', label: 'Porcentaje Utilidad %' },
@@ -598,36 +600,38 @@ export default {
       let igualProducto = false;
       let sinStock = 0;
       let faltaCantidad = false;
+      const clave = p =>
+        p.IdProductoLote
+          ? "L" + p.IdProductoLote
+          : (p.Lote || "").trim().toUpperCase();
+
       this.productos.forEach((prod, index) => {
         let stockActual = parseFloat(prod.stock || 0);
         let cantidadPedida = parseFloat(prod.cantidad || 0);
         
-        if (this.movimiento.movimientoTipo.Tipo != 0) {
-          if (prod.EsPadre != 1) {
-            if (
-              stockActual <= 0 || 
-              Number(stockActual.toFixed(2)) < Number(cantidadPedida.toFixed(2)) || 
-              prod.stock === undefined
-            ) {
-              sinStock++;
-            }
-          }
-        }
 
         let pro = this.productos.filter(
-          p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1
+          p =>
+            p.IdProducto == prod.IdProducto &&
+            p.EsObsequio != 1 &&
+            clave(p) === clave(prod)
         );
         if (pro.length > 1) {
           igualProducto = true;
-          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1)) {
+          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio != 1 && clave(p) === clave(prod))) {
             this.$toasted.show(prod.Producto + " repite 2 veces", { duration: 4000 });
           }
         }
 
-        let proObs = this.productos.filter(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1);
+        let proObs = this.productos.filter(
+          p =>
+            p.IdProducto == prod.IdProducto &&
+            p.EsObsequio == 1 &&
+            clave(p) === clave(prod)
+        );
         if (proObs.length > 1) {
           igualProducto = true;
-          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1)) {
+          if (index === this.productos.findIndex(p => p.IdProducto == prod.IdProducto && p.EsObsequio == 1 && clave(p) === clave(prod))) {
             this.$toasted.show(prod.Producto + " (Obsequio) repite 2 veces", { duration: 4000 });
           }
         }
@@ -674,10 +678,13 @@ export default {
         return;
       }
 
-      if (sinStock >= 1 && (this.isTraslado == true || this.isSalida == true)) {
-        this.$toasted.show("No tiene stock para realizar el movimiento");
-        this.inProgress = false;
-        return;
+      if (this.isTraslado == true || this.isSalida == true) {
+        const errStock = this.validarStockSalida();
+        if (errStock) {
+          this.$toasted.show(errStock, { duration: 5000 });
+          this.inProgress = false;
+          return;
+        }
       }
       if (this.isTraslado == true || this.isSalida == true) {
         this.movimiento.alterarProductos = 0;
@@ -685,6 +692,16 @@ export default {
 
       let r = confirm("¿Desea Guardar el Movimiento?");
       if (r == true) {
+        // NUEVO: deja el lote limpio. Sin lote => Lote, FechaVen y Registro van en null
+        this.productos.forEach(p => {
+          p.Lote = (p.Lote || "").trim().toUpperCase() || null;
+          if (!p.Lote) {
+            p.FechaVen = null;
+            p.Registro = null;
+            p.IdProductoLote = null;
+          }
+        });
+
         this.axios
           .post(this.API + "movimientos", {
             movimiento: this.movimiento,
@@ -712,6 +729,61 @@ export default {
       } else {
         this.inProgress = false;
       }
+    },
+    validarStockSalida() {
+      const carrito = this.$refs.carrito;
+      const lotesMap = (carrito && carrito.lotesPorProducto) || {};
+      const r2 = n => Number(parseFloat(n || 0).toFixed(2));
+
+      const porProducto = {};
+      this.productos.forEach(p => {
+        if (p.EsPadre == 1) return;
+        const unid =
+          (parseFloat(p.cantidad) || 0) * (parseFloat(p.CantidadPresentacion) || 1);
+        if (!porProducto[p.IdProducto]) {
+          porProducto[p.IdProducto] = {
+            nombre: p.Producto,
+            stock: parseFloat(p.stock || 0),
+            total: 0,
+            sinLote: 0,
+            lotes: {}
+          };
+        }
+        const g = porProducto[p.IdProducto];
+        g.total += unid;
+        if (p.IdProductoLote) {
+          g.lotes[p.IdProductoLote] = (g.lotes[p.IdProductoLote] || 0) + unid;
+        } else {
+          g.sinLote += unid;
+        }
+      });
+
+      for (const id in porProducto) {
+        const g = porProducto[id];
+        const lotes = lotesMap[id] || [];
+
+        if (r2(g.total) > r2(g.stock)) {
+          return `${g.nombre}: stock insuficiente. Disponible: ${g.stock} unid., solicitado: ${r2(g.total)} unid.`;
+        }
+
+        for (const idL in g.lotes) {
+          const l = lotes.find(x => x.IdProductoLote == idL);
+          const disp = l ? parseFloat(l.Stock) : 0;
+          if (r2(g.lotes[idL]) > r2(disp)) {
+            return `${g.nombre}: el lote "${l ? l.Lote : "?"}" solo tiene ${disp} unid. y está pidiendo ${r2(g.lotes[idL])} unid.`;
+          }
+        }
+
+        const enLotes = lotes.reduce(
+          (s, l) => s + Math.max(parseFloat(l.Stock) || 0, 0),
+          0
+        );
+        const libre = Math.max(g.stock - enLotes, 0);
+        if (r2(g.sinLote) > r2(libre)) {
+          return `${g.nombre}: sin lote solo hay ${r2(libre)} unid. libres (el resto está en lotes) y está pidiendo ${r2(g.sinLote)} unid.`;
+        }
+      }
+      return null;
     },
     focusAutocomplete(ref) {
       //this.$refs[ref].type = ""
