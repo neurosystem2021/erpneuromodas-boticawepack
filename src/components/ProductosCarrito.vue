@@ -174,7 +174,8 @@
         <template slot="precio" slot-scope="data">
           <input
             v-model="productos[data.index].precio"
-            :disabled="bloquearInput || productos[data.index].EsRegalo ? true : false"
+            :disabled="isVentas || bloquearInput || productos[data.index].EsRegalo ? true : false"
+            :readonly="isVentas"
             type="number"
             style="width: 110px"
             min="0"

@@ -216,7 +216,7 @@
                                       <div class="opciones-cuerpo">
                                           <b-form-checkbox
                                               v-model="venta.EsCredito"
-                                              :disabled="bloquearInput?true:false || isNota"
+                                              :disabled="bloquearInput?true:false || isNota || efectivoParcialObligatorio"
                                               :value="1"
                                               :unchecked-value="0">
                                               Venta a credito
@@ -225,7 +225,7 @@
                                               v-if="venta.EsCredito"
                                               class="mt-2"
                                               v-model="venta.FechaCredito"
-                                              :disabled="bloquearInput?true:false || isNota"
+                                              :disabled="bloquearInput?true:false || isNota || efectivoParcialObligatorio"
                                               type="date">
                                           </b-form-input>
                                       </div>
@@ -378,7 +378,7 @@
                                                   v-model="venta.EfectivoParcial"
                                                   :value="1"
                                                   :unchecked-value="0"
-                                                  :disabled="isNota"
+                                                  :disabled="isNota || efectivoParcialObligatorio"
                                                   switch
                                                   size="lg">
                                                   <i class="fas fa-coins"></i> <b>EFECTIVO PARCIAL</b>
@@ -581,7 +581,7 @@ export default {
   watch: {
     // NUEVO: si se marca crédito, se desmarca efectivo parcial (son excluyentes)
     "venta.EsCredito"(val) {
-      if (val) this.venta.EfectivoParcial = 0;
+      if (val && !this.efectivoParcialObligatorio) this.venta.EfectivoParcial = 0;
     },
     totalCart(newVal) {
       this.venta.pago.efectivo.monto = parseFloat(
@@ -596,7 +596,10 @@ export default {
     ...mapState({
       productos: state => state.cart.productos,
       totalCart: state => state.cart.totalCart
-    })
+    }),
+    efectivoParcialObligatorio() {
+      return Number(this.idPerfil) === 3;
+    }
   },
   methods: {
     ...mapActions({
@@ -639,7 +642,7 @@ export default {
     initForm() {
       this.venta = {
         EsCredito: 0,
-        EfectivoParcial: 0, // NUEVO
+        EfectivoParcial: Number(this.idPerfil) === 3 ? 1 : 0,
         Serie: "",
         Numero: "",
         cliente: {},
@@ -695,7 +698,7 @@ export default {
         // 07 - nota de credito, 08 - Nota de debito
         this.limpiarCart();
         this.isNota = true;
-        this.venta.EfectivoParcial = 0; // NUEVO
+        this.venta.EfectivoParcial = 0;
       }
 
       if (obj.TieneIgv) {
@@ -703,7 +706,9 @@ export default {
       } else {
         this.tieneIgv = false;
       }
-
+      if (!this.isNota && this.efectivoParcialObligatorio) {
+        this.venta.EfectivoParcial = 1;
+      }
       this.venta.tipoVenta = obj;
       this.getNumeroVenta();
     },

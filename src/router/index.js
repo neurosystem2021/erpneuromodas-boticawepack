@@ -34,6 +34,7 @@ import ProductoVencido from "@/views/reportes/ProductoVencido";
 import ReporteDetallado from "@/views/reportes/ReporteDetallado";
 import ReporteProductosConsolidado from "@/views/reportes/ReporteProductosConsolidado";
 import ReporteDeudaClientesUsuario from "@/views/reportes/ReporteDeudaClientesUsuario";
+import ReporteVentasParciales from "@/views/reportes/ReporteVentasParciales";
 Vue.use(Router);
 
 export default new Router({
@@ -199,6 +200,11 @@ export default new Router({
       path: "/reportes/ReporteDeudaClientesUsuario",
       name: "ReporteDeudaClientesUsuario",
       component: ReporteDeudaClientesUsuario
+    },
+    {
+      path: "/reportes/ReporteVentasParciales",
+      name: "ReporteVentasParciales",
+      component: ReporteVentasParciales
     }
   ]
 });
