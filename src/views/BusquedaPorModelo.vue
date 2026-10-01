@@ -249,15 +249,10 @@ export default {
       modalProducto: false,
       fieldsCarrito: [
         { key: "stock" },
-        // { key: "CodigoBarra" },
+        { key: "ProductoCategoria", label: "Categoría" },
         { key: "Producto" },
         { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMarca", label: "Marca" },
-        { key: "ProductoTalla", label: "Talla" },
-        { key: "Color" },
-        { key: "Genero" },
-        { key: "Botapie" },
-        { key: "Imagen" },
         { key: "cantidad" },
         { key: "precio" },
         { key: "subTotal", class: "text-center clsSubTotal" },
@@ -269,14 +264,11 @@ export default {
         { key: "seleccionar", label: "Elegir", class: "text-center" },
         { key: "action", label: "" },
         { key: "stock" },
+        { key: "ProductoCategoria", label: "Categoría" },
         { key: "Producto" },
         { key: "CodeBarModelo", label: "Cod. Bar. Modelo" },
-        { key: "ProductoTalla", label: "Talla" },
+        { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMarca", label: "Marca" },
-        { key: "Color" },
-        { key: "Genero" },
-        { key: "Botapie" },
-        { key: "Imagen" }
       ]
     };
   },

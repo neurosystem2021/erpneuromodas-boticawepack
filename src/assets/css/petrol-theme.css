@@ -1,0 +1,1339 @@
+/*
+ * Tema general de pantallas.
+ * Mantiene intacta la barra de navegacion del sistema y reemplaza el azul
+ * dominante de los modulos por una paleta verde petroleo consistente.
+ */
+
+#app {
+  --theme-petrol-950: #032b25;
+  --theme-petrol-900: #05382f;
+  --theme-petrol-800: #08483d;
+  --theme-petrol-700: #0b5c4d;
+  --theme-petrol-600: #137563;
+  --theme-petrol-200: #b9d8d0;
+  --theme-petrol-100: #e2f0ec;
+  --theme-petrol-50: #f2f8f6;
+  --theme-petrol-ink: #173b33;
+  --action-amber: #ffb000;
+  --action-orange: #f97316;
+  --action-slate: #405269;
+  --action-steel: #66758a;
+  --action-brown: #8b5e34;
+  --action-cyan: #0891b2;
+  --action-magenta: #c0266d;
+  --action-coral: #e24a3b;
+  --action-charcoal: #475569;
+  --action-green: #16b85f;
+  --action-blue: #0b7fc1;
+  --action-red: #e3131b;
+  --action-indigo: #4056d8;
+  --action-violet: #7c3aed;
+}
+
+/* Fondos generales con un matiz verde muy suave. */
+#app .ops-page,
+#app .dashboard-modern,
+#app .supplier-report-page,
+#app .movement-report-page,
+#app .cash-report-page,
+#app .cash-report-blue,
+#app .stock-report-page,
+#app .product-catalog-page,
+#app .inventory-movement-page,
+#app .printer-page,
+#app .printer-catalog,
+#app .kardex-page,
+#app .simple-kardex-page,
+#app .rotation-report-page,
+#app .format37-page,
+#app .reprint-page {
+  color: var(--theme-petrol-ink) !important;
+  background: var(--theme-petrol-50) !important;
+}
+
+/* Cabeceras principales de todas las pantallas modernas. */
+#app .ops-hero,
+#app .dashboard-hero,
+#app .supplier-report-hero,
+#app .movement-report-hero,
+#app .cash-report-hero,
+#app .stock-report-hero,
+#app .product-catalog-header,
+#app .inventory-heading,
+#app .printer-hero,
+#app .kardex-hero,
+#app .simple-kardex-hero,
+#app .rotation-report-hero,
+#app .format37-hero,
+#app .reprint-header,
+#app .xml-heading,
+#app .modern-report-page .breadcrumb {
+  color: #fff !important;
+  border-color: rgba(130, 211, 190, .28) !important;
+  background: var(--theme-petrol-900) !important;
+  box-shadow: 0 14px 32px rgba(5, 56, 47, .2) !important;
+}
+
+/* Cobertura general para cabeceras presentes y futuras de cualquier modulo. */
+#app [class$="-hero"],
+#app [class*="-hero "] {
+  color: #fff !important;
+  border-color: rgba(130, 211, 190, .28) !important;
+  background-color: var(--theme-petrol-900) !important;
+  background-image: none !important;
+  box-shadow: 0 14px 32px rgba(5, 56, 47, .2) !important;
+}
+
+#app [class$="-hero"] h1,
+#app [class$="-hero"] h2,
+#app [class$="-hero"] h3,
+#app [class$="-hero"] strong,
+#app [class*="-hero "] h1,
+#app [class*="-hero "] h2,
+#app [class*="-hero "] h3,
+#app [class*="-hero "] strong,
+#app .product-catalog-header h1,
+#app .reprint-header h1,
+#app .xml-heading h1,
+#app .xml-heading h2,
+#app .modern-report-page .breadcrumb h1,
+#app .modern-report-page .breadcrumb h2 {
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
+#app [class$="-hero"] p,
+#app [class*="-hero "] p,
+#app .product-catalog-header p,
+#app .reprint-header p {
+  color: #d9eee8 !important;
+}
+
+#app [class$="-hero"] small,
+#app [class$="-hero"] [class*="eyebrow"],
+#app [class*="-hero "] small,
+#app [class*="-hero "] [class*="eyebrow"],
+#app .product-catalog-header small,
+#app .product-catalog-eyebrow,
+#app .reprint-header small {
+  color: #9de4d1 !important;
+}
+
+#app .ops-hero small,
+#app .dashboard-hero small,
+#app .supplier-report-hero small,
+#app .movement-report-hero small,
+#app .cash-report-hero small,
+#app .stock-report-hero small,
+#app .product-catalog-header small,
+#app .inventory-heading small,
+#app .printer-hero small,
+#app .kardex-hero small,
+#app .simple-kardex-hero small,
+#app .rotation-report-hero small,
+#app .format37-hero small,
+#app .reprint-header small {
+  color: #91dec9 !important;
+}
+
+#app .ops-hero p,
+#app .dashboard-hero p,
+#app .supplier-report-hero p,
+#app .movement-report-hero p,
+#app .cash-report-hero p,
+#app .stock-report-hero p,
+#app .product-catalog-header p,
+#app .inventory-heading p,
+#app .printer-hero p,
+#app .kardex-hero p,
+#app .simple-kardex-hero p,
+#app .rotation-report-hero p,
+#app .format37-hero p,
+#app .reprint-header p {
+  color: #d9eee8 !important;
+}
+
+/* Encabezados de tablas y bandas de resultados. */
+#app table thead th,
+#app table.table thead th,
+#app .product-catalog-table thead th,
+#app .inventory-products-table thead th,
+#app .stock-report-table thead th,
+#app .movement-table-card thead th,
+#app .movement-detail-modal table thead th,
+#app .supplier-results-card thead th,
+#app .cash-report-table thead th,
+#app .printer-table thead th,
+#app .kardex-table thead th,
+#app .simple-kardex-table thead,
+#app .rotation-table thead th,
+#app .documents-table thead th,
+#app .xml-products-table thead th,
+#app .ops-results thead th,
+#app .ops-page #table-render th,
+#app .modern-report-page table.table thead th,
+#app .barcode-multi-table thead th,
+#app .model-products-table thead th,
+#app .model-cart-table thead th,
+#app .debt-table thead th,
+#app .debt-history-table thead th,
+#app .payment-method-table thead th,
+#app .proforma-table thead th {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .15) !important;
+  background-color: var(--theme-petrol-700) !important;
+  background-image: none !important;
+}
+
+/* Botones que antes usaban azul como accion principal. */
+#app .btn-primary,
+#app .btn-info,
+#app button.btn-primary,
+#app button.btn-info,
+#app a.btn-primary,
+#app a.btn-info,
+#app .supplier-create__trigger,
+#app .inventory-barcode-button,
+#app .product-catalog-multiple__button,
+#app .btn-kardex,
+#app .email-button,
+#app .guide-button {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background-color: var(--theme-petrol-700) !important;
+  background-image: none !important;
+  box-shadow: 0 7px 16px rgba(5, 56, 47, .2) !important;
+}
+
+/* Modulos con clases propias que antes conservaban azul. */
+#app .caja-bancos-modern .cb-hero,
+#app .security-hero,
+#app .billing-hero,
+#app .nm-guide-hero,
+#app .nm-report-hero,
+#app .nm-statistics-hero,
+#app .nm-stock-min-hero,
+#app .caja-bancos-modern .cb-operation-modal .modal-header,
+#app .security-modern .modal-header,
+#app .modal-header {
+  color: #fff !important;
+  border-color: var(--theme-petrol-900) !important;
+  background-color: var(--theme-petrol-900) !important;
+  background-image: none !important;
+}
+
+#app .caja-bancos-modern .cb-tabs .active,
+#app .caja-bancos-modern .cb-btn-export,
+#app .caja-bancos-modern .cb-btn-new,
+#app .caja-bancos-modern .cb-btn-generate,
+#app .caja-bancos-modern .cb-modal-panel .panel-heading,
+#app .security-modern .nav-pills .nav-link.active {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background-color: var(--theme-petrol-700) !important;
+  background-image: none !important;
+  box-shadow: 0 7px 16px rgba(5, 56, 47, .2) !important;
+}
+
+#app .caja-bancos-modern .cb-tabs a:hover,
+#app .caja-bancos-modern .cb-tabs button:hover,
+#app .security-modern .nav-pills .nav-link:hover {
+  color: var(--theme-petrol-700) !important;
+  border-color: var(--theme-petrol-200) !important;
+  background: var(--theme-petrol-100) !important;
+}
+
+#app .caja-bancos-modern .cb-breadcrumb,
+#app .caja-bancos-modern .cb-breadcrumb a,
+#app .caja-bancos-modern .cb-tabs a,
+#app .caja-bancos-modern .cb-tabs button,
+#app .security-modern .nav-pills .nav-link,
+#app .security-modern .nav-pills .nav-link i {
+  color: var(--theme-petrol-700) !important;
+}
+
+#app .caja-bancos-modern .cb-tabs .active i,
+#app .security-modern .nav-pills .nav-link.active i {
+  color: #fff !important;
+}
+
+#app .caja-bancos-modern .cb-hero h1,
+#app .caja-bancos-modern .cb-hero p,
+#app .security-hero h1,
+#app .security-hero p,
+#app .modal-header .modal-title,
+#app .modal-header h1,
+#app .modal-header h2,
+#app .modal-header h3 {
+  color: #fff !important;
+}
+
+#app .caja-bancos-modern .cb-hero small,
+#app .security-hero small {
+  color: #9de4d1 !important;
+}
+
+body.security-modern,
+body.caja-bancos-modern {
+  color: #173b33 !important;
+  background: #f2f8f6 !important;
+}
+
+#app .inventory-card__title > span,
+#app .inventory-field .autocomplete ul li a:hover,
+#app .inventory-field .autocomplete ul li.focus-list a,
+#app .inventory-field .autocomplete ul li a:focus,
+#app .stock-locked,
+#app .stock-kardex-modal .modal-header,
+#app .stock-kardex-product > i,
+#app .stock-kardex-generate,
+#app .stock-access-confirm,
+#app .stock-denied-confirm,
+#app .stock-export-modal .modal-header,
+#app .stock-export-option__icon,
+#app .stock-export-option.is-range .btn,
+#app .stock-report-page .btn-group-toggle .btn.active,
+#app .btn-format-generate,
+#app .rotation-actions .btn:first-child,
+#app .btn-generate,
+#app .cash-report-filters .btn,
+#app .cash-report-table .btn,
+#app .printer-device__icon,
+#app .printer-action--edit,
+#app .printer-empty > span,
+#app .printer-empty button,
+#app .printer-form-modal .modal-header,
+#app .printer-form-intro > span,
+#app .printer-form-btn--save {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background: var(--theme-petrol-700) !important;
+  background-image: none !important;
+}
+
+#app .stock-value-card,
+#app .stock-general-card,
+#app .stock-summary-panel,
+#app .ops-summary,
+#app .confront-active-category,
+#app .printer-list-card__header {
+  background: var(--theme-petrol-50) !important;
+  background-image: none !important;
+}
+
+#app .btn-primary:hover,
+#app .btn-info:hover,
+#app button.btn-primary:hover,
+#app button.btn-info:hover,
+#app a.btn-primary:hover,
+#app a.btn-info:hover {
+  border-color: var(--theme-petrol-900) !important;
+  background-color: var(--theme-petrol-900) !important;
+  background-image: none !important;
+}
+
+#app .btn-outline-primary,
+#app .btn-outline-info {
+  color: var(--theme-petrol-700) !important;
+  border-color: var(--theme-petrol-600) !important;
+}
+
+#app .btn-outline-primary:hover,
+#app .btn-outline-info:hover {
+  color: #fff !important;
+  background: var(--theme-petrol-700) !important;
+}
+
+/* Totales, resumenes, pestañas activas y cabeceras secundarias azules. */
+#app .dashboard-total,
+#app .supplier-summary .col-3,
+#app .cash-report-metrics .metric-main,
+#app .movement-totals-card .total,
+#app .inventory-total,
+#app .inventory-list-meta__total,
+#app .inventory-list-meta__icon,
+#app .inventory-section-title > span,
+#app .printer-list-card__header,
+#app .payment-method-heading,
+#app .debt-section-heading,
+#app .debt-history-heading,
+#app .pos-calculator-heading,
+#app .sale-options-heading,
+#app .barcode-multi-header,
+#app .modal-header.bg-primary,
+#app .ops-page .modal-header,
+#app .movement-detail-modal .modal-header {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background-color: var(--theme-petrol-800) !important;
+  background-image: none !important;
+}
+
+#app .supplier-modal__hero,
+#app .supplier-modal__search-button,
+#app .supplier-modal__save,
+#app .product-modal__hero,
+#app .product-code-generate,
+#app .inventory-cart-table thead th {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background: var(--theme-petrol-700) !important;
+  background-image: none !important;
+}
+
+#app .supplier-create__trigger::after,
+#app .inventory-heading::after,
+#app .product-catalog-header::after {
+  display: none !important;
+  background: none !important;
+}
+
+/* Evita fondos heredados dentro de las cabeceras y mejora su lectura. */
+#app .printer-hero__content,
+#app .security-hero-copy,
+#app .cb-hero > div:not(.cb-hero__icon) {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+#app .printer-list-card__header h2,
+#app .printer-list-card__header strong,
+#app .inventory-list-meta__total strong,
+#app .inventory-list-meta__total small,
+#app .dashboard-total strong,
+#app .dashboard-total small,
+#app .supplier-summary strong,
+#app .supplier-summary small {
+  color: #fff !important;
+}
+
+#app .printer-data i,
+#app .printer-width strong,
+#app .kardex-filter-title small,
+#app .simple-kardex-report-head small,
+#app .rotation-filter-title small,
+#app .format37-filter-title small {
+  color: var(--theme-petrol-600) !important;
+}
+
+#app .printer-list-card__eyebrow {
+  color: #9de4d1 !important;
+}
+
+/* Acentos y titulos secundarios: elimina el azul residual sin perder jerarquia. */
+#app [class$="-filter-title"] small,
+#app [class$="-filter-title"] > i,
+#app [class*="-filter-title "] small,
+#app [class*="-filter-title "] > i,
+#app [class$="-report-head"] small,
+#app [class*="-report-head "] small,
+#app .cb-empty i,
+#app .cash-report-empty i {
+  color: var(--theme-petrol-600) !important;
+}
+
+#app [class$="-filter-title"] h2,
+#app [class*="-filter-title "] h2,
+#app [class$="-report-head"] h2,
+#app [class*="-report-head "] h2,
+#app .dashboard-card-title h3,
+#app .supplier-results-title h2,
+#app .movement-section-title h2,
+#app [class$="-empty"] h3,
+#app [class*="-empty "] h3 {
+  color: var(--theme-petrol-ink) !important;
+}
+
+#app [class$="-empty"] > div,
+#app [class$="-empty"] > span,
+#app [class*="-empty "] > div,
+#app [class*="-empty "] > span,
+#app .cb-empty i,
+#app .cash-report-empty i {
+  color: var(--theme-petrol-700) !important;
+  background-color: var(--theme-petrol-100) !important;
+  background-image: none !important;
+}
+
+#app [class$="-hero"] [class$="__icon"],
+#app [class*="-hero "] [class$="__icon"],
+#app .security-hero-icon,
+#app .cb-hero__icon {
+  color: #b7eadc !important;
+  border-color: rgba(255, 255, 255, .25) !important;
+  background-color: rgba(255, 255, 255, .1) !important;
+  background-image: none !important;
+}
+
+/*
+ * Botonera viva y elegante.
+ * Las superficies estructurales siguen siendo petroleo plano; el color vivo
+ * queda reservado a las acciones para reconocerlas rapidamente.
+ */
+#app .btn-primary {
+  color: #fff !important;
+  border-color: #7080ed !important;
+  background: var(--action-indigo) !important;
+  box-shadow: 0 5px 0 #2e3fa8, 0 11px 20px rgba(64, 86, 216, .3), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .btn-info {
+  color: #fff !important;
+  border-color: #48a8db !important;
+  background: var(--action-blue) !important;
+  box-shadow: 0 5px 0 #075789, 0 11px 20px rgba(11, 127, 193, .29), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .btn-success {
+  color: #fff !important;
+  border-color: #50da8c !important;
+  background: var(--action-green) !important;
+  box-shadow: 0 5px 0 #087b3d, 0 11px 20px rgba(22, 184, 95, .28), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .btn-warning {
+  color: #233247 !important;
+  border-color: #ffd65c !important;
+  background: var(--action-amber) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .32) !important;
+  box-shadow: 0 5px 0 #c87b00, 0 11px 20px rgba(245, 158, 11, .29), inset 0 1px 0 rgba(255, 255, 255, .5) !important;
+}
+
+#app .btn-danger {
+  color: #fff !important;
+  border-color: #ff7d89 !important;
+  background: var(--action-red) !important;
+  box-shadow: 0 5px 0 #a00b10, 0 11px 20px rgba(227, 19, 27, .29), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .btn-secondary,
+#app .btn-dark {
+  color: #fff !important;
+  border-color: #8294aa !important;
+  background: var(--action-slate) !important;
+  box-shadow: 0 5px 0 #293546, 0 11px 20px rgba(64, 82, 105, .27), inset 0 1px 0 rgba(255, 255, 255, .38) !important;
+}
+
+#app .btn-primary:not(:disabled):hover,
+#app .btn-info:not(:disabled):hover,
+#app .btn-success:not(:disabled):hover,
+#app .btn-warning:not(:disabled):hover,
+#app .btn-danger:not(:disabled):hover,
+#app .btn-secondary:not(:disabled):hover,
+#app .btn-dark:not(:disabled):hover {
+  filter: brightness(1.07) saturate(1.08) !important;
+  transform: translateY(-2px);
+}
+
+#app .btn:disabled,
+#app .btn.disabled {
+  box-shadow: none !important;
+  filter: grayscale(.28) !important;
+  transform: none !important;
+}
+
+/* Cuatro accesos rapidos de venta: cada uno con identidad propia. */
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(1) .btn {
+  color: #233247 !important;
+  border-color: #ffd65c !important;
+  background: var(--action-amber) !important;
+  box-shadow: 0 6px 0 #c87b00, 0 13px 23px rgba(255, 176, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .5) !important;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(2) .btn {
+  color: #fff !important;
+  border-color: #c89a6e !important;
+  background: var(--action-brown) !important;
+  box-shadow: 0 6px 0 #5e3b1f, 0 13px 23px rgba(139, 94, 52, .3), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(3) .btn {
+  color: #fff !important;
+  border-color: #ff998e !important;
+  background: var(--action-coral) !important;
+  box-shadow: 0 6px 0 #a62b21, 0 13px 23px rgba(226, 74, 59, .29), inset 0 1px 0 rgba(255, 255, 255, .44) !important;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(4) .btn {
+  color: #fff !important;
+  border-color: #56c9dc !important;
+  background: var(--action-cyan) !important;
+  box-shadow: 0 6px 0 #05657c, 0 13px 23px rgba(8, 145, 178, .3), inset 0 1px 0 rgba(255, 255, 255, .44) !important;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions .btn {
+  min-height: 52px !important;
+  border-radius: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: .2px;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(1) .btn i,
+#app .pos-modern.pos-modern .pos-actions .pos-action-add.btnAction i {
+  color: #233247 !important;
+}
+
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(2) .btn i,
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(3) .btn i,
+#app .pos-modern.pos-modern .pos-quick-actions > .btn-group:nth-child(4) .btn i,
+#app .pos-modern.pos-modern .pos-actions .pos-action-proforma.btnAction i,
+#app .pos-modern.pos-modern .pos-actions .pos-model-search-button i,
+#app .pos-modern.pos-modern .pos-actions .pos-action-touch.btnAction i,
+#app .pos-modern.pos-modern .pos-actions .pos-action-nav.btnAction i {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .42) !important;
+  background-color: rgba(255, 255, 255, .18) !important;
+  background-image: none !important;
+}
+
+/* Centro de acciones del punto de venta. */
+#app .pos-modern.pos-modern .pos-actions .pos-action-add.btnAction {
+  color: #233247 !important;
+  border-color: #ffd65c !important;
+  background: var(--action-amber) !important;
+  box-shadow: 0 6px 0 #c87b00, 0 13px 23px rgba(255, 176, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .52) !important;
+}
+
+#app .pos-modern.pos-modern .pos-actions .pos-action-proforma.btnAction {
+  color: #fff !important;
+  border-color: #55aeff !important;
+  background: var(--action-indigo) !important;
+  box-shadow: 0 6px 0 #2e3fa8, 0 13px 23px rgba(64, 86, 216, .3), inset 0 1px 0 rgba(255, 255, 255, .44) !important;
+}
+
+#app .pos-modern.pos-modern .pos-actions .pos-model-search-button,
+#app .pos-modern.pos-modern .pos-actions .pos-action-model .pos-model-search-button {
+  color: #fff !important;
+  border-color: #8192a8 !important;
+  background: var(--action-slate) !important;
+  box-shadow: 0 6px 0 #293546, 0 13px 23px rgba(64, 82, 105, .29), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .pos-modern.pos-modern .pos-actions .pos-action-touch.btnAction {
+  color: #fff !important;
+  border-color: #48a8db !important;
+  background: var(--action-blue) !important;
+  box-shadow: 0 6px 0 #075789, 0 13px 23px rgba(11, 127, 193, .3), inset 0 1px 0 rgba(255, 255, 255, .48) !important;
+}
+
+#app .pos-modern.pos-modern .pos-actions .pos-action-cancel.btnAction {
+  color: #fff !important;
+  border-color: #f87171 !important;
+  background: #991b1b !important;
+  box-shadow: 0 6px 0 #5f0a0a, 0 13px 23px rgba(153, 27, 27, .3), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .pos-modern.pos-modern .pos-actions .pos-action-nav.btnAction {
+  color: #fff !important;
+  border-color: #ff7d89 !important;
+  background: var(--action-red) !important;
+  box-shadow: 0 6px 0 #a00b10, 0 13px 23px rgba(227, 19, 27, .3), inset 0 1px 0 rgba(255, 255, 255, .42) !important;
+}
+
+#app .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn {
+  color: #fff !important;
+  border-color: #65edb0 !important;
+  background: var(--action-green) !important;
+  box-shadow: 0 7px 0 #087b3d, 0 15px 28px rgba(22, 184, 95, .34), 0 0 0 5px rgba(43, 202, 112, .12), inset 0 1px 0 rgba(255, 255, 255, .46) !important;
+}
+
+#app .pos-modern.pos-modern .pos-pay-row .pos-pay-button.btn .pos-pay-amount {
+  color: #fff !important;
+  font-size: 1.16rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-shadow: 0 1px 2px rgba(0, 45, 28, .3) !important;
+}
+
+/* Resumen final: petroleo solido y cifras legibles, sin rojo sobre azul. */
+#app .pos-modern.pos-modern .pos-summary .resumen-venta > tbody > tr:nth-child(3) .resumen-total-label,
+#app .pos-modern.pos-modern .pos-summary .resumen-venta > tbody > tr:nth-child(3) .resumen-total-monto {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  background: var(--theme-petrol-700) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .28) !important;
+}
+
+#app .pos-modern.pos-modern .pos-summary .resumen-venta > tbody > tr:nth-child(3) .resumen-total-monto {
+  color: #fff !important;
+}
+
+/* Los controles secundarios no compiten con el verde exclusivo de PAGAR. */
+#app .pos-modern.pos-modern .pos-product-image-button.btn {
+  color: #fff !important;
+  border-color: #7080ed !important;
+  background: var(--action-indigo) !important;
+  box-shadow: 0 4px 0 #2e3fa8, 0 8px 15px rgba(64, 86, 216, .25) !important;
+}
+
+#app .pos-modern.pos-modern .pos-summary .pos-payment-trigger.btn {
+  color: #fff !important;
+  border-color: #48a8db !important;
+  background: var(--action-blue) !important;
+  box-shadow: 0 4px 0 #075789, 0 8px 15px rgba(11, 127, 193, .25) !important;
+}
+
+/* Acciones personalizadas fuera de los variants de Bootstrap. */
+#app .caja-bancos-modern .cb-btn-export,
+#app .stock-export-button,
+#app .btn-export,
+#app .btn-excel {
+  color: #fff !important;
+  border-color: #43dc91 !important;
+  background: var(--action-green) !important;
+  box-shadow: 0 5px 0 #087840, 0 11px 20px rgba(9, 158, 82, .27) !important;
+}
+
+#app .caja-bancos-modern .cb-btn-new,
+#app .caja-bancos-modern .cb-btn-generate {
+  color: #fff !important;
+  border-color: #5aa5ff !important;
+  background: var(--action-indigo) !important;
+  box-shadow: 0 5px 0 #2e3fa8, 0 11px 20px rgba(64, 86, 216, .3) !important;
+}
+
+#app .dashboard-card-title small,
+#app .dashboard-card-title > i,
+#app .supplier-results-title small,
+#app .movement-section-title small,
+#app .cash-report-section-title > i,
+#app .cash-report-table-heading > i,
+#app .inventory-section-title small,
+#app .product-catalog-heading small,
+#app .text-primary,
+#app a:not(.btn):not(.nav-link).text-primary {
+  color: var(--theme-petrol-600) !important;
+}
+
+#app .dashboard-card-title > i,
+#app .cash-report-metrics article > span,
+#app .product-catalog-heading > i {
+  background: var(--theme-petrol-100) !important;
+}
+
+#app .badge-primary,
+#app .bg-primary,
+#app .page-item.active .page-link,
+#app .nav-pills .nav-link.active,
+#app .custom-control-input:checked ~ .custom-control-label::before {
+  color: #fff !important;
+  border-color: var(--theme-petrol-700) !important;
+  background-color: var(--theme-petrol-700) !important;
+}
+
+#app .form-control:focus,
+#app .custom-select:focus,
+#app .autocomplete-input:focus {
+  border-color: var(--theme-petrol-600) !important;
+  box-shadow: 0 0 0 3px rgba(19, 117, 99, .14) !important;
+}
+
+#app .ops-page .autocomplete ul li a:hover,
+#app .ops-page .autocomplete ul li.focus-list a {
+  color: #fff !important;
+  background: var(--theme-petrol-700) !important;
+}
+
+#app .ops-results tbody tr:hover,
+#app .supplier-results-card tbody tr:hover,
+#app .movement-table-card tbody tr:hover,
+#app .cash-report-table tbody tr:hover td,
+#app table.table-hover tbody tr:hover {
+  background-color: var(--theme-petrol-50) !important;
+}
+
+/* La cabecera de venta ya elegida por el usuario usa el mismo petroleo oscuro. */
+#app #conten.pos-modern.pos-modern .pos-sale-header,
+#app #conten.pos-modern.pos-modern .pos-sale-header > .row,
+#app #conten.pos-modern.pos-modern .pos-document-layout {
+  background-color: var(--theme-petrol-900) !important;
+  background-image: none !important;
+}
+
+/* Selector de presentaciones: composición sobria, sólida y sin espacios vacíos. */
+body .presentation-modal .presentation-modal-dialog {
+  width: min(1060px, calc(100vw - 30px)) !important;
+  max-width: 1060px !important;
+}
+
+body .presentation-modal .presentation-modal-content {
+  overflow: hidden;
+  border: 1px solid #82b9ae !important;
+  border-radius: 22px !important;
+  background: #f2f7f6 !important;
+  background-image: none !important;
+  box-shadow: 0 28px 70px rgba(4, 45, 39, .34), 0 0 0 4px rgba(15, 118, 110, .09) !important;
+}
+
+body .presentation-modal .modal-header {
+  min-height: 82px;
+  padding: 15px 22px !important;
+  border: 0 !important;
+  background: #064c43 !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .presentation-title-icon {
+  color: #fff !important;
+  border-color: #65b9aa !important;
+  background: #0f766e !important;
+  background-image: none !important;
+  box-shadow: 0 7px 16px rgba(0, 30, 25, .22) !important;
+}
+
+body .presentation-modal .presentation-title-copy small {
+  color: #83dfcf !important;
+}
+
+body .presentation-modal .modal-header .close {
+  color: #fff !important;
+  border-color: #5fa99d !important;
+  background: #0d665b !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .modal-body {
+  padding: 18px 20px 20px !important;
+  background: #eef4f2 !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .presentation-intro {
+  min-height: 68px;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  border: 1px solid #c7dbd6;
+  border-left: 5px solid #0f766e;
+  border-radius: 14px;
+  background: #fff !important;
+  box-shadow: 0 6px 16px rgba(19, 76, 67, .07);
+}
+
+body .presentation-modal .presentation-intro-icon {
+  color: #fff;
+  background: #0f766e !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .presentation-intro strong {
+  color: #153f38;
+}
+
+body .presentation-modal .presentation-count {
+  color: #075c51;
+  border-color: #a9d5cc;
+  background: #def2ed !important;
+}
+
+body .presentation-modal .presentation-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin: 0 !important;
+}
+
+body .presentation-modal .presentation-option {
+  --presentation-accent: #0f766e;
+  position: relative;
+  display: grid !important;
+  width: 100%;
+  min-width: 0;
+  min-height: 230px;
+  padding: 16px;
+  overflow: hidden;
+  gap: 0 11px;
+  border: 1px solid #ccdbd7 !important;
+  border-top: 4px solid var(--presentation-accent) !important;
+  border-radius: 17px !important;
+  color: #173c36;
+  background: #fff !important;
+  background-image: none !important;
+  box-shadow: 0 8px 20px rgba(14, 65, 57, .08) !important;
+  text-align: left;
+}
+
+body .presentation-modal .presentation-option-unit {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1.35fr) minmax(255px, .65fr);
+  grid-template-areas:
+    "head head"
+    "name price"
+    "description price"
+    "stock action";
+  min-height: 176px;
+}
+
+body .presentation-modal .presentation-option-pack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "head head"
+    "name name"
+    "description description"
+    "price total"
+    "stock stock"
+    "action action";
+}
+
+body .presentation-modal .presentation-option-pack:nth-child(2) { --presentation-accent: #4056d8; }
+body .presentation-modal .presentation-option-pack:nth-child(3) { --presentation-accent: #d18400; }
+body .presentation-modal .presentation-option-pack:nth-child(4) { --presentation-accent: #a62e73; }
+body .presentation-modal .presentation-option-pack:nth-child(5) { --presentation-accent: #087f9c; }
+
+body .presentation-modal .presentation-option:not(:disabled):hover,
+body .presentation-modal .presentation-option:not(:disabled):focus-visible {
+  border-color: var(--presentation-accent) !important;
+  outline: 0;
+  box-shadow: 0 15px 30px rgba(14, 65, 57, .15), 0 0 0 3px rgba(15, 118, 110, .1) !important;
+  transform: translateY(-2px);
+}
+
+body .presentation-modal .presentation-card-head {
+  grid-area: head;
+  border-bottom-color: #dce8e5;
+}
+
+body .presentation-modal .presentation-card-kind {
+  color: #5c746e;
+}
+
+body .presentation-modal .presentation-card-kind i {
+  color: var(--presentation-accent);
+}
+
+body .presentation-modal .presentation-card-badge,
+body .presentation-modal .presentation-option-pack .presentation-card-badge {
+  color: var(--presentation-accent);
+  border: 1px solid #d0dedb;
+  background: #eff4f3 !important;
+}
+
+body .presentation-modal .presentation-card-name {
+  grid-area: name;
+  color: #133d36;
+  font-size: 1.12rem;
+}
+
+body .presentation-modal .presentation-card-description {
+  grid-area: description;
+  color: #6a7f7a;
+}
+
+body .presentation-modal .presentation-card-price {
+  grid-area: price;
+  border-color: #cadbd7;
+  background: #f7faf9 !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .presentation-option-unit .presentation-card-price {
+  margin-top: 13px;
+  align-self: stretch;
+}
+
+body .presentation-modal .presentation-card-price--wide {
+  grid-column: 1 / -1;
+}
+
+body .presentation-modal .presentation-card-price strong {
+  color: var(--presentation-accent);
+  font-size: 1.28rem;
+}
+
+body .presentation-modal .presentation-card-total {
+  grid-area: total;
+  border-color: #abd9ce;
+  background: #e5f5f1 !important;
+  background-image: none !important;
+}
+
+body .presentation-modal .presentation-card-total strong {
+  color: #08705d;
+}
+
+body .presentation-modal .presentation-card-stock {
+  grid-area: stock;
+  color: #48665f;
+  font-weight: 800;
+}
+
+body .presentation-modal .presentation-card-stock i {
+  color: var(--presentation-accent);
+}
+
+body .presentation-modal .presentation-card-action {
+  grid-area: action;
+  min-height: 40px;
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: 11px;
+  color: #fff;
+  background: var(--presentation-accent) !important;
+  background-image: none !important;
+  box-shadow: 0 5px 11px rgba(23, 60, 54, .14);
+}
+
+body .presentation-modal .presentation-option-unit .presentation-card-action {
+  align-self: end;
+}
+
+@media (max-width: 767px) {
+  body .presentation-modal .presentation-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body .presentation-modal .presentation-option-unit {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "name"
+      "description"
+      "price"
+      "stock"
+      "action";
+  }
+
+  body .presentation-modal .presentation-option-pack {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "name"
+      "description"
+      "price"
+      "total"
+      "stock"
+      "action";
+  }
+}
+
+/* Versión compacta del selector: cinco opciones visibles, poco texto y lectura rápida. */
+body .presentation-modal .presentation-modal-dialog {
+  width: min(900px, calc(100vw - 28px)) !important;
+  max-width: 900px !important;
+  margin: 18px auto !important;
+}
+
+body .presentation-modal .modal-header {
+  min-height: 68px;
+  padding: 11px 18px !important;
+}
+
+body .presentation-modal .presentation-title-icon {
+  width: 42px;
+  height: 42px;
+  flex-basis: 42px;
+  border-radius: 12px;
+}
+
+body .presentation-modal .presentation-title-copy small {
+  margin-bottom: 3px;
+  font-size: .58rem;
+}
+
+body .presentation-modal .presentation-title-copy strong {
+  font-size: 1.08rem;
+}
+
+body .presentation-modal .modal-body {
+  padding: 13px 15px 15px !important;
+}
+
+body .presentation-modal .presentation-intro {
+  min-height: 50px;
+  margin-bottom: 11px;
+  padding: 8px 11px;
+  border-left-width: 4px;
+  border-radius: 12px;
+}
+
+body .presentation-modal .presentation-intro-icon {
+  width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+  border-radius: 9px;
+}
+
+body .presentation-modal .presentation-intro strong {
+  font-size: .8rem;
+}
+
+body .presentation-modal .presentation-count {
+  padding: 5px 9px;
+  font-size: .64rem;
+}
+
+body .presentation-modal .presentation-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+body .presentation-modal .presentation-option,
+body .presentation-modal .presentation-option-unit,
+body .presentation-modal .presentation-option-pack {
+  display: flex !important;
+  grid-column: span 2;
+  min-height: 166px;
+  padding: 12px;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 14px !important;
+}
+
+body .presentation-modal .presentation-option:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+body .presentation-modal .presentation-option:nth-child(5) {
+  grid-column: 4 / span 2;
+}
+
+body .presentation-modal .presentation-card-head {
+  min-height: 25px;
+  padding-bottom: 7px;
+}
+
+body .presentation-modal .presentation-card-kind {
+  gap: 5px;
+  font-size: .59rem;
+}
+
+body .presentation-modal .presentation-card-kind i {
+  font-size: .77rem;
+}
+
+body .presentation-modal .presentation-card-badge,
+body .presentation-modal .presentation-option-pack .presentation-card-badge {
+  padding: 3px 7px;
+  font-size: .61rem;
+}
+
+body .presentation-modal .presentation-card-name {
+  min-height: 24px;
+  margin-top: 9px;
+  font-size: .94rem;
+  line-height: 1.2;
+}
+
+body .presentation-modal .presentation-card-price,
+body .presentation-modal .presentation-option-unit .presentation-card-price {
+  min-height: 44px;
+  margin-top: 7px;
+  padding: 7px 9px;
+  border-radius: 10px;
+}
+
+body .presentation-modal .presentation-card-price small {
+  font-size: .62rem;
+}
+
+body .presentation-modal .presentation-card-price strong {
+  font-size: 1.02rem;
+}
+
+body .presentation-modal .presentation-card-stock {
+  min-height: 20px;
+  margin-top: 6px;
+  gap: 5px;
+  font-size: .63rem;
+}
+
+body .presentation-modal .presentation-card-action,
+body .presentation-modal .presentation-option-unit .presentation-card-action {
+  min-height: 32px;
+  margin-top: auto;
+  padding: 7px 10px;
+  align-self: stretch;
+  border-radius: 9px;
+  font-size: .67rem;
+}
+
+@media (max-width: 767px) {
+  body .presentation-modal .presentation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  body .presentation-modal .presentation-option,
+  body .presentation-modal .presentation-option-unit,
+  body .presentation-modal .presentation-option-pack,
+  body .presentation-modal .presentation-option:nth-child(4),
+  body .presentation-modal .presentation-option:nth-child(5) {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 520px) {
+  body .presentation-modal .presentation-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Aviso de stock previo al pago. */
+body .swal2-popup.stock-alert-popup {
+  width: min(520px, calc(100vw - 28px)) !important;
+  padding: 0 0 18px !important;
+  overflow: hidden;
+  border: 1px solid #d9c78f;
+  border-top: 6px solid #d99000;
+  border-radius: 19px;
+  background: #fff !important;
+  background-image: none !important;
+  box-shadow: 0 26px 70px rgba(35, 45, 42, .28) !important;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-icon {
+  width: 58px;
+  height: 58px;
+  margin: 21px auto 9px;
+  border-width: 4px;
+  color: #d99000;
+  border-color: #efbd54;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-title {
+  padding: 0 24px;
+  color: #173f38;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-content {
+  margin: 8px 20px 0;
+  color: #49635e;
+}
+
+body .stock-alert-copy {
+  margin-bottom: 13px;
+  color: #667a75;
+  font-size: .82rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+body .stock-alert-list {
+  display: grid;
+  max-height: 255px;
+  overflow-y: auto;
+  gap: 8px;
+  text-align: left;
+}
+
+body .stock-alert-item {
+  display: flex;
+  min-height: 69px;
+  padding: 10px 11px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d9e4e1;
+  border-left: 4px solid #d99000;
+  border-radius: 12px;
+  background: #f8faf9;
+}
+
+body .stock-alert-product {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+
+body .stock-alert-product__icon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+  place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  background: #0f766e;
+}
+
+body .stock-alert-product > span:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+body .stock-alert-product strong {
+  overflow: hidden;
+  color: #193f39;
+  font-size: .83rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body .stock-alert-product small {
+  margin-top: 2px;
+  color: #87948f;
+  font-size: .64rem;
+  font-weight: 700;
+}
+
+body .stock-alert-values {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+body .stock-alert-values > span {
+  display: flex;
+  min-width: 62px;
+  padding: 6px 8px;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid #d7e4e1;
+  border-radius: 9px;
+  background: #fff;
+}
+
+body .stock-alert-values small {
+  color: #72847f;
+  font-size: .57rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+body .stock-alert-values strong {
+  margin-top: 1px;
+  color: #173f38;
+  font-size: .92rem;
+  font-weight: 900;
+}
+
+body .stock-alert-values__available strong {
+  color: #bd252d;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-actions {
+  margin: 15px 0 0;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-confirm {
+  min-width: 180px;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  background: #0f766e;
+  box-shadow: 0 6px 13px rgba(15, 118, 110, .24);
+  font-size: .82rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-confirm:hover {
+  background: #095f57;
+}
+
+@media (max-width: 520px) {
+  body .stock-alert-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body .stock-alert-values > span {
+    flex: 1;
+  }
+}
+

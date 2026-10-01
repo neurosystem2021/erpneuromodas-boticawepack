@@ -73,11 +73,12 @@ export default {
       API: config.API,
       carrito: {
         fields: [
-          //{ key: 'manoobra', label: 'Mano de obra', class:'text-center' },
-          //{ key: 'stock', label: 'Stock', variant: 'info', class:'text-center' },
+          { key: "stock", label: "Stock sistema", class: "text-center" },
           { key: "CodigoBarra", label: "Codigo" },
           { key: "Producto" },
           { key: "ProductoCategoria", label: "Categoria" },
+          { key: "ProductoMarca", label: "Marca" },
+          { key: "ProductoModelo", label: "Modelo" },
           { key: "cantidad", label: "Cantidad Fisica" },
           { key: "acciones", label: "" }
         ]
@@ -136,6 +137,11 @@ export default {
           response.data.map(item => {
             this.add([item, () => {}, { setPrecioCosto: true }, false, false]);
           });
+          this.$nextTick(() => {
+            if (this.almacen.IdAlmacen) {
+              this.obtenerStok({ IdAlmacen: this.almacen.IdAlmacen });
+            }
+          });
         });
     },
     onReset(evt) {
@@ -143,9 +149,9 @@ export default {
     },
     setAlmacenOrigen(obj) {
       this.almacen = obj;
-      /*this.obtenerStok({
-        IdAlmacen: !this.isTraslado?(this.movimiento.almacenDestino.IdAlmacen > 0 ? this.movimiento.almacenDestino.IdAlmacen : 1): (this.movimiento.almacenOrigen.IdAlmacen > 0 ? this.movimiento.almacenOrigen.IdAlmacen : 1) 
-      })*/
+      if (this.productos.length) {
+        this.obtenerStok({ IdAlmacen: obj.IdAlmacen });
+      }
     },
     guardarMovimiento(evt) {
       evt.preventDefault();
@@ -228,6 +234,8 @@ export default {
           Productos: this.productos.map(p => ({
             Producto: p.Producto,
             ProductoCategoria: p.ProductoCategoria,
+            ProductoMarca: p.ProductoMarca,
+            ProductoModelo: p.ProductoModelo,
             CodigoBarra: p.CodigoBarra,
             cantidad: p.cantidad > 0 ? p.cantidad : 0
           })),

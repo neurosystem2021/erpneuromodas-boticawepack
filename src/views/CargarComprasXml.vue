@@ -2,7 +2,7 @@
     <b-container class="xml-movement-page" fluid>
       <div class="xml-heading">
         <div class="xml-heading__icon"><i class="fas fa-file-code"></i></div>
-        <div><small>INVENTARIO INTELIGENTE</small><h1>Movimiento desde XML</h1><p>Importa y revisa los productos del comprobante antes de registrar el ingreso.</p></div>
+        <div><small>LLANTAS Y BATERÍAS · COMPRAS</small><h1>Movimiento desde XML</h1><p>Importa y revisa los productos del comprobante antes de registrar el ingreso.</p></div>
         <span class="xml-heading__status"><i class="fas fa-shield-alt"></i> Validación de compra</span>
       </div>
       <b-row class="xml-data-grid">
@@ -191,8 +191,10 @@
                         <th>Grupo</th>
                         <th>Stock</th>
                         <th>Cod. Barra</th>
+                        <th>Categoría</th>
                         <th>Artículo</th>
                         <th>Marca</th>
+                        <th>Modelo</th>
                         <th></th>
                         <th>Presentación</th>
                         
@@ -216,6 +218,7 @@
                     </td>
                     <td> {{producto.stock }}</td>
                     <td class="px-2" > {{producto.CodigoBarra}} </td>
+                    <td class="px-2" >{{ producto.ProductoCategoria }}</td>
                     <td class="px-2" >{{ producto.Producto }}</td>
                     <td class="px-2" >
                       <span >
@@ -235,6 +238,7 @@
                       </autocomplete> -->
 
                     </td>
+                    <td class="px-2">{{ producto.ProductoModelo }}</td>
                     <td> 
                       <b-button variant="info" v-if="producto.TienePresentacion" @click="abrirModalPresentacion(producto,index)">
                         <i class="fas fa-list" ></i>
@@ -1060,8 +1064,9 @@ export default {
                 <td style="width: 200px"><b>${data.Producto} - ${
           data.CodigoBarra
         }</b></td>
-                <td style="width: 100px">${data.ProductoCategoria}</td>
-                <td style="width: 100px">${data.ProductoMarca}</td>
+                        <td style="width: 100px">${data.ProductoCategoria}</td>
+                        <td style="width: 120px">${data.ProductoModelo || ""}</td>
+                        <td style="width: 100px">${data.ProductoMarca}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>

@@ -8289,3 +8289,241 @@ body.modal-open .pos-modern.pos-modern .trDetails {
     flex-direction: column;
   }
 }
+
+/* Clear, touch-friendly presentation choices in the point of sale. */
+.presentation-modal .presentation-modal-dialog {
+  width: min(960px, calc(100vw - 28px));
+  max-width: 960px !important;
+}
+
+.presentation-modal .modal-body {
+  padding: 18px 22px 22px !important;
+}
+
+.presentation-modal .presentation-intro {
+  margin-bottom: 17px;
+}
+
+.presentation-modal .presentation-intro small {
+  display: block;
+}
+
+.presentation-modal .presentation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.presentation-option {
+  --presentation-accent: #0789ad;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 255px;
+  padding: 17px;
+  flex-direction: column;
+  align-items: stretch;
+  border: 1px solid #d5e4ef;
+  border-radius: 19px;
+  color: #142d4c;
+  background: linear-gradient(155deg, #fff 0%, #f6fbff 100%);
+  box-shadow: 0 9px 24px rgba(15, 55, 90, .09);
+  cursor: pointer;
+  text-align: left;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.presentation-option-pack {
+  --presentation-accent: #6552d9;
+}
+
+.presentation-option:hover,
+.presentation-option:focus-visible {
+  border-color: var(--presentation-accent);
+  outline: 0;
+  box-shadow: 0 15px 32px rgba(17, 58, 94, .16), 0 0 0 4px rgba(14, 165, 233, .09);
+  transform: translateY(-2px);
+}
+
+.presentation-card-head {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid #e6eef5;
+}
+
+.presentation-card-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #60758c;
+  font-size: .67rem;
+  font-weight: 850;
+  letter-spacing: .06em;
+}
+
+.presentation-card-kind i {
+  color: var(--presentation-accent);
+  font-size: .9rem;
+}
+
+.presentation-card-badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--presentation-accent);
+  background: #e0f2fe;
+  font-size: .68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.presentation-option-pack .presentation-card-badge {
+  background: #ede9fe;
+}
+
+.presentation-card-name {
+  display: block;
+  margin-top: 15px;
+  color: #102b4d;
+  font-size: 1.08rem;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.presentation-card-description {
+  display: block;
+  margin-top: 4px;
+  color: #71849a;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.presentation-card-price,
+.presentation-card-total {
+  display: flex;
+  min-height: 57px;
+  margin-top: 13px;
+  padding: 10px 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #dceaf4;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.presentation-card-price small,
+.presentation-card-total small {
+  color: #64788f;
+  font-size: .71rem;
+  font-weight: 750;
+}
+
+.presentation-card-price strong {
+  color: #08699b;
+  font-size: 1.2rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.presentation-card-total {
+  min-height: 48px;
+  margin-top: 7px;
+  border-color: #bfe8da;
+  background: linear-gradient(100deg, #effcf7, #e1f7ef);
+}
+
+.presentation-card-total strong {
+  color: #08764d;
+  font-size: .98rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.presentation-card-stock {
+  display: flex;
+  min-height: 26px;
+  margin-top: 10px;
+  align-items: center;
+  gap: 7px;
+  color: #577089;
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.presentation-card-stock i {
+  color: #16a36a;
+}
+
+.presentation-card-action {
+  display: flex;
+  margin-top: auto;
+  padding-top: 13px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--presentation-accent);
+  font-size: .75rem;
+  font-weight: 900;
+}
+
+.presentation-card-action i {
+  transition: transform .18s ease;
+}
+
+.presentation-option:hover .presentation-card-action i {
+  transform: translateX(4px);
+}
+
+.pos-modern .pos-item-discount {
+  display: flex;
+  min-width: 88px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pos-modern .pos-item-discount .form-control {
+  width: 88px !important;
+  min-width: 0;
+}
+
+.pos-modern .pos-item-discount-percent {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 3px 7px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f5d18b;
+  border-radius: 999px;
+  color: #92520a;
+  background: #fff5df;
+  font-size: .61rem;
+  font-weight: 850;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .presentation-modal .modal-body {
+    padding: 12px 13px 16px !important;
+  }
+
+  .presentation-modal .presentation-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .presentation-option {
+    min-height: 235px;
+    padding: 14px;
+  }
+
+  .presentation-modal .presentation-intro {
+    align-items: flex-start;
+  }
+}

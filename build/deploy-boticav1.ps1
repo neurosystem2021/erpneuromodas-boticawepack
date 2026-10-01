@@ -18,6 +18,14 @@ if (-not (Test-Path -LiteralPath $targetRoot)) {
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'index.html') -Destination (Join-Path $targetRoot 'index.html') -Force
 Copy-Item -Path (Join-Path $sourceRoot 'static\*') -Destination (Join-Path $targetRoot 'static') -Recurse -Force
 
+$serverPrintSource = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\server\imprimir'))
+$serverPrintTarget = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\boticav1\imprimir'))
+if ($serverPrintTarget -ne [System.IO.Path]::GetFullPath('C:\xampp\htdocs\boticav1\imprimir')) {
+    throw "Ruta de impresion inesperada: $serverPrintTarget"
+}
+Copy-Item -LiteralPath (Join-Path $serverPrintSource 'usb.php') -Destination (Join-Path $serverPrintTarget 'usb.php') -Force
+Copy-Item -LiteralPath (Join-Path $serverPrintSource 'usb-print.ps1') -Destination (Join-Path $serverPrintTarget 'usb-print.ps1') -Force
+
 $sourceHash = (Get-FileHash -LiteralPath (Join-Path $sourceRoot 'index.html') -Algorithm SHA256).Hash
 $targetHash = (Get-FileHash -LiteralPath (Join-Path $targetRoot 'index.html') -Algorithm SHA256).Hash
 if ($sourceHash -ne $targetHash) { throw 'La verificacion del despliegue fallo.' }

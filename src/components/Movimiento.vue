@@ -6,6 +6,80 @@
       <b-modal v-model="showMovimientoModal" size="lg" title="Caja y banco" ref="modalCarrito"
         hide-footer centered modal-class="cash-modal">
         <b-tabs content-class="mt-3">
+          <b-tab title="Compra de chatarra" active>
+            <b-form class="scrap-purchase-form" @submit.prevent="insertarCompraChatarra">
+              <div class="scrap-purchase-intro">
+                <span class="scrap-purchase-intro__icon"><i class="fas fa-recycle"></i></span>
+                <div>
+                  <strong>Ingreso de chatarra con salida de caja</strong>
+                  <small>Al guardar, el stock aumenta y el mismo total se registra como egreso.</small>
+                </div>
+              </div>
+
+              <div class="scrap-purchase-grid">
+                <b-form-group label="Almacén:" label-for="scrap-warehouse">
+                  <b-form-select id="scrap-warehouse" v-model="compraChatarra.IdAlmacen" required>
+                    <option disabled value="">Seleccione el almacén</option>
+                    <option v-for="almacen in almacenesChatarra" :key="almacen.IdAlmacen" :value="almacen.IdAlmacen">
+                      {{ almacen.Almacen }}
+                    </option>
+                  </b-form-select>
+                </b-form-group>
+
+                <b-form-group label="Cuenta de salida:" label-for="scrap-account">
+                  <b-form-select id="scrap-account" v-model="compraChatarra.IdCuenta" required>
+                    <option disabled value="">Seleccione la cuenta</option>
+                    <option v-for="cuenta in cuentasChatarra" :key="cuenta.IdCuenta" :value="cuenta.IdCuenta">
+                      {{ cuenta.Cuenta }}
+                    </option>
+                  </b-form-select>
+                </b-form-group>
+
+                <b-form-group class="scrap-product-field" label="Producto marcado como chatarra:" label-for="scrap-product">
+                  <b-form-select id="scrap-product" v-model="compraChatarra.IdProducto" required @change="seleccionarProductoChatarra($event)">
+                    <option disabled value="">Seleccione el producto</option>
+                    <option v-for="producto in productosChatarra" :key="producto.IdProducto" :value="producto.IdProducto">
+                      {{ etiquetaProductoChatarra(producto) }}
+                    </option>
+                  </b-form-select>
+                  <small v-if="!cargandoChatarra && !productosChatarra.length" class="scrap-empty-help">
+                    No hay productos marcados como “Es chatarra”. Actívelo desde la ficha del producto.
+                  </small>
+                </b-form-group>
+
+                <b-form-group label="Cantidad (entera):" label-for="scrap-quantity">
+                  <b-form-input id="scrap-quantity" v-model.number="compraChatarra.Cantidad" required type="number" min="1" step="1" inputmode="numeric" @input="actualizarCantidadChatarra"></b-form-input>
+                </b-form-group>
+
+                <b-form-group label="Costo unitario:" label-for="scrap-cost">
+                  <b-input-group prepend="S/">
+                    <b-form-input id="scrap-cost" v-model.number="compraChatarra.Costo" required type="number" min="0.01" step="0.01"></b-form-input>
+                  </b-input-group>
+                </b-form-group>
+
+                <b-form-group label="Total de costo:" label-for="scrap-total">
+                  <b-input-group prepend="S/">
+                    <b-form-input id="scrap-total" :value="totalCompraChatarra.toFixed(2)" readonly></b-form-input>
+                  </b-input-group>
+                </b-form-group>
+
+                <b-form-group class="scrap-description-field" label="Descripción / comprobante:" label-for="scrap-description">
+                  <b-form-input id="scrap-description" v-model.trim="compraChatarra.Descripcion" required maxlength="180" placeholder="Ej.: compra de batería usada, recibo o referencia"></b-form-input>
+                </b-form-group>
+              </div>
+
+              <div class="scrap-purchase-summary">
+                <span>Total que saldrá de caja</span>
+                <strong>S/ {{ totalCompraChatarra.toFixed(2) }}</strong>
+              </div>
+
+              <b-btn variant="success" type="submit" :disabled="guardandoChatarra || cargandoChatarra || !productosChatarra.length">
+                <i class="fas fa-save mr-2"></i>{{ guardandoChatarra ? "Guardando..." : "Guardar compra" }}
+              </b-btn>
+              <b-btn variant="secondary" type="button" @click="showMovimientoModal=false">Cerrar</b-btn>
+            </b-form>
+          </b-tab>
+
           <b-tab title="Gasto">
             <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
             <div class="my-3">
@@ -174,6 +248,19 @@ export default {
     return {
       API: config.API,
       showMovimientoModal: false,
+      cargandoChatarra: false,
+      guardandoChatarra: false,
+      almacenesChatarra: [],
+      productosChatarra: [],
+      cuentasChatarra: [],
+      compraChatarra: {
+        IdAlmacen: "",
+        IdCuenta: "",
+        IdProducto: "",
+        Cantidad: 1,
+        Costo: "",
+        Descripcion: ""
+      },
       selectProducto: {
         IdCuenta: "",
         Gasto: "",
@@ -191,11 +278,18 @@ export default {
   computed: {
     ...mapState({
       productos: state => state.cart.productos
-    })
+    }),
+    totalCompraChatarra() {
+      const cantidad = Math.trunc(Number(this.compraChatarra.Cantidad));
+      const costo = Number(this.compraChatarra.Costo);
+      if (!Number.isFinite(cantidad) || !Number.isFinite(costo) || cantidad <= 0 || costo < 0) return 0;
+      return Math.round(cantidad * costo * 100) / 100;
+    }
   },
   methods: {
     async promptPassword() {
       this.showMovimientoModal = true;
+      this.cargarDatosCompraChatarra();
       return;
 
       // this.$swal.fire("golsss");
@@ -289,6 +383,130 @@ export default {
     },
     focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
+    },
+    etiquetaProductoChatarra(producto) {
+      const codigo = String(producto.CodigoBarra || producto.Codigo || "").trim();
+      const nombre = String(producto.Producto || "").trim();
+      const modelo = String(producto.ProductoModelo || "").trim();
+      return [codigo, nombre, modelo].filter(Boolean).join(" · ");
+    },
+    actualizarCantidadChatarra(valor) {
+      if (valor === "" || valor === null || valor === undefined) {
+        this.compraChatarra.Cantidad = "";
+        return;
+      }
+      const cantidad = Number(valor);
+      this.compraChatarra.Cantidad = Number.isFinite(cantidad)
+        ? Math.max(1, Math.trunc(cantidad))
+        : "";
+    },
+    async cargarDatosCompraChatarra() {
+      if (this.cargandoChatarra) return;
+      this.cargandoChatarra = true;
+      try {
+        const respuestas = await Promise.all([
+          this.axios.get(this.API + "almacenes"),
+          this.axios.get(this.API + "productos/chatarra"),
+          this.axios.get(this.API + "cuentas")
+        ]);
+        this.almacenesChatarra = respuestas[0].data || [];
+        this.productosChatarra = respuestas[1].data || [];
+        this.cuentasChatarra = respuestas[2].data || [];
+
+        if (!this.compraChatarra.IdAlmacen && this.almacenesChatarra.length) {
+          const principal = this.almacenesChatarra.find(almacen => Number(almacen.EsPrincipal) === 1);
+          this.compraChatarra.IdAlmacen = (principal || this.almacenesChatarra[0]).IdAlmacen;
+        }
+        if (!this.compraChatarra.IdCuenta && this.cuentasChatarra.length) {
+          this.compraChatarra.IdCuenta = this.cuentasChatarra[0].IdCuenta;
+        }
+        if (this.compraChatarra.IdProducto) {
+          this.seleccionarProductoChatarra(this.compraChatarra.IdProducto);
+        }
+      } catch (error) {
+        const respuesta = error.response && error.response.data;
+        this.$toasted.error(
+          (respuesta && (respuesta.error || respuesta.message)) ||
+          "No se pudieron cargar los datos para la compra de chatarra."
+        );
+      } finally {
+        this.cargandoChatarra = false;
+      }
+    },
+    obtenerCostoProductoChatarra(producto) {
+      if (!producto) return "";
+      const valores = [producto.PrecioCosto, producto.PrecioCompra, producto.Costo];
+      const valor = valores.find(item => item !== null && item !== undefined && item !== "" && Number.isFinite(Number(item)));
+      return valor === undefined ? "" : Math.max(0, Number(valor));
+    },
+    seleccionarProductoChatarra(idProducto) {
+      const seleccionado = idProducto !== undefined && idProducto !== null
+        ? idProducto
+        : this.compraChatarra.IdProducto;
+      const producto = this.productosChatarra.find(
+        item => String(item.IdProducto) === String(seleccionado)
+      );
+      const costo = this.obtenerCostoProductoChatarra(producto);
+      this.compraChatarra.Costo = costo === "" ? "" : Number(costo.toFixed(2));
+    },
+    async insertarCompraChatarra() {
+      if (this.guardandoChatarra) return;
+      const cantidadOriginal = Number(this.compraChatarra.Cantidad);
+      const cantidad = Math.trunc(cantidadOriginal);
+      const costo = Number(this.compraChatarra.Costo);
+      if (!this.compraChatarra.IdAlmacen || !this.compraChatarra.IdCuenta || !this.compraChatarra.IdProducto) {
+        this.$toasted.error("Seleccione almacén, cuenta y producto.");
+        return;
+      }
+      if (!Number.isInteger(cantidadOriginal) || !(cantidad > 0) || !(costo > 0) || !(this.totalCompraChatarra > 0)) {
+        this.$toasted.error("Ingrese una cantidad entera y un costo mayores a cero.");
+        return;
+      }
+      if (!String(this.compraChatarra.Descripcion || "").trim()) {
+        this.$toasted.error("Ingrese la descripción o referencia de la compra.");
+        return;
+      }
+
+      const confirmacion = await this.$swal.fire({
+        icon: "question",
+        title: "Registrar compra de chatarra",
+        text: `Se aumentará el stock y saldrán S/ ${this.totalCompraChatarra.toFixed(2)} de caja.`,
+        showCancelButton: true,
+        confirmButtonText: "Sí, guardar",
+        cancelButtonText: "Cancelar"
+      });
+      if (!confirmacion.isConfirmed) return;
+
+      this.guardandoChatarra = true;
+      try {
+        const response = await this.axios.post(this.API + "cajaybanco/compra-chatarra", {
+          ...this.compraChatarra,
+          Cantidad: cantidad,
+          Costo: costo,
+          TotalCosto: this.totalCompraChatarra,
+          Usuario: sessionStorage.getItem("User") || ""
+        });
+        const resultado = response.data || {};
+        await this.$swal.fire({
+          icon: "success",
+          title: "Compra registrada",
+          text: `Stock actualizado: ${resultado.StockActual}. Salida de caja: S/ ${Number(resultado.TotalCosto || this.totalCompraChatarra).toFixed(2)}.`
+        });
+        this.compraChatarra.IdProducto = "";
+        this.compraChatarra.Cantidad = 1;
+        this.compraChatarra.Costo = "";
+        this.compraChatarra.Descripcion = "";
+        this.$emit("stock-actualizado", resultado);
+      } catch (error) {
+        const respuesta = error.response && error.response.data;
+        this.$swal.fire({
+          icon: "error",
+          title: "No se guardó la compra",
+          text: (respuesta && (respuesta.error || respuesta.message)) || "No se pudo actualizar caja y stock. No se realizó ningún movimiento."
+        });
+      } finally {
+        this.guardandoChatarra = false;
+      }
     },
     insertarGasto() {
       let usuario = sessionStorage.getItem("User");
@@ -462,7 +680,7 @@ h6 {
 }
 
 /deep/ .cash-modal .modal-dialog {
-  max-width: 820px;
+  max-width: 980px;
 }
 
 /deep/ .cash-modal .modal-content {
@@ -531,7 +749,7 @@ h6 {
 
 /deep/ .cash-modal .nav-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
   padding: 6px;
   border: 1px solid #d7e5f4;
@@ -575,6 +793,92 @@ h6 {
   border-radius: 18px;
   background: rgba(255, 255, 255, .92);
   box-shadow: 0 12px 30px rgba(15, 54, 93, .08);
+}
+
+.scrap-purchase-intro {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #b9ded5;
+  border-radius: 14px;
+  color: #083f36;
+  background: #eaf7f3;
+}
+
+.scrap-purchase-intro__icon {
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  color: #fff;
+  background: #075e54;
+  font-size: 1.15rem;
+}
+
+.scrap-purchase-intro strong,
+.scrap-purchase-intro small {
+  display: block;
+}
+
+.scrap-purchase-intro strong {
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.scrap-purchase-intro small {
+  margin-top: 3px;
+  color: #47726b;
+  font-weight: 700;
+}
+
+.scrap-purchase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.scrap-purchase-grid .form-group {
+  margin: 0;
+}
+
+.scrap-purchase-grid /deep/ label {
+  display: block;
+  margin-bottom: 7px !important;
+}
+
+.scrap-product-field,
+.scrap-description-field {
+  grid-column: 1 / -1;
+}
+
+.scrap-empty-help {
+  display: block;
+  margin-top: 7px;
+  color: #b45309;
+  font-weight: 800;
+}
+
+.scrap-purchase-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #fff;
+  background: #06483e;
+  font-weight: 800;
+}
+
+.scrap-purchase-summary strong {
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 950;
 }
 
 /deep/ .cash-modal .tab-pane .my-3 {
@@ -819,6 +1123,13 @@ h6 {
   }
   /deep/ .cash-modal .nav-tabs {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .scrap-purchase-grid {
+    grid-template-columns: 1fr;
+  }
+  .scrap-product-field,
+  .scrap-description-field {
+    grid-column: auto;
   }
   /deep/ .cash-modal .tab-pane .col-md-4 {
     grid-template-columns: 1fr;

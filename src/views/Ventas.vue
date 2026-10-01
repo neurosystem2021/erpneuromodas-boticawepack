@@ -29,7 +29,8 @@
               </template>
               <b-container fluid>
                 <b-row class="pos-command-header">
-                  <b-col lg="6" xl="6" cols="12" class="pos-sale-header">
+                  <b-col lg="6" xl="6" cols="12" class="pos-sale-header"
+                    style="background: #05382f !important; background-image: none !important; background-color: #05382f !important; border-color: #05382f !important; color: #f6fffb !important;">
                     <b-row>
                       <b-col lg="4" xl="4" cols="12" class="mostrarMovil">
                         Tipo de Venta: {{ ventas[ventaActiva].Serie }} - {{ ventas[ventaActiva].Numero }}
@@ -283,8 +284,8 @@
                         <div class="pos-product-media-actions">
                           <b-button v-if="tienePresentaciones(data.item)" size="sm" variant="info"
                             class="pos-presentation-button"
-                            @click="showPresentacion(data.item, data.index)" title="Ver presentaciones y precios">
-                            <i class="fas fa-list"></i>
+                            @click="showPresentacion(data.item, data.index)" title="Ver presentaciones y precios" aria-label="Ver presentaciones y precios">
+                            <i class="fas fa-list-ul"></i>
                           </b-button>
                           <b-button
                             @click="abrirImagen(data.item)"
@@ -333,8 +334,8 @@
                           <input v-model="data.item.descuento" type="text"
                             style="text-align:center; font-weight:bold; width: 100px;" autocomplete="false"
                             @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 3)" class="form-control" />
-                          <small v-if="getPorcentajeDescuentoProducto(data.item) > 0" class="pos-item-discount-percent">
-                            {{ getPorcentajeDescuentoProducto(data.item) }}%
+                          <small v-if="Number(getSubTotalDetalle(data.item)) > 0" class="pos-item-discount-percent">
+                            {{ getPorcentajeDescuentoAplicado(data.item).toFixed(2) }}% aplicado
                           </small>
                         </div>
 
@@ -581,12 +582,12 @@
                   
                   <b-col lg="3" xl="3" cols="12" class="pos-actions">
                     <b-row class="centrado d-flex justify-content-center my-2">
+                      <b-button block class="mx-1 btnAction pos-action-proforma" variant="primary" @click="guardarProforma()">
+                        <i class="fas fa-file-invoice mr-1"></i> Crear Proforma</b-button>
                       <b-button block variant="warning" class="btnAction pos-action-add" @click="anadirVentana()">
                         <i class="fas fa-plus-circle mr-1"></i> Añadir Ventana</b-button>
                       <!-- <b-button block class="mx-1 btnAction" variant="success" @click="guardarVenta()"> <i
                           class="fas fa-shopping-cart"></i> PAGAR</b-button> -->
-                      <b-button block class="mx-1 btnAction pos-action-proforma" variant="primary" @click="guardarProforma()">
-                        <i class="fas fa-file-invoice mr-1"></i> Crear Proforma</b-button>
                       <busqueda-modelo class="pos-action-model"
                         :idAlmacen="venta.almacen.IdAlmacen"
                         @onAgregarProductos="cargarProductosDeModelo">
@@ -886,91 +887,51 @@
         <div>
           <span class="presentation-intro-icon"><i class="fas fa-tags"></i></span>
           <span>
-            <strong>Selecciona cómo vender este producto</strong>
-            <small>Compara stock, contenido y precio antes de continuar.</small>
+            <strong>Elige una presentación</strong>
           </span>
         </div>
         <span class="presentation-count">
-          {{ 1 + (producto.PreciosPorProducto ? producto.PreciosPorProducto.length : 0) }} opciones
+          {{ 1 + contarPresentaciones(producto) }} opciones
         </span>
       </div>
-      <b-row class="presentation-grid">
-        <b-col cols="12" md="6">
-          <b-card align="center" class="mb-3 contentCard presentation-option presentation-option-unit" @click="cambiarPresentacion(
-            producto,
-            false
-          )">
-            <div class="presentation-option-top">
-              <span class="presentation-option-icon"><i class="fas fa-cube"></i></span>
-              <span class="presentation-option-kind">Presentación base</span>
-              <span class="presentation-option-arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <b-row class="presentation-option-body">
-              <b-col cols="5" class="nomCart">
-                <div class="presentation-name-block">
-                  <h6 class="text-uppercase">{{ producto.ProductoPresentacion }}</h6>
-                  <span class="presentation-stock">
-                    <i class="fas fa-layer-group"></i> Stock <b>{{ producto.stock }}</b>
-                  </span>
-                </div>
-              </b-col>
-              <b-col cols="7" class="presentation-price-block">
-                <span class="presentation-quantity">x1</span>
-                <span class="presentation-cost"><b>Costo</b> S/ {{ producto.PrecioCosto | redondear(2) }}</span>
-                <span class="presentation-sale-price"><small>Precio de venta</small><b>S/ {{ producto.PrecioContado | redondear(2) }}</b></span>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-col>
+      <div class="presentation-grid" role="list">
+        <button type="button" class="presentation-option presentation-option-unit"
+          @click="cambiarPresentacion(producto, false)">
+          <span class="presentation-card-head">
+            <span class="presentation-card-kind"><i class="fas fa-cube"></i> UNIDAD</span>
+            <span class="presentation-card-badge">x1</span>
+          </span>
+          <span class="presentation-card-name">{{ producto.ProductoPresentacion || 'UNIDAD' }}</span>
+          <span class="presentation-card-price">
+            <small>Precio final</small>
+            <strong>S/ {{ producto.PrecioContado | redondear(2) }}</strong>
+          </span>
+          <span class="presentation-card-stock">
+            <i class="fas fa-boxes"></i>
+            {{ Math.max(0, Number(producto.stock || 0)) }} disponibles
+          </span>
+          <span class="presentation-card-action">Seleccionar <i class="fas fa-arrow-right"></i></span>
+        </button>
 
-
-        <b-col cols="12" md="6" v-for="(pres, index) in producto.PreciosPorProducto" :key="index">
-          <b-card align="center" class="mb-3 contentCard presentation-option presentation-option-pack" @click="cambiarPresentacion(
-            pres,
-            true
-          )">
-            <div class="presentation-option-top">
-              <span class="presentation-option-icon"><i class="fas fa-boxes"></i></span>
-              <span class="presentation-option-kind">Precio por volumen</span>
-              <span class="presentation-option-arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <b-row class="presentation-option-body">
-              <b-col cols="5" class="nomCart">
-                <div class="presentation-name-block">
-                  <h6 class="text-uppercase">{{ pres.nombre }}</h6>
-                  <span class="presentation-stock">
-                    <i class="fas fa-layer-group"></i> Stock
-                    <b>{{ parseFloat(producto.stock / pres.cantidad).toFixed(2) }}</b>
-                  </span>
-                </div>
-              </b-col>
-              <b-col cols="7" class="presentation-price-block">
-                <span class="presentation-quantity">x{{ pres.cantidad }}</span>
-                <span class="presentation-cost"><b>Costo</b> S/ {{ pres.precioc | redondear(2) }}</span>
-                <span class="presentation-sale-price"><small>Precio de venta</small><b>S/ {{ pres.precio | redondear(2) }}</b></span>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-col>
-
-        <!-- <b-col md="6" v-for="(pres,index) in producto.PreciosPorProducto" :key="index" class="nomCart">
-                
-                <div>
-                  <b-row class="nomCart2">
-                    <center> <h6 class="text-uppercase"> {{pres.nombre}} </h6> </center>
-                  </b-row>
-                    Stock <span style="padding: 5px 10px; border-radius: 5px ;background-color:#28a745;color:#fff"> {{ 
-                    parseFloat(producto.stock/pres.cantidad).toFixed(2)
-                    }} </span>
-                </div>
-              </b-col>
-              <b-col md="6" class="text-left">
-              <h5>x1</h5>
-              <span><b >Precio C: </b>S/ {{ producto.PrecioCosto | redondear(2) }}</span><br>
-              <b>Precio V: </b>S/ {{ producto.PrecioContado | redondear(2) }}
-          </b-col> -->
-      </b-row>
-    </b-modal>
+        <button v-for="(pres, index) in producto.PreciosPorProducto" :key="'pres-' + index"
+          type="button" class="presentation-option presentation-option-pack"
+          @click="cambiarPresentacion(pres, true)">
+          <span class="presentation-card-head">
+            <span class="presentation-card-kind"><i class="fas fa-box-open"></i> PRESENTACIÓN</span>
+            <span class="presentation-card-badge">x{{ pres.cantidad }}</span>
+          </span>
+          <span class="presentation-card-name">{{ pres.nombre }}</span>
+          <span class="presentation-card-price">
+            <small>Precio final</small>
+            <strong>S/ {{ (pres.precio * pres.cantidad) | redondear(2) }}</strong>
+          </span>
+          <span class="presentation-card-stock">
+            <i class="fas fa-boxes"></i>
+            {{ Math.max(0, Math.floor(Number(producto.stock || 0) / Number(pres.cantidad || 1))) }} disponibles
+          </span>
+          <span class="presentation-card-action">Seleccionar <i class="fas fa-arrow-right"></i></span>
+        </button>
+      </div>    </b-modal>
     <!-- MODALS TOUCH -->
 
     <b-modal ref="modalIngCant" id="ingCant" size="sm" hide-footer class="ingCant" modal-class="pos-calculator-modal" title="Cantidad" hide-header-close>
@@ -1318,16 +1279,11 @@ export default {
       headerTable: [
         { key: "stock", label: "Stock", variant: "info", class: "text-center" },
         { key: "CodigoBarra" },
+        { key: "ProductoCategoria", label: "Categoría" },
         { key: "Producto" },
         { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMarca", label: "Marca" },
-        { key: "ProductoTalla", label: "Talla" },
-        { key: "Color" },
-        { key: "Genero" },
-        { key: "Botapie", label: "Botapie/Manga" },
-        { key: "Anaquel" },
-        { key: "pres", label: "" },
-        { key: "presentacion", label: "Presentacion" },
+        { key: "pres", label: "Formatos", class: "text-center" },
         { key: "cantidad" },
         { key: "precio", label: "Precio" },
         {
@@ -1643,6 +1599,81 @@ beforeDestroy() {
       if (ticketWindow) ticketWindow.focus();
       else this.$toasted.error("Permita las ventanas emergentes para imprimir el ticket");
     },
+    imprimirTicketEnNavegador(idVenta) {
+      if (!idVenta) return Promise.resolve();
+
+      const iframeAnterior = document.getElementById("pos-ticket-print-frame");
+      if (iframeAnterior) iframeAnterior.remove();
+
+      const iframe = document.createElement("iframe");
+      iframe.id = "pos-ticket-print-frame";
+      iframe.title = "Impresion de respaldo del ticket";
+      iframe.setAttribute("aria-hidden", "true");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "1px";
+      iframe.style.height = "1px";
+      iframe.style.border = "0";
+      iframe.style.opacity = "0";
+      iframe.src =
+        "/imprimir/index.php?IdDocVenta=" +
+        encodeURIComponent(idVenta) +
+        "&popup=1";
+      return new Promise(resolve => {
+        let terminado = false;
+        const finalizar = () => {
+          if (terminado) return;
+          terminado = true;
+          resolve();
+        };
+
+        iframe.addEventListener("load", () => {
+          window.setTimeout(finalizar, 300);
+        });
+        document.body.appendChild(iframe);
+
+        window.setTimeout(finalizar, 10000);
+        window.setTimeout(() => {
+          if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }, 60000);
+      });
+    },
+    async imprimirVentaDirecta(idVenta) {
+      if (!idVenta) return false;
+
+      try {
+        const respuesta = await this.axios.post(
+          "/imprimir/usb.php",
+          {
+            IdDocVenta: idVenta,
+            PrinterName: "bar"
+          },
+          { timeout: 20000 }
+        );
+
+        if (!respuesta.data || respuesta.data.ok !== true) {
+          throw new Error(
+            (respuesta.data && respuesta.data.mensaje) ||
+              "La impresora BAR no confirmo la impresion."
+          );
+        }
+
+        this.$toasted.success("Ticket enviado a la impresora BAR");
+        return true;
+      } catch (error) {
+        const mensaje =
+          error && error.response && error.response.data
+            ? error.response.data.mensaje
+            : error && error.message;
+        console.error("No se pudo imprimir directamente en BAR:", mensaje || error);
+        this.$toasted.error(
+          "No se pudo imprimir en BAR. Se abrira la impresion de respaldo."
+        );
+        await this.imprimirTicketEnNavegador(idVenta);
+        return false;
+      }
+    },
     reimprimirUltimaVenta() {
       this.abrirTicket(this.ultimaVentaId);
     },
@@ -1815,7 +1846,12 @@ beforeDestroy() {
       prod.precio = Number.isFinite(precioActualizado)
         ? precioActualizado
         : (Number(productoActual.precio) || 0);
-      prod.descuento = Number(productoActual.descuento) || 0;
+      const porcentajeAnterior = Number(productoActual.PorcentajeLiquidacion) || 0;
+      const porcentajeActualizado = Number(prod.PorcentajeLiquidacion) || 0;
+      const cambioPorcentajeDescuento = porcentajeAnterior !== porcentajeActualizado;
+      prod.descuento = cambioPorcentajeDescuento
+        ? 0
+        : (Number(productoActual.descuento) || 0);
       prod.tienePresentacion = prod.PreciosPorProducto.some(
         v => v.cantidad > 0
       );
@@ -1823,6 +1859,9 @@ beforeDestroy() {
       prod.CantidadPresentacion = 1;
       prod.esPresentacion = false;
       prod.pres = "";
+      if (cambioPorcentajeDescuento && porcentajeActualizado > 0) {
+        this.aplicarDescuentoProducto(prod);
+      }
 
       Vue.set(productos, index, prod);
     },
@@ -2227,6 +2266,7 @@ beforeDestroy() {
       }
       if (this.$refs["modalIngDesc"].is_show) {
         this.objProd.descuento = this.cantidadInput;
+        this.metodoPagoCambio(1);
       }
       // Vue.set(this.ventas[this.ventaActiva].productos, this.index, this.objProd);
       // console.log("this.objProd");
@@ -2423,12 +2463,6 @@ beforeDestroy() {
                 <td style="width: 120px">${
                   data.ProductoMarca ? data.ProductoMarca : ""
                 }</td>
-                <td style="width: 80px">${
-                  data.ProductoTalla ? data.ProductoTalla : ""
-                }</td>
-                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
-                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
-                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
                 <td style="width: 65px" class="table-primary"><b>${
                   data.PrecioContado
                 }</b></td>
@@ -2884,6 +2918,12 @@ beforeDestroy() {
       const porcentaje = parseFloat(prod && prod.PorcentajeLiquidacion);
       return Number.isFinite(porcentaje) && porcentaje > 0 ? porcentaje : 0;
     },
+    getPorcentajeDescuentoAplicado(prod) {
+      const subtotal = Number(this.getSubTotalDetalle(prod));
+      const descuento = Number(prod && prod.descuento);
+      if (!Number.isFinite(subtotal) || subtotal <= 0 || !Number.isFinite(descuento)) return 0;
+      return Number((Math.max(0, descuento) / subtotal * 100).toFixed(2));
+    },
     aplicarDescuentoProducto(prod) {
       const porcentaje = this.getPorcentajeDescuentoProducto(prod);
       if (!porcentaje) return;
@@ -2994,6 +3034,123 @@ beforeDestroy() {
         solid: true,
         autoHideDelay: 2200
       });
+    },
+
+    async validarStockDisponibleVenta(venta) {
+      if (String(venta.tipoVenta && venta.tipoVenta.CodSunat) === "07") return true;
+
+      const productosControlados = (venta.productos || []).filter(prod => {
+        const codigo = String(prod.CodigoBarra || "").trim().toUpperCase();
+        const noControlaStock = prod.ControlaStock === 0 || prod.ControlaStock === "0" || prod.ControlaStock === false;
+        return !noControlaStock && codigo !== "COSTODELIVERY" && codigo !== "MANODEOBRA";
+      });
+      if (!productosControlados.length) return true;
+
+      const requeridos = {};
+      productosControlados.forEach(prod => {
+        const idProducto = String(prod.IdProducto);
+        const cantidad = Number(prod.cantidad);
+        const factorPresentacion = prod.esPresentacion
+          ? (Number(prod.CantidadPresentacion) || 1)
+          : 1;
+        if (!requeridos[idProducto]) {
+          requeridos[idProducto] = {
+            IdProducto: prod.IdProducto,
+            Producto: prod.Producto || prod.CodigoBarra || "Producto",
+            Cantidad: 0
+          };
+        }
+        requeridos[idProducto].Cantidad += Number.isFinite(cantidad)
+          ? cantidad * factorPresentacion
+          : 0;
+      });
+
+      try {
+        const idAlmacen = venta.almacen && venta.almacen.IdAlmacen
+          ? venta.almacen.IdAlmacen
+          : 1;
+        const response = await this.axios.get(this.API + "productos/puntoventa/stock/" + idAlmacen, {
+          params: {
+            idProductos: Object.keys(requeridos),
+            noLimit: 1
+          }
+        });
+        const stockActual = Array.isArray(response.data) ? response.data : [];
+        const stockPorProducto = {};
+        stockActual.forEach(prod => {
+          stockPorProducto[String(prod.IdProducto)] = Number(prod.stock) || 0;
+        });
+
+        productosControlados.forEach(prod => {
+          this.$set(prod, "stock", stockPorProducto[String(prod.IdProducto)] || 0);
+        });
+
+        const faltantes = Object.keys(requeridos).map(idProducto => {
+          const requerido = requeridos[idProducto];
+          const disponible = stockPorProducto[idProducto] || 0;
+          return {
+            ...requerido,
+            Disponible: disponible
+          };
+        }).filter(item => !(item.Cantidad > 0) || item.Cantidad > item.Disponible);
+
+        if (!faltantes.length) return true;
+
+        const escaparHtml = valor => String(valor == null ? "" : valor).replace(/[&<>"']/g, caracter => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[caracter]);
+        const formatearCantidad = valor => {
+          const numero = Math.max(0, Number(valor) || 0);
+          return Number.isInteger(numero) ? numero : numero.toFixed(3);
+        };
+        const detalle = faltantes.map(item => `
+          <div class="stock-alert-item">
+            <div class="stock-alert-product">
+              <span class="stock-alert-product__icon"><i class="fas fa-box"></i></span>
+              <span><strong>${escaparHtml(item.Producto)}</strong><small>Existencia insuficiente</small></span>
+            </div>
+            <div class="stock-alert-values">
+              <span><small>Solicita</small><strong>${formatearCantidad(item.Cantidad)}</strong></span>
+              <span class="stock-alert-values__available"><small>Disponible</small><strong>${formatearCantidad(item.Disponible)}</strong></span>
+            </div>
+          </div>
+        `).join("");
+
+        await this.$swal.fire({
+          icon: "warning",
+          title: "Stock no disponible",
+          html: `
+            <div class="stock-alert-copy">No se registró la venta. Ajuste las cantidades o retire el producto.</div>
+            <div class="stock-alert-list">${detalle}</div>
+          `,
+          confirmButtonText: "Volver a la venta",
+          buttonsStyling: false,
+          customClass: {
+            popup: "stock-alert-popup",
+            icon: "stock-alert-icon",
+            title: "stock-alert-title",
+            htmlContainer: "stock-alert-content",
+            actions: "stock-alert-actions",
+            confirmButton: "stock-alert-confirm"
+          },
+          allowOutsideClick: false,
+          target: document.getElementById("conten")
+        });
+        return false;
+      } catch (error) {
+        await this.$swal.fire({
+          icon: "error",
+          title: "No se pudo verificar el stock",
+          text: "La venta fue detenida para evitar registrar productos sin existencias.",
+          confirmButtonText: "Entiendo",
+          target: document.getElementById("conten")
+        });
+        return false;
+      }
     },
 
     async guardarVenta() {
@@ -3175,6 +3332,12 @@ beforeDestroy() {
         return;
       }
 
+      const stockDisponible = await this.validarStockDisponibleVenta(venta);
+      if (!stockDisponible) {
+        this.inProgress = false;
+        return;
+      }
+
       venta.nombreLlevar = venta.nombreLlevar.toUpperCase();
       // venta.productos = this.productos;
       if (venta.tipoVenta.CodSunat == "07" || venta.tipoVenta.CodSunat == "08") {
@@ -3216,11 +3379,11 @@ beforeDestroy() {
         .toUpperCase()
         .trim();
 
-      await this.axios.post(this.API + "ventas", venta).then(response => {
+      await this.axios.post(this.API + "ventas", venta).then(async response => {
         if (response.data.insertId) {
     this.ultimaVentaId = response.data.insertId;
     window.localStorage.setItem("ultimaVentaId", String(response.data.insertId));
-    this.abrirTicket(response.data.insertId);
+    await this.imprimirVentaDirecta(response.data.insertId);
 
           this.$toasted.success("Venta realizada con exito");
           venta.productos.map(pro => {
@@ -3670,8 +3833,8 @@ beforeDestroy() {
         console.error("Error al cargar proforma:", error);
       }
     },
-    tienePresentaciones(prod) {
-      if (!prod) return false;
+    obtenerPresentacionesVenta(prod) {
+      if (!prod) return [];
       let presentaciones = prod.PreciosPorProducto;
       if (typeof presentaciones === "string") {
         try {
@@ -3680,30 +3843,23 @@ beforeDestroy() {
           presentaciones = [];
         }
       }
-      return Array.isArray(presentaciones) && presentaciones.some(item => {
-        const cantidad = item.cantidad || item.Cantidad || item.CantidadPresentacion || 0;
-        return parseFloat(cantidad) > 0;
-      });
+      if (!Array.isArray(presentaciones)) return [];
+      return presentaciones.map(item => ({
+        ...item,
+        nombre: String(item.nombre || item.Nombre || item.Presentacion || "PRESENTACIÓN").trim(),
+        cantidad: parseFloat(item.cantidad || item.Cantidad || item.CantidadPresentacion || 0),
+        precioc: parseFloat(item.precioc || item.PrecioCosto || item.Costo || 0),
+        precio: parseFloat(item.precio || item.Precio || item.PrecioVenta || 0)
+      })).filter(item => item.nombre && item.cantidad > 0 && item.precio > 0);
     },
-    showPresentacion(prod, index) {
-      let presentaciones = prod.PreciosPorProducto;
-      if (typeof presentaciones === "string") {
-        try {
-          presentaciones = JSON.parse(presentaciones);
-        } catch (error) {
-          presentaciones = [];
-        }
-      }
-      presentaciones = Array.isArray(presentaciones)
-        ? presentaciones
-            .map(item => ({
-              ...item,
-              nombre: item.nombre || item.Nombre || item.Presentacion || "PRESENTACIÓN",
-              cantidad: parseFloat(item.cantidad || item.Cantidad || item.CantidadPresentacion || 0),
-              precio: parseFloat(item.precio || item.Precio || item.PrecioVenta || 0)
-            }))
-            .filter(item => item.cantidad > 0)
-        : [];
+    contarPresentaciones(prod) {
+      return this.obtenerPresentacionesVenta(prod).length;
+    },
+    tienePresentaciones(prod) {
+      return this.obtenerPresentacionesVenta(prod).length > 0;
+    },    showPresentacion(prod, index) {
+      const presentaciones = this.obtenerPresentacionesVenta(prod);
+      if (!this.tienePresentaciones(prod)) return;
       this.producto = { ...prod, PreciosPorProducto: presentaciones };
       this.index = index;
       this.modalPresentacion = true;

@@ -6,9 +6,9 @@
           <div class="product-catalog-heading">
             <span class="product-catalog-heading__icon"><i class="fas fa-boxes"></i></span>
             <div>
-              <span class="product-catalog-eyebrow">INVENTARIO INTELIGENTE</span>
+              <span class="product-catalog-eyebrow">LLANTAS Y BATERÍAS</span>
               <h1>Catálogo de productos</h1>
-              <p>Administra, busca y actualiza tus artículos desde un solo lugar.</p>
+              <p>Consulta categoría, marca, modelo y stock en un solo lugar.</p>
             </div>
           </div>
           <div class="product-catalog-header__actions">
@@ -62,6 +62,12 @@
             :per-page="perPage"
             :current-page="currentPage"
             class="product-catalog-table">
+            <template slot="stock" slot-scope="data">
+              <span v-if="data.item.stock === null" class="text-muted">—</span>
+              <b-badge v-else :variant="Number(data.item.stock) > 0 ? 'success' : 'danger'">
+                {{ data.item.stock }}
+              </b-badge>
+            </template>
             <template slot="empty">
               <div class="product-catalog-empty">
                 <span><i class="fas fa-box-open"></i></span>
@@ -107,15 +113,12 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-        { key: "CodigoBarra", label: "Codigo", sortable: true },
+        { key: "CodigoBarra", label: "Código", sortable: true },
         { key: "Producto", sortable: true },
         { key: "ProductoCategoria", label: "Categoría", sortable: true },
         { key: "ProductoMarca", label: "Marca", sortable: true },
         { key: "ProductoModelo", label: "Modelo", sortable: true },
-        { key: "Color", sortable: true },
-        { key: "ProductoTalla", label: "Talla", sortable: true },
-        { key: "Genero", sortable: true },
-        { key: 'Botapie', sortable: true }
+        { key: "stock", label: "Stock", sortable: false, class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
@@ -154,15 +157,33 @@ export default {
 
       return promise
         .then(result => {
-          this.items = result.data;
-          this.actualizarTabla();
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
+          const productos = Array.isArray(result.data) ? result.data : [];
+          if (!productos.length) {
+            this.items = [];
+            return this.items;
+          }
+
+          return this.axios.get(this.API + "productos/stock", {
+            params: {
+              idProductos: productos.map(item => item.IdProducto),
+              idAlmacen: Number(sessionStorage.getItem("IdAlmacen")) || 1
+            }
+          }).then(stockResult => {
+            const stockPorProducto = (Array.isArray(stockResult.data) ? stockResult.data : []).reduce((stock, item) => {
+              stock[item.IdProducto] = item.stock;
+              return stock;
+            }, {});
+            this.items = productos.map(item => ({
+              ...item,
+              stock: stockPorProducto[item.IdProducto] == null ? null : stockPorProducto[item.IdProducto]
+            }));
+            return this.items;
+          }).catch(() => {
+            this.items = productos.map(item => ({ ...item, stock: null }));
+            return this.items;
+          });
         })
         .catch(error => {
-          this.actualizarTabla();
           // Here we could override the busy state, setting isBusy to false
           // this.isBusy = false
           // Returning an empty array, allows table to correctly handle busy state in case of error

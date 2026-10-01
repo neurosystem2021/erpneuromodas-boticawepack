@@ -53,7 +53,7 @@
       </b-form-group>
       <p class="inventory-search-help">
         <i class="fas fa-filter"></i>
-        Búsqueda avanzada por producto, categoría, marca, modelo o color.
+        Busca por producto, categoría, marca, modelo o código de barras.
       </p>
       <div class="mostrarMovil">
       <b-form-group>
@@ -387,15 +387,12 @@ export default {
     fields: {
       default() {
         return [
+          { key: "stock", label: "Stock", variant: "info", class: "text-center" },
+          { key: "CodigoBarra", label: "Código" },
           { key: "ProductoCategoria", label: "Categoria" },
           { key: "Producto", label: "Artículo" },
           { key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoTalla", label: "Talla" },
-          { key: "Color" },
-          { key: "Genero" },
-          { key: "Botapie", label: "Botapie/Manga" },
-          { key: "Anaquel" },
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           { key: "subtotal", label: "SubTotal", variant: "success" },
@@ -734,8 +731,7 @@ export default {
       const details = [
         data.ProductoCategoria,
         data.ProductoMarca,
-        data.ProductoModelo,
-        data.ProductoTalla ? `Talla ${data.ProductoTalla}` : ""
+        data.ProductoModelo
       ]
         .filter(Boolean)
         .map(escapeHtml)
@@ -760,15 +756,6 @@ export default {
           <span class="inventory-suggestion__main">
             <strong>${productName}</strong>
             <small>${barcode}${details ? ` · ${details}` : ""}</small>
-          </span>
-          <span class="inventory-suggestion__tags">
-            <em>${escapeHtml(data.Color || "Sin color")}</em>
-            <em>${escapeHtml(data.Genero || "Sin género")}</em>
-            <em>${escapeHtml(data.Botapie || "Sin detalle")}</em>
-          </span>
-          <span class="inventory-suggestion__location">
-            <small>Anaquel</small>
-            <strong>${escapeHtml(data.Anaquel || "—")}</strong>
           </span>
           <span class="inventory-suggestion__price">
             <small>Precio</small>
@@ -833,14 +820,6 @@ export default {
                 <td style="width: 120px">${
                   data.ProductoMarca ? data.ProductoMarca : ""
                 }</td>
-                <td style="width: 80px">${
-                  data.ProductoTalla ? data.ProductoTalla : ""
-                }</td>
-                <td style="width: 80px">${data.Color ? data.Color : ""}</td>
-                <td style="width: 80px">${data.Genero ? data.Genero : ""}</td>
-                <td style="width: 80px">${data.Botapie ? data.Botapie : ""}</td>
-                <td style="width: 80px">${data.Anaquel ? data.Anaquel : ""}</td>
-                </td>
                 <td class="table-primary"  style="width: 65px"><b>${
                   data.PrecioContado
                 }</b></td>
@@ -1148,7 +1127,7 @@ canvas {
 }
 .inventory-suggestion {
   display: grid;
-  grid-template-columns: 78px minmax(360px, 2.7fr) minmax(285px, 1.7fr) 92px 125px 58px;
+  grid-template-columns: 78px minmax(360px, 1fr) 125px 58px;
   align-items: center;
   gap: 0;
   min-height: 62px;

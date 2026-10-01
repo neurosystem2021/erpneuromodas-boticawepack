@@ -6,7 +6,7 @@
           <div class="inventory-heading">
             <div class="inventory-heading__icon"><i class="fas fa-boxes"></i></div>
             <div>
-              <span class="inventory-heading__eyebrow">INVENTARIO INTELIGENTE</span>
+              <span class="inventory-heading__eyebrow">LLANTAS Y BATERÍAS · LOGÍSTICA</span>
               <h1>Nuevo movimiento de inventario</h1>
               <p>Registra entradas, salidas o transferencias y mantén el stock actualizado.</p>
             </div>
@@ -247,13 +247,8 @@ export default {
           },
           { key: "ProductoCategoria", label: "Categoria" },
           { key: "Producto", label: "Articulo" },
-          { key: "eventPres", label: "Img" },
           { key: "ProductoMarca", label: "Marca" },
           { key: "ProductoModelo", label: "Modelo" },
-          { key: "Color", label: "Color" },
-          { key: "ProductoTalla", label: "Talla" },
-          { key: "Genero" },
-          { key: "Botapie", label: "Botapie" },
           { key: "cantidad" },
           { key: "precio", label: "P/U" },
           {

@@ -86,12 +86,10 @@
               <th class="center">Cant.</th>
               <th colspan="2" class="left">Descripción</th>
               <th class="center">U.M.</th>
+              <th class="center">Categoría</th>
               <th class="center">Modelo</th>
               <th class="center">Marca</th>
-              <th class="center">Talla</th>
-              <th class="center">Color</th>
-              <th class="center">Género</th>
-              <th class="center">Botapie</th>
+              <th class="center">Medida</th>
               <th class="right">Precio U.</th>
               <th class="right">Total</th>
             </tr>
@@ -105,19 +103,13 @@
               <td colspan="2" class="left">
                 <div class="prod-name">
                   {{ prod.Producto }} - {{ prod.CodigoBarra }}
-                  <span v-if="presentacionProducto(prod)" class="prod-pres">({{ presentacionProducto(prod) }})</span>
                 </div>
-                <div v-if="prod.ProductoDesc" class="prod-desc">{{ prod.ProductoDesc }}</div>
-                <div v-if="prod.ProductoDesc2" class="prod-desc">{{ prod.ProductoDesc2 }}</div>
-                <div v-if="prod.ProductoDesc3" class="prod-desc">{{ prod.ProductoDesc3 }}</div>
               </td>
               <td class="center">{{ getPresentacion(prod) }}</td>
+              <td class="center">{{ prod.ProductoCategoria }}</td>
               <td class="center">{{ prod.ProductoModelo }}</td>
               <td class="center">{{ prod.ProductoMarca }}</td>
               <td class="center">{{ prod.ProductoTalla }}</td>
-              <td class="center">{{ prod.Color }}</td>
-              <td class="center">{{ prod.Genero }}</td>
-              <td class="center">{{ prod.Botapie }}</td>
               <td class="right precio">S/. {{ prod.Precio | moneda }}</td>
               <td class="right precio">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}
@@ -127,12 +119,12 @@
           </tbody>
           <tfoot>
             <tr class="inv-table__subtotal">
-              <td colspan="10"></td>
+              <td colspan="8"></td>
               <td colspan="2" class="right">Subtotal</td>
               <td class="right">S/. {{ subTotal | redondear }}</td>
             </tr>
             <tr class="inv-table__total">
-              <td colspan="10"></td>
+              <td colspan="8"></td>
               <td colspan="2" class="right">TOTAL</td>
               <td class="right">S/. {{ subTotal | redondear }}</td>
             </tr>

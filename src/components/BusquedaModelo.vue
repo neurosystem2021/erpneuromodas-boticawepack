@@ -1,6 +1,6 @@
 <template>
     <div class="contenedor-raiz" style="margin-top:5px; margin-bottom:5px;">
-        <b-button block class="btnAction" style="background-color: #592E37;" @click="abrirModal">
+        <b-button block class="btnAction pos-model-search-button" @click="abrirModal">
             <i class="fas fa-search"></i> Buscar Modelo
         </b-button>
 
@@ -226,14 +226,10 @@ export default {
             newDniRuc: '',
             fieldsCarrito: [
                 { key: 'stock', label: 'Stock' },
+                { key: 'ProductoCategoria', label: 'Categoría' },
                 { key: 'Producto' },
                 { key: 'ProductoModelo', label: 'Modelo' },
                 { key: 'ProductoMarca', label: 'Marca' },
-                { key: 'ProductoTalla', label: 'Talla' },
-                { key: 'Color' },
-                { key: 'Genero' },
-                { key: 'Botapie' },
-                { key: 'Imagen' },
                 { key: 'cantidad' },
                 { key: 'precio' },
                 { key: 'subTotal', label: 'SubTotal' },
@@ -245,13 +241,10 @@ export default {
                 { key: 'seleccionar', label: '' },
                 { key: 'action', label: '' },
                 { key: 'stock' },
+                { key: 'ProductoCategoria', label: 'Categoría' },
                 { key: 'Producto' },
-                { key: 'ProductoTalla', label: 'Talla' },
+                { key: 'ProductoModelo', label: 'Modelo' },
                 { key: 'ProductoMarca', label: 'Marca' },
-                { key: 'Color' },
-                { key: 'Genero' },
-                { key: 'Botapie' },
-                { key: 'Imagen' }
             ]
         };
     },

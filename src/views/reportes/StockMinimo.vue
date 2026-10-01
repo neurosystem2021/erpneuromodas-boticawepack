@@ -91,11 +91,11 @@ export default {
       items: [],
       isBusy: false,
       fields: [
-            { key: 'IdProducto', label: 'ID', sortable: true },
             { key: 'CodigoBarra', label: 'Codigo', sortable: true },
             { key: 'Producto', sortable: true },
             { key: 'ProductoCategoria', label: 'Categoría', sortable: true},
             { key: 'ProductoMarca', label: 'Marca', sortable: true },
+            { key: 'ProductoModelo', label: 'Modelo', sortable: true },
             { key: 'ProductoMedicion', label: 'Medición', sortable: true },
             { key: 'stock', label: 'Stock', sortable: true },
       ],

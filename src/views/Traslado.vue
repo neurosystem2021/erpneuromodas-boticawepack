@@ -85,9 +85,12 @@ export default {
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
       fields: [
+        { key: "CodigoBarra", label: "Código" },
+        { key: "stock", label: "Stock" },
         { key: "ProductoCategoria", label: "Categoria" },
         { key: "Producto", label: "Artículo" },
         { key: "ProductoMarca", label: "Marca" },
+        { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMedicion", label: "Medicion" },
         { key: "cantidad" },
         { key: "precio", label: "P/U", readOnly: true },

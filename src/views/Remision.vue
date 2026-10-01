@@ -273,7 +273,10 @@ export default {
       carrito: {
         fields: [
           { key: 'CodigoBarra', label: 'Código' }, 
+          { key: 'ProductoCategoria', label: 'Categoría' },
           { key: 'Producto' }, 
+          { key: 'ProductoMarca', label: 'Marca' },
+          { key: 'ProductoModelo', label: 'Modelo' },
           { key: 'cantidad' },
           { key: 'acciones', label: ''}
         ]

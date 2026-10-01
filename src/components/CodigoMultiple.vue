@@ -31,7 +31,7 @@
                         <span class="barcode-multi-section-title__icon"><i class="fas fa-search"></i></span>
                         <span>
                             <strong>Agregar productos</strong>
-                            <small>Busca por nombre, código, modelo, marca o presentación</small>
+                            <small>Busca por producto, código, categoría, marca o modelo</small>
                         </span>
                     </div>
                     <div class="barcode-multi-autocomplete">
@@ -65,11 +65,9 @@
                                 <tr>
                                     <th>Cantidad</th>
                                     <th>Producto</th>
+                                    <th>Categoría</th>
                                     <th>Marca</th>
                                     <th>Modelo</th>
-                                    <th>Color</th>
-                                    <th>Talla</th>
-                                    <th>Género</th>
                                     <th>Precio</th>
                                     <th aria-label="Acciones"></th>
                                 </tr>
@@ -84,11 +82,9 @@
                                         </div>
                                     </td>
                                     <td><strong class="barcode-multi-product">{{prod.Producto}}</strong></td>
+                                    <td>{{prod.ProductoCategoria}}</td>
                                     <td>{{prod.ProductoMarca}}</td>
                                     <td>{{prod.ProductoModelo}}</td>
-                                    <td>{{prod.Color}}</td>
-                                    <td>{{prod.ProductoTalla}}</td>
-                                    <td>{{prod.Genero}}</td>
                                     <td><span class="barcode-multi-price">S/ {{prod.PrecioContado>0?prod.PrecioContado:0}}</span></td>
                                     <td>
                                         <button type="button" class="barcode-multi-delete" @click="quitarProducto(index)" aria-label="Eliminar producto">
@@ -148,7 +144,7 @@ import config from '@/store/config.js'
         methods: {
             renderChild(data) {
                 return `
-                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} / ${data.ProductoTalla} / ${data.Color} / ${data.Genero} - <b> S/ ${data.PrecioContado>0?data.PrecioContado:0}</b>
+                    <b>${data.Producto}</b> / ${data.ProductoCategoria} / ${data.ProductoMarca} / ${data.ProductoModelo} - <b> S/ ${data.PrecioContado>0?data.PrecioContado:0}</b>
                 `
             },
             focusAutocomplete (ref) {

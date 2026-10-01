@@ -1,7 +1,7 @@
 <template>
   <div class="stock-report-page">
       <b-container fluid class="stock-report-shell">
-        <header class="stock-report-hero"><div class="stock-report-hero__icon"><i class="fas fa-boxes"></i></div><div><small>CONTROL DE INVENTARIO</small><h1>Stock y valorización</h1><p>Consulta existencias, costos y valores comerciales por almacén.</p></div><span><i class="fas fa-shield-alt"></i> Información protegida</span></header>
+        <header class="stock-report-hero"><div class="stock-report-hero__icon"><i class="fas fa-boxes"></i></div><div><small>LLANTAS Y BATERÍAS · INVENTARIO</small><h1>Stock y valorización</h1><p>Consulta existencias, costos y valores comerciales por almacén.</p></div><span><i class="fas fa-shield-alt"></i> Información protegida</span></header>
         <b-row class="stock-summary-panel">
           <b-col md="12"  class="my-1">
             <b-row>
@@ -87,7 +87,7 @@
         </b-row>
         <b-row class="stock-filters-card">
           <br>
-          <b-col md="6">
+          <b-col md="12">
             <b-row>
               <b-col md="3">
                 <b-form-group>
@@ -147,73 +147,17 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col md="6">
-            <b-row>
-              <b-col md="3">
-                <b-form-group>
-                  <label>Color:</label>
-                  <autocomplete
-                    :url="API + 'productos/colores'"
-                    ref="inputColor"
-                    anchor="Color"
-                    label="writer"
-                    :on-select="val => generateFilter('color', val.Color)"
-                    :onInput="(val) => !val ? generateFilter('color', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>  
-              <b-col md="3">
-                <b-form-group>
-                  <label>Talla:</label>
-                  <autocomplete
-                    :url="API + 'tallas'"
-                    ref="inputTalla"
-                    anchor="ProductoTalla"
-                    label="writer"
-                    :on-select="val => generateFilter('talla', val.ProductoTalla)"
-                    :onInput="(val) => !val ? generateFilter('talla', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col> 
-              <b-col md="3">
-                <b-form-group>
-                  <label>Genero:</label>
-                  <autocomplete
-                    :url="API + 'productos/generos'"
-                    ref="inputGenero"
-                    anchor="Genero"
-                    label="writer"
-                    :on-select="val => generateFilter('genero', val.Genero)"
-                    :onInput="(val) => !val ? generateFilter('genero', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group>
-                  <label>Botapie:</label>
-                  <autocomplete
-                    :url="API + 'productos/botapies'"
-                    ref="inputBotapie"
-                    anchor="Botapie"
-                    label="writer"
-                    :on-select="val => generateFilter('botapie', val.Botapie)"
-                    :onInput="(val) => !val ? generateFilter('botapie', val) : false"
-                    :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-col>
         </b-row>
         <b-row class="stock-results-card">
           <b-col md="12" class="my-1">
             <table class="table border b-table table-footer table-sm table-detalle">
               <thead>
                 <tr>
+                  <th>Código</th>
+                  <th>Categoría</th>
                   <th>Producto</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
                   <th class="text-center">Precio de compra</th>
                   <th class="text-center">Precio de venta</th>
                   <th class="text-center">Stock</th>
@@ -221,7 +165,11 @@
               </thead>
               <tbody>
                 <tr>
+                  <td>{{ productoSelect.CodigoBarra }}</td>
+                  <td>{{ productoSelect.ProductoCategoria }}</td>
                   <td>{{ productoSelect.Producto }}</td>
+                  <td>{{ productoSelect.ProductoMarca }}</td>
+                  <td>{{ productoSelect.ProductoModelo }}</td>
                   <td class="text-center">{{ productoSelect.PrecioCosto }}</td>
                   <td class="text-center">{{ productoSelect.PrecioContado }}</td>
                   <td class="text-center table-info">{{ getStock(productoSelect.IdProducto) }}</td>
@@ -392,15 +340,10 @@ export default {
       fields: [
         { key: "CodigoBarra", label: "Código", sortable: true },
         { key: "ProductoCategoria", label: "Categoría", sortable: true },
-        { key: "ImagenProducto", label: "Img." },
         { key: "Producto", label: "Artículo", sortable: true },
         { key: "ProductoMarca", label: "Marca", sortable: true },
         { key: "ProductoModelo", label: "Modelo", sortable: true },
-        { key: "Color", sortable: true },
-        { key: "ProductoTalla", label: "Talla", sortable: true },
-        { key: "Genero", sortable: true },
-        { key: "Botapie", sortable: true },
-        { key: "stock", sortable: false, variant: "", class: "text-center" }
+        { key: "stock", label: "Stock", sortable: true, variant: "", class: "text-center" }
       ],
       totalRows: 50,
       perPage: 10,
@@ -472,9 +415,7 @@ export default {
         " / " +
         this.productoSelect.ProductoModelo +
         " / " +
-        this.productoSelect.Color +
-        " / " +
-        this.productoSelect.ProductoTalla
+        this.productoSelect.ProductoCategoria
       );
     },
     hrefXlsFechas() {
@@ -750,10 +691,6 @@ export default {
       this.$refs.inputProducto.setValue("");
       this.$refs.inputMarca.setValue("");
       this.$refs.inputModelo.setValue("");
-      this.$refs.inputColor.setValue("");
-      this.$refs.inputTalla.setValue("");
-      this.$refs.inputGenero.setValue("");
-      this.$refs.inputBotapie.setValue("");
 
       this.productoSelect = {};
       this.limpiarClassRows();

@@ -117,9 +117,10 @@
                     <thead>
                         <tr>
                             <th class="text-center">Codigo</th>
+                            <th class="text-center">Categoría</th>
                             <th class="text-center">Producto</th>
-                            <th class="text-center">Laboratorio</th>
-                            <th class="text-center">Forma</th>
+                            <th class="text-center">Marca</th>
+                            <th class="text-center">Modelo</th>
                             <th class="text-center">Cantidad</th>
                             <th class="text-center">Precio</th>
                             <th class="text-center">Total</th>
@@ -128,9 +129,10 @@
                     <tbody>
                         <tr v-for="(prod, i) in detalle" :key="i">
                             <td class="text-center">{{ prod.CodigoBarra }}</td>
+                            <td class="text-center">{{ prod.ProductoCategoria }}</td>
                             <td class="text-center">{{ prod.Producto }}</td>
                             <td class="text-center">{{ prod.ProductoMarca }}</td>
-                            <td class="text-center">{{ prod.ProductoFormaFarmaceutica }}</td>
+                            <td class="text-center">{{ prod.ProductoModelo }}</td>
                             <td class="text-center">{{ prod.Cantidad }}</td>
                             <td class="text-center">{{ prod.Precio }}</td>
                             <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
@@ -138,7 +140,7 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                      <td colspan="5"></td>
+                      <td colspan="6"></td>
                       <td class="text-center"><b>TOTAL</b></td>
                       <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{infoOrden.Total | moneda}} </td>
                     </tr>
@@ -252,9 +254,10 @@ export default {
       carrito: {
         fields: [
           { key: "CodigoBarra", label: "Código" },
+          { key: "ProductoCategoria", label: "Categoría" },
           { key: "Producto" },
           { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoFormaFarmaceutica", label: "Lab." },
+          { key: "ProductoModelo", label: "Modelo" },
           { key: "ProductoMedicion", label: "Med." },
           {
             key: "StockMinimo",
