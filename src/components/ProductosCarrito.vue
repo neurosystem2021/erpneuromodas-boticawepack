@@ -775,15 +775,76 @@ export default {
 
       if (idProducto) {
         let params = { codigoBarra: idProducto };
+
+        // 1. Buscar producto por código de barras
         this.axios
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
-            if (response.data.IdProducto) {
-              this.setProducto(response.data);
+
+            if (response.data && response.data.IdProducto) {
+
+              let producto = response.data;
+
+              // 2. Obtener stock del almacén actual
+              this.axios
+                .get(
+                  this.API + "productos/puntoventa/stock/" + (this.idAlmacen || 1),
+                  {
+                    params: {
+                      idProductos: [producto.IdProducto]
+                    }
+                  }
+                )
+                .then(stockResponse => {
+
+                  // 3. Si encontró el producto con stock,
+                  //    agregamos el stock al objeto original
+                  if (
+                    stockResponse.data &&
+                    stockResponse.data.length > 0
+                  ) {
+                    producto = Object.assign(
+                      {},
+                      producto,
+                      stockResponse.data[0]
+                    );
+                  }
+
+                  // 4. Continuamos con el flujo normal
+                  this.setProducto(producto);
+
+                })
+                .catch(error => {
+
+                  console.error("Error obteniendo stock:", error);
+
+                  // Si falla la consulta de stock,
+                  // igual dejamos agregar el producto
+                  this.setProducto(producto);
+
+                });
+
             } else {
+
               this.loadCode = "";
-              this.$toasted.show("No se encontró ningun producto");
+
+              this.$toasted.show(
+                "No se encontró ningun producto"
+              );
+
             }
+
+          })
+          .catch(error => {
+
+            console.error("Error buscando producto:", error);
+
+            this.loadCode = "";
+
+            this.$toasted.show(
+              "No se encontró ningun producto"
+            );
+
           });
       }
     },
