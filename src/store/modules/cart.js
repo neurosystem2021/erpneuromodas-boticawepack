@@ -19,7 +19,7 @@ const mutations = {
       }
     } else {
       //if(!productos.find( producto => producto.IdProducto === item.IdProducto )) {
-        productos.unshift(item)
+      productos.unshift(item)
       /*}else{
         let index2 = productos.findIndex(prod => prod.IdProducto == item.IdProducto)
         productos.splice(index2, 1)
@@ -39,6 +39,9 @@ const mutations = {
   },
   ACTUALIZAR_PRODUCTO ({ productos }, obj) {
     //let index = productos.findIndex( p => p.IdProducto === prod.IdProducto )
+    if (obj.Pos === undefined || obj.Pos === null || obj.Pos < 0 || obj.Pos >= productos.length) {
+      return
+    }
     productos.splice(obj.Pos, 1, obj.Producto)
   },
   ELIMINAR_PRODUCTO ({ productos }, index) {
@@ -115,7 +118,7 @@ const actions = {
       producto.Descripcion = producto.Descripcion || ""
       // console.log(producto);
       producto.disabledProf = 0
-      
+
       commit('AGREGAR_PRODUCTO', producto)
       if (cb) cb(producto)
     } else {

@@ -775,20 +775,20 @@ export default {
       });
       return total 
     },
-  	totalAdelantos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado) total += ade.Importe
-  		})
-  		return total
-  	},
+    totalAdelantos () {
+      let total = 0
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado) total += ade.Importe
+      })
+      return total
+    },
     totalAdelantosActivos () {
-  		let total = 0
-  		this.adelantos.forEach(ade => {
-  			if (!ade.Anulado  &&  !ade.AnuladoVenta && !ade.EsCreditoVenta) total += ade.Importe
-  		})
-  		return total
-  	},
+      let total = 0
+      this.adelantos.forEach(ade => {
+        if (!ade.Anulado  &&  !ade.AnuladoVenta && !ade.EsCreditoVenta) total += ade.Importe
+      })
+      return total
+    },
     totalVentasEfectivo () {
       let total = 0
       this.ventasEfectivo.forEach(venta => {
@@ -804,7 +804,7 @@ export default {
     totalVentasVisa () {
       let total = 0
       this.ventasVisa.forEach(venta => {
-        if (!venta.Anulado) total += venta.Visa
+        if (!venta.Anulado && venta.CodSunat != '07') total += venta.Visa
       });
       return total
     },
@@ -816,14 +816,14 @@ export default {
     totalVentasMastercard () {
       let total = 0
       this.ventasMastercard.forEach(venta => {
-        if (!venta.Anulado) total += venta.Mastercard
+        if (!venta.Anulado && venta.CodSunat != '07') total += venta.Mastercard
       });
       return total
     },
     totalVentasTarjeta () {
       let total = 0
       this.ventasTarjeta.forEach(venta => {
-        if (!venta.Anulado) total += venta.Tarjeta
+        if (!venta.Anulado && venta.CodSunat != '07') total += venta.Tarjeta
       });
       return total
     },
@@ -840,7 +840,7 @@ export default {
     totalVentasCredito () {
       let total = 0
       this.ventasCredito.forEach(venta => {
-        if (!venta.Anulado) total += venta.Total
+        if (!venta.Anulado && venta.CodSunat != '07') total += venta.Total
       });
       return total
     },
@@ -851,19 +851,19 @@ export default {
     },
     // ---- Conteos usados en el ticket ----
     cantidadEfectivo () {
-      return this.ventasEfectivo.filter(v => !v.Anulado).length
+      return this.ventasEfectivo.filter(v => !v.Anulado && v.CodSunat != '07').length
     },
     cantidadVisa () {
-      return this.ventasVisa.filter(v => !v.Anulado).length
+      return this.ventasVisa.filter(v => !v.Anulado && v.CodSunat != '07').length
     },
     cantidadMastercard () {
-      return this.ventasMastercard.filter(v => !v.Anulado).length
+      return this.ventasMastercard.filter(v => !v.Anulado && v.CodSunat != '07').length
     },
     cantidadTarjeta () {
-      return this.ventasTarjeta.filter(v => !v.Anulado).length
+      return this.ventasTarjeta.filter(v => !v.Anulado && v.CodSunat != '07').length
     },
     cantidadCredito () {
-      return this.ventasCredito.filter(v => !v.Anulado).length
+      return this.ventasCredito.filter(v => !v.Anulado && v.CodSunat != '07').length
     },
     fechaImpresion () {
       return new Date().toLocaleString('es-PE')

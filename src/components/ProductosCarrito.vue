@@ -106,7 +106,7 @@
               step="0.001"
               min="0"
               :disabled="bloquearInput?true:false"
-              @input="(val) => changeCant(val.target.value, productos[data.index])"
+              @input="(val) => changeCant(val.target.value, productos[data.index], data.index)"
               placeholder="Cantidad"
               class="form-control" />
             <span>x{{productos[data.index].cantidadPres}}</span>
@@ -357,9 +357,9 @@ import ProductoForm from './ProductoForm'
 import config from '@/store/config.js'
 
 export default {
-  mounted() {
+mounted() {
     // this.alterarBuscadorProductos()
-  },
+},
   data () {
     return {
       API: config.API,
@@ -737,9 +737,11 @@ export default {
       this.objProd = obj
     },  
     setProductoUni (obj) {
-      this.objProd.cantxPrecio = 1
+      obj = Object.assign({}, obj)
+
       this.$refs.autocompleteProducto.setValue('')
-      //obj.FLETE = 0
+      obj.cantxPrecio = 1
+      obj.Descripcion = ''  
       obj.precio = obj.PrecioCosto
       obj.cantidad = 0
       //obj.IdLote = 0
@@ -764,10 +766,11 @@ export default {
       this.$refs.barcodeInput.focus()
     },
     setProductoCant (prod) {
-      this.objProd.cantxPrecio = 1
       this.cant = prod.cantidad
-      let obj = this.objProd
+      let obj = Object.assign({}, this.objProd)
       this.$refs.autocompleteProducto.setValue('')
+      obj.cantxPrecio = 1
+      obj.Descripcion = ''
       //obj.FLETE = 0
       // this.objProd.precio = 0
       // this.objProd.cantidad = 0
