@@ -1867,6 +1867,7 @@ export default {
       const descuento = parseFloat(val) || 0;
       this.ventas[this.ventaActiva].descuentoGeneral = descuento;
       this.aplicarDescuentoAProductos(descuento);
+      this.metodoPagoCambio(1);
     },
 
     reaplicarDescuentoVigente(ventaIndex = null) {
