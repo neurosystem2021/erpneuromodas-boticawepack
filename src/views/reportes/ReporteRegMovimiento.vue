@@ -127,10 +127,6 @@
                   <th>Descripcion</th>
                   <th>Modelo</th>
                   <th>Marca</th>
-                  <th>Talla</th>
-                  <th>Color</th>
-                  <th>Genero</th>
-                  <th>Botapie/ Manga</th>
                   <th>Medición</th>
                   <th>Cantidad</th>
                   <th>Precio</th>
@@ -147,10 +143,6 @@
                   <td>{{ detalle.Descripcion }}</td>
                   <td>{{ detalle.ProductoModelo }}</td>
                   <td>{{ detalle.ProductoMarca }}</td>
-                  <td>{{ detalle.ProductoTalla }}</td>
-                  <td>{{ detalle.Color }}</td>
-                  <td>{{ detalle.Genero }}</td>
-                  <td>{{ detalle.Botapie }}</td>
                   <td>{{ detalle.ProductoMedicion }}</td>
                   <td>{{ detalle.Cantidad }}</td>
                   <td>{{ detalle.Precio }}</td>

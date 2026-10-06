@@ -19,7 +19,7 @@
       var keys = vm.fields.map(function (field) { return field.key || field; });
       if (keys.indexOf('ProductoMarca') === -1 || keys.indexOf('stock') === -1) continue;
       var brandIndex = keys.indexOf('ProductoMarca');
-      [{key:'Color',label:'Color'},{key:'ProductoTalla',label:'Talla'},{key:'ProductoModelo',label:'Modelo'}].forEach(function (field) {
+      [{key:'ProductoModelo',label:'Modelo'}].forEach(function (field) {
         if (!vm.fields.some(function (current) { return (current.key || current) === field.key; })) vm.fields.splice(brandIndex + 1, 0, field);
       });
       vm._stockColumnsEnhanced = true;

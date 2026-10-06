@@ -485,6 +485,18 @@ export default {
   min-height: 140px;        /* ← más alto */
 }
 
+.kpi-card.border-primary {
+  border-color: #075247 !important;
+  color: #fff;
+  background: linear-gradient(145deg, #043b35, #087363) !important;
+  box-shadow: 0 9px 22px rgba(7, 82, 71, .22);
+}
+.kpi-card.border-primary .kpi-label,
+.kpi-card.border-primary .kpi-value,
+.kpi-card.border-primary .text-primary {
+  color: #fff !important;
+}
+
 .kpi-card .card-body {
   padding: 16px 10px;
   display: flex;

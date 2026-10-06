@@ -1,4 +1,4 @@
-:root{--ri-navy:#082b58;--ri-blue:#075f99;--ri-cyan:#0fa7c4;--ri-bg:#f2f8fc;--ri-line:#cfe0ec;--ri-text:#153653;--ri-muted:#668096;--ri-green:#11975f}
+:root{--ri-navy:#043b35;--ri-blue:#075247;--ri-cyan:#0a806d;--ri-bg:#f1f8f6;--ri-line:#cde3dd;--ri-text:#153b35;--ri-muted:#66857d;--ri-green:#087363}
 body.nm-inventory-report-page{min-height:100vh;color:var(--ri-text);background:radial-gradient(circle at 92% 12%,rgba(15,167,196,.11),transparent 27%),linear-gradient(145deg,#f5faff,#eef7fb 55%,#f8fbfd);font-family:Inter,"Segoe UI",Arial,sans-serif}
 .nm-report-shell{max-width:1380px;margin:28px auto;padding:0 24px}
 .nm-report-hero{display:flex;align-items:center;gap:18px;padding:25px 28px;border-radius:24px;color:#fff;background:linear-gradient(115deg,var(--ri-navy),var(--ri-blue) 62%,var(--ri-cyan));box-shadow:0 18px 42px rgba(6,55,94,.2)}

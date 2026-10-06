@@ -16,6 +16,10 @@
               <strong>{{ totalRows }}</strong>
               <span>artículos registrados</span>
             </div>
+            <b-button v-if="idPerfil === 1" class="product-catalog-import" @click="abrirImportacion">
+              <i class="fas fa-file-excel"></i>
+              <span>Importar Excel</span>
+            </b-button>
             <b-button class="product-catalog-new" @click="nuevoProducto">
               <i class="fas fa-plus"></i>
               <span>Nuevo producto</span>
@@ -87,6 +91,124 @@
         </footer>
       </section>
       <producto-form ref="productoForm" :producto-update="productoSelect" :cbGuardar="actualizarTabla"></producto-form>
+
+      <b-modal
+        v-model="mostrarImportacion"
+        size="lg"
+        centered
+        hide-footer
+        no-close-on-backdrop
+        modal-class="product-import-modal"
+        content-class="product-import-content"
+        body-class="product-import-body">
+        <template slot="modal-title">
+          <div class="product-import-title">
+            <span><i class="fas fa-file-excel"></i></span>
+            <div>
+              <strong>Importar productos desde Excel</strong>
+              <small>Revisa la información antes de actualizar el catálogo.</small>
+            </div>
+          </div>
+        </template>
+
+        <input
+          ref="archivoExcel"
+          type="file"
+          class="d-none"
+          accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          @change="seleccionarArchivo" />
+
+        <button
+          type="button"
+          class="product-import-dropzone"
+          :class="{ 'product-import-dropzone--selected': archivoImportacion }"
+          @click="elegirArchivo"
+          @dragover.prevent
+          @drop.prevent="soltarArchivo">
+          <span class="product-import-dropzone__icon"><i class="fas fa-cloud-upload-alt"></i></span>
+          <span class="product-import-dropzone__copy">
+            <strong>{{ archivoImportacion ? archivoImportacion.name : 'Seleccionar archivo XLS o XLSX' }}</strong>
+            <small>{{ archivoImportacion ? formatoPeso(archivoImportacion.size) : 'También puedes arrastrarlo aquí · Máximo 12 MB' }}</small>
+          </span>
+          <span class="product-import-dropzone__action">{{ archivoImportacion ? 'Cambiar' : 'Examinar' }}</span>
+        </button>
+
+        <div v-if="analizandoImportacion" class="product-import-loading">
+          <b-spinner small></b-spinner>
+          <span>Analizando columnas y productos...</span>
+        </div>
+
+        <div v-if="errorImportacion" class="product-import-alert product-import-alert--error">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>{{ errorImportacion }}</span>
+        </div>
+
+        <template v-if="analisisImportacion">
+          <div class="product-import-stats">
+            <div><strong>{{ analisisImportacion.total_filas }}</strong><span>Filas leídas</span></div>
+            <div><strong>{{ analisisImportacion.productos_nuevos }}</strong><span>Nuevos</span></div>
+            <div><strong>{{ analisisImportacion.productos_actualizados }}</strong><span>Actualizar</span></div>
+            <div><strong>{{ analisisImportacion.categorias_nuevas }}</strong><span>Categorías</span></div>
+            <div><strong>{{ analisisImportacion.marcas_nuevas }}</strong><span>Marcas</span></div>
+          </div>
+
+          <div class="product-import-alert product-import-alert--notice">
+            <i class="fas fa-box-open"></i>
+            <span>Solo se registrarán o actualizarán los datos de los productos. El stock actual no será modificado.</span>
+          </div>
+
+          <div v-if="analisisImportacion.errores && analisisImportacion.errores.length" class="product-import-errors">
+            <strong><i class="fas fa-times-circle"></i> Corrige estas filas antes de importar</strong>
+            <ul>
+              <li v-for="error in analisisImportacion.errores.slice(0, 8)" :key="error.fila">
+                Fila {{ error.fila }}<span v-if="error.codigo"> · {{ error.codigo }}</span>: {{ error.mensaje }}
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="analisisImportacion.muestra && analisisImportacion.muestra.length" class="product-import-preview">
+            <div class="product-import-preview__heading">
+              <strong>Vista previa</strong>
+              <span>{{ analisisImportacion.validas }} productos válidos</span>
+            </div>
+            <div class="product-import-preview__table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th><th>Producto</th><th>Categoría</th><th>Marca</th><th>Modelo</th><th>Costo</th><th>Venta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="fila in analisisImportacion.muestra" :key="fila.fila">
+                    <td>{{ fila.codigo }}</td>
+                    <td>{{ fila.producto }}</td>
+                    <td>{{ fila.categoria }}</td>
+                    <td>{{ fila.marca }}</td>
+                    <td>{{ fila.modelo }}</td>
+                    <td>S/ {{ numeroImportacion(fila.precio_costo) }}</td>
+                    <td>S/ {{ numeroImportacion(fila.precio_contado) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </template>
+
+        <div class="product-import-actions">
+          <button type="button" class="product-import-cancel" :disabled="guardandoImportacion" @click="mostrarImportacion = false">
+            Cerrar
+          </button>
+          <button
+            type="button"
+            class="product-import-confirm"
+            :disabled="!puedeImportar || guardandoImportacion || analizandoImportacion"
+            @click="confirmarImportacion">
+            <b-spinner v-if="guardandoImportacion" small></b-spinner>
+            <i v-else class="fas fa-file-import"></i>
+            <span>{{ guardandoImportacion ? 'Importando...' : 'Importar productos' }}</span>
+          </button>
+        </div>
+      </b-modal>
     </b-container>
   </div>
 </template>
@@ -98,13 +220,12 @@ import CodigoMultiple from "@/components/CodigoMultiple.vue";
 
 export default {
   mounted() {
-    this.axios.get(this.API + "productos/count").then(response => {
-      this.totalRows = response.data.total;
-    });
+    this.cargarTotal();
   },
   data() {
     return {
       API: config.API,
+      idPerfil: Number(sessionStorage.getItem("IdPerfil") || sessionStorage.getItem("idPerfil") || 0),
       pageOptions: [5, 10, 15, 50, 100],
       filter: null,
       sortBy: "IdProducto",
@@ -122,8 +243,19 @@ export default {
       ],
       totalRows: 50,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      mostrarImportacion: false,
+      archivoImportacion: null,
+      analizandoImportacion: false,
+      guardandoImportacion: false,
+      analisisImportacion: null,
+      errorImportacion: ""
     };
+  },
+  computed: {
+    puedeImportar() {
+      return Boolean(this.archivoImportacion && this.analisisImportacion && this.analisisImportacion.puede_importar);
+    }
   },
   methods: {
     rowClick(item, index) {
@@ -133,11 +265,115 @@ export default {
       //console.log(this.$refs.productoForm.$refs.productoForm)
     },
     actualizarTabla() {
-      this.$refs.tablaProductos.refresh();
+      if (this.$refs.tablaProductos) this.$refs.tablaProductos.refresh();
+      this.cargarTotal();
+    },
+    cargarTotal() {
+      this.axios.get(this.API + "productos/count").then(response => {
+        this.totalRows = Number(response.data.total) || 0;
+      }).catch(() => {
+        this.totalRows = 0;
+      });
     },
     nuevoProducto() {
       this.productoSelect = {};
       this.$refs.productoForm.show = true;
+    },
+    abrirImportacion() {
+      this.archivoImportacion = null;
+      this.analisisImportacion = null;
+      this.errorImportacion = "";
+      this.mostrarImportacion = true;
+      this.$nextTick(() => {
+        if (this.$refs.archivoExcel) this.$refs.archivoExcel.value = "";
+      });
+    },
+    elegirArchivo() {
+      if (this.$refs.archivoExcel) this.$refs.archivoExcel.click();
+    },
+    soltarArchivo(evento) {
+      const archivo = evento.dataTransfer && evento.dataTransfer.files ? evento.dataTransfer.files[0] : null;
+      if (archivo) this.prepararArchivo(archivo);
+    },
+    seleccionarArchivo(evento) {
+      const archivo = evento.target.files && evento.target.files[0] ? evento.target.files[0] : null;
+      if (archivo) this.prepararArchivo(archivo);
+    },
+    prepararArchivo(archivo) {
+      const extension = (archivo.name.split(".").pop() || "").toLowerCase();
+      this.errorImportacion = "";
+      this.analisisImportacion = null;
+      if (["xls", "xlsx"].indexOf(extension) === -1) {
+        this.archivoImportacion = null;
+        this.errorImportacion = "Seleccione un archivo en formato XLS o XLSX.";
+        return;
+      }
+      if (archivo.size > 12 * 1024 * 1024) {
+        this.archivoImportacion = null;
+        this.errorImportacion = "El archivo supera el máximo permitido de 12 MB.";
+        return;
+      }
+      this.archivoImportacion = archivo;
+      this.analizarExcel();
+    },
+    urlImportacion() {
+      return this.API.replace(/index\.php\/?$/, "productos-importar.php");
+    },
+    datosImportacion(modo) {
+      const datos = new FormData();
+      datos.append("archivo", this.archivoImportacion);
+      datos.append("modo", modo);
+      return datos;
+    },
+    analizarExcel() {
+      if (!this.archivoImportacion) return;
+      this.analizandoImportacion = true;
+      this.errorImportacion = "";
+      this.axios.post(this.urlImportacion(), this.datosImportacion("vista_previa"), {
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(response => {
+        this.analisisImportacion = response.data.analisis;
+      }).catch(error => {
+        const respuesta = error.response && error.response.data ? error.response.data : {};
+        this.analisisImportacion = respuesta.analisis || null;
+        this.errorImportacion = respuesta.error || "No se pudo analizar el archivo Excel.";
+      }).finally(() => {
+        this.analizandoImportacion = false;
+      });
+    },
+    confirmarImportacion() {
+      if (!this.puedeImportar) return;
+      this.guardandoImportacion = true;
+      this.errorImportacion = "";
+      this.axios.post(this.urlImportacion(), this.datosImportacion("importar"), {
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(response => {
+        const resultado = response.data.resultado || {};
+        this.mostrarImportacion = false;
+        this.currentPage = 1;
+        this.filter = "";
+        this.actualizarTabla();
+        this.$swal({
+          title: "Importación completada",
+          text: (resultado.productos_creados || 0) + " productos creados y " + (resultado.productos_actualizados || 0) + " actualizados.",
+          type: "success",
+          confirmButtonText: "Entendido"
+        });
+      }).catch(error => {
+        const respuesta = error.response && error.response.data ? error.response.data : {};
+        this.analisisImportacion = respuesta.analisis || this.analisisImportacion;
+        this.errorImportacion = respuesta.error || "No se pudo completar la importación.";
+      }).finally(() => {
+        this.guardandoImportacion = false;
+      });
+    },
+    formatoPeso(bytes) {
+      if (!bytes) return "0 KB";
+      if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    },
+    numeroImportacion(valor) {
+      return Number(valor || 0).toFixed(2);
     },
     myProvider(ctx) {
       // Here we don't set isBusy prop, so busy state will be handled by table itself

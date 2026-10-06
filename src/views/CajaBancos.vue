@@ -230,12 +230,13 @@
    
     <!-- MODAL AGREGAR  PROVEEDOR-->
     <b-modal 
+      id="modal-registro-caja"
       v-model="modalRegistro" 
+      @hidden="limpiarLuegoPago"
       title="Agregar Tipo Caja" 
       backdrop="static" 
       no-close-on-backdrop
       no-close-on-esc 
-      hide-footer
       no-stacking
       container="body"  
       v-if="modalRegistro"
@@ -409,10 +410,6 @@
                     </table>
                     </div>
                   </div>
-                  <div class="card-footer">
-                    <b-button :disabled="!puedeGuardarMovimiento" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
-                    <b-button variant="warning">Cancelar</b-button>
-                  </div>
               </b-col>
             </b-row>
         </b-col>
@@ -496,6 +493,17 @@
           </b-row>
         </b-col>
         </b-row>
+        <template slot="modal-footer">
+          <div v-if="!aplicarLetra" class="cb-operation-actions">
+            <b-button :disabled="!puedeGuardarMovimiento" variant="success" @click="GuardarMovimiento()">
+              <i class="fas fa-check-circle"></i>
+              {{ requiereDocumentoPago ? 'Pagar' : 'Guardar' }}
+            </b-button>
+            <b-button variant="warning" @click="cancelarMovimiento">
+              <i class="fas fa-times"></i> Cancelar
+            </b-button>
+          </div>
+        </template>
     </b-modal>
   </b-container>
 </template>
@@ -566,6 +574,9 @@ export default {
   methods: {
     abrirModalNuevaOperacion() {
       this.modalRegistro = true;
+    },
+    cancelarMovimiento() {
+      this.limpiarLuegoPago();
     },
     addLetra() {
       this.nroLetras += 1;
@@ -1020,6 +1031,12 @@ export default {
     }
   },
   computed: {
+    requiereDocumentoPago() {
+      return (
+        String(this.IdTipoCajaBanco) === "1" ||
+        String(this.IdTipoCajaBanco) === "2"
+      );
+    },
     puedeGuardarMovimiento() {
       const datosCompletos =
         !!this.IdCuenta &&
@@ -1032,10 +1049,7 @@ export default {
 
       // Pago a proveedor y pago de cliente requieren un documento aplicado.
       // Los vales de egreso/ingreso son movimientos directos y no lo requieren.
-      const requiereDocumento =
-        String(this.IdTipoCajaBanco) === "1" ||
-        String(this.IdTipoCajaBanco) === "2";
-      return !requiereDocumento || this.lstAplicado.length > 0;
+      return !this.requiereDocumentoPago || this.lstAplicado.length > 0;
     },
     mostrarProveedor() {
       if (this.IdTipoCajaBanco) {

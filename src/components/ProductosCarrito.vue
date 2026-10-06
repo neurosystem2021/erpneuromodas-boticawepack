@@ -1509,7 +1509,7 @@ canvas {
 }
 .inventory-movement-summary tr:last-child td {
   color: #fff;
-  background: linear-gradient(135deg, #0d356c, #078db8);
+  background: linear-gradient(135deg, #043b35, #087363);
   font-size: 16px;
   letter-spacing: .2px;
 }
@@ -1543,14 +1543,27 @@ canvas {
   flex-direction: column;
   border-radius: 13px;
   color: #fff;
-  background: linear-gradient(135deg, #0d356c, #078db8);
-  box-shadow: 0 8px 18px rgba(13, 53, 108, .18);
+  background: linear-gradient(135deg, #043b35, #087363);
+  box-shadow: 0 8px 18px rgba(4, 59, 53, .2);
 }
-.inventory-list-meta__total small { margin:0;color:#d9f4ff;font-size:9px;font-weight:900; }
+.inventory-list-meta__total small { margin:0;color:#d8fff5;font-size:9px;font-weight:900; }
 .inventory-list-meta__total strong { color:#fff;font-size:17px;font-weight:900; }
 .inventory-movement-summary .table-danger {
   color: #97253a;
   background: #ffe2e7;
+}
+.inventory-movement-summary tr:last-child .table-danger {
+  color: #fff !important;
+  background: linear-gradient(135deg, #043b35, #087363) !important;
+}
+#app .inventory-movement-summary tbody tr:last-child td,
+#app .inventory-movement-summary tbody tr:last-child td.table-danger,
+#app .inventory-movement-summary tbody tr:last-child td b {
+  color: #fff !important;
+}
+#app .inventory-movement-summary tbody tr:last-child td,
+#app .inventory-movement-summary tbody tr:last-child td.table-danger {
+  background: linear-gradient(135deg, #043b35, #087363) !important;
 }
 @media (max-width: 767px) {
   .inventory-product-search__bar {

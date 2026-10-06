@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" role="img" aria-labelledby="title desc">
+  <title id="title">Producto automotriz sin fotografía</title>
+  <desc id="desc">Ilustración de una batería, una llanta y un aro.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f7fcfd"/>
+      <stop offset="1" stop-color="#dbecef"/>
+    </linearGradient>
+    <linearGradient id="petrol" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#061522"/>
+      <stop offset="1" stop-color="#075247"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#f04438"/>
+      <stop offset="1" stop-color="#ffad00"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#08283a" flood-opacity=".22"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="900" rx="38" fill="url(#bg)"/>
+  <path d="M0 155 800 0v150L0 305z" fill="#16c8f4" opacity=".07"/>
+  <circle cx="683" cy="150" r="146" fill="#ffad00" opacity=".10"/>
+  <circle cx="112" cy="747" r="188" fill="#16c8f4" opacity=".08"/>
+
+  <g opacity=".18" stroke="#0b6170" stroke-width="2">
+    <path d="M72 106h656M72 164h656M72 222h656M72 280h656M72 338h656M72 396h656M72 454h656M72 512h656M72 570h656M72 628h656M72 686h656M72 744h656"/>
+    <path d="M108 70v690M166 70v690M224 70v690M282 70v690M340 70v690M398 70v690M456 70v690M514 70v690M572 70v690M630 70v690M688 70v690"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <circle cx="400" cy="390" r="238" fill="#fff" stroke="#bcdce2" stroke-width="8"/>
+    <circle cx="400" cy="390" r="198" fill="#071c29"/>
+    <circle cx="400" cy="390" r="150" fill="#102f3d" stroke="#16c8f4" stroke-width="8"/>
+    <circle cx="400" cy="390" r="104" fill="#edf8fa" stroke="#ffad00" stroke-width="9"/>
+    <circle cx="400" cy="390" r="34" fill="#075247"/>
+    <g fill="#0c7180">
+      <path d="M387 285h26l10 72-23 33-23-33z"/>
+      <path d="m491 331 13 23-58 44-40-4 12-39z"/>
+      <path d="m505 435-13 23-68-28-24-40 42-6z"/>
+      <path d="m413 495-26 1-11-72 24-34 23 34z"/>
+      <path d="m309 449-13-23 58-44 40 4-12 39z"/>
+      <path d="m295 345 13-23 68 28 24 40-42 6z"/>
+    </g>
+    <circle cx="400" cy="390" r="69" fill="none" stroke="#16c8f4" stroke-width="5" stroke-dasharray="5 8"/>
+  </g>
+
+  <g transform="translate(92 436)" filter="url(#shadow)">
+    <rect x="0" y="48" width="242" height="166" rx="25" fill="url(#petrol)" stroke="#16c8f4" stroke-width="6"/>
+    <rect x="29" y="15" width="56" height="38" rx="8" fill="#ffad00"/>
+    <rect x="157" y="15" width="56" height="38" rx="8" fill="#ffad00"/>
+    <rect x="30" y="80" width="182" height="91" rx="16" fill="#fff" opacity=".96"/>
+    <path d="M96 125h50M121 100v50" stroke="#f04438" stroke-width="14" stroke-linecap="round"/>
+    <path d="M58 125h22M162 125h22" stroke="#075247" stroke-width="11" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(556 500)" filter="url(#shadow)">
+    <circle cx="70" cy="70" r="70" fill="#071c29" stroke="#ffad00" stroke-width="7"/>
+    <circle cx="70" cy="70" r="45" fill="#eef8fa" stroke="#16c8f4" stroke-width="6"/>
+    <circle cx="70" cy="70" r="13" fill="#075247"/>
+    <g stroke="#075247" stroke-width="12" stroke-linecap="round">
+      <path d="M70 57V30M83 63l23-14M83 77l23 14M70 83v27M57 77 34 91M57 63 34 49"/>
+    </g>
+  </g>
+
+  <rect x="118" y="711" width="564" height="74" rx="37" fill="url(#petrol)"/>
+  <rect x="118" y="711" width="564" height="7" rx="4" fill="url(#orange)"/>
+  <text x="400" y="758" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="29" font-weight="800" letter-spacing="3">BATERÍAS · LLANTAS · AROS</text>
+  <text x="400" y="827" text-anchor="middle" fill="#075247" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" letter-spacing="2">IMAGEN REFERENCIAL</text>
+</svg>

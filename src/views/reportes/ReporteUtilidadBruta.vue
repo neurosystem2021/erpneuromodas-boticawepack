@@ -31,10 +31,6 @@
                         <th>Producto </th>
                         <th>Modelo </th>
                         <th>Marca </th>
-                        <th>Talla </th>
-                        <th>Color </th>
-                        <th>Genero </th>
-                        <th>Botapie </th>
                         <th style="text-align: center;">Cantidad </th>
                         <th style="text-align: center;">Precio Costo </th>
                         <th style="text-align: center;">Precio Venta </th>
@@ -50,10 +46,6 @@
                         <td>{{reporte.Producto}}</td>
                         <td>{{reporte.ProductoModelo}}</td>
                         <td>{{reporte.ProductoMarca}}</td>
-                        <td>{{reporte.ProductoTalla}}</td>
-                        <td>{{reporte.Color}}</td>
-                        <td>{{reporte.Genero}}</td>
-                        <td>{{reporte.Botapie}}</td>
                         <td style="text-align: center;">{{reporte.Cantidad}}</td>
                         <td style="text-align: center;">{{reporte.PrecioCosto}}</td>
                         <td style="text-align: center;">{{reporte.PrecioVenta}}</td>
@@ -65,7 +57,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="11">{{footer.Producto}}</td>
+                        <td colspan="7">{{footer.Producto}}</td>
                        
                         <td style="text-align: center;">{{footer.TotalVenta}}</td>
                         <td style="text-align: center;">{{footer.TotalCosto}}</td>
@@ -116,10 +108,6 @@ export default {
         { key: "Producto" },
         { key: "ProductoModelo" },
         { key: "ProductoMarca" },
-        { key: "ProductoTalla" },
-        { key: "Color" },
-        { key: "Genero" },
-        { key: "Botapie" },
         { key: "Cantidad" },
         { key: "PrecioCosto" },
         { key: "PrecioVenta" },

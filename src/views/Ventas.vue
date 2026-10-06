@@ -28,9 +28,19 @@
                 <span>Venta {{ index + 1 }}</span>
               </template>
               <b-container fluid>
-                <b-row class="pos-command-header">
-                  <b-col lg="6" xl="6" cols="12" class="pos-sale-header"
-                    style="background: #05382f !important; background-image: none !important; background-color: #05382f !important; border-color: #05382f !important; color: #f6fffb !important;">
+                <button type="button" class="pos-mobile-document-toggle"
+                  :aria-expanded="mostrarDatosBoletaMovil ? 'true' : 'false'"
+                  @click="mostrarDatosBoletaMovil = !mostrarDatosBoletaMovil">
+                  <span class="pos-mobile-document-toggle-icon">
+                    <i :class="mostrarDatosBoletaMovil ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </span>
+                  <span>{{ mostrarDatosBoletaMovil ? 'Ocultar datos de boleta' : 'Mostrar datos de boleta' }}</span>
+                  <i class="fas fa-chevron-up pos-mobile-document-toggle-chevron"
+                    :class="{ 'is-collapsed': !mostrarDatosBoletaMovil }"></i>
+                </button>
+                <b-row class="pos-command-header"
+                  :class="{ 'pos-document-data-collapsed': !mostrarDatosBoletaMovil }">
+                  <b-col lg="6" xl="6" cols="12" class="pos-sale-header">
                     <b-row>
                       <b-col lg="4" xl="4" cols="12" class="mostrarMovil">
                         Tipo de Venta: {{ ventas[ventaActiva].Serie }} - {{ ventas[ventaActiva].Numero }}
@@ -144,7 +154,7 @@
                   <b-col lg="6" xl="6" cols="12" class="ocultarMovil pos-document-summary">
                     <div class="pos-document-layout" style="display: flex; align-items: center; justify-content: space-around; gap: 8px; padding: 4px 0;">
                       <b-col md="4">
-                        <b-form-group class="text-center pos-points-card" v-if="venta.cliente.Cliente && ventas[ventaActiva].tipoVenta.CodSunat != '07' && ventas[ventaActiva].tipoVenta.CodSunat != '08'">
+                        <b-form-group class="text-center pos-points-card">
                             <span class="pos-metric-label"><i class="fas fa-star"></i> Puntos del cliente</span>
                             <div class="puntos">
                                 {{ (venta.cliente.Puntos || 0) | redondeoMenor }}
@@ -233,8 +243,8 @@
                           type="text" class="form-control pos-barcode-input" placeholder="Codigo de Barra" />
                         <b-input-group-append class="pos-search-actions">
                           <!--<proveedores-tabla></proveedores-tabla>-->
-                          <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
-                          <b-button variant="primary" class="ocultarMovil pos-search-button" @click="loadBarcode" title="Buscar código"><i
+                          <b-button variant="success" class="pos-barcode-camera-button" @click="abrirCodigoBarra" title="Escanear código"><i class="fas fa-barcode"></i></b-button>
+                          <b-button variant="primary" class="pos-search-button" @click="loadBarcode" title="Buscar código"><i
                               class="fas fa-search"></i></b-button>
                         </b-input-group-append>
                       </b-input-group>
@@ -310,6 +320,14 @@
 
 
                       </template>
+                      <template slot="Descripcion" slot-scope="data">
+                        <textarea v-model="data.item.Descripcion"
+                          class="form-control pos-item-description"
+                          placeholder="Descripción"
+                          maxlength="180"
+                          rows="1"
+                          aria-label="Descripción del producto"></textarea>
+                      </template>
                       <template slot="cantidad" slot-scope="data">
                         <input v-model="data.item.cantidad" type="number"
                           style="text-align:center; font-weight:bold; width: 90px;" autocomplete="false"
@@ -323,17 +341,26 @@
                         </p>
                       </template>
                       <template slot="precio" slot-scope="data">
-                        <input :disabled="data.item.bloquearInputPrecio" v-model="data.item.precio" min="0"
+                        <input :disabled="precioProductoBloqueado(data.item)" v-model="data.item.precio" min="0"
                           step="0.00001" type="text" style="text-align:center; font-weight:bold; width: 105px;"
-                          autocomplete="false" @input="actualizarDetalleConDescuento(data.item)" @focus="abrirModalTouch(data.index, 2)"
-                          class="form-control">
+                          autocomplete="false" @input="actualizarDetalleConDescuento(data.item)"
+                          @focus="abrirModalTouch(data.index, 2)"
+                          :title="precioProductoBloqueado(data.item) ? 'Precio unitario bloqueado para este perfil' : 'Editar precio unitario'"
+                          :aria-label="precioProductoBloqueado(data.item) ? 'Precio unitario bloqueado' : 'Precio unitario editable'"
+                          :class="['form-control', { 'pos-manual-price-locked': precioProductoBloqueado(data.item) }]">
 
                       </template>
                       <template slot="descuento" slot-scope="data">
                         <div class="pos-item-discount">
-                          <input v-model="data.item.descuento" type="text"
+                          <input v-model.number="data.item.descuento" type="number"
                             style="text-align:center; font-weight:bold; width: 100px;" autocomplete="false"
-                            @input="metodoPagoCambio(1)" @focus="abrirModalTouch(data.index, 3)" class="form-control" />
+                            min="0" :max="getSubTotalDetalle(data.item)" step="0.01"
+                            :disabled="!puedeAplicarDescuentos"
+                            @input="actualizarDescuentoProductoManual(data.item, $event.target.value)"
+                            @focus="puedeAplicarDescuentos && abrirModalTouch(data.index, 3)"
+                            :title="puedeAplicarDescuentos ? 'Editar descuento del producto' : 'Solo el administrador puede aplicar descuentos'"
+                            :aria-label="puedeAplicarDescuentos ? 'Descuento editable' : 'Descuento bloqueado para este perfil'"
+                            :class="['form-control', { 'pos-manual-discount-locked': !puedeAplicarDescuentos }]" />
                           <small v-if="Number(getSubTotalDetalle(data.item)) > 0" class="pos-item-discount-percent">
                             {{ getPorcentajeDescuentoAplicado(data.item).toFixed(2) }}% aplicado
                           </small>
@@ -365,13 +392,131 @@
                       <template slot="cantxPrecio" slot-scope="data">
                         <b-form-input v-if="data.item.esPresentacion" v-model="data.item.CantidadPresentacion"
                           type="text" style="text-align:center; font-weight:bold; width: 100px;" autocomplete="false"
-                          @input="metodoPagoCambio(1)"></b-form-input>
+                          @input="actualizarDetalleConDescuento(data.item)"></b-form-input>
                         <!-- {{data.item.esPresentacion}} -->
                         <!-- esPresentacion -->
 
                       </template>
 
                     </b-table>
+                    <div v-if="!venta.productos.length" class="pos-mobile-empty-cart">
+                      <span class="pos-mobile-empty-cart-icon"><i class="fas fa-shopping-basket"></i></span>
+                      <div>
+                        <strong>Lista para agregar productos</strong>
+                        <small>Busca por nombre o escanea el codigo de barras.</small>
+                      </div>
+                    </div>
+                    <div v-if="venta.productos.length" class="pos-mobile-cart-list" aria-label="Productos agregados">
+                      <article v-for="(producto, productoIndex) in venta.productos"
+                        :key="'producto-movil-' + (producto.IdProducto || producto.CodigoBarra || productoIndex) + '-' + productoIndex"
+                        class="pos-mobile-product-card">
+                        <header class="pos-mobile-product-head">
+                          <div class="pos-mobile-product-title">
+                            <div class="pos-mobile-product-badges">
+                              <span class="pos-mobile-product-code">
+                                <i class="fas fa-barcode"></i>
+                                {{ producto.CodigoBarra || producto.Codigo || 'SIN CODIGO' }}
+                              </span>
+                              <span class="pos-mobile-stock-badge"
+                                :class="{ 'is-empty': Number(producto.stock || 0) <= 0 }">
+                                <i class="fas fa-box"></i>
+                                Stock {{ formatearStockMovil(producto.stock) }}
+                              </span>
+                            </div>
+                            <h3>{{ producto.Producto || 'Producto sin nombre' }}</h3>
+                          </div>
+                          <div class="pos-mobile-product-total">
+                            <small>Total</small>
+                            <strong>S/ {{ getTotalDetalle(producto) }}</strong>
+                          </div>
+                        </header>
+
+                        <div class="pos-mobile-product-controls">
+                          <label class="pos-mobile-quantity-field">
+                            <span>Cantidad</span>
+                            <div class="pos-mobile-quantity-stepper">
+                              <button type="button" :disabled="producto.esPresentacion || Number(producto.cantidad) <= 1"
+                                @click="cambiarCantidadProductoMovil(producto, -1)"
+                                aria-label="Disminuir cantidad" title="Disminuir cantidad">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                              <input v-model="producto.cantidad" type="number" inputmode="decimal"
+                                :disabled="producto.esPresentacion"
+                                @input="actualizarDetalleConDescuento(producto)"
+                                @focus="abrirModalTouch(productoIndex, 1)"
+                                @keydown.enter="irBusquedaProducto"
+                                class="form-control" />
+                              <button type="button" :disabled="producto.esPresentacion"
+                                @click="cambiarCantidadProductoMovil(producto, 1)"
+                                aria-label="Aumentar cantidad" title="Aumentar cantidad">
+                                <i class="fas fa-plus"></i>
+                              </button>
+                            </div>
+                            <small v-if="producto.esPresentacion">
+                              {{ producto.CantidadPresentacion * producto.cantidad }} unid.
+                            </small>
+                          </label>
+                          <label :class="{ 'pos-mobile-price-locked': precioProductoBloqueado(producto) }">
+                            <span>Precio unitario <i v-if="precioProductoBloqueado(producto)" class="fas fa-lock" aria-hidden="true"></i></span>
+                            <input :disabled="precioProductoBloqueado(producto)" v-model="producto.precio"
+                              min="0" step="0.00001" type="text" inputmode="decimal"
+                              @input="actualizarDetalleConDescuento(producto)"
+                              @focus="abrirModalTouch(productoIndex, 2)"
+                              :title="precioProductoBloqueado(producto) ? 'Precio unitario bloqueado para este perfil' : 'Editar precio unitario'"
+                              :aria-label="precioProductoBloqueado(producto) ? 'Precio unitario bloqueado' : 'Precio unitario editable'"
+                              :class="['form-control', { 'pos-manual-price-locked': precioProductoBloqueado(producto) }]" />
+                          </label>
+                          <label :class="{ 'pos-mobile-discount-locked': !puedeAplicarDescuentos }">
+                            <span>Descuento <i v-if="!puedeAplicarDescuentos" class="fas fa-lock" aria-hidden="true"></i></span>
+                            <input v-model.number="producto.descuento" type="number" inputmode="decimal"
+                              min="0" :max="getSubTotalDetalle(producto)" step="0.01"
+                              :disabled="!puedeAplicarDescuentos"
+                              @input="actualizarDescuentoProductoManual(producto, $event.target.value)"
+                              @focus="puedeAplicarDescuentos && abrirModalTouch(productoIndex, 3)"
+                              :title="puedeAplicarDescuentos ? 'Editar descuento del producto' : 'Solo el administrador puede aplicar descuentos'"
+                              :aria-label="puedeAplicarDescuentos ? 'Descuento editable' : 'Descuento bloqueado para este perfil'"
+                              :class="['form-control', { 'pos-manual-discount-locked': !puedeAplicarDescuentos }]" />
+                            <small v-if="Number(getSubTotalDetalle(producto)) > 0">
+                              {{ getPorcentajeDescuentoAplicado(producto).toFixed(2) }}% aplicado
+                            </small>
+                          </label>
+                        </div>
+
+                        <label v-if="producto._mostrarDescripcionMovil" class="pos-mobile-description-field">
+                          <span>Descripcion del producto</span>
+                          <textarea v-model="producto.Descripcion"
+                            class="form-control pos-item-description"
+                            placeholder="Escriba una descripcion solo si es necesaria"
+                            maxlength="180"
+                            rows="2"
+                            aria-label="Descripcion del producto"></textarea>
+                        </label>
+
+                        <footer class="pos-mobile-product-actions">
+                          <b-button size="sm" variant="outline-info"
+                            class="pos-mobile-description-toggle"
+                            @click="toggleDescripcionProductoMovil(producto)"
+                            :title="producto._mostrarDescripcionMovil ? 'Ocultar descripcion' : 'Agregar descripcion'">
+                            <i class="fas fa-align-left"></i>
+                            <span>{{ producto._mostrarDescripcionMovil ? 'Ocultar descripcion' : 'Descripcion' }}</span>
+                          </b-button>
+                          <b-button v-if="tienePresentaciones(producto)" size="sm" variant="info"
+                            @click="showPresentacion(producto, productoIndex)" title="Ver presentaciones y precios">
+                            <i class="fas fa-list-ul"></i><span>Formatos</span>
+                          </b-button>
+                          <b-button size="sm" variant="success" @click="abrirImagen(producto)" title="Ver imagen">
+                            <i class="fas fa-image"></i><span>Imagen</span>
+                          </b-button>
+                          <b-button v-if="mostrarEditarProducto()" size="sm" variant="info"
+                            @click="editarProducto(producto, productoIndex)" title="Editar producto">
+                            <i class="fas fa-pencil-alt"></i><span>Editar</span>
+                          </b-button>
+                          <b-button size="sm" variant="danger" @click="quitarProducto(productoIndex)" title="Quitar producto">
+                            <i class="fas fa-trash-alt"></i><span>Quitar</span>
+                          </b-button>
+                        </footer>
+                      </article>
+                    </div>
                   </b-row>
                 </div>
                 <b-row class="justify-content-center pos-pay-row">
@@ -382,20 +527,101 @@
                     <span v-else class="pos-pay-spacer" aria-hidden="true"></span>
                   </b-button>
                 </b-row>
+
+                <section class="pos-mobile-payment-section">
+                  <button type="button" class="pos-mobile-payment-toggle"
+                    :aria-expanded="mostrarMetodosMovil ? 'true' : 'false'"
+                    aria-controls="pos-mobile-payment-methods"
+                    @click.stop="mostrarMetodosMovil = !mostrarMetodosMovil">
+                    <span class="pos-mobile-payment-toggle-icon"><i class="fas fa-wallet"></i></span>
+                    <span class="pos-mobile-payment-toggle-copy">
+                      <strong>Metodos de pago</strong>
+                      <small>Seleccione o distribuya el importe</small>
+                    </span>
+                    <i class="fas fa-chevron-down pos-mobile-payment-chevron"
+                      :class="{ 'is-open': mostrarMetodosMovil }"></i>
+                  </button>
+
+                  <div v-if="mostrarMetodosMovil" id="pos-mobile-payment-methods"
+                    class="pos-mobile-payment-methods" @focusin="seleccionarContenidoPago">
+                    <div class="pos-mobile-payment-method payment-cash">
+                      <button type="button" @click="seleccionarMetodoPago(1, index)" title="Seleccionar efectivo">
+                        <i class="fas fa-money-bill-wave"></i>
+                      </button>
+                      <strong>Efectivo</strong>
+                      <b-form-input v-model="ventas[index].pago.efectivo.descripcion"
+                        class="pos-mobile-payment-reference" type="text" placeholder="Referencia"></b-form-input>
+                      <input v-model="ventas[index].pago.efectivo.monto" min="0" step="0.01"
+                        type="number" inputmode="decimal" placeholder="S/."
+                        class="form-control pos-mobile-payment-amount" />
+                    </div>
+                    <div class="pos-mobile-payment-method payment-wallet">
+                      <button type="button" @click="seleccionarMetodoPago(3, index)" title="Seleccionar Yape o Plin">
+                        <i class="fas fa-mobile-alt"></i>
+                      </button>
+                      <strong>Yape/Plin</strong>
+                      <b-form-input v-model="ventas[index].pago.mastercard.descripcion"
+                        class="pos-mobile-payment-reference" type="text" placeholder="Operacion"></b-form-input>
+                      <input v-model="ventas[index].pago.mastercard.monto" min="0" step="0.01"
+                        type="number" inputmode="decimal" placeholder="S/."
+                        class="form-control pos-mobile-payment-amount"
+                        @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(getTotal(index) - ventas[index].pago.visa.monto - ventas[index].pago.delivery.monto - $event.target.value)" />
+                    </div>
+                    <div class="pos-mobile-payment-method payment-card">
+                      <button type="button" @click="seleccionarMetodoPago(2, index)" title="Seleccionar tarjeta">
+                        <i class="fas fa-credit-card"></i>
+                      </button>
+                      <strong>Tarjeta</strong>
+                      <b-form-input v-model="ventas[index].pago.visa.descripcion"
+                        class="pos-mobile-payment-reference" type="text" placeholder="Operacion"></b-form-input>
+                      <input v-model="ventas[index].pago.visa.monto" min="0" step="0.01"
+                        type="number" inputmode="decimal" placeholder="S/."
+                        class="form-control pos-mobile-payment-amount"
+                        @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(getTotal(index) - ventas[index].pago.mastercard.monto - ventas[index].pago.delivery.monto - $event.target.value)" />
+                    </div>
+                    <div class="pos-mobile-payment-method payment-transfer">
+                      <button type="button" @click="seleccionarMetodoPago(4, index)" title="Seleccionar transferencia">
+                        <i class="fas fa-university"></i>
+                      </button>
+                      <strong>Transferencia</strong>
+                      <b-form-input v-model="ventas[index].pago.delivery.descripcion"
+                        class="pos-mobile-payment-reference" type="text" placeholder="Operacion"></b-form-input>
+                      <input v-model="ventas[index].pago.delivery.monto" min="0" step="0.01"
+                        type="number" inputmode="decimal" placeholder="S/."
+                        class="form-control pos-mobile-payment-amount"
+                        @input="ventas[index].pago.efectivo.monto = $options.filters.redondear(getTotal(index) - ventas[index].pago.visa.monto - ventas[index].pago.mastercard.monto - $event.target.value)" />
+                    </div>
+                  </div>
+                </section>
+
+                <div class="pos-mobile-primary-actions">
+                  <b-button type="button" block class="btnAction pos-mobile-action-proforma"
+                    variant="primary" @click="guardarProforma()">
+                    <i class="fas fa-file-invoice"></i><span>Crear Proforma</span>
+                  </b-button>
+                  <b-button type="button" block class="btnAction pos-mobile-action-add"
+                    variant="warning" @click="anadirVentana()">
+                    <i class="fas fa-plus-circle"></i><span>Añadir Ventana</span>
+                  </b-button>
+                  <b-button type="button" block class="btnAction pos-mobile-action-view"
+                    variant="danger" @click="abrirProformasMovil">
+                    <i class="fas fa-file-alt"></i><span>Ver Proformas</span>
+                  </b-button>
+                </div>
                 <b-row class="mt-4 pos-checkout">
                  <b-col lg="3" xl="4" cols="12" class="pos-options-column">
                     <b-row>
                       <!-- BOTONES DE ACCIONES RÁPIDAS -->
                       <b-col cols="12" class="mt-2">
                         <div class="d-flex flex-wrap gap-2 pos-quick-actions" style="gap: 8px;">
-                          <b-button-group size="sm" class="ocularMovil">
+                          <b-button-group size="sm" class="ocularMovil pos-debt-trigger">
                             <pago-deuda></pago-deuda>
                           </b-button-group>
                           <b-button-group size="sm">
                             <movimiento></movimiento>
                           </b-button-group>
-                          <b-button-group size="sm">
-                            <proformas :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"
+                          <b-button-group size="sm" class="pos-proformas-trigger">
+                            <proformas ref="proformasLista" :idAlmacen="venta.almacen.IdAlmacen" @onSelectProforma="cargarProforma"
                               @cargarProforma="cargarProforma">
                             </proformas>
                           </b-button-group>
@@ -742,13 +968,17 @@
                                     v-if="ventas[ventaActiva].puntosAplicados === 0">
                                     <div class="sale-option-label">
                                       <span><i class="fas fa-percentage"></i></span>
-                                      <div><b>Descuento general</b><small>Se aplica al total de la venta</small></div>
+                                      <div><b>Descuento general</b><small>Se prorratea segun el importe de cada producto</small></div>
                                     </div>
                                       <b-input-group prepend="S/" append="Descuento" class="sale-option-input">
-                                        <input v-model="ventas[ventaActiva].descuentoGeneral"
-                                          :disabled="bloquearInput ? true : false" min="0" value="0"
-                                          @input="(val) => { aplicarDescuentoGeneral(val.target.value) }" type="number"
-                                          class="form-control" step="0.01" />
+                                        <input v-model.number="ventas[ventaActiva].descuentoGeneral"
+                                          min="0" :max="getSubTotal(ventaActiva)" value="0"
+                                          :disabled="!puedeAplicarDescuentos || bloquearInput"
+                                          @input="aplicarDescuentoGeneral($event.target.value)"
+                                          :title="puedeAplicarDescuentos ? 'Aplicar y prorratear descuento general' : 'Solo el administrador puede aplicar descuentos'"
+                                          :aria-label="puedeAplicarDescuentos ? 'Descuento general editable' : 'Descuento general bloqueado para este perfil'"
+                                          type="number"
+                                          :class="['form-control', { 'pos-manual-discount-locked': !puedeAplicarDescuentos }]" step="0.01" />
                                       </b-input-group>
                                   </section>
                                   <section class="sale-option-section sale-option-toggles">
@@ -771,6 +1001,28 @@
                                         <small>Marca la venta como pendiente</small>
                                       </b-form-checkbox>
                                     </div>
+                                  </section>
+                                  <section class="sale-option-section sale-document-fields">
+                                    <button type="button" class="sale-document-field-button"
+                                      :class="{ 'has-value': String(ventas[ventaActiva].Observacion || '').trim() !== '' }"
+                                      @click.stop="abrirDatoVenta('observacion')">
+                                      <span class="sale-document-field-icon observation"><i class="fas fa-align-left"></i></span>
+                                      <span class="sale-document-field-copy">
+                                        <b>Observaciones</b>
+                                        <small>{{ resumenDatoVenta(ventas[ventaActiva].Observacion, 'Agregar una indicación') }}</small>
+                                      </span>
+                                      <i class="fas fa-chevron-right sale-document-field-arrow"></i>
+                                    </button>
+                                    <button type="button" class="sale-document-field-button"
+                                      :class="{ 'has-value': String(ventas[ventaActiva].Placa || '').trim() !== '' }"
+                                      @click.stop="abrirDatoVenta('placa')">
+                                      <span class="sale-document-field-icon plate"><i class="fas fa-car"></i></span>
+                                      <span class="sale-document-field-copy">
+                                        <b>Placa del vehículo</b>
+                                        <small>{{ resumenDatoVenta(ventas[ventaActiva].Placa, 'Agregar placa') }}</small>
+                                      </span>
+                                      <i class="fas fa-chevron-right sale-document-field-arrow"></i>
+                                    </button>
                                   </section>
                                   <section class="sale-option-section sale-option-validity">
                                     <div class="sale-option-label">
@@ -873,6 +1125,44 @@
       </b-col>
 
     </b-row>
+    <b-modal ref="modalObservacionVenta" centered hide-footer
+      modal-class="sale-document-modal" content-class="sale-document-modal-content">
+      <template slot="modal-title">
+        <span class="sale-document-modal-title-icon observation"><i class="fas fa-align-left"></i></span>
+        <span><small>Dato para el comprobante</small><strong>Observaciones de la venta</strong></span>
+      </template>
+      <label class="sale-document-modal-label" for="venta-observacion">Observaciones</label>
+      <b-form-textarea id="venta-observacion" v-model="observacionTemporal" maxlength="500" rows="5"
+        placeholder="Ejemplo: Entregar por la tarde o indicar una referencia"></b-form-textarea>
+      <div class="sale-document-modal-help">
+        <span>Se imprimirá en la boleta o factura.</span>
+        <span>{{ String(observacionTemporal || '').length }}/500</span>
+      </div>
+      <div class="sale-document-modal-actions">
+        <b-button variant="outline-secondary" @click="$refs.modalObservacionVenta.hide()">Cancelar</b-button>
+        <b-button variant="primary" @click="guardarObservacionVenta"><i class="fas fa-check mr-1"></i> Guardar</b-button>
+      </div>
+    </b-modal>
+
+    <b-modal ref="modalPlacaVenta" centered hide-footer
+      modal-class="sale-document-modal" content-class="sale-document-modal-content">
+      <template slot="modal-title">
+        <span class="sale-document-modal-title-icon plate"><i class="fas fa-car"></i></span>
+        <span><small>Dato para el comprobante</small><strong>Placa del vehículo</strong></span>
+      </template>
+      <label class="sale-document-modal-label" for="venta-placa">Placa</label>
+      <b-form-input id="venta-placa" v-model="placaTemporal" maxlength="20" autocomplete="off"
+        placeholder="Ejemplo: ABC-123" @input="normalizarPlacaTemporal"></b-form-input>
+      <div class="sale-document-modal-help">
+        <span>Se imprimirá en la boleta o factura.</span>
+        <span>{{ String(placaTemporal || '').length }}/20</span>
+      </div>
+      <div class="sale-document-modal-actions">
+        <b-button variant="outline-secondary" @click="$refs.modalPlacaVenta.hide()">Cancelar</b-button>
+        <b-button variant="primary" @click="guardarPlacaVenta"><i class="fas fa-check mr-1"></i> Guardar</b-button>
+      </div>
+    </b-modal>
+
     <b-modal v-model="modalPresentacion" size="lg" centered hide-footer
       modal-class="presentation-modal" dialog-class="presentation-modal-dialog"
       content-class="presentation-modal-content">
@@ -1148,18 +1438,19 @@
     <producto-form ref="productoFormEdit" :producto-update="productoSelect"
       @productoactualizado="actualizarRegistro"></producto-form>
 
-    <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer title="ESCANEE EL CODIGO DE BARRA">
+    <b-modal id="modalCodigoBarra" size="lg" ref="modalCodigoBarra" hide-footer
+      title="ESCANEE EL CODIGO DE BARRA" @shown="iniciarCodigoBarra" @hidden="cerrarCodigoBarra">
         <div class="d-block text-center">
           <div id="codigoBarraStyle">
-            <v-quagga
+            <barcode-camera-scanner
+              v-if="modalAbiertCode"
               :onDetected="onBarcodeScanned"
               :readerSize="readerSize"
               :readerTypes="detecteds"
-              :patchSize="'large'"
               class="cameraBarra"
-            ></v-quagga>
+            ></barcode-camera-scanner>
             <div class="pos-camera-guide" aria-hidden="true"><span></span></div>
-            <p class="pos-camera-help">Centre el c&oacute;digo dentro del recuadro y mantenga la c&aacute;mara estable.</p>
+            <p class="pos-camera-help">Acerque la etiqueta, centre todas las barras y evite reflejos.</p>
           </div>
         </div>
       </b-modal>
@@ -1204,12 +1495,13 @@ import ConfigVenta from "@/components/ConfigVenta";
 import ProductoForm from "@/components/ProductoForm";
 import AutoComplete from "@/components/AutoComplete.vue";
 import Movimiento from "@/components/Movimiento";
+import BarcodeCameraScanner from "@/components/BarcodeCameraScanner.vue";
+import sound from "../../static/beep.mp3";
 import Vue from "vue";
-import VueQuagga from "vue-quaggajs";
-Vue.use(VueQuagga);
 
 export default {
   components: {
+    BarcodeCameraScanner,
     ClientesForm,
     Proformas,
     PagoDeuda,
@@ -1229,21 +1521,15 @@ export default {
   data() {
     return {
       readerSize: {
-        width: 1600,
-        height: 1080
+        width: 1280,
+        height: 720
       },
       detecteds: [
         "code_128_reader",
         "ean_reader",
         "ean_8_reader",
-        "code_39_reader",
-        "code_39_vin_reader",
-        "codabar_reader",
         "upc_reader",
-        "upc_e_reader",
-        "i2of5_reader",
-        "2of5_reader",
-        "code_93_reader"
+        "upc_e_reader"
       ],
       tiposVentaMovil: [],
       inProgress: false,
@@ -1281,6 +1567,7 @@ export default {
         { key: "CodigoBarra" },
         { key: "ProductoCategoria", label: "Categoría" },
         { key: "Producto" },
+        { key: "Descripcion", label: "Descripción" },
         { key: "ProductoModelo", label: "Modelo" },
         { key: "ProductoMarca", label: "Marca" },
         { key: "pres", label: "Formatos", class: "text-center" },
@@ -1306,10 +1593,15 @@ export default {
       isListening: false,
       recognition: null,
       loadCode: "",
+      result: "",
+      format: "",
+      modalAbiertCode: false,
       tabActive: 0,
       ventaActiva: 0,
       paymentPopoverIndex: null,
       saleOptionsPopoverIndex: null,
+      mostrarMetodosMovil: false,
+      mostrarDatosBoletaMovil: true,
       venta: {
         pagocon: 0,
         cliente: {},
@@ -1317,6 +1609,7 @@ export default {
         Serie: "",
         Numero: "",
         Observacion: "",
+        Placa: "",
         comisionista: {},
         puntosAplicados: 0,
         descuentoPuntos: {},
@@ -1382,6 +1675,7 @@ export default {
           Serie: "",
           Numero: "",
           Observacion: "",
+          Placa: "",
           cliente: {},
           comisionista: {},
           tipoVenta: {
@@ -1435,6 +1729,8 @@ export default {
         { text: "Delivery", value: 2 }
       ],
       modalPresentacion: false,
+      observacionTemporal: "",
+      placaTemporal: "",
       calculatorExpression: "",
       calculatorOpen: false,
       calculatorPosition: { x: 0, y: 0 },
@@ -1585,6 +1881,55 @@ beforeDestroy() {
     obtenerStok: 'obtenerStock',
     add:'agregarProducto'
     }),
+    toggleDescripcionProductoMovil(producto) {
+      this.$set(
+        producto,
+        "_mostrarDescripcionMovil",
+        !producto._mostrarDescripcionMovil
+      );
+    },
+    cambiarCantidadProductoMovil(producto, variacion) {
+      if (!producto || producto.esPresentacion) return;
+      const cantidadActual = Number(producto.cantidad);
+      const cantidadBase = Number.isFinite(cantidadActual) ? cantidadActual : 0;
+      const nuevaCantidad = Math.max(1, Math.round((cantidadBase + variacion) * 1000) / 1000);
+      this.$set(producto, "cantidad", nuevaCantidad);
+      this.actualizarDetalleConDescuento(producto);
+    },
+    formatearStockMovil(stock) {
+      const cantidad = Number(stock);
+      if (!Number.isFinite(cantidad)) return "0";
+      return Number.isInteger(cantidad) ? String(cantidad) : cantidad.toFixed(2);
+    },
+    abrirPagoDeudaMovil() {
+      this.mostrarMetodosMovil = false;
+      this.$nextTick(() => {
+        const botonPagoDeuda = this.$el.querySelector(".pos-debt-trigger .btn-pos");
+        if (botonPagoDeuda) botonPagoDeuda.click();
+      });
+    },
+    crearProformaMovil() {
+      this.mostrarMetodosMovil = false;
+      this.guardarProforma();
+    },
+    precioProductoBloqueado(producto) {
+      return !this.puedeEditarPrecioVenta || Boolean(producto && producto.bloquearInputPrecio);
+    },
+    abrirProformasMovil() {
+      const referencias = this.$refs.proformasLista;
+      const listaActiva = Array.isArray(referencias)
+        ? (referencias[this.ventaActiva] || referencias[0])
+        : referencias;
+
+      if (listaActiva && typeof listaActiva.abrir === "function") {
+        listaActiva.abrir();
+        return;
+      }
+
+      const botonProformas = this.$el.querySelector(".pos-proformas-trigger .btn-pos");
+      if (botonProformas) botonProformas.click();
+      else this.$toasted.error("No se pudo abrir el listado de proformas");
+    },
     abrirTicket(idVenta) {
       if (!idVenta) return;
       const ticketWidth = 460;
@@ -1685,6 +2030,53 @@ beforeDestroy() {
       this.ventaActiva = index;
       this.saleOptionsPopoverIndex = this.saleOptionsPopoverIndex === index ? null : index;
     },
+    resumenDatoVenta(valor, textoVacio) {
+      const texto = String(valor || "").trim();
+      if (!texto) return textoVacio;
+      return texto.length > 42 ? texto.slice(0, 39) + "..." : texto;
+    },
+    abrirDatoVenta(tipo) {
+      const venta = this.ventas[this.ventaActiva];
+      if (!venta) return;
+      this.saleOptionsPopoverIndex = null;
+
+      if (tipo === "placa") {
+        this.placaTemporal = String(venta.Placa || "");
+        this.$nextTick(() => this.$refs.modalPlacaVenta.show());
+        return;
+      }
+
+      this.observacionTemporal = String(venta.Observacion || "");
+      this.$nextTick(() => this.$refs.modalObservacionVenta.show());
+    },
+    normalizarPlacaTemporal(valor) {
+      const placa = String(valor || "")
+        .replace(/[^A-Za-z0-9-]/g, "")
+        .slice(0, 20);
+      if (placa !== this.placaTemporal) this.placaTemporal = placa;
+    },
+    guardarObservacionVenta() {
+      const venta = this.ventas[this.ventaActiva];
+      if (!venta) return;
+      const observacion = String(this.observacionTemporal || "")
+        .trim()
+        .slice(0, 500);
+      this.$set(venta, "Observacion", observacion);
+      this.$refs.modalObservacionVenta.hide();
+      this.$toasted.success(observacion ? "Observaciones guardadas" : "Observaciones eliminadas");
+    },
+    guardarPlacaVenta() {
+      const venta = this.ventas[this.ventaActiva];
+      if (!venta) return;
+      const placa = String(this.placaTemporal || "")
+        .trim()
+        .replace(/[^A-Za-z0-9-]/g, "")
+        .slice(0, 20);
+      this.$set(venta, "Placa", placa);
+      this.placaTemporal = placa;
+      this.$refs.modalPlacaVenta.hide();
+      this.$toasted.success(placa ? "Placa guardada" : "Placa eliminada");
+    },
     seleccionarContenidoPago(event) {
       const input = event && event.target;
       if (input && input.tagName === "INPUT" && typeof input.select === "function") {
@@ -1777,16 +2169,51 @@ beforeDestroy() {
       }
     },
     abrirCodigoBarra() {
-      this.$refs["modalCodigoBarra"].show();
-      this.modalAbiertCode = true;
+      this.prepararSonidoEscaneo();
+      // El video necesita un contenedor visible y con dimensiones reales.
+      // Bootstrap termina de mostrar el modal antes de montar el escaner.
+      this.modalAbiertCode = false;
       this.result = "";
+      this.$nextTick(() => this.$refs["modalCodigoBarra"].show());
+    },
+    iniciarCodigoBarra() {
+      this.$nextTick(() => {
+        this.modalAbiertCode = true;
+      });
+    },
+    prepararSonidoEscaneo() {
+      if (!this._scanAudio) {
+        this._scanAudio = new Audio(sound);
+        this._scanAudio.preload = "auto";
+      }
+      const audio = this._scanAudio;
+      audio.volume = 0;
+      const desbloqueo = audio.play();
+      if (desbloqueo && typeof desbloqueo.then === "function") {
+        desbloqueo.then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 0.85;
+        }).catch(() => { audio.volume = 0.85; });
+      }
+    },
+    cerrarCodigoBarra() {
+      this.modalAbiertCode = false;
+      window.setTimeout(() => this.enfocarCodigoBarra(true), 120);
     },
     onBarcodeScanned(barcode) {
       if (this.modalAbiertCode) {
-        this.result = barcode.codeResult.code;
-        this.format = barcode.codeResult.format;
-        const audio = new Audio(sound);
-        audio.play();
+        const codeResult = barcode && barcode.codeResult ? barcode.codeResult : null;
+        this.result = String(codeResult ? codeResult.code : barcode || "").trim();
+        this.format = codeResult ? codeResult.format : "scanner";
+        const audio = this._scanAudio || new Audio(sound);
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 0.85;
+        audio.play().catch(() => {});
+        if (window.navigator && typeof window.navigator.vibrate === "function") {
+          window.navigator.vibrate(70);
+        }
         if (this.result.length > 0) {
           this.loadCode = this.result;
           this.loadBarcode();
@@ -2236,6 +2663,7 @@ beforeDestroy() {
       this.$nextTick(() => this.enfocarCodigoBarra(true));
     },
     abrirModalTouch(index, tipo) {
+      if (tipo == 3 && !this.puedeAplicarDescuentos) return;
       this.capturaIndex = index;
       this.cantidadInput = "";
       this.objProd = this.ventas[this.ventaActiva].productos[index];
@@ -2260,13 +2688,14 @@ beforeDestroy() {
     ingresaNum() {
       if (this.$refs["modalIngCant"].is_show) {
         this.objProd.cantidad = this.cantidadInput;
+        this.actualizarDetalleConDescuento(this.objProd);
       }
       if (this.$refs["modalIngPre"].is_show) {
         this.objProd.precio = this.cantidadInput;
+        this.actualizarDetalleConDescuento(this.objProd);
       }
       if (this.$refs["modalIngDesc"].is_show) {
-        this.objProd.descuento = this.cantidadInput;
-        this.metodoPagoCambio(1);
+        this.actualizarDescuentoProductoManual(this.objProd, this.cantidadInput);
       }
       // Vue.set(this.ventas[this.ventaActiva].productos, this.index, this.objProd);
       // console.log("this.objProd");
@@ -2650,9 +3079,29 @@ beforeDestroy() {
     },
 
     aplicarDescuentoGeneral(val) {
-      const descuento = parseFloat(val) || 0;
-      this.ventas[this.ventaActiva].descuentoGeneral = descuento;
-      this.aplicarDescuentoAProductos(descuento);
+      if (!this.puedeAplicarDescuentos || this.bloquearInput) return;
+
+      const venta = this.ventas[this.ventaActiva];
+      const subtotal = Number(this.getSubTotal(this.ventaActiva)) || 0;
+      const descuentoSolicitado = Number.parseFloat(val);
+      const descuento = Math.min(
+        subtotal,
+        Math.max(0, Number.isFinite(descuentoSolicitado) ? descuentoSolicitado : 0)
+      );
+      const descuentoNormalizado = Math.round(descuento * 100) / 100;
+
+      venta.puntosAplicados = 0;
+      venta.descuentoPuntos = {};
+      if (descuentoNormalizado === 0) {
+        venta.descuentoGeneral = 0;
+        this.restaurarDescuentosAutomaticos(this.ventaActiva);
+      } else {
+        venta.descuentoGeneral = this.aplicarDescuentoAProductos(
+          descuentoNormalizado,
+          this.ventaActiva
+        );
+      }
+      this.$nextTick(() => this.metodoPagoCambio(1, this.ventaActiva));
     },
 
     reaplicarDescuentoVigente(ventaIndex = null) {
@@ -2661,33 +3110,60 @@ beforeDestroy() {
       if (venta.puntosAplicados > 0 && venta.descuentoPuntos && venta.descuentoPuntos.descuento) {
         this.aplicarDescuentoAProductos(parseFloat(venta.descuentoPuntos.descuento), idx);
       } else if (parseFloat(venta.descuentoGeneral) > 0) {
-        this.aplicarDescuentoAProductos(parseFloat(venta.descuentoGeneral), idx);
+        venta.descuentoGeneral = this.aplicarDescuentoAProductos(
+          parseFloat(venta.descuentoGeneral),
+          idx
+        );
       }
+      this.$nextTick(() => this.metodoPagoCambio(1, idx));
     },
     aplicarDescuentoAProductos(descuentoTotal, ventaIndex = null) {
       const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
       const productos = this.ventas[idx].productos;
-      if (!productos.length) return;
+      if (!productos.length) return 0;
 
-      const subtotal = parseFloat(this.getSubTotal(idx));
-      if (subtotal <= 0) return;
+      const importesCentavos = productos.map(prod =>
+        Math.max(0, Math.round((Number(this.getSubTotalDetalle(prod)) || 0) * 100))
+      );
+      const subtotalCentavos = importesCentavos.reduce((total, importe) => total + importe, 0);
+      if (subtotalCentavos <= 0) return 0;
 
-      productos.forEach((prod, index) => {
-        const subtotalProd = parseFloat(prod.cantidad * prod.precio);
-        const proporcion = subtotalProd / subtotal;
-        const descuentoProd = parseFloat((descuentoTotal * proporcion).toFixed(2));
-        this.$set(this.ventas[idx].productos, index, { ...prod, descuento: descuentoProd });
+      const solicitado = Number.parseFloat(descuentoTotal);
+      const descuentoCentavos = Math.min(
+        subtotalCentavos,
+        Math.max(0, Math.round((Number.isFinite(solicitado) ? solicitado : 0) * 100))
+      );
+
+      // Se distribuye en centavos mediante restos mayores para que la suma sea exacta.
+      const distribucion = importesCentavos.map((importe, index) => {
+        const exacto = descuentoCentavos * importe / subtotalCentavos;
+        const base = Math.floor(exacto);
+        return { index, importe, centavos: base, resto: exacto - base };
       });
-
-      const totalDistribuido = productos.reduce((sum, p) => sum + parseFloat(p.descuento), 0);
-      const diferencia = parseFloat((descuentoTotal - totalDistribuido).toFixed(2));
-      if (diferencia !== 0 && productos.length > 0) {
-        const ultimo = productos[productos.length - 1];
-        this.$set(this.ventas[idx].productos, productos.length - 1, {
-          ...ultimo,
-          descuento: parseFloat((parseFloat(ultimo.descuento) + diferencia).toFixed(2))
-        });
+      let pendientes = descuentoCentavos - distribucion.reduce(
+        (total, item) => total + item.centavos,
+        0
+      );
+      const orden = [...distribucion].sort((a, b) =>
+        b.resto - a.resto || b.importe - a.importe || a.index - b.index
+      );
+      for (let i = 0; pendientes > 0 && orden.length; i = (i + 1) % orden.length) {
+        const item = orden[i];
+        if (item.centavos < item.importe) {
+          item.centavos += 1;
+          pendientes -= 1;
+        }
       }
+
+      distribucion.forEach(item => {
+        const prod = productos[item.index];
+        this.$set(productos, item.index, {
+          ...prod,
+          descuento: item.centavos / 100,
+          _descuentoManual: false
+        });
+      });
+      return descuentoCentavos / 100;
     },
     async cargarProductosDeModelo(productos) {
       for (const item of productos) {
@@ -2780,6 +3256,7 @@ beforeDestroy() {
       prod.ProductoPresentacion = prod.ProductoPresentacion
         ? prod.ProductoPresentacion
         : "UNIDAD";
+      prod.Descripcion = String(prod.Descripcion || "").trim();
       prod.cantidad = 1;
       prod.precio = prod.PrecioContado;
       prod.descuento = 0;
@@ -2926,7 +3403,10 @@ beforeDestroy() {
     },
     aplicarDescuentoProducto(prod) {
       const porcentaje = this.getPorcentajeDescuentoProducto(prod);
-      if (!porcentaje) return;
+      if (!porcentaje) {
+        if (!prod._descuentoManual) this.$set(prod, "descuento", 0);
+        return;
+      }
 
       const cantidad = parseFloat(prod.cantidad) || 0;
       const precio = parseFloat(prod.precio) || 0;
@@ -2936,9 +3416,61 @@ beforeDestroy() {
       const subtotal = factorPresentacion * cantidad * precio;
       this.$set(prod, "descuento", parseFloat((subtotal * porcentaje / 100).toFixed(2)));
     },
+    restaurarDescuentosAutomaticos(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      const venta = this.ventas[idx];
+      if (!venta) return;
+
+      venta.productos.forEach((prod, index) => {
+        const productoActualizado = {
+          ...prod,
+          descuento: 0,
+          _descuentoManual: false
+        };
+        this.aplicarDescuentoProducto(productoActualizado);
+        this.$set(venta.productos, index, productoActualizado);
+      });
+    },
+    actualizarDescuentoProductoManual(prod, valorIngresado) {
+      if (!this.puedeAplicarDescuentos || !prod) return;
+
+      const venta = this.ventas[this.ventaActiva];
+      const productoIndex = venta.productos.indexOf(prod);
+      if (productoIndex < 0) return;
+
+      if (Number(venta.descuentoGeneral) > 0 || Number(venta.puntosAplicados) > 0) {
+        venta.descuentoGeneral = 0;
+        venta.puntosAplicados = 0;
+        venta.descuentoPuntos = {};
+        this.restaurarDescuentosAutomaticos(this.ventaActiva);
+      }
+
+      const productoActual = venta.productos[productoIndex];
+      const subtotal = Number(this.getSubTotalDetalle(productoActual)) || 0;
+      const valor = Number.parseFloat(valorIngresado);
+      const descuento = Math.min(
+        subtotal,
+        Math.max(0, Number.isFinite(valor) ? valor : 0)
+      );
+      this.$set(venta.productos, productoIndex, {
+        ...productoActual,
+        descuento: Math.round(descuento * 100) / 100,
+        _descuentoManual: true
+      });
+      this.$nextTick(() => this.metodoPagoCambio(1, this.ventaActiva));
+    },
     actualizarDetalleConDescuento(prod) {
-      this.aplicarDescuentoProducto(prod);
-      this.metodoPagoCambio(1);
+      const venta = this.ventas[this.ventaActiva];
+      if (Number(venta.puntosAplicados) > 0 || Number(venta.descuentoGeneral) > 0) {
+        this.reaplicarDescuentoVigente(this.ventaActiva);
+      } else if (prod._descuentoManual) {
+        const subtotal = Number(this.getSubTotalDetalle(prod)) || 0;
+        const descuento = Math.min(subtotal, Math.max(0, Number(prod.descuento) || 0));
+        this.$set(prod, "descuento", Math.round(descuento * 100) / 100);
+      } else {
+        this.aplicarDescuentoProducto(prod);
+      }
+      this.$nextTick(() => this.metodoPagoCambio(1, this.ventaActiva));
     },
     getTotalDetalle(prod) {
       let total = 0;
@@ -2957,11 +3489,7 @@ beforeDestroy() {
       let prod = [...this.ventas[idx].productos];
       if (prod.length == 0) return 0;
       let subtotal = prod.reduce((total, prod) => {
-        if (prod.esPresentacion) {
-          return total + parseFloat(prod.CantidadPresentacion * prod.cantidad * prod.precio).toFixed(2);
-        } else {
-          return parseFloat(total + parseFloat(prod.cantidad * prod.precio));
-        }
+        return total + (Number(this.getSubTotalDetalle(prod)) || 0);
       }, 0);
       return parseFloat(subtotal).toFixed(2);
     },
@@ -3120,14 +3648,16 @@ beforeDestroy() {
           </div>
         `).join("");
 
-        await this.$swal.fire({
+        const confirmacion = await this.$swal.fire({
           icon: "warning",
-          title: "Stock no disponible",
+          title: "Stock insuficiente",
           html: `
-            <div class="stock-alert-copy">No se registró la venta. Ajuste las cantidades o retire el producto.</div>
+            <div class="stock-alert-copy">Puede continuar con la venta bajo confirmación. Revise los productos sin existencia suficiente.</div>
             <div class="stock-alert-list">${detalle}</div>
           `,
-          confirmButtonText: "Volver a la venta",
+          showCancelButton: true,
+          confirmButtonText: "Continuar con la venta",
+          cancelButtonText: "Revisar productos",
           buttonsStyling: false,
           customClass: {
             popup: "stock-alert-popup",
@@ -3135,12 +3665,13 @@ beforeDestroy() {
             title: "stock-alert-title",
             htmlContainer: "stock-alert-content",
             actions: "stock-alert-actions",
-            confirmButton: "stock-alert-confirm"
+            confirmButton: "stock-alert-confirm",
+            cancelButton: "stock-alert-cancel"
           },
           allowOutsideClick: false,
           target: document.getElementById("conten")
         });
-        return false;
+        return Boolean(confirmacion && (confirmacion.isConfirmed || confirmacion.value));
       } catch (error) {
         await this.$swal.fire({
           icon: "error",
@@ -3366,7 +3897,8 @@ beforeDestroy() {
         this.inProgress = true;
         return;
       }
-      venta.Observacion = (venta.Observacion + "").toUpperCase();
+      venta.Observacion = String(venta.Observacion || "").trim().slice(0, 500);
+      venta.Placa = String(venta.Placa || "").trim().replace(/[^A-Za-z0-9-]/g, "").slice(0, 20);
       venta.idProductos = productos.map(prod => prod.IdProducto);
       if (venta.cliente.DniRuc != "00000000") {
         venta.EsOrganizacion = 0;
@@ -3673,7 +4205,8 @@ beforeDestroy() {
       }
       venta.PagoCon = venta.pagocon;
       venta.totalCart = this.getTotal();
-      venta.Observacion = (venta.Observacion + "").toUpperCase();
+      venta.Observacion = String(venta.Observacion || "").trim().slice(0, 500);
+      venta.Placa = String(venta.Placa || "").trim().replace(/[^A-Za-z0-9-]/g, "").slice(0, 20);
       venta.idProductos = productos.map(prod => prod.IdProducto);
       if (venta.cliente.DniRuc != "00000000") {
         venta.EsOrganizacion = 0;
@@ -4021,6 +4554,13 @@ beforeDestroy() {
     }
   },
   computed: {
+    puedeAplicarDescuentos() {
+      return Number(this.idPerfil) === 1;
+    },
+    puedeEditarPrecioVenta() {
+      const perfil = Number(this.idPerfil);
+      return perfil === 1 || perfil === 31;
+    },
     APIProductos() {
       // console.log(this.ventas[this.ventaActiva].almacen.IdAlmacen);
       if (this.ventas[this.ventaActiva].almacen.IdAlmacen) {

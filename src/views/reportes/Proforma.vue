@@ -89,7 +89,6 @@
               <th class="center">Categoría</th>
               <th class="center">Modelo</th>
               <th class="center">Marca</th>
-              <th class="center">Medida</th>
               <th class="right">Precio U.</th>
               <th class="right">Total</th>
             </tr>
@@ -109,7 +108,6 @@
               <td class="center">{{ prod.ProductoCategoria }}</td>
               <td class="center">{{ prod.ProductoModelo }}</td>
               <td class="center">{{ prod.ProductoMarca }}</td>
-              <td class="center">{{ prod.ProductoTalla }}</td>
               <td class="right precio">S/. {{ prod.Precio | moneda }}</td>
               <td class="right precio">
                 S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}
@@ -119,12 +117,12 @@
           </tbody>
           <tfoot>
             <tr class="inv-table__subtotal">
-              <td colspan="8"></td>
+              <td colspan="7"></td>
               <td colspan="2" class="right">Subtotal</td>
               <td class="right">S/. {{ subTotal | redondear }}</td>
             </tr>
             <tr class="inv-table__total">
-              <td colspan="8"></td>
+              <td colspan="7"></td>
               <td colspan="2" class="right">TOTAL</td>
               <td class="right">S/. {{ subTotal | redondear }}</td>
             </tr>

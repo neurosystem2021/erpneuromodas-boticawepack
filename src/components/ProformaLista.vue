@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button @click="show=true" variant="primary" class="btn-pos btn-accion"><i class="fas fa-file-alt mr-2"></i>Ver Proformas</b-button>
+        <b-button @click="abrir" variant="primary" class="btn-pos btn-accion"><i class="fas fa-file-alt mr-2"></i>Ver Proformas</b-button>
         <b-form>
             <b-modal id="modalProformas" 
                 title="Buscar Proforma"
@@ -9,6 +9,7 @@
                 content-class="proforma-modal-content"
                 body-class="proforma-modal-body"
                 size="xl" v-model="show"
+                @shown="refrescarListado"
                 header-bg-variant="dark"
                 headerTextVariant="light"
                 body-bg-variant="light"
@@ -206,6 +207,17 @@ export default {
       obtenerStok: "obtenerStock",
       limpiarCarrito: "limpiarCarrito"
     }),
+    abrir() {
+      this.filter = "";
+      this.currentPage = 1;
+      this.show = true;
+    },
+    refrescarListado() {
+      this.$nextTick(() => {
+        const tabla = this.$refs.tableProformas;
+        if (tabla && typeof tabla.refresh === "function") tabla.refresh();
+      });
+    },
     cargarFavoritas() {
       this.lstProformasFavoritas = [];
       this.axios(`${this.API}proformas/favoritas`).then(response => {

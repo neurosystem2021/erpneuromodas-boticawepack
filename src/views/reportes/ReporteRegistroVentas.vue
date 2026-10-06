@@ -92,10 +92,6 @@
               <th>Producto</th>
               <th>Modelo</th>
               <th>Marca</th>
-              <th>Talla</th>
-              <th>Color</th>
-              <th>Genero</th>
-              <th>Botapie/ Manga</th>
               <th>Cantidad</th>
               <th>Precio</th>
               <th>Descuento</th>
@@ -108,10 +104,6 @@
                 <td>{{ det.Producto }}</td>
                 <td>{{ det.ProductoModelo }}</td>
                 <td>{{ det.ProductoMarca }}</td>
-                <td>{{ det.ProductoTalla }}</td>
-                <td>{{ det.Color }}</td>
-                <td>{{ det.Genero }}</td>
-                <td>{{ det.Botapie }}</td>
                 <td>{{ det.Cantidad }}</td>
                 <td>{{ det.Precio }}</td>
                 <td>{{ det.Descuento }}</td>

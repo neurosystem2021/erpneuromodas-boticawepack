@@ -53,6 +53,24 @@
 .sale-products-table tbody td{padding:12px;border-color:#e3edf3;vertical-align:middle}
 @media(max-width:800px){.sale-detail-head{grid-template-columns:1fr 1fr}.sale-products-table{min-width:900px}}
 
+/* Identidad unificada de reportes para baterias, aros y llantas. */
+.modern-report-page{background:linear-gradient(145deg,#f2f9f7 0%,#e8f5f1 100%);color:#143a34}
+.modern-report-page>.container,.modern-report-page>.container-fluid,.modern-report-page>div>.container,.modern-report-page>div>.container-fluid{border-color:#cfe4de;box-shadow:0 14px 38px rgba(7,82,71,.09)}
+.modern-report-page .breadcrumb{background:linear-gradient(110deg,#043b35,#087363)}
+.modern-report-page h1,.modern-report-page h2{color:#075247}
+.modern-report-page label,.modern-report-page .form-group>label{color:#214d46}
+.modern-report-page .form-control,.modern-report-page .custom-select{border-color:#c0dbd4;background:#fbfefd;color:#143a34}
+.modern-report-page .form-control:focus,.modern-report-page .custom-select:focus{border-color:#0a806d;box-shadow:0 0 0 3px rgba(10,128,109,.14)}
+.modern-report-page .btn-info,.modern-report-page .btn-primary,.modern-report-page .btn-success{background:linear-gradient(135deg,#043b35,#0a806d)}
+.modern-report-page .table-container,.modern-report-page .table-responsive{border-color:#d3e6e1;box-shadow:0 8px 22px rgba(7,82,71,.07)}
+.modern-report-page table.table thead th{background:linear-gradient(110deg,#043b35,#087363)}
+.modern-report-page table.table tbody td{border-top-color:#e0ede9;color:#214d46}
+.modern-report-page table.table-striped tbody tr:nth-of-type(odd){background:#f3faf8}.modern-report-page table.table-hover tbody tr:hover{background:#e4f4ef}
+.modern-report-page .page-link{color:#075247;background:#e8f5f1}.modern-report-page .page-item.active .page-link{background:#075247;color:#fff}
+.modern-report-page .model-cart-table{border-color:#cde3dd;box-shadow:0 10px 26px rgba(7,82,71,.08)}
+.modern-report-page .model-cart-grid thead th,.modern-report-page .model-cart-grid thead th:last-child{background:#075247!important}.modern-report-page .model-cart-grid tbody tr:nth-child(even){background:#f1f8f6}.modern-report-page .model-cart-grid tbody tr:nth-child(even) td:last-child{background:#f1f8f6}
+.sale-detail-modal .modal-header,.sale-products-table thead th{background:#075247!important}
+
 /* Pestañas generadas por BootstrapVue en Cierre de Caja */
 .modern-report-page .cash-close-modern .card-header .nav.nav-pills{display:flex!important;justify-content:flex-start!important;gap:12px!important}
 .modern-report-page .cash-close-modern .card-header .nav-item{flex:0 0 auto!important}
@@ -70,3 +88,8 @@
 .cash-close-modern .admin-user-current>.fa-user-circle{font-size:1.65rem;color:#087da7}.cash-close-modern .admin-user-current>span{display:flex;flex:1;min-width:0;flex-direction:column;line-height:1.15}.cash-close-modern .admin-user-current strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:1rem}.cash-close-modern .admin-user-current small{margin:4px 0 0;color:#71879a;font-size:.72rem;text-transform:lowercase}.cash-close-modern .admin-user-arrow{margin-left:auto;color:#087da7;transition:transform .18s ease}.cash-close-modern .admin-user-dropdown.show .admin-user-arrow{transform:rotate(180deg)}
 .cash-close-modern .admin-user-menu{width:100%!important;margin-top:7px!important;padding:7px!important;border:1px solid #c8dce9!important;border-radius:13px!important;background:#fff!important;box-shadow:0 15px 32px rgba(10,50,78,.2)!important}.cash-close-modern .admin-user-menu .dropdown-item{margin:3px 0;padding:8px 10px;border-radius:9px;color:#173d58;transition:background .16s ease,transform .16s ease}.cash-close-modern .admin-user-menu .dropdown-item:hover{background:#e8f5fb;transform:translateX(2px)}.cash-close-modern .admin-user-menu .dropdown-item.active{background:#0b729d;color:#fff}
 .cash-close-modern .admin-user-option{display:flex;align-items:center;gap:10px}.cash-close-modern .admin-user-avatar{display:grid;flex:0 0 35px;height:35px;place-items:center;border-radius:10px;background:#d9eff8;color:#08678d;font-weight:900}.cash-close-modern .dropdown-item.active .admin-user-avatar{background:rgba(255,255,255,.2);color:#fff}.cash-close-modern .admin-user-option-text{display:flex;flex:1;min-width:0;flex-direction:column}.cash-close-modern .admin-user-option-text strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.88rem}.cash-close-modern .admin-user-option-text small{margin:2px 0 0;color:#71879a;font-size:.7rem}.cash-close-modern .dropdown-item.active .admin-user-option-text small{color:#d7eff8}
+
+.modern-report-page .cash-close-modern .card-header .nav-item:nth-child(n) .nav-link{background:linear-gradient(135deg,#075247,#0a806d)!important}
+.modern-report-page .cash-close-modern .card-header .nav-link.active{background:linear-gradient(135deg,#032f2b,#0a947d)!important;box-shadow:0 7px 0 rgba(3,47,43,.23),0 12px 21px rgba(7,82,71,.2)!important}
+.cash-close-modern .admin-user-dropdown>.btn{border-color:#9bcbbf!important;color:#173f38!important;box-shadow:0 3px 8px rgba(7,82,71,.08)!important}
+.cash-close-modern .admin-user-current>.fa-user-circle,.cash-close-modern .admin-user-arrow{color:#075247}.cash-close-modern .admin-user-menu{border-color:#c9e1db!important;box-shadow:0 15px 32px rgba(7,82,71,.18)!important}.cash-close-modern .admin-user-menu .dropdown-item:hover{background:#e6f5f1}.cash-close-modern .admin-user-menu .dropdown-item.active{background:#075247;color:#fff}.cash-close-modern .admin-user-avatar{background:#d9f1eb;color:#075247}

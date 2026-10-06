@@ -1,0 +1,27 @@
+Options -Indexes
+RewriteEngine On
+
+# Este ERP heredado y sus dependencias estan validados con PHP 7.4.
+# OpenLiteSpeed aplica este manejador al actualizar el repositorio, sin depender
+# de una seleccion manual distinta para cada subdominio en CyberPanel.
+<IfModule LiteSpeed>
+    AddHandler application/x-httpd-php74 .php
+</IfModule>
+
+# Nunca exponer configuracion, repositorio, respaldos ni archivos operativos.
+RewriteRule (^|/)\.git(?:/|$) - [F,L,NC]
+RewriteRule ^(?:config|data|docs|storage|tasks|tests)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:composer\.(?:json|lock)|package-lock\.json|error_log|migration_.*\.sql)$ - [F,L,NC]
+RewriteRule ^.*\.(?:env|ini|log|sql|sqlite|bak|backup|old|orig|dist|ps1)$ - [F,L,NC]
+
+# Una imagen subida nunca debe poder ejecutarse como PHP.
+RewriteRule ^resources/uploads/.*\.(?:php[0-9]?|phtml|phar)$ - [F,L,NC]
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), geolocation=(), microphone=(self)"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+    Header always unset X-Powered-By
+</IfModule>

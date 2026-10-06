@@ -2,31 +2,69 @@
   <b-row>
     <b-col md="12">
       <b-form-group>
-        <b-input-group>
-          <autocomplete
-            ref="autocompleteProducto"
-            :url="APIProductos"
-            :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
-            :onShouldRenderChild="renderChild"
-            anchor="Producto"
-            label="writer"
-            placeholder="Agregar Producto"
-            :on-select="abrirCalcularM2"
-            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-            :classes="{input: 'form-control'}">
-          </autocomplete>
+        <b-input-group class="confront-searchbar">
+          <div class="confront-product-search">
+            <autocomplete
+              ref="autocompleteProducto"
+              :url="APIProductos"
+              :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+              :onShouldRenderChild="renderChild"
+              anchor="Producto"
+              label="writer"
+              placeholder="Agregar Producto"
+              :on-select="abrirCalcularM2"
+              :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+              :classes="{input: 'form-control'}">
+            </autocomplete>
+            <button
+              type="button"
+              class="confront-voice-button"
+              :class="{ 'is-listening': isListening }"
+              :aria-pressed="isListening ? 'true' : 'false'"
+              :title="isListening ? 'Detener busqueda por voz' : 'Buscar producto por voz'"
+              @click="toggleVoiceSearch">
+              <i :class="isListening ? 'fas fa-stop' : 'fas fa-microphone'"></i>
+              <span>{{ isListening ? 'Escuchando' : 'Voz' }}</span>
+            </button>
+          </div>
           <input v-model="loadCode"
                   @keydown.enter.prevent="loadBarcode"
                   type="text"
                   class="form-control"
                   placeholder="Codigo de Barra" />
-          <b-input-group-append>
-            <!--<proveedores-tabla></proveedores-tabla>-->
-             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+          <b-input-group-append class="confront-code-actions">
+             <b-button
+               class="confront-camera-button"
+               variant="success"
+               :disabled="!idAlmacen"
+               title="Escanear con la camara"
+               @click="abrirEscaner">
+               <i class="fas fa-barcode"></i><span> Escanear</span>
+             </b-button>
+             <b-button class="confront-code-search-button" variant="primary" title="Buscar código" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form v-if="tipo!='mov'" :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
+
+      <b-modal
+        v-model="mostrarEscaner"
+        dialog-class="confront-scanner-dialog"
+        content-class="confront-scanner-modal"
+        title="Escanear codigo de barra"
+        hide-footer
+        centered>
+        <div class="confront-scanner-stage">
+          <barcode-camera-scanner
+            v-if="mostrarEscaner"
+            :onDetected="onBarcodeScanned"
+            :readerSize="readerSize"
+            :readerTypes="readerTypes">
+          </barcode-camera-scanner>
+          <div class="confront-scanner-guide" aria-hidden="true"><span></span></div>
+        </div>
+        <p class="confront-scanner-help">Centre todas las barras dentro del recuadro y mantenga la camara estable.</p>
+      </b-modal>
 
       <b-modal id="modalImagen" size="lg" ref="modalImagen" hide-footer hide-header>
         <div class="d-block text-center">
@@ -38,7 +76,7 @@
       </b-modal>
 
 
-      <b-table small responsive  striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:-12px">
+      <b-table class="confront-desktop-table" small responsive striped hover :items="productos" :fields="fields" ref="tablaCarrito" style="margin-top:10px">
         <template slot="eventPres" slot-scope="data">
           <!--<b-button size="sm" v-if="productos[data.index].estadoPxP == false" :disabled="bloquearInput?true:false" variant="info" @click="showPresentacion(productos[data.index])"><i class="fas fa-list"></i></b-button>-->
           <b-button @click="abrirImagen(productos[data.index].Producto,productos[data.index].Imagen == null || productos[data.index].Imagen==''?'static/no-photo.png': '/resources/images/productos/' + productos[data.index].Imagen)" style="margin-top:2px;" :id="'popover-imagen' + productos[data.index].IdProducto" variant="success" size="sm"><i class="fas fa-image"></i></b-button>	
@@ -76,41 +114,20 @@
         </template>
 
         <template slot="cantidad" slot-scope="data">
-          <input
-            v-model="productos[data.index].cantidad"
-            :disabled="bloquearInput?true:false || esDelivery"
-            type="number"
-            style="width: 95px"
-            class="form-control"
-            step="0.001"
-            min="0"
-            @input="(val) => {
-              changeCant(val.target.value, productos[data.index], data.index)
-              $emit('onInputCantidad', val.target.value)
-              /*if(this.ventas){
-                if(!productos[data.index].PreciosPorProducto) {
-                productos[data.index].precio = (productos[data.index].StockPorMayor && val.target.value >= productos[data.index].StockPorMayor) ? productos[data.index].PrecioPorMayor : (tipo == 'mov' ? productos[data.index].PrecioCosto : productos[data.index].PrecioContado)
-                return
-                }
-
-                let reg = JSON.parse(productos[data.index].PreciosPorProducto).find( e => e.cantidad === productos[data.index].cantidadPres )
-                if(reg && reg.cantidad){
-                  productos[data.index].precio = reg.precio
-                  return
-                }
-                
-                productos[data.index].precio = productos[data.index].PrecioContado 
-              }else{
-                if(productos[data.index].EsObsequio==1){
-                    productos[data.index].precio = 0
-                    productos[data.index].nuevoPrecioContado = 0
-                }else{
-                    productos[data.index].precio = productos[data.index].PrecioCosto; 
-                }
-              }*/
-
-            }"
-            placeholder="Cantidad"/>
+          <div class="confront-qty-control">
+            <button type="button" aria-label="Restar una unidad" :disabled="bloquearInput || esDelivery" @click="ajustarCantidadFisica(data.index, -1)">−</button>
+            <input
+              v-model.number="productos[data.index].cantidad"
+              :disabled="bloquearInput || esDelivery"
+              type="number"
+              inputmode="numeric"
+              class="form-control"
+              step="1"
+              min="0"
+              @input="actualizarCantidadFisica(data.index)"
+              placeholder="0"/>
+            <button type="button" aria-label="Sumar una unidad" :disabled="bloquearInput || esDelivery" @click="ajustarCantidadFisica(data.index, 1)">+</button>
+          </div>
         </template>
         <template slot="precio" slot-scope="data">
           <input
@@ -277,6 +294,23 @@
           </div>
         </template>
       </b-table>
+
+      <div class="confront-mobile-list" aria-label="Productos por confrontar">
+        <article v-for="(producto, index) in productos" :key="producto.IdProducto || index" class="confront-mobile-card">
+          <div class="confront-mobile-card__head">
+            <div class="confront-mobile-card__product">
+              <small>{{ producto.CodigoBarra || 'SIN CODIGO' }}</small>
+              <strong>{{ producto.Producto }}</strong>
+            </div>
+            <div class="confront-qty-control confront-qty-control--mobile">
+              <button type="button" aria-label="Restar una unidad" :disabled="bloquearInput" @click="ajustarCantidadFisica(index, -1)">−</button>
+              <input v-model.number="producto.cantidad" aria-label="Cantidad fisica" type="number" min="0" step="1" inputmode="numeric" @input="actualizarCantidadFisica(index)">
+              <button type="button" aria-label="Sumar una unidad" :disabled="bloquearInput" @click="ajustarCantidadFisica(index, 1)"><i class="fas fa-plus"></i></button>
+            </div>
+            <button type="button" class="confront-mobile-card__remove" aria-label="Quitar producto" :disabled="bloquearInput" @click="quitarProducto(index)"><i class="fas fa-times"></i></button>
+          </div>
+        </article>
+      </div>
     </b-col>
 
     <br><br>
@@ -286,11 +320,19 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import ProductoForm from "./ProductoForm";
+import BarcodeCameraScanner from "./BarcodeCameraScanner.vue";
 import config from "@/store/config.js";
+import sound from "../../static/beep.mp3";
 
 export default {
   mounted() {
     // this.alterarBuscadorProductos()
+  },
+  beforeDestroy() {
+    if (this.recognition && this.isListening) {
+      this.voiceSearchCancelled = true;
+      this.recognition.stop();
+    }
   },
   data() {
     return {
@@ -313,7 +355,21 @@ export default {
       productoNombre: "",
       productoUrl: "",
       mensajeM2: "",
-      M2: ""
+      M2: "",
+      mostrarEscaner: false,
+      isListening: false,
+      recognition: null,
+      voiceQuery: "",
+      voiceSearchCancelled: false,
+      voiceSearchFailed: false,
+      readerSize: { width: 1280, height: 720 },
+      readerTypes: [
+        "code_128_reader",
+        "ean_reader",
+        "ean_8_reader",
+        "upc_reader",
+        "upc_e_reader"
+      ]
     };
   },
   watch: {
@@ -448,7 +504,111 @@ export default {
       obtenerStok: "obtenerStock"
     }),
     abrirCalcularM2(obj) {
-      this.setProducto(obj);
+      this.setProducto(obj, false);
+    },
+    toggleVoiceSearch() {
+      if (this.isListening && this.recognition) {
+        this.voiceSearchCancelled = true;
+        this.recognition.stop();
+        this.isListening = false;
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        this.$toasted.show("La busqueda por voz no esta disponible en este navegador");
+        return;
+      }
+
+      this.voiceQuery = "";
+      this.voiceSearchCancelled = false;
+      this.voiceSearchFailed = false;
+      this.recognition = new SpeechRecognition();
+      this.recognition.lang = "es-PE";
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.maxAlternatives = 1;
+
+      this.recognition.onstart = () => {
+        this.isListening = true;
+      };
+      this.recognition.onresult = event => {
+        const resultado = event.results[event.results.length - 1];
+        const consulta = resultado && resultado[0]
+          ? String(resultado[0].transcript || "").trim()
+          : "";
+        this.voiceQuery = consulta;
+        if (consulta) this.buscarProductoPorVoz(consulta);
+      };
+      this.recognition.onerror = event => {
+        this.voiceSearchFailed = true;
+        if (event.error !== "aborted") {
+          this.$toasted.show("No se pudo reconocer la voz. Intente nuevamente");
+        }
+      };
+      this.recognition.onend = () => {
+        this.isListening = false;
+        if (!this.voiceQuery && !this.voiceSearchFailed && !this.voiceSearchCancelled) {
+          this.$toasted.show("No se detectaron palabras");
+        }
+      };
+
+      try {
+        this.recognition.start();
+      } catch (error) {
+        this.isListening = false;
+        this.$toasted.show("No se pudo iniciar la busqueda por voz");
+      }
+    },
+    buscarProductoPorVoz(consulta) {
+      const autocomplete = this.$refs.autocompleteProducto;
+      if (!autocomplete) return;
+
+      autocomplete.type = consulta;
+      autocomplete.showList = true;
+      this.$nextTick(() => {
+        if (autocomplete.$refs && autocomplete.$refs.input) {
+          autocomplete.$refs.input.focus();
+        }
+        if (typeof autocomplete.getData === "function") {
+          autocomplete.getData(consulta);
+        }
+      });
+    },
+    abrirEscaner() {
+      if (!this.idAlmacen) {
+        this.$toasted.show("Seleccione primero el almacen a confrontar");
+        return;
+      }
+      this.mostrarEscaner = true;
+    },
+    onBarcodeScanned(result) {
+      if (!this.mostrarEscaner || !result || !result.codeResult) return;
+      const codigo = String(result.codeResult.code || "").trim();
+      if (!codigo) return;
+      const audio = new Audio(sound);
+      audio.volume = 0.85;
+      audio.play().catch(() => {});
+      if (window.navigator && typeof window.navigator.vibrate === "function") {
+        window.navigator.vibrate(70);
+      }
+      this.loadCode = codigo;
+      this.mostrarEscaner = false;
+      this.loadBarcode();
+    },
+    actualizarCantidadFisica(index) {
+      const producto = this.productos[index];
+      const cantidad = Math.max(0, Number(producto.cantidad) || 0);
+      this.$set(producto, "cantidad", cantidad);
+      this.changeCant(cantidad, producto, index);
+      this.$emit("onInputCantidad", cantidad);
+    },
+    ajustarCantidadFisica(index, diferencia) {
+      const producto = this.productos[index];
+      const cantidad = Math.max(0, (Number(producto.cantidad) || 0) + diferencia);
+      this.$set(producto, "cantidad", cantidad);
+      this.changeCant(cantidad, producto, index);
+      this.$emit("onInputCantidad", cantidad);
     },
     abrirImagen(producto, url) {
       this.productoNombre = producto;
@@ -548,7 +708,7 @@ export default {
     // },
 
     async loadBarcode(e) {
-      e.preventDefault();
+      if (e && typeof e.preventDefault === "function") e.preventDefault();
       let idProducto = this.loadCode;
 
       if (idProducto) {
@@ -557,7 +717,7 @@ export default {
           .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
             if (response.data.IdProducto) {
-              this.setProducto(response.data);
+              this.setProducto(response.data, true);
             } else {
               this.loadCode = "";
               this.$toasted.show("No se encontró ningun producto");
@@ -629,10 +789,16 @@ export default {
         }
       }
     },
-    setProducto(obj) {
-      console.log(obj);
-      obj.cantidad = 0;
+    setProducto(obj, incrementarCantidad) {
+      const existente = this.productos.findIndex(producto => Number(producto.IdProducto) === Number(obj.IdProducto));
+      if (existente >= 0) {
+        if (incrementarCantidad) this.ajustarCantidadFisica(existente, 1);
+        this.$toasted.show(incrementarCantidad ? "Cantidad fisica incrementada" : "El producto ya esta en la lista");
+        return;
+      }
+      obj.cantidad = incrementarCantidad ? 1 : 0;
       this.$store.state.cart.productos.unshift(obj);
+      this.$nextTick(() => this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 }));
     },
     setProductoUni(obj, precio) {
       this.objProd.cantxPrecio = 1;
@@ -720,6 +886,14 @@ export default {
       }
     },
     renderChild(data) {
+      if (this.tipo === "mov") {
+        return `
+          <div class="confront-search-result">
+            <small>${data.CodigoBarra || "SIN CODIGO"}</small>
+            <b>${data.Producto || "Producto sin nombre"}</b>
+          </div>
+        `;
+      }
       if (this.idAlmacen) {
         let styleStock = "";
         if (data.stock <= 0) {
@@ -890,7 +1064,8 @@ export default {
     }
   },
   components: {
-    ProductoForm
+    ProductoForm,
+    BarcodeCameraScanner
   }
 };
 </script>
@@ -912,6 +1087,239 @@ export default {
 .ofertanom {
   color: #dc3545;
   border-right: 2px solid #dc3545;
+}
+.confront-mobile-list {
+  display: none;
+}
+.confront-product-search {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: stretch;
+}
+.confront-product-search > *:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.confront-voice-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-width: 74px;
+  padding: 0 14px;
+  border: 1px solid #075247;
+  border-radius: 0 11px 11px 0;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #fff;
+  background: #075247;
+  font-weight: 800;
+  cursor: pointer;
+}
+.confront-voice-button.is-listening {
+  border-color: #d82737;
+  background: #d82737;
+  box-shadow: 0 0 0 4px rgba(216, 39, 55, .15);
+}
+.confront-qty-control {
+  display: inline-flex;
+  min-width: 142px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #9fcfc5;
+  border-radius: 12px;
+  background: #fff;
+}
+.confront-qty-control button {
+  width: 40px;
+  border: 0;
+  color: #fff;
+  background: #075247;
+  font-size: 22px;
+  font-weight: 900;
+}
+.confront-qty-control input {
+  width: 60px !important;
+  min-width: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  text-align: center;
+  font-weight: 900;
+  box-shadow: none !important;
+}
+.confront-camera-button {
+  background: #087363 !important;
+  border-color: #087363 !important;
+}
+.confront-scanner-stage {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #020b16;
+}
+.confront-scanner-guide {
+  position: absolute;
+  inset: 25% 8%;
+  pointer-events: none;
+  border: 3px solid #e1b859;
+  border-radius: 18px;
+}
+.confront-scanner-guide span {
+  position: absolute;
+  top: 50%;
+  right: 4%;
+  left: 4%;
+  height: 2px;
+  background: #ff315c;
+  box-shadow: 0 0 9px #ff315c;
+}
+.confront-scanner-help {
+  margin: 13px 4px 0;
+  color: #075247;
+  text-align: center;
+  font-weight: 800;
+}
+@media (max-width: 767px) {
+  .confront-searchbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 92px;
+    gap: 7px 0;
+    align-items: stretch;
+  }
+  .confront-searchbar > .input-group-prepend,
+  .confront-searchbar > div:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+  .confront-product-search {
+    min-height: 54px;
+  }
+  .confront-voice-button {
+    min-width: 54px;
+    width: 54px;
+    padding: 0;
+    border-radius: 0 12px 12px 0;
+    font-size: 18px;
+  }
+  .confront-voice-button span {
+    display: none;
+  }
+  .confront-searchbar > input {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    border-radius: 11px 0 0 11px !important;
+  }
+  .confront-searchbar > .confront-code-actions {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(2, 46px);
+    width: 92px;
+    min-width: 92px;
+    margin-left: 0;
+    align-items: stretch;
+  }
+  .confront-code-actions .btn {
+    display: inline-flex;
+    width: 46px;
+    min-width: 46px;
+    min-height: 46px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 !important;
+    font-size: 1rem;
+  }
+  .confront-code-actions .confront-code-search-button {
+    border-radius: 0 11px 11px 0 !important;
+  }
+  .confront-camera-button span {
+    display: none;
+  }
+  .confront-desktop-table {
+    display: none !important;
+  }
+  .confront-mobile-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .confront-mobile-card {
+    padding: 11px;
+    overflow: hidden;
+    border: 1px solid #9fcfc5;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(7, 82, 71, .11);
+  }
+  .confront-mobile-card__quantity {
+    display: flex;
+    padding: 12px 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #fff;
+    background: linear-gradient(135deg, #043b35, #087363);
+  }
+  .confront-mobile-card__quantity > span {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .7px;
+  }
+  .confront-qty-control--mobile {
+    min-width: 112px;
+    height: 44px;
+    border-color: rgba(255,255,255,.5);
+  }
+  .confront-qty-control--mobile button {
+    width: 34px;
+    color: #075247;
+    background: #d8fff5;
+    font-size: 14px;
+  }
+  .confront-qty-control--mobile input {
+    width: 44px !important;
+    padding: 0 3px;
+  }
+  .confront-mobile-card__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 112px 40px;
+    padding: 0;
+    align-items: center;
+    gap: 8px;
+  }
+  .confront-mobile-card__product {
+    min-width: 0;
+  }
+  .confront-mobile-card__head small,
+  .confront-mobile-card__head strong {
+    display: block;
+  }
+  .confront-mobile-card__head small {
+    color: #087363;
+    font-weight: 900;
+  }
+  .confront-mobile-card__head strong {
+    margin-top: 3px;
+    color: #18334a;
+    font-size: 14px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .confront-mobile-card__remove {
+    width: 40px;
+    height: 44px;
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    background: #dc2535;
+  }
+  .confront-scanner-stage {
+    height: 340px;
+  }
 }
 </style>
 <style>
@@ -935,5 +1343,28 @@ export default {
   display: flex;
   justify-content: center;
   justify-items: center;
+}
+.confront-product-search .autocomplete-wrapper input {
+  min-height: 46px;
+  border-radius: 11px 0 0 11px !important;
+}
+.confront-search-result {
+  display: grid;
+  gap: 2px;
+  padding: 7px 9px;
+  color: #17364a;
+}
+.confront-search-result small {
+  color: #087363;
+  font-weight: 900;
+}
+.confront-search-result b {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .confront-product-search .autocomplete-wrapper input {
+    min-height: 54px;
+  }
 }
 </style>

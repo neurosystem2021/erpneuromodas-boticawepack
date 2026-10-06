@@ -167,6 +167,9 @@
 
 (function enableLastReceiptViewer() {
   'use strict';
+  // La reimpresion del punto de venta local debe ir directo a la impresora.
+  // Esta vista previa agregaba una capa gris y alteraba el flujo existente.
+  return;
   if (window.__lastReceiptViewerEnabled) return;
   window.__lastReceiptViewerEnabled = true;
 
@@ -231,6 +234,8 @@
 
 (function enableInAppReceiptPreview() {
   'use strict';
+  // Conserva la impresion directa configurada para este equipo local.
+  return;
   if (window.__inAppReceiptPreviewEnabled) return;
   window.__inAppReceiptPreviewEnabled = true;
 
@@ -1093,7 +1098,6 @@
         if (!response.ok || !payload.ok) {
           throw new Error(payload.mensaje || 'No se pudo enviar el ticket.');
         }
-        window.alert('OK');
         return true;
       });
     }).catch(function (error) {

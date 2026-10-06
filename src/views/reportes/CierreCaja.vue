@@ -4,6 +4,18 @@
       <b-col cols="12" lg="9" class="no-print cash-detail-panel">
         
         <b-card no-body>
+          <div class="cash-detail-toolbar">
+            <b-button
+              type="button"
+              class="btn-toggle-all-details"
+              :class="{ 'is-open': todosDetallesVisibles }"
+              :disabled="!ventas.length"
+              @click="alternarTodosDetalles"
+            >
+              <i :class="todosDetallesVisibles ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+              {{ todosDetallesVisibles ? 'Ocultar todos los detalles' : 'Mostrar todos los detalles' }}
+            </b-button>
+          </div>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
             <b-tab title="Resumen" active class="clsVentas">
               <div class="clsVentas">
@@ -31,10 +43,6 @@
                             <th>Descripcion</th>
                             <th>Modelo</th>
                             <th>Marca</th>
-                            <th>Talla</th>
-                            <th>Color</th>
-                            <th>Genero</th>
-                            <th>Botapie/ Manga</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
@@ -50,10 +58,6 @@
                             <td>{{ prod.Descripcion }}</td>
                             <td>{{ prod.ProductoModelo }}</td>
                             <td>{{ prod.ProductoMarca }}</td>
-                            <td>{{ prod.ProductoTalla }}</td>
-                            <td>{{ prod.Color }}</td>
-                            <td>{{ prod.Genero }}</td>
-                            <td>{{ prod.Botapie }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
@@ -67,11 +71,12 @@
                           </tr>
                         </tbody>
                       </table>
-                      <div><i><small>
-                      <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" title="Ver consumo" @click="alternarDetalleVenta(item)"><i class="fa fa-eye"></i></b-button>
-                      <b>Cliente:</b>
-                      
-                      {{ item.Cliente }}</small></i></div>
+                      <div class="sale-client-line">
+                        <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" :title="esDetalleVisible(item) ? 'Ocultar consumo' : 'Ver consumo'" @click="alternarDetalleVenta(item)">
+                          <i :class="esDetalleVisible(item) ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                        </b-button>
+                        <span><b>Cliente:</b> {{ item.Cliente }}</span>
+                      </div>
 
                     </td>
                     
@@ -113,10 +118,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -132,10 +133,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -149,10 +146,12 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small>
-                <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" title="Ver consumo" @click="alternarDetalleVenta(item)"><i class="fa fa-eye"></i></b-button>
-                <b>Cliente:</b>
-                {{ item.Cliente }}</small></i></div>
+                <div class="sale-client-line">
+                  <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" :title="esDetalleVisible(item) ? 'Ocultar consumo' : 'Ver consumo'" @click="alternarDetalleVenta(item)">
+                    <i :class="esDetalleVisible(item) ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </b-button>
+                  <span><b>Cliente:</b> {{ item.Cliente }}</span>
+                </div>
 
               </td>
               <td>{{ item.VisaDesc }}</td>
@@ -193,10 +192,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -212,10 +207,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -232,10 +223,12 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small>
-                <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" title="Ver consumo" @click="alternarDetalleVenta(item)"><i class="fa fa-eye"></i></b-button>
-                <b>Cliente:</b> 
-                {{ item.Cliente }}</small></i></div>
+                <div class="sale-client-line">
+                  <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" :title="esDetalleVisible(item) ? 'Ocultar consumo' : 'Ver consumo'" @click="alternarDetalleVenta(item)">
+                    <i :class="esDetalleVisible(item) ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </b-button>
+                  <span><b>Cliente:</b> {{ item.Cliente }}</span>
+                </div>
                     
               </td>
               <td>{{ item.MastercardDesc }}</td>
@@ -276,10 +269,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -295,10 +284,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -315,10 +300,12 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small>
-                <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" title="Ver consumo" @click="alternarDetalleVenta(item)"><i class="fa fa-eye"></i></b-button>
-                <b>Cliente:</b> 
-                {{ item.Cliente }}</small></i></div>
+                <div class="sale-client-line">
+                  <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" :title="esDetalleVisible(item) ? 'Ocultar consumo' : 'Ver consumo'" @click="alternarDetalleVenta(item)">
+                    <i :class="esDetalleVisible(item) ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </b-button>
+                  <span><b>Cliente:</b> {{ item.Cliente }}</span>
+                </div>
                     
               </td>
               <td>{{ item.TransferenciaDesc }}</td>
@@ -357,10 +344,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -376,10 +359,6 @@
                        <td>{{ prod.Descripcion }}</td>
                          <td>{{ prod.ProductoModelo }}</td>
                         <td>{{ prod.ProductoMarca }}</td>
-                        <td>{{ prod.ProductoTalla }}</td>
-                        <td>{{ prod.Color }}</td>
-                        <td>{{ prod.Genero }}</td>
-                        <td>{{ prod.Botapie }}</td>
                         <td>{{ prod.Cantidad }}</td>
                         <td>{{ prod.Precio }}</td>
                         <td>{{ prod.Descuento }}</td>
@@ -393,10 +372,12 @@
                     </tr>
                   </tbody>
                 </table>
-                <div><i><small>
-                <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" title="Ver consumo" @click="alternarDetalleVenta(item)"><i class="fa fa-eye"></i></b-button>
-                <b>Cliente:</b>
-                {{ item.Cliente }}</small></i></div>
+                <div class="sale-client-line">
+                  <b-button size="sm" class="btn-sale-detail" :class="{ 'is-open': esDetalleVisible(item) }" :title="esDetalleVisible(item) ? 'Ocultar consumo' : 'Ver consumo'" @click="alternarDetalleVenta(item)">
+                    <i :class="esDetalleVisible(item) ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </b-button>
+                  <span><b>Cliente:</b> {{ item.Cliente }}</span>
+                </div>
 
 
               </td>
@@ -563,10 +544,6 @@
               <th>Producto</th>
               <th>Modelo</th>
               <th>Marca</th>
-              <th>Talla</th>
-              <th>Color</th>
-              <th>Genero</th>
-              <th>Botapie/ Manga</th>
               <th>Cantidad Vendida</th>
               <th>Monto</th>
             </tr>
@@ -577,10 +554,6 @@
                <td> {{ produtos.Producto }} </td>
                <td>{{ produtos.ProductoModelo }}</td>
                <td>{{ produtos.ProductoMarca }}</td>
-               <td>{{ produtos.ProductoTalla }}</td>
-               <td>{{ produtos.Color }}</td>
-               <td>{{ produtos.Genero }}</td>
-               <td>{{ produtos.Botapie }}</td>
                <td> {{ produtos.total }} </td>
                <td> {{ produtos.Precio }} </td>
               
@@ -699,6 +672,10 @@
           <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
           <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>
           <div v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></div>
+          <div v-if="cierre.Descripcion" class="cash-close-description-readonly">
+            <strong>Descripción del cierre</strong>
+            <span>{{ cierre.Descripcion }}</span>
+          </div>
         </div>
         <h2 class="text-center">Mi Cierre de Caja</h2> 
         <b-row  align-h="end" class=" no-print">
@@ -739,6 +716,22 @@
                 </b-dropdown-item>
               </b-dropdown>
             </div>
+            <b-form-group
+              v-if="!this.$route.params.id"
+              label="Descripción del cierre"
+              label-for="descripcion-cierre"
+              class="cash-close-description-field"
+            >
+              <b-form-textarea
+                id="descripcion-cierre"
+                v-model="descripcionCierre"
+                rows="3"
+                max-rows="5"
+                maxlength="500"
+                placeholder="Ejemplo: cierre sin novedades, diferencia verificada o detalle del turno"
+              />
+              <small>{{ descripcionCierre.length }}/500 caracteres</small>
+            </b-form-group>
            
             <b-button-group>
               <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
@@ -839,9 +832,14 @@
 
     <section v-if="modoImpresionTicket" class="si-print ticket-print-summary">
       <header>
+        <span v-if="logoEmpresaCierre" class="print-company-logo-frame print-company-logo-ticket">
+          <img :src="logoEmpresaCierre" :alt="nombreEmpresaCierre">
+        </span>
+        <strong class="print-company-name">{{ nombreEmpresaCierre }}</strong>
         <h1>CIERRE DE CAJA</h1>
         <p>Fecha: {{ cierre.FechaCierre || fechaActualTicket }}</p>
         <p>Vendedor(a): {{ cierre.UsuarioReg || nombreCajaSeleccionada }}</p>
+        <p v-if="cierre.Descripcion">Descripción: {{ cierre.Descripcion }}</p>
         <p>Ventas realizadas: <b>{{ ventasActivas.length }}</b></p>
       </header>
       <div class="ticket-grand"><span>GRAN TOTAL</span><strong>S/. {{ totalGeneralVentas | moneda }}</strong></div>
@@ -871,14 +869,20 @@
     </section>
 
     <section v-if="modoImpresionProductos" class="si-print products-print" :class="'products-print-' + modoImpresionProductos">
-      <h1>PRODUCTOS VENDIDOS</h1>
+      <header class="print-report-brand">
+        <span v-if="logoEmpresaCierre" class="print-company-logo-frame">
+          <img :src="logoEmpresaCierre" :alt="nombreEmpresaCierre">
+        </span>
+        <strong class="print-company-name">{{ nombreEmpresaCierre }}</strong>
+        <h1>PRODUCTOS VENDIDOS</h1>
+        <p>{{ cierre.FechaCierre || fechaActualTicket }}</p>
+      </header>
       <table v-if="modoImpresionProductos === 'pdf'" class="products-pdf-table">
-        <thead><tr><th>ID</th><th>Producto</th><th>Modelo</th><th>Marca</th><th>Talla</th><th>Color</th><th>Género</th><th>Botapié/Manga</th><th>Cantidad vendida</th><th>Monto</th></tr></thead>
+        <thead><tr><th>ID</th><th>Producto</th><th>Modelo</th><th>Marca</th><th>Cantidad vendida</th><th>Monto</th></tr></thead>
         <tbody>
           <tr v-for="(producto, index) in reportePorProveedor" :key="'pdf-producto-'+index">
             <td>{{ producto.IdProducto }}</td><td>{{ producto.Producto }}</td><td>{{ producto.ProductoModelo }}</td>
-            <td>{{ producto.ProductoMarca }}</td><td>{{ producto.ProductoTalla }}</td><td>{{ producto.Color }}</td>
-            <td>{{ producto.Genero }}</td><td>{{ producto.Botapie }}</td><td>{{ producto.total }}</td>
+            <td>{{ producto.ProductoMarca }}</td><td>{{ producto.total }}</td>
             <td>S/. {{ producto.Precio | redondear }}</td>
           </tr>
           <tr v-if="!reportePorProveedor.length"><td colspan="10" class="ticket-empty">Sin productos vendidos</td></tr>
@@ -899,12 +903,15 @@
     </section>
 
     <section v-if="modoImpresionYape" class="si-print yape-print" :class="'yape-print-' + modoImpresionYape">
-      <header v-if="modoImpresionYape === 'pdf'" class="yape-print-header">
-        <div class="yape-print-icon">YP</div>
-        <div><h1>CONCILIACIÓN YAPE / PLIN</h1><p>{{ cierre.FechaCierre || fechaActualTicket }}</p></div>
+      <header class="print-report-brand yape-print-header">
+        <span v-if="logoEmpresaCierre" class="print-company-logo-frame">
+          <img :src="logoEmpresaCierre" :alt="nombreEmpresaCierre">
+        </span>
+        <strong class="print-company-name">{{ nombreEmpresaCierre }}</strong>
+        <h1>CONCILIACIÓN YAPE / PLIN</h1>
+        <p>{{ cierre.FechaCierre || fechaActualTicket }}</p>
       </header>
       <div v-if="modoImpresionYape === 'ticket'" class="yape-ticket-list">
-        <h1>CONCILIACIÓN YAPE / PLIN</h1>
         <table class="yape-ticket-table">
           <thead><tr><th>Recibo</th><th>Operación</th><th>Monto</th></tr></thead>
           <tbody>
@@ -923,12 +930,15 @@
     </section>
 
     <section v-if="modoImpresionTransferencia" class="si-print yape-print" :class="'yape-print-' + modoImpresionTransferencia">
-      <header v-if="modoImpresionTransferencia === 'pdf'" class="yape-print-header">
-        <div class="yape-print-icon"><i class="fas fa-exchange-alt"></i></div>
-        <div><h1>CONCILIACIÓN DE TRANSFERENCIAS</h1><p>{{ cierre.FechaCierre || fechaActualTicket }}</p></div>
+      <header class="print-report-brand yape-print-header">
+        <span v-if="logoEmpresaCierre" class="print-company-logo-frame">
+          <img :src="logoEmpresaCierre" :alt="nombreEmpresaCierre">
+        </span>
+        <strong class="print-company-name">{{ nombreEmpresaCierre }}</strong>
+        <h1>CONCILIACIÓN DE TRANSFERENCIAS</h1>
+        <p>{{ cierre.FechaCierre || fechaActualTicket }}</p>
       </header>
       <div v-if="modoImpresionTransferencia === 'ticket'" class="yape-ticket-list">
-        <h1>TRANSFERENCIAS</h1>
         <table class="yape-ticket-table">
           <thead><tr><th>Recibo</th><th>Operación</th><th>Monto</th></tr></thead>
           <tbody>
@@ -948,9 +958,14 @@
 
     <section v-if="!modoImpresionTicket && !modoImpresionProductos && !modoImpresionYape && !modoImpresionTransferencia" class="si-print cierre-print-compacto">
       <header class="print-cierre-header">
-        <div>
+        <div class="print-cierre-brand">
+          <span v-if="logoEmpresaCierre" class="print-company-logo-frame">
+            <img :src="logoEmpresaCierre" :alt="nombreEmpresaCierre">
+          </span>
+          <strong class="print-company-name">{{ nombreEmpresaCierre }}</strong>
           <h1>Reporte de cierre de caja</h1>
           <p>{{ cierre.UsuarioReg || nombreCajaSeleccionada }} · {{ cierre.FechaCierre || 'Caja actual' }}</p>
+          <p v-if="cierre.Descripcion">Descripción: {{ cierre.Descripcion }}</p>
         </div>
         <div class="print-cierre-total">
           <small>TOTAL DE CAJA</small>
@@ -973,7 +988,7 @@
         <thead>
           <tr>
             <th>Fecha</th><th>Comprobante</th><th>Producto</th><th>Modelo</th>
-            <th>Marca</th><th>Talla</th><th>Cant.</th><th>P. unit.</th><th>Desc.</th><th>Total</th>
+            <th>Marca</th><th>Cant.</th><th>P. unit.</th><th>Desc.</th><th>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -981,7 +996,7 @@
             <tr class="print-grupo-titulo" :key="'grupo-'+grupoIndex"><td colspan="10">VENTAS {{ grupo.nombre }}</td></tr>
             <tr v-for="(fila, index) in grupo.filas" :key="'print-'+grupoIndex+'-'+index" :class="{ anulado: fila.anulado }">
               <td>{{ fila.fecha }}</td><td>{{ fila.comprobante }}</td><td>{{ fila.producto }}</td><td>{{ fila.modelo }}</td>
-              <td>{{ fila.marca }}</td><td>{{ fila.talla }}</td><td>{{ fila.cantidad }}</td>
+              <td>{{ fila.marca }}</td><td>{{ fila.cantidad }}</td>
               <td>{{ fila.precio | redondear }}</td><td>{{ fila.descuento | redondear }}</td><td>{{ fila.total | redondear }}</td>
             </tr>
             <tr class="print-grupo-total" :key="'total-'+grupoIndex"><td colspan="9">TOTAL {{ grupo.nombre }}</td><td>S/. {{ grupo.total | redondear }}</td></tr>
@@ -1065,10 +1080,6 @@
                             <th>Descripcion</th>
                             <th>Modelo</th>
                             <th>Marca</th>
-                            <th>Talla</th>
-                            <th>Color</th>
-                            <th>Genero</th>
-                            <th>Botapie/ Manga</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
@@ -1083,10 +1094,6 @@
                             <td>{{ prod.Descripcion }}</td>
                             <td>{{ prod.ProductoModelo }}</td>
                             <td>{{ prod.ProductoMarca }}</td>
-                            <td>{{ prod.ProductoTalla }}</td>
-                            <td>{{ prod.Color }}</td>
-                            <td>{{ prod.Genero }}</td>
-                            <td>{{ prod.Botapie }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
@@ -1150,10 +1157,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -1170,10 +1173,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -1232,10 +1231,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -1251,10 +1246,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -1313,10 +1304,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -1332,10 +1319,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
@@ -1394,10 +1377,6 @@
                       <th>Descripcion</th>
                       <th>Modelo</th>
                       <th>Marca</th>
-                      <th>Talla</th>
-                      <th>Color</th>
-                      <th>Genero</th>
-                      <th>Botapie/ Manga</th>
                       <th>Cantidad</th>
                       <th>Precio</th>
                       <th>Descuento</th>
@@ -1413,10 +1392,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.ProductoTalla }}</td>
-                      <td>{{ prod.Color }}</td>
-                      <td>{{ prod.Genero }}</td>
-                      <td>{{ prod.Botapie }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -1595,6 +1570,7 @@ import CierresCaja from "@/components/CierresCaja.vue";
 
 export default {
   mounted() {
+    this.cargarEmpresaImpresion();
     if (this.$route.params.id) {
       this.getCierre(this.$route.params.id);
       this.loadData();
@@ -1626,13 +1602,35 @@ export default {
       usuarioCajaSeleccionado: null,
       reportePorProveedor: [],
       detallesVentaAbiertos: [],
+      descripcionCierre: "",
       modoImpresionTicket: false,
       modoImpresionProductos: null,
       modoImpresionYape: null,
-      modoImpresionTransferencia: null
+      modoImpresionTransferencia: null,
+      empresaImpresion: {
+        RAZONSOCIAL: "IMPORT COMPANY EDEN E.I.R.L.",
+        nombre_comercial: "EDEN COMPANY",
+        logo_principal: "/resources/uploads/empresa/logo_principal-20261002043422-1c191a.jpg"
+      }
     };
   },
   computed: {
+    logoEmpresaCierre() {
+      return String(this.empresaImpresion.logo_principal || "").trim();
+    },
+    nombreEmpresaCierre() {
+      return String(
+        this.empresaImpresion.RAZONSOCIAL ||
+        this.empresaImpresion.nombre_comercial ||
+        "IMPORT COMPANY EDEN E.I.R.L."
+      ).trim();
+    },
+    todosDetallesVisibles() {
+      const ids = this.ventas
+        .map(venta => this.idDetalleVenta(venta))
+        .filter(id => id !== null && id !== undefined && id !== "");
+      return ids.length > 0 && ids.every(id => this.detallesVentaAbiertos.includes(id));
+    },
     resumenDocumentosTicket() {
       const texto = venta => String(venta.TipoDoc || "").toUpperCase();
       const codigo = venta => String(venta.CodSunat || "").padStart(2, "0");
@@ -1688,7 +1686,6 @@ export default {
             producto: producto.Producto || "Sin detalle",
             modelo: producto.ProductoModelo || producto.Descripcion || "",
             marca: producto.ProductoMarca || "",
-            talla: producto.ProductoTalla || "",
             cantidad: Number(producto.Cantidad || 0),
             precio: Number(producto.Precio || 0),
             descuento: Number(producto.Descuento || 0),
@@ -1722,7 +1719,6 @@ export default {
           producto: producto.Producto || "Sin detalle",
           modelo: producto.ProductoModelo || producto.Descripcion || "",
           marca: producto.ProductoMarca || "",
-          talla: producto.ProductoTalla || "",
           cantidad: numero(producto.Cantidad),
           precio: numero(producto.Precio),
           descuento: numero(producto.Descuento),
@@ -1917,6 +1913,18 @@ export default {
     }
   },
   methods: {
+    cargarEmpresaImpresion() {
+      this.axios
+        .get("/api/tienda/index.php", { params: { action: "empresa" } })
+        .then(response => {
+          if (response.data && typeof response.data === "object") {
+            this.empresaImpresion = { ...this.empresaImpresion, ...response.data };
+          }
+        })
+        .catch(() => {
+          // Se conserva la identidad local de respaldo para no perder el logo al imprimir.
+        });
+    },
     idDetalleVenta(venta) {
       return venta.idDocVenta || venta.IdDocVenta || `${venta.Serie}-${venta.Numero}`;
     },
@@ -1931,6 +1939,17 @@ export default {
       } else {
         this.detallesVentaAbiertos.splice(posicion, 1);
       }
+    },
+    alternarTodosDetalles() {
+      if (this.todosDetallesVisibles) {
+        this.detallesVentaAbiertos = [];
+        return;
+      }
+      this.detallesVentaAbiertos = Array.from(new Set(
+        this.ventas
+          .map(venta => this.idDetalleVenta(venta))
+          .filter(id => id !== null && id !== undefined && id !== "")
+      ));
     },
     getDetalles(idDocVenta) {
       let detalles = this.itemsDetalle.filter(
@@ -2063,10 +2082,6 @@ export default {
           Producto: lstProducto[0].Producto,
           ProductoModelo: lstProducto[0].ProductoModelo,
           ProductoMarca: lstProducto[0].ProductoMarca,
-          ProductoTalla: lstProducto[0].ProductoTalla,
-          Color: lstProducto[0].Color,
-          Genero: lstProducto[0].Genero,
-          Botapie: lstProducto[0].Botapie,
           total: total,
           Precio: Precio
         });
@@ -2093,9 +2108,11 @@ export default {
             salidas: this.totalSalidas,
             total: this.granTotal,
             idAlmacen: sessionStorage.getItem("IdAlmacen"),
-            totalVentas: this.totalVentas
+            totalVentas: this.totalVentas,
+            descripcion: String(this.descripcionCierre || "").trim().slice(0, 500)
           })
           .then(res => {
+            this.descripcionCierre = "";
             this.loadData();
             this.$toasted.show("¡Caja cerrada!");
             // console.log(res)
@@ -2302,7 +2319,7 @@ th {
 }
 @media print {
   @page cierre-landscape { size: A4 landscape; margin: 7mm; }
-  @page ticket { size: 80mm 297mm; margin: 1mm; }
+  @page ticket { size: auto; margin: 0; }
   @page products-pdf { size: A4 portrait; margin: 10mm; }
   .cierre-print-anterior { display: none !important; }
   .cierre-print-compacto {
@@ -2464,6 +2481,238 @@ th {
     margin:0!important;
     overflow:visible!important;
   }
+
+  /* Identidad corporativa uniforme para cierre, productos y conciliaciones. */
+  .print-company-logo-frame{
+    display:block;
+    width:46mm;
+    height:15mm;
+    margin:0 auto 1.5mm;
+    overflow:hidden;
+    border-radius:2mm;
+    background:#fff;
+  }
+  .print-company-logo-frame img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 53%;
+  }
+  .print-company-name{
+    display:block;
+    color:#073f3a!important;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.55px;
+    line-height:1.15;
+    text-align:center;
+    text-transform:uppercase;
+  }
+  .print-report-brand{
+    display:flex!important;
+    margin:0 auto 4mm!important;
+    padding:0 0 2.5mm!important;
+    align-items:center!important;
+    flex-direction:column!important;
+    gap:.6mm!important;
+    border:0!important;
+    border-bottom:2px solid #075247!important;
+    text-align:center!important;
+  }
+  .print-report-brand h1{
+    margin:1mm 0 0!important;
+    color:#082f39!important;
+    font:900 18px/1.12 Arial,sans-serif!important;
+    letter-spacing:.2px!important;
+    text-align:center!important;
+  }
+  .print-report-brand p{
+    margin:0!important;
+    color:#536b72!important;
+    font-size:9px!important;
+    font-weight:700!important;
+  }
+  .print-cierre-header{
+    display:grid!important;
+    padding:0 0 2mm!important;
+    grid-template-columns:1fr auto 1fr!important;
+    align-items:center!important;
+    border-bottom:2px solid #075247!important;
+  }
+  .print-cierre-brand{
+    grid-column:2;
+    text-align:center;
+  }
+  .print-cierre-brand .print-company-logo-frame{
+    width:40mm;
+    height:13mm;
+    margin-bottom:1mm;
+  }
+  .print-cierre-brand h1{margin:1mm 0 0!important;color:#073f3a!important;text-align:center}
+  .print-cierre-brand p{text-align:center}
+  .print-cierre-total{grid-column:3;justify-self:end}
+  .ticket-print-summary{
+    left:0!important;
+    margin:0 auto!important;
+    padding:3mm 2.2mm!important;
+    box-sizing:border-box!important;
+  }
+  .ticket-print-summary header{
+    padding-bottom:2.5mm!important;
+    border-bottom:2px solid #075247!important;
+  }
+  .ticket-print-summary header h1{
+    margin:1.5mm 0 1mm!important;
+    color:#082f39!important;
+    font-size:19px!important;
+  }
+  .ticket-print-summary header p{margin:.6mm 0!important;font-size:11px!important}
+  .products-print-ticket,
+  .yape-print-ticket{
+    left:0!important;
+    margin:0 auto!important;
+    padding:3mm 2.2mm!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+  .products-print-ticket .print-report-brand,
+  .yape-print-ticket .print-report-brand{margin-bottom:2.5mm!important}
+  .products-print-ticket .print-company-logo-frame,
+  .yape-print-ticket .print-company-logo-frame,
+  .ticket-print-summary .print-company-logo-frame{
+    width:48mm;
+    height:15.5mm;
+  }
+  .products-print-ticket .print-company-name,
+  .yape-print-ticket .print-company-name,
+  .ticket-print-summary .print-company-name{font-size:9px}
+  .products-print-ticket .print-report-brand h1,
+  .yape-print-ticket .print-report-brand h1{font-size:17px!important}
+  .products-print-pdf,
+  .yape-print-pdf{margin:0 auto!important}
+  .products-pdf-table,
+  .yape-pdf-table{margin-right:auto!important;margin-left:auto!important}
+  .products-pdf-table thead th,
+  .yape-pdf-table thead th,
+  .print-resumen-grid span,
+  .print-total-general{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+
+  /* Formato termico adaptable: ocupa el ancho real configurado en la impresora. */
+  .cash-close-modern.ticket-mode{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    right:auto!important;
+    bottom:auto!important;
+    display:block!important;
+    float:none!important;
+    width:100vw!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+    transform:none!important;
+  }
+  .cash-close-modern.ticket-mode > .ticket-print-summary,
+  .cash-close-modern.ticket-mode > .products-print-ticket,
+  .cash-close-modern.ticket-mode > .yape-print-ticket{
+    position:relative!important;
+    left:0!important;
+    top:0!important;
+    right:auto!important;
+    display:block!important;
+    float:none!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:3mm 3.5mm 4mm!important;
+    border:0!important;
+    border-radius:0!important;
+    box-sizing:border-box!important;
+    color:#111!important;
+    font-size:15px!important;
+    line-height:1.28!important;
+    transform:none!important;
+  }
+  .cash-close-modern.ticket-mode .print-report-brand,
+  .cash-close-modern.ticket-mode .ticket-print-summary > header{
+    width:100%!important;
+    max-width:none!important;
+    margin:0 0 3mm!important;
+    padding:0 0 2.5mm!important;
+    box-sizing:border-box!important;
+    text-align:center!important;
+  }
+  .cash-close-modern.ticket-mode .print-company-logo-frame{
+    width:72%!important;
+    max-width:76mm!important;
+    height:21mm!important;
+    margin:0 auto 1.5mm!important;
+  }
+  .cash-close-modern.ticket-mode .print-company-name{
+    font-size:12px!important;
+    line-height:1.2!important;
+    letter-spacing:.35px!important;
+  }
+  .cash-close-modern.ticket-mode .print-report-brand h1,
+  .cash-close-modern.ticket-mode .ticket-print-summary h1{
+    margin:1.2mm 0 .7mm!important;
+    font-size:22px!important;
+    line-height:1.08!important;
+  }
+  .cash-close-modern.ticket-mode .print-report-brand p,
+  .cash-close-modern.ticket-mode .ticket-print-summary header p{
+    font-size:13px!important;
+    line-height:1.25!important;
+  }
+  .cash-close-modern.ticket-mode .ticket-products,
+  .cash-close-modern.ticket-mode .yape-ticket-table{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    table-layout:fixed!important;
+    font-size:14.5px!important;
+    line-height:1.25!important;
+  }
+  .cash-close-modern.ticket-mode .ticket-products th,
+  .cash-close-modern.ticket-mode .yape-ticket-table th{
+    padding:9px 3px!important;
+    font-size:12px!important;
+    line-height:1.15!important;
+  }
+  .cash-close-modern.ticket-mode .ticket-products td,
+  .cash-close-modern.ticket-mode .yape-ticket-table td{
+    padding:8px 3px!important;
+    font-size:14.5px!important;
+    line-height:1.25!important;
+  }
+  .cash-close-modern.ticket-mode .ticket-products tfoot td,
+  .cash-close-modern.ticket-mode .yape-print-total{
+    padding:11px 3px 9px!important;
+    font-size:18px!important;
+    line-height:1.2!important;
+  }
+  .cash-close-modern.ticket-mode .yape-print-total strong{font-size:19px!important}
+  .products-print-pdf .print-report-brand,
+  .yape-print-pdf .print-report-brand{width:100%!important;max-width:none!important}
+  .products-print-pdf .print-company-logo-frame,
+  .yape-print-pdf .print-company-logo-frame{width:62mm!important;height:21mm!important}
+  .products-print-pdf .print-report-brand h1,
+  .yape-print-pdf .print-report-brand h1{font-size:22px!important}
+  .products-print-pdf .products-pdf-table{font-size:9px!important}
+  .products-print-pdf .products-pdf-table th{font-size:8.5px!important;padding:7px 4px!important}
+  .products-print-pdf .products-pdf-table td{padding:7px 4px!important}
+  .yape-print-pdf .yape-pdf-table{font-size:10px!important}
+  .yape-print-pdf .yape-pdf-table th,
+  .yape-print-pdf .yape-pdf-table td{padding:7px 5px!important}
 }
 
 .clsVentas {
@@ -2560,13 +2809,33 @@ th {
 .cash-close-modern .btn-sale-detail{display:inline-flex!important;align-items:center;justify-content:center;width:36px!important;height:36px!important;min-height:36px!important;margin:0 9px 5px 0!important;padding:0!important;border:0!important;border-radius:9px!important;background:#f59e0b!important;color:#fff!important;box-shadow:0 5px 11px rgba(245,158,11,.25)!important}
 .cash-close-modern .btn-sale-detail:hover{transform:translateY(-2px) rotate(-4deg);background:#e58a00!important;box-shadow:0 8px 15px rgba(245,158,11,.32)!important}
 .cash-close-modern .btn-sale-detail i{font-size:1rem}
+.cash-close-modern .sale-client-line{display:flex;align-items:center;gap:9px;min-height:40px;margin-top:7px;color:#24475f;font-size:.78rem;font-style:normal;line-height:1.25}
+.cash-close-modern .sale-client-line .btn-sale-detail{flex:0 0 36px;margin:0!important;align-self:center}
+.cash-close-modern .sale-client-line span{display:block;min-width:0;font-style:italic}
+.cash-detail-toolbar{display:flex;justify-content:flex-end;padding:14px 14px 0}
+.cash-close-modern .btn-toggle-all-details{display:inline-flex;min-height:42px!important;padding:9px 15px!important;align-items:center;gap:8px;border:0!important;border-radius:10px!important;color:#fff!important;background:#f59e0b!important;font-size:.82rem;font-weight:900!important;box-shadow:0 6px 14px rgba(245,158,11,.25)!important}
+.cash-close-modern .btn-toggle-all-details:hover{transform:translateY(-2px);background:#e58a00!important}
+.cash-close-modern .btn-toggle-all-details.is-open{background:#10b981!important;box-shadow:0 6px 14px rgba(16,185,129,.28)!important}
+.cash-close-modern .btn-toggle-all-details.is-open:hover{background:#059669!important}
+.cash-close-modern .btn-toggle-all-details:disabled{transform:none!important;opacity:.48;box-shadow:none!important}
+.cash-close-description-field{margin:4px 0 12px;padding:12px;border:1px solid #c9dce8;border-radius:12px;background:#f7fbfd}
+.cash-close-description-field label{margin-bottom:7px;color:#073e68;font-size:.82rem;font-weight:900;text-transform:uppercase;letter-spacing:.3px}
+.cash-close-description-field textarea{min-height:84px!important;padding:10px 12px!important;resize:vertical}
+.cash-close-description-field small{display:block;margin-top:5px;color:#607786;text-align:right;font-weight:700}
+.cash-close-description-readonly{margin:8px 0 14px;padding:11px 13px;border-left:4px solid #075247;border-radius:8px;background:#e5f2ef;color:#173f3a;text-align:left}
+.cash-close-description-readonly strong,.cash-close-description-readonly span{display:block}
+.cash-close-description-readonly strong{margin-bottom:3px;font-size:.76rem;text-transform:uppercase;letter-spacing:.3px}
+.cash-close-description-readonly span{white-space:pre-wrap;overflow-wrap:anywhere}
 .cash-close-modern .btn-print-ticket{background:#159a87!important;color:#fff!important}
 .products-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .products-title-row h5{margin:0}
 .cash-close-modern .btn-sale-detail.is-open{
-  background:#2563eb!important;
-  box-shadow:0 5px 13px rgba(37,99,235,.32)!important;
+  background:#10b981!important;
+  color:#fff!important;
+  box-shadow:0 5px 13px rgba(16,185,129,.38)!important;
+  transform:none!important;
 }
+.cash-close-modern .btn-sale-detail.is-open:hover{background:#059669!important;transform:translateY(-1px)!important}
 .cash-close-modern .inline-sale-detail{
   width:100%!important;
   table-layout:auto!important;
@@ -2577,6 +2846,8 @@ th {
 .cash-close-modern .inline-sale-detail td:nth-child(1),
 .cash-close-modern .inline-sale-detail th:nth-child(2),
 .cash-close-modern .inline-sale-detail td:nth-child(2),
+.cash-close-modern .inline-sale-detail th:nth-child(3),
+.cash-close-modern .inline-sale-detail td:nth-child(3),
 .cash-close-modern .inline-sale-detail th:nth-child(5),
 .cash-close-modern .inline-sale-detail td:nth-child(5),
 .cash-close-modern .inline-sale-detail th:nth-child(10),
@@ -2591,7 +2862,9 @@ th {
   white-space:normal!important;
 }
 .cash-close-modern .inline-sale-detail th:nth-child(2),
-.cash-close-modern .inline-sale-detail td:nth-child(2){width:32%!important}
+.cash-close-modern .inline-sale-detail td:nth-child(2){width:26%!important}
+.cash-close-modern .inline-sale-detail th:nth-child(3),
+.cash-close-modern .inline-sale-detail td:nth-child(3){width:30%!important;overflow-wrap:anywhere!important}
 .cash-close-modern .inline-sale-detail{margin:10px 0 7px!important;border:1px solid #d8e6ee!important;border-radius:10px!important;background:#fff!important;box-shadow:0 5px 14px rgba(24,68,96,.07)}
 .cash-close-modern .inline-sale-detail thead th{padding:8px!important;background:#fff3dc!important;color:#8b5800!important;border-bottom:1px solid #f2d49e!important;font-size:.72rem!important}
 .cash-close-modern .inline-sale-detail tbody td{padding:9px!important;background:#fff!important;border-bottom:0!important;font-size:.76rem!important}

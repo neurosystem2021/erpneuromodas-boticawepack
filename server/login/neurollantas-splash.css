@@ -1,0 +1,198 @@
+/* Identidad NeuroLlantas para la pantalla de carga del acceso. */
+.splash {
+  background-color: #02070d;
+}
+
+.splash::before {
+  background:
+    radial-gradient(circle at center, rgba(2, 22, 36, .24) 0 19%, rgba(1, 8, 17, .72) 54%, rgba(1, 4, 10, .96) 100%),
+    linear-gradient(110deg, rgba(0, 209, 255, .06), transparent 35%, rgba(255, 178, 11, .055));
+}
+
+.splash-orbit {
+  width: clamp(285px, 37vw, 430px);
+  margin-bottom: 13px;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, transparent 0 28px, rgba(21, 209, 244, .08) 29px 30px, transparent 31px 46px, rgba(255, 178, 11, .10) 47px 48px),
+    radial-gradient(circle, transparent 0 33%, rgba(255, 178, 11, .18) 33.4% 33.9%, transparent 34.3% 43%, rgba(255, 122, 24, .16) 43.4% 44%, transparent 44.4% 53%, rgba(28, 209, 244, .10) 53.4% 54%, transparent 54.4%),
+    repeating-conic-gradient(from 12deg, rgba(255, 178, 11, .20) 0 .7deg, transparent .8deg 9deg);
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .38));
+}
+
+.splash-orbit::before,
+.splash-orbit::after {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.splash-orbit::before {
+  inset: 1.5%;
+  padding: 2px;
+  background: conic-gradient(from 30deg, transparent 0 5%, #ffb20b 7% 32%, transparent 34% 42%, #24d9ff 44% 54%, transparent 56% 61%, #ff7a18 63% 84%, transparent 86% 90%, #ff344e 92% 98%, transparent 99%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: neurollantasOrbit .64s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 153, 18, .68));
+}
+
+.splash-orbit::after {
+  inset: 15%;
+  border: 2px dashed rgba(255, 178, 11, .76);
+  border-right-color: rgba(30, 211, 246, .82);
+  border-bottom-color: rgba(255, 122, 24, .82);
+  box-shadow:
+    0 0 0 5px rgba(3, 20, 34, .78),
+    0 0 0 7px rgba(32, 207, 239, .18),
+    0 0 19px rgba(255, 150, 20, .26);
+  animation: neurollantasOrbitReverse .92s linear infinite;
+}
+
+.splash-ring {
+  inset: 6%;
+  z-index: 1;
+  border: 1px solid rgba(255, 190, 64, .52);
+  box-shadow:
+    inset 0 0 42px rgba(255, 122, 24, .10),
+    0 0 0 4px rgba(255, 178, 11, .10),
+    0 0 0 10px rgba(255, 122, 24, .08),
+    0 0 0 16px rgba(26, 191, 231, .05),
+    0 0 34px rgba(255, 145, 18, .28);
+  animation: neurollantasPulse .7s ease-in-out infinite;
+}
+
+.splash-ring::before,
+.splash-ring::after {
+  border-width: 2px;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.splash-ring::before {
+  inset: -10%;
+  border-top-color: #ffb20b;
+  border-right-color: rgba(255, 122, 24, .9);
+  border-bottom-color: #21d8ff;
+  animation: neurollantasOrbit .48s linear infinite;
+}
+
+.splash-ring::after {
+  inset: 10%;
+  border-top-color: #24d9ff;
+  border-left-color: rgba(255, 178, 11, .92);
+  border-bottom-color: rgba(255, 52, 78, .68);
+  animation: neurollantasOrbitReverse .76s linear infinite;
+}
+
+.splash-logo {
+  z-index: 3;
+  width: 98%;
+  border-radius: 0;
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 0 18px rgba(34, 216, 255, .25)) drop-shadow(0 15px 28px rgba(0, 0, 0, .62));
+  animation: neurollantasLogo 1.1s ease-in-out infinite alternate;
+}
+
+.splash-name {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: .3em;
+  text-shadow: 0 0 18px rgba(33, 216, 255, .5);
+}
+
+.splash-name::before,
+.splash-name::after {
+  display: inline-block;
+  width: 25px;
+  height: 1px;
+  margin: 0 12px 4px;
+  background: linear-gradient(90deg, transparent, #ffb20b);
+  box-shadow: 0 0 7px rgba(255, 178, 11, .65);
+  content: "";
+}
+
+.splash-name::after {
+  background: linear-gradient(90deg, #24d9ff, transparent);
+  box-shadow: 0 0 7px rgba(36, 217, 255, .65);
+}
+
+.splash-tagline {
+  margin-top: 6px;
+  margin-bottom: 16px;
+  color: #bfe8f2;
+  font-size: 10px;
+  letter-spacing: .19em;
+}
+
+.splash-progress {
+  width: min(78vw, 350px);
+  height: 9px;
+  padding: 2px;
+  border: 1px solid rgba(144, 225, 242, .4);
+  background: rgba(3, 15, 25, .8);
+  box-shadow: 0 0 0 3px rgba(15, 144, 174, .08), inset 0 0 8px rgba(0, 0, 0, .7);
+}
+
+.splash-progress-bar {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #0aaee0, #ff7a18 58%, #ffb20b);
+  box-shadow: 0 0 14px rgba(255, 122, 24, .62);
+}
+
+.splash-progress-bar::after {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(120deg, transparent 0 11px, rgba(255,255,255,.7) 12px 14px, transparent 15px 23px);
+  content: "";
+  animation: neurollantasSpeedLines .3s linear infinite;
+}
+
+.splash-status {
+  display: inline-flex;
+  min-width: 190px;
+  margin-top: 9px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #e8fbff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.splash-status::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb20b;
+  box-shadow: 0 0 10px #ffb20b;
+  content: "";
+  animation: neurollantasStatus .65s ease-in-out infinite;
+}
+
+@keyframes neurollantasOrbit { to { transform: rotate(360deg); } }
+@keyframes neurollantasOrbitReverse { to { transform: rotate(-360deg); } }
+@keyframes neurollantasPulse { 50% { transform: scale(1.025); opacity: .84; } }
+@keyframes neurollantasLogo { from { transform: scale(.985); } to { transform: scale(1.02); } }
+@keyframes neurollantasSpeedLines { to { transform: translateX(24px); } }
+@keyframes neurollantasStatus { 50% { opacity: .35; transform: scale(.7); } }
+
+@media (max-width: 520px) {
+  .splash-orbit { width: min(82vw, 330px); }
+  .splash-name { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-orbit::before,
+  .splash-orbit::after,
+  .splash-ring,
+  .splash-logo,
+  .splash-progress-bar::after,
+  .splash-status::before { animation: none !important; }
+}

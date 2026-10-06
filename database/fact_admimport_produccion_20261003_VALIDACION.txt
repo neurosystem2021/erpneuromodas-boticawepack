@@ -1,0 +1,31 @@
+VALIDACION DE RESPALDO SQL PARA PRODUCCION
+==========================================
+Resultado: OK
+Generado: 2026-10-03 16:14:16 America/Lima
+Origen: fact_imceden
+Destino sugerido: fact_admimport
+Archivo: fact_admimport_produccion_20261003.sql
+Tamano: 631,732 bytes
+SHA-256: 50edbedc51c4609fcd13976877a6e7912af2794e5091bd6ca67ce5b969f4bc4a
+
+Objetos incluidos:
+- Tablas: 81
+- Procedimientos: 80
+- Datos: incluidos por mysqldump
+
+Comprobaciones:
+[OK] Nombres canonicos con mayusculas/minusculas.
+[OK] Sin CREATE DATABASE ni USE de la base local.
+[OK] Sin DEFINER local en procedimientos.
+[OK] Codificacion de exportacion utf8mb4.
+[OK] Compatible con importacion dentro de fact_admimport.
+
+ADVERTENCIA:
+- Es un respaldo completo y contiene DROP TABLE.
+- Importarlo sobre fact_admimport reemplaza las tablas y datos existentes.
+- Descargue primero un respaldo completo de la base de produccion.
+
+Importacion:
+1. Cree o seleccione fact_admimport en phpMyAdmin.
+2. Abra Importar y seleccione el archivo SQL.
+3. No active opciones para convertir nombres a minusculas.

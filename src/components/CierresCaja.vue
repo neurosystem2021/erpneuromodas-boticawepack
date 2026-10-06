@@ -77,7 +77,15 @@ import config from '@/store/config.js'
                 filter: '',
                 items: [],
                 isBusy: false,
-                fields: [ 'IdCierreCaja', 'Almacen' ,'FechaCierre', 'IdTurno', 'UsuarioReg', 'ver' ],
+                fields: [
+                  'IdCierreCaja',
+                  'Almacen',
+                  'FechaCierre',
+                  'IdTurno',
+                  'UsuarioReg',
+                  { key: 'Descripcion', label: 'Descripción' },
+                  'ver'
+                ],
                 totalRows: 50,
                 perPage: 5,
                 currentPage: 1

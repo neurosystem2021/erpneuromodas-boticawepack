@@ -1326,6 +1326,23 @@ body .swal2-popup.stock-alert-popup .stock-alert-confirm:hover {
   background: #095f57;
 }
 
+body .swal2-popup.stock-alert-popup .stock-alert-cancel {
+  min-width: 160px;
+  margin-left: 9px;
+  padding: 11px 20px;
+  border: 1px solid #b8c8c5;
+  border-radius: 11px;
+  color: #34524d;
+  background: #fff;
+  font-size: .82rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+body .swal2-popup.stock-alert-popup .stock-alert-cancel:hover {
+  background: #edf5f3;
+}
+
 @media (max-width: 520px) {
   body .stock-alert-item {
     align-items: stretch;

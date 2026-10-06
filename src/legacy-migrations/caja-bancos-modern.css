@@ -156,3 +156,62 @@
 .caja-bancos-modern .cb-table .btn-danger{
   display:inline-grid;width:34px;height:34px;padding:0;place-items:center;border:0;border-radius:10px;
 }
+
+/* Mantiene disponibles las acciones aunque el formulario sea mas alto que la pantalla. */
+.caja-bancos-modern .cb-operation-modal .modal-dialog{
+  max-height:calc(100vh - 36px)!important;
+}
+.caja-bancos-modern .cb-operation-modal .modal-content{
+  display:flex!important;
+  max-height:calc(100vh - 36px)!important;
+  flex-direction:column!important;
+}
+.caja-bancos-modern .cb-operation-modal .modal-body{
+  min-height:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+}
+.caja-bancos-modern .cb-operation-modal .modal-footer{
+  display:block!important;
+  flex:0 0 auto!important;
+}
+.caja-bancos-modern .cb-operation-actions{
+  display:flex;
+  width:100%;
+  justify-content:flex-end;
+  gap:10px;
+}
+.caja-bancos-modern .cb-operation-actions .btn{
+  min-width:145px;
+  height:46px;
+  border:0!important;
+  border-radius:13px!important;
+  font-size:13px;
+  font-weight:900;
+}
+.caja-bancos-modern .cb-operation-actions .btn-warning{
+  color:#fff!important;
+  background:linear-gradient(135deg,#d97706,#f59e0b)!important;
+  box-shadow:0 8px 20px rgba(217,119,6,.24)!important;
+}
+.caja-bancos-modern .cb-operation-actions .btn:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+  box-shadow:none!important;
+}
+@media(max-width:767px){
+  .caja-bancos-modern .cb-operation-modal .modal-dialog,
+  .caja-bancos-modern .cb-operation-modal .modal-content{
+    max-height:calc(100vh - 8px)!important;
+  }
+  .caja-bancos-modern .cb-operation-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .caja-bancos-modern .cb-operation-actions .btn{
+    width:100%;
+    min-width:0;
+  }
+}

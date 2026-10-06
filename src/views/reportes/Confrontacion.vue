@@ -1,6 +1,15 @@
 <template>
-  <div class="ops-page">
+  <div class="ops-page confront-page" :class="{ 'confront-mobile-collapsed': !mostrarCabeceraMovil }">
     <Menu v-if="false"></Menu>
+    <button
+      type="button"
+      class="confront-mobile-header-toggle"
+      :aria-expanded="mostrarCabeceraMovil ? 'true' : 'false'"
+      @click="mostrarCabeceraMovil = !mostrarCabeceraMovil">
+      <i :class="mostrarCabeceraMovil ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+      <span>{{ mostrarCabeceraMovil ? 'Ocultar cabecera y filtros' : 'Mostrar cabecera y filtros' }}</span>
+      <i :class="mostrarCabeceraMovil ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+    </button>
     <header class="ops-hero"><div class="ops-hero__icon"><i class="fas fa-balance-scale"></i></div><div><small>CONTROL DE EXISTENCIAS</small><h1>Confrontación de inventario</h1><p>Compara el stock físico con el sistema y genera los ajustes correspondientes.</p></div><span><i class="fas fa-check-double"></i> Verificación física</span></header>
     <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated Target="_blank">
         <b-container fluid class="ops-card">
@@ -22,9 +31,6 @@
                       </autocomplete>
                     </b-form-group>
               </b-col>
-              <b-col md="4" v-if="almacen.IdAlmacen" class="ops-actions confront-export-all">
-                <b-button variant="success" :href="'/api/index.php/reporte/confrontacion/total?idAlmacen=' + almacen.IdAlmacen" target="_blank"><i class="fas fa-file-excel"></i> Reporte completo</b-button>
-              </b-col>
           </b-row>
           <b-row class="confront-category-row">
             <b-col md="4">
@@ -44,10 +50,10 @@
                 tipo="mov" :idAlmacen="almacen.IdAlmacen" :fields="carrito.fields" :ordenNormal="true"></carrito-confrontacion>
             </b-col>
           </b-row>
-          <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Confrontar Inventario</b-button>
-              <b-button variant="primary" size="md" :disabled="inProgress" @click="preConfrontar">Pre Confrontar (Listado)</b-button>
+          <b-row align-h="center" class="text-center confront-submit-row">
+            <b-col cols="12" md="8" lg="6" class="confront-submit-actions">
+              <b-button class="confront-submit-primary" size="lg" type="submit" :disabled="inProgress"><i class="fas fa-check-double"></i><span class="confront-button-label-desktop">Confrontar Inventario</span><span class="confront-button-label-mobile">Confrontar</span></b-button>
+              <b-button class="confront-submit-secondary" size="md" :disabled="inProgress" @click="preConfrontar"><i class="fas fa-clipboard-list"></i><span class="confront-button-label-desktop">Pre Confrontar (Listado)</span><span class="confront-button-label-mobile">Preconfrontar</span></b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -70,16 +76,13 @@ export default {
   data() {
     return {
       inProgress: false,
+      mostrarCabeceraMovil: true,
       API: config.API,
       carrito: {
         fields: [
-          { key: "stock", label: "Stock sistema", class: "text-center" },
           { key: "CodigoBarra", label: "Codigo" },
           { key: "Producto" },
-          { key: "ProductoCategoria", label: "Categoria" },
-          { key: "ProductoMarca", label: "Marca" },
-          { key: "ProductoModelo", label: "Modelo" },
-          { key: "cantidad", label: "Cantidad Fisica" },
+          { key: "cantidad", label: "Cantidad Fisica", class: "text-center" },
           { key: "acciones", label: "" }
         ]
       },
@@ -279,7 +282,80 @@ export default {
 };
 </script>
 <style>
-.input-group {
-  /*margin: 0.25rem 0 !important;*/
+.confront-submit-row {
+  margin-top: 24px;
+}
+.confront-submit-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.confront-submit-primary,
+.confront-submit-secondary {
+  border: 0 !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #043b35, #087363) !important;
+  box-shadow: 0 8px 18px rgba(7, 82, 71, .2) !important;
+  font-weight: 800 !important;
+}
+.confront-submit-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.confront-button-label-mobile,
+.confront-mobile-header-toggle {
+  display: none;
+}
+@media (max-width: 767px) {
+  .confront-mobile-header-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 42px;
+    margin: 0 0 8px;
+    padding: 8px 12px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 9px;
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, #043b35, #087363);
+    box-shadow: 0 7px 17px rgba(7, 82, 71, .2);
+    font-size: 12px;
+    font-weight: 850;
+  }
+  .confront-mobile-header-toggle span {
+    flex: 1;
+    text-align: left;
+  }
+  .confront-mobile-collapsed > .ops-hero,
+  .confront-mobile-collapsed .confront-filter-row,
+  .confront-mobile-collapsed .confront-category-row {
+    display: none !important;
+  }
+  .confront-mobile-collapsed .ops-card {
+    padding-top: 10px !important;
+  }
+  .confront-submit-actions {
+    flex-direction: row;
+    gap: 7px;
+  }
+  .confront-submit-actions .btn {
+    width: auto;
+    min-width: 0;
+    min-height: 46px;
+    padding: 8px 7px;
+    flex: 1 1 0;
+    font-size: 11px !important;
+    white-space: nowrap;
+  }
+  .confront-button-label-desktop {
+    display: none;
+  }
+  .confront-button-label-mobile {
+    display: inline;
+  }
 }
 </style>

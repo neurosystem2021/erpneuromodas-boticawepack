@@ -51,6 +51,7 @@ import "./assets/css/pos-search-compact.css";
 import "./assets/css/pos-image-gallery-fix.css";
 import "./assets/css/pos-tire-battery.css";
 import "./assets/css/petrol-theme.css";
+import "./assets/css/pos-neurollantas-palette.css";
 
 import "./legacy-migrations/busqueda-modelo-page.js";
 import "./legacy-migrations/caja-bancos-modern.js";

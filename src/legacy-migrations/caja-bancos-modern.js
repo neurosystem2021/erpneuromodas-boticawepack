@@ -57,9 +57,10 @@
     var tabTexts=['Caja Bancos','Gasto','Ingreso','Salida','Dep. Cuenta Bancaria'];
     var tabLinks=all.filter(function(el){return (el.tagName==='A'||el.tagName==='BUTTON')&&tabTexts.indexOf(textOf(el))!==-1;});
     if(tabLinks.length){var tabBox=closestCompact(tabLinks[0],['Caja Bancos','Gasto','Ingreso','Salida'],180);if(tabBox)tabBox.classList.add('cb-tabs');}
-    var cuentaLabel=all.find(function(el){return el.tagName==='LABEL'&&textOf(el).replace(':','')==='Cuenta';});
-    var fechaLabel=all.find(function(el){return el.tagName==='LABEL'&&textOf(el).replace(':','')==='Fecha';});
-    var filter=null;if(cuentaLabel){filter=closestCompact(cuentaLabel,['Cuenta','Fecha','EXPORTAR','NUEVO'],520)||commonParent([cuentaLabel,fechaLabel]);if(filter&&filter!==root)filter.classList.add('cb-filter-card');}
+    var table=Array.prototype.slice.call(root.querySelectorAll('table')).find(function(el){var t=textOf(el);return t.indexOf('Concepto')!==-1&&t.indexOf('Ingresos')!==-1&&t.indexOf('Salida')!==-1;});
+    var cajaPane=table&&table.closest('.tab-pane');
+    var filter=cajaPane&&cajaPane.querySelector('.clsCuenta');
+    if(filter)filter.classList.add('cb-filter-card');
     Array.prototype.slice.call(root.querySelectorAll('.clsCuenta')).forEach(function(card){
       var controls=card.querySelectorAll('select,.autocomplete');
       Array.prototype.slice.call(controls).forEach(function(control){
@@ -67,7 +68,6 @@
         if(holder)holder.classList.add('cb-account-field');
       });
     });
-    var table=Array.prototype.slice.call(root.querySelectorAll('table')).find(function(el){var t=textOf(el);return t.indexOf('Concepto')!==-1&&t.indexOf('Ingresos')!==-1&&t.indexOf('Salida')!==-1;});
     if(table){
       table.classList.add('cb-table');
       var wrapper=table.parentElement;if(wrapper)wrapper.classList.add('cb-table-card');
@@ -77,7 +77,6 @@
         var empty=document.createElement('div');empty.className='cb-empty';empty.innerHTML='<i class="fas fa-receipt"></i><strong>Sin movimientos registrados</strong><span>Selecciona una cuenta y fecha, o crea un nuevo movimiento.</span>';wrapper.appendChild(empty);
       }
     }
-    wireMainLayout(filter,table?table.parentElement:null);
     var exportButton=all.find(function(el){return /^(BUTTON|A)$/.test(el.tagName)&&textOf(el)==='EXPORTAR';});if(exportButton)exportButton.classList.add('cb-btn-export');
     var newButton=all.find(function(el){return /^(BUTTON|A)$/.test(el.tagName)&&textOf(el)==='NUEVO';});if(newButton)newButton.classList.add('cb-btn-new');
     if(isReport){
@@ -98,7 +97,14 @@
         var header=modal.querySelector('.modal-header');
         if(header&&!header.querySelector('.cb-modal-heading')){
           var original=title||'Nuevo movimiento';
-          header.innerHTML='<div class="cb-modal-heading"><span><i class="fas fa-wallet"></i></span><div><small>CAJA Y BANCOS</small><strong>'+original+'</strong><p>Registra la operacion y aplica los documentos correspondientes.</p></div></div><button type="button" class="cb-modal-close" data-dismiss="modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>';
+          var titleNode=header.querySelector('.modal-title');
+          var closeButton=header.querySelector('button.close');
+          var heading=document.createElement('div');
+          heading.className='cb-modal-heading';
+          heading.innerHTML='<span><i class="fas fa-wallet"></i></span><div><small>CAJA Y BANCOS</small><strong>'+original+'</strong><p>Registra la operacion y aplica los documentos correspondientes.</p></div>';
+          header.insertBefore(heading,titleNode||header.firstChild);
+          if(titleNode)titleNode.style.display='none';
+          if(closeButton){closeButton.classList.add('cb-modal-close');closeButton.innerHTML='<i class="fas fa-times"></i>';}
         }
         Array.prototype.slice.call(modal.querySelectorAll('.panel')).forEach(function(panel){panel.classList.add('cb-modal-panel');});
         Array.prototype.slice.call(modal.querySelectorAll('select')).forEach(function(select){select.classList.add('cb-modern-select');});

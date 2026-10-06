@@ -29,10 +29,6 @@
                 <th>Producto</th>
                 <th>Modelo</th>
                 <th>Marca</th>
-                <th>Talla</th>
-                <th>Color</th>
-                <th>Genero</th>
-                <th>Botapie</th>
                 <th>Cantidad</th>
                 <th>Prom. Precio Costo</th>
                 <th>Prom. Precio Venta</th>
@@ -46,10 +42,6 @@
                     <td>{{ reporte.Producto }}</td>
                     <td>{{ reporte.ProductoModelo }}</td>
                     <td>{{ reporte.ProductoMarca }}</td>
-                    <td>{{ reporte.ProductoTalla }}</td>
-                    <td>{{ reporte.Color }}</td>
-                    <td>{{ reporte.Genero }}</td>
-                    <td>{{ reporte.Botapie }}</td>
                     <td>{{ reporte.Cantidad }}</td>
                     <td>{{ reporte.PrecioCosto }}</td>
                     <td>{{ reporte.PrecioVenta }}</td>
@@ -61,7 +53,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                <td colspan="11"> Sumatoria
+                <td colspan="7"> Sumatoria
                 </td>
                 <td><strong class="sumTotalVenta">
                     {{ lstReporte.reduce((sum,reporte)=>{

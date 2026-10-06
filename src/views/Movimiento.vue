@@ -12,6 +12,10 @@
             </div>
             <div class="inventory-heading__actions">
               <div class="inventory-heading__status"><span></span> Movimiento en edición</div>
+              <b-button v-if="esSuperadmin" class="inventory-initial-button" type="button" @click="abrirImportacionInicial">
+                <i class="fas fa-file-excel"></i>
+                <span>Ingreso inicial Excel</span>
+              </b-button>
               <b-button class="inventory-toggle-data" type="button" @click="datosOcultos = !datosOcultos">
                 <i :class="datosOcultos ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                 {{ datosOcultos ? 'Mostrar datos' : 'Ocultar datos' }}
@@ -178,8 +182,7 @@
                         v-model="movimiento.MovimientoFecha"
                         type="datetime-local"
                         step="1"
-                        placeholder="Fecha Contable"
-                        disabled="disabled"></b-form-input>
+                        placeholder="Fecha Contable"></b-form-input>
 
                     </b-form-group>
                     <b-form-group>
@@ -187,8 +190,7 @@
                       <b-form-input
                         v-model="movimiento.FechaStock"
                         type="date"
-                        placeholder="Fecha Stock"
-                        disabled="disabled"></b-form-input>
+                        placeholder="Fecha Stock"></b-form-input>
                     </b-form-group>
                     <b-form-group>
                       <label>Tipo de cambio:</label>
@@ -220,6 +222,119 @@
           </b-row>
         </b-container>
     </b-form>
+
+    <b-modal
+      v-model="mostrarImportacionInicial"
+      size="lg"
+      centered
+      hide-footer
+      no-close-on-backdrop
+      modal-class="inventory-initial-modal"
+      content-class="inventory-initial-content"
+      body-class="inventory-initial-body">
+      <template slot="modal-title">
+        <div class="inventory-initial-title">
+          <span><i class="fas fa-boxes"></i></span>
+          <div>
+            <strong>Ingreso inicial de inventario</strong>
+            <small>Se registrará un solo movimiento para el almacén actual.</small>
+          </div>
+        </div>
+      </template>
+
+      <input
+        ref="archivoInventarioInicial"
+        type="file"
+        class="d-none"
+        accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        @change="seleccionarArchivoInicial" />
+
+      <button
+        type="button"
+        class="inventory-initial-dropzone"
+        :class="{ 'is-selected': archivoInventarioInicial }"
+        :disabled="analizandoInventarioInicial || guardandoInventarioInicial"
+        @click="elegirArchivoInicial"
+        @dragover.prevent
+        @drop.prevent="soltarArchivoInicial">
+        <span class="inventory-initial-dropzone__icon"><i class="fas fa-file-excel"></i></span>
+        <span class="inventory-initial-dropzone__copy">
+          <strong>{{ archivoInventarioInicial ? archivoInventarioInicial.name : 'Seleccionar archivo XLS o XLSX' }}</strong>
+          <small>{{ archivoInventarioInicial ? formatoPesoInicial(archivoInventarioInicial.size) : 'Columnas mínimas: CODIGO y STOCK · Máximo 12 MB' }}</small>
+        </span>
+        <span class="inventory-initial-dropzone__action">{{ archivoInventarioInicial ? 'Cambiar' : 'Examinar' }}</span>
+      </button>
+
+      <div v-if="analizandoInventarioInicial" class="inventory-initial-loading">
+        <b-spinner small></b-spinner>
+        <span>Validando productos, cantidades y costos...</span>
+      </div>
+
+      <div v-if="errorInventarioInicial" class="inventory-initial-alert inventory-initial-alert--error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ errorInventarioInicial }}</span>
+      </div>
+
+      <template v-if="analisisInventarioInicial">
+        <div class="inventory-initial-stats">
+          <div><strong>{{ analisisInventarioInicial.total_filas }}</strong><span>Filas leídas</span></div>
+          <div><strong>{{ analisisInventarioInicial.productos_importar }}</strong><span>Productos</span></div>
+          <div><strong>{{ formatoCantidadInicial(analisisInventarioInicial.total_unidades) }}</strong><span>Unidades</span></div>
+          <div><strong>S/ {{ formatoImporteInicial(analisisInventarioInicial.valor_total) }}</strong><span>Valorización</span></div>
+        </div>
+
+        <div v-if="analisisInventarioInicial.movimiento_existente" class="inventory-initial-alert inventory-initial-alert--error">
+          <i class="fas fa-lock"></i>
+          <span>Ya existe el movimiento {{ analisisInventarioInicial.movimiento_existente.Serie }}-{{ analisisInventarioInicial.movimiento_existente.Numero }}. Se bloqueó una segunda carga para no duplicar el stock.</span>
+        </div>
+
+        <div v-if="analisisInventarioInicial.advertencias && analisisInventarioInicial.advertencias.length" class="inventory-initial-alert inventory-initial-alert--warning">
+          <i class="fas fa-info-circle"></i>
+          <ul>
+            <li v-for="(advertencia, indice) in analisisInventarioInicial.advertencias" :key="indice">{{ advertencia }}</li>
+          </ul>
+        </div>
+
+        <div v-if="analisisInventarioInicial.errores && analisisInventarioInicial.errores.length" class="inventory-initial-errors">
+          <strong><i class="fas fa-times-circle"></i> Corrige estos datos antes de continuar</strong>
+          <ul>
+            <li v-for="error in analisisInventarioInicial.errores.slice(0, 10)" :key="error.fila + '-' + error.codigo">
+              Fila {{ error.fila }}<span v-if="error.codigo"> · {{ error.codigo }}</span>: {{ error.mensaje }}
+            </li>
+          </ul>
+        </div>
+
+        <div v-if="analisisInventarioInicial.muestra && analisisInventarioInicial.muestra.length" class="inventory-initial-preview">
+          <div class="inventory-initial-preview__heading">
+            <strong>Vista previa del movimiento</strong>
+            <span>Almacén actual · {{ analisisInventarioInicial.productos_importar }} productos</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead><tr><th>Código</th><th>Producto</th><th class="text-right">Cantidad</th><th class="text-right">P. costo</th><th class="text-right">Subtotal</th></tr></thead>
+              <tbody>
+                <tr v-for="fila in analisisInventarioInicial.muestra" :key="fila.fila">
+                  <td><strong>{{ fila.codigo }}</strong></td>
+                  <td>{{ fila.producto }}</td>
+                  <td class="text-right">{{ formatoCantidadInicial(fila.cantidad) }}</td>
+                  <td class="text-right">S/ {{ formatoImporteInicial(fila.precio_costo) }}</td>
+                  <td class="text-right"><strong>S/ {{ formatoImporteInicial(fila.subtotal) }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+
+      <div class="inventory-initial-actions">
+        <button type="button" class="inventory-initial-cancel" :disabled="guardandoInventarioInicial" @click="mostrarImportacionInicial = false">Cerrar</button>
+        <button type="button" class="inventory-initial-confirm" :disabled="!puedeImportarInicial || guardandoInventarioInicial || analizandoInventarioInicial" @click="confirmarImportacionInicial">
+          <b-spinner v-if="guardandoInventarioInicial" small></b-spinner>
+          <i v-else class="fas fa-save"></i>
+          <span>{{ guardandoInventarioInicial ? 'Registrando...' : 'Registrar ingreso inicial' }}</span>
+        </button>
+      </div>
+    </b-modal>
 
   </div>
 </template>
@@ -274,7 +389,13 @@ export default {
       API: config.API,
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
-      idPerfil: sessionStorage.getItem("IdPerfil")
+      idPerfil: Number(sessionStorage.getItem("IdPerfil") || sessionStorage.getItem("idPerfil") || 0),
+      mostrarImportacionInicial: false,
+      archivoInventarioInicial: null,
+      analizandoInventarioInicial: false,
+      guardandoInventarioInicial: false,
+      analisisInventarioInicial: null,
+      errorInventarioInicial: ""
     };
   },
   computed: {
@@ -282,7 +403,17 @@ export default {
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
       productos: state => state.cart.productos
-    })
+    }),
+    esSuperadmin() {
+      return this.idPerfil === 1;
+    },
+    puedeImportarInicial() {
+      return Boolean(
+        this.archivoInventarioInicial &&
+        this.analisisInventarioInicial &&
+        this.analisisInventarioInicial.puede_importar
+      );
+    }
   },
   methods: {
     ...mapActions({
@@ -403,6 +534,132 @@ export default {
     getAlmacenes(value) {
       this.buscarAlmacenes(value);
     },
+    abrirImportacionInicial() {
+      if (!this.esSuperadmin) return;
+      this.archivoInventarioInicial = null;
+      this.analisisInventarioInicial = null;
+      this.errorInventarioInicial = "";
+      this.mostrarImportacionInicial = true;
+      this.$nextTick(() => {
+        if (this.$refs.archivoInventarioInicial) this.$refs.archivoInventarioInicial.value = "";
+      });
+    },
+    elegirArchivoInicial() {
+      if (this.$refs.archivoInventarioInicial) this.$refs.archivoInventarioInicial.click();
+    },
+    soltarArchivoInicial(evento) {
+      const archivo = evento.dataTransfer && evento.dataTransfer.files ? evento.dataTransfer.files[0] : null;
+      if (archivo) this.prepararArchivoInicial(archivo);
+    },
+    seleccionarArchivoInicial(evento) {
+      const archivo = evento.target.files && evento.target.files[0] ? evento.target.files[0] : null;
+      if (archivo) this.prepararArchivoInicial(archivo);
+    },
+    prepararArchivoInicial(archivo) {
+      const extension = (archivo.name.split(".").pop() || "").toLowerCase();
+      this.errorInventarioInicial = "";
+      this.analisisInventarioInicial = null;
+      if (["xls", "xlsx"].indexOf(extension) === -1) {
+        this.archivoInventarioInicial = null;
+        this.errorInventarioInicial = "Seleccione un archivo en formato XLS o XLSX.";
+        return;
+      }
+      if (archivo.size > 12 * 1024 * 1024) {
+        this.archivoInventarioInicial = null;
+        this.errorInventarioInicial = "El archivo supera el máximo permitido de 12 MB.";
+        return;
+      }
+      this.archivoInventarioInicial = archivo;
+      this.analizarInventarioInicial();
+    },
+    urlInventarioInicial() {
+      return this.API.replace(/index\.php\/?$/, "inventario-inicial-importar.php");
+    },
+    datosInventarioInicial(modo) {
+      const datos = new FormData();
+      datos.append("archivo", this.archivoInventarioInicial);
+      datos.append("modo", modo);
+      datos.append("idAlmacen", Number(this.IdAlmacen) || 1);
+      return datos;
+    },
+    analizarInventarioInicial() {
+      if (!this.archivoInventarioInicial) return;
+      this.analizandoInventarioInicial = true;
+      this.errorInventarioInicial = "";
+      this.axios.post(this.urlInventarioInicial(), this.datosInventarioInicial("vista_previa"), {
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(response => {
+        this.analisisInventarioInicial = response.data.analisis;
+      }).catch(error => {
+        const respuesta = error.response && error.response.data ? error.response.data : {};
+        this.analisisInventarioInicial = respuesta.analisis || null;
+        this.errorInventarioInicial = respuesta.error || "No se pudo analizar el archivo Excel.";
+      }).then(() => {
+        this.analizandoInventarioInicial = false;
+      });
+    },
+    async confirmarImportacionInicial() {
+      if (!this.puedeImportarInicial) return;
+      const analisis = this.analisisInventarioInicial;
+      const confirmacion = await this.$swal({
+        icon: "warning",
+        title: "Registrar inventario inicial",
+        html: `<div class="inventory-confirm-copy">Esta operación agregará stock y quedará guardada como un único movimiento. No se permitirá repetirla en el mismo almacén.</div>
+          <div class="inventory-confirm-summary">
+            <div><span>Productos</span><strong>${Number(analisis.productos_importar || 0)}</strong></div>
+            <div><span>Unidades</span><strong>${this.formatoCantidadInicial(analisis.total_unidades)}</strong></div>
+            <div class="inventory-confirm-summary__wide inventory-confirm-summary__total"><span>Valorización</span><strong>S/ ${this.formatoImporteInicial(analisis.valor_total)}</strong></div>
+          </div>`,
+        showCancelButton: true,
+        confirmButtonText: "Sí, registrar movimiento",
+        cancelButtonText: "Volver a revisar",
+        buttonsStyling: false,
+        customClass: {
+          popup: "inventory-confirm-popup",
+          icon: "inventory-confirm-icon",
+          title: "inventory-confirm-title",
+          content: "inventory-confirm-content",
+          actions: "inventory-confirm-actions",
+          confirmButton: "inventory-confirm-save",
+          cancelButton: "inventory-confirm-review"
+        },
+        allowOutsideClick: false
+      });
+      if (!confirmacion.isConfirmed) return;
+
+      this.guardandoInventarioInicial = true;
+      this.errorInventarioInicial = "";
+      this.axios.post(this.urlInventarioInicial(), this.datosInventarioInicial("importar"), {
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(response => {
+        const resultado = response.data.resultado || {};
+        this.ultimoMovimiento = resultado.hash || "";
+        this.mostrarImportacionInicial = false;
+        this.$swal({
+          icon: "success",
+          title: "Inventario inicial registrado",
+          html: `<strong>${resultado.serie || "INICIAL"}-${resultado.numero || ""}</strong><br>${resultado.productos || 0} productos · ${this.formatoCantidadInicial(resultado.unidades)} unidades<br>Registro: INGRESO INICIAL DE INVENTARIO`,
+          confirmButtonText: "Aceptar"
+        });
+      }).catch(error => {
+        const respuesta = error.response && error.response.data ? error.response.data : {};
+        this.analisisInventarioInicial = respuesta.analisis || this.analisisInventarioInicial;
+        this.errorInventarioInicial = respuesta.error || "No se pudo registrar el ingreso inicial.";
+      }).then(() => {
+        this.guardandoInventarioInicial = false;
+      });
+    },
+    formatoCantidadInicial(valor) {
+      return Number(valor || 0).toLocaleString("es-PE", { maximumFractionDigits: 4 });
+    },
+    formatoImporteInicial(valor) {
+      return Number(valor || 0).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
+    formatoPesoInicial(bytes) {
+      if (!bytes) return "0 KB";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    },
     async guardarMovimiento(evt) {
       evt.preventDefault();
       const faltantes = [];
@@ -493,9 +750,14 @@ export default {
 
       this.inProgress = true;
 
+      const movimientoEnvio = Object.assign({}, this.movimiento, {
+        MovimientoFecha: this.$moment(this.movimiento.MovimientoFecha).format("YYYY-MM-DD HH:mm:ss"),
+        FechaStock: this.$moment(this.movimiento.FechaStock).format("YYYY-MM-DD HH:mm:ss")
+      });
+
       this.axios
         .post(this.API + "movimientos", {
-          movimiento: this.movimiento,
+          movimiento: movimientoEnvio,
           productos: this.productos
         })
         .then(response => {
@@ -586,6 +848,13 @@ export default {
 }
 .inventory-toggle-data i { margin-right:7px; color:#087ca9; }
 .inventory-toggle-data:hover { transform:translateY(-1px);background:#eaf8ff!important; }
+.inventory-initial-button {
+  min-height:38px;padding:8px 14px!important;border:1px solid rgba(111,235,183,.38)!important;
+  border-radius:999px!important;color:#fff!important;background:#0b9564!important;
+  font-size:12px!important;font-weight:900!important;box-shadow:0 7px 16px rgba(2,40,31,.2)!important;
+}
+.inventory-initial-button i { margin-right:7px;color:#c8ffe8; }
+.inventory-initial-button:hover { transform:translateY(-1px);background:#0aab70!important; }
 .inventory-heading__status span {
   display: inline-block; width: 8px; height: 8px; margin-right: 7px;
   border-radius: 50%; background: #34e6a1; box-shadow: 0 0 0 4px rgba(52,230,161,.13);
@@ -865,10 +1134,58 @@ export default {
 .inventory-confirm-review { color: #415a70; background-color: #e9eff4; }
 .inventory-confirm-save:hover,
 .inventory-confirm-review:hover { filter: brightness(1.04); transform: translateY(-1px); }
+
+.inventory-initial-modal .modal-dialog { max-width:900px; }
+.inventory-initial-content { overflow:hidden;border:0!important;border-radius:22px!important;box-shadow:0 30px 85px rgba(4,35,62,.34)!important; }
+.inventory-initial-content .modal-header { align-items:center;padding:18px 22px;border:0;color:#fff;background:linear-gradient(115deg,#043b38,#08735f); }
+.inventory-initial-content .modal-header .close { color:#fff;opacity:.86;text-shadow:none; }
+.inventory-initial-title { display:flex;align-items:center;gap:12px; }
+.inventory-initial-title>span { display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(255,255,255,.25);border-radius:12px;background:rgba(255,255,255,.1);font-size:18px; }
+.inventory-initial-title strong,.inventory-initial-title small { display:block; }
+.inventory-initial-title strong { font-size:18px;font-weight:900; }
+.inventory-initial-title small { margin-top:2px;color:#c9eee7;font-size:11px;font-weight:700; }
+.inventory-initial-body { padding:20px 22px 22px!important;background:#f5faf9; }
+.inventory-initial-dropzone { display:flex;align-items:center;width:100%;min-height:82px;padding:14px 16px;border:2px dashed #a9cec7;border-radius:16px;color:#173b3a;text-align:left;background:#fff;cursor:pointer;transition:.2s ease; }
+.inventory-initial-dropzone:hover,.inventory-initial-dropzone.is-selected { border-color:#0aa873;background:#edfbf6;transform:translateY(-1px); }
+.inventory-initial-dropzone:disabled { cursor:wait;opacity:.7; }
+.inventory-initial-dropzone__icon { display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;border-radius:14px;color:#fff;background:#0aa873;font-size:21px;box-shadow:0 8px 18px rgba(10,168,115,.22); }
+.inventory-initial-dropzone__copy { min-width:0;margin:0 14px;flex:1; }
+.inventory-initial-dropzone__copy strong,.inventory-initial-dropzone__copy small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.inventory-initial-dropzone__copy strong { font-size:14px;font-weight:900; }
+.inventory-initial-dropzone__copy small { margin-top:3px;color:#68817d;font-size:11px;font-weight:700; }
+.inventory-initial-dropzone__action { padding:8px 12px;border-radius:9px;color:#087154;background:#d6f5e9;font-size:11px;font-weight:900; }
+.inventory-initial-loading { display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px;padding:12px;border-radius:12px;color:#176c5b;background:#e5f7f1;font-size:12px;font-weight:800; }
+.inventory-initial-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px; }
+.inventory-initial-stats>div { padding:12px;border:1px solid #d8e9e5;border-radius:13px;background:#fff; }
+.inventory-initial-stats strong,.inventory-initial-stats span { display:block; }
+.inventory-initial-stats strong { color:#075a4a;font-size:17px;font-weight:900; }
+.inventory-initial-stats span { margin-top:2px;color:#6a817d;font-size:9px;font-weight:900;letter-spacing:.55px;text-transform:uppercase; }
+.inventory-initial-alert { display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:12px;font-weight:750;line-height:1.45; }
+.inventory-initial-alert i { margin-top:2px; }
+.inventory-initial-alert ul { margin:0;padding-left:17px; }
+.inventory-initial-alert--warning { border:1px solid #f2d894;color:#755613;background:#fff7dc; }
+.inventory-initial-alert--error { border:1px solid #f0b8bc;color:#9c2630;background:#fff0f1; }
+.inventory-initial-errors { margin-top:12px;padding:13px 15px;border:1px solid #efb9bd;border-radius:12px;color:#91252d;background:#fff; }
+.inventory-initial-errors>strong { font-size:12px;font-weight:900; }
+.inventory-initial-errors ul { max-height:125px;margin:8px 0 0;padding-left:18px;overflow:auto;font-size:11px; }
+.inventory-initial-preview { margin-top:14px;overflow:hidden;border:1px solid #d7e6e3;border-radius:14px;background:#fff; }
+.inventory-initial-preview__heading { display:flex;align-items:center;justify-content:space-between;padding:11px 14px;color:#fff;background:#075c50; }
+.inventory-initial-preview__heading strong { font-size:12px;font-weight:900; }
+.inventory-initial-preview__heading span { color:#cbeae5;font-size:10px;font-weight:750; }
+.inventory-initial-preview table { min-width:690px;font-size:11px; }
+.inventory-initial-preview th { border:0!important;color:#315b55;background:#e7f3f0;font-size:9px;font-weight:900;text-transform:uppercase; }
+.inventory-initial-preview td { vertical-align:middle;border-color:#e6efed!important; }
+.inventory-initial-actions { display:flex;justify-content:flex-end;gap:9px;margin-top:17px;padding-top:15px;border-top:1px solid #dce9e6; }
+.inventory-initial-cancel,.inventory-initial-confirm { min-height:45px;padding:0 18px;border:0;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer; }
+.inventory-initial-cancel { color:#506965;background:#e3ecea; }
+.inventory-initial-confirm { min-width:220px;color:#fff;background:#0aac70;box-shadow:0 9px 20px rgba(10,172,112,.23); }
+.inventory-initial-confirm:disabled,.inventory-initial-cancel:disabled { cursor:not-allowed;opacity:.55; }
+.inventory-initial-confirm i { margin-right:7px; }
 @media (max-width: 991px) {
   .inventory-movement-page { padding: 14px; }
   .inventory-heading { align-items: flex-start; }
   .inventory-heading__status { display: none; }
+  .inventory-heading__actions { flex-wrap:wrap;justify-content:flex-end; }
   .inventory-data-grid > .inventory-card {
     max-width: calc(100% - 14px); flex: 0 0 calc(100% - 14px); margin-bottom: 14px;
   }
@@ -876,6 +1193,9 @@ export default {
 @media (max-width: 575px) {
   .inventory-movement-page { padding: 8px; }
   .inventory-heading { padding: 15px; border-radius: 17px; }
+  .inventory-heading { flex-wrap:wrap; }
+  .inventory-heading__actions { width:100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr; }
+  .inventory-initial-button,.inventory-toggle-data { width:100%; }
   .inventory-heading__icon { width: 46px; height: 46px; flex-basis: 46px; }
   .inventory-heading p, .inventory-section-title > span { display: none; }
   .inventory-card, .inventory-products-section { padding: 14px !important; border-radius: 16px; }
@@ -890,5 +1210,12 @@ export default {
   .inventory-confirm-summary__wide { grid-column: auto; }
   .inventory-confirm-actions { flex-direction: column; }
   .inventory-confirm-save, .inventory-confirm-review { width: 100%; }
+  .inventory-initial-body { padding:14px!important; }
+  .inventory-initial-title small { display:none; }
+  .inventory-initial-dropzone__action { display:none; }
+  .inventory-initial-stats { grid-template-columns:1fr 1fr; }
+  .inventory-initial-preview__heading { align-items:flex-start;flex-direction:column;gap:3px; }
+  .inventory-initial-actions { flex-direction:column-reverse; }
+  .inventory-initial-cancel,.inventory-initial-confirm { width:100%; }
 }
 </style>
