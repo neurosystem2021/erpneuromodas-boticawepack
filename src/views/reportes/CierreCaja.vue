@@ -1705,13 +1705,6 @@ export default {
       });
       return resultado;
     },
-    totalEfectivoParcial() {
-      let total = 0;
-      this.ventasParcial.forEach((venta) => {
-        if (!venta.Anulado) total += venta.Total;
-      });
-      return total;
-    },
     saldoEfectivoParcial() {
       return this.totalEfectivoParcial - this.totalIngresos;
     },
@@ -1893,8 +1886,13 @@ export default {
       // Ajusta esta condición si el backend expone un flag booleano
       // (p.ej. venta.EsNotaCredito) en vez de venir sólo en TipoDoc.
       if (venta.EsNotaCredito) return true;
+      if (String(venta.CodSunat || "") === "07") return true;
       const tipo = (venta.TipoDoc || "").toUpperCase();
-      return tipo.includes("NOTA DE CREDITO") || tipo.includes("NOTA DE CRÉDITO");
+      return (
+        tipo.includes("NOTA DE CREDITO") ||
+        tipo.includes("NOTA DE CRÉDITO") ||
+        tipo === "NC"
+      );
     },
     focusAutocomplete(ref) {
       // this.$refs[ref].type = ""
@@ -2028,10 +2026,6 @@ export default {
           });
       }
     },
-    focusAutocomplete(ref) {
-      // this.$refs[ref].type = ""
-      this.$refs[ref].handleDoubleClick();
-    },
     estadoVenta(venta) {
       return venta.Anulado
         ? "ANULADO"
@@ -2078,7 +2072,7 @@ export default {
           params: params,
         })
         .then((res) => {
-          this.ventas = res.data;
+          this.ventas = (res.data || []).filter(v => !this.esNotaCredito(v));
           this.loadDetalles();
           this.getAdelantos();
         })

@@ -78,8 +78,9 @@
                         <td style="text-align: center;">{{reporte.Moneda}}</td>
                         <td style="text-align: center;">{{parseFloat(reporte.TOTAL).toFixed(2)}}</td>
                         <td>
-                          <b-button v-if="idPerfil != 3" size="sm" class="mx-1 my-1" @click="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                          <b-button size="sm" class="mx-1 my-1" @click="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
+                          <b-button v-if="idPerfil != 3 && esEditable(reporte)" size="sm" class="mx-1 my-1" @click.stop="abrirEditar(reporte)" variant="warning" title="Editar"><i class="fa fa-edit" aria-hidden="true"></i></b-button>
+                          <b-button v-if="idPerfil != 3" size="sm" class="mx-1 my-1" @click.stop="elimimnarRegistro(reporte)" variant="danger"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                          <b-button size="sm" class="mx-1 my-1" @click.stop="imprimirMovimiento(reporte)" variant="info"><i class="fa fa-print" aria-hidden="true"></i></b-button>
                         </td>
                     </tr>
                 </tbody>
@@ -96,8 +97,51 @@
             </b-row>
         </b-col>
     </b-row>
-    <b-modal v-model="detalleMovimiento" no-close-on-backdrop no-close-on-esc hide-footer>
-        <b-row>
+    <b-modal
+      v-model="detalleMovimiento"
+      no-close-on-backdrop
+      no-close-on-esc
+      hide-footer
+      title-class="w-100"
+    >
+      <template #modal-title>
+        <div class="audit-header">
+          <h5 class="audit-titulo">
+            <i class="fa fa-file-alt" aria-hidden="true"></i> Detalle del movimiento
+          </h5>
+
+          <div class="audit-cards">
+            <!-- Registro -->
+            <div class="audit-card audit-reg">
+              <div class="audit-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+              <div class="audit-info">
+                <div class="audit-label">Registrado por</div>
+                <div class="audit-user">{{ auditoria.usuarioReg || "-" }}</div>
+                <div class="audit-fecha">
+                  <i class="far fa-clock" aria-hidden="true"></i> {{ auditoria.fechaReg || "-" }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Edición -->
+            <div class="audit-card" :class="auditoria.usuarioMod ? 'audit-mod' : 'audit-sin-mod'">
+              <div class="audit-icon"><i class="fa fa-user-edit" aria-hidden="true"></i></div>
+              <div class="audit-info">
+                <div class="audit-label">Última edición</div>
+                <template v-if="auditoria.usuarioMod">
+                  <div class="audit-user">{{ auditoria.usuarioMod }}</div>
+                  <div class="audit-fecha">
+                    <i class="far fa-clock" aria-hidden="true"></i> {{ auditoria.fechaMod || "-" }}
+                  </div>
+                </template>
+                <div v-else class="audit-user audit-vacio">Sin modificaciones</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <br>
+      <b-row>
           <b-col cols="6">
             <b-input-group>
               <input type="text" class="form-control" v-model="FechaPeriodoTributario">
@@ -148,12 +192,15 @@
           </b-col>
         </b-row>
     </b-modal>
+    <movimiento-edit-form ref="movimientoEdit" @guardado="generarReporte"></movimiento-edit-form>
   </b-container>
 </template>
 
 <script>
 import config from "@/store/config.js";
+import MovimientoEditForm from "@/components/MovimientoEditForm.vue";
 export default {
+  components: { MovimientoEditForm },
   data() {
     return {
       detalleMovimiento: false,
@@ -164,6 +211,12 @@ export default {
       API: config.API,
       lstReporte: [],
       lstDetalle: [],
+      auditoria: {
+        usuarioReg: "",
+        fechaReg: "",
+        usuarioMod: "",
+        fechaMod: ""
+      },
       items: [
         {
           text: "MOVIMIENTO",
@@ -308,15 +361,18 @@ export default {
           let TotalPEN = 0;
           let TotalUSD = 0;
           data.forEach(element => {
+            const sub = parseFloat(element.SUBTOTAL) || 0;
+            const igv = parseFloat(element.IGV) || 0;
+            const tot = parseFloat(element.TOTAL) || 0;
             if (element.Moneda == "PEN") {
-              SubTotalPEN += element.SUBTOTAL;
-              IgvlPEN += element.IGV;
-              TotalPEN += element.TOTAL;
+              SubTotalPEN += sub;
+              IgvlPEN += igv;
+              TotalPEN += tot;
             }
             if (element.Moneda == "USD") {
-              SubTotalUSD = element.SUBTOTAL;
-              IgvlUSD = element.IGV;
-              TotalUSD = element.TOTAL;
+              SubTotalUSD += sub;
+              IgvlUSD += igv;
+              TotalUSD += tot;
             }
           });
           this.SubTotalPEN = parseFloat(SubTotalPEN).toFixed(2);
@@ -329,20 +385,35 @@ export default {
       });
     },
     async abrirDedetalle(reporte) {
-      console.log(reporte);
       this.FechaPeriodoTributario = reporte.FechaPeriodoTributario;
       this.IdMovimiento = reporte.IdMovimiento;
       this.lstDetalle = [];
-      let params = {
-        IdMovimiento: reporte.IdMovimiento
-      };
+      this.auditoria = { usuarioReg: "", fechaReg: "", usuarioMod: "", fechaMod: "" };
+
       await this.axios(`${this.API}movmiento/detalles`, {
-        params: params
+        params: { IdMovimiento: reporte.IdMovimiento }
       }).then(res => {
-        if (res.data) {
-          this.lstDetalle = res.data;
-        }
+        if (res.data) this.lstDetalle = res.data;
       });
+
+      // Auditoría (usuario que registró / modificó)
+      try {
+        const r = await this.axios(`${this.API}movimiento/obtener`, {
+          params: { IdMovimiento: reporte.IdMovimiento }
+        });
+        const cab = r.data && r.data.cabecera;
+        if (cab) {
+          this.auditoria = {
+            usuarioReg: cab.UsuarioReg || "",
+            fechaReg: cab.FechaReg || "",
+            usuarioMod: cab.UsuarioMod || "",
+            fechaMod: cab.FechaMod || ""
+          };
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       this.detalleMovimiento = true;
     },
     async actualizarPeriodo() {
@@ -389,6 +460,12 @@ export default {
       }
       monto = item.Cantidad * item.Precio + igv;
       return parseFloat(monto).toFixed(2);
+    },
+    esEditable(reporte) {
+      return !!reporte.Proveedor;
+    },
+    abrirEditar(reporte) {
+      this.$refs.movimientoEdit.abrir(reporte.IdMovimiento);
     }
   },
   computed: {
@@ -407,4 +484,67 @@ export default {
   max-width: 60% !important;
   width: 60% !important;
 }
+
+.audit-header { width: 100%; }
+.audit-titulo {
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: #343a40;
+}
+.audit-titulo i { color: #6c757d; margin-right: 6px; }
+
+.audit-cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.audit-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 260px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background: #f8f9fa;
+}
+.audit-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+.audit-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c757d;
+  line-height: 1.2;
+}
+.audit-user {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+  line-height: 1.3;
+}
+.audit-fecha {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+.audit-fecha i { margin-right: 3px; }
+
+.audit-reg { border-color: #17a2b8; background: #e8f6f8; }
+.audit-reg .audit-icon { background: #17a2b8; }
+
+.audit-mod { border-color: #ffc107; background: #fff8e1; }
+.audit-mod .audit-icon { background: #e0a800; }
+
+.audit-sin-mod { border-color: #ced4da; background: #f1f3f5; }
+.audit-sin-mod .audit-icon { background: #adb5bd; }
+.audit-vacio { font-weight: 400; font-style: italic; color: #868e96; font-size: 0.9rem; }
 </style>

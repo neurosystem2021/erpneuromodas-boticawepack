@@ -189,14 +189,15 @@
                           <template slot="operaciones">
                               <div class="panel-operaciones">
 
-                                  <div class="acciones-pos" v-if="idPerfil == 1">
+                                  <div class="acciones-pos" v-if="idPerfil != 3">
                                       <div class="fila-botones">
                                           <pago-deuda></pago-deuda>
 
-                                          <proformas
-                                              :idAlmacen="venta.almacen.IdAlmacen"
-                                              @onSelectProforma="setCliente">
-                                          </proformas>
+                                            <proformas
+                                                :idAlmacen="venta.almacen.IdAlmacen"
+                                                @onSelectProforma="setCliente"
+                                                @onProformaCargada="cargarLotesProforma">
+                                            </proformas>
                                       </div>
 
                                       <div class="fila-botones">
@@ -1346,7 +1347,12 @@ export default {
     eliminarCliente() {
       this.$refs.inputCliente.setValue("");
       this.venta.cliente = {};
-    }
+    },
+    cargarLotesProforma() {
+        this.$nextTick(() => {
+            this.$refs.carrito.cargarLotesDelCarrito();
+        });
+    },
   },
   components: {
     ProductosCarrito,

@@ -128,6 +128,7 @@ import { mapActions } from 'vuex'
                     this.filter = ''
                     this.show = false
                     this.$emit('onSelectProforma', item.IdCliente)
+                    this.$emit('onProformaCargada')
                 })
             },
             myProvider (ctx) {

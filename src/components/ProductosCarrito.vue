@@ -1064,6 +1064,12 @@ export default {
       obj.PromoUnidad = promo.Unidad;
       obj.PromoProductoRegalo = promo.ProductoRegaloNombre;
     },
+    cargarLotesDelCarrito() {
+      const ids = [...new Set(
+        this.productos.filter(p => !p.EsRegalo).map(p => p.IdProducto)
+      )];
+      ids.forEach(id => this.loadMovimientoLotes(id));
+    },
     agregarObjetoAlCarrito(obj) {
       if (this.indexProdSelect == null) {
         this.add([

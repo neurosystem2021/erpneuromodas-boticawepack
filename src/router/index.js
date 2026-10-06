@@ -146,7 +146,7 @@ export default new Router({
       component: Dashboard
     },
     {
-      path: "/reporte/reporteregmovimiento",
+      path: "/reportes/reporteregmovimiento",
       name: "ReporteRegMovimiento",
       component: ReporteRegMovimiento
     },
