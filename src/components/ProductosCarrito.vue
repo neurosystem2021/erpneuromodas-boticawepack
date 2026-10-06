@@ -5,7 +5,7 @@
         <label>Agregar Productos:</label>
         <b-input-group>
           <autocomplete
-            :ref="`autocompleteProducto${index}`"
+            ref="autocompleteProducto"
             :url="APIProductos"
             :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
             :onShouldRenderChild="renderChild"
@@ -13,7 +13,7 @@
             label="writer"
             placeholder="Agregar Producto"
             :on-select="setProducto"
-            :onFocus="focusAutocomplete.bind(null, `autocompleteProducto${index}`)"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
             :classes="{input: 'form-control'}">
           </autocomplete>
           <input v-model="loadCode"
@@ -22,6 +22,7 @@
                   class="form-control"
                   placeholder="Codigo de Barra" />
           <b-input-group-append>
+            <!--<proveedores-tabla></proveedores-tabla>-->
             <b-button variant="success" @click="abrirCodigoBarra"><i class="fas fa-barcode"></i></b-button>
             <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
             <producto-form :showButton="showButton" :cbGuardar="(id,pxp,obj) =>{agregarGuardar(id,pxp,obj)}" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
@@ -470,7 +471,7 @@ export default {
   },
   computed: {
     ...mapState({
-      // productos ya NO viene del store: es prop. Solo dejamos lo que sigue siendo global
+      productos: state => state.cart.productos,
       filtrados: state => state.cart.productosFiltrados
     }),
     APIProductos() {
@@ -526,8 +527,11 @@ export default {
   },
   methods: {
     ...mapActions({
+      add: "agregarProducto",
       buscar: "buscarProductos",
+      eliminar: "eliminarProducto",
       actualizarTotal: "actualizarTotalCart",
+      actualizarProd: "actualizarProducto",
       obtenerStok: "obtenerStock"
     }),
     setSubtotal(index, val) {
@@ -548,7 +552,9 @@ export default {
         prod.cantidad = prod.cantidadPres;
         prod.cantidad *= val;
       }
-      // Ya no dispatch a Vuex: el producto ya está en el array del padre (por referencia)
+      this.$nextTick(() => {
+        this.actualizarProd(prod);
+      });
     },
     abrirCodigoBarra() {
       this.$refs["modalCodigoBarra"].show();
@@ -607,18 +613,22 @@ export default {
       }
     },
     asignarDisabledProf(index, e) {
-      this.productos[index].disabledProf = e.target.checked === true ? 1 : 0;
+      if (e.target.checked === true) {
+        this.productos[index].disabledProf = 1;
+        return;
+      }
+      this.productos[index].disabledProf = 0;
     },
     asignarVuelto() {
       this.vuelto = this.pagocon - this.sumatoriaTotal;
     },
     loadBarcode(e) {
-      if (e) e.preventDefault();
+      if (e) {e.preventDefault();}
       let idProducto = this.loadCode;
       if (idProducto) {
         let params = { codigoBarra: idProducto };
         this.axios
-          .get(this.API + "productos/id/" + idProducto, { params })
+          .get(this.API + "productos/id/" + idProducto, { params: params })
           .then(response => {
             if (response.data.IdProducto) {
               this.setProducto(response.data);
@@ -629,16 +639,38 @@ export default {
           });
       }
     },
-    focusAutocomplete(ref) {
-      const comp = this.$refs[ref];
-      if (comp && comp.handleDoubleClick) {
-        comp.type = "";
-        comp.handleDoubleClick();
+
+    /*alterarBuscadorProductos() {
+      this.handleKeyDown = this.$refs.autocompleteProducto.handleKeyDown
+
+      this.$refs.autocompleteProducto.$refs.input.onpaste = (e) => {
+        console.log('paste')
+        this.pasteCode = (e.originalEvent || e).clipboardData.getData('text/plain')
       }
-    },
-    clonarVentaBase() {
-      // Clona profundamente preVenta para que cada pestaña tenga sus propios objetos anidados
-      return JSON.parse(JSON.stringify(this.preVenta));
+
+      this.$refs.autocompleteProducto.handleKeyDown = (e) =>{
+        let key = e.keyCode;
+
+        if (key == 13) {
+          if(this.pasteCode) {
+            e.preventDefault()
+            let idProducto = this.pasteCode.substring(2, this.pasteCode.length -2);
+            this.add([idProducto, () => {
+              this.$emit('onAddProducto')
+            }])
+          } else {
+            e.preventDefault()
+            this.handleKeyDown(e) 
+          }   
+        } else {
+          this.handleKeyDown(e)
+        }
+        this.pasteCode = false
+      }
+    },*/
+    focusAutocomplete(ref) {
+      this.$refs[ref].type = "";
+      this.$refs[ref].handleDoubleClick();
     },
     editarProducto(Pro) {
       this.productoSelect = Pro;
@@ -646,7 +678,11 @@ export default {
       this.$refs.productoFormEdit.nuevo = false;
     },
     agregarGuardar(id, pxp, obj) {
-      // Antes: this.add([id, ...]) directo al store. Ahora se resuelve vía setProducto/emit.
+      this.add([id, false, false, false, false, true, this.isVentas]);
+      setTimeout(() => {
+        this.obtenerStok({ IdAlmacen: this.idAlmacen || 1 });
+      }, 200);
+
       if (this.isVentas) {
         let fPP = pxp.filter(p => p.cantidad === 0 || p.cantidad === "0");
         if (fPP.length != 4) {
@@ -659,10 +695,8 @@ export default {
           this.productoSelect = obj;
           this.productoSelect.PreciosPorProducto = JSON.stringify(pxp);
           this.showPresentacion(this.productoSelect);
-          return;
         }
       }
-      this.setProducto(obj);
     },
     setProducto(obj) {
       this.precioCont = obj.PrecioContado;
@@ -699,11 +733,16 @@ export default {
       obj.cantidadPres = 1;
       obj = this.onSetProducto(obj);
 
-      // ---- NUEVO: en vez de dispatch al store, se emite al padre ----
-      this.$emit("setProducto", obj);
-      this.$emit("onAddProducto", obj);
-      this.$toasted.success("Producto añadido correctamente");
-      // -----------------------------------------------------------
+      this.add([
+        obj,
+        () => {
+          this.$emit("onAddProducto", obj);
+          this.$toasted.success("Producto añadido correctamente");
+        },
+        { setPrecioCosto: this.tipo == "mov" ? true : false },
+        false,
+        this.cliente.EsVIP
+      ]);
 
       this.$refs["modalCant"].hide();
     },
@@ -821,8 +860,7 @@ export default {
       this.buscar(value);
     },
     quitarProducto(index) {
-      // ---- NUEVO: se pide al padre que elimine el producto de SU array ----
-      this.$emit("eliminarProducto", index);
+      this.eliminar(index);
       this.$emit("onRemoveProducto", index);
       this.$toasted.show("Producto quitado del listado");
     },
