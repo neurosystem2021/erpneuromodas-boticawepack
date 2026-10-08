@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="px-4 py-4 cash-close-modern" :class="{ 'ticket-mode': modoImpresionTicket || modoImpresionProductos === 'ticket' || modoImpresionYape === 'ticket' || modoImpresionTransferencia === 'ticket' }">
-    <b-row class="no-print">  
+    <b-row class="no-print cash-close-layout">
       <b-col cols="12" lg="9" class="no-print cash-detail-panel">
         
         <b-card no-body>
@@ -16,7 +16,7 @@
               {{ todosDetallesVisibles ? 'Ocultar todos los detalles' : 'Mostrar todos los detalles' }}
             </b-button>
           </div>
-          <b-tabs content-class="mt-3 mx-3" card fill pills>
+          <b-tabs class="cash-tabs" content-class="mt-3 mx-3 cash-tab-content" card fill pills>
             <b-tab title="Resumen" active class="clsVentas">
               <div class="clsVentas">
               <h5 class="payment-title payment-cash">Ventas Efectivo</h5><br>
@@ -210,9 +210,6 @@
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
                         {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
                       </td>
@@ -284,9 +281,6 @@
                       <td>{{ prod.Descripcion }}</td>
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
                       <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
@@ -394,51 +388,61 @@
           </tfoot>
         </table>
         <b-row>
-        <b-col v-if="totalIngresos">
+        <b-col v-if="movimientosIngresosDia.length">
           <h5 class="movement-title movement-income">Ingresos</h5><br>
           <table class="table b-table table-sm movement-table income-table">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Fecha de registro</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="item in movimientosIngresosDia" :key="'ingreso-actividad-' + item.IdCajaBanco" :class="{ 'bank-activity-row': item.EsReferenciaBancaria }">
                 <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>{{ item.FechaActividad }}</td>
+                <td>
+                  {{ item.Concepto }}
+                  <small v-if="item.EsReferenciaBancaria" class="bank-activity-detail">
+                    {{ item.Cuenta }} - Registrado por {{ item.UsuarioReg || 'cajera' }} - Fecha de operacion: {{ item.FechaDoc }}
+                  </small>
+                </td>
+                <td>S/. {{ item.Importe | redondear }}<small v-if="item.EsReferenciaBancaria" class="bank-activity-detail">Referencial</small></td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>Total Ingresos Caja Principal</b></td>
                 <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col v-if="movimientosSalidasDia.length">
           <h5 class="movement-title movement-outflow">Salidas</h5><br>
           <table class="table b-table table-sm movement-table outflow-table">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>ID</th><th>Fecha de registro</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
+              <tr v-for="item in movimientosSalidasDia" :key="'salida-actividad-' + item.IdCajaBanco" :class="{ 'bank-activity-row': item.EsReferenciaBancaria }">
                 <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
-                <td>S/. {{ item.Importe | redondear }}</td>
+                <td>{{ item.FechaActividad }}</td>
+                <td>
+                  {{ item.Concepto }}
+                  <small v-if="item.EsReferenciaBancaria" class="bank-activity-detail">
+                    {{ item.Cuenta }} - Registrado por {{ item.UsuarioReg || 'cajera' }} - Fecha de operacion: {{ item.FechaDoc }}
+                  </small>
+                </td>
+                <td>S/. {{ item.Importe | redondear }}<small v-if="item.EsReferenciaBancaria" class="bank-activity-detail">Referencial</small></td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>Total Salidas Caja Principal</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -446,9 +450,10 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalIngresosTarjeta">
-          <h5>Ingresos de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
+        <b-col v-if="ingresosTarjeta.length">
+          <h5 class="movement-title movement-bank-reference">Ingresos bancarios de referencia</h5><br>
+          <small class="bank-reference-note">Informativo: estos movimientos no aumentan el efectivo de Caja Principal.</small>
+          <table class="table b-table table-sm movement-table bank-reference-table">
             <thead>
               <tr class="thDetalle">
                 <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
@@ -458,7 +463,7 @@
               <tr v-for="(item, index) in ingresosTarjeta" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
-                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.FechaDoc }}<small class="bank-activity-detail">Registro: {{ item.FechaReg || item.FechaDoc }} - Cajera: {{ item.UsuarioReg || '-' }}</small></td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
@@ -466,7 +471,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td class="total"><b>Total ingresos bancarios (referencial)</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -474,19 +479,20 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalSalidasTarjeta">
-          <h5>Salidas de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
+        <b-col v-if="salidasTarjeta.length">
+          <h5 class="movement-title movement-bank-reference">Salidas bancarias de referencia</h5><br>
+          <small class="bank-reference-note">Informativo: estos movimientos no reducen el efectivo de Caja Principal.</small>
+          <table class="table b-table table-sm movement-table bank-reference-table">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in salidasTarjeta" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
-                <td>{{ item.FechaDoc }}</td>
+                <td>{{ item.FechaDoc }}<small class="bank-activity-detail">Registro: {{ item.FechaReg || item.FechaDoc }} - Cajera: {{ item.UsuarioReg || '-' }}</small></td>
                 <td>{{ item.Concepto }}</td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
@@ -494,7 +500,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>Total salidas bancarias (referencial)</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -679,7 +685,7 @@
         </div>
         <h2 class="text-center">Mi Cierre de Caja</h2> 
         <b-row  align-h="end" class=" no-print">
-        <b-col cols="12">
+        <b-col cols="12" class="cash-summary-actions">
             <div v-if="esAdministrador && !this.$route.params.id" class="admin-cash-control">
               <b-dropdown
                 id="admin-cash-user"
@@ -733,20 +739,20 @@
               <small>{{ descripcionCierre.length }}/500 caracteres</small>
             </b-form-group>
            
-            <b-button-group>
-              <b-button variant="danger" @click="cerrarCaja" v-if="!this.$route.params.id"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
+            <b-button-group v-if="!this.$route.params.id" class="cash-action cash-action-close">
+              <b-button variant="danger" @click="cerrarCaja"><i class="fa fa-unlock mx-1" aria-hidden="true"></i>
                 {{ esAdministrador ? 'Cerrar caja seleccionada' : 'Cerrar Caja' }}</b-button>
             </b-button-group>
-            <b-button-group>
+            <b-button-group class="cash-action cash-action-history">
               <cierres-caja
                 :es-administrador="esAdministrador"
                 :usuario-actual="usuarioSesion"
               ></cierres-caja>
             </b-button-group>
-            <b-button-group>
+            <b-button-group class="cash-action cash-action-print">
               <b-button variant="primary" @click="imprimir"><i class="fa fa-print mx-1" aria-hidden="true"></i> Imprimir</b-button>
             </b-button-group>
-            <b-button-group>
+            <b-button-group class="cash-action cash-action-summary">
               <b-button class="btn-print-ticket" @click="imprimirResumen"><i class="fa fa-file-text-o mx-1" aria-hidden="true"></i> Imprimir resumen</b-button>
             </b-button-group>
           </b-col>
@@ -861,9 +867,9 @@
       <div class="ticket-line"><span>Crédito</span><b>S/. {{ totalVentasCredito | redondear }}</b></div>
       <h2>MOVIMIENTOS DE CAJA</h2>
       <div class="ticket-line"><span>Total ingresos</span><b>S/. {{ totalIngresos | redondear }}</b></div>
-      <div v-for="item in ingresos" :key="'ti-'+item.IdCajaBanco" class="ticket-detail"><span>{{ item.Concepto }}</span><b>S/. {{ item.Importe | redondear }}</b></div>
+      <div v-for="item in movimientosIngresosDia" :key="'ti-'+item.IdCajaBanco" class="ticket-detail"><span>{{ item.Concepto }}<template v-if="item.EsReferenciaBancaria"> - {{ item.Cuenta }} (referencial)</template></span><b>S/. {{ item.Importe | redondear }}</b></div>
       <div class="ticket-line ticket-out"><span>Total salidas</span><b>S/. {{ totalSalidas | redondear }}</b></div>
-      <div v-for="item in salidas" :key="'ts-'+item.IdCajaBanco" class="ticket-detail"><span>{{ item.Concepto }}</span><b>S/. {{ item.Importe | redondear }}</b></div>
+      <div v-for="item in movimientosSalidasDia" :key="'ts-'+item.IdCajaBanco" class="ticket-detail"><span>{{ item.Concepto }}<template v-if="item.EsReferenciaBancaria"> - {{ item.Cuenta }} (referencial)</template></span><b>S/. {{ item.Importe | redondear }}</b></div>
       <div class="ticket-final"><span>TOTAL FINAL DE CAJA</span><strong>S/. {{ granTotal | moneda }}</strong></div>
       <footer>Resumen generado por el sistema</footer>
     </section>
@@ -1006,15 +1012,15 @@
         <tfoot><tr class="print-gran-total-final"><td colspan="9">GRAN TOTAL DE VENTAS</td><td>S/. {{ totalGeneralVentas | moneda }}</td></tr></tfoot>
       </table>
 
-      <div class="print-movimientos-grid" v-if="ingresos.length || salidas.length">
+      <div class="print-movimientos-grid" v-if="movimientosIngresosDia.length || movimientosSalidasDia.length">
         <table>
           <thead><tr><th colspan="4">Ingresos</th></tr><tr><th>ID</th><th>Fecha</th><th>Detalle</th><th>Monto</th></tr></thead>
-          <tbody><tr v-for="item in ingresos" :key="'ing-'+item.IdCajaBanco"><td>{{ item.IdCajaBanco }}</td><td>{{ item.FechaDoc }}</td><td>{{ item.Concepto }}</td><td>S/. {{ item.Importe | redondear }}</td></tr></tbody>
+          <tbody><tr v-for="item in movimientosIngresosDia" :key="'ing-'+item.IdCajaBanco"><td>{{ item.IdCajaBanco }}</td><td>{{ item.FechaActividad }}</td><td>{{ item.Concepto }}<small v-if="item.EsReferenciaBancaria">{{ item.Cuenta }} - referencial</small></td><td>S/. {{ item.Importe | redondear }}</td></tr></tbody>
           <tfoot><tr><td colspan="3">Total ingresos</td><td>S/. {{ totalIngresos | redondear }}</td></tr></tfoot>
         </table>
         <table>
           <thead><tr><th colspan="4">Salidas</th></tr><tr><th>ID</th><th>Fecha</th><th>Detalle</th><th>Monto</th></tr></thead>
-          <tbody><tr v-for="item in salidas" :key="'sal-'+item.IdCajaBanco"><td>{{ item.IdCajaBanco }}</td><td>{{ item.FechaDoc }}</td><td>{{ item.Concepto }}</td><td>S/. {{ item.Importe | redondear }}</td></tr></tbody>
+          <tbody><tr v-for="item in movimientosSalidasDia" :key="'sal-'+item.IdCajaBanco"><td>{{ item.IdCajaBanco }}</td><td>{{ item.FechaActividad }}</td><td>{{ item.Concepto }}<small v-if="item.EsReferenciaBancaria">{{ item.Cuenta }} - referencial</small></td><td>S/. {{ item.Importe | redondear }}</td></tr></tbody>
           <tfoot><tr><td colspan="3">Total salidas</td><td>S/. {{ totalSalidas | redondear }}</td></tr></tfoot>
         </table>
       </div>
@@ -1077,6 +1083,7 @@
                         <table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
+                            <th>Producto</th>
                             <th>Descripcion</th>
                             <th>Modelo</th>
                             <th>Marca</th>
@@ -1094,9 +1101,6 @@
                             <td>{{ prod.Descripcion }}</td>
                             <td>{{ prod.ProductoModelo }}</td>
                             <td>{{ prod.ProductoMarca }}</td>
-                            <td>{{ prod.Cantidad }}</td>
-                            <td>{{ prod.Precio }}</td>
-                            <td>{{ prod.Descuento }}</td>
                             <td>{{ prod.Cantidad }}</td>
                             <td>{{ prod.Precio }}</td>
                             <td>{{ prod.Descuento }}</td>
@@ -1320,7 +1324,6 @@
                       <td>{{ prod.ProductoModelo }}</td>
                       <td>{{ prod.ProductoMarca }}</td>
                       <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Cantidad }}</td>
                       <td>{{ prod.Precio }}</td>
                       <td>{{ prod.Descuento }}</td>
                       <td v-if="item.TieneIgv">
@@ -1425,51 +1428,51 @@
           </tfoot>
         </table>
         <b-row>
-        <b-col v-if="totalIngresos">
+        <b-col v-if="movimientosIngresosDia.length">
           <h5>Ingresos</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Fecha de registro</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresos" :key="index">
+              <tr v-for="item in movimientosIngresosDia" :key="'print-ingreso-' + item.IdCajaBanco">
                 <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
+                <td>{{ item.FechaActividad }}</td>
+                <td>{{ item.Concepto }}<small v-if="item.EsReferenciaBancaria">{{ item.Cuenta }} - registrado por {{ item.UsuarioReg || 'cajera' }} - fecha operacion: {{ item.FechaDoc }} - referencial</small></td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos</b></td>
+                <td class="total"><b>Total Ingresos Caja Principal</b></td>
                 <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
               </tr>
             </tfoot>
           </table>
         </b-col>
-        <b-col v-if="totalSalidas">
+        <b-col v-if="movimientosSalidasDia.length">
           <h5>Salidas</h5><br>
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
+                <th>ID</th><th>Fecha de registro</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidas" :key="index">
+              <tr v-for="item in movimientosSalidasDia" :key="'print-salida-' + item.IdCajaBanco">
                 <td>{{ item.IdCajaBanco }}</td>
-                <td>{{ item.FechaDoc }}</td>
-                <td>{{ item.Concepto }}</td>
+                <td>{{ item.FechaActividad }}</td>
+                <td>{{ item.Concepto }}<small v-if="item.EsReferenciaBancaria">{{ item.Cuenta }} - registrado por {{ item.UsuarioReg || 'cajera' }} - fecha operacion: {{ item.FechaDoc }} - referencial</small></td>
                 <td>S/. {{ item.Importe | redondear }}</td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas</b></td>
+                <td class="total-salida"><b>Total Salidas Caja Principal</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -1477,8 +1480,9 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalIngresosTarjeta">
-          <h5>Ingresos de Cuentas Bancarias </h5><br>
+        <b-col v-if="ingresosTarjeta.length">
+          <h5>Ingresos bancarios de referencia</h5><br>
+          <small>Informativo: estos movimientos no aumentan el efectivo de Caja Principal.</small>
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
@@ -1497,7 +1501,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
+                <td class="total"><b>Total ingresos bancarios (referencial)</b></td>
                 <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -1505,12 +1509,13 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalSalidasTarjeta">
-          <h5>Salidas de Cuentas Bancarias </h5><br>
+        <b-col v-if="salidasTarjeta.length">
+          <h5>Salidas bancarias de referencia</h5><br>
+          <small>Informativo: estos movimientos no reducen el efectivo de Caja Principal.</small>
           <table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
@@ -1525,7 +1530,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
+                <td class="total-salida"><b>Total salidas bancarias (referencial)</b></td>
                 <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
               </tr>
             </tfoot>
@@ -1584,6 +1589,7 @@ export default {
       ventas: [],
       ingresos: [],
       salidas: [],
+      idCuentaCajaPrincipal: null,
       ingresosTarjeta: [],
       salidasTarjeta: [],
       adelantos: [],
@@ -1808,6 +1814,12 @@ export default {
     totalVentas() {
       return this.totalVentasEfectivo;
     },
+    movimientosIngresosDia() {
+      return this.combinarMovimientosActividad(this.ingresos, this.ingresosTarjeta);
+    },
+    movimientosSalidasDia() {
+      return this.combinarMovimientosActividad(this.salidas, this.salidasTarjeta);
+    },
     totalSalidas() {
       let total = 0;
       this.salidas.forEach(salida => {
@@ -1824,15 +1836,15 @@ export default {
     },
     totalIngresosTarjeta() {
       let total = 0;
-      this.ingresosTarjeta.filter(v => v.Anulado == 0).forEach(ingresoTar => {
-        if (!ingresoTar.Anulado) total += Number(ingresoTar.Importe || 0);
+      this.ingresosTarjeta.forEach(ingresoTar => {
+        if (Number(ingresoTar.Anulado || 0) !== 1) total += Number(ingresoTar.Importe || 0);
       });
       return total;
     },
     totalSalidasTarjeta() {
       let total = 0;
-      this.salidasTarjeta.filter(v => v.Anulado == 0).forEach(salidaTar => {
-        if (!salidaTar.Anulado) total += Number(salidaTar.Importe || 0);
+      this.salidasTarjeta.forEach(salidaTar => {
+        if (Number(salidaTar.Anulado || 0) !== 1) total += Number(salidaTar.Importe || 0);
       });
       return total;
     },
@@ -1913,6 +1925,37 @@ export default {
     }
   },
   methods: {
+    combinarMovimientosActividad(movimientosCaja, movimientosBanco) {
+      const preparar = (movimientos, esBanco) => (Array.isArray(movimientos) ? movimientos : []).map(item => ({
+        ...item,
+        EsReferenciaBancaria: esBanco,
+        FechaActividad: item.FechaReg || item.FechaDoc
+      }));
+      const valorFecha = item => {
+        const fecha = String(item.FechaActividad || "").replace(" ", "T");
+        const tiempo = new Date(fecha).getTime();
+        return Number.isNaN(tiempo) ? 0 : tiempo;
+      };
+      return preparar(movimientosCaja, false)
+        .concat(preparar(movimientosBanco, true))
+        .sort((a, b) => valorFecha(a) - valorFecha(b));
+    },
+    async cargarCuentaCajaPrincipal() {
+      if (this.idCuentaCajaPrincipal) return this.idCuentaCajaPrincipal;
+
+      const response = await this.axios.get(this.API + "cuentas");
+      const cuentas = Array.isArray(response.data) ? response.data : [];
+      const principal = cuentas.find(cuenta =>
+        String(cuenta.Cuenta || "").trim().toUpperCase() === "CAJA PRINCIPAL"
+      );
+
+      if (!principal || !Number(principal.IdCuenta)) {
+        throw new Error("No se encontro la cuenta CAJA PRINCIPAL");
+      }
+
+      this.idCuentaCajaPrincipal = Number(principal.IdCuenta);
+      return this.idCuentaCajaPrincipal;
+    },
     cargarEmpresaImpresion() {
       this.axios
         .get("/api/tienda/index.php", { params: { action: "empresa" } })
@@ -2038,9 +2081,18 @@ export default {
       this.$nextTick(() => window.print());
     },
     async loadData() {
+      try {
+        await this.cargarCuentaCajaPrincipal();
+      } catch (error) {
+        console.log(error);
+        this.$toasted.show("No se pudo identificar la cuenta CAJA PRINCIPAL");
+        return;
+      }
+
       await this.getVentas();
       await this.getIngresos();
       await this.getSalidas();
+      await this.getMovimientosBancarios();
 
       await this.generarReporte();
       // console.log(this.ventas);
@@ -2108,6 +2160,7 @@ export default {
             salidas: this.totalSalidas,
             total: this.granTotal,
             idAlmacen: sessionStorage.getItem("IdAlmacen"),
+            idCuenta: this.idCuentaCajaPrincipal,
             totalVentas: this.totalVentas,
             descripcion: String(this.descripcionCierre || "").trim().slice(0, 500)
           })
@@ -2179,7 +2232,8 @@ export default {
     },
     async getIngresos() {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: this.idCuentaCajaPrincipal
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
@@ -2199,7 +2253,8 @@ export default {
     },
     async getSalidas() {
       let params = {
-        idCierre: this.$route.params.id
+        idCierre: this.$route.params.id,
+        idCuenta: this.idCuentaCajaPrincipal
       };
       if (this.vendedor.Usuario) {
         params.usuario = this.vendedor.Usuario;
@@ -2216,6 +2271,29 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    async getMovimientosBancarios() {
+      const params = {
+        idCierre: this.$route.params.id,
+        soloBancos: 1
+      };
+      if (this.vendedor.Usuario) {
+        params.usuario = this.vendedor.Usuario;
+      }
+
+      try {
+        const respuestas = await Promise.all([
+          this.axios.get(this.API + "cierrecaja/ingresos", { params }),
+          this.axios.get(this.API + "cierrecaja/salidas", { params })
+        ]);
+        this.ingresosTarjeta = Array.isArray(respuestas[0].data) ? respuestas[0].data : [];
+        this.salidasTarjeta = Array.isArray(respuestas[1].data) ? respuestas[1].data : [];
+      } catch (error) {
+        console.log(error);
+        this.ingresosTarjeta = [];
+        this.salidasTarjeta = [];
+        this.$toasted.show("No se pudieron cargar los movimientos bancarios de referencia");
+      }
     },
     getAdelantos() {
       this.axios
@@ -2838,6 +2916,7 @@ th {
 .cash-close-modern .btn-sale-detail.is-open:hover{background:#059669!important;transform:translateY(-1px)!important}
 .cash-close-modern .inline-sale-detail{
   width:100%!important;
+  min-width:560px!important;
   table-layout:auto!important;
 }
 .cash-close-modern .inline-sale-detail th,
@@ -2850,6 +2929,8 @@ th {
 .cash-close-modern .inline-sale-detail td:nth-child(3),
 .cash-close-modern .inline-sale-detail th:nth-child(5),
 .cash-close-modern .inline-sale-detail td:nth-child(5),
+.cash-close-modern .inline-sale-detail th:nth-child(6),
+.cash-close-modern .inline-sale-detail td:nth-child(6),
 .cash-close-modern .inline-sale-detail th:nth-child(10),
 .cash-close-modern .inline-sale-detail td:nth-child(10),
 .cash-close-modern .inline-sale-detail th:nth-child(11),
@@ -2862,9 +2943,17 @@ th {
   white-space:normal!important;
 }
 .cash-close-modern .inline-sale-detail th:nth-child(2),
-.cash-close-modern .inline-sale-detail td:nth-child(2){width:26%!important}
+.cash-close-modern .inline-sale-detail td:nth-child(2){width:26%!important;min-width:150px!important}
 .cash-close-modern .inline-sale-detail th:nth-child(3),
-.cash-close-modern .inline-sale-detail td:nth-child(3){width:30%!important;overflow-wrap:anywhere!important}
+.cash-close-modern .inline-sale-detail td:nth-child(3){width:30%!important;min-width:160px!important;overflow-wrap:normal!important;word-break:normal!important}
+.cash-close-modern .inline-sale-detail th:nth-child(1),
+.cash-close-modern .inline-sale-detail td:nth-child(1){min-width:80px!important}
+.cash-close-modern .inline-sale-detail th:nth-child(5),
+.cash-close-modern .inline-sale-detail td:nth-child(5){min-width:90px!important}
+.cash-close-modern .inline-sale-detail th:nth-child(6),
+.cash-close-modern .inline-sale-detail td:nth-child(6){width:76px!important;min-width:76px!important;text-align:center!important}
+.cash-close-modern .inline-sale-detail th:last-child,
+.cash-close-modern .inline-sale-detail td:last-child{min-width:80px!important}
 .cash-close-modern .inline-sale-detail{margin:10px 0 7px!important;border:1px solid #d8e6ee!important;border-radius:10px!important;background:#fff!important;box-shadow:0 5px 14px rgba(24,68,96,.07)}
 .cash-close-modern .inline-sale-detail thead th{padding:8px!important;background:#fff3dc!important;color:#8b5800!important;border-bottom:1px solid #f2d49e!important;font-size:.72rem!important}
 .cash-close-modern .inline-sale-detail tbody td{padding:9px!important;background:#fff!important;border-bottom:0!important;font-size:.76rem!important}
@@ -2883,6 +2972,12 @@ th {
 .cash-close-modern .movement-credit{background:#fff0c9;color:#8b5a00;border:1px solid #f0d38c}
 .cash-close-modern .movement-outflow{background:#ffe0e5;color:#a91f3c;border:1px solid #f3b9c4}
 .cash-close-modern .movement-income{background:#ddf5e9;color:#08754a;border:1px solid #a9e2c7}
+.cash-close-modern .movement-bank-reference{margin-top:14px!important;background:#e0f2fe;color:#075985;border:1px solid #7dd3fc}
+.cash-close-modern .bank-reference-note{display:block;margin:-2px 0 9px;padding:7px 10px;border-radius:8px;background:#f0f9ff;color:#365a70;font-weight:700}
+.cash-close-modern .bank-reference-table>thead th{background:#0e7490!important;color:#fff!important;border-bottom-color:#0e7490!important}
+.cash-close-modern .bank-reference-table>tfoot td{background:#dff3f7!important;color:#075985!important}
+.cash-close-modern .bank-activity-row>td{background:#effaff!important;border-color:#bae6fd!important}
+.cash-close-modern .bank-activity-detail{display:block;margin-top:3px;color:#075985;font-size:.76rem;font-weight:700;line-height:1.25}
 .cash-close-modern .credit-table>thead th,.cash-close-modern .credit-table>tfoot td{background:#fff0c9!important;color:#8b5a00!important;border-bottom-color:#f0d38c!important}
 .cash-close-modern .outflow-table>thead th,.cash-close-modern .outflow-table>tfoot td{background:#ffe0e5!important;color:#a91f3c!important;border-bottom-color:#f3b9c4!important}
 .cash-close-modern .income-table>thead th,.cash-close-modern .income-table>tfoot td{background:#ddf5e9!important;color:#08754a!important;border-bottom-color:#a9e2c7!important}
@@ -2975,4 +3070,224 @@ th {
 .cash-close-modern .income-table>tfoot td{background:#dfe5ec!important;color:#415166!important}
 .cash-close-modern .tableResumen .summary-income td{background:#dfe5ec!important;color:#415166!important}
 .cash-close-modern .tableResumen .summary-outflow td{background:#ffe0e5!important;color:#a91f3c!important}
+</style>
+
+<style>
+/* Adaptación del cierre de caja para escritorio, laptop, tablet y móvil. */
+@media screen {
+  .cash-close-modern {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .cash-close-modern .cash-close-layout {
+    align-items: flex-start;
+  }
+
+  .cash-close-modern .cash-detail-panel,
+  .cash-close-modern .cash-summary-panel {
+    min-width: 0;
+  }
+
+  .cash-close-modern .cash-tabs,
+  .cash-close-modern .cash-tabs .tab-content,
+  .cash-close-modern .cash-tabs .tab-pane {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .cash-close-modern .cash-tabs .nav-pills {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .cash-close-modern .cash-summary-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .cash-close-modern .cash-summary-actions > .admin-cash-control,
+  .cash-close-modern .cash-summary-actions > .cash-close-description-field {
+    grid-column: 1 / -1;
+  }
+
+  .cash-close-modern .cash-summary-actions > .cash-action {
+    width: 100%;
+    margin: 0;
+  }
+
+  .cash-close-modern .cash-summary-actions > .cash-action-close,
+  .cash-close-modern .cash-summary-actions > .cash-action-summary {
+    grid-column: span 2;
+  }
+
+  .cash-close-modern .cash-summary-actions > .cash-action > *,
+  .cash-close-modern .cash-summary-actions > .cash-action .btn {
+    width: 100%;
+  }
+
+  .cash-close-modern .cash-summary-actions .btn {
+    height: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .cash-close-modern .cash-detail-panel {
+    flex: 1 1 calc(100% - 400px) !important;
+    max-width: calc(100% - 400px) !important;
+  }
+
+  .cash-close-modern .cash-summary-panel {
+    flex: 0 0 400px !important;
+    max-width: 400px !important;
+  }
+}
+
+@media screen and (max-width: 1399.98px) {
+  .cash-close-modern .cash-detail-panel .table:not(.inline-sale-detail) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .cash-close-modern .cash-detail-panel .sale-client-line span,
+  .cash-close-modern .cash-detail-panel .inline-sale-detail th,
+  .cash-close-modern .cash-detail-panel .inline-sale-detail td {
+    white-space: normal !important;
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  .cash-close-modern .cash-close-layout > .cash-detail-panel,
+  .cash-close-modern .cash-close-layout > .cash-summary-panel {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .cash-close-modern .cash-summary-panel {
+    margin-top: 16px;
+  }
+
+  .cash-close-modern .cash-detail-panel > .card {
+    height: auto;
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .cash-close-modern {
+    padding: 8px !important;
+  }
+
+  .cash-close-modern .cash-close-layout {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+
+  .cash-close-modern .cash-close-layout > .cash-detail-panel,
+  .cash-close-modern .cash-close-layout > .cash-summary-panel {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .cash-close-modern .cash-detail-panel > .card,
+  .cash-close-modern .cash-summary-panel {
+    border-radius: 12px;
+  }
+
+  .cash-close-modern .cash-detail-toolbar {
+    padding: 10px 10px 0;
+  }
+
+  .cash-close-modern .btn-toggle-all-details {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cash-close-modern .cash-tabs > .card-header {
+    padding: 10px;
+  }
+
+  .cash-close-modern .cash-tabs .nav-pills {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .cash-close-modern .cash-tabs .nav-item,
+  .cash-close-modern .cash-tabs .nav-link {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .cash-close-modern .cash-tabs .nav-link {
+    min-height: 46px;
+    padding: 9px 8px;
+    font-size: .78rem;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .cash-close-modern .cash-tab-content {
+    margin-right: 8px !important;
+    margin-left: 8px !important;
+  }
+
+  .cash-close-modern .products-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cash-close-modern .products-title-row .dropdown,
+  .cash-close-modern .products-title-row .dropdown > .btn {
+    width: 100%;
+  }
+
+  .cash-close-modern .cash-summary-panel {
+    padding: 14px !important;
+  }
+
+  .cash-close-modern .cash-summary-panel h2 {
+    font-size: 1.45rem;
+  }
+
+  .cash-close-modern .tableResumen tr td {
+    padding: 10px !important;
+  }
+}
+
+@media screen and (max-width: 479.98px) {
+  .cash-close-modern .cash-tabs .nav-pills,
+  .cash-close-modern .cash-summary-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .cash-close-modern .cash-summary-actions > .cash-action-close,
+  .cash-close-modern .cash-summary-actions > .cash-action-summary {
+    grid-column: auto;
+  }
+
+  .cash-close-modern .cash-summary-panel {
+    padding: 11px !important;
+  }
+
+  .cash-close-modern .cash-summary-panel .btn {
+    min-height: 44px;
+    padding: 9px 11px;
+  }
+
+  .cash-close-modern .cash-detail-panel .table:not(.inline-sale-detail) {
+    font-size: .78rem !important;
+  }
+}
 </style>

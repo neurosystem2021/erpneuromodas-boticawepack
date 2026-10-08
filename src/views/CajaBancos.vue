@@ -27,7 +27,7 @@
                 </b-col>
                 <b-col cols="12">
                     Fecha:
-                    <input type="date" class="form-control" v-model="FechaDoc">
+                    <input type="date" class="form-control" v-model="FechaDoc" @change="cargarOperaciones">
                 </b-col>
                 <b-col cols="12" class="mt-2 text-center">
                     <b-button variant="success" :disabled="!IdCuenta"  @click="exportarOperaciones()"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
@@ -246,7 +246,7 @@
         <b-row>
           <b-col :cols="aplicarLetra?7:12">
             <b-row>
-              <b-col cols="6">
+              <b-col cols="12" md="6">
                 <b-row>
                   <b-col cols="12">
                     Tipo Operación:
@@ -259,7 +259,7 @@
                     ></b-form-select>
                   </b-col>
                   <b-col cols="12" v-if="mostrarCliente">
-                    Cliente:
+                    Cliente (opcional):
                     <autocomplete
                         required="required"
                         ref="inputCliente"
@@ -274,7 +274,7 @@
                     </autocomplete>
                   </b-col>
                   <b-col cols="12" v-if="mostrarProveedor">
-                    Proveedor
+                    Proveedor (opcional):
                     <autocomplete
                         required="required"
                         ref="inputProveedor"
@@ -290,7 +290,7 @@
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
+              <b-col cols="12" md="6" v-if="mostrarDatosPrincipalesOperaciones">
                 <b-row>
                   <b-col cols="12">
                     Fecha Operacion: 
@@ -301,12 +301,12 @@
                     <input type="text" class="form-control" v-model="Concepto">
                   </b-col>
                   <b-col cols="12">
-                    Importe: 
-                    <input type="number" class="form-control" v-model="Importe">
+                    Importe / Monto S/.: 
+                    <input type="number" min="0.01" step="0.01" required class="form-control" v-model="Importe" placeholder="0.00">
                   </b-col>
                 </b-row>
               </b-col>
-              <b-col cols="12" class="mt-3">
+              <b-col cols="12" class="mt-3" v-if="requiereDocumentoPago">
                 <div class="card">
                   <div class="card-header">Documentos a aplicar</div>
               
@@ -360,7 +360,7 @@
               </div>
               </div>
               </b-col>
-              <b-col cols="12" class="mt-3">
+              <b-col cols="12" class="mt-3" v-if="requiereDocumentoPago">
                   <div class="card">
                   <div class="card-header">Documentos Aplicados</div>
                   <div class="card-body">
@@ -1052,34 +1052,13 @@ export default {
       return !this.requiereDocumentoPago || this.lstAplicado.length > 0;
     },
     mostrarProveedor() {
-      if (this.IdTipoCajaBanco) {
-        return this.lstTipoOpe.some(
-          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 1
-        );
-      }
-      return false;
+      return !!this.IdTipoCajaBanco;
     },
     mostrarCliente() {
-      if (this.IdTipoCajaBanco) {
-        return this.lstTipoOpe.some(
-          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco && v.Tipo == 0
-        );
-      }
-      return false;
+      return !!this.IdTipoCajaBanco;
     },
     mostrarDatosPrincipalesOperaciones() {
-      if (!this.IdTipoCajaBanco) {
-        return false;
-      }
-
-      if (
-        Object.keys(this.Cliente).length === 0 &&
-        Object.keys(this.Proveedor).length === 0
-      ) {
-        return false;
-      }
-
-      return true;
+      return !!this.IdTipoCajaBanco;
     }
   }
 };

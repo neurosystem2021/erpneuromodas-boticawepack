@@ -74,12 +74,19 @@
                     </b-col>
                 </b-row>
                 <b-row class="mb-1">
-                    <b-col><label for="input-concepto"><i class="fas fa-file-signature"></i> Concepto</label>
+                    <b-col cols="12" md="8"><label for="input-concepto"><i class="fas fa-file-signature"></i> Concepto</label>
                         <b-form-input v-model="cajaBanco.Concepto"
                             id="input-concepto"
                             required
                             type="text"
                             placeholder="Detalle o referencia del pago"></b-form-input>
+                    </b-col>
+                    <b-col cols="12" md="4">
+                        <label for="input-cuenta"><i class="fas fa-cash-register"></i> Cuenta de ingreso</label>
+                        <b-form-select v-model="cajaBanco.IdCuenta"
+                            id="input-cuenta"
+                            :options="cuentas"
+                            required></b-form-select>
                     </b-col>
                 </b-row>
                 </div>
@@ -118,6 +125,7 @@
                                             type="number"
                                             step="0.01"
                                             min="0"
+                                            :max="item.Saldo"
                                             class="form-control"
                                             placeholder="0"/>
                                      </td>
@@ -168,8 +176,9 @@
                     <b-btn variant="secondary" @click="show=false">
                         <i class="fas fa-times"></i> Cerrar
                     </b-btn>
-                    <b-btn variant="success" type="submit">
-                        <i class="fas fa-save"></i> Guardar pago
+                    <b-btn variant="success" type="submit" :disabled="guardando">
+                        <i :class="guardando ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+                        {{ guardando ? 'Guardando...' : 'Guardar pago' }}
                     </b-btn>
                 </div>
             
@@ -184,6 +193,7 @@ import config from '@/store/config.js'
         mounted () {
             this.initForm()
             this.getVendedor()
+            this.cargarCuentas()
         },
         data () {
             return {
@@ -192,16 +202,20 @@ import config from '@/store/config.js'
                 pagos: [],
                 cajaBanco: {},
                 vendedor: {},
-                show: false
+                show: false,
+                guardando: false,
+                cuentas: [
+                    { value: null, text: '-- SELECCIONE CUENTA --' }
+                ]
             }
         },
         methods: {
             initForm () {
-                this.vendedor = {}
                 this.documentos = []
                 this.pagos = []
                 this.cajaBanco = {
-                    FechaDoc: this.$moment().format("YYYY-MM-DD")
+                    FechaDoc: this.$moment().format("YYYY-MM-DD"),
+                    IdCuenta: this.cajaBanco.IdCuenta || null
                 }
                 this.$refs.inputCliente.setValue('')
             },
@@ -220,6 +234,31 @@ import config from '@/store/config.js'
             },
             setVendedor (obj) {
                 this.vendedor = obj
+                this.$set(this.cajaBanco, 'IdAlmacen', obj && obj.IdAlmacen ? obj.IdAlmacen : null)
+            },
+            cargarCuentas () {
+                this.axios.get(this.API + 'cuentas')
+                .then((response) => {
+                    const disponibles = (response.data || []).map(cuenta => ({
+                        value: Number(cuenta.IdCuenta),
+                        text: cuenta.Cuenta
+                    }))
+                    this.cuentas = [
+                        { value: null, text: '-- SELECCIONE CUENTA --' },
+                        ...disponibles
+                    ]
+
+                    if (!this.cajaBanco.IdCuenta && disponibles.length) {
+                        const principal = disponibles.find(cuenta =>
+                            String(cuenta.text).trim().toUpperCase() === 'CAJA PRINCIPAL'
+                        )
+                        this.$set(this.cajaBanco, 'IdCuenta', (principal || disponibles[0]).value)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                    this.$toasted.show('No se pudieron cargar las cuentas de ingreso')
+                })
             },
             focusAutocomplete (ref) {
                 this.$refs[ref].handleDoubleClick()
@@ -229,7 +268,10 @@ import config from '@/store/config.js'
 
                 this.axios.get(this.API + 'cliente/deudas?idCliente=' + cliente.IdCliente)
                 .then((response) => {
-                   this.documentos = response.data
+                   this.documentos = (response.data || []).map(documento => ({
+                       ...documento,
+                       aplicar: 0
+                   }))
                 })
                 .catch((error) => {
                     console.log(error)
@@ -251,32 +293,63 @@ import config from '@/store/config.js'
             },
             guardarPago (evt) {
                 evt.preventDefault()
-                let importe = 0
-                this.documentos.map(doc => {
-                    if (doc.aplicar > 0) {
-                        importe += doc.aplicar
-                    }
-                })
+                if (this.guardando) return
 
-                if(importe === 0) {
-                    this.$toasted.show('Error: no ha ingresado ningun importe');
+                const documentos = this.documentos
+                    .map(doc => ({
+                        ...doc,
+                        aplicar: Math.round((Number(doc.aplicar) || 0) * 100) / 100
+                    }))
+                    .filter(doc => doc.aplicar > 0)
+
+                if (!this.cajaBanco.cliente || !this.cajaBanco.cliente.IdCliente) {
+                    this.$toasted.show('Error: seleccione un cliente')
+                    return
                 }
 
+                if (!this.cajaBanco.IdCuenta) {
+                    this.$toasted.show('Error: seleccione la cuenta de ingreso')
+                    return
+                }
+
+                if (!documentos.length) {
+                    this.$toasted.show('Error: no ha ingresado ningún importe')
+                    return
+                }
+
+                const excedeSaldo = documentos.some(doc =>
+                    doc.aplicar > Math.round(Number(doc.Saldo) * 100) / 100
+                )
+                if (excedeSaldo) {
+                    this.$toasted.show('Error: el pago no puede ser mayor al saldo pendiente')
+                    return
+                }
+
+                this.guardando = true
                 this.axios.post(this.API + 'cliente/deudas/pagar', {
                     cajaBanco: this.cajaBanco,
-                    documentos: this.documentos,
-                    vendedor: this.vendedor
+                    documentos: documentos,
+                    vendedor: this.vendedor,
+                    idAlmacen: this.cajaBanco.IdAlmacen || this.vendedor.IdAlmacen || null
                 })
                 .then((response) => {
                     console.log(response.data)
-                    this.$toasted.show('Se pagó la deuda del cliente.')
+                    const importe = Number(response.data.importe || 0).toFixed(2)
+                    this.$toasted.show(`Se registró el pago de S/ ${importe} como ingreso de caja.`)
+                    this.$emit('deuda-actualizada', response.data)
                     this.show = false
                     this.initForm()
                     // window.open('/imprimir/pagocredito.php?idCajaBanco=' + response.data.idCajaBanco)
                 })
                 .catch((error) => {
                     console.log(error)
-                    this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
+                    const mensaje = error.response && error.response.data && error.response.data.error
+                        ? error.response.data.error
+                        : 'Ha ocurrido un error, vuelva a intentarlo'
+                    this.$toasted.show(mensaje)
+                })
+                .then(() => {
+                    this.guardando = false
                 })
             }
         }

@@ -85,7 +85,7 @@
                       <autocomplete
                         ref="inputAlmacenOrigen"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue=""
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -103,7 +103,7 @@
                       <autocomplete
                         ref="inputAlmacenDestino"
                         required="required"
-                        initValue="PRINCIPAL"
+                        initValue=""
                         :url="API + 'almacenes'"
                         anchor="Almacen"
                         label="writer"
@@ -133,7 +133,8 @@
                 <b-row>
                   <b-col md="6">
                     <b-form-group>
-                      <b-form-checkbox id="alterar-productos"
+                      <b-form-checkbox v-if="!esTraslado"
+                        id="alterar-productos"
                         v-model="movimiento.alterarProductos"
                         :value="1"
                         :unchecked-value="0">
@@ -206,7 +207,7 @@
           </b-row>
           <b-row no-gutters class="inventory-products-section">
             <b-col cols="12">
-              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" @onAddProducto="onAddProducto" :idAlmacen="IdAlmacen">
+              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" @onAddProducto="onAddProducto" :idAlmacen="almacenStockId">
                 <template slot="movimientoAcciones">
                   <b-button class="inventory-save-button inventory-save-button--inline" variant="success" type="submit" :disabled="inProgress"><i class="fas fa-save"></i><span>Guardar movimiento</span></b-button>
                   <b-button class="inventory-barcode-button inventory-save-button--inline" v-if="ultimoMovimiento" target="_blank" variant="info" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento"><i class="fas fa-barcode"></i> Código de barra</b-button>
@@ -348,10 +349,13 @@ import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
 
 export default {
-  mounted() {},
+  mounted() {
+    this.cargarAlmacenActual();
+  },
   data() {
     return {
-      IdAlmacen: sessionStorage.getItem("IdAlmacen"),
+      IdAlmacen: Number(sessionStorage.getItem("IdAlmacen")) || 1,
+      almacenActual: null,
       carrito: {
         fields: [
           {
@@ -389,7 +393,7 @@ export default {
       API: config.API,
       ultimoMovimiento: "",
       movimiento: this.initMovimiento(),
-      idPerfil: Number(sessionStorage.getItem("IdPerfil") || sessionStorage.getItem("idPerfil") || 0),
+      usuarioActual: String(sessionStorage.getItem("User") || "").trim().toLowerCase(),
       mostrarImportacionInicial: false,
       archivoInventarioInicial: null,
       analizandoInventarioInicial: false,
@@ -405,7 +409,7 @@ export default {
       productos: state => state.cart.productos
     }),
     esSuperadmin() {
-      return this.idPerfil === 1;
+      return this.usuarioActual === "superadmin";
     },
     puedeImportarInicial() {
       return Boolean(
@@ -413,6 +417,16 @@ export default {
         this.analisisInventarioInicial &&
         this.analisisInventarioInicial.puede_importar
       );
+    },
+    esTraslado() {
+      return Number((this.movimiento.movimientoTipo || {}).Tipo) === 2;
+    },
+    almacenStockId() {
+      const tipo = Number((this.movimiento.movimientoTipo || {}).Tipo);
+      if (tipo === 1 || tipo === 2) {
+        return Number((this.movimiento.almacenOrigen || {}).IdAlmacen) || this.IdAlmacen;
+      }
+      return Number((this.movimiento.almacenDestino || {}).IdAlmacen) || this.IdAlmacen;
     }
   },
   methods: {
@@ -422,15 +436,8 @@ export default {
       limpiar: "limpiarCarrito",
       obtenerStok: "obtenerStock"
     }),
-    onAddProducto(obj) {
-      this.obtenerStok({
-        IdAlmacen:
-          this.movimiento.almacenDestino.IdAlmacen > 0
-            ? this.movimiento.almacenDestino.IdAlmacen
-            : this.movimiento.almacenOrigen.IdAlmacen > 0
-              ? this.movimiento.almacenOrigen.IdAlmacen
-              : 1
-      });
+    onAddProducto() {
+      this.actualizarStockCarrito();
     },
     afe(e) {
       return false;
@@ -454,6 +461,49 @@ export default {
           console.log(error);
           // this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
         });
+    },
+    cargarAlmacenActual() {
+      this.axios.get(this.API + "almacenes/id/" + this.IdAlmacen)
+        .then(response => {
+          if (response.data && Number(response.data.IdAlmacen) > 0) {
+            this.almacenActual = response.data;
+            this.aplicarAlmacenesPorTipo();
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.almacenActual = { IdAlmacen: this.IdAlmacen, Almacen: "" };
+        });
+    },
+    aplicarAlmacenesPorTipo() {
+      const tipo = Number((this.movimiento.movimientoTipo || {}).Tipo);
+      if ([0, 1, 2].indexOf(tipo) === -1) return;
+
+      const actual = this.almacenActual || { IdAlmacen: this.IdAlmacen, Almacen: "" };
+      if (tipo === 0) {
+        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
+        this.movimiento.almacenDestino = Object.assign({}, actual);
+      } else if (tipo === 1) {
+        this.movimiento.almacenOrigen = Object.assign({}, actual);
+        this.movimiento.almacenDestino = { IdAlmacen: -1 };
+      } else {
+        this.movimiento.almacenOrigen = Object.assign({}, actual);
+        this.movimiento.almacenDestino = { IdAlmacen: -1 };
+      }
+
+      this.$nextTick(() => {
+        if (this.$refs.inputAlmacenOrigen) {
+          this.$refs.inputAlmacenOrigen.setValue(tipo === 0 ? "" : (actual.Almacen || ""));
+        }
+        if (this.$refs.inputAlmacenDestino) {
+          this.$refs.inputAlmacenDestino.setValue(tipo === 0 ? (actual.Almacen || "") : "");
+        }
+      });
+      this.actualizarStockCarrito();
+    },
+    actualizarStockCarrito() {
+      if (!this.productos.length || Number(this.almacenStockId) <= 0) return;
+      this.obtenerStok({ IdAlmacen: Number(this.almacenStockId) });
     },
     initMovimiento() {
       let currentMonth = this.$moment().month() + 1;
@@ -490,18 +540,9 @@ export default {
       this.$nextTick(() => { this.show = true });*/
     },
     setTipoMovimiento(obj) {
-      if (obj.Tipo == 0) {
-        this.movimiento.almacenOrigen = { IdAlmacen: -1 };
-        this.movimiento.almacenDestino = { IdAlmacen: 1 };
-      } else if (obj.Tipo == 1) {
-        this.movimiento.almacenDestino = { IdAlmacen: -1 };
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
-      } else {
-        this.movimiento.almacenDestino = { IdAlmacen: 1 };
-        this.movimiento.almacenOrigen = { IdAlmacen: 1 };
-      }
       this.movimiento.movimientoTipo = obj;
-
+      this.movimiento.alterarProductos = Number(obj.Tipo) === 2 ? 0 : 1;
+      this.aplicarAlmacenesPorTipo();
       this.cargarNumero();
     },
     setProveedor(obj) {
@@ -509,21 +550,11 @@ export default {
     },
     setAlmacenOrigen(obj) {
       this.movimiento.almacenOrigen = obj;
-      this.obtenerStok({
-        IdAlmacen:
-          this.movimiento.almacenOrigen.IdAlmacen > 0
-            ? this.movimiento.almacenOrigen.IdAlmacen
-            : 1
-      });
+      this.actualizarStockCarrito();
     },
     setAlmacenDestino(obj) {
       this.movimiento.almacenDestino = obj;
-      this.obtenerStok({
-        IdAlmacen:
-          this.movimiento.almacenDestino.IdAlmacen > 0
-            ? this.movimiento.almacenDestino.IdAlmacen
-            : 1
-      });
+      if (!this.esTraslado) this.actualizarStockCarrito();
     },
     setMoneda(obj) {
       this.movimiento.Moneda = obj.Moneda;
@@ -666,7 +697,7 @@ export default {
       const tipo = this.movimiento.movimientoTipo || {};
       const proveedor = this.movimiento.proveedor || {};
       if (!tipo.IdMovimientoTipo) faltantes.push("tipo de movimiento");
-      if (!proveedor.IdProveedor) faltantes.push("proveedor");
+      if (Number(tipo.Tipo) !== 2 && !proveedor.IdProveedor) faltantes.push("proveedor");
       if (!String(this.movimiento.Serie || "").trim()) faltantes.push("serie");
       if (!String(this.movimiento.Numero || "").trim()) faltantes.push("número");
       if (!String(this.movimiento.Moneda || "").trim()) faltantes.push("moneda");
@@ -675,6 +706,7 @@ export default {
       if (!Number(this.movimiento.TipoCambio)) faltantes.push("tipo de cambio");
       if ((Number(tipo.Tipo) === 1 || Number(tipo.Tipo) === 2) && Number((this.movimiento.almacenOrigen || {}).IdAlmacen) <= 0) faltantes.push("almacén de origen");
       if ((Number(tipo.Tipo) === 0 || Number(tipo.Tipo) === 2) && Number((this.movimiento.almacenDestino || {}).IdAlmacen) <= 0) faltantes.push("almacén de destino");
+      if (Number(tipo.Tipo) === 2 && Number(this.movimiento.almacenOrigen.IdAlmacen) === Number(this.movimiento.almacenDestino.IdAlmacen)) faltantes.push("un almacén destino diferente al origen");
       if (this.movimiento.EsCredito && !this.movimiento.FechaVenCredito) faltantes.push("fecha de vencimiento del crédito");
 
       if (faltantes.length) {
@@ -686,6 +718,20 @@ export default {
       if (!this.productos.length) {
         this.$toasted.show("No ha seleccionado ningun producto");
         return;
+      }
+
+      if (Number(tipo.Tipo) === 2) {
+        const sinStock = this.productos.find(producto =>
+          Number(producto.cantidad || 0) > Number(producto.stock || 0)
+        );
+        if (sinStock) {
+          this.$toasted.show(
+            "Stock insuficiente en " + (this.movimiento.almacenOrigen.Almacen || "el almacén origen") +
+            " para " + (sinStock.Producto || "el producto seleccionado") + ".",
+            { duration: 7000 }
+          );
+          return;
+        }
       }
 
       let faltaLlenar = false;
@@ -714,6 +760,10 @@ export default {
         .filter(Boolean)
         .join("-");
       const monedaMovimiento = escaparResumen(this.movimiento.Moneda || "PEN");
+      const resumenTraslado = Number(tipo.Tipo) === 2
+        ? `<div><span>Origen</span><strong>${escaparResumen(this.movimiento.almacenOrigen.Almacen || "-")}</strong></div>
+           <div><span>Destino</span><strong>${escaparResumen(this.movimiento.almacenDestino.Almacen || "-")}</strong></div>`
+        : "";
       const confirmacion = await this.$swal({
         icon: "question",
         title: "Confirmar movimiento",
@@ -722,6 +772,7 @@ export default {
           <div class="inventory-confirm-summary">
             <div><span>Tipo</span><strong>${escaparResumen(tipo.TipoMovimiento || "Movimiento")}</strong></div>
             <div><span>Documento</span><strong>${escaparResumen(documentoMovimiento || "Sin serie")}</strong></div>
+            ${resumenTraslado}
             <div class="inventory-confirm-summary__wide"><span>Proveedor</span><strong>${nombreProveedor}</strong></div>
             <div><span>Productos</span><strong>${this.productos.length}</strong></div>
             <div class="inventory-confirm-summary__total"><span>Total</span><strong>${monedaMovimiento} ${totalMovimiento.toFixed(2)}</strong></div>
@@ -755,8 +806,12 @@ export default {
         FechaStock: this.$moment(this.movimiento.FechaStock).format("YYYY-MM-DD HH:mm:ss")
       });
 
+        // El endpoint general ya contiene la lógica de traslado usada por el
+        // sistema. Mantener una segunda implementación provocaba que se
+        // registrara la cabecera del movimiento y luego fallara el stock.
+        const endpoint = "movimientos";
       this.axios
-        .post(this.API + "movimientos", {
+        .post(this.API + endpoint, {
           movimiento: movimientoEnvio,
           productos: this.productos
         })
@@ -774,7 +829,10 @@ export default {
           this.inProgress = false;
         })
         .catch(error => {
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          const mensaje = error.response && error.response.data && error.response.data.error
+            ? error.response.data.error
+            : "Ha ocurrido un error, vuelva a intentarlo";
+          this.$toasted.show(mensaje, { duration: 7000 });
           this.inProgress = false;
         });
     },
