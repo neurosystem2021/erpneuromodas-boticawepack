@@ -1,0 +1,6 @@
+﻿const assert=require('assert'),{createDescriptionDictation}=require('./load-source-module')('src/utils/descriptionDictation.js');
+let instance,clock=0,next=0,timers=new Map(),value,active;
+class Recognition{constructor(){instance=this;}start(){this.onstart();}stop(){this.stopped=true;}abort(){}}
+const advance=ms=>{clock+=ms;for(const [id,t] of Array.from(timers)){if(t.at<=clock){timers.delete(id);t.fn();}}};
+const controller=createDescriptionDictation({Recognition,initialText:'Reparación',setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:clock+ms});return id;},clearTimeout:id=>timers.delete(id),onText:text=>value=text,onState:state=>active=state,onError:error=>{throw Error(error);}});
+controller.start();instance.onresult({results:[[{transcript:'de laptop'}]]});assert.equal(value,'Reparación de laptop');advance(9000);assert(active);instance.onresult({results:[[{transcript:'de laptop con cambio de pantalla'}]]});assert.equal(value,'Reparación de laptop con cambio de pantalla');instance.onend();advance(200);advance(9000);assert(active);advance(800);assert(!active);assert(instance.stopped);controller.dispose();assert.equal(timers.size,0);console.log('Dictation: retained text, interim replacement, ten-second silence and restart deadline OK');

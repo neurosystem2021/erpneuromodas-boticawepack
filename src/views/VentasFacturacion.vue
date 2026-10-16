@@ -1,238 +1,238 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
-          
+<div class="nst-screen nst-screen--ventasfacturacion">
+    <b-container class="bv-example-row">
+        
 
-        <b-row>
-          <b-col md="12" class="my-1">
-            <b-row>
-              <b-col md="2">
-                <b-form-group>
-                  <label>Almacen:</label>
-                  <autocomplete
-                      required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      initValue=""
-                      label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
-                </b-form-group>
-                
-                
-              </b-col>
-              <b-col md="4">
-                <!--<b-form-group label="Mostrar">
-                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group>-->
-                
-
-                <!--<b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
-                </b-form-group>-->
-                
-                <b-form-group v-show="isBoleta">
-                  <label>Fecha Referencia:</label>
-                  <b-form-input
-                    v-model="fechaReferencia"
-                    type="date"
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="12" class="my-1">
+          <b-row>
+            <b-col md="2">
+              <b-form-group>
+                <label>Almacen:</label>
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    initValue=""
+                    label="writer"
                     placeholder=""
-                    @input="setFechaReferencia"></b-form-input>
-                </b-form-group>
-                
-                <b-form-group v-show="!isBoleta">
-                  <label>Fecha Inicio:</label>
-                  <b-form-input v-model="fechaInicio"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
-                </b-form-group>
-
-                <b-form-group v-show="!isBoleta">
-                  <label>Fecha Fin:</label>
-                  <b-form-input v-model="fechaFin"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaFin', val) "></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <!--<div class="total-ventas">
-                  S/ {{ ventasAcumuladas || '0.00' }}
-                </div>-->
-                <!--<b-form-group label="Tipo Documento">
-                <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="selectTipoDoc" />
-                </b-form-group>-->
-                  <b-form-group>
-                      <label>Tipo Comprobante:</label>
-                      <autocomplete
-                          required="required"
-                          ref="inputTipoVenta"
-                          :url="API + 'ventas/tipos/electronicos'"
-                          initValue=""
-                          anchor="TipoDoc"
-                          label="writer"
-                          placeholder=""
-                          :on-select="setTipoDoc" 
-                          :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
-                          :classes="{input: 'form-control'}">
-                      </autocomplete>
-                  </b-form-group>
-
-                
-                
-              </b-col>
-              <b-col md="2">
-                  <b-form-group label="Estado">
-                  <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
-                </b-form-group>
-                <br />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <b-row>
-
-          
-          <b-col md="12">
-            <b-table small
-              ref="tablaVentas"
-              :filter="filter"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              striped
-              hover
-              id="tabla-ventas" 
-              :busy.sync="isBusy" 
-              :items="myProvider" 
-              :fields="fields"
-              :per-page="perPage"
-              :current-page="currentPage">
-
-                <template slot="detalles" slot-scope="row">
-                  <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
-                    {{ row.detailsShowing ? '-' : '+'}}
-                  </b-button>
-                </template>
-
-                <template slot="row-details" slot-scope="row">
-
-                  <b-card>
-                    <b-row class="m-2" v-if="row.item.CodSunat=='07'" style="font-weight:bold">
-                      <b-col md="12" class="text-center">
-                        <label>DOCUMENTO QUE MODIFICA</label>
-                      </b-col>
-                      <b-col  md="6" class="text-left">
-                        <label>Tipo de Documento: <span style="font-weight:normal">{{row.item.CodSunatModifica=='01'? '01 - FACTURA ELECTRÓNICA':'03 - BOLETA ELECTRÓNICA'}}</span> </label>
-                        <br>
-                        <label>Serie y Número: <span style="font-weight:normal">{{row.item.NroComprobanteModifica}}</span></label>
-                      </b-col>
-                      <b-col md="6" class="text-right">
-                        <label>Motivo: <span style="font-weight:normal">{{row.item.NotaDescMotivo}} - {{row.item.NotaIdMotivo}}</span></label>
-                      </b-col>
-                    </b-row>
-                    <b-row class="mb-2">
-                  <table class="table b-table table-sm prod-detalle">
-                    <thead>
-                      <tr>
-                        <th>Codigo</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Descuento</th>
-                        <th v-if="row.item.TieneIgv">Subtotal</th>
-                        <th v-if="row.item.TieneIgv">IGV</th>
-                        <th>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
-                        <td>{{ item.CodigoBarra }}</td>
-                        <td>{{ item.Producto }}</td>
-                        <td>{{ item.Cantidad }}</td>
-                        <td>{{ item.Precio }}</td>
-                        <td>{{ item.Descuento }}</td>
-                        <td v-if="row.item.TieneIgv">
-                         <!-- {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }} -->
-                          {{ (item.Subtotal / 1.18) | redondear }}                          
-                        </td>
-                        <td v-if="row.item.TieneIgv">
-                          {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
-                        </td>
-                        <td>{{ item.Subtotal | redondear }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                      <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
-                      <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
-                    </b-row>
-                  </b-card>
-                </template>
-
-                <template slot="estado" slot-scope="data">
-                  <div style="display:flex;">
-                      <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
-                      <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
-                      &nbsp;&nbsp;
-                      <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
-                      <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
-                      
-                      &nbsp;&nbsp;
-                      <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
-                      <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
-                      &nbsp;&nbsp;
-                      <!--<b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
-                      <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
-                        <form @submit.prevent="emitirNotaCredito(data.item)" >
-                          <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
-                          <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
-                          <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
-                          <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
-                        </form>
-                      </b-popover>-->
-                  </div>
-                </template>
-
-                <template slot="consulta" slot-scope="data">
-                  <div >
-                    <div style="width: 150px;">
-                      <img id="captcha" style="width: 80px; float:left;" v-if="imgCaptcha" src="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/captcha?accion=image&nmagic=0" />
-                      <input style="width: 60px;" class="form-control" type="text" v-model="captcha"/>
-                    </div>
-                    <b-button :disabled="loading" variant="warning" size="sm"
-                      @click="consultaElectronico(data.item)">Consulta SUNAT</b-button>
-                  </div>
-                  
-                </template>
-
-              </b-table>
-          </b-col>
-          <!--<b-row>
-              <b-col md="6" class="my-1">
-                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-              </b-col>
-          </b-row>-->
-        </b-row>
-        <br />
-        <b-row align-h="center" class="text-center">
-            <b-col cols="12">
-              <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
-              <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
+                    :on-select="setAlmacen" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+              
+              
             </b-col>
-        </b-row>
-        <br /><br />
-      </b-container>
+            <b-col md="4">
+              <!--<b-form-group label="Mostrar">
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+              </b-form-group>-->
+              
 
-      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showVenta" title="Kardex de producto">
-        <b-alert show variant="warning">titulo</b-alert>
-        <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
-      </b-modal>
-  </div>
+              <!--<b-form-group label="Limpiar Filtros">
+                <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+              </b-form-group>-->
+              
+              <b-form-group v-show="isBoleta">
+                <label>Fecha Referencia:</label>
+                <b-form-input
+                  v-model="fechaReferencia"
+                  type="date"
+                  placeholder=""
+                  @input="setFechaReferencia"></b-form-input>
+              </b-form-group>
+              
+              <b-form-group v-show="!isBoleta">
+                <label>Fecha Inicio:</label>
+                <b-form-input v-model="fechaInicio"
+                  type="date"
+                  placeholder=""
+                  @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+              </b-form-group>
+
+              <b-form-group v-show="!isBoleta">
+                <label>Fecha Fin:</label>
+                <b-form-input v-model="fechaFin"
+                  type="date"
+                  placeholder=""
+                  @input="val => generateFilter('fechaFin', val) "></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+              <!--<div class="total-ventas">
+                S/ {{ ventasAcumuladas || '0.00' }}
+              </div>-->
+              <!--<b-form-group label="Tipo Documento">
+              <b-form-select v-model="tipoDoc.IdTipoDoc" :options="optionsTipoDoc" @input="selectTipoDoc" />
+              </b-form-group>-->
+                <b-form-group>
+                    <label>Tipo Comprobante:</label>
+                    <autocomplete
+                        required="required"
+                        ref="inputTipoVenta"
+                        :url="API + 'ventas/tipos/electronicos'"
+                        initValue=""
+                        anchor="TipoDoc"
+                        label="writer"
+                        placeholder=""
+                        :on-select="setTipoDoc" 
+                        :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                        :classes="{input: 'form-control'}">
+                    </autocomplete>
+                </b-form-group>
+
+              
+              
+            </b-col>
+            <b-col md="2">
+                <b-form-group label="Estado">
+                <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
+              </b-form-group>
+              <br />
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row></section>
+      <section class="nst-panel nst-panel--filters"><b-row>
+
+        
+        <b-col md="12">
+          <b-table small
+            ref="tablaVentas"
+            :filter="filter"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            striped
+            hover
+            id="tabla-ventas" 
+            :busy.sync="isBusy" 
+            :items="myProvider" 
+            :fields="fields"
+            :per-page="perPage"
+            :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+
+              <template slot="detalles" slot-scope="row">
+                <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+                  {{ row.detailsShowing ? '-' : '+'}}
+                </b-button>
+              </template>
+
+              <template slot="row-details" slot-scope="row">
+
+                <b-card>
+                  <b-row class="m-2" v-if="row.item.CodSunat=='07'" style="font-weight:bold">
+                    <b-col md="12" class="text-center">
+                      <label>DOCUMENTO QUE MODIFICA</label>
+                    </b-col>
+                    <b-col  md="6" class="text-left">
+                      <label>Tipo de Documento: <span style="font-weight:normal">{{row.item.CodSunatModifica=='01'? '01 - FACTURA ELECTRÓNICA':'03 - BOLETA ELECTRÓNICA'}}</span> </label>
+                      <br>
+                      <label>Serie y Número: <span style="font-weight:normal">{{row.item.NroComprobanteModifica}}</span></label>
+                    </b-col>
+                    <b-col md="6" class="text-right">
+                      <label>Motivo: <span style="font-weight:normal">{{row.item.NotaDescMotivo}} - {{row.item.NotaIdMotivo}}</span></label>
+                    </b-col>
+                  </b-row>
+                  <b-row class="mb-2">
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm prod-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="row.item.TieneIgv">Subtotal</th>
+                      <th v-if="row.item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in getDetalles(row.item.idDocVenta)" :key="index">
+                      <td>{{ item.CodigoBarra }}</td>
+                      <td>{{ item.Producto }}</td>
+                      <td>{{ item.Cantidad }}</td>
+                      <td>{{ item.Precio }}</td>
+                      <td>{{ item.Descuento }}</td>
+                      <td v-if="row.item.TieneIgv">
+                       <!-- {{ item.Subtotal - (item.Subtotal * 0.18) | redondear }} -->
+                        {{ (item.Subtotal / 1.18) | redondear }}                          
+                      </td>
+                      <td v-if="row.item.TieneIgv">
+                        {{ item.Subtotal - (item.Subtotal / 1.18) | redondear}}
+                      </td>
+                      <td>{{ item.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table></div>
+
+                    <b-button style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                    <b-button style="margin-left: 10px;" variant="primary" size="sm" @click="cambiarAAnonimo(row.item)">Cambiar a cliente anónimo</b-button>
+                  </b-row>
+                </b-card>
+              </template>
+
+              <template slot="estado" slot-scope="data">
+                <div style="display:flex;">
+                    <img v-b-tooltip.hover  :title="getStatus(data.item.idDocVenta).msj_sunat" placement="right" v-if="getStatus(data.item.idDocVenta).image && estadoVenta != 2" :src="'static/' + getStatus(data.item.idDocVenta).image" width="32" height="32"/>
+                    <img v-b-tooltip.hover ref="imgSuccess"  :title="data.item.Msj_sunat" v-if="data.item.Estado == 2" src="static/success.png" width="32" height="32"/>
+                    &nbsp;&nbsp;
+                    <img v-b-tooltip.hover  :title="data.item.Msj_sunat + '\nDocumento Anulado'" v-if="estadoVenta == 0" src="static/cancel.png" height="32"/>
+                    <b-button v-if="estadoVenta == 2" :disabled="loading" variant="danger" size="sm" @click="eliminarElectronico(data.item)">Anular</b-button>
+                    
+                    &nbsp;&nbsp;
+                    <b-button variant="warning" @click="regenerarXML(data.item)">XML</b-button>
+                    <b-button v-if="estadoVenta == 2" @click="regenerarPDF(data.item)">PDF</b-button>
+                    &nbsp;&nbsp;
+                    <!--<b-button :id="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" :disabled="loading" variant="primary" size="sm" >Nota Credito</b-button>
+                    <b-popover :target="'popover-nota' + data.index" v-if="estadoVenta == 2 && tipoDoc.CodSunat == '01'" title="Emitir Nota Credito" placement="top">
+                      <form @submit.prevent="emitirNotaCredito(data.item)" >
+                        <b-form-select v-model="notaIdMotivo" :options="itemsMotivoNota" class="mb-3" size="sm" required/>
+                        <input type="text" v-model="notaCredito.serie" class="form-control" placeholder="Serie" required/>
+                        <input type="text" v-model="notaCredito.numero" class="form-control" placeholder="Numero" required/>
+                        <b-button type="submit" variant="primary" size="sm" :disabled="loading">Emitir</b-button>
+                      </form>
+                    </b-popover>-->
+                </div>
+              </template>
+
+              <template slot="consulta" slot-scope="data">
+                <div >
+                  <div style="width: 150px;">
+                    <img id="captcha" style="width: 80px; float:left;" v-if="imgCaptcha" src="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/captcha?accion=image&nmagic=0" />
+                    <input style="width: 60px;" class="form-control" type="text" v-model="captcha"/>
+                  </div>
+                  <b-button :disabled="loading" variant="warning" size="sm"
+                    @click="consultaElectronico(data.item)">Consulta SUNAT</b-button>
+                </div>
+                
+              </template>
+
+            </b-table>
+        </b-col>
+        <!--<b-row>
+            <b-col md="6" class="my-1">
+                <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+            </b-col>
+        </b-row>-->
+      </b-row></section>
+      <br />
+      <b-row align-h="center" class="text-center nst-action-bar">
+          <b-col cols="12">
+            <!--<b-button v-if="estadoVenta == 1 && tipoDoc.CodSunat == '03'" :disabled="this.loading" variant="warning" size="lg" @click="emitirElectronicoResumen">Emitir Como Resumen Diario</b-button>-->
+            <b-button v-if="estadoVenta == 1" :disabled="this.loading" variant="success" size="lg" @click="emitirElectronico">Emitir Documentos Electronicas</b-button>
+          </b-col>
+      </b-row>
+      <br /><br />
+    </b-container>
+
+    <b-modal id="kardex" size="lg" modal-class="modal-xl nst-dialog" v-model="showVenta" title="Kardex de producto" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-alert show variant="warning">titulo</b-alert>
+      <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
+    </b-modal>
+</div>
 </template>
 
 <script>

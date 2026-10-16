@@ -1,0 +1,12 @@
+{
+  "name": "NEUROSOFT INVENTARIO",
+  "short_name": "INVENTARIO",
+  "lang": "es-PE",
+  "id": "/views/lo_confrontacion.php?app=1",
+  "start_url": "/views/lo_confrontacion.php?app=1",
+  "scope": "/views/",
+  "display": "standalone",
+  "background_color": "#f4f9fc",
+  "theme_color": "#009f87",
+  "icons": [{ "src": "/nuevo/static/logo.png", "type": "image/png" }]
+}

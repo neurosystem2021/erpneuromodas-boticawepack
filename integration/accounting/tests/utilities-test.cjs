@@ -1,0 +1,10 @@
+const fs=require('fs'),assert=require('assert/strict');
+const code=fs.readFileSync('src/utils/accounting.js','utf8').replace(/export /g,'');const u=new Function(code+';return {accountingCSV,accountingMoney,accountingDraft,accountingToday};')();
+assert.deepEqual(u.accountingCSV('\uFEFFcode,name\r\n101,"Caja, principal"\r\n'),[{code:'101',name:'Caja, principal'}]);
+assert.deepEqual(u.accountingCSV('id;memo;amount\n1;"Abono ""cliente""";10.00'),[{id:'1',memo:'Abono "cliente"',amount:'10.00'}]);
+assert.deepEqual(u.accountingCSV('id,memo\n1,"Varias\nlíneas"'),[{id:'1',memo:'Varias\nlíneas'}]);
+assert.throws(()=>u.accountingCSV('id,memo\n1,"sin cierre'));assert.throws(()=>u.accountingCSV('id,id\n1,2'));assert.throws(()=>u.accountingCSV('__proto__,amount\nvalue,1'));assert.throws(()=>u.accountingCSV('id,memo\n1,2,3'));
+assert.equal(u.accountingDraft().lines.length,2);assert.match(u.accountingToday(),/^\d{4}-\d{2}-\d{2}$/);assert.equal(u.accountingMoney(12345),'123.45');assert.equal(u.accountingMoney(-101),'-1.01');
+const compiler=require('vue-template-compiler');const file=fs.readFileSync('src/views/Contabilidad.vue','utf8');const p=compiler.parseComponent(file);assert.deepEqual(compiler.compile(p.template.content).errors,[]);
+const compiled=compiler.compile(p.template.content);require('vue-template-es2015-compiler')('function render(){'+compiled.render+'}');
+console.log('PASS CSV delimiters, escaping, multiline fields, malformed files, prototype keys, cents display, Lima date and accounting Vue template.');process.exit(0);

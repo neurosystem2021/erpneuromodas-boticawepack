@@ -1,0 +1,23 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=r/'integration/ali-api.php';s=p.read_text(encoding='utf-8');s=s.replace("(strpos($path,'/ali/voz')!==false?'voice'", "(strpos($path,'/ali/pago/')!==false?'checkout':(strpos($path,'/ali/voz')!==false?'voice'")
+s=s.replace("?'learning':null));if($bucket)", "?'learning':null)));if($bucket)")
+s=s.replace("'learning'=>10][$bucket]", "'learning'=>10,'checkout'=>30][$bucket]")
+s=s.replace(" $app->get('/ali/config'", " aliRegisterCheckout($app,$auth);\n $app->get('/ali/config'",1);p.write_text(s,encoding='utf-8')
+p=r/'src/utils/aliCommands.js';s=p.read_text(encoding='utf-8');needle=" if (/^(?:muchas )?gracias";s=s.replace(needle," if(/^(?:ali\\s*pago|ali\\s+pagar|ali\\s+paga)$/.test(text))return {type:'pay'};\n"+needle,1)
+s=s.replace("confirmar pago|confirmo el pago|confirmar cobro", "confirmar pago|confirmo el pago|confirmar cobro|confirmo pago|confirmar alipago|confirmo alipago")
+p.write_text(s,encoding='utf-8')
+p=r/'src/components/AliAssistant.vue';s=p.read_text(encoding='utf-8');s=s.replace("if(action.type==='greet')this.awake=true;", "if(action.type==='greet')this.awake=true;if(['pay','confirm'].includes(action.type)){this.open=false;this.operationState='processing';}")
+s=s.replace("await this.execute(action);", "await this.execute(Object.assign({},action,{csrf:this.config.csrf}));")
+s=s.replace("if(action.type==='unknown'){this.say", "if(action.type==='unknown'){this.operationState='listening';this.say")
+s=s.replace('“Pagar”, “Confirmar pago”','“ALIPAGO”, “Confirmar pago”')
+p.write_text(s,encoding='utf-8')
+p=r/'src/views/Ventas.vue';s=p.read_text(encoding='utf-8');s=s.replace('<ali-assistant :execute=', '<ali-assistant ref="aliAssistant" :execute=',1)
+s=s.replace('async guardarVenta(evt) {','async guardarVenta(evt, aliOptions = null) {',1)
+needle="      const printWindow = window.open('about:blank', '_blank');";pos=s.index(needle,s.index('    async guardarVenta(evt,'));s=s[:pos]+"      if (aliOptions && aliOptions.prepare) { this.inProgress = false; return JSON.parse(JSON.stringify(this.venta)); }\n"+s[pos:]
+s=s.replace("      if(action.type==='cancel'){this._aliPayment=null;return {pending:'',message:'Cobro por voz cancelado. La venta sigue abierta.'};}", "      if(action.type==='cancel'){await this.aliCancelCheckout(action.csrf);return {pending:'',message:'Operación cancelada. La venta sigue abierta.'};}")
+s=s.replace("      if(action.type==='pay'||action.type==='confirm')throw new Error('El cobro por ALI requiere la fase de confirmación e idempotencia. Usa el botón Pagar del POS.');", "      if(action.type==='pay')return this.aliPrepareCheckout(action.csrf);\n      if(action.type==='confirm')return this.aliConfirmCheckout(action.csrf);")
+s=s.replace("Di ALI pagar", "Di ALIPAGO")
+s=s.replace("Para cobrar, di ALI pagar.", "Para cobrar, di ALIPAGO y revisa el resumen antes de confirmar pago.")
+p.write_text(s,encoding='utf-8')
+print('ALI pay phrase, permission gate and staged existing POS validation integrated. Fiscal sources untouched.')

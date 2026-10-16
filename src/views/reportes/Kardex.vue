@@ -1,112 +1,112 @@
 <template>
-    <div>
-      <br>
-        <b-container class="bv-example-row">
-          <b-row>
-            <b-col md="2" class="my-1">
-              <b-form-group>
-                <label>Almacen:</label>
-                <autocomplete
-                    required="required"
-                    ref="inputAlmacen"
-                    :url="API + 'almacenes'"
-                    anchor="Almacen"
-                    label="writer"
-                    placeholder=""
-                    :on-select="setAlmacen" 
-                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                    :classes="{input: 'form-control'}">
-                </autocomplete>
-              </b-form-group>
-            </b-col>
-            <b-col md="3" class="my-1">
-              <b-form-group>
-                <label>Seleccionar Producto:</label>
-                <b-input-group>
-                  <autocomplete
-                    ref="autocompleteProducto"
-                    :url="API + 'productos'"
-                    :onShouldRenderChild="renderChild"
-                    anchor="Producto"
-                    label="writer"
-                    placeholder="Seleccionar Producto"
-                    :on-select="setProducto"
-                    :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-                    :classes="{input: 'form-control'}">
-                  </autocomplete>
-                </b-input-group>
-              </b-form-group>
-            </b-col>
-            <b-col md="2" class="my-1">
-              <b-form-group>
-                <label>Fecha Inicio:</label>
-                <b-form-input
-                  v-model="kardex.fechaDesde"
-                  type="date"
-                  step="1"
-                  placeholder="Fecha Inicio"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col md="2" class="my-1">
-              <b-form-group>
-                <label>Fecha Fin:</label>
-                <b-form-input
-                  v-model="kardex.fechaHasta"
-                  type="date"
-                  step="1"
-                  placeholder="Fecha Inicio"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col md="3" class="my-1">
-              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
-              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
-              <hr>
-              <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
-            </b-col>
-          </b-row>
+<div class="nst-screen nst-screen--kardex">
+  <br>
+    <b-container class="bv-example-row">
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label>Almacen:</label>
+            <autocomplete
+                required="required"
+                ref="inputAlmacen"
+                :url="API + 'almacenes'"
+                anchor="Almacen"
+                label="writer"
+                placeholder=""
+                :on-select="setAlmacen" 
+                :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                :classes="{input: 'form-control'}">
+            </autocomplete>
+          </b-form-group>
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-form-group>
+            <label>Seleccionar Producto:</label>
+            <b-input-group>
+              <autocomplete
+                ref="autocompleteProducto"
+                :url="API + 'productos'"
+                :onShouldRenderChild="renderChild"
+                anchor="Producto"
+                label="writer"
+                placeholder="Seleccionar Producto"
+                :on-select="setProducto"
+                :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+                :classes="{input: 'form-control'}">
+              </autocomplete>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label>Fecha Inicio:</label>
+            <b-form-input
+              v-model="kardex.fechaDesde"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio"></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label>Fecha Fin:</label>
+            <b-form-input
+              v-model="kardex.fechaHasta"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio"></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardex">Kardex</b-button>
+          <b-button :disabled="!producto.IdProducto" variant="success" size="sm" @click="verKardexValorizado">Kardex Valorizado</b-button>
+          <hr>
+          <b-button :disabled="!producto.IdProducto" variant="success" size="sm" :href="hrefXls" target="_blank">Exportar</b-button>
+        </b-col>
+      </b-row></section>
 
-          <b-row>
-            <table class="table b-table table-striped table-hover table-sm">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Tipo</th>
-                  <th>Serie</th>
-                  <th>Número</th>
-                  <th>Tipo de <br>Operación</th>
-                  <th>Entradas</th>
-                  <th v-if="esValorizado">Costo<br> Unitario</th>
-                  <th v-if="esValorizado">Costo<br> Total</th>
-                  <th>Salidas</th>
-                  <th v-if="esValorizado">Costo<br> Unitario</th>
-                  <th v-if="esValorizado">Costo<br> Total</th>
-                  <th>Saldo Final</th>
-                  <th v-if="esValorizado">Costo<br> Unitario</th>
-                  <th v-if="esValorizado">Costo<br> Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(prod, i) in kardexSaldoFecha" :key="i">
-                  <td>{{ prod.Fecha }}</td>
-                  <td>{{ prod.CodSunat }}</td>
-                  <td>{{ prod.Serie }}</td>
-                  <td>{{ prod.Numero }}</td>
-                  <td>{{ prod.TipoDocSunat }}</td>
-                  <td>{{ prod.IngresoCantidad }}</td>
-                  <td v-if="esValorizado">{{ prod.IngresoPrecio | redondear }}</td>
-                  <td v-if="esValorizado">{{ prod.IngresoCantidad * prod.IngresoPrecio | redondear }}</td>
-                  <td>{{ prod.SalidaCantidad }}</td>
-                  <td v-if="esValorizado">{{ prod.SalidaPrecio | redondear }}</td>
-                  <td v-if="esValorizado">{{ prod.SalidaCantidad * prod.SalidaPrecio | redondear}}</td>
-                  <td>{{ prod.saldo }}</td>
-                  <td v-if="esValorizado">{{ prod.saldoCostoUnitario | redondear }}</td>
-                  <td v-if="esValorizado">{{ prod.saldoCostoTotal | redondear }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </b-row>
-        </b-container>
-    </div>
+      <section class="nst-panel nst-panel--results"><b-row>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-striped table-hover table-sm">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Serie</th>
+              <th>Número</th>
+              <th>Tipo de <br>Operación</th>
+              <th>Entradas</th>
+              <th v-if="esValorizado">Costo<br> Unitario</th>
+              <th v-if="esValorizado">Costo<br> Total</th>
+              <th>Salidas</th>
+              <th v-if="esValorizado">Costo<br> Unitario</th>
+              <th v-if="esValorizado">Costo<br> Total</th>
+              <th>Saldo Final</th>
+              <th v-if="esValorizado">Costo<br> Unitario</th>
+              <th v-if="esValorizado">Costo<br> Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(prod, i) in kardexSaldoFecha" :key="i">
+              <td>{{ prod.Fecha }}</td>
+              <td>{{ prod.CodSunat }}</td>
+              <td>{{ prod.Serie }}</td>
+              <td>{{ prod.Numero }}</td>
+              <td>{{ prod.TipoDocSunat }}</td>
+              <td>{{ prod.IngresoCantidad }}</td>
+              <td v-if="esValorizado">{{ prod.IngresoPrecio | redondear }}</td>
+              <td v-if="esValorizado">{{ prod.IngresoCantidad * prod.IngresoPrecio | redondear }}</td>
+              <td>{{ prod.SalidaCantidad }}</td>
+              <td v-if="esValorizado">{{ prod.SalidaPrecio | redondear }}</td>
+              <td v-if="esValorizado">{{ prod.SalidaCantidad * prod.SalidaPrecio | redondear}}</td>
+              <td>{{ prod.saldo }}</td>
+              <td v-if="esValorizado">{{ prod.saldoCostoUnitario | redondear }}</td>
+              <td v-if="esValorizado">{{ prod.saldoCostoTotal | redondear }}</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </b-row></section>
+    </b-container>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'

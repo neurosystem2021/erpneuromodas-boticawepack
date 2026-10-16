@@ -60,6 +60,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     // copy custom static assets
     new CopyWebpackPlugin([
       {
+        from: path.resolve(__dirname, '../node_modules/exceljs/dist/exceljs.min.js'),
+        to: config.dev.assetsSubDirectory + '/vendor/exceljs-4.4.0.min.js'
+      },
+      {
         from: path.resolve(__dirname, '../static'),
         to: config.dev.assetsSubDirectory,
         ignore: ['.*']

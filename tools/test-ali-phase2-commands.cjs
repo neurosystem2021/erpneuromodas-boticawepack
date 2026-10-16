@@ -1,0 +1,10 @@
+const fs=require('fs'),assert=require('node:assert/strict');
+const source=fs.readFileSync('src/utils/aliCommands.js','utf8').replace(/export function/g,'function');
+const {parse,query}=new Function(source+';return {parse:parseAliCommand,query:aliNormalizeProductQuery}')();
+for(const command of ['ALI, silencio','ALI deja de escuchar','ALI desactívate','apagar micrófono'])assert.equal(parse(command,{field:'barcode'}).type,'stopAssistant',command);
+assert.deepEqual(parse('ALI, muéstrame cámaras de cuatro megapíxeles'),{type:'search',query:'camaras de cuatro megapixeles'});
+assert.equal(query('Cámaras de cuatro megapíxeles'),'camara 4MP');
+assert.equal(query('Daua hik vision de cinco mp'),'dahua hikvision 5MP');
+assert.equal(parse('busca el código 7751234567890').accept,true);
+assert.equal(parse('codigo de barras 7751234567890').accept,false);
+console.log('PASS full-stop commands in any field, natural search variants, brand/megapixel normalization and explicit code search.');

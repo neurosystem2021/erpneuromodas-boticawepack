@@ -1,0 +1,19 @@
+{
+  "project": "ALI – Control inteligente del punto de venta NEUROSOFT",
+  "phase_1": "auditoria_documentada",
+  "phase_2": "implementada_y_verificada",
+  "phase_3": "pendiente",
+  "phase_4": "pago_POS_con_confirmacion_instalado_emision_excluida_otros_flujos_pendientes",
+  "phase_5": "pendiente",
+  "branch": "feature/ali-control-inteligente-20261013",
+  "backup": "C:\\xampp\\htdocs\\boticawebpack\\backups\\ali-baseline-20261013-192156",
+  "application_changes_this_phase": true,
+  "production_data_changed": false,
+  "sql_migrations_applied": [
+    "integration/ali-checkout.sql"
+  ],
+  "test_environment": "ERP_local_sin_certificados_no_probar_emision",
+  "fiscal_changes_authorized": false,
+  "phase_2_evidence": "docs/ali/evidencia-fase-2.json",
+  "ali_pago": "instalado_confirmacion_idempotencia_verificadas"
+}

@@ -1,0 +1,426 @@
+# PROYECTO: ALI – CONTROL INTELIGENTE DEL PUNTO DE VENTA NEUROSOFT
+
+## OBJETIVO GENERAL
+
+Implementar un asistente inteligente llamado ALI, integrado directamente al punto de venta del ERP NEUROSOFT, que permita controlar mediante voz y texto las funciones operativas del POS.
+
+ALI debe actuar como un asistente de ventas profesional, rápido, seguro y conversacional.
+
+Debe entender instrucciones naturales en español peruano y ejecutar las operaciones utilizando exclusivamente las funciones, servicios, permisos y datos reales del sistema.
+
+## REGLA PRINCIPAL: NO DAÑAR EL SISTEMA EXISTENTE
+
+Antes de programar:
+
+1. Analizar `views/V_VentaForm.php`.
+2. Identificar sus archivos JavaScript, controladores, modelos y servicios relacionados.
+3. Revisar las tablas existentes de productos, clientes, inventario, ventas, pagos y facturación.
+4. Identificar los eventos, funciones y endpoints que ya ejecutan operaciones del POS.
+5. Reutilizar los procesos existentes sin duplicar lógica.
+6. No modificar ni eliminar información real.
+7. No alterar los procesos de facturación electrónica.
+8. No cambiar los correlativos de comprobantes.
+9. No sobrescribir funcionalidades existentes.
+10. Crear una rama de desarrollo y realizar respaldo antes de cualquier migración.
+
+Si una función existente no puede reutilizarse, explicar el motivo antes de implementar una alternativa.
+
+## MÓDULO 1: RECONOCIMIENTO DE VOZ
+
+Implementar reconocimiento de voz compatible con navegadores modernos.
+
+Requisitos:
+
+- Activación mediante botón de micrófono.
+- Activación opcional mediante palabra clave "ALI", cuando la tecnología y permisos del navegador lo permitan.
+- Modo de escucha continua configurable.
+- Botón para detener completamente el micrófono.
+- Comandos "ALI, silencio", "ALI, deja de escuchar" y "ALI, desactívate".
+- Reactivación mediante botón visible; por voz solo si existe un mecanismo de activación separado que permanezca habilitado con consentimiento.
+- Mostrar estados: escuchando, procesando, ejecutando, esperando confirmación y desactivado.
+- Evitar que ALI interprete su propia respuesta hablada como un comando.
+- Solicitar permiso del micrófono y mostrar errores comprensibles.
+- No grabar ni almacenar audio permanentemente sin autorización.
+
+## MÓDULO 2: BÚSQUEDA DE PRODUCTOS
+
+ALI debe buscar productos mediante:
+
+- Nombre completo.
+- Nombre parcial.
+- Marca.
+- Modelo.
+- Categoría.
+- Código interno.
+- Código de barras.
+- Variaciones de pronunciación.
+
+Ejemplos:
+
+"ALI, busca cámara Dahua".
+
+"ALI, busca productos Hikvision".
+
+"ALI, busca el código 7751234567890".
+
+"ALI, muéstrame cámaras de cuatro megapíxeles".
+
+La búsqueda debe utilizar el catálogo real de NEUROSOFT.
+
+Cuando existan varios resultados, mostrar una lista numerada y permitir elegir mediante voz.
+
+Nunca inventar productos, precios ni existencias.
+
+## MÓDULO 3: CONTROL DEL CARRITO
+
+Implementar comandos:
+
+- Agregar producto.
+- Agregar varias unidades.
+- Quitar producto.
+- Cambiar cantidad.
+- Consultar total.
+- Consultar subtotal.
+- Consultar descuentos.
+- Limpiar carrito previa confirmación.
+- Repetir el último producto.
+- Mostrar detalle de compra.
+
+Ejemplos:
+
+"ALI, agrega dos unidades del primer producto".
+
+"ALI, cambia la cantidad a cinco".
+
+"ALI, elimina el segundo producto".
+
+"ALI, dime cuánto tengo que cobrar".
+
+Todas las acciones deben reflejarse inmediatamente en la tabla visual del punto de venta.
+
+No permitir agregar productos sin validar sus restricciones de inventario, unidad de medida, lote o serie cuando corresponda.
+
+## MÓDULO 4: CONTROL DE CLIENTES
+
+Permitir:
+
+- Buscar cliente por nombre.
+- Buscar por DNI.
+- Buscar por RUC.
+- Buscar por teléfono.
+- Seleccionar cliente.
+- Cambiar cliente.
+- Registrar nuevo cliente.
+- Actualizar datos autorizados.
+- Seleccionar consumidor final cuando corresponda.
+
+Ejemplo:
+
+"ALI, busca al cliente Juan Pérez".
+
+"ALI, selecciona al segundo cliente".
+
+"ALI, registra un cliente nuevo".
+
+Para registrar un cliente, solicitar los datos necesarios mediante conversación y mostrar el formulario antes de guardar.
+
+Validar duplicados, formatos de documentos y reglas tributarias.
+
+No enviar documentos de identidad ni datos personales a OpenAI salvo que sea estrictamente necesario y exista una base legal y controles adecuados; preferir búsquedas locales en el servidor.
+
+## MÓDULO 5: COMPROBANTES
+
+Permitir seleccionar:
+
+- Boleta electrónica.
+- Factura electrónica.
+- Nota de venta, cuando esté habilitada.
+- Otros documentos permitidos por el ERP.
+
+Comandos:
+
+"ALI, selecciona boleta".
+
+"ALI, cambia a factura".
+
+"ALI, prepara la emisión del comprobante".
+
+Antes de emitir, validar:
+
+- Tipo de documento.
+- Identificación del cliente según normativa.
+- Serie y numeración.
+- Productos.
+- Impuestos.
+- Totales.
+- Empresa y sucursal.
+- Estado de la operación.
+
+La emisión debe realizarse exclusivamente mediante el servicio de facturación electrónica existente, respetando las reglas SUNAT vigentes y el mecanismo SEE utilizado por la empresa.
+
+No marcar un comprobante como aceptado si no existe una respuesta real que respalde ese estado.
+
+## MÓDULO 6: MÉTODOS DE PAGO
+
+ALI debe permitir seleccionar los métodos habilitados en el sistema:
+
+- Efectivo.
+- Yape.
+- Plin.
+- Tarjeta.
+- Transferencia bancaria.
+- Pago mixto.
+- Crédito, según permisos.
+
+Ejemplos:
+
+"ALI, paga con efectivo".
+
+"ALI, el cliente pagará con Yape".
+
+"ALI, recibe cien soles en efectivo y el resto con tarjeta".
+
+"ALI, calcula el vuelto".
+
+Validar los montos y los métodos disponibles.
+
+Nunca asumir que una transferencia, Yape, Plin o tarjeta fue pagada únicamente porque el usuario lo dijo. Verificar confirmación del medio de pago o solicitar la verificación autorizada del cajero según la integración existente.
+
+## MÓDULO 7: COBRAR Y EMITIR COMPROBANTE
+
+Implementar un proceso guiado:
+
+1. Verificar carrito.
+2. Verificar cliente.
+3. Verificar comprobante.
+4. Verificar stock.
+5. Verificar precios y descuentos.
+6. Calcular impuestos y total.
+7. Seleccionar método de pago.
+8. Mostrar resumen de operación.
+9. Solicitar confirmación explícita del usuario autorizado.
+10. Ejecutar el cobro mediante el proceso existente.
+11. Emitir el comprobante electrónico cuando corresponda.
+12. Mostrar el estado real de emisión.
+13. Ofrecer imprimir, descargar o enviar el comprobante.
+
+Ejemplo:
+
+Usuario: "ALI, cobra esta venta con Yape y emite boleta".
+
+ALI: "El total es 230 soles. El método es Yape y el comprobante es boleta electrónica. ¿Confirmas el cobro y la emisión?".
+
+Después de la confirmación, ALI debe validar el pago y ejecutar la operación mediante el backend.
+
+Usar identificadores de operación únicos e idempotencia para evitar ventas o comprobantes duplicados.
+
+Si falla SUNAT, la red o el proceso de pago, conservar el estado real y permitir una recuperación controlada sin volver a cobrar automáticamente.
+
+## MÓDULO 8: NAVEGACIÓN POR VOZ
+
+Permitir comandos como:
+
+"ALI, abre ventas".
+
+"ALI, enfoca la búsqueda de productos".
+
+"ALI, abre clientes".
+
+"ALI, muestra los métodos de pago".
+
+"ALI, abre caja".
+
+"ALI, vuelve al carrito".
+
+Reutilizar la navegación existente del ERP y comprobar los permisos antes de acceder a cada pantalla.
+
+## MÓDULO 9: RESPUESTAS HABLADAS
+
+ALI debe poder responder mediante audio:
+
+"Encontré tres productos".
+
+"El producto cuesta 230 soles".
+
+"El stock disponible es cinco unidades".
+
+"Se agregó el producto al carrito".
+
+"El total de la venta es 460 soles".
+
+"La operación está pendiente de confirmación".
+
+La respuesta hablada debe poder activarse y desactivarse independientemente del micrófono.
+
+Permitir regular volumen y velocidad de voz.
+
+## MÓDULO 10: MOTOR DE INTELIGENCIA ARTIFICIAL
+
+Integrar OpenAI desde el backend del sistema.
+
+Utilizar el modelo configurado por el administrador y verificar que esté disponible.
+
+Implementar function calling con esquemas estrictos y validación de parámetros.
+
+Definir acciones autorizadas como:
+
+- buscar_productos
+- buscar_por_codigo_barras
+- consultar_stock
+- agregar_producto_carrito
+- modificar_cantidad
+- eliminar_producto_carrito
+- consultar_total
+- buscar_cliente
+- seleccionar_cliente
+- preparar_registro_cliente
+- guardar_cliente
+- seleccionar_comprobante
+- seleccionar_metodo_pago
+- calcular_vuelto
+- preparar_cobro
+- confirmar_cobro
+- preparar_emision
+- confirmar_emision
+- consultar_estado_comprobante
+- imprimir_comprobante
+- navegar_pos
+- detener_asistente
+
+IMPORTANTE:
+
+El modelo de IA interpreta la intención, pero no ejecuta directamente consultas SQL ni operaciones financieras.
+
+Cada acción debe pasar por un despachador seguro que valide parámetros, sesión, empresa, sucursal, permisos, estado de la venta y reglas del negocio.
+
+No aceptar nombres de funciones arbitrarios generados por la IA.
+
+## MÓDULO 11: SEGURIDAD Y CONTROL
+
+Implementar:
+
+- Autenticación obligatoria.
+- Validación de sesión activa.
+- Permisos por usuario y rol.
+- Separación de empresas y sucursales.
+- Protección CSRF.
+- Validación de entradas.
+- Consultas parametrizadas.
+- Registro de auditoría.
+- Límites de solicitudes API.
+- Control de consumo de tokens y costos.
+- Manejo seguro de errores.
+- Protección de datos personales.
+- Confirmaciones para cobros, emisión, descuentos y cancelaciones.
+
+Guardar la clave OpenAI únicamente en configuración segura del servidor, cifrada cuando corresponda, y nunca exponerla al navegador ni registrarla en logs.
+
+Los comandos hablados no deben poder eludir autorizaciones del ERP.
+
+## MÓDULO 12: INTERFAZ ALI
+
+Conservar el diseño visual actual de NEUROSOFT.
+
+Mejorar el botón flotante ALI e incorporar:
+
+- Indicador de micrófono.
+- Indicador de escucha.
+- Texto reconocido.
+- Historial reciente de comandos.
+- Resultado de acciones.
+- Botón de detener.
+- Botón de activar o desactivar voz.
+- Botón de configuración.
+- Confirmaciones visuales.
+- Indicador de errores.
+
+El asistente no debe tapar botones importantes del punto de venta.
+
+Debe funcionar correctamente en computadoras, tablets y pantallas táctiles.
+
+## MÓDULO 13: OPTIMIZACIÓN
+
+Implementar:
+
+- Búsqueda local rápida de productos.
+- Índices adecuados para nombres y códigos de barras.
+- Debounce para búsquedas escritas.
+- Caché seguro de catálogos cuando sea conveniente.
+- Cancelación de solicitudes obsoletas.
+- Control de llamadas simultáneas.
+- Manejo de pérdida de conexión.
+- Uso de IA solo cuando sea necesario.
+
+Los comandos sencillos y deterministas deben procesarse localmente siempre que sea posible, para ahorrar créditos de OpenAI.
+
+## MÓDULO 14: PRUEBAS OBLIGATORIAS
+
+Probar:
+
+1. Buscar producto por nombre.
+2. Buscar por código de barras.
+3. Buscar con nombres incompletos.
+4. Agregar varios productos.
+5. Modificar cantidades.
+6. Eliminar productos.
+7. Seleccionar cliente.
+8. Crear cliente.
+9. Seleccionar boleta.
+10. Seleccionar factura.
+11. Seleccionar Yape.
+12. Seleccionar efectivo.
+13. Calcular vuelto.
+14. Preparar cobro.
+15. Confirmar cobro.
+16. Emitir comprobante en ambiente de pruebas.
+17. Imprimir comprobante.
+18. Detener y reactivar micrófono.
+19. Cancelar una operación pendiente.
+20. Recuperar errores de conexión.
+21. Impedir operaciones sin permiso.
+22. Impedir ventas duplicadas.
+23. Impedir cobros duplicados.
+24. Impedir comprobantes duplicados.
+25. Verificar que el POS manual siga funcionando.
+
+No ejecutar pruebas de cobro o emisión contra datos de producción sin autorización explícita.
+
+## ORDEN DE IMPLEMENTACIÓN
+
+FASE 1:
+Auditar el código existente y documentar los servicios disponibles.
+
+FASE 2:
+Implementar reconocimiento de voz, comandos locales y búsqueda de productos.
+
+FASE 3:
+Integrar carrito, clientes y selección de comprobantes.
+
+FASE 4:
+Integrar pagos, confirmaciones y emisión electrónica.
+
+FASE 5:
+Agregar seguridad, auditoría, optimización y pruebas completas.
+
+## RESULTADO ESPERADO
+
+El asistente ALI debe permitir operar el punto de venta de NEUROSOFT mediante voz y texto, manteniendo sincronizados los datos y controles visuales existentes.
+
+No crear un punto de venta paralelo.
+
+No duplicar la lógica de negocio.
+
+No modificar las operaciones actuales sin necesidad.
+
+Al finalizar cada fase, entregar:
+
+- Archivos modificados.
+- Funciones implementadas.
+- Migraciones SQL, si son necesarias.
+- Pruebas realizadas.
+- Resultados.
+- Riesgos detectados.
+- Instrucciones de instalación.
+- Procedimiento de reversión.
+
+Comenzar revisando el proyecto real y presentar primero el diagnóstico técnico. Después implementar progresivamente cada fase, verificando que el sistema siga funcionando correctamente.

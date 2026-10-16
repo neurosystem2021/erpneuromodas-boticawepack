@@ -1,0 +1,22 @@
+[
+  {
+    "file": "src/views/Ventas.vue",
+    "sha256": "7b237b1c3289b9a0a31137265e6b89b40b2658ba115c889587397d47bd35cca3"
+  },
+  {
+    "file": "src/utils/aliCommands.js",
+    "sha256": "87072d00c03d7ab73e82994bcf2c261e2d46233830774ba0cfb6f3e8258c43ad"
+  },
+  {
+    "file": "src/components/AliAssistant.vue",
+    "sha256": "7788dfc0b2f729a7cf2200ba5b3ffcea47692cfe5fef55a4c98976c5b8c43ad6"
+  },
+  {
+    "file": "integration/ali-api.php",
+    "sha256": "27fb21247d6ab21007d8646711b2bcd14a68a6569dc3a9eea569516a88d03332"
+  },
+  {
+    "file": "integration/ali-pos-security.php",
+    "sha256": "0d3e522dc37cd037b3be2358d41e668050011ab67e8391268e8dbc2d70e649f8"
+  }
+]

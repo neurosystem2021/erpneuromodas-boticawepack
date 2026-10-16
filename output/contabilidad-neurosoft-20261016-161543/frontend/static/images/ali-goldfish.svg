@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 190">
+<defs>
+ <radialGradient id="gold" cx=".42" cy=".2" r=".85"><stop stop-color="#fffbd2"/><stop offset=".3" stop-color="#ffe781"/><stop offset=".65" stop-color="#ffc133"/><stop offset="1" stop-color="#e38b0a"/></radialGradient>
+ <linearGradient id="fin" x1="0" y1="0" x2=".6" y2="1"><stop stop-color="#fff5ad"/><stop offset=".45" stop-color="#ffd24f"/><stop offset="1" stop-color="#f09a12"/></linearGradient>
+ <radialGradient id="iris"><stop stop-color="#885222"/><stop offset=".55" stop-color="#56331c"/><stop offset="1" stop-color="#241d1b"/></radialGradient>
+ <filter id="shadow" x="-.4" y="-.4" width="1.8" height="1.8"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#ad7014" flood-opacity=".22"/></filter>
+</defs>
+<style>.left-fin{transform-origin:78px 100px;animation:fin 1.3s ease-in-out infinite alternate}.right-fin{transform-origin:182px 100px;animation:fin 1.3s ease-in-out infinite alternate-reverse}.spark{animation:shine 2.6s ease-in-out infinite}@keyframes fin{to{transform:scaleX(.88)}}@keyframes shine{50%{opacity:.3}}@media(prefers-reduced-motion:reduce){.left-fin,.right-fin,.spark{animation:none}}.fish-tail{transform-origin:130px 149px;animation:tailWag .65s ease-in-out infinite alternate}.right-fin{animation:tailFinWag .8s ease-in-out infinite alternate}@keyframes tailWag{from{transform:rotate(-13deg) scaleX(.85)}to{transform:rotate(13deg) scaleX(1.1)}}@keyframes tailFinWag{from{transform:rotate(-10deg) scaleX(.82)}to{transform:rotate(10deg) scaleX(1.04)}}@media(prefers-reduced-motion:reduce){.fish-tail,.right-fin{animation:none}}</style>
+<g class="spark" fill="#fff6c0"><path d="M42 29l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><path d="M216 134l2 7 7 2-7 2-2 7-2-7-7-2 7-2z"/></g>
+<g fill="none" stroke="#fff4c6" stroke-width="2" opacity=".8"><circle cx="212" cy="31" r="7"/><circle cx="226" cy="13" r="4"/></g>
+<g filter="url(#shadow)" stroke-linejoin="round">
+ <path d="M109 53Q110 20 132 17Q149 19 153 54" fill="url(#fin)" stroke="#e7a52a" stroke-width="2"/>
+ <path d="M119 42L130 24M135 43L139 27" fill="none" stroke="#fff5b6" stroke-width="3" stroke-linecap="round"/>
+ <g class="left-fin"><path d="M82 89C63 67 35 59 29 76 23 92 36 100 34 106 21 130 43 148 65 133L87 114Z" fill="url(#fin)" stroke="#e9ac2d" stroke-width="2"/><path d="M37 78Q56 89 80 101M38 106L79 106M42 132L80 110" stroke="#fff2a5" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+ <g class="right-fin"><path d="M178 89C197 67 225 59 231 76 237 92 224 100 226 106 239 130 217 148 195 133L173 114Z" fill="url(#fin)" stroke="#e9ac2d" stroke-width="2"/><path d="M223 78Q204 89 180 101M222 106L181 106M218 132L180 110" stroke="#fff2a5" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+ <g class="fish-tail"><path d="M111 147Q111 170 130 175Q150 169 149 146" fill="url(#fin)" stroke="#e9ac2d" stroke-width="2"/><path d="M123 151L130 166L137 151" fill="none" stroke="#fff2a5" stroke-width="3" stroke-linecap="round"/></g>
+ <path d="M64 100C63 64 90 43 130 43 170 43 197 64 196 100 196 137 169 157 130 158 91 157 64 137 64 100Z" fill="url(#gold)" stroke="#e5a12a" stroke-width="2"/>
+ <path d="M92 64Q116 49 143 55" fill="none" stroke="#fffdf1" stroke-opacity=".65" stroke-width="9" stroke-linecap="round"/>
+ <path d="M88 77Q97 71 108 75M152 75Q164 71 173 77" fill="none" stroke="#d8972a" stroke-width="3" stroke-linecap="round"/>
+ <ellipse cx="100" cy="97" rx="23" ry="25" fill="#fffef5" stroke="#e6aa40" stroke-width="1.5"/>
+ <ellipse cx="160" cy="97" rx="23" ry="25" fill="#fffef5" stroke="#e6aa40" stroke-width="1.5"/>
+ <ellipse cx="104" cy="99" rx="13" ry="17" fill="url(#iris)"/>
+ <ellipse cx="156" cy="99" rx="13" ry="17" fill="url(#iris)"/>
+ <ellipse cx="108" cy="92" rx="5.5" ry="6.5" fill="white"/><ellipse cx="160" cy="92" rx="5.5" ry="6.5" fill="white"/>
+ <circle cx="99" cy="106" r="2.5" fill="#ffecc7"/><circle cx="151" cy="106" r="2.5" fill="#ffecc7"/>
+ <ellipse cx="86" cy="124" rx="13" ry="6" fill="#f38a38" opacity=".4"/><ellipse cx="174" cy="124" rx="13" ry="6" fill="#f38a38" opacity=".4"/>
+ <path d="M115 128Q130 143 145 128Q130 153 115 128Z" fill="#a76620" stroke="#9f601c" stroke-width="2" stroke-linejoin="round"/><path d="M122 139Q130 133 138 139" fill="#ffb06b"/>
+ <path d="M113 126Q115 122 119 125M141 125Q145 122 147 126" fill="none" stroke="#d89428" stroke-width="2" stroke-linecap="round"/>
+ <path d="M120 77Q130 82 140 77" fill="none" stroke="#f4bc44" stroke-opacity=".6" stroke-width="2"/>
+</g>
+</svg>

@@ -1,0 +1,204 @@
+FACTURA.VIP - MESA DE AYUDA: PRIMERA ENTREGA TECNICA
+Fecha: 14/10/2026. Entorno inspeccionado: localhost.
+
+ALCANCE DE ESTA ENTREGA
+Diagnostico real, arquitectura compatible, cuatro migraciones UP/DOWN y validacion
+sobre una base temporal separada. No se ha instalado un portal nuevo ni conectado
+clientes. No se han modificado facturacion, SUNAT, inventarios, login ni datos reales.
+Las fases funcionales que se describen abajo estan pendientes de implementacion.
+
+DECISIONES CONFIRMADAS POR EL PROPIETARIO
+- Cada empresa tiene su propia instalacion y base de datos.
+- Preparar primero la central de soporte en localhost.
+- Conservar el diario de actividades y soporte ya existente.
+
+1. DIAGNOSTICO DEL CODIGO Y LA BASE REAL
+Frontend: package.json declara Vue ^2.5.2, vue-router 3, Vuex 2, Axios 0.18,
+BootstrapVue y Webpack 3.6. No es Laravel.
+Backend: PHP CLI 7.4.33; api/composer.lock registra Slim 3.10.0.
+Base: MariaDB 10.4.27. Backend desplegado en C:/xampp/htdocs/boticav1/api.
+La aplicacion frontend se construye en boticawebpack y sirve desde /nuevo.
+
+Identidad: controllers/validarLogin.php establece session user, permisos, idPerfil
+idAlmacen. No establece un tenant global. Seg_Usuario usa Usuario como parte de su
+clave y tiene NombreUsuario, IdUsuarioPerfil e IdAlmacen. Los perfiles/permisos
+se resuelven con Seg_UsuarioPerfil y Seg_UsuarioModulo_has_UsuarioPerfil.
+Gen_Empresa contiene una fila emisora local; EmpresaConfig toma la primera fila.
+Lo_Almacen representa almacenes; no asumir que todo almacen es una sucursal legal.
+Ve_DocVentaCliente son clientes comerciales de esa empresa, no necesariamente las
+empresas abonadas a FACTURA.VIP. Ag_Empresa tampoco acredita un registro SaaS global.
+No se encontro en esta instalacion un catalogo central verificable de los 50 abonados.
+
+El diario implementado ya proporciona tareas, adjuntos privados, eventos, tiempos,
+roles locales, resultados, calificaciones internas, contactos de soporte y reportes.
+Su alcance es usuario/empleado; no contiene fronteras por empresa SaaS. No basta
+agregarle un filtro visible de empresa para ofrecer aislamiento multicliente.
+Sus calificaciones de empleado NO deben mezclarse con satisfaccion del cliente.
+
+Hallazgos de integracion:
+- Login legado construye SQL por concatenacion con addslashes: endurecimiento
+  previo a exposicion publica mediante consultas preparadas y regeneracion de sesion.
+- api/index.php configura conexiones por separado y activa detalles de error.
+  El modulo nuevo usara configuracion privada, errores genericos y logs sin secretos.
+- No copiar credenciales existentes a tickets, logs, archivos publicos ni anexos.
+- PHP 7.4 es la version observada; mantener sintaxis compatible para el piloto.
+  La actualizacion de runtime requiere un trabajo independiente y pruebas del ERP.
+
+2. ARQUITECTURA PROPUESTA
+Central Slim 3 + MariaDB dedicada + interfaz Vue 2 reutilizando el estilo actual.
+Conector pequeno en cada instalacion; nunca conectarse a sus bases desde el navegador.
+Flujo: navegador -> API de la instalacion (sesion/CSRF) -> central -> respuesta.
+La interfaz llama /api/support de su propio origen. El proxy servidor-servidor evita
+cookies de terceros y el intercambio de credenciales de BD con la central.
+
+Cada instalacion recibe un UUID aprovisionado, claves de firma y un registro activo.
+Cada tenant se identifica por (installation_id, external_company_id), NO por RUC,
+por dominio recibido del navegador ni por el idEmpresa numerico de otra base.
+Cada persona: (installation_id, external_user_id). El usuario admin de una empresa
+no es el mismo admin de otra. La tabla de tenants es un mapa de referencias, no una
+segunda copia editable del maestro de empresas. Datos generales se consultan por
+conector autorizado; snapshots historicos se justificaran expresamente.
+
+Conector: lee usuario/empresa autorizada desde sesion y configuracion del servidor;
+valida usuario activo en Seg_Usuario en cada operacion. No acepta tenant, actor ni
+privilegios globales suministrados por el navegador. Firma metodo, ruta canonica,
+hash del cuerpo, timestamp, nonce e identidad. Propuesta: Ed25519 con clave privada
+fuera del webroot; confirmar extension sodium en ambos despliegues antes de activar.
+Central: valida emisor aprovisionado, clave activa, firma, ventana maxima de 120 s y
+nonce de un solo uso. La clave publica central no permite firmar como el cliente.
+Rotacion por key_id; revocar instalacion/clave/membresia detiene el acceso.
+En localhost se admiten origenes HTTP SOLO en configuracion de pruebas, nunca
+como excepcion implicita en el modo de produccion.
+
+El equipo central inicia sesion con el ERP local; sus roles de soporte se asignan
+explicitamente. El perfil ADMINISTRADOR de un cliente nunca concede supervisor
+ni superadministrador central. Roles multiples mediante support_memberships.
+Un supervisor o tecnico solo ve tenants con membresia activa; superadmin central
+puede administrar todos, con concesion explicita y auditoria.
+
+Servicios independientes: IdentityResolver, TenantScope, TicketService,
+ConversationService, AttachmentService, SlaClock, SurveyService, ReportingService.
+Los repositorios exigen contexto autorizado. Ninguna lectura de ticket, mensaje,
+archivo, notificacion o exportacion se hace solo por id, sin tenant y permiso.
+Notas internas se filtran por servidor, incluido conteo de adjuntos y no leidos.
+
+3. MODELO Y MIGRACIONES
+Directorio migrations; 001 a 004 se aplican en orden. DOWN en orden inverso.
+Usar una BD de soporte dedicada. No ejecutar estas migraciones sobre la BD del ERP.
+Un runner pendiente registrara numero, checksum y fecha de cada migracion y bloqueo
+exclusivo. MariaDB puede confirmar DDL implicitamente: no prometer rollback por
+transaccion. Hacer preflight, respaldo y recuperacion por migracion/version.
+
+001: instalaciones, tenants, principals, membresias, categorias, tickets,
+historial, auditoria, claves publicas de instalacion y nonces anti-replay.
+002: conversaciones publicas/internas, archivos, asignaciones y notificaciones.
+003: politicas SLA, eventos, tiempos de trabajo y encuestas.
+004: conocimientos e integraciones opcionales mediante outbox.
+
+Todos los tickets tienen tenant_id; sus hijos usan FK compuesta tenant_id,ticket_id.
+Esto impide enlazar un mensaje a un ticket de otra empresa. No sustituye autorizacion:
+la pertenencia del autor, solicitante, tecnico y destinatario se valida en servicios.
+Adjuntos de mensajes usan FK tenant_id,ticket_id,message_id. El archivo privado
+se sirve exclusivamente despues de verificar permiso y visibilidad del mensaje.
+
+Codigo SOP-AAAA-NNNNNN generado en central desde id autoincremental unico, dentro
+de la misma transaccion de creacion. Nunca SELECT MAX+1. El anio usa America/Lima;
+la secuencia global no reinicia por anio. El codigo se conserva al reabrir.
+Los tickets DEV/SUP del diario siguen siendo tareas internas. Enlazar una tarea a
+un ticket de soporte mediante relacion explicita; no convertir historicos sin mapeo.
+
+El rollback DOWN elimina SOLO tablas nuevas y sus datos: queda prohibido ejecutarlo
+automaticamente en produccion. En produccion preferir restauracion o migracion
+correctiva. Los scripts estan entregados como propuesta, no instalados.
+
+4. FASES FUNCIONALES Y CRITERIOS DE ACEPTACION
+FASE 1 - Localhost, tickets y permisos.
+- Central en BD dedicada, configuracion privada y runner versionado.
+- Dos instalaciones sinteticas en pruebas (sin altas automaticas de empresas reales).
+- Adaptador de identidad local y protocolo de conector con firma y anti-replay.
+- Menu Centro de Soporte, portal solicitante, bandeja central/tecnico y categorias.
+- Crear/ver/listar tickets, paginacion por cursor, filtros permitidos y codigo unico.
+- Asunto, descripcion, modulo, categoria, prioridad, empresa/sede de la sesion.
+- Roles explicitamente aprovisionados y auditoria de cada cambio.
+- Estados y transiciones validadas con version para evitar actualizaciones perdidas.
+Entrega: UI funcional y endpoints probados entre dos tenants. Ningun usuario de un
+cliente puede autoconcederse rol central ni enviar mensajes de otro cliente.
+
+FASE 2 - Operacion de atencion.
+- Asignar/reasignar, aceptar, escalar, conversacion, notas internas y worklog inicial.
+- Adjuntar capturas/PDF/TXT/LOG/JSON permitidos; comprobar MIME, extension y tamano.
+- Rechazar ejecutables, HTML, SVG activo y archivos con credenciales identificadas;
+  informar al usuario que quite secretos. Ningun filtro garantiza detectarlos todos.
+- Limites por archivo, ticket y empresa; almacenamiento privado sin rutas del usuario.
+- Polling incremental con cursor y pausa al ocultar pagina; indicador de no leidos.
+- Mostrar hora y actor de eventos; idempotencia en mensajes/acciones reintentadas.
+Entrega: cliente y tecnico conversan sin recargar y sin exponer notas internas.
+
+FASE 3 - SLA, calidad y reportes.
+- Prioridades iniciales: critica 15/120, alta 30/240, media 120/480, baja 480/1440
+  minutos para primera respuesta/resolucion. Calendario/contrato antes de activarlos.
+- Hasta configurar horario contractual, mostrar simulacion, no SLA contractual cumplido.
+- Primer mensaje PUBLICO humano del tecnico marca primera respuesta; asignacion,
+  notas internas y mensajes automaticos no cuentan como respuesta.
+- Clock en minutos laborables, zona Lima, feriados/calendarios versionados,
+  pausas justificadas segun politica. Guardar snapshot para no alterar historicos.
+- Worker CLI periodico e idempotente evalua vencimientos/escalamiento aunque no haya
+  navegador abierto. Usar programador de tareas en Windows, cron en servidor.
+- Reapertura crea nuevo ciclo SLA, conserva resoluciones y encuestas previas.
+- Cliente confirma solucion/cierra o reabre con motivo; tecnico propone resuelto.
+- Encuesta por ciclo: resuelto, rapidez, trato, solucion, recomendacion y comentario.
+- Sin respuesta es NULL/ausencia, no una estrella. Alertas de puntuaciones negativas.
+- Dashboard total de registros autorizados, sin confundir pagina con total general.
+- Denominadores separados SLA respuesta/resolucion y satisfaccion respondida.
+- CSV/Excel seguro contra formulas; Excel con libreria instalada; PDF con renderer
+  a confirmar, no llamar PDF a una pagina HTML. Exportaciones restringidas por tenant.
+Entrega: calculos verificables y exportaciones que coincidan con filtros y permisos.
+
+FASE 4 - Conocimiento y automatizacion.
+- Articulos con borrador/publicacion, busqueda, categorias, sugerencias y FAQ.
+- Soluciones a articulo requieren revision y eliminacion de datos de clientes.
+- Contenido global/publico separado del conocimiento privado por empresa.
+- Correo y WhatsApp mediante adaptadores oficiales y outbox con reintentos.
+- Mantener desactivado envio real hasta disponer de credenciales y autorizacion;
+  funcionamiento esencial sin servicios externos.
+Entrega: articulos buscables e integraciones probadas primero con adaptadores falsos.
+
+5. PERMISOS Y TRANSICIONES
+Solicitante: sus tickets; crea, responde publico, confirma/reabre y califica.
+Admin empresa: tickets de su tenant; no ve notas internas; gestiona acceso local.
+Tecnico: tickets de tenants habilitados dentro de su bandeja/asignacion; notas,
+solucion, tiempos, escalamiento permitido; no modifica encuestas del cliente.
+Supervisor: asignacion y revision de sus tenants; reportes y categorias autorizadas.
+Superadmin: administracion central; siempre auditar acceso privilegiado.
+
+new -> assigned/cancelled; assigned -> in_progress/escalated/cancelled;
+in_progress -> waiting_customer/escalated/resolved;
+waiting_customer -> in_progress/escalated; escalated -> assigned/in_progress;
+resolved -> closed/reopened; closed -> reopened segun politica; reopened ->
+assigned/in_progress. Cancelled es terminal salvo accion explicita de supervisor.
+Toda transicion valida actor, tenant, estado anterior y version; motivo obligatorio
+para cancelar, escalar, reabrir y pausar. Resolver exige solucion registrada.
+
+6. PRUEBAS Y PUBLICACION
+Ya ejecutado: tools/test-helpdesk-migrations.php crea BD helpdesk_test aleatoria,
+aplica las cuatro migraciones, valida FKs entre tenants, duplicados de mensajes,
+unicidad de codigo, limites de encuesta, DOWN inverso y elimina su propia BD temporal.
+No modifica el esquema ni registros del ERP.
+Pendiente: pruebas completas de API, UI, firmas/replay, permisos, SLA, adjuntos,
+exportaciones, concurrencia y carga antes de declarar fases terminadas.
+
+Probar dos empresas con IdEmpresa=1 y usuario admin en ambas. Cambiar IDs en URL,
+body, adjunto y exportacion debe denegarse sin filtrar existencia de otras empresas.
+Probar notas internas, rol falsificado, clave revocada, nonce repetido, usuario
+inactivo, CSRF, XSS, SQL, paginacion, actualizacion simultanea y encuesta duplicada.
+SLA: fuera de horario, fines de semana, feriados, pausa/resume, cambio de politica,
+reapertura y ejecucion repetida de worker. Pruebas con reloj fijo, no esperas reales.
+
+Publicacion gradual: piloto local -> tenant de prueba -> pocas empresas -> todas.
+Conectar los 50 sitios requiere inventario de dominios/instalaciones y el conector
+en cada uno. No se puede registrar sus usuarios ni reusar sus sesiones con solo
+copiar el frontend a localhost. La direccion HTTPS central definitiva queda para
+el despliegue posterior. No se presupone acceso remoto a esos servidores.
+
+Siguiente trabajo: implementar fase 1 local con estas fronteras, conservar diario
+existente y mantener funciones nuevas fuera del ERP operativo hasta pasar pruebas.

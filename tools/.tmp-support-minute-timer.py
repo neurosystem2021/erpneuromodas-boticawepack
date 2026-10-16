@@ -1,0 +1,11 @@
+﻿from pathlib import Path
+p=Path('src/components/SupportLauncher.vue');s=p.read_text(encoding='utf-8')
+s=s.replace('clearInterval(this._timer);clearTimeout(this._toastTimer);','clearInterval(this._timer);clearTimeout(this._toastTimer);clearTimeout(this._urgentTimer);',1)
+s=s.replace("if(this.urgentTotal)await this.announceUrgent();else try{localStorage.removeItem('support:urgent-last:'+this.context.principal)}catch(e){}", "if(this.urgentTotal){await this.announceUrgent();this.scheduleUrgent();}else{clearTimeout(this._urgentTimer);try{localStorage.removeItem('support:urgent-last:'+this.context.principal)}catch(e){}}")
+s=s.replace(' async announceUrgent(){', " scheduleUrgent(){clearTimeout(this._urgentTimer);if(!this.soundEnabled||!this.urgentTickets.length)return;let last=this._urgentLast||0;try{last=Math.max(last,Number(localStorage.getItem('support:urgent-last:'+this.context.principal))||0)}catch(e){}this._urgentTimer=setTimeout(()=>this.poll(),Math.max(250,last+urgentReminderMs-Date.now()));},\n async announceUrgent(){",1)
+s=s.replace('toggleSound(){this.soundEnabled=', 'toggleSound(){clearTimeout(this._urgentTimer);this.soundEnabled=',1)
+s=s.replace("this._audio.resume().then(()=>this.announceUrgent()).catch", "this._audio.resume().then(()=>{this.announceUrgent();this.scheduleUrgent()}).catch")
+s=s.replace("if(this.urgentTotal)this.announceUrgent();else this.speakUrgent", "if(this.urgentTotal){this.announceUrgent();this.scheduleUrgent()}else this.speakUrgent")
+p.write_text(s,encoding='utf-8')
+p=Path('src/components/DiarioArea.vue');s=p.read_text(encoding='utf-8').replace("watch:{periodo:","watch:{'context.user'(){this.load();},periodo:");p.write_text(s,encoding='utf-8')
+p=Path('tools/test-support-urgency.cjs');s=p.read_text(encoding='utf-8').replace("}finally{Date.now=original;}})().catch", "}finally{Date.now=original;}})().then(()=>process.exit(0)).catch");p.write_text(s,encoding='utf-8')

@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();echo json_encode($db->query('SELECT IdUsuarioPerfil,UsuarioPerfil FROM Seg_UsuarioPerfil')->fetchAll(PDO::FETCH_ASSOC),JSON_UNESCAPED_UNICODE);echo PHP_EOL;echo implode(',',array_column($db->query('SHOW COLUMNS FROM Seg_Usuario')->fetchAll(PDO::FETCH_ASSOC),'Field'));

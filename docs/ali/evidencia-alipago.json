@@ -1,0 +1,56 @@
+{
+  "updated_lima": "2026-10-13T20:36:36.435936-05:00",
+  "feature": "ALIPAGO",
+  "commands": [
+    "Hola ALI",
+    "ALIPAGO",
+    "confirmar pago",
+    "cancelar"
+  ],
+  "files": [
+    "src/utils/aliCommands.js",
+    "src/utils/aliCheckout.js",
+    "src/components/AliAssistant.vue",
+    "src/views/Ventas.vue",
+    "integration/ali-api.php",
+    "integration/ali-pos-security.php",
+    "integration/ali-checkout.php",
+    "integration/ali-checkout.sql"
+  ],
+  "preservation": {
+    "api/index.php": true,
+    "api/sunat/sunat.php": true,
+    "views/V_VentaForm.php": true,
+    "views/header.php": true,
+    "imprimir/index.php": true,
+    "src/views/VentasFacturacion.vue": true,
+    "guardarVenta_original_body_preserved_except_early_prepare_and_pending_guard": true,
+    "deployed/ali-api.php": true,
+    "deployed/ali-pos-security.php": true,
+    "deployed/ali-checkout.php": true
+  },
+  "migration": "integration/ali-checkout.sql",
+  "rollback_source": "backups/ali-pago-20261013-201849/before.zip",
+  "rollback_live": "C:/xampp/htdocs/boticav1/.ali-pago-backup-20261013-202651",
+  "latest_deployment": "C:/xampp/htdocs/boticav1/.ali-pago-backup-20261013-203514",
+  "tests": {
+    "exact_voice_commands": "passed",
+    "permissions_csrf_expiry": "passed",
+    "isolated_mysql_two_concurrent_confirmations_one_sale_one_payment": "passed",
+    "rollback_partial_writes": "passed",
+    "completed_receipt_recovery_without_stock_lookup": "passed",
+    "browser_voice_review_cancel_changed_cart_recovery_mobile_manual_pos": "passed",
+    "existing_voice_search_regressions": "passed",
+    "real_catalog_insufficient_stock_rejected_without_writes": "passed"
+  },
+  "real_sales_created_by_tests": 0,
+  "sunat_calls": 0,
+  "openai_test_calls": 0,
+  "limits": [
+    "No se probó un cobro real ni un micrófono físico.",
+    "Confirmar pago es la declaración del cajero de haber verificado la recepción; no hay verificación bancaria automática.",
+    "Crédito, preórdenes, ofertas, kits y alquileres conservan el flujo manual.",
+    "El bloqueo e idempotencia cubren operaciones ALI. Las rutas heredadas de ventas conservan sus limitaciones frente a otros procesos concurrentes.",
+    "La emisión electrónica permanece excluida por instrucción del usuario."
+  ]
+}

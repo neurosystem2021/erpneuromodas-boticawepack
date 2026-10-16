@@ -1,0 +1,2 @@
+﻿<?php
+$ch=curl_init('http://localhost/api/index.php/reporte/ordencomprapdf?id=29');curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>20]);$body=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);if($status!==200||strpos($body,'OrdenCompra_2026_5.pdf')===false)throw new Exception('Order PDF endpoint failed');echo 'Live purchase order PDF endpoint OK',PHP_EOL;

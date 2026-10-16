@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="nst-screen nst-screen--stockminimo">
       <b-container class="bv-example-row">
-        <b-row>
+        <section class="nst-panel nst-panel--filters"><b-row>
           <b-col md="4" class="my-1">  
             <b-row>
               <b-form-group v-if="false">
@@ -81,15 +81,15 @@
             :items="myProvider" 
             :fields="fields"
             :per-page="perPage"
-            :current-page="currentPage"></b-table>
+            :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." ></b-table>
             <b-row>
                 <b-col md="6" class="my-1">
                     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
                 </b-col>
             </b-row>
-        </b-row>
+        </b-row></section>
         <br /><br />
-        <b-row align-h="center" class="text-center">
+        <b-row align-h="center" class="text-center nst-action-bar">
             <b-col cols="4">
               <b-button variant="success" :href="urlExportar" target="_blank" size="lg" >Exportar (Con Condición)</b-button>
             </b-col>

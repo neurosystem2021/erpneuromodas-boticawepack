@@ -1,144 +1,144 @@
 <template>
-  <div>
-   
-      <b-button @click="promptPassword" variant="primary" style="background: #5E35B1;" class="btnAction">Movimiento</b-button>
-    
-    <b-modal 
-    v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito"
-    hide-footer
-    >
-      <b-tabs content-class="mt-3" @click.stop>
-        <!-- <b-tab title="Compra de chatarra">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="6">
-                  <b-form-group>
-                  <label>Almacen:</label>
-                  <autocomplete
-                      required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
+<div>
+ 
+    <b-button @click="promptPassword" variant="primary" style="background: #5E35B1;" class="btnAction">Movimiento</b-button>
+  
+  <b-modal 
+  v-model="showMovimientoModal" size="lg" title="Caja banco" ref="modalCarrito"
+  hide-footer modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered=""
+  >
+    <b-tabs content-class="mt-3" @click.stop>
+      <!-- <b-tab title="Compra de chatarra">
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <b-row>
+              <b-col md="6">
+                <b-form-group>
+                <label>Almacen:</label>
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacen" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+                <b-form-group>
+                  <label>Gasto:</label>
+                  <b-form-select v-model="selectProducto.IdProducto" 
+                  :options="lstProducto"
+                  value-field="IdProducto"
+                  text-field="Producto"
+                  required
+                  @change="ObtenerCosto"
+                  ref="cboProductos"
+                  ></b-form-select>
                 </b-form-group>
-                  <b-form-group>
-                    <label>Gasto:</label>
-                    <b-form-select v-model="selectProducto.IdProducto" 
-                    :options="lstProducto"
-                    value-field="IdProducto"
-                    text-field="Producto"
-                    required
-                    @change="ObtenerCosto"
-                    ref="cboProductos"
-                    ></b-form-select>
-                  </b-form-group>
-                  <b-form-group>
-                    Cantidad:
-                    <input v-model="selectProducto.Cantidad"
-                    @input="recalcularTotal"
-                    
-                    required type="number" class="form-control" step="1" />
-                  </b-form-group>
-                  <b-form-group>
-                    Costo:
-                    <input v-model="selectProducto.Gasto"  @input="recalcularTotal" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <b-form-group>
-                    Total Costo:
-                    <input v-model="selectProducto.TotalGasto" readonly required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                 
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template #modal-footer>
-              <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-         -->
-        <b-tab title="Ingreso">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4">
-                  <label>Ingreso:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Ingreso" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.IngresoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template #modal-footer>
-              <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
+                <b-form-group>
+                  Cantidad:
+                  <input v-model="selectProducto.Cantidad"
+                  @input="recalcularTotal"
+                  
+                  required type="number" class="form-control" step="1" />
+                </b-form-group>
+                <b-form-group>
+                  Costo:
+                  <input v-model="selectProducto.Gasto"  @input="recalcularTotal" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <b-form-group>
+                  Total Costo:
+                  <input v-model="selectProducto.TotalGasto" readonly required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+               
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
+          <template #modal-footer>
+            <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+       -->
+      <b-tab title="Ingreso"><template slot="title"><i class="fas fa-arrow-circle-up nst-tab-icon" aria-hidden="true"></i><span>Ingreso</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <b-row>
+              <b-col md="4" class="nst-editor-section">
+                <label>Ingreso:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Ingreso" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.IngresoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
+          <template #modal-footer>
+            <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
 
-        <b-tab title="Salida">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4">
-                  <label>Salida:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Salida" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.SalidaDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template #modal-footer>
-              <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
+      <b-tab title="Salida"><template slot="title"><i class="fas fa-arrow-circle-down nst-tab-icon" aria-hidden="true"></i><span>Salida</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <b-row>
+              <b-col md="4" class="nst-editor-section">
+                <label>Salida:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Salida" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.SalidaDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
+          <template #modal-footer>
+            <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
 
-        <b-tab title="Dep. Cuenta Bancaria">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4">
-                  <label>Monto:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Deposito" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>N° Cuenta - Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.DepositoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template #modal-footer>
-              <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-      </b-tabs>
-    </b-modal>
-  </div>
+      <b-tab title="Dep. Cuenta Bancaria"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Dep. Cuenta Bancaria</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <b-row>
+              <b-col md="4" class="nst-editor-section">
+                <label>Monto:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Deposito" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>N° Cuenta - Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.DepositoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
+          <template #modal-footer>
+            <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+    </b-tabs>
+  </b-modal>
+</div>
 </template>
 
 <script>

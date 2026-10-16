@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();foreach(['Ve_DocVentaTipoDoc','Ve_DocVentaDet'] as $t){echo $t,"\n";echo implode(',',array_column($db->query("SHOW COLUMNS FROM $t")->fetchAll(PDO::FETCH_ASSOC),'Field')),"\n";}

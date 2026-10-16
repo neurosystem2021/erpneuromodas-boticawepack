@@ -1,0 +1,45 @@
+{
+  "time_lima": "2026-10-13T20:52:19.185327-05:00",
+  "case": "2 cámaras de código 1 × S/120 = S/240, Yape/Plin",
+  "previous_reproduced_error": {
+    "http": 409,
+    "message": "Importe o cantidad inválida."
+  },
+  "causes": [
+    "Campos opcionales vacíos rechazados como importes inválidos",
+    "CampoDireccion real es un valor de dirección, no el nombre de una columna",
+    "Comisionista TIENDA del POS rechazado por el adaptador",
+    "Una serie existente se interpretaba erróneamente como obligatoriedad de todas las unidades",
+    "Error no visible fuera del panel ALI"
+  ],
+  "fixes": [
+    "Normalizar a cero solo números opcionales vacíos; mantener cantidades y precios requeridos",
+    "Validar contra las direcciones registradas del cliente y conservar el valor real, con escape en el límite SQL heredado",
+    "Validar y conservar el comisionista real, incluido TIENDA",
+    "Mantener la selección opcional de series del POS; validar disponibilidad, almacén y cantidad cuando se selecciona una",
+    "Mostrar el motivo exacto del bloqueo dentro del POS y transmitirlo a ALI"
+  ],
+  "tests": {
+    "live_api_actual_defaults_prepare_cancel": "passed",
+    "live_browser_voice_barcode_yape_ALIPAGO_240_prepare_cancel": "passed",
+    "original_sales_handler_in_disposable_database": "passed_one_sale_one_payment_one_bank_movement",
+    "concurrency_idempotency_rollback": "passed",
+    "inline_specific_validation_error": "passed",
+    "manual_POS_regression": "passed",
+    "session_CSRF_permissions": "passed"
+  },
+  "preservation": {
+    "api/index.php": true,
+    "api/sunat/sunat.php": true,
+    "views/header.php": true,
+    "views/V_VentaForm.php": true,
+    "imprimir/index.php": true,
+    "VentasFacturacion.vue": true,
+    "deployed_checkout": true
+  },
+  "real_sales_from_tests": 0,
+  "fiscal_calls": 0,
+  "backup_source": "backups/ali-pago-fix-20261013-204309/before.zip",
+  "backup_live": "C:/xampp/htdocs/boticav1/.ali-pago-backup-20261013-204722",
+  "no_new_sql_migration": true
+}

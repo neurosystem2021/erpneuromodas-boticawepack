@@ -1,0 +1,5 @@
+﻿from pathlib import Path
+p=Path('src/components/DiarioArea.vue');s=p.read_text(encoding='utf-8')
+s=s.replace("{{internalDone}}", "{{error?'—':internalDone}}",1).replace('{{d.acumulado}}',"{{error || supportError?'—':d.acumulado}}",1)
+s=s.replace("const r=await this.axios.get(config.API+'support/activity',{params:{from:filters.desde,to:filters.hasta,mode:this.vista==='equipo'||!staff?'team':'mine'},timeout:15000});", "let selectedUser='';if(this.vista==='equipo'&&filters.responsable){if(filters.responsable.startsWith('u:'))selectedUser=filters.responsable.slice(2);else{const employee=(this.context.empleados||[]).find(e=>String(e.IdEmpleado)===filters.responsable.slice(2));selectedUser=employee&&employee.Usuario||'';if(!selectedUser)throw new Error('unlinked employee');}}const r=await this.axios.get(config.API+'support/activity',{params:{from:filters.desde,to:filters.hasta,mode:this.vista==='equipo'||!staff?'team':'mine',technician_user:selectedUser},timeout:15000});")
+p.write_text(s,encoding='utf-8')

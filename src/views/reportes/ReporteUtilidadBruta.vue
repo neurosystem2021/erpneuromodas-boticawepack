@@ -1,78 +1,78 @@
 <template>
-  <b-container fluid class="px-5 mb-5">
-    <b-row>
-       <b-col cols="12">
-        <b-breadcrumb :items="items"></b-breadcrumb>
-       </b-col>
-        <b-col cols="3">
-            Fecha
-            <input type="date" class="form-control" v-model="fechaInicio">
-        </b-col>
-        <b-col cols="3">
-            Fecha
-            <input type="date" class="form-control" v-model="fechaFin">
-        </b-col>
-        <b-col cols="3">
-            Almacén
-            <b-form-select v-model="almacen" 
-                 value-field="IdAlmacen"
-                 text-field="Almacen"
-                :options="lstAlmances"></b-form-select>
-        </b-col>
-        <b-col cols="3" class="pt-4">
-            <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-            <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
-        </b-col>
-        <b-col cols="12" class="mt-4">
-            <table class="table table-hover table-striped ">
-                <thead>
-                    <tr>
-                        <th style="text-align: center;">IdProducto </th>
-                        <th>Producto </th>
-                        <th style="text-align: center;">Cantidad </th>
-                        <th style="text-align: center;">Precio Costo </th>
-                        <th style="text-align: center;">Precio Venta </th>
-                        <th style="text-align: center;">Total Venta </th>
-                        <th style="text-align: center;">Total Costo </th>
-                        <th style="text-align: center;">Utilidad Bruta </th>
-                        <th style="text-align: center;">% Utilidad </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(reporte,index) in lstReporte" :key="index">
-                        <td style="text-align: center;">{{reporte.IdProducto}}</td>
-                        <td>{{reporte.Producto}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.Cantidad).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.TotalCosto).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat(reporte.UtilidadBruta).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{parseFloat((reporte.TotalVenta-reporte.TotalCosto)/reporte.TotalCosto).toFixed(2)}}</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="5">{{footer.Producto}}</td>
-                       
-                        <td style="text-align: center;">{{footer.TotalVenta}}</td>
-                        <td style="text-align: center;">{{footer.TotalCosto}}</td>
-                        <td style="text-align: center;">{{footer.UtilidadBruta}}</td>
-                        <td style="text-align: center;">{{footer.PorcentajeUti}}</td>
-                    </tr>
-                </tfoot>
-            </table>
-            <!-- <b-table
-                id="my-table"
-                :items="lstReporte"
-                :per-page="perPage"
-                :current-page="currentPage"
-                small
-                :fields="header"
-                ></b-table> -->
-        </b-col>
-    </b-row>
-  </b-container>
+<b-container fluid class="px-5 mb-5 nst-screen nst-screen--reporteutilidadbruta">
+  <section class="nst-panel nst-panel--filters"><b-row>
+     <b-col cols="12">
+      <b-breadcrumb :items="items"></b-breadcrumb>
+     </b-col>
+      <b-col cols="3">
+          Fecha
+          <input type="date" class="form-control" v-model="fechaInicio">
+      </b-col>
+      <b-col cols="3">
+          Fecha
+          <input type="date" class="form-control" v-model="fechaFin">
+      </b-col>
+      <b-col cols="3">
+          Almacén
+          <b-form-select v-model="almacen" 
+               value-field="IdAlmacen"
+               text-field="Almacen"
+              :options="lstAlmances"></b-form-select>
+      </b-col>
+      <b-col cols="3" class="pt-4">
+          <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+          <b-button variant="success" @click="exportarReporte()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+      </b-col>
+      <b-col cols="12" class="mt-4">
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table table-hover table-striped ">
+              <thead>
+                  <tr>
+                      <th style="text-align: center;">IdProducto </th>
+                      <th>Producto </th>
+                      <th style="text-align: center;">Cantidad </th>
+                      <th style="text-align: center;">Precio Costo </th>
+                      <th style="text-align: center;">Precio Venta </th>
+                      <th style="text-align: center;">Total Venta </th>
+                      <th style="text-align: center;">Total Costo </th>
+                      <th style="text-align: center;">Utilidad Bruta </th>
+                      <th style="text-align: center;">% Utilidad </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="(reporte,index) in lstReporte" :key="index">
+                      <td style="text-align: center;">{{reporte.IdProducto}}</td>
+                      <td>{{reporte.Producto}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.Cantidad).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.PrecioCosto).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.PrecioVenta).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.TotalVenta).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.TotalCosto).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat(reporte.UtilidadBruta).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{parseFloat((reporte.TotalVenta-reporte.TotalCosto)/reporte.TotalCosto).toFixed(2)}}</td>
+                  </tr>
+              </tbody>
+              <tfoot>
+                  <tr style="background: #006064; color: #ffffff; font-weight: bold;">
+                      <td colspan="5">{{footer.Producto}}</td>
+                     
+                      <td style="text-align: center;">{{footer.TotalVenta}}</td>
+                      <td style="text-align: center;">{{footer.TotalCosto}}</td>
+                      <td style="text-align: center;">{{footer.UtilidadBruta}}</td>
+                      <td style="text-align: center;">{{footer.PorcentajeUti}}</td>
+                  </tr>
+              </tfoot>
+          </table></div>
+          <!-- <b-table
+              id="my-table"
+              :items="lstReporte"
+              :per-page="perPage"
+              :current-page="currentPage"
+              small
+              :fields="header"
+              ></b-table> -->
+      </b-col>
+  </b-row></section>
+</b-container>
 </template>
 
 <script>

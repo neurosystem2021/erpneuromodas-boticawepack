@@ -1,0 +1,28 @@
+{
+    "database": "neuro_mig_test_20261015_201239_7c3c7a",
+    "private_directory": "C:\/xampp\/neuro-private\/migration\/neuro_mig_test_20261015_201239_7c3c7a",
+    "profile": "C:\/xampp\/neuro-private\/migration\/neuro_mig_test_20261015_201239_7c3c7a\/profile.json",
+    "restored": true,
+    "recovered_tables": {
+        "gen_moneda": {
+            "expected_header_rows": 2,
+            "actual_rows": 2,
+            "check_ok": true
+        },
+        "lo_ordencompra": {
+            "expected_header_rows": 5,
+            "actual_rows": 5,
+            "check_ok": true
+        },
+        "lo_ordencompradet": {
+            "expected_header_rows": 205,
+            "actual_rows": 205,
+            "check_ok": true
+        },
+        "tblkardexvalor": {
+            "expected_header_rows": 17,
+            "actual_rows": 17,
+            "check_ok": true
+        }
+    }
+}

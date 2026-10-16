@@ -1,0 +1,7 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];p=r/'src/views/Ventas.vue';s=p.read_text(encoding='utf-8');pos=s.rfind('</style>');s=s[:pos]+'''
+.ali-checkout-panel{margin:12px 16px;padding:14px 18px;border:2px solid #08a879;border-radius:14px;background:#effbf6;color:#173f4a;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.ali-checkout-panel p{margin:4px 0;flex-basis:100%;font-size:13px}.ali-checkout-panel>div:first-child{flex:1;min-width:180px}.ali-checkout-total{font-size:26px;color:#067c60}.ali-checkout-panel details{flex-basis:100%;max-height:150px;overflow:auto}.ali-checkout-panel summary{cursor:pointer}.ali-checkout-actions{display:flex;gap:8px;flex-wrap:wrap}.ali-checkout-actions button{padding:9px 13px;border:0;border-radius:8px;background:#077c67;color:white;font-weight:700}.ali-checkout-actions button:disabled{opacity:.55}.ali-checkout-actions button:nth-child(2){background:#627783}@media(max-width:767px){.ali-checkout-panel{margin:8px;padding:12px}.ali-checkout-actions{width:100%}.ali-checkout-actions button{flex:1;font-size:12px}}
+'''+s[pos:];p.write_text(s,encoding='utf-8')
+p=r/'src/components/AliAssistant.vue';s=p.read_text(encoding='utf-8');s=s.replace("if(this.busy){if(this._activeAction", "if(this.busy){if(['pay','confirm'].includes(parseAliCommand(raw).type))return;if(this._activeAction");p.write_text(s,encoding='utf-8')
+print('Compact in-POS confirmation and financial command queue protection added.')

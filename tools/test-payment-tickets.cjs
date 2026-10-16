@@ -1,0 +1,16 @@
+const assert=require('assert');
+const {yapePaymentSummary,yapePaymentTicket}=require('./load-source-module')('src/utils/yapePaymentTicket.js');
+const sales=[{Serie:'B001',Numero:1,Yape:'70.25',YapeDesc:'OP<123>',Mastercard:'30',MastercardDesc:'TR456',Anulado:0},{Serie:'F001',Numero:2,Yape:10,Mastercard:20,Anulado:0},{Yape:500,Mastercard:500,Anulado:1},{Yape:900,Mastercard:900,CodSunat:'07'}];
+assert.equal(yapePaymentSummary(sales).total,80.25);
+assert.equal(yapePaymentSummary(sales,true).total,50);
+const yape=yapePaymentTicket({sales,company:{},seller:'Admin',date:'13/10/2026'});
+const transfer=yapePaymentTicket({sales,company:{},transfer:true});
+assert(yape.includes('OP&lt;123&gt;'));
+assert(yape.includes('S/ 80.25'));
+assert(transfer.includes('TR456'));
+assert(transfer.includes('TOTAL TRANSFERENCIAS'));
+assert(transfer.includes('S/ 50.00'));
+assert(!transfer.includes('OP&lt;123&gt;'));
+assert(yape.includes('width:72mm'));
+assert(yapePaymentTicket({sales:[]}).includes('S/ 0.00'));
+console.log('Yape/Plin and transfer tickets: operation, mixed-payment amounts, cancellations, totals and empty report OK');

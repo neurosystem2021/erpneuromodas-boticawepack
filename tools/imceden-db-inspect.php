@@ -1,0 +1,3 @@
+﻿<?php
+$source=file_get_contents('C:/xampp/htdocs/boticav1/api/index.php');$settings=[];foreach(['host','user','pass','dbname'] as $key){preg_match('/^\$config\[\x27db\x27\]\[\x27'.$key.'\x27\]\s*=\s*[\x27"]([^\x27"]*)[\x27"]/m',$source,$m);$settings[$key]=$m[1];}$db=new PDO('mysql:host='.$settings['host'].';dbname='.$settings['dbname'].';charset=utf8mb4',$settings['user'],$settings['pass'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+foreach(['Gen_Producto_Totales','Gen_ProductoTalla','Lo_MovimientoDetalle','Lo_MovimientoTipo','Ve_DocVentaTipoDoc']as$t){echo $t.': ';try{echo implode(',',$db->query('SHOW COLUMNS FROM '.$t)->fetchAll(PDO::FETCH_COLUMN));}catch(Throwable$e){echo 'MISSING';}echo "\n";}

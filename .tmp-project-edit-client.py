@@ -1,0 +1,6 @@
+﻿from pathlib import Path
+p=Path('src/components/ClientesForm.vue');s=p.read_text(encoding='utf-8').replace('title="Nuevo Cliente"',':title="editCliente && editCliente.IdCliente ? \'Editar cliente\' : \'Nuevo cliente\'"',1).replace('        this.cliente = this.editCliente;','        this.cliente = Object.assign({}, this.editCliente);',1);p.write_text(s,encoding='utf-8')
+p=Path('src/views/Habitaciones.vue');s=p.read_text(encoding='utf-8');a=s.index('                <clientes-form :project-mode="true"');b=s.index('              </b-input-group-append>',a)
+s=s[:b]+'''                <clientes-form v-if="selectCliente.IdCliente" :project-mode="true" :id-modal="'editarClienteProyecto_' + i" :edit-cliente="selectCliente" txt-button="Editar" button-icon="fas fa-pencil-alt" button-title="Editar cliente y teléfono" button-class="project-edit-client" @onAddCliente="(obj) => { setCliente(obj); pegarTextoBuscador('cboClientePrincipal', obj); }"></clientes-form>
+'''+s[b:]
+a=s.index('            </b-input-group>',a)+len('            </b-input-group>');s=s[:a]+'''<p v-if="selectCliente.IdCliente" class="project-client-phone"><i class="fas fa-phone" aria-hidden="true"></i> {{ selectCliente.Telefono || 'Sin teléfono. Usa Editar para agregarlo.' }}</p>'''+s[a:];p.write_text(s,encoding='utf-8')

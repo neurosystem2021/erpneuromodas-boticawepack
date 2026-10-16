@@ -1,0 +1,8 @@
+<?php
+ob_start();$dir=__DIR__.'/../.tmp-test-sessions';if(!is_dir($dir))mkdir($dir);ini_set('session.save_path',$dir);session_start();$_SESSION['user']='test';
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();
+$db->exec('CREATE TEMPORARY TABLE Gen_Producto(IdProducto INT,IdClienteReserva INT,EsHabitacion INT,Anulado INT)');$db->exec('CREATE TEMPORARY TABLE Ve_DocVentaCliente(IdCliente INT,Telefono VARCHAR(100),Cliente VARCHAR(100))');$db->exec("INSERT INTO Gen_Producto VALUES(1,2,1,0)");$db->exec("INSERT INTO Ve_DocVentaCliente VALUES(2,'','Original')");
+class PhoneRequest{public $data;function __construct($data){$this->data=$data;}function getParam($key){return $this->data[$key]??null;}}
+class PhoneResponse{function withJson($data,$status=200){return ['data'=>$data,'status'=>$status];}}
+$callback=require __DIR__.'/../integration/project-phone-edit/api/project-phone-save.php';$context=(object)['db'=>$db];$callback=$callback->bindTo($context);
+$result=$callback(new PhoneRequest(['IdProducto'=>1,'Telefono'=>'999 123 456']),new PhoneResponse());if($result['status']!==200)throw new Exception('Save failed');$row=$db->query('SELECT * FROM Ve_DocVentaCliente')->fetch(PDO::FETCH_ASSOC);if($row['Telefono']!=='999 123 456'||$row['Cliente']!=='Original')throw new Exception('Unexpected data update');$invalid=$callback(new PhoneRequest(['IdProducto'=>1,'Telefono'=>'bad']),new PhoneResponse());if($invalid['status']!==422)throw new Exception('Invalid phone accepted');session_destroy();ob_end_clean();echo "Phone save: updates only phone, validates input; temporary tables only.\n";

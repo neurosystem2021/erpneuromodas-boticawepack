@@ -1,324 +1,323 @@
 <template>
-  <div>
-      <b-container fluid style="width: calc(95%);" class="bv-example-row">
+<div class="nst-screen nst-screen--reporteproyectos">
+    <b-container fluid style="width: calc(95%);" class="bv-example-row">
+      <header class="project-register-hero"><div><span>CONTROL Y SEGUIMIENTO</span><h1>Registro de proyectos</h1><p>Consulta tus servicios, responsables y movimientos.</p></div><div class="project-register-count"><i class="fas fa-briefcase" aria-hidden="true"></i><strong>{{ totalRows }}</strong><small>proyectos registrados</small></div></header>
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="3" class="my-1">
+          <b-form-group horizontal label="Almacén" class="mb-0">
+            <b-form-select v-model="idAlmacen" :options="almacenes" v-on:change="setAlmacen($event)" class="mb-3" size="md"/>
+          </b-form-group>
+        </b-col>
+        <b-col md="5" class="my-1">
+          <b-form-group horizontal label="Buscar" class="mb-0">
+            <b-input-group>
+              <b-form-input v-model="filter" placeholder="Proyecto, cliente o documento" @input="currentPage = 1" />
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <br />
+        </b-col>
+        <b-col md="4" class="my-1">
+          <b-row>
+          <b-col md="8">
+
+            <b-form-group horizontal label="Mostrar" class="mb-0">
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+            </b-form-group>
+          </b-col>
+          <b-col md="4">
+            <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Ped</p>
+          </b-col>
+          </b-row>
+        </b-col>
+        <b-col>
+          <b-row>
+        <b-col>
+          <b-form-group horizontal label="Inicio">
+            <b-form-input
+              v-model="fechaIni"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio">
+          </b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col>
+                <b-form-group horizontal label="Fin">
+                  <b-form-input
+                    v-model="fechaFin"
+                    type="date"
+                    step="1"
+                    placeholder="Fecha Inicio"></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col>
+                <b-button variant="success" size="md" @click="actualizarTabla()" :disabled="fechaFin=='' || fechaIni==''"><i class="fas fa-search"></i> Buscar por Fecha de Registro</b-button>
+          <b-button variant="info" size="md" @click="limpiarBusquador()">Limpiar</b-button>
+              </b-col>
+        </b-row>
+        </b-col>
+
+        <b-table small
+          ref="tablaVentas"
+          :filter="filter"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          striped
+          hover
+          @row-clicked="rowClick"
+          id="my-table" 
+          :busy.sync="isBusy" 
+          :items="myProvider" 
+          :fields="fields"
+          no-provider-paging
+          :per-page="perPage"
+          :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+            <template slot="IdPreOrden" slot-scope="data">
+             <label>{{ data.item.IdPreOrden }}</label>
+            </template>
+            <template slot="UsuarioCreador" slot-scope="data"><span class="project-creator"><i class="far fa-user" aria-hidden="true"></i> {{ data.item.UsuarioCreador || 'Sin registro histórico' }}</span></template>
+            <template slot="TotalDetalle" slot-scope="data"><strong class="project-money">S/ {{ data.item.TotalDetalle | moneda }}</strong></template>
+            <template slot="Adelantos" slot-scope="data"><span class="project-advance">S/ {{ data.item.Adelantos | moneda }}</span></template>
+            <template slot="Estado" slot-scope="data">
+                <b-badge variant="success" v-if="data.item.IdDocVenta!=null">FACTURADO</b-badge>
+                <b-badge variant="primary" v-else>SIN COMPROBANTE</b-badge>
+            </template>
+            <template slot="Visualizar" slot-scope="data">
+              <b-button variant="primary" title="Ver detalle del proyecto" aria-label="Ver detalle del proyecto" @click="verDetalle(data.item.IdPreOrden,data.item)"><i class="fas fa-eye"></i></b-button>
+            </template>
+        </b-table>
+          <b-row>
+              <b-col md="6" class="my-1">
+                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+          </b-row>
+      </b-row></section>
+      <br />
+      <br />
+      <b-modal size="lg" id="modalDetalle" ref="modalDetalle" :title="'DETALLE DE '+nombreProyecto" ok-only ok-title="Cerrar" modal-class="nst-dialog project-detail-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
         <b-row>
-          <b-col class="text-center">
-            <h3>Registro de Proyectos</h3>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">RUC</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.DniRuc }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Cliente</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Cliente }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Inicio</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaAlquilerInicioF }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Estado</td>
+                  <td class="celda" style="text-transform: uppercase">:
+                    <b-badge variant="success" v-if="productoSelect.IdDocVenta!=null">FACTURADO</b-badge>
+                    <b-badge variant="primary" v-else>SIN COMPROBANTE</b-badge>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Comprobante</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Comprobante }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Usuario</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.UsuarioCreador || "Sin registro histórico" }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Fin</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaAlquilerFinF }}</td>
+                </tr>
+              </tbody>
+            </table>
           </b-col>
         </b-row>
         <hr>
         <b-row>
-          <b-col md="3" class="my-1">
-            <b-form-group horizontal label="Almacén" class="mb-0">
-              <b-form-select v-model="idAlmacen" :options="almacenes" v-on:change="setAlmacen($event)" class="mb-3" size="md"/>
-            </b-form-group>
+          <b-col md="6">
+            <div style="left: 1rem;" v-if="productoSelect.IdProducto">
+                <b-input-group>
+                  <b-form-input
+                    v-model="cantidadCodigoBarra"
+                    type="number"
+                    style="width:80px;"
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + productoSelect.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
+                  </b-input-group-append>
+                </b-input-group>
+              </div>
           </b-col>
-          <b-col md="5" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <br />
+          <b-col md="12">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold;">Descripción: <span style="font-weight: normal;">{{ productoSelect.Descripcion }}</span></td>
+                </tr>
+              </tbody>
+            </table>
           </b-col>
-          <b-col md="4" class="my-1">
-            <b-row>
-            <b-col md="8">
-
-              <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Ped</p>
-            </b-col>
-            </b-row>
-          </b-col>
-          <b-col>
-            <b-row>
-          <b-col>
-            <b-form-group horizontal label="Inicio">
-              <b-form-input
-                v-model="fechaIni"
-                type="date"
-                step="1"
-                placeholder="Fecha Inicio">
-            </b-form-input>
-                  </b-form-group>
-                </b-col>
-                <b-col>
-                  <b-form-group horizontal label="Fin">
-                    <b-form-input
-                      v-model="fechaFin"
-                      type="date"
-                      step="1"
-                      placeholder="Fecha Inicio"></b-form-input>
-                  </b-form-group>
-                </b-col>
-                <b-col>
-                  <b-button variant="success" size="md" @click="actualizarTabla()" :disabled="fechaFin=='' || fechaIni==''"><i class="fas fa-search"></i> Buscar por Fecha de Registro</b-button>
-            <b-button variant="info" size="md" @click="limpiarBusquador()">Limpiar</b-button>
-                </b-col>
-          </b-row>
-          </b-col>
-
-          <b-table small
-            ref="tablaVentas"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage">
-              <template slot="IdPreOrden" slot-scope="data">
-               <label>{{ data.item.IdPreOrden }}</label>
-              </template>
-              <template slot="Estado" slot-scope="data">
-                  <b-badge variant="success" v-if="data.item.IdDocVenta!=null">FACTURADO</b-badge>
-                  <b-badge variant="primary" v-else>SIN COMPROBANTE</b-badge>
-              </template>
-              <template slot="Visualizar" slot-scope="data">
-                <b-button variant="primary" @click="verDetalle(data.item.IdPreOrden,data.item)"><i class="fas fa-eye"></i></b-button>
-              </template>
-          </b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
         </b-row>
-        <br />
-        <br />
-        <b-modal size="lg" id="modalDetalle" ref="modalDetalle" :title="'DETALLE DE '+nombreProyecto" ok-only ok-title="Cerrar">
-          <b-row>
-            <b-col md="6">
-              <table>
+        <br>
+        <h6>Adelantos:</h6>
+        <b-row>
+          <b-col md="12">
+            <table class="table b-table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id Caja</th>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Concepto</th>
+                        <th class="text-center">Importe</th>
+                        <th class="text-center">Doc</th>
+                    </tr>
+                </thead>
                 <tbody>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">RUC</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.DniRuc }}</td>
-                  </tr>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Cliente</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Cliente }}</td>
-                  </tr>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Inicio</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaAlquilerInicioF }}</td>
-                  </tr>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Estado</td>
-                    <td class="celda" style="text-transform: uppercase">:
-                      <b-badge variant="success" v-if="productoSelect.IdDocVenta!=null">FACTURADO</b-badge>
-                      <b-badge variant="primary" v-else>SIN COMPROBANTE</b-badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Comprobante</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.Comprobante }}</td>
-                  </tr>
+                    <tr v-for="(ade, i) in adelantos" :key="i">
+                        <td class="text-center">{{ ade.IdCajaBanco }}</td>
+                        <td class="text-center">{{ ade.FechaDoc }}</td>
+                        <td class="text-center">{{ ade.Concepto }}</td>
+                        <td class="text-center">{{ ade.Importe | moneda }}</td>
+                        <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + ade.IdCajaBanco" target="_blank"><i class="fas fa-print"></i></b-btn></td>
+                    </tr>
                 </tbody>
-              </table>
-            </b-col>
-            <b-col md="6">
-              <table>
+                <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="text-center"><b>TOTAL ADELANTOS</b></td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{productoSelect.Adelantos | moneda}} </td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+        </b-row>
+        <h6>Gastos:</h6>
+        <b-row>
+          <b-col md="12">
+            <table class="table b-table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id Caja</th>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Concepto</th>
+                        <th class="text-center">Importe</th>
+                        <th class="text-center">Doc</th>
+                    </tr>
+                </thead>
                 <tbody>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Usuario</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.UsuarioReg }}</td>
-                  </tr>
-                  <tr>
-                    <td class="celda" style="font-weight:bold; width:40% !important;">Fecha Fin</td>
-                    <td class="celda" style="text-transform: uppercase">: {{ productoSelect.FechaAlquilerFinF }}</td>
-                  </tr>
+                    <tr v-for="(ade, i) in gastos" :key="i">
+                        <td class="text-center">{{ ade.IdCajaBanco }}</td>
+                        <td class="text-center">{{ ade.FechaDoc }}</td>
+                        <td class="text-center">{{ ade.Concepto }}</td>
+                        <td class="text-center">{{ ade.Importe | moneda }}</td>
+                        <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + ade.IdCajaBanco" target="_blank"><i class="fas fa-print"></i></b-btn></td>
+                    </tr>
                 </tbody>
-              </table>
-            </b-col>
-          </b-row>
-          <hr>
-          <b-row>
-            <b-col md="6">
-              <div style="left: 1rem;" v-if="productoSelect.IdProducto">
-                  <b-input-group>
-                    <b-form-input
-                      v-model="cantidadCodigoBarra"
-                      type="number"
-                      style="width:80px;"
-                    ></b-form-input>
-                    <b-input-group-append>
-                      <b-btn variant="info" target="_blank" :href="'/views/codigoBarra.php?idProducto=' + productoSelect.IdProducto + '&cantidad=' + cantidadCodigoBarra ">Código de barra</b-btn>
-                    </b-input-group-append>
-                  </b-input-group>
-                </div>
-            </b-col>
-            <b-col md="12">
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="celda" style="font-weight:bold;">Descripción: <span style="font-weight: normal;">{{ productoSelect.Descripcion }}</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </b-col>
-          </b-row>
-          <br>
-          <h6>Adelantos:</h6>
-          <b-row>
-            <b-col md="12">
-              <table class="table b-table table-sm table-striped">
-                  <thead>
-                      <tr>
-                          <th class="text-center">Id Caja</th>
-                          <th class="text-center">Fecha</th>
-                          <th class="text-center">Concepto</th>
-                          <th class="text-center">Importe</th>
-                          <th class="text-center">Doc</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr v-for="(ade, i) in adelantos" :key="i">
-                          <td class="text-center">{{ ade.IdCajaBanco }}</td>
-                          <td class="text-center">{{ ade.FechaDoc }}</td>
-                          <td class="text-center">{{ ade.Concepto }}</td>
-                          <td class="text-center">{{ ade.Importe | moneda }}</td>
-                          <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + ade.IdCajaBanco" target="_blank"><i class="fas fa-print"></i></b-btn></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <td colspan="2"></td>
-                    <td class="text-center"><b>TOTAL ADELANTOS</b></td>
-                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{productoSelect.Adelantos | moneda}} </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </b-col>
-          </b-row>
-          <h6>Gastos:</h6>
-          <b-row>
-            <b-col md="12">
-              <table class="table b-table table-sm table-striped">
-                  <thead>
-                      <tr>
-                          <th class="text-center">Id Caja</th>
-                          <th class="text-center">Fecha</th>
-                          <th class="text-center">Concepto</th>
-                          <th class="text-center">Importe</th>
-                          <th class="text-center">Doc</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr v-for="(ade, i) in gastos" :key="i">
-                          <td class="text-center">{{ ade.IdCajaBanco }}</td>
-                          <td class="text-center">{{ ade.FechaDoc }}</td>
-                          <td class="text-center">{{ ade.Concepto }}</td>
-                          <td class="text-center">{{ ade.Importe | moneda }}</td>
-                          <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + ade.IdCajaBanco" target="_blank"><i class="fas fa-print"></i></b-btn></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <td colspan="2"></td>
-                    <td class="text-center"><b>TOTAL ADELANTOS</b></td>
-                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
-                        gastos.reduce((total,gasto)=>{
-                          return total + parseFloat(gasto.Importe)
-                        },0)
-                      }} </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </b-col>
-          </b-row>
-          <hr>
-          <h6>Productos:</h6>
-          <b-row>
-            <b-col md="12">
-              <table class="table b-table table-sm table-striped">
-                  <thead>
-                      <tr>
-                          <th class="text-center">Codigo</th>
-                          <th class="text-center">Producto</th>
-                          <th class="text-center">Cantidad</th>
-                          <th class="text-center">Precio</th>
-                          <th class="text-center">Total</th>
-                          <th class="text-center">Pagado</th>
-                          <th class="text-center">Deuda</th>
-                          <th class="text-center">Incluido Mano de Obra</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr v-for="(prod, i) in productos" :key="i" v-show="prod.EsHabitacion!=1">
-                          <td class="text-center">{{ prod.CodigoBarra }}</td>
-                          <td class="text-center">{{ prod.Producto }}</td>
-                          <td class="text-center">{{ prod.Cantidad }}</td>
-                          <td class="text-center">{{ prod.Precio | moneda }}</td>
-                          <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
-                          <td class="text-center">{{ prod.MontoPagado }}</td>
-                          <td class="text-center">{{ prod.Deuda }}</td>
-                          <td class="text-center"><span v-if="prod.EsManoDeObra==1"><b-badge style="font-size:0.8rem" variant="primary">SI</b-badge></span><span v-else>-</span></td>
-                      </tr>
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <td colspan="3"></td>
-                    <td class="text-center"><b>TOTAL PRODUCTOS</b></td>
-                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{productoSelect.TotalDetalle | moneda}} </td>
-                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
-                      productos.reduce((total,producto)=>{
-                        return total + parseFloat(producto.MontoPagado)
+                <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td class="text-center"><b>TOTAL ADELANTOS</b></td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                      gastos.reduce((total,gasto)=>{
+                        return total + parseFloat(gasto.Importe)
                       },0)
                     }} </td>
-                    <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
-                      productos.reduce((total,producto)=>{
-                        return total + parseFloat(producto.Deuda)
-                      },0)
-                    }} </td>
-                   
-                  </tr>
-                </tfoot>
-              </table>
-            </b-col>
-          </b-row>
-          <hr>
-          
-          <table class="tbl" width="100%">
-            <thead>
-              <tr>
-                <th>Mano de obra bruta</th>
-                <th>Gastos</th>
-                <th>Ganancia Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ totalManoObra }}</td>
-                <td>{{ totalGasto }}</td>
-                <td>{{ totalManoObraNeta }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <hr>
-          <h6><b>Pago Restante: {{(productoSelect.TotalDetalle - productoSelect.Adelantos)  | moneda}}</b></h6>
-          <hr>
-          <b-row v-if="productoSelect.Imagen">
-            <b-col class="text-center">
-              <b-img :src="'/resources/images/pedidos/' + productoSelect.Imagen" fluid alt="" style="width: 500px; height: 500px;" @error="setAltImg"></b-img>
-            </b-col>
-          </b-row>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+        </b-row>
+        <hr>
+        <h6>Productos:</h6>
+        <b-row>
+          <b-col md="12">
+            <table class="table b-table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Codigo</th>
+                        <th class="text-center">Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Precio</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">Pagado</th>
+                        <th class="text-center">Deuda</th>
+                        <th class="text-center">Incluido Mano de Obra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(prod, i) in productos" :key="i" v-show="prod.EsHabitacion!=1">
+                        <td class="text-center">{{ prod.CodigoBarra }}</td>
+                        <td class="text-center">{{ prod.Producto }}</td>
+                        <td class="text-center">{{ prod.Cantidad }}</td>
+                        <td class="text-center">{{ prod.Precio | moneda }}</td>
+                        <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
+                        <td class="text-center">{{ prod.MontoPagado }}</td>
+                        <td class="text-center">{{ prod.Deuda }}</td>
+                        <td class="text-center"><span v-if="prod.EsManoDeObra==1"><b-badge style="font-size:0.8rem" variant="primary">SI</b-badge></span><span v-else>-</span></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                  <td colspan="3"></td>
+                  <td class="text-center"><b>TOTAL PRODUCTOS</b></td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{productoSelect.TotalDetalle | moneda}} </td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                    productos.reduce((total,producto)=>{
+                      return total + parseFloat(producto.MontoPagado)
+                    },0)
+                  }} </td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{
+                    productos.reduce((total,producto)=>{
+                      return total + parseFloat(producto.Deuda)
+                    },0)
+                  }} </td>
+                 
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+        </b-row>
+        <hr>
+        
+        <table class="tbl" width="100%">
+          <thead>
+            <tr>
+              <th>Mano de obra bruta</th>
+              <th>Gastos</th>
+              <th>Ganancia Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ totalManoObra }}</td>
+              <td>{{ totalGasto }}</td>
+              <td>{{ totalManoObraNeta }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        <h6><b>Pago Restante: {{(productoSelect.TotalDetalle - productoSelect.Adelantos)  | moneda}}</b></h6>
+        <hr>
+        <b-row v-if="productoSelect.Imagen">
+          <b-col class="text-center">
+            <b-img :src="'/resources/images/pedidos/' + productoSelect.Imagen" fluid alt="" style="width: 500px; height: 500px;" @error="setAltImg"></b-img>
+          </b-col>
+        </b-row>
 
-        </b-modal>
-      </b-container>
-  </div>
+      </b-modal>
+    </b-container>
+</div>
 </template>
 
 <script>
@@ -326,9 +325,6 @@ import config from "@/store/config.js";
 
 export default {
   mounted() {
-    this.axios.get(this.API + "proyectos/count").then(response => {
-      this.totalRows = response.data.total;
-    });
     this.getAlmacenes();
   },
   data() {
@@ -354,10 +350,10 @@ export default {
         { key: "Nombre", sortable: true },
         { key: "Cliente", sortable: true },
         { key: "DniRuc", sortable: true },
+        { key: "UsuarioCreador", label: "Creado por", sortable: true },
         { key: "FechaReg", label: "Fecha Registro", sortable: true },
         { key: "FechaAlquilerInicioF", label: "Fecha Inicio", sortable: true },
         { key: "FechaAlquilerFinF", label: "Fecha Fin", sortable: true },
-        { key: "Cliente", sortable: true },
         { key: "Adelantos", label: "Adelantos", sortable: true },
         { key: "TotalDetalle", label: "Total", sortable: true },
         {
@@ -463,49 +459,27 @@ export default {
         });
     },
     actualizarTabla() {
-      setTimeout(() => {
-        this.$refs.tablaVentas.refresh();
-      }, 300);
+      if (this.fechaIni && this.fechaFin && this.fechaIni > this.fechaFin) {
+        this.$toasted.error('La fecha de inicio debe ser anterior a la fecha final.'); return;
+      }
+      this.currentPage = 1;
+      this.$nextTick(() => { this.$refs.tablaVentas.refresh(); });
     },
-    setAlmacen() {
-      this.actualizarTabla();
-    },
+    setAlmacen() { this.actualizarTabla(); },
     myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      let url =
-        this.API +
-        "reporte/proyectos?&FechaIni=" +
-        this.fechaFin +
-        "&FechaFin=" +
-        this.fechaIni +
-        "&idAlmacen=" +
-        this.idAlmacen +
-        "&limit=" +
-        ctx.perPage +
-        "&page=" +
-        ctx.currentPage +
-        "&filter=" +
-        (ctx.filter || "") +
-        "&sortBy=" +
-        ctx.sortBy;
-      url += "&sortDesc=" + (ctx.sortDesc ? 1 : 0);
-      let promise = this.axios.get(url);
-
-      return promise
-        .then(result => {
-          this.items = result.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
-        })
-        .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return [];
-        });
+      return this.axios.get(this.API + 'reporte/proyectos', {params:{
+        FechaIni:this.fechaIni, FechaFin:this.fechaFin,
+        idAlmacen:this.idAlmacen, filter:ctx.filter || '',
+        sortBy:ctx.sortBy || 'IdPreOrden', sortDesc:ctx.sortDesc ? 1 : 0
+      }}).then(result => {
+        this.items = Array.isArray(result.data) ? result.data : [];
+        this.totalRows = this.items.length;
+        return this.items;
+      }).catch(() => {
+        this.totalRows = 0;
+        this.$toasted.error('No se pudo cargar la búsqueda de proyectos. Intente nuevamente.');
+        return [];
+      });
     },
     getAlmacenes() {
       this.almacenes = [];

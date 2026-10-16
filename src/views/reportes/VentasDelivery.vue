@@ -1,45 +1,45 @@
 <template>
-  <b-container fluid>
-    <b-row>
-        <b-col cols="4" class="my-3">
-            <b-input-group prepend="Desde:">
-                <b-form-input v-model="desde" type="date"></b-form-input>
-            </b-input-group>
-        </b-col>
-        <b-col cols="4" class="my-3">
-            <b-input-group prepend="Hasta:">
-                <b-form-input v-model="hasta" type="date"></b-form-input>
-            </b-input-group>
-        </b-col>
-        <b-col cols="4" class="my-3">
-            <b-button variant="success" @click="cargarVentasDelivery">Generar</b-button>
-        </b-col>
-        <!-- <b-col cols="2"></b-col>
-        <b-col cols="2"></b-col> -->
-        <b-col cols="12">
-            <b-table 
-                :items="ventas" 
-                :fields="fields"
-                :per-page="perPage"
-                :current-page="currentPage"
-            >
-                <template slot="action" slot-scope="data">
-                    <b-button @click="cargarVentasDetalle(data.item)" variant="info"> <i class="fa fa-eye" aria-hidden="true"></i> Detalle</b-button>
-                </template>
-            </b-table>
+<b-container fluid class="nst-screen nst-screen--ventasdelivery">
+  <section class="nst-panel nst-panel--filters"><b-row>
+      <b-col cols="4" class="my-3">
+          <b-input-group prepend="Desde:">
+              <b-form-input v-model="desde" type="date"></b-form-input>
+          </b-input-group>
+      </b-col>
+      <b-col cols="4" class="my-3">
+          <b-input-group prepend="Hasta:">
+              <b-form-input v-model="hasta" type="date"></b-form-input>
+          </b-input-group>
+      </b-col>
+      <b-col cols="4" class="my-3">
+          <b-button variant="success" @click="cargarVentasDelivery">Generar</b-button>
+      </b-col>
+      <!-- <b-col cols="2"></b-col>
+      <b-col cols="2"></b-col> -->
+      <b-col cols="12">
+          <b-table 
+              :items="ventas" 
+              :fields="fields"
+              :per-page="perPage"
+              :current-page="currentPage" responsive=""
+           show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+              <template slot="action" slot-scope="data">
+                  <b-button @click="cargarVentasDetalle(data.item)" variant="info"> <i class="fa fa-eye" aria-hidden="true"></i> Detalle</b-button>
+              </template>
+          </b-table>
 
-            <b-pagination
-                v-model="currentPage"
-                :total-rows="ventas.length"
-                :per-page="perPage"
-                aria-controls="my-table"
-            ></b-pagination>
-        </b-col>
-    </b-row>
-    <b-modal v-model="dlgDetalle" size="lg" :title="`${venta.Serie}-${venta.Numero}`">
-        <b-table :items="detalle" :fields="fieldsDet"></b-table>
-    </b-modal>
-  </b-container>
+          <b-pagination
+              v-model="currentPage"
+              :total-rows="ventas.length"
+              :per-page="perPage"
+              aria-controls="my-table"
+          ></b-pagination>
+      </b-col>
+  </b-row></section>
+  <b-modal v-model="dlgDetalle" size="lg" :title="`${venta.Serie}-${venta.Numero}`" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-table :items="detalle" :fields="fieldsDet"></b-table>
+  </b-modal>
+</b-container>
 </template>
 
 <script>

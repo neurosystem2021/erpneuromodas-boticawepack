@@ -1,0 +1,46 @@
+CONECTOR FACTURA.VIP - NST
+Este paquete NO contiene claves privadas, contrasenas ni datos de clientes.
+No instala una central por cliente. Solo conecta la sesion de su ERP a la central.
+
+REQUISITOS
+ERP compatible con NST: PHP 7.4, Slim 3, appPdoConnection en config/database.php,
+Gen_Empresa, Seg_Usuario y sesion user. PHP OpenSSL y cURL habilitados.
+Central accesible por HTTPS desde ese servidor. Localhost solo sirve para probar NST;
+ningun servidor remoto puede conectarse al localhost de esta computadora.
+Mantener reloj del servidor sincronizado. La firma vence a los 120 segundos.
+
+1. Definir la direccion HTTPS definitiva de la API central (termina en /api/index.php).
+2. En el servidor CLIENTE, generar sus claves:
+ php setup-connector.php --central=https://central.example/api/index.php --company=1 --private-dir=/private/support --webroot=/var/www/erp
+ En Windows usar rutas fuera de C:/xampp/htdocs para private-dir.
+ No copiar la clave privada fuera de ese servidor. La generacion no reemplaza
+ configuraciones existentes ni rota claves silenciosamente.
+3. Compartir SOLO public-registration.json con el superadmin central. En NST:
+ Centro de soporte -> Empresas y accesos -> Registrar otra instalacion.
+ Registrar UUID, origen HTTPS del CLIENTE, IdEmpresa local, key_id y clave PUBLICA.
+4. Instalar el adaptador y UI aislada, despues de respaldo y prueba del cliente:
+ php install-connector.php --erp-root=/var/www/erp --private-config=/private/support/support-client.php
+ El instalador agrega rutas /support, menu y /support-ui; no reemplaza /nuevo.
+ Si no coinciden los puntos de integracion del ERP, se detiene para revision.
+5. Abrir Centro de soporte con un usuario cliente y verificar su empresa.
+6. Desde NST conceder a los tecnicos centrales acceso a esa empresa y asignar tickets.
+7. Probar dos empresas: un cliente no puede consultar tickets ni notas de la otra.
+
+FIRMA Y PRIVACIDAD
+RSA-SHA256, clave RSA 2048 bits, TLS verificado, sin redirecciones HTTP.
+El proxy toma usuario desde sesion y verifica que siga activo en Seg_Usuario.
+Empresa configurada en servidor, sede del almacen de sesion. El navegador no
+puede conceder roles centrales ni elegir otra empresa con tenant_id.
+El cliente recibe un CSRF local; la clave privada nunca se entrega al navegador.
+La central valida firma del cuerpo, instalacion/clave activa, timestamp y nonce.
+No hay reintento automatico de creacion: revisar el listado si falla la conexion.
+
+ESTADO DEL PAQUETE
+Implementa tickets, consulta, estados, conversaciones, notas segun permisos,
+registro de tiempos y encuesta. Registro de empresas/accesos/categorias en central.
+No incluye aun transporte de adjuntos remotos, SLA contractual ni integraciones
+correo/WhatsApp. El paquete no conecta a ninguna empresa hasta aprovisionar su clave.
+La UI se compila desde el mismo frontend NST; /support-ui se usa exclusivamente
+para la ruta /soporte y no sustituye el frontend operativo del cliente.
+Para conectar sistemas que no sean NST, adaptar solo resolucion de identidad,
+registro de rutas/menu y carga de configuracion; mantener el protocolo de firma.

@@ -1,0 +1,17 @@
+import { createApp } from 'vue'
+import App from './App.vue'
+import './style.css'
+import './ai-settings.css'
+import './inbox.css'
+import './connection.css'
+import './customer-import.css'
+import './campaign-media.css'
+import './analytics.css'
+import './segments.css'
+import './home.css'
+import './tasks.css'
+import './loyalty.css'
+import './bot-rules.css'
+import './customers.css'
+
+createApp(App).mount('#app')

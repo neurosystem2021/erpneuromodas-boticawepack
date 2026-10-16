@@ -1,0 +1,10 @@
+﻿const fs=require('fs'),assert=require('assert');
+let script=fs.readFileSync('src/views/reportes/Confrontacion.vue','utf8').match(/<script>([\s\S]*?)<\/script>/)[1].replace(/^import .*;$/gm,'').replace('export default','return');
+const win={addEventListener(){},removeEventListener(){}};
+const c=new Function('config','InventoryCamera','inventoryQuantity','window',script)({API:'/'},{},Number,win);
+const ctx=Object.assign(c.data(),c.methods,{restoreDraft(){this.restored=true},scheduleSearch(){this.searched=true}});
+ctx.toggleVoice();assert(ctx.error.includes('NO ADMITE'));
+win.SpeechRecognition=class{start(){this.onstart()}stop(){this.onend()}};
+ctx.toggleVoice();assert(ctx.listening);ctx._recognition.onresult({results:[[{transcript:' teclado gamer '}]]});assert.equal(ctx.query,'teclado gamer');assert(ctx.searched);ctx.toggleVoice();assert(!ctx.listening);
+ctx.axios={get(url){return url.includes('almacenes')?Promise.resolve({data:[{IdAlmacen:1,Almacen:'TARAPACA'}]}):Promise.reject(Error('category unavailable'))}};
+c.mounted.call(ctx).then(()=>{assert.equal(ctx.warehouseId,'1');assert(ctx.restored);console.log('PASS: voice support, transcript search, stop, TARAPACA despite category failure')}).catch(e=>{console.error(e);process.exit(1)});

@@ -1,0 +1,9 @@
+{
+    "payment_orphans": 4728,
+    "detail_orphans": 0,
+    "credit_note_orphans": 23,
+    "duplicate_documents": 0,
+    "duplicate_barcodes": 0,
+    "sale_client_orphans": 0,
+    "detail_product_orphans": 0
+}

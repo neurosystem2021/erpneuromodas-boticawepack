@@ -1,192 +1,192 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="12" class="my-1">
-            <b-row>
-               <b-col md="4">
-                <!-- <b-form-group>
-                  <label>Almacen:</label>
-                  <autocomplete
-                      required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      initValue="VENTA"
-                      label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
-                </b-form-group> -->
-
-                <b-form-group>
-                  <label>Fecha Inicio:</label>
-                  <b-form-input v-model="fechaInicio"
-                    type="date"
-                    placeholder=""
-                    :value="fechaInc"
-                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
-                </b-form-group>
-                <b-form-group>
-                    <label>Fecha Fin:</label>
-                    <b-form-input v-model="fechaFin"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaFin', val) "></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-row>
-                  <b-col md="12">
-                    <b-form-group>
-                        <label>Cliente:</label>
-                        <autocomplete
-                            required="required"
-                            ref="inputCliente"
-                            :url="API + 'clientes'"
-                            anchor="ClienteDniRuc"
-                            label="writer"
-                            placeholder=""
-                            :onInput="(val) => !val ? generateFilter('cliente', val) : false"
-                            :on-select="setCliente" 
-                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-                
-                
-              </b-col>
-              
-              <b-col md="4">
-                <b-row>
-                    <b-col md="6">
-                        <b-form-group label="Limpiar Filtros">
-                            <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
-                        </b-form-group>
-                    </b-col>
-                    <b-col md="6">
-                        <b-form-group label="Mostrar">
-                            <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-              </b-col>
-            </b-row>
-          </b-col>
-          
-        </b-row>
-        <b-row>
-          
-          <b-col md="12">
-            <b-table small
-              ref="tablaVentas"
-              :filter="filter"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              striped
-              hover
-              @row-clicked="rowClick"
-              id="tabla-ventas" 
-              :busy.sync="isBusy" 
-              :items="myProvider" 
-              :fields="fields"
-              :per-page="perPage"
-              :current-page="currentPage">
-
-                <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
-                  </div>
-                </template>
-
-                <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
-                </template>
-
-                <template slot="Entregar" slot-scope="data">
-                  <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
-                  <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
-                </template>
-
-              </b-table>
-          </b-col>
+<div class="nst-screen nst-screen--porentregar">
+    <b-container class="bv-example-row">
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="12" class="my-1">
           <b-row>
-              <b-col md="6" class="my-1">
-                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-              </b-col>
+             <b-col md="4">
+              <!-- <b-form-group>
+                <label>Almacen:</label>
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    initValue="VENTA"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacen" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group> -->
+
+              <b-form-group>
+                <label>Fecha Inicio:</label>
+                <b-form-input v-model="fechaInicio"
+                  type="date"
+                  placeholder=""
+                  :value="fechaInc"
+                  @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+              </b-form-group>
+              <b-form-group>
+                  <label>Fecha Fin:</label>
+                  <b-form-input v-model="fechaFin"
+                  type="date"
+                  placeholder=""
+                  @input="val => generateFilter('fechaFin', val) "></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+              <b-row>
+                <b-col md="12">
+                  <b-form-group>
+                      <label>Cliente:</label>
+                      <autocomplete
+                          required="required"
+                          ref="inputCliente"
+                          :url="API + 'clientes'"
+                          anchor="ClienteDniRuc"
+                          label="writer"
+                          placeholder=""
+                          :onInput="(val) => !val ? generateFilter('cliente', val) : false"
+                          :on-select="setCliente" 
+                          :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              
+              
+            </b-col>
+            
+            <b-col md="4">
+              <b-row>
+                  <b-col md="6">
+                      <b-form-group label="Limpiar Filtros">
+                          <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+                      </b-form-group>
+                  </b-col>
+                  <b-col md="6">
+                      <b-form-group label="Mostrar">
+                          <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+                      </b-form-group>
+                  </b-col>
+              </b-row>
+            </b-col>
           </b-row>
+        </b-col>
+        
+      </b-row></section>
+      <section class="nst-panel nst-panel--results"><b-row>
+        
+        <b-col md="12">
+          <b-table small
+            ref="tablaVentas"
+            :filter="filter"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            striped
+            hover
+            @row-clicked="rowClick"
+            id="tabla-ventas" 
+            :busy.sync="isBusy" 
+            :items="myProvider" 
+            :fields="fields"
+            :per-page="perPage"
+            :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+
+              <template slot="stock" slot-scope="data">
+                <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                  {{ getStock(data.item.IdProducto) }}
+                </div>
+              </template>
+
+              <template slot="Reimprimir" slot-scope="data">
+                <a class="btn btn-success" target="_blank" :href="'/imprimir/index.php?IdDocVenta=' + data.item.idDocVenta + '&preview=1'">{{data.item.TipoDoc}}</a>
+              </template>
+
+              <template slot="Entregar" slot-scope="data">
+                <!--<button class="btn btn-success" target="_blank" @click="() => entregarVenta(data.item)">ENTREGAR</button>-->
+                <button class="btn btn-success" target="_blank" @click="openEntregarDet(data.item)">ENTREGAR</button>
+              </template>
+
+            </b-table>
+        </b-col>
+        <b-row>
+            <b-col md="6" class="my-1">
+                <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+            </b-col>
         </b-row>
-        <br />
+      </b-row></section>
+      <br />
 
-        <br /><br />
-      </b-container>
+      <br /><br />
+    </b-container>
 
-      <!-- POR ENTREGAR -->
-      <b-modal v-model="modalShow" title="Por Entregar" size="lg" @ok="saveEntrega ">
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>PRODUCTO</th>
-              <th>CANTIDAD</th>
-              <th>ACTUAL</th>
-              <th>ENTREGAR</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="end in porEntregarDet" :key="end.id">
-              <td>{{ end.IdDocVentaDet }}</td>
-              <td>{{ end.Producto }}</td>
-              <td>{{ end.Cantidad }}</td>
-              <td>{{ end.entregar }}</td>
-              <td>
-                <input 
-                  type="number" 
-                  class="form-control"
-                  step="0.001"
-                  :disabled="end.entregar === 0"
-                  v-model="end.cantEntregar"
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- POR ENTREGAR -->
+    <b-modal v-model="modalShow" title="Por Entregar" size="lg" @ok="saveEntrega " modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <table class="table b-table table-sm">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>PRODUCTO</th>
+            <th>CANTIDAD</th>
+            <th>ACTUAL</th>
+            <th>ENTREGAR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="end in porEntregarDet" :key="end.id">
+            <td>{{ end.IdDocVentaDet }}</td>
+            <td>{{ end.Producto }}</td>
+            <td>{{ end.Cantidad }}</td>
+            <td>{{ end.entregar }}</td>
+            <td>
+              <input 
+                type="number" 
+                class="form-control"
+                step="0.001"
+                :disabled="end.entregar === 0"
+                v-model="end.cantEntregar"
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <hr>
+      <hr>
 
-        <table class="table b-table table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>PRODUCTO</th>
-              <th>FECHA</th>
-              <th>CANTIDAD</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="en in porEntregar" :key="en.id" :class="{'rowImprimir': en.th}">
-              <td>{{ en.IdDocVentaDetEntrega }}</td>
-              <td>{{ en.Producto }}</td>
-              <td>{{ en.Fecha }}</td>
-              <td>{{ en.Cantidad }}</td>
-              <td v-if="en.th">
-                <button class="btn btn-info" target="_blank" @click="imprimir(en)">IMPRIMIR</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <table class="table b-table table-sm">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>PRODUCTO</th>
+            <th>FECHA</th>
+            <th>CANTIDAD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="en in porEntregar" :key="en.id" :class="{'rowImprimir': en.th}">
+            <td>{{ en.IdDocVentaDetEntrega }}</td>
+            <td>{{ en.Producto }}</td>
+            <td>{{ en.Fecha }}</td>
+            <td>{{ en.Cantidad }}</td>
+            <td v-if="en.th">
+              <button class="btn btn-info" target="_blank" @click="imprimir(en)">IMPRIMIR</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-      </b-modal>
+    </b-modal>
 
-      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showVenta" title="Kardex de producto">
-        <b-alert show variant="warning">titulo</b-alert>
-        <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
-      </b-modal>
-  </div>
+    <b-modal id="kardex" size="lg" modal-class="modal-xl nst-dialog" v-model="showVenta" title="Kardex de producto" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-alert show variant="warning">titulo</b-alert>
+      <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
+    </b-modal>
+</div>
 </template>
 
 <script>

@@ -1,8 +1,18 @@
+import Contabilidad from '@/views/Contabilidad.vue';
+import ProformaEditor from '@/views/ProformaEditor.vue';
+import MigradorHistorico from '@/views/MigradorHistorico.vue';
+import ReporteSireVentas from '@/views/reportes/ReporteSireVentas.vue';
+import ReporteSireMovimiento from '@/views/reportes/ReporteSireMovimiento.vue';
 import Vue from "vue";
+import CentroSoporte from '@/views/CentroSoporte.vue';
+import DiarioActividades from '@/views/DiarioActividades.vue';
+import TecnicoExperto from '@/views/TecnicoExperto.vue';
 import Router from "vue-router";
 // import HelloWorld from '@/components/HelloWorld'
 import Movimiento from "@/views/Movimiento.vue";
 import Productos from "@/views/Productos.vue";
+import ReposicionStock from "@/views/ReposicionStock.vue";
+import ProductosSinMovimiento from "@/views/ProductosSinMovimiento.vue";
 import Almacen from "@/views/Almacen.vue";
 import Ventas from "@/views/Ventas.vue";
 import VentaReimpresion from "@/views/VentaReimpresion.vue";
@@ -28,6 +38,7 @@ import Ordenes from "@/views/reportes/Ordenes.vue";
 import ReporteVentas from "@/views/reportes/Ventas.vue";
 import StockMinimo from "@/views/reportes/StockMinimo.vue";
 import Comisionistas from "@/views/reportes/Comisionistas.vue";
+import Planilla from "@/views/Planilla.vue";
 import DeudaClientes from "@/views/reportes/DeudaClientes.vue";
 import DeudaProveedores from "@/views/reportes/DeudaProveedores.vue";
 import RankingClientes from "@/views/reportes/RankingClientes.vue";
@@ -57,6 +68,15 @@ Vue.use(Router);
 export default new Router({
   // mode: 'history',
   routes: [
+    {path:'/contabilidad',name:'Contabilidad',component:Contabilidad},
+    { path: '/proformas/editar/:id', component: ProformaEditor },
+    {path:'/migrador-historico',name:'MigradorHistorico',component:MigradorHistorico},
+    {path:'/tecnico-experto',name:'TecnicoExperto',component:TecnicoExperto},
+    {path:'/soporte',name:'CentroSoporte',component:CentroSoporte},
+    {path:'/diario', name:'DiarioActividades', component:DiarioActividades},
+    {path:"/planilla", name:"Planilla", component:Planilla},
+    { path: "/reportes/ReporteSireVentas", name: "ReporteSireVentas", component: ReporteSireVentas },
+    { path: "/reportes/ReporteSireMovimiento", name: "ReporteSireMovimiento", component: ReporteSireMovimiento },
     {
       path: "/",
       name: "Movimiento",
@@ -66,6 +86,16 @@ export default new Router({
       path: "/productos",
       name: "Productos",
       component: Productos
+    },
+    {
+      path: "/productos-sin-movimiento",
+      name: "ProductosSinMovimiento",
+      component: ProductosSinMovimiento
+    },
+    {
+      path: "/productos/reposicion",
+      name: "ReposicionStock",
+      component: ReposicionStock
     },
     {
       path: "/reimpresion",
@@ -188,6 +218,7 @@ export default new Router({
       name: "Remision",
       component: Remision
     },
+    {path:"/remision/ver/:idDocVenta/:Serie/:Numero",name:"RemisionVer",component:Remision},
     {
       path: "/remision-lista",
       name: "RemisionLista",

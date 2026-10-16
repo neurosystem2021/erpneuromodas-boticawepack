@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('src/views/Habitaciones.vue');s=p.read_text(encoding='utf-8');a=s.index('<div class="project-amount">');b=s.index('\n              <div class="project-meta"',a)
+s=s[:a]+'''<div class="project-amount project-balance-summary"><div class="project-balance-main"><span>Saldo pendiente</span><strong>S/ {{ hab.SaldoPendiente | moneda }}</strong></div><div class="project-balance-details"><div><span>Total del proyecto</span><b>S/ {{ hab.TotalServicio | moneda }}</b></div><div><span>Adelanto recibido</span><b>S/ {{ hab.TotalAdelantos | moneda }}</b></div></div></div>'''+s[b:];p.write_text(s,encoding='utf-8')

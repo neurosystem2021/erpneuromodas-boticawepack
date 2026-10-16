@@ -1,0 +1,2 @@
+﻿<?php
+ob_start();require 'C:/xampp/htdocs/boticav1/config/database.php';require __DIR__.'/../integration/ali-product-guide.php';require __DIR__.'/../integration/ali-product-images.php';$db=appPdoConnection();ob_end_clean();$s=aliKnowledgeRead($db,4679)['sources'][0];$html=aliImageDownload($s['url'],1500000);preg_match_all('~https?[^\s"<>]+?\.(?:png|jpg|webp)(?:\?[^\s"<>]*)?~i',$html,$matches);echo json_encode(array_slice(array_unique($matches[0]),0,12),JSON_UNESCAPED_SLASHES);

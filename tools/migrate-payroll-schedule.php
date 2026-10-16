@@ -1,0 +1,4 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$fields=['DiaPago'=>'TINYINT UNSIGNED NULL','Banco'=>"VARCHAR(80) NOT NULL DEFAULT ''",'NumeroCuenta'=>"VARCHAR(80) NOT NULL DEFAULT ''",'CCI'=>"VARCHAR(20) NOT NULL DEFAULT ''",'Titular'=>"VARCHAR(150) NOT NULL DEFAULT ''"];
+foreach($fields as $name=>$type){$q=$db->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?');$q->execute(['Rhu_PlanillaPersonal',$name]);if(!$q->fetchColumn())$db->exec("ALTER TABLE Rhu_PlanillaPersonal ADD COLUMN `$name` $type");}
+$q=$db->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?');$q->execute(['Rhu_PlanillaPago','DatosDestino']);if(!$q->fetchColumn())$db->exec('ALTER TABLE Rhu_PlanillaPago ADD COLUMN DatosDestino LONGTEXT NULL');echo "Payment schedule and destination account fields ready.\n";

@@ -1,0 +1,6 @@
+{
+  "src/components/ProductoForm.vue": {
+    "scriptSha256": "3fcaedc9e10273a39f58e820495d699200c425029c74c890bba1e2f335b4855a",
+    "reason": "User requested three product images; save waits for image upload and reports failures."
+  }
+}

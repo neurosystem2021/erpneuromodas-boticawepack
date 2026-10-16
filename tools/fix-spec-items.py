@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('integration/ali-characteristics.php');s=p.read_text(encoding='utf-8').replace('|[.;]\\s+', '|(?<!\\d)[.;]\\s+');s=s.replace("$catalog=array_intersect_key($row,array_flip(['IdProducto','Producto','ProductoModelo','ProductoDescCorto','ProductoDesc']));", "$catalog=[];foreach(['IdProducto','Producto','ProductoModelo','ProductoDescCorto','ProductoDesc'] as $field)$catalog[$field]=$row[$field];");p.write_text(s,encoding='utf-8')
+p=Path('src/utils/productGuide.js');s=p.read_text(encoding='utf-8').replace('|[.;]\\s+', '|(?<!\\d)[.;]\\s+');p.write_text(s,encoding='utf-8')

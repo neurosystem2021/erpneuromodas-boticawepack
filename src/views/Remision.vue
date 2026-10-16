@@ -1,293 +1,293 @@
 <template>
-  <div>
-    <Menu v-if="false"></Menu>
-    <br />
-    <b-form @submit="guardarRemision" @reset="onReset" @keyup="afe" validated id="remision-form">
-        <b-container fluid class="bv-example-row">
+<div class="nst-screen nst-screen--remision">
+  <Menu v-if="false"></Menu>
+  <br />
+  <b-form @submit="guardarRemision" @reset="onReset" @keyup="afe" validated id="remision-form">
+      <b-container fluid class="bv-example-row">
 
-        <b-row>
-          <b-col md="6">
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>GRE</h5>
-              </legend>
-              <div class="container text-center">
-                  <h2>{{ SerieGRE }} - {{ NumeroGRE }}</h2>
-                  <h6>{{ FechaDocGRE }}</h6>
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="6">
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>GRE</h5>
+            </legend>
+            <div class="container text-center">
+                <h2>{{ SerieGRE }} - {{ NumeroGRE }}</h2>
+                <h6>{{ FechaDocGRE }}</h6>
+            </div>
+          </fieldset>
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>Resumen</h5>
+            </legend>
+            <h5>Guía de remisión</h5>
+            <div class="container">
+              <div class="row">
+                <label for="fechaTraslado" class="col-sm-4">Fecha de Traslado</label>
+                <input type="date" class="form-control form-control-sm col-sm-8" id="fechaTraslado" placeholder="Fecha de Traslado" v-model="remision.fechaTraslado" required>
               </div>
-            </fieldset>
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>Resumen</h5>
-              </legend>
-              <h5>Guía de remisión</h5>
-              <div class="container">
-                <div class="row">
-                  <label for="fechaTraslado" class="col-sm-4">Fecha de Traslado</label>
-                  <input type="date" class="form-control form-control-sm col-sm-8" id="fechaTraslado" placeholder="Fecha de Traslado" v-model="remision.fechaTraslado" required>
-                </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="observacion" class="col-sm-4">Observación</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Observación" v-model="remision.observacion" autocomplete="off">
               </div>
-              <div class="container">
-                <div class="row">
-                  <label for="observacion" class="col-sm-4">Observación</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Observación" v-model="remision.observacion" autocomplete="off">
-                </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="codUndPesoBruto" class="col-sm-4">Peso Total</label>
+                <select class="form-control form-control-sm col-sm-2" id="codUndPesoBruto" v-model="remision.codUndPesoBruto" required>
+                  <option value="KGM">KILOGRAMO</option>
+                </select>
+                <input type="text" class="form-control form-control-sm col-sm-3" id="pesoBruto" placeholder="Peso Total" v-model="remision.pesoBruto" required autocomplete="off">
+                <input type="text" class="form-control form-control-sm col-sm-3" id="totalBultos" placeholder="Total Bultos" v-model="remision.totalBultos" autocomplete="off">
               </div>
-              <div class="container">
-                <div class="row">
-                  <label for="codUndPesoBruto" class="col-sm-4">Peso Total</label>
-                  <select class="form-control form-control-sm col-sm-2" id="codUndPesoBruto" v-model="remision.codUndPesoBruto" required>
-                    <option value="KGM">KILOGRAMO</option>
-                  </select>
-                  <input type="text" class="form-control form-control-sm col-sm-3" id="pesoBruto" placeholder="Peso Total" v-model="remision.pesoBruto" required autocomplete="off">
-                  <input type="text" class="form-control form-control-sm col-sm-3" id="totalBultos" placeholder="Total Bultos" v-model="remision.totalBultos" autocomplete="off">
-                </div>
-              </div>
+            </div>
 
-              <h5>Motivo de Traslado</h5>
+            <h5>Motivo de Traslado</h5>
 
-              <div class="container">
-                <div class="row">
-                  <label for="codModalidadTraslado" class="col-sm-4">Modalidad Traslado</label>
-                  <select class="form-control form-control-sm col-sm-8" id="codModalidadTraslado" v-model="remision.codModalidadTraslado" required v-on:change="cambioModalidad($event)">
-                    <option value="01">Transporte público</option>
-                    <option value="02">Transporte privado</option>
-                  </select>
+            <div class="container">
+              <div class="row">
+                <label for="codModalidadTraslado" class="col-sm-4">Modalidad Traslado</label>
+                <select class="form-control form-control-sm col-sm-8" id="codModalidadTraslado" v-model="remision.codModalidadTraslado" required v-on:change="cambioModalidad($event)">
+                  <option value="01">Transporte público</option>
+                  <option value="02">Transporte privado</option>
+                </select>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <b-form-text style="color:red !important; font-size:0.8rem;">*La opción público requiere información de un transportista tercero registrado en el MTC, hace referencia a una empresa de transportes encargada en trasladar los bienes.*</b-form-text>
+                  <b-form-text style="color:red !important; font-size:0.8rem;">*La opción privado solo requiere información del conductor y del vehiculo, ya que es su empresa o el cliente el encargado en trasladar los bienes.*</b-form-text>
                 </div>
-                <div class="row">
-                  <div class="col-12">
-                    <b-form-text style="color:red !important; font-size:0.8rem;">*La opción público requiere información de un transportista tercero registrado en el MTC, hace referencia a una empresa de transportes encargada en trasladar los bienes.*</b-form-text>
-                    <b-form-text style="color:red !important; font-size:0.8rem;">*La opción privado solo requiere información del conductor y del vehiculo, ya que es su empresa o el cliente el encargado en trasladar los bienes.*</b-form-text>
+              </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="codMotivoTraslado" class="col-sm-4">Motivos Traslado</label>
+                <select @change="motivoTrasladoChange" class="form-control form-control-sm col-sm-8" id="codMotivoTraslado" v-model="remision.codMotivoTraslado" required>
+                  <option value="01">VENTA</option>
+                  <option value="14">VENTA SUJETA A CONFIRMACION DEL COMPRADOR</option>
+                  <option value="02">COMPRA</option>
+                  <option value="04">TRASLADO ENTRE ESTABLECIMIENTOS DE LA MISMA EMPRESA</option>
+                  <option value="18">TRASLADO EMISOR ITINERANTE CP</option>
+                  <option value="08">IMPORTACION</option>
+                  <option value="09">EXPORTACION</option>
+                  <option value="19">TRASLADO A ZONA PRIMARIA</option>
+                  <option value="13">OTROS</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>Remitente</h5>
+            </legend>
+            <div class="container">
+              <div class="row">
+                <label for="codUbigeoOrigen" class="col-sm-4">Ubigeo de Partida</label>
+                <div class="input-group input-group-sm col-sm-8">
+                  <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required autocomplete="off">
+                  <div class="input-group-append">
+                    <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
                   </div>
                 </div>
               </div>
-              <div class="container">
-                <div class="row">
-                  <label for="codMotivoTraslado" class="col-sm-4">Motivos Traslado</label>
-                  <select @change="motivoTrasladoChange" class="form-control form-control-sm col-sm-8" id="codMotivoTraslado" v-model="remision.codMotivoTraslado" required>
-                    <option value="01">VENTA</option>
-                    <option value="14">VENTA SUJETA A CONFIRMACION DEL COMPRADOR</option>
-                    <option value="02">COMPRA</option>
-                    <option value="04">TRASLADO ENTRE ESTABLECIMIENTOS DE LA MISMA EMPRESA</option>
-                    <option value="18">TRASLADO EMISOR ITINERANTE CP</option>
-                    <option value="08">IMPORTACION</option>
-                    <option value="09">EXPORTACION</option>
-                    <option value="19">TRASLADO A ZONA PRIMARIA</option>
-                    <option value="13">OTROS</option>
-                  </select>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="direccionOrigen" class="col-sm-4">Dirección de Partida</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required autocomplete="off">
+              </div>
+            </div>
+          </fieldset>
+
+
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>Documento Relacionado</h5>
+            </legend>
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-6">
+                  <label>Importar Factura:</label>
+                  <autocomplete
+                      ref="inputDocRef"
+                      :url="API + 'remision/ventas/busqueda'"
+                      anchor="NroComprobante"
+                      initValue=""
+                      label="writer"
+                      placeholder=""
+                      :on-select="setDocRef"
+                      :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                      :classes="{input: 'form-control form-control-sm '}">
+                  </autocomplete>
+                </div>
+                <div class="col-sm-6">
+                  <label>Importar Movimiento:</label>
+                  <autocomplete
+                      ref="inputMovRef"
+                      :url="API + 'movimientos/lista'"
+                      anchor="NroComprobante"
+                      initValue=""
+                      label="writer"
+                      placeholder=""
+                      :on-select="setMovRef"
+                      :onFocus="focusAutocomplete.bind(null, 'inputMovRef')"
+                      :classes="{input: 'form-control form-control-sm '}">
+                  </autocomplete>
                 </div>
               </div>
-            </fieldset>
+            </div>
+          </fieldset>
+        </b-col>
 
 
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>Remitente</h5>
-              </legend>
-              <div class="container">
-                <div class="row">
-                  <label for="codUbigeoOrigen" class="col-sm-4">Ubigeo de Partida</label>
+        <b-col md="6">
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>Destinatario</h5>
+            </legend>
+            <h5>Datos del destinatario</h5>
+            <div class="container">
+              <div class="row">
+                <label for="nroDocumentoCliente" class="col-sm-4">RUC</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required autocomplete="off">
+              </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="razonSocialCliente" class="col-sm-4">Razón Social</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialCliente" placeholder="Razón Social" v-model="remision.razonSocialCliente" required autocomplete="off">
+              </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="direccionCliente" class="col-sm-4">Dirección</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="direccionCliente" placeholder="Dirección" v-model="remision.direccionCliente" autocomplete="off">
+              </div>
+            </div>
+            <!-- <div class="container">
+              <div class="row">
+                <label for="observacion" class="col-sm-4">Dirección</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Dirección" v-mdoel="remision.">
+              </div>
+            </div> -->
+
+            <h5>Punto de llegada</h5>
+
+            <div class="container">
+              <div class="row">
+                <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
+                <div class="input-group input-group-sm col-sm-8">
+                  <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required autocomplete="off">
+                  <div class="input-group-append">
+                    <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="direccionDestino" class="col-sm-4">Dirección de Llegada</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required autocomplete="off">
+              </div>
+            </div>
+          </fieldset> 
+
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border">
+              <h5>Transportista</h5>
+            </legend>
+            <h5>Datos de la empresa de transportes</h5>
+            <div class="container">
+              <div class="row">
+                  <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
                   <div class="input-group input-group-sm col-sm-8">
-                    <input id="codUbigeoOrigen" type="text" class="form-control" placeholder="Ubigeo de Partida" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoOrigen" required autocomplete="off">
+                    <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" ref="inputnroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista" autocomplete="off">
                     <div class="input-group-append">
-                      <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
+                        <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUC()">Buscar</b-button>
                     </div>
                   </div>
-                </div>
               </div>
-              <div class="container">
-                <div class="row">
-                  <label for="direccionOrigen" class="col-sm-4">Dirección de Partida</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionOrigen" placeholder="Dirección de Partida" v-model="remision.direccionOrigen" required autocomplete="off">
-                </div>
+            </div>
+            <div class="container">
+              <div class="row">
+                <label for="razonSocialTransportista" class="col-sm-4">Razón Social</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" ref="inputrazonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista" autocomplete="off">
               </div>
-            </fieldset>
+            </div>
+
+            <h5>Unidad de transporte</h5>
+
+            <!--<div class="container">
+              <div class="row">
+                <label for="placaCarreta" class="col-sm-4">N° de Placa Carreta</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="placaCarreta" placeholder="N° de Placa" v-model="remision.placaCarreta">
+              </div>
+            </div>-->
+
+            <div class="container mt-2">
+              <div class="row">
+                  <label for="nroDocChofer" class="col-sm-4">Doc. del Chofer (DNI)</label>
+                  <div class="input-group input-group-sm col-sm-8">
+                     <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer" autocomplete="off">
+                    <div class="input-group-append">
+                        <b-button size="sm" variant="outline-secondary" @click="consultaDocConductor()">Buscar</b-button>
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="container mt-2">
+              <div class="row">
+                <label for="apellidosChofer" class="col-sm-4">Apellidos del Chofer</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="container mt-2">
+              <div class="row">
+                <label for="nombresChofer" class="col-sm-4">Nombres del Chofer</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="container mt-2">
+              <div class="row">
+                <label for="licenciaChofer" class="col-sm-4">Licencia del Chofer</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="container">
+              <div class="row">
+                <label for="placaVehiculo" class="col-sm-4">N° de Placa Vehículo</label>
+                <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo" autocomplete="off">
+              </div>
+            </div>
 
 
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>Documento Relacionado</h5>
-              </legend>
-              <div class="container">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <label>Importar Factura:</label>
-                    <autocomplete
-                        ref="inputDocRef"
-                        :url="API + 'remision/ventas/busqueda'"
-                        anchor="NroComprobante"
-                        initValue=""
-                        label="writer"
-                        placeholder=""
-                        :on-select="setDocRef"
-                        :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
-                        :classes="{input: 'form-control form-control-sm '}">
-                    </autocomplete>
-                  </div>
-                  <div class="col-sm-6">
-                    <label>Importar Movimiento:</label>
-                    <autocomplete
-                        ref="inputMovRef"
-                        :url="API + 'movimientos/lista'"
-                        anchor="NroComprobante"
-                        initValue=""
-                        label="writer"
-                        placeholder=""
-                        :on-select="setMovRef"
-                        :onFocus="focusAutocomplete.bind(null, 'inputMovRef')"
-                        :classes="{input: 'form-control form-control-sm '}">
-                    </autocomplete>
-                  </div>
-                </div>
-              </div>
-            </fieldset>
+          </fieldset>
+        </b-col>
+      </b-row></section>
+
+        <section class="nst-panel nst-panel--products"><b-row>
+          <b-col>
+            <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true"></productos-carrito>
           </b-col>
-
-
-          <b-col md="6">
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>Destinatario</h5>
-              </legend>
-              <h5>Datos del destinatario</h5>
-              <div class="container">
-                <div class="row">
-                  <label for="nroDocumentoCliente" class="col-sm-4">RUC</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nroDocumentoCliente" placeholder="Ruc" v-model="remision.nroDocumentoCliente" required autocomplete="off">
-                </div>
-              </div>
-              <div class="container">
-                <div class="row">
-                  <label for="razonSocialCliente" class="col-sm-4">Razón Social</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialCliente" placeholder="Razón Social" v-model="remision.razonSocialCliente" required autocomplete="off">
-                </div>
-              </div>
-              <div class="container">
-                <div class="row">
-                  <label for="direccionCliente" class="col-sm-4">Dirección</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionCliente" placeholder="Dirección" v-model="remision.direccionCliente" autocomplete="off">
-                </div>
-              </div>
-              <!-- <div class="container">
-                <div class="row">
-                  <label for="observacion" class="col-sm-4">Dirección</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="observacion" placeholder="Dirección" v-mdoel="remision.">
-                </div>
-              </div> -->
-
-              <h5>Punto de llegada</h5>
-
-              <div class="container">
-                <div class="row">
-                  <label for="codUbigeoDestino" class="col-sm-4">Ubigeo de Llegada</label>
-                  <div class="input-group input-group-sm col-sm-8">
-                    <input id="codUbigeoDestino" type="text" class="form-control" placeholder="Ubigeo de Llegada" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="remision.codUbigeoDestino" required autocomplete="off">
-                    <div class="input-group-append">
-                      <a class="btn btn-outline-secondary" target="_blank" href="http://account.geodir.co/recursos/ubigeo-inei-peru.html">Buscar</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="container">
-                <div class="row">
-                  <label for="direccionDestino" class="col-sm-4">Dirección de Llegada</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="direccionDestino" placeholder="Dirección de Llegada" v-model="remision.direccionDestino" required autocomplete="off">
-                </div>
-              </div>
-            </fieldset> 
-
-            <fieldset class="scheduler-border">
-              <legend class="scheduler-border">
-                <h5>Transportista</h5>
-              </legend>
-              <h5>Datos de la empresa de transportes</h5>
-              <div class="container">
-                <div class="row">
-                    <label for="nroDocumentoTransportista" class="col-sm-4">Número Documento</label>
-                    <div class="input-group input-group-sm col-sm-8">
-                      <input type="text" style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocumentoTransportista" ref="inputnroDocumentoTransportista" placeholder="Número Documento" v-model="remision.nroDocumentoTransportista" autocomplete="off">
-                      <div class="input-group-append">
-                          <b-button size="sm" variant="outline-secondary" @click="consultarDNIRUC()">Buscar</b-button>
-                      </div>
-                    </div>
-                </div>
-              </div>
-              <div class="container">
-                <div class="row">
-                  <label for="razonSocialTransportista" class="col-sm-4">Razón Social</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="razonSocialTransportista" ref="inputrazonSocialTransportista" placeholder="Razón Social" v-model="remision.razonSocialTransportista" autocomplete="off">
-                </div>
-              </div>
-
-              <h5>Unidad de transporte</h5>
-
-              <!--<div class="container">
-                <div class="row">
-                  <label for="placaCarreta" class="col-sm-4">N° de Placa Carreta</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="placaCarreta" placeholder="N° de Placa" v-model="remision.placaCarreta">
-                </div>
-              </div>-->
-
-              <div class="container mt-2">
-                <div class="row">
-                    <label for="nroDocChofer" class="col-sm-4">Doc. del Chofer (DNI)</label>
-                    <div class="input-group input-group-sm col-sm-8">
-                       <input type="text"  style="max-width: none;" class="form-control form-control-sm col-sm-8" id="nroDocChofer" ref="inputnroDocChofer" placeholder="Documento del Chofer" v-model="remision.nroDocChofer" autocomplete="off">
-                      <div class="input-group-append">
-                          <b-button size="sm" variant="outline-secondary" @click="consultaDocConductor()">Buscar</b-button>
-                      </div>
-                    </div>
-                </div>
-              </div>
-
-              <div class="container mt-2">
-                <div class="row">
-                  <label for="apellidosChofer" class="col-sm-4">Apellidos del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="apellidosChofer" ref="inputapellidosChofer" placeholder="Apellidos del Chofer" v-model="remision.apellidosChofer" autocomplete="off">
-                </div>
-              </div>
-
-              <div class="container mt-2">
-                <div class="row">
-                  <label for="nombresChofer" class="col-sm-4">Nombres del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="nombresChofer" ref="inputnombresChofer" placeholder="Nombres del Chofer" v-model="remision.nombresChofer" autocomplete="off">
-                </div>
-              </div>
-
-              <div class="container mt-2">
-                <div class="row">
-                  <label for="licenciaChofer" class="col-sm-4">Licencia del Chofer</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" id="licenciaChofer" ref="inputlicenciaChofer" placeholder="Ejemplo: Y74746010" v-model="remision.licenciaChofer" autocomplete="off">
-                </div>
-              </div>
-
-              <div class="container">
-                <div class="row">
-                  <label for="placaVehiculo" class="col-sm-4">N° de Placa Vehículo</label>
-                  <input type="text" class="form-control form-control-sm col-sm-8" style="text-transform:uppercase" id="placaVehiculo" ref="inputplacaVehiculo" placeholder="Ejemplo: XYZ123" v-model="remision.placaVehiculo" autocomplete="off">
-                </div>
-              </div>
-
-
-            </fieldset>
+        </b-row></section>
+        <b-row align-h="center" class="text-center nst-action-bar">
+          <b-col cols="4">
+            <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
           </b-col>
         </b-row>
+      </b-container>
+      <br><br>
+  </b-form>
 
-          <b-row>
-            <b-col>
-              <productos-carrito ref="carrito" tipo="mov" :fields="carrito.fields" :noSubtotal="true"></productos-carrito>
-            </b-col>
-          </b-row>
-          <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <br><br>
-    </b-form>
-
-  </div>
+</div>
 </template>
 
 <script>
@@ -299,6 +299,8 @@ export default {
   mounted () {
     this.limpiarCamposRefs();
     this.obtenerNumero()
+    const params=this.$route.params;
+    if(params.idDocVenta) this.setDocRef({IdDocVenta:params.idDocVenta,NroComprobante:params.Serie+'-'+params.Numero});
   },
   data () {
     return {
@@ -358,6 +360,7 @@ export default {
           }
       })
       .catch((error) => {
+          this.inProgress = false;
           this.$toasted.show('Ha ocurrido un error, vuelva a intentarlo')
       })
     },
@@ -433,7 +436,8 @@ export default {
           this.$refs.inputMovRef.setValue('');
           this.limpiarCamposRefs();
           this.$toasted.success('Guia de remisión guardada correctamente ') 
-          this.obtenerNumero();       
+          this.obtenerNumero();
+          this.$nextTick(()=>document.getElementById('remision-form').dispatchEvent(new Event('nst-remision-reset')));       
         }
         this.inProgress = false
       })

@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$db->exec(file_get_contents(__DIR__.'/../integration/payroll/schema.sql'));echo "Payroll tables ready. Existing data preserved.\n";

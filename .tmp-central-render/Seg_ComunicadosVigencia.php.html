@@ -1,0 +1,1780 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../resources/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/dataTables.bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/main.css">
+<script src="../resources/js/jquery-3.2.1.min.js"></script>
+<script src="../resources/js/main.js"></script>
+<script src="../resources/js/bootstrap.js"></script>
+<script src="../resources/js/jquery.dataTables.js"></script>
+<script src="../resources/js/dataTables.bootstrap.js"></script>
+<script src="../resources/js/bootstrap-notify.js"></script>
+<!-- <script src="../resources/js/jquery.print.js"></script> -->
+<script src="../resources/js/jspdf.min.js"></script>
+<script src="../resources/js/jspdf.plugin.autotable.js"></script>
+<script src="../resources/js/FileSaver.js"></script>
+
+
+<!-- Add this to <head> -->
+<!--<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>-->
+
+<!-- development version, includes helpful console warnings -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- production version, optimized for size and speed -->
+<!--<script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+
+<!-- VUE SELECT -->
+<script src="https://cdn.jsdelivr.net/npm/vue-select@3.20.2/dist/vue-select.min.js"></script>
+<script>Vue.component('v-select', VueSelect.VueSelect);</script>
+
+<!-- AXIOS GET/POST -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- Add this after vue.js -->
+<!--<script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+<script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>-->
+
+
+<br />
+<b>Notice</b>:  session_start(): A session had already been started - ignoring in <b>C:\xampp\htdocs\boticav1\views\validateUser.php</b> on line <b>2</b><br />
+  
+  <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comunicados y vigencia</title></head><body>
+<script>
+  async function consultaPago() {
+    try {
+      const url = 'https://admin.factura.vip:5000/api/v1/sistema/aviso?Url=localhost';
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.success) {
+        setTimeout(() => {
+          if (document.getElementsByTagName("iframe")[0]) {
+            document.getElementsByTagName("iframe")[0].style.height = ($(window).height() - 120) + 'px';
+          }
+          let divAviso = document.getElementById("avisoPago");
+          divAviso.style.display = "block";
+          divAviso.className = data.clase;
+          divAviso.insertAdjacentHTML('afterbegin', "<marquee scrollamount='13' direction='left' style='font-size: 1.8rem; font-weight: bold; margin-bottom: -4px;'><span id='avisoPagoLabel'></span></marquee>");
+          document.getElementById("avisoPagoLabel").innerHTML = data.msg;
+          if (data.pago == 1) {
+            let btnPago = document.getElementById("botonPago")
+            btnPago.style.display = "block";
+          }
+
+        }, 1000);
+
+      }
+    } catch (error) {
+      console.log("Error en consulta super admin");
+    }
+  }
+  consultaPago();
+</script>
+
+<script>
+  function datos() {
+    fetch('https://deperu.com/api/rest/cotizaciondolar.json')
+      .then(res => res.json())
+      .then(data => {
+        var cotizacion = data.Cotizacion[0];
+        var compra = cotizacion.Compra;
+        var venta = cotizacion.Venta;
+
+        if ($.isNumeric(compra) && $.isNumeric(venta)) {
+          $('#compra').html(compra)
+          $('#venta').html(venta)
+        }
+      })
+  }
+  datos();
+</script>
+<style>
+  .erp-topbar {
+        --erp-navy: #050914;
+        --erp-blue: #2563ff;
+        --erp-cyan: #00e5ff;
+    --erp-mint: #42e8b4;
+        --erp-ruby: #ff3154;
+        --erp-wine: #160b1b;
+        --erp-gold: #00e5ff;
+        --erp-champagne: #e9fbff;
+    --erp-line: rgba(0, 229, 255, 0.28);
+    position: relative;
+    z-index: 1040;
+    min-height: 66px;
+    margin: 0 !important;
+    padding: 0 16px;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 0 20px 20px;
+    text-transform: uppercase;
+    background:
+      radial-gradient(circle at 5% -90%, rgba(0, 229, 255, 0.25), transparent 34%),
+      radial-gradient(circle at 92% 180%, rgba(255, 49, 84, 0.25), transparent 40%),
+      linear-gradient(112deg, #040812 0%, #071522 48%, #170b19 100%) !important;
+    box-shadow: 0 14px 34px rgba(1, 7, 17, 0.42), inset 0 1px 0 rgba(125, 238, 255, 0.09), inset 0 -1px 0 rgba(0, 229, 255, 0.19);
+    isolation: isolate;
+  }
+
+  .erp-topbar::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    content: "";
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(105deg, transparent 10%, rgba(113, 237, 255, 0.13) 26%, transparent 42%) -70vw 0 / 70vw 100% no-repeat,
+      linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.19), rgba(132, 87, 255, 0.18), rgba(255, 49, 84, 0.18), transparent) 0 100% / 100% 1px no-repeat;
+    animation: erpHeaderSweep 6.6s ease-in-out infinite;
+  }
+
+  .erp-topbar::after {
+    position: absolute;
+    z-index: 0;
+    right: 4%;
+    bottom: -1px;
+    left: 4%;
+    height: 2px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--erp-cyan), #8457ff, var(--erp-ruby), transparent);
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.56));
+  }
+
+  .erp-topbar > .container-fluid {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    min-height: 66px;
+    align-items: center;
+    padding: 0;
+  }
+
+  .erp-topbar .navbar-header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    margin: 0;
+  }
+
+  .erp-topbar .navbar-brand {
+    position: relative;
+    height: auto;
+    margin: 0 13px 0 0 !important;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 229, 255, 0.30);
+    border-radius: 12px;
+    color: #ffffff !important;
+    line-height: 1;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.055em;
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.30);
+    background: linear-gradient(145deg, rgba(7, 30, 45, 0.92), rgba(40, 13, 32, 0.82));
+    box-shadow: 0 7px 18px rgba(1, 8, 18, 0.30), inset 0 1px 0 rgba(125, 238, 255, 0.13);
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .erp-topbar .navbar-brand::before {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    border-radius: 50%;
+    content: "";
+    vertical-align: 2px;
+    background: var(--erp-mint);
+    box-shadow: 0 0 0 4px rgba(66, 232, 180, 0.12), 0 0 14px var(--erp-mint);
+    animation: erpStatusPulse 1.8s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-brand:hover,
+  .erp-topbar .navbar-brand:focus {
+    border-color: rgba(0, 229, 255, 0.72);
+    box-shadow: 0 9px 24px rgba(3, 127, 181, 0.24), 0 0 18px rgba(255, 49, 84, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .erp-topbar #myNavbar {
+    display: flex !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: auto !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: visible !important;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .erp-topbar .navbar-nav {
+    display: flex;
+    flex: 1 1 auto;
+    float: none;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .erp-topbar .navbar-nav::before,
+  .erp-topbar .navbar-nav::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .erp-topbar .navbar-nav > li {
+    float: none;
+    font-size: 12px !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a {
+    --erp-button-a: rgba(69, 9, 26, 0.94);
+    --erp-button-b: rgba(151, 20, 54, 0.84);
+    --erp-button-c: rgba(205, 113, 43, 0.62);
+    position: relative;
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 10px 9px;
+    overflow: hidden;
+    border: 1px solid rgba(247, 200, 112, 0.32);
+    border-radius: 13px;
+    color: rgba(255, 248, 231, 0.96) !important;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1;
+    letter-spacing: 0.015em;
+    white-space: nowrap;
+    background: linear-gradient(118deg, var(--erp-button-a), var(--erp-button-b), var(--erp-button-c)) !important;
+    background-size: 220% 220% !important;
+    box-shadow: 0 8px 20px rgba(42, 3, 15, 0.30), 0 0 0 1px rgba(255, 216, 139, 0.04), inset 0 1px 0 rgba(255, 239, 207, 0.20), inset 0 -1px 0 rgba(255, 173, 75, 0.12);
+    animation: erpButtonFlow 5.2s ease-in-out infinite;
+    isolation: isolate;
+    transition: transform 0.22s cubic-bezier(.2, .8, .2, 1), border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n + 2) > a {
+    --erp-button-a: rgba(48, 14, 20, 0.96);
+    --erp-button-b: rgba(124, 44, 23, 0.88);
+    --erp-button-c: rgba(221, 148, 53, 0.62);
+    animation-delay: -1.4s;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n + 3) > a {
+    --erp-button-a: rgba(71, 9, 39, 0.96);
+    --erp-button-b: rgba(158, 18, 63, 0.86);
+    --erp-button-c: rgba(211, 77, 37, 0.68);
+    animation-delay: -2.8s;
+  }
+
+  .erp-topbar .navbar-nav > li > a::before {
+    position: absolute;
+    top: -70%;
+    left: -55%;
+    width: 35%;
+    height: 240%;
+    content: "";
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 235, 190, 0.58), transparent);
+    transform: rotate(22deg) translateX(-220%);
+    animation: erpButtonSheen 6.4s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::before,
+  .erp-topbar .navbar-nav > li.open > a::before {
+    animation-duration: 1.35s;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    position: absolute;
+    z-index: 0;
+    inset: 1px;
+    border: 1px solid rgba(255, 227, 166, 0.18);
+    border-radius: 11px;
+    content: "";
+    pointer-events: none;
+    box-shadow: inset 0 0 16px rgba(255, 198, 92, 0.05);
+    animation: erpButtonEdge 3.2s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-nav > li > a > .fa {
+    margin-right: 6px;
+    color: #ffd98d;
+    font-size: 13px;
+    text-shadow: 0 0 13px rgba(242, 189, 98, 0.68);
+    transition: transform 0.22s ease, color 0.22s ease;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover,
+  .erp-topbar .navbar-nav > li > a:focus,
+  .erp-topbar .navbar-nav > li.open > a,
+  .erp-topbar .navbar-nav > li.open > a:hover,
+  .erp-topbar .navbar-nav > li.open > a:focus,
+  .erp-topbar .navbar-nav > li.erp-current > a {
+    border-color: rgba(255, 221, 151, 0.78);
+    color: #ffffff !important;
+    background: linear-gradient(120deg, rgba(128, 11, 42, 0.96), rgba(220, 29, 65, 0.92), rgba(225, 151, 52, 0.82)) !important;
+    background-size: 220% 220% !important;
+    box-shadow: 0 12px 28px rgba(164, 14, 51, 0.40), 0 0 20px rgba(242, 189, 98, 0.16), 0 0 0 1px rgba(255, 225, 164, 0.20), inset 0 1px 0 rgba(255, 247, 229, 0.32);
+    transform: translateY(-3px) scale(1.025);
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover > .fa,
+  .erp-topbar .navbar-nav > li.open > a > .fa,
+  .erp-topbar .navbar-nav > li.erp-current > a > .fa {
+    color: #ffffff;
+    transform: translateY(-1px) scale(1.08);
+  }
+
+  .erp-topbar .caret {
+    margin-left: 7px;
+    border-top-color: #ffd98d !important;
+    transition: transform 0.24s ease;
+  }
+
+  .erp-topbar .open > a .caret {
+    transform: rotate(180deg);
+  }
+
+  .erp-topbar .dropdown-menu {
+    top: calc(100% + 9px);
+    min-width: 270px;
+    max-width: min(360px, calc(100vw - 24px));
+    max-height: calc(100vh - 92px);
+    margin: 0;
+    padding: 9px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgba(242, 189, 98, 0.34);
+    border-radius: 15px;
+    background:
+      radial-gradient(circle at 90% 0, rgba(219, 31, 67, 0.18), transparent 55%),
+      linear-gradient(145deg, rgba(29, 12, 18, 0.98), rgba(11, 10, 14, 0.99)) !important;
+    box-shadow: 0 24px 55px rgba(28, 2, 11, 0.54), 0 0 24px rgba(242, 189, 98, 0.08), inset 0 1px 0 rgba(255, 233, 191, 0.10);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transform-origin: top center;
+  }
+
+  .erp-topbar .open > .dropdown-menu {
+    animation: erpDropdownIn 0.24s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    position: relative;
+    display: flex;
+    min-height: 37px;
+    align-items: center;
+    margin: 2px 0;
+    padding: 8px 12px 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    border-color: rgba(242, 189, 98, 0.07);
+    color: rgba(255, 241, 215, 0.92) !important;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: 0.025em;
+    white-space: normal;
+    background: linear-gradient(100deg, rgba(132, 17, 49, 0.18), rgba(199, 89, 35, 0.11), rgba(255, 220, 153, 0.035)) !important;
+    background-size: 220% 100% !important;
+    animation: erpSubmenuFlow 7.2s ease-in-out infinite;
+    transition: color 0.18s ease, transform 0.18s ease, border-color 0.18s ease, background 0.18s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::before {
+    position: absolute;
+    left: 7px;
+    width: 3px;
+    height: 14px;
+    border-radius: 999px;
+    content: "";
+    background: linear-gradient(var(--erp-gold), var(--erp-ruby));
+    box-shadow: 0 0 10px rgba(242, 189, 98, 0.58);
+    opacity: 0.35;
+    transform: scaleY(0.45);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover,
+  .erp-topbar .dropdown-menu > li > a:focus,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link {
+    border-color: rgba(255, 221, 151, 0.30);
+    color: #ffffff !important;
+    background: linear-gradient(90deg, rgba(179, 21, 56, 0.40), rgba(214, 122, 43, 0.25)) !important;
+    box-shadow: 0 7px 16px rgba(88, 4, 27, 0.24), inset 0 1px 0 rgba(255, 238, 202, 0.10);
+    transform: translateX(5px);
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::before,
+  .erp-topbar .dropdown-menu > li > a:focus::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::before {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  .erp-topbar .dropdown-menu .divider {
+    height: 1px;
+    margin: 7px 7px;
+    overflow: hidden;
+    background: linear-gradient(90deg, transparent, rgba(242, 189, 98, 0.38), rgba(219, 31, 67, 0.28), transparent);
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: linear-gradient(var(--erp-gold), var(--erp-ruby));
+  }
+
+  .erp-topbar .erp-market {
+    display: flex;
+    min-height: 40px;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 2px;
+    padding: 5px 9px;
+    border: 1px solid rgba(242, 189, 98, 0.22);
+    border-radius: 11px;
+    color: #fff0cf;
+    font-size: 9.5px;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: 0.035em;
+    white-space: nowrap;
+    background: linear-gradient(145deg, rgba(91, 12, 35, 0.56), rgba(34, 15, 19, 0.62));
+  }
+
+  .erp-topbar .erp-logo-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .erp-topbar .erp-nav-logo {
+    display: block;
+    width: 104px;
+    max-height: 43px;
+    margin: 0 0 0 5px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.28));
+    transition: transform 0.25s ease, filter 0.25s ease;
+  }
+
+  .erp-topbar .erp-nav-logo:hover {
+    filter: drop-shadow(0 7px 14px rgba(242, 189, 98, 0.30));
+    transform: translateY(-2px) scale(1.025);
+  }
+
+  .erp-topbar .navbar-toggle {
+    margin: 10px 0 10px auto;
+    padding: 10px;
+    border: 1px solid rgba(242, 189, 98, 0.46) !important;
+    border-radius: 11px;
+    background: linear-gradient(145deg, rgba(189, 20, 57, 0.72), rgba(219, 139, 46, 0.55)) !important;
+    box-shadow: 0 9px 20px rgba(77, 4, 24, 0.34), inset 0 1px 0 rgba(255, 240, 210, 0.20);
+  }
+
+  .erp-topbar .navbar-toggle .icon-bar {
+    width: 22px;
+    height: 2px;
+    border-radius: 999px;
+    background: #fff3da !important;
+    box-shadow: 0 0 8px rgba(242, 189, 98, 0.60);
+  }
+
+  @keyframes erpHeaderSweep {
+    0%, 58%, 100% { background-position: -70vw 0, 0 100%; }
+    78% { background-position: 150vw 0, 0 100%; }
+  }
+
+  @keyframes erpDropdownIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes erpButtonFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpButtonSheen {
+    0%, 58%, 100% { transform: rotate(22deg) translateX(-220%); opacity: 0; }
+    64% { opacity: 0.85; }
+    78% { transform: rotate(22deg) translateX(520%); opacity: 0; }
+  }
+
+  @keyframes erpButtonEdge {
+    0%, 100% {
+      border-color: rgba(255, 227, 166, 0.14);
+      box-shadow: inset 0 0 13px rgba(255, 198, 92, 0.04), 0 0 0 rgba(242, 189, 98, 0);
+    }
+    50% {
+      border-color: rgba(255, 227, 166, 0.42);
+      box-shadow: inset 0 0 18px rgba(255, 198, 92, 0.09), 0 0 13px rgba(242, 189, 98, 0.14);
+    }
+  }
+
+  @keyframes erpSubmenuFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpStatusPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.68; transform: scale(0.72); }
+  }
+
+  @media (max-width: 1440px) {
+    .erp-topbar {
+      min-height: 60px;
+      padding: 0 12px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .erp-topbar > .container-fluid {
+      display: block;
+      min-height: 60px;
+    }
+
+    .erp-topbar .navbar-header {
+      float: none;
+      width: 100%;
+      min-height: 60px;
+    }
+
+    .erp-topbar .navbar-brand {
+      order: 1;
+      margin-right: auto !important;
+    }
+
+    .erp-topbar .navbar-toggle {
+      display: block !important;
+      order: 2;
+      margin-right: 0;
+      margin-left: auto;
+    }
+
+    .erp-topbar #myNavbar {
+      display: none !important;
+      width: 100%;
+      max-height: calc(100vh - 74px) !important;
+      margin: 0;
+      padding: 8px 0 13px;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      border-top: 1px solid rgba(242, 189, 98, 0.20);
+      background: rgba(17, 8, 13, 0.66);
+    }
+
+    .erp-topbar #myNavbar.in {
+      display: block !important;
+      animation: erpMobileMenuIn 0.24s ease both;
+    }
+
+    .erp-topbar .navbar-nav {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .erp-topbar .navbar-nav > li {
+      width: 100%;
+    }
+
+    .erp-topbar .navbar-nav > li > a {
+      width: 100%;
+      min-height: 43px;
+      justify-content: flex-start;
+      padding: 11px 13px;
+    }
+
+    .erp-topbar .dropdown-menu,
+    .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+      position: static;
+      float: none;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      max-height: none;
+      margin: 5px 0 0;
+      padding: 6px;
+      border-radius: 11px;
+      background: rgba(30, 11, 18, 0.70) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 229, 182, 0.07);
+    }
+
+    .erp-topbar .erp-market {
+      min-height: 43px;
+      margin: 0;
+    }
+
+    .erp-topbar .erp-logo-item {
+      display: none;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .erp-topbar {
+      padding: 0 8px;
+    }
+
+    .erp-topbar .navbar-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .erp-topbar .navbar-brand {
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @keyframes erpMobileMenuIn {
+    from { opacity: 0; transform: translateY(-7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .erp-topbar,
+    .erp-topbar *,
+    .erp-topbar *::before,
+    .erp-topbar *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  /* Neurosoft Tech Surface v2: interacción de superficie completa */
+  .erp-topbar .navbar-nav > li > a {
+    --tech-a: #00e5ff;
+    --tech-b: #2563ff;
+    --tech-c: #ff3154;
+    position: relative !important;
+    z-index: 0;
+    isolation: isolate;
+    overflow: hidden !important;
+    border-color: rgba(77, 220, 242, 0.25) !important;
+    color: #edfaff !important;
+    text-shadow: 0 1px 10px rgba(0, 229, 255, 0.12) !important;
+    background: linear-gradient(145deg, rgba(10, 27, 41, 0.96), rgba(24, 15, 31, 0.96)) !important;
+    background-size: auto !important;
+    box-shadow: 0 7px 18px rgba(0, 4, 12, 0.30), inset 0 1px 0 rgba(144, 239, 255, 0.08) !important;
+    animation: none !important;
+    transition: transform 0.30s cubic-bezier(.2,.85,.25,1), border-color 0.30s ease, box-shadow 0.30s ease, color 0.30s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(2n) > a {
+    --tech-a: #17d7d4;
+    --tech-b: #1678ff;
+    --tech-c: #7b57ff;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n) > a {
+    --tech-a: #00d8ff;
+    --tech-b: #654dff;
+    --tech-c: #ff3154;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(5n) > a {
+    --tech-a: #26e2c4;
+    --tech-b: #1684ff;
+    --tech-c: #e62b70;
+  }
+
+  .erp-topbar .navbar-nav > li > a::before {
+    position: absolute !important;
+    z-index: -1 !important;
+    inset: -1px !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border-radius: inherit !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(110deg, var(--tech-a) 0%, var(--tech-b) 48%, var(--tech-c) 100%) !important;
+    background-size: 220% 100% !important;
+    transform: translate3d(-102%, 0, 0) !important;
+    transform-origin: left center !important;
+    animation: none !important;
+    transition: transform 0.48s cubic-bezier(.16,1,.3,1) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    position: absolute !important;
+    z-index: 1 !important;
+    inset: 1px !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border: 1px solid rgba(122, 231, 255, 0.10) !important;
+    border-radius: 11px !important;
+    opacity: 0.55 !important;
+    pointer-events: none !important;
+    background: transparent !important;
+    box-shadow: inset 0 0 13px rgba(0, 229, 255, 0.05) !important;
+    transform: none !important;
+    animation: none !important;
+    transition: border-color 0.28s ease, box-shadow 0.28s ease, opacity 0.28s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover,
+  .erp-topbar .navbar-nav > li > a:focus,
+  .erp-topbar .navbar-nav > .open > a,
+  .erp-topbar .navbar-nav > .open > a:hover,
+  .erp-topbar .navbar-nav > .open > a:focus,
+  .erp-topbar .navbar-nav > li > a.erp-current,
+  .erp-topbar .navbar-nav > li.erp-current > a {
+    color: #ffffff !important;
+    border-color: rgba(129, 240, 255, 0.82) !important;
+    background: linear-gradient(145deg, rgba(10, 27, 41, 0.98), rgba(24, 15, 31, 0.98)) !important;
+    box-shadow: 0 12px 25px rgba(0, 174, 224, 0.24), 0 0 18px rgba(255, 49, 84, 0.16), inset 0 1px 0 rgba(255,255,255,0.22) !important;
+    transform: translateY(-2px) scale(1.025) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::before,
+  .erp-topbar .navbar-nav > li > a:focus::before,
+  .erp-topbar .navbar-nav > .open > a::before,
+  .erp-topbar .navbar-nav > li > a.erp-current::before,
+  .erp-topbar .navbar-nav > li.erp-current > a::before {
+    transform: translate3d(0, 0, 0) !important;
+    animation: erpTechSurface 2.3s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::after,
+  .erp-topbar .navbar-nav > li > a:focus::after,
+  .erp-topbar .navbar-nav > .open > a::after,
+  .erp-topbar .navbar-nav > li > a.erp-current::after,
+  .erp-topbar .navbar-nav > li.erp-current > a::after {
+    border-color: rgba(238, 253, 255, 0.68) !important;
+    opacity: 1 !important;
+    box-shadow: inset 0 0 14px rgba(255,255,255,0.13), 0 0 11px rgba(0,229,255,0.42), 0 0 17px rgba(255,49,84,0.20) !important;
+    animation: erpTechEdge 1.55s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a .fa,
+  .erp-topbar .navbar-nav > li > a .glyphicon {
+    display: inline-flex !important;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    border: 1px solid rgba(0, 229, 255, 0.22);
+    border-radius: 7px;
+    color: #66efff !important;
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.06);
+    transition: color .25s ease, background .25s ease, transform .32s cubic-bezier(.2,.9,.2,1), box-shadow .25s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover .fa,
+  .erp-topbar .navbar-nav > li > a:focus .fa,
+  .erp-topbar .navbar-nav > .open > a .fa,
+  .erp-topbar .navbar-nav > li > a.erp-current .fa,
+  .erp-topbar .navbar-nav > li.erp-current > a .fa,
+  .erp-topbar .navbar-nav > li > a:hover .glyphicon,
+  .erp-topbar .navbar-nav > li > a:focus .glyphicon,
+  .erp-topbar .navbar-nav > .open > a .glyphicon,
+  .erp-topbar .navbar-nav > li > a.erp-current .glyphicon,
+  .erp-topbar .navbar-nav > li.erp-current > a .glyphicon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.48);
+    background: rgba(255,255,255,.15);
+    box-shadow: 0 0 13px rgba(255,255,255,.24);
+    transform: rotate(-5deg) scale(1.10);
+  }
+
+  .erp-topbar .caret {
+    color: #62edff !important;
+    border-top-color: currentColor !important;
+    filter: drop-shadow(0 0 4px rgba(0,229,255,.48));
+    transition: transform .28s ease, color .28s ease !important;
+  }
+
+  .erp-topbar .open > a .caret,
+  .erp-topbar a:hover .caret {
+    color: #ffffff !important;
+    transform: rotate(180deg);
+  }
+
+  .erp-topbar .dropdown-menu {
+    border-color: rgba(0, 229, 255, 0.25) !important;
+    background:
+      radial-gradient(circle at 12% 0, rgba(0,229,255,.13), transparent 42%),
+      radial-gradient(circle at 100% 100%, rgba(255,49,84,.13), transparent 46%),
+      linear-gradient(145deg, rgba(5,17,29,.985), rgba(17,10,25,.985)) !important;
+    box-shadow: 0 22px 46px rgba(0,5,14,.48), 0 0 22px rgba(0,229,255,.08), inset 0 1px 0 rgba(131,236,255,.10) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    --sub-a: rgba(0, 213, 239, .76);
+    --sub-b: rgba(43, 95, 255, .76);
+    --sub-c: rgba(255, 49, 84, .68);
+    position: relative !important;
+    z-index: 0;
+    isolation: isolate;
+    min-height: 38px;
+    padding-left: 43px !important;
+    overflow: hidden !important;
+    border-color: rgba(83, 218, 240, .14) !important;
+    color: #dff9ff !important;
+    background: linear-gradient(135deg, rgba(12,31,45,.86), rgba(28,16,34,.86)) !important;
+    background-size: auto !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+    animation: none !important;
+    transition: transform .30s cubic-bezier(.2,.85,.25,1), border-color .28s ease, box-shadow .28s ease, color .28s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::before {
+    position: absolute !important;
+    z-index: -1 !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border-radius: inherit !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(105deg, var(--sub-a), var(--sub-b), var(--sub-c)) !important;
+    background-size: 220% 100% !important;
+    transform: translate3d(-102%,0,0) !important;
+    transform-origin: left center !important;
+    animation: none !important;
+    transition: transform .42s cubic-bezier(.16,1,.3,1) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::after {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 12px;
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,229,255,.28);
+    border-radius: 7px;
+    content: "\f105";
+    color: #68efff;
+    font-family: FontAwesome;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    background: rgba(0,229,255,.08);
+    box-shadow: inset 0 0 9px rgba(0,229,255,.08);
+    transform: translateY(-50%);
+    transition: color .25s ease, background .25s ease, border-color .25s ease, transform .3s cubic-bezier(.2,.85,.25,1), box-shadow .25s ease;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(1) .dropdown-menu > li > a::after { content: "\f1b2"; }
+  .erp-topbar .navbar-nav > li:nth-child(2) .dropdown-menu > li > a::after { content: "\f0d1"; }
+  .erp-topbar .navbar-nav > li:nth-child(3) .dropdown-menu > li > a::after { content: "\f07a"; }
+  .erp-topbar .navbar-nav > li:nth-child(4) .dropdown-menu > li > a::after { content: "\f15c"; }
+  .erp-topbar .navbar-nav > li:nth-child(5) .dropdown-menu > li > a::after { content: "\f080"; }
+  .erp-topbar .navbar-nav > li:nth-child(6) .dropdown-menu > li > a::after { content: "\f09d"; }
+  .erp-topbar .navbar-nav > li:nth-child(7) .dropdown-menu > li > a::after { content: "\f0c0"; }
+  .erp-topbar .navbar-nav > li:nth-child(8) .dropdown-menu > li > a::after { content: "\f132"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-barcode) .dropdown-menu > li > a::after { content: "\f1b2"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-clipboard) .dropdown-menu > li > a::after { content: "\f0d1"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-cart-plus) .dropdown-menu > li > a::after { content: "\f07a"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-file) .dropdown-menu > li > a::after { content: "\f15c"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-bar-chart) .dropdown-menu > li > a::after { content: "\f080"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-credit-card-alt) .dropdown-menu > li > a::after { content: "\f09d"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-users) .dropdown-menu > li > a::after { content: "\f0c0"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-shield) .dropdown-menu > li > a::after { content: "\f132"; }
+
+  .erp-topbar .dropdown-menu > li > a:hover,
+  .erp-topbar .dropdown-menu > li > a:focus,
+  .erp-topbar .dropdown-menu > li > a.erp-current,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link {
+    color: #ffffff !important;
+    border-color: rgba(116,235,255,.56) !important;
+    background: linear-gradient(135deg, rgba(12,31,45,.92), rgba(28,16,34,.92)) !important;
+    box-shadow: 0 8px 17px rgba(0,170,220,.15), inset 0 1px 0 rgba(255,255,255,.12) !important;
+    transform: translateX(4px) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::before,
+  .erp-topbar .dropdown-menu > li > a:focus::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::before {
+    transform: translate3d(0,0,0) !important;
+    animation: erpTechSurface 2.15s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::after,
+  .erp-topbar .dropdown-menu > li > a:focus::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::after {
+    color: #ffffff;
+    border-color: rgba(255,255,255,.58);
+    background: rgba(255,255,255,.16);
+    box-shadow: 0 0 12px rgba(255,255,255,.24);
+    transform: translateY(-50%) rotate(-7deg) scale(1.08);
+  }
+
+  /* Iconos semánticos: cada submenú comunica su función real. */
+  .erp-topbar .dropdown-menu > li > a::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon {
+    position: absolute !important;
+    z-index: 2;
+    top: 50%;
+    left: 12px;
+    display: inline-flex !important;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    border: 1px solid rgba(0,229,255,.28);
+    border-radius: 7px;
+    color: #68efff !important;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    text-shadow: 0 0 9px rgba(0,229,255,.42);
+    background: rgba(0,229,255,.08);
+    box-shadow: inset 0 0 9px rgba(0,229,255,.08);
+    transform: translateY(-50%);
+    transition: color .25s ease, background .25s ease, border-color .25s ease, transform .3s cubic-bezier(.2,.85,.25,1), box-shadow .25s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a:focus > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link > .erp-submenu-icon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.58);
+    background: rgba(255,255,255,.16);
+    box-shadow: 0 0 12px rgba(255,255,255,.24), inset 0 0 9px rgba(255,255,255,.10);
+    transform: translateY(-50%) rotate(-7deg) scale(1.08);
+  }
+
+  .erp-topbar .dropdown-menu .divider {
+    background: linear-gradient(90deg, transparent, rgba(0,229,255,.40), rgba(255,49,84,.34), transparent) !important;
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--erp-cyan), #5b63ff, var(--erp-ruby)) !important;
+  }
+
+  .erp-topbar .erp-market {
+    border-color: rgba(0,229,255,.20) !important;
+    color: #dffaff !important;
+    background: linear-gradient(145deg, rgba(8,29,44,.88), rgba(35,14,35,.84)) !important;
+    box-shadow: inset 0 1px 0 rgba(139,239,255,.08), 0 6px 15px rgba(0,5,14,.22);
+  }
+
+  .erp-topbar .erp-nav-logo:hover {
+    filter: drop-shadow(0 7px 13px rgba(0,229,255,.22)) drop-shadow(0 0 8px rgba(255,49,84,.16)) !important;
+  }
+
+  .erp-topbar .navbar-toggle {
+    border-color: rgba(0,229,255,.42) !important;
+    background: linear-gradient(125deg, rgba(0,190,225,.78), rgba(55,77,245,.78), rgba(238,42,88,.72)) !important;
+    background-size: 220% 100% !important;
+    box-shadow: 0 9px 20px rgba(0,94,150,.26), inset 0 1px 0 rgba(255,255,255,.20) !important;
+    animation: erpTechSurface 3.2s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-toggle .icon-bar {
+    background: #ffffff !important;
+    box-shadow: 0 0 8px rgba(0,229,255,.62) !important;
+  }
+
+  @media (max-width: 1440px) {
+    .erp-topbar #myNavbar {
+      border-top-color: rgba(0,229,255,.18) !important;
+      background: linear-gradient(145deg, rgba(4,17,29,.96), rgba(22,10,26,.96)) !important;
+    }
+
+    .erp-topbar .dropdown-menu,
+    .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+      background: linear-gradient(145deg, rgba(6,24,38,.94), rgba(25,11,29,.94)) !important;
+      box-shadow: inset 0 1px 0 rgba(112,232,255,.08) !important;
+    }
+  }
+
+  /* Acabado Signature: profundidad, luz reactiva y color funcional. */
+  .erp-topbar {
+    background-size: 100% 100%, 100% 100%, 160% 100% !important;
+    backdrop-filter: saturate(1.25) blur(18px);
+    -webkit-backdrop-filter: saturate(1.25) blur(18px);
+    animation: erpHeaderAurora 11s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-brand {
+    border-color: rgba(78,226,246,.34) !important;
+    background:
+      radial-gradient(circle at 16% 22%, rgba(63,255,208,.15), transparent 35%),
+      linear-gradient(140deg, rgba(5,33,48,.96), rgba(37,12,35,.90)) !important;
+    box-shadow: 0 8px 20px rgba(0,5,14,.30), inset 0 1px 0 rgba(167,244,255,.15), inset 0 -1px 0 rgba(255,49,84,.10) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a {
+    border-color: rgba(73,213,236,.23) !important;
+    background:
+      linear-gradient(145deg, rgba(8,27,41,.97), rgba(24,14,31,.97)) !important;
+    box-shadow: 0 8px 20px rgba(0,4,12,.31), inset 0 1px 0 rgba(151,240,255,.09), inset 0 -1px 0 rgba(255,49,84,.045) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.31), rgba(119,235,255,.10) 24%, transparent 48%) !important;
+    opacity: 0 !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::after,
+  .erp-topbar .navbar-nav > li > a:focus::after,
+  .erp-topbar .navbar-nav > .open > a::after,
+  .erp-topbar .navbar-nav > li.erp-current > a::after {
+    opacity: 1 !important;
+  }
+
+  .erp-topbar .dropdown-menu {
+    padding: 10px !important;
+    border-color: rgba(91,225,245,.30) !important;
+    background:
+      radial-gradient(circle at 12% -5%, rgba(0,229,255,.17), transparent 40%),
+      radial-gradient(circle at 103% 105%, rgba(255,49,84,.17), transparent 44%),
+      linear-gradient(145deg, rgba(4,17,29,.988), rgba(19,9,26,.99)) !important;
+    box-shadow: 0 28px 58px rgba(0,4,13,.56), 0 0 30px rgba(0,229,255,.10), inset 0 1px 0 rgba(168,242,255,.13), inset 0 -1px 0 rgba(255,49,84,.11) !important;
+    backdrop-filter: blur(24px) saturate(1.22) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(1.22) !important;
+  }
+
+  .erp-topbar .dropdown-menu::before {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    left: 15px;
+    height: 2px;
+    border-radius: 999px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, #23e7ff, #7763ff, #ff3154, transparent);
+    background-size: 220% 100%;
+    filter: drop-shadow(0 0 7px rgba(0,229,255,.48));
+    animation: erpTechSurface 3s ease-in-out infinite;
+  }
+
+  .erp-topbar .dropdown-menu > li {
+    transform-origin: top center;
+  }
+
+  .erp-topbar .open > .dropdown-menu > li {
+    animation: erpSubmenuReveal .34s cubic-bezier(.2,.85,.25,1) both;
+    animation-delay: calc(var(--menu-index, 0) * 22ms);
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    margin: 3px 0 !important;
+    border-color: rgba(94,211,232,.13) !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, rgba(9,30,44,.90), rgba(27,15,35,.89)) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 4px 11px rgba(0,3,10,.11) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::after {
+    position: absolute !important;
+    z-index: 1 !important;
+    inset: 0 !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: inherit !important;
+    content: "" !important;
+    pointer-events: none !important;
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.22), transparent 46%) !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+    transform: none !important;
+    transition: opacity .24s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::after,
+  .erp-topbar .dropdown-menu > li > a:focus::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::after {
+    border: 0 !important;
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.22), transparent 46%) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-cyan {
+    --sub-a: rgba(0,213,239,.78);
+    --sub-b: rgba(43,95,255,.77);
+    --sub-c: rgba(113,78,255,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-violet {
+    --sub-a: rgba(111,77,255,.79);
+    --sub-b: rgba(181,54,235,.73);
+    --sub-c: rgba(255,49,111,.68);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-emerald {
+    --sub-a: rgba(18,196,154,.79);
+    --sub-b: rgba(0,160,210,.73);
+    --sub-c: rgba(37,99,255,.68);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-amber {
+    --sub-a: rgba(231,151,44,.82);
+    --sub-b: rgba(241,91,62,.76);
+    --sub-c: rgba(238,46,100,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-rose {
+    --sub-a: rgba(242,53,96,.80);
+    --sub-b: rgba(174,48,181,.75);
+    --sub-c: rgba(92,74,255,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon {
+    --icon-color: #69efff;
+    --icon-rgb: 0,229,255;
+    border-color: rgba(var(--icon-rgb),.38) !important;
+    color: var(--icon-color) !important;
+    text-shadow: 0 0 10px rgba(var(--icon-rgb),.56) !important;
+    background: linear-gradient(145deg, rgba(var(--icon-rgb),.18), rgba(var(--icon-rgb),.07)) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.11), 0 0 12px rgba(var(--icon-rgb),.12) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-violet {
+    --icon-color: #b9a7ff;
+    --icon-rgb: 139,92,246;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-emerald {
+    --icon-color: #66f1c7;
+    --icon-rgb: 24,211,160;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-amber {
+    --icon-color: #ffc36a;
+    --icon-rgb: 245,158,58;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-rose {
+    --icon-color: #ff8ba2;
+    --icon-rgb: 255,66,111;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a:focus > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link > .erp-submenu-icon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.68) !important;
+    background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.11)) !important;
+    box-shadow: 0 0 16px rgba(var(--icon-rgb),.52), inset 0 1px 0 rgba(255,255,255,.30) !important;
+    transform: translateY(-50%) rotate(-8deg) scale(1.12) !important;
+  }
+
+  @keyframes erpHeaderAurora {
+    0%, 100% { background-position: 0 0, 0 0, 0% 50%; }
+    50% { background-position: 0 0, 0 0, 100% 50%; }
+  }
+
+  @keyframes erpSubmenuReveal {
+    from { opacity: 0; transform: translateY(-7px) scale(.985); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  @keyframes erpTechSurface {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpTechEdge {
+    0%, 100% { opacity: .72; filter: brightness(1); }
+    50% { opacity: 1; filter: brightness(1.28); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .erp-topbar .navbar-nav > li > a::before,
+    .erp-topbar .navbar-nav > li > a::after,
+    .erp-topbar .dropdown-menu > li > a::before,
+    .erp-topbar .dropdown-menu > li > a::after {
+      animation: none !important;
+      transition-duration: .01ms !important;
+    }
+  }
+</style>
+
+<script>
+  // Evita que el navbar se cierre al hacer clic en un dropdown
+  $(document).on('click', '.navbar-collapse.in .dropdown-toggle', function(e) {
+    e.stopPropagation(); // evita que el evento burbujee y cierre el navbar
+  });
+
+  $(function() {
+    var currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+
+    $('#myNavbar a[href]').each(function() {
+      var href = $(this).attr('href');
+      if (!href || href === '#' || href.indexOf('javascript:') === 0) {
+        return;
+      }
+
+      var target = document.createElement('a');
+      target.href = href;
+      var targetPath = target.pathname.toLowerCase().replace(/\/+$/, '');
+
+      if (targetPath && targetPath === currentPath) {
+        $(this).addClass('erp-current-link');
+        $(this).closest('.dropdown').addClass('erp-current');
+      }
+    });
+
+    var submenuIconRules = [
+      [/categorias.*impresoras/, 'fa-tags'],
+      [/modificar.*producto/, 'fa-pencil-square-o'],
+      [/cargar.*xml/, 'fa-file-code-o'],
+      [/articulos.*movimiento/, 'fa-line-chart'],
+      [/nuevo.*kardex/, 'fa-book'],
+      [/listado.*ordenes/, 'fa-list-alt'],
+      [/nueva.*orden/, 'fa-cart-arrow-down'],
+      [/confrontacion/, 'fa-balance-scale'],
+      [/registro.*movimiento/, 'fa-random'],
+      [/registro.*compras/, 'fa-shopping-basket'],
+      [/traslado|tralado/, 'fa-exchange'],
+      [/^stock$/, 'fa-cubes'],
+      [/punto.*venta/, 'fa-desktop'],
+      [/^clientes?$/, 'fa-users'],
+      [/pre.*orden/, 'fa-clock-o'],
+      [/oferta/, 'fa-tags'],
+      [/proyect.*empleado/, 'fa-id-badge'],
+      [/ventas?.*delivery/, 'fa-motorcycle'],
+      [/ventas?.*vendedor/, 'fa-user-circle'],
+      [/registro.*ventas?/, 'fa-file-text-o'],
+      [/registro.*proyectos?/, 'fa-briefcase'],
+      [/proyectos?.*tarapaca/, 'fa-building-o'],
+      [/reporte.*cierre/, 'fa-calculator'],
+      [/cierre.*caja/, 'fa-lock'],
+      [/reimpresion/, 'fa-print'],
+      [/u\.?\s*bruta.*usuario/, 'fa-user-plus'],
+      [/utilidad/, 'fa-line-chart'],
+      [/guia.*remision/, 'fa-truck'],
+      [/historial/, 'fa-history'],
+      [/facturacion.*electronica/, 'fa-file-text'],
+      [/pagina.*cliente/, 'fa-external-link'],
+      [/consulta.*cpe/, 'fa-search'],
+      [/dashboard/, 'fa-tachometer'],
+      [/estadistico/, 'fa-pie-chart'],
+      [/stock.*minimo/, 'fa-level-down'],
+      [/deuda.*clientes?/, 'fa-user-times'],
+      [/deuda.*proveedores?/, 'fa-truck'],
+      [/ranking/, 'fa-trophy'],
+      [/comisionistas?/, 'fa-percent'],
+      [/^reportes?$/, 'fa-bar-chart'],
+      [/buscador.*caja/, 'fa-search'],
+      [/caja.*banco/, 'fa-credit-card'],
+      [/^operaciones?$/, 'fa-cogs'],
+      [/configuracion/, 'fa-sliders'],
+      [/^usuarios?$/, 'fa-user-circle-o']
+    ];
+
+    var parentFallbackIcons = {
+      'fa-barcode': 'fa-cube',
+      'fa-clipboard': 'fa-exchange',
+      'fa-cart-plus': 'fa-file-text-o',
+      'fa-file': 'fa-file-text',
+      'fa-bar-chart': 'fa-bar-chart',
+      'fa-credit-card-alt': 'fa-credit-card',
+      'fa-users': 'fa-cogs',
+      'fa-shield': 'fa-shield'
+    };
+
+    $('#myNavbar .dropdown-menu > li > a').each(function() {
+      var submenuLink = $(this);
+      var normalizedLabel = submenuLink.text().toLowerCase();
+
+      if (normalizedLabel.normalize) {
+        normalizedLabel = normalizedLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      normalizedLabel = normalizedLabel.replace(/\s+/g, ' ').trim();
+      var selectedIcon = '';
+
+      $.each(submenuIconRules, function(_, rule) {
+        if (!selectedIcon && rule[0].test(normalizedLabel)) {
+          selectedIcon = rule[1];
+        }
+      });
+
+      if (!selectedIcon) {
+        var parentToggleIcon = submenuLink.closest('.dropdown').children('.dropdown-toggle').find('.fa').first();
+        $.each(parentFallbackIcons, function(parentClass, fallbackIcon) {
+          if (!selectedIcon && parentToggleIcon.hasClass(parentClass)) {
+            selectedIcon = fallbackIcon;
+          }
+        });
+      }
+
+      var iconTone = 'cyan';
+      var violetIcons = ['fa-users', 'fa-user-circle', 'fa-user-circle-o', 'fa-user-plus', 'fa-user-times', 'fa-id-badge', 'fa-briefcase', 'fa-building-o'];
+      var emeraldIcons = ['fa-line-chart', 'fa-bar-chart', 'fa-pie-chart', 'fa-tachometer', 'fa-calculator', 'fa-percent', 'fa-credit-card', 'fa-shopping-basket', 'fa-cubes'];
+      var amberIcons = ['fa-clock-o', 'fa-tag', 'fa-tags', 'fa-truck', 'fa-motorcycle', 'fa-exchange', 'fa-cart-arrow-down', 'fa-history'];
+      var roseIcons = ['fa-lock', 'fa-shield', 'fa-print', 'fa-level-down'];
+
+      if ($.inArray(selectedIcon, violetIcons) !== -1) {
+        iconTone = 'violet';
+      } else if ($.inArray(selectedIcon, emeraldIcons) !== -1) {
+        iconTone = 'emerald';
+      } else if ($.inArray(selectedIcon, amberIcons) !== -1) {
+        iconTone = 'amber';
+      } else if ($.inArray(selectedIcon, roseIcons) !== -1) {
+        iconTone = 'rose';
+      }
+
+      submenuLink.children('.fa').remove();
+      submenuLink.addClass('erp-tone-' + iconTone);
+      submenuLink.parent().css('--menu-index', submenuLink.parent().index());
+      $('<i>', {
+        'class': 'fa ' + (selectedIcon || 'fa-circle-o') + ' erp-submenu-icon erp-icon-' + iconTone,
+        'aria-hidden': 'true'
+      }).prependTo(submenuLink);
+    });
+
+    $('.erp-topbar .navbar-nav > li > a, #myNavbar .dropdown-menu > li > a')
+      .on('mousemove', function(event) {
+        var bounds = this.getBoundingClientRect();
+        this.style.setProperty('--light-x', Math.round(event.clientX - bounds.left) + 'px');
+        this.style.setProperty('--light-y', Math.round(event.clientY - bounds.top) + 'px');
+      })
+      .on('mouseleave', function() {
+        this.style.setProperty('--light-x', '50%');
+        this.style.setProperty('--light-y', '50%');
+      });
+  });
+</script>
+
+<nav id="navBar" class="navbar navbar-default erp-topbar">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://localhost/index.php">NEUROSOFT</a>
+    </div>
+    <div class="collapse navbar-collapse navbar-rigth" id="myNavbar">
+      <ul class="nav navbar-nav">
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-barcode" aria-hidden="true"></i> Producto
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/views/Gen_ProductoForm.php" class="text-primary-color"><i class="fa fa-"></i>Modificar Producto</a></li>
+            <li><a href="/views/Gen_ProductosSinMovimiento.php" class="text-primary-color"><i class="fa fa-clock-o"></i>Productos sin movimiento</a></li>
+            <li><a href="/views/Gen_Impresora.php" class="text-primary-color"><i class="fa fa-"></i>Categorias / Impresoras</a></li>
+            <!--<li><a href="http://localhost/views/Gen_ProductoMarcaForm.php" >Marca</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoFormaFarmaceuticaForm.php">Forma Farmaceutica</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoModelo.php">Modelo</a></li>
+          <li><a href="http://localhost/views/Gen_ProductoMedicionForm.php">Medicion</a></li>
+          <li><a href="http://localhost/views/Gen_ProductoCategoriaForm.php">Categoria</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoCompuestoForm.php">Compuesto</a></li>-->
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-clipboard"></i> Logistica
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/Lo_InventarioForm.php">REGISTRO DE COMPRAS</a></li>
+            <li><a href="http://localhost/views/Lo_MovimientoXML.php">CARGAR COMPRAS XML</a></li>
+            <li><a href="http://localhost/views/Lo_Traslado.php">TRALADOS</a></li>
+            <!--<li><a href="http://localhost/views/Lo_GenerarCodigoBarra.php">CODIGO DE BARRA</a></li>-->
+            <li role="separator" class="divider"></li>
+            <!--<li class="dropdown-header">KARDEX CONTABLE</li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexform.php?Tipo=0">1. KARDEX</a></li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexvalorizadoform.php?Tipo=0">1. KARDEX VALORIZADO</a></li>-->
+            <!--<li class="dropdown-header">KARDEX FECHA STOCK</li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexform.php?Tipo=1">1. KARDEX</a></li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexvalorizadoform.php?Tipo=1">2. KARDEX VALORIZADO</a></li>-->
+            <li><a href="/views/lo_reportemasmovimiento.php">ARTICULOS CON MAS MOVIMIENTOS</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/views/lo_kardex.php">NUEVO KARDEX</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/Lo_ReporteStockForm.php"></a></li>
+            <li><a href="http://localhost/views/Lo_ReporteStockForm.php">STOCK</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/lo_ordenes.php">LISTADO ORDENES COMPRA</a></li>
+            <li><a href="http://localhost/views/lo_ordencompra.php">NUEVA ORDEN COMPRA</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="navli"><a href="/views/lo_confrontacion.php">Confrontación de Inventario</a></li>
+            <!-- <li><a href="http://localhost/views/lo_regmovimiento.php">REGISTRO DE MOVIMIENTO</a></li> -->
+            <li><a href="http://localhost/views/ReporteRegMovimiento.php">REGISTRO DE MOVIMIENTO </a></li>
+<li><a href="/views/ReporteSireMovimiento.php">SIRE COMPRAS</a></li>
+
+            <!--<li><a href="http://localhost/views/lo_regcompracontable.php">REGISTRO DE COMPRA CONTABLE</a></li>-->
+            <li role="separator" class="divider"></li>
+            <!--<li><a href="http://localhost/views/Lo_BuscarVencimiento.php">PRODUCTOS POR VENCER</a></li>-->
+          </ul>
+        </li>
+
+        <!--<li><a href="http://localhost/views/V_ExpertoForm.php">Sistema Experto</a></li>-->
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cart-plus"></i> Ventas
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/V_VentaForm.php">Punto de venta</a></li>
+<li><a href="/views/VentasApp.php">VENTAS APP</a></li>
+<li><a href="/views/TiendaVirtual.php">TIENDA VIRTUAL</a></li>
+<li><a href="/views/ReporteSireVentas.php">SIRE VENTAS</a></li>
+            <li><a href="http://localhost/views/V_VentaCliente.php">Clientes </a></li>
+            <li><a href="http://localhost/views/V_PreOrden.php">Pre Orden</a></li>
+            <li><a href="http://localhost/views/V_RegOferta.php">Registro Ofertas</a></li>
+            <li><a href="/views/proyectos.php?id=1">Proyectos TARAPACA</a></li>
+            <!-- <li><a href="/views/proyectos.php?id=2">Proyectos </a></li> -->
+            <li><a href="/views/reg_proyectos.php">Registro de Proyectos</a></li>
+            <li role="separator" class="divider"></li>
+            <!-- <li><a href="http://localhost/views/ve_regventaform.php">Registro de Ventas</a></li> -->
+            <li><a href="http://localhost/views/ReporteRegistroVentas.php">Registro de Ventas </a></li>
+            <li><a href="http://localhost/views/ReporteProyectosEmpleado.php">Registro Proyects - Empleado </a></li>
+            <li><a href="http://localhost/views/VentasDelivery.php">Registro de Ventas Delivery</a></li>
+            <li><a href="http://localhost/views/ve_regventaformvendedor.php">Registro de Ventas VENDEDOR</a></li>
+            <li><a href="http://localhost/views/ve_cierreform.php">Cierre de Caja</a></li>
+            <li><a href="http://localhost//views/v_cierrereporte.php">Reporte Cierre de Caja</a></li>
+            <!--<li><a href="http://localhost/views/ve_cambiopreciobloque.php">Cambio de precio por bloque</a></li>-->
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/ve_reimpresionDocumentos.php">Reimpresión de Documentos</a></li>
+            <li><a href="http://localhost/views/ReportUtilidadBruta.php">Reporte Utilidad Bruta</a></li>
+            <!-- <li><a href="http://localhost/views/ReportUtilidadBrutaPorVendedor.php">Reporte Utilidad Bruta Por Vendedor</a></li> -->
+            <li><a href="http://localhost/views/ReporteUtilidadBrutaPorUsuario.php">REPORTE U. BRUTA POR USUARIO</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/views/remision.php">Generar guía de Remisión</a></li>
+            <li><a href="http://localhost/views/Ve_HistorialVentaKit.php">Historial Venta Kit</a></li>
+          </ul>
+        </li>
+
+                  <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-file" aria-hidden="true"></i> Facturación
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/views/facturacion.php"> Facturación Electrónica </a></li>
+              <li><a href="/api/sunat/pag_cliente/" target="_blank"> Página Cliente </a></li>
+              <li><a href="http://emision.factura.vip/" target="_blank"> Consulta CPE </a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="/views/remisionLista.php"> Emitir guía de Remisión</a></li>
+            </ul>
+
+          </li>
+                          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-bar-chart" aria-hidden="true"></i> Reportes
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="http://localhost/views/Dashboard.php"> Dashboard</a></li>
+<li><a href="/views/KpiDashboard.php">DASHBOARD KPI</a></li>
+<li><a href="/views/KpiDashboard.php#ventas">KPI VENTAS</a></li>
+<li><a href="/views/KpiDashboard.php#productos">KPI PRODUCTOS</a></li>
+<li><a href="/views/KpiDashboard.php#inventario">KPI INVENTARIO</a></li>
+<li><a href="/views/KpiDashboard.php#vendedores">KPI VENDEDORES</a></li>
+<li><a href="/views/KpiDashboard.php#clientes">KPI CLIENTES</a></li>
+<li><a href="/views/KpiDashboard.php#sucursales">KPI SUCURSALES</a></li>
+<li><a href="/views/KpiDashboard.php#alertas">KPI ALERTAS</a></li>
+
+              <li><a href="/views/reporteestadistico.php"> Reporte Estadistico </a></li>
+              <li><a href="/views/reportehuespedes.php"> Registro de Proyectos </a></li>
+              <li><a href="/views/reportestockminimo.php"> Reporte Stock Mínimo </a></li>
+              <li><a href="/views/reportesdeudacliente.php"> Reporte Deuda Clientes </a></li>
+              <li><a href="/views/reportesdeudaproveedor.php"> Reporte Deuda Proveedores </a></li>
+              <li><a href="/views/reportesrankingclientes.php"> Reporte Ranking Clientes </a></li>
+              <li><a href="/views/comisionistas.php"> Reporte Comisionistas </a></li>
+              <li><a href="/views/reportes.php">REPORTES</a></li>
+            </ul>
+          </li>
+        
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-credit-card-alt" aria-hidden="true"></i> Caja y Banco
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/CajaBancos.php"> Caja y Banco</a></li>
+            <!-- <li><a href="http://localhost/views/FrmCb_CajaBancoBuscador.php">Buscador de Caja y Banco</a></li> -->
+            <li><a href="http://localhost/views/BuscadorCajaBanco.php">Buscador de Caja y Banco</a></li>
+          </ul>
+
+        </li>
+
+
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-users" aria-hidden="true"></i> Multi Agente
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/views/Ag_Operacion.php"> Operaciones</a></li>
+            <li><a href="/views/Ag_Reimpresion.php">Reimpresión de Recibos</a></li>
+            <li><a href="/views/Ag_CierreCaja.php">Cierre de Caja</a></li>
+            <li><a href="/views/Ag_Configuracion.php">Configuración</a></li>
+          </ul>
+        </li>
+
+
+                  <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-shield" aria-hidden="true"></i> Seguridad
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <!-- <li><a href="http://localhost/views/Seg_UsuarioForm.php">Usuarios</a></li> -->
+              <li><a href="http://localhost/views/V_Usuario.php">Usuarios</a></li>
+<li class="navli" ><a href="/views/EmpresaConfig.php"><i class="fa fa-building-o"></i> Datos de empresa</a></li>
+<li class="navli" ><a href="/views/Seg_ComunicadosVigencia.php"><i class="fa fa-bell"></i> Comunicados y vigencia</a></li>
+<li class="navli" ><a href="/views/Seg_ConfigurarEtiquetas.php"><i class="fa fa-tags"></i> Configurar etiquetas</a></li>
+<li class="navli" ><a href="/views/Seg_CorreoConfig.php"><i class="fa fa-envelope"></i> Configuración de correo</a></li>
+<li class="navli" data-plan-manager="1"><a href="/views/Seg_PlanesMenu.php"><i class="fa fa-th-large"></i> Planes y módulos</a></li>
+            </ul>
+          </li>
+                        <li class="crm-nav-item"><a href="/views/CRM.php"><i class="fa fa-comments"></i> CRM</a></li>
+        <li class="dropdown">
+          <a href="http://localhost/controllers/logout.php"> <i class="fa fa-sign-out" aria-hidden="true"></i></a>
+        </li>
+        <li>
+          <div class="erp-market">
+            Compra: <span id="compra"></span></br>
+            Venta : <span id="venta"></span>
+          </div>
+        </li>
+        <li class="navli erp-logo-item">
+          <img class="erp-nav-logo" src="/resources/images/neurologo.png" alt="Neurosoft">
+        </li>
+      </ul>
+      <!-- <ul class="nav navbar-nav navbar-right"> -->
+      <!-- <li><a href=""><i class="fa fa-user-circle"></i> Usuario</a></li> -->
+      <!-- <li><a href=""><i class="fa fa-sign-out"></i> Cerrar Sesion</a></li> -->
+      <!-- </ul> -->
+    </div>
+  </div>
+</nav>
+<script>
+(function(){
+  var disabled=[];
+  var disabledGroups=[];
+  var isSuperadmin=true;
+  function clean(v){return String(v||'').replace(/\s+/g,' ').trim().toLowerCase()}
+  function key(a){try{var u=new URL(a.href,location.href);return u.origin===location.origin?u.pathname.toLowerCase():u.href.toLowerCase()}catch(e){return String(a.getAttribute('href')||'').toLowerCase()}}
+  document.addEventListener('DOMContentLoaded',function(){
+    var nav=document.getElementById('navBar');if(!nav)return;
+    var submenuIcons=[
+      [/cliente|ranking cliente|compras por cliente/,'users'],[/proveedor/,'truck'],[/producto|articulo|modelo|marca|categoria|compuesto|medicion|forma farmaceutica/,'cube'],
+      [/inventario|stock|kardex|confrontacion/,'cubes'],[/movimiento|traslado|ingreso|salida/,'exchange'],[/orden.*compra|compra contable/,'shopping-basket'],
+      [/punto de venta|ventas app|tienda virtual|pre.?orden/,'shopping-cart'],[/registro de venta|venta/,'file-text-o'],[/cierre/,'calculator'],[/reimpresion|impresora/,'print'],
+      [/facturacion|factura|boleta|cpe/,'file-text'],[/remision|guia/,'truck'],[/dashboard|estadistico|kpi|inteligencia/,'line-chart'],[/reporte|sire|formato/,'bar-chart'],
+      [/caja|banco|deuda|pago/,'credit-card'],[/usuario|vendedor/,'user'],[/rol|perfil|permiso|seguridad/,'shield'],[/empresa|vigencia|plan/,'building-o'],
+      [/correo/,'envelope'],[/etiqueta|codigo/,'tags'],[/configur/,'cog'],[/buscar|busqueda/,'search'],[/proforma/,'clipboard'],[/alerta|comunicado/,'bell']
+    ];
+    nav.querySelectorAll('.dropdown-menu li.navli>a').forEach(function(a){
+      var label=clean(a.textContent),icon='folder-open-o';if(!label)return;
+      var currentIcon=a.querySelector(':scope>i.fa'),image=a.querySelector(':scope>img');
+      if(image)return;
+      if(currentIcon&&Array.from(currentIcon.classList).some(function(name){return /^fa-.+/.test(name)&&name!=='fa-'}))return;
+      if(currentIcon)currentIcon.remove();
+      for(var i=0;i<submenuIcons.length;i++){if(submenuIcons[i][0].test(label)){icon=submenuIcons[i][1];break}}
+      var node=document.createElement('i');node.className='fa fa-'+icon;node.setAttribute('aria-hidden','true');a.insertBefore(node,a.firstChild);
+    });
+    nav.querySelectorAll('#myNavbar>ul>li.dropdown').forEach(function(group){
+      var toggle=group.querySelector(':scope>a.dropdown-toggle'),menu=group.querySelector(':scope>ul.dropdown-menu');if(!toggle||!menu)return;
+      var groupName=clean(toggle.textContent);
+      if(disabledGroups.indexOf(groupName)!==-1&&!(isSuperadmin&&groupName==='seguridad'))group.style.display='none';
+      menu.querySelectorAll(':scope>li>a[href]').forEach(function(a){
+        if(isSuperadmin&&a.closest('[data-plan-manager="1"]'))return;
+        if(disabled.indexOf(key(a))!==-1)a.closest('li').style.display='none';
+      });
+      var visible=Array.from(menu.querySelectorAll(':scope>li')).some(function(li){return li.style.display!=='none'});
+      if(!visible)group.style.display='none';
+    });
+    var crmItem=nav.querySelector('.crm-nav-item'),crmLink=crmItem&&crmItem.querySelector(':scope>a[href]');
+    if(crmItem&&crmLink&&(disabledGroups.indexOf('crm')!==-1||disabled.indexOf(key(crmLink))!==-1))crmItem.style.display='none';
+  });
+})();
+</script>
+<style>
+#navBar .dropdown-menu li.navli>a{display:flex;align-items:center;gap:10px}
+#navBar .dropdown-menu li.navli>a>i.fa{width:18px;flex:0 0 18px;color:#174a76;text-align:center;font-size:14px}
+#navBar .dropdown-menu li.navli>a:hover>i.fa,#navBar .dropdown-menu li.navli.active>a>i.fa{color:inherit}
+</style>
+
+
+
+
+
+
+
+
+<div id="avisoPago" style="display: none; margin-top: -13px; margin-bottom: 0 !important; padding: 0 !important; text-align: center; ">
+  <a id="botonPago" href="#" class="text-center font-size: 1.8rem; font-weight: bold;" data-toggle="modal" data-target="#modalPagoFact" style="color:red; font-size: 1.6rem; display:none"><i class="fa fa-hand-o-right" aria-hidden="true"></i><b> PAGAR AQUI </b><i class="fa fa-hand-o-left" aria-hidden="true"></i></a>
+</div>
+<div class="modal fade" id="modalPagoFact" tabindex="-1" role="dialog" aria-labelledby="modalPagoFact" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 65% !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel"><b>METODOS DE PAGO NEUROSYSTEM PERU S.A.C.</b></h4>
+      </div>
+      <div class="modal-body">
+        <div>
+          <img src="https://admin.factura.vip:5000/img/config/metodosdepago.jpg" alt="Metodos de Pago NeuroSystem" style="width: -webkit-fill-available;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="loading"></div>
+
+<script>
+  sessionStorage.clear();
+  sessionStorage.setItem('User', "superadmin");
+  sessionStorage.setItem('IdPerfil', "1")
+  sessionStorage.setItem('IdAlmacen', "1")
+  sessionStorage.setItem('HostUrl', "http://localhost/")
+</script>
+
+<!-- NST PREMIUM MODULE ADAPTER -->
+<link rel="stylesheet" href="/nuevo/static/css/nst-legacy.css?v=1791864333">
+<script defer src="/nuevo/static/js/nst-legacy-ui.js?v=1791864333"></script>
+<!-- END NST PREMIUM MODULE ADAPTER -->
+<link rel="stylesheet" href="/resources/css/central-config.css?v=20261012-1">
+<style>
+:root{--vg-navy:#092e50;--vg-blue:#0ba4dd;--vg-green:#10b96d;--vg-orange:#f2a007;--vg-purple:#7437df;--vg-line:#cce3ef;--vg-text:#0a2945;--vg-muted:#60778a}body{background:#eef8fc!important;color:var(--vg-text)}
+.vg-page{max-width:1200px;margin:22px auto 48px;padding:0 16px;font-family:Inter,"Segoe UI",Arial,sans-serif}.vg-hero{display:flex;align-items:center;gap:16px;padding:22px 28px;border-radius:19px;color:#fff;background:linear-gradient(110deg,var(--vg-navy),#0b77b2 65%,#12ace3);box-shadow:0 16px 36px rgba(9,46,80,.17)}.vg-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.14);font-size:24px}.vg-hero h1{margin:0 0 4px;font-size:27px;font-weight:900}.vg-hero p{margin:0;color:#d9f1fb}.vg-card{margin-top:18px;padding:24px;border:1px solid var(--vg-line);border-radius:19px;background:#fff;box-shadow:0 12px 34px rgba(9,46,80,.08)}
+.vg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.vg-stat{min-height:112px;padding:20px 22px;border-radius:16px;color:#fff}.vg-stat small{display:block;margin-bottom:9px;font-size:12px;opacity:.9}.vg-stat strong{display:block;font-size:25px;line-height:1.1}.vg-stat.client{background:linear-gradient(135deg,#7140e5,#8834da)}.vg-stat.days{background:linear-gradient(135deg,#08a967,#12c37a)}.vg-stat.status{background:linear-gradient(135deg,#ef8f00,#ffae10)}.vg-stat.danger{background:linear-gradient(135deg,#b9273b,#ed4054)}
+.vg-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 20px;margin-top:24px}.vg-field label{display:block;margin-bottom:7px;font-size:12px;font-weight:850}.vg-field input,.vg-field select,.vg-field textarea{width:100%;min-height:49px;padding:11px 14px;border:1px solid #bcdcee;border-radius:11px;background:#fbfdff;color:var(--vg-text);font-size:14px;outline:0;transition:.2s}.vg-field textarea{height:88px;resize:vertical}.vg-field input:focus,.vg-field select:focus,.vg-field textarea:focus{border-color:var(--vg-blue);box-shadow:0 0 0 4px rgba(11,164,221,.11)}.vg-span{grid-column:span 2}.vg-switch{display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid var(--vg-line);border-radius:12px;background:#f0faff}.vg-switch input{width:21px;height:21px;accent-color:var(--vg-green)}.vg-switch strong{display:block;font-size:13px}.vg-switch small{color:var(--vg-muted)}
+.vg-preview{margin-top:22px}.vg-preview h2{font-size:14px}.preview-banner{display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 18px;border-radius:13px;color:#102a43;background:linear-gradient(100deg,#ffd43b,#ffb703 55%,#ffe066);font-weight:850;box-shadow:0 9px 22px rgba(226,132,0,.2)}.preview-banner.info{color:#fff;background:linear-gradient(100deg,#075985,#0284c7,#06b6d4)}.preview-banner.urgent{color:#fff;background:linear-gradient(100deg,#ea580c,#f97316,#ef4444)}.preview-banner.expired{color:#fff;background:linear-gradient(100deg,#991b1b,#dc2626,#be123c)}.preview-banner .badge{padding:6px 12px;border:1px solid rgba(255,255,255,.65);border-radius:999px;color:#fff;background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 5px 14px rgba(153,27,27,.3);font-weight:900}.preview-media{display:none;width:31px;height:31px;place-items:center;border-radius:0;background:transparent;font-size:20px;animation:noticeIconPulse 1.3s ease-in-out infinite}.preview-media.show{display:grid}.preview-media img{width:29px;height:29px;border-radius:0;object-fit:contain;background:transparent}
+.vg-social{margin-top:28px;padding-top:24px;border-top:1px solid var(--vg-line)}.vg-social-head{display:flex;align-items:center;gap:13px}.vg-social-head i{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;color:#fff;background:linear-gradient(135deg,#f16c31,#e73581)}.vg-social-head h2{margin:0;font-size:19px}.vg-social-head p{margin:3px 0 0;color:var(--vg-muted);font-size:13px}.social-demo{position:relative;overflow:hidden;height:58px;margin-top:18px;border-radius:13px;background:linear-gradient(100deg,#6538d8,#cf3979 55%,#f39c17);color:#fff}.social-demo-track{position:absolute;display:flex;align-items:center;gap:12px;height:100%;white-space:nowrap;font-weight:850;animation:socialDemo 12s linear infinite}.social-demo.saludo{background:linear-gradient(100deg,#0088ba,#17b487)}.social-demo.informativo{background:linear-gradient(100deg,#07588e,#0b9ed0)}@keyframes socialDemo{from{transform:translateX(1200px)}to{transform:translateX(-100%)}}
+.vg-actions{display:flex;justify-content:flex-end;margin-top:20px}.vg-save{border:0;border-radius:11px;padding:13px 21px;color:#fff;background:linear-gradient(135deg,#08a85e,#12c77b);font-weight:850;box-shadow:0 10px 24px rgba(8,168,94,.24);cursor:pointer}.vg-save:disabled{opacity:.6}.vg-toast{position:fixed;right:22px;bottom:22px;z-index:9999;padding:14px 18px;border-radius:11px;color:#fff;background:var(--vg-navy);box-shadow:0 12px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(80px);transition:.25s}.vg-toast.show{opacity:1;transform:none}.vg-toast.error{background:#b9273b}
+.vg-add-notice{height:49px;margin-top:16px;padding:0 18px;border:0;border-radius:12px;color:#fff;background:linear-gradient(135deg,#6e38df,#df3982);font-weight:850;cursor:pointer}.vg-notice-list{display:grid;gap:10px;margin-top:17px}.vg-notice-empty{padding:22px;border:1px dashed #acd2e5;border-radius:13px;color:var(--vg-muted);background:#f5fbfe;text-align:center}.vg-notice-item{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:13px;padding:13px;border:1px solid var(--vg-line);border-radius:14px;background:#f9fcfe}.vg-notice-item.off{opacity:.55}.vg-notice-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;color:#fff;background:linear-gradient(135deg,#6638dc,#ed3d79);font-size:19px}.vg-notice-icon i{animation:noticeIconPulse 1.5s ease-in-out infinite}.vg-notice-copy strong,.vg-notice-copy small{display:block}.vg-notice-copy small{margin-top:4px;color:var(--vg-muted)}.vg-notice-tools{display:flex;gap:7px}.vg-notice-tools button{width:36px;height:36px;border:0;border-radius:10px;color:#fff;cursor:pointer}.vg-edit{background:#168bc0}.vg-toggle{background:#12a86a}.vg-delete{background:#e63e58}@keyframes noticeIconPulse{50%{transform:scale(1.22) rotate(6deg)}}
+.vg-payment-head{grid-column:span 2;display:flex;align-items:center;gap:13px;margin-top:7px;padding:16px 18px;border:1px solid #bce4d2;border-radius:15px;color:#fff;background:linear-gradient(110deg,#075a48,#08a56b 58%,#16c784);box-shadow:0 10px 25px rgba(8,165,107,.16)}.vg-payment-head i{display:grid;place-items:center;width:43px;height:43px;border-radius:12px;background:rgba(255,255,255,.17);font-size:20px;animation:noticeIconPulse 1.35s ease-in-out infinite}.vg-payment-head strong,.vg-payment-head small{display:block}.vg-payment-head strong{font-size:17px}.vg-payment-head small{margin-top:3px;color:#dcfff0}.vg-payment-fields{border-color:#a9dec7!important;background:#f3fff9!important}
+@media(max-width:720px){.vg-stats,.vg-form{grid-template-columns:1fr}.vg-span,.vg-payment-head{grid-column:span 1}.vg-hero{padding:17px}.vg-hero h1{font-size:21px}.vg-card{padding:14px}.preview-banner{align-items:flex-start;flex-direction:column}.vg-save{width:100%}}
+</style>
+<main class="vg-page">
+ <header class="vg-hero"><span class="vg-icon"><i class="fa fa-bell"></i></span><div><h1>Comunicados y vigencia</h1><p>Controla renovaciones, pagos y avisos preventivos para tus clientes.</p></div></header>
+ <form class="vg-card" id="vigenciaForm">
+  <input type="hidden" name="csrf" value="393925f2a630f6af734624359a736fa9fed866b5e3213c946f42fe06d6d536a0"><input type="hidden" name="id_empresa" value="1">
+  <section class="vg-stats"><div class="vg-stat client"><small>Cliente</small><strong id="statCliente">CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C.</strong></div><div class="vg-stat days " id="daysCard"><small>Días restantes</small><strong id="statDias">30</strong></div><div class="vg-stat status"><small>Estado de pago</small><strong id="statEstado">PENDIENTE</strong></div></section>
+  <div class="vg-form">
+   <div class="vg-field vg-span"><label>País y zona horaria del sistema</label><select name="sistema_pais" id="sistemaPais"><option value="PE" selected>Perú — America/Lima</option><option value="CO" >Colombia — America/Bogota</option><option value="EC" >Ecuador — America/Guayaquil</option><option value="BO" >Bolivia — America/La_Paz</option><option value="CL" >Chile — America/Santiago</option><option value="AR" >Argentina — America/Argentina/Buenos_Aires</option><option value="MX" >México — America/Mexico_City</option><option value="US" >Estados Unidos (Este) — America/New_York</option><option value="ES" >España — Europe/Madrid</option></select><small style="color:var(--vg-muted)">Los avisos, vencimientos y horarios usarán esta zona. Hora actual: 12/10/2026 23:27</small></div>
+   <div class="vg-field vg-span"><label>Nombre del cliente o empresa</label><input name="vigencia_cliente" id="cliente" value="CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C." required></div>
+   <div class="vg-field"><label>Vigencia desde</label><input type="date" name="vigencia_desde" id="desde" value="2026-10-12" required></div><div class="vg-field"><label>Vigencia hasta</label><input type="date" name="vigencia_hasta" id="hasta" value="2026-11-11" required></div>
+   <div class="vg-field"><label>Periodo rápido</label><select id="periodo"><option value="">Rango personalizado</option><option value="1">1 mes</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">1 año</option></select></div><div class="vg-field"><label>Estado del pago</label><select name="vigencia_estado_pago" id="estado"><option selected>PENDIENTE</option><option >PAGADO</option><option >VENCIDO</option></select></div>
+   <div class="vg-field"><label>Importe del periodo (S/)</label><input type="number" min="0" step="0.01" name="vigencia_importe" value="0.00"></div><div class="vg-field"><label>Fecha límite de pago para bloquear ventas</label><input type="date" name="vigencia_fecha_ultimo_pago" id="fechaLimitePago" value=""><small style="color:var(--vg-muted)">Esta fecha controla el contador y bloquea solamente el Punto de Venta si continúa PENDIENTE.</small></div>
+   <div class="vg-field"><label>Mostrar aviso de pago con anticipación</label><input type="number" name="vigencia_dias_anticipacion" id="diasAnticipacion" min="1" max="365" value="20"><small style="color:var(--vg-muted)">Días antes del vencimiento. El valor inicial es 20.</small></div>
+   <div class="vg-field vg-span"><label>Mensaje que verá el cliente</label><textarea name="vigencia_mensaje" id="mensaje" required>Su servicio está próximo a vencer. Comuníquese con soporte para mantenerlo activo.</textarea></div>
+   <div class="vg-field"><label>Icono animado del aviso de corte</label><select name="vigencia_icono"><option value="bell" selected>Campana</option><option value="clock-o" >Reloj</option><option value="exclamation-triangle" >Advertencia</option><option value="info-circle" >Información</option><option value="shield" >Escudo</option><option value="hourglass-half" >Reloj de arena</option></select></div>
+   <div class="vg-field"><label>Emoji que acompaña al aviso</label><select name="vigencia_emoji" id="vigenciaEmoji"><option value="">Sin emoji</option><option value="🎉" >🎉 Fiesta</option><option value="🎂" >🎂 Cumpleaños</option><option value="🎁" >🎁 Regalo</option><option value="⚠️" >⚠️ Advertencia</option><option value="⏳" >⏳ Tiempo</option><option value="🔔" >🔔 Campana</option><option value="💳" >💳 Pago</option><option value="✨" >✨ Destello</option><option value="📢" >📢 Anuncio</option><option value="❤️" >❤️ Corazón</option></select></div>
+   <div class="vg-field vg-span"><label>GIF animado opcional</label><input type="hidden" name="vigencia_gif_actual" value=""><input type="file" name="vigencia_gif" id="vigenciaGif" accept="image/gif"><small style="color:var(--vg-muted)">GIF máximo 3 MB. Si carga uno, se mostrará animado junto al aviso.</small></div>
+   <div class="vg-field"><label>Velocidad del recorrido (segundos)</label><input type="number" name="vigencia_velocidad_segundos" min="6" max="90" value="22"><small style="color:var(--vg-muted)">Menos segundos = más rápido.</small></div>
+   <div class="vg-payment-head"><i class="fa fa-money"></i><div><strong>Pagos y contacto</strong><small>Configure el botón flotante para mostrar QR, Yape, Plin, cuentas bancarias y WhatsApp.</small></div></div>
+   <label class="vg-switch vg-span vg-payment-fields"><input type="checkbox" name="pago_flotante_activo" value="1" checked><span><strong>Activar botón flotante parpadeante</strong><small>Aparecerá en todas las pantallas cuando guarde esta configuración.</small></span></label>
+   <div class="vg-field"><label><i class="fa fa-whatsapp" style="color:#08a963"></i> WhatsApp de contacto</label><input name="pago_whatsapp" inputmode="numeric" placeholder="Ejemplo: 51954370221" value=""><small style="color:var(--vg-muted)">Incluya el código del país.</small></div>
+   <div class="vg-field"><label>Imagen QR de Yape o Plin</label><input type="hidden" name="pago_qr_actual" value=""><input type="file" name="pago_qr" accept="image/png,image/jpeg,image/webp"><small style="color:var(--vg-muted)">PNG, JPG o WEBP; máximo 4 MB.</small></div>
+   <div class="vg-field vg-span"><label><i class="fa fa-university"></i> Yape, Plin y cuentas bancarias</label><textarea name="pago_cuentas" placeholder="Yape: 999 999 999 - Titular&#10;BCP Soles: 000-0000000-0-00&#10;CCI: 00000000000000000000"></textarea><small style="color:var(--vg-muted)">Escriba un medio de pago por línea.</small></div>
+   <label class="vg-switch vg-span"><input type="checkbox" name="vigencia_aviso_activo" value="1" ><span><strong>Mostrar aviso de pago en el sistema</strong><small>Solo aparecerá dentro de la anticipación configurada. Es independiente de los avisos de festejos.</small></span></label>
+   <div class="vg-switch vg-span"><i class="fa fa-lock" style="font-size:20px;color:#c52d43"></i><span><strong>Bloqueo exclusivo del Punto de Venta</strong><small>Se activa al llegar la fecha límite de pago. Los demás módulos continuarán funcionando con normalidad.</small></span></div>
+   <div class="vg-payment-head" style="background:linear-gradient(110deg,#33105f,#7134c9 58%,#9a4de0)"><i class="fa fa-mobile"></i><div><strong>Bloqueo independiente de Ventas App</strong><small>Configuración exclusiva para views/VentasApp.php. No modifica las fechas del Punto de Venta.</small></div></div>
+   <label class="vg-switch"><input type="checkbox" name="ventas_app_bloqueo_activo" value="1" ><span><strong>Activar bloqueo de Ventas App</strong><small>Bloquea únicamente la aplicación cuando llegue su fecha.</small></span></label>
+   <label class="vg-switch"><input type="checkbox" name="ventas_app_aviso_activo" value="1" ><span><strong>Mostrar aviso anticipado en Ventas App</strong><small>Usa solamente la anticipación configurada para la app.</small></span></label>
+   <div class="vg-field"><label>Fecha límite de Ventas App</label><input type="date" name="ventas_app_fecha_limite" value=""><small style="color:var(--vg-muted)">Independiente de la fecha límite del Punto de Venta.</small></div>
+   <div class="vg-field"><label>Estado de pago de Ventas App</label><select name="ventas_app_estado_pago"><option >PENDIENTE</option><option selected>PAGADO</option><option >VENCIDO</option></select></div>
+   <div class="vg-field"><label>Aviso anticipado de Ventas App</label><input type="number" min="1" max="365" name="ventas_app_dias_anticipacion" value="20"><small style="color:var(--vg-muted)">Cantidad de días antes de la fecha límite.</small></div>
+   <div class="vg-field vg-span"><label>Mensaje para Ventas App</label><textarea name="ventas_app_mensaje" placeholder="Mensaje que verá el usuario de la app">La vigencia de Ventas App está próxima a vencer. Comuníquese con soporte.</textarea></div>
+  </div>
+  <section class="vg-preview"><h2>Vista previa del aviso</h2><div class="preview-banner" id="preview"><i class="fa fa-bell" style="display:grid;place-items:center;width:31px;height:31px;border-radius:10px;color:#fff;background:linear-gradient(135deg,#ef334f,#b91c1c);box-shadow:0 5px 14px rgba(185,28,28,.35)"></i><span class="preview-media "></span><span><b id="previewTitle">Renovación próxima:</b> <span id="previewText">Su servicio está próximo a vencer. Comuníquese con soporte para mantenerlo activo.</span></span><span class="badge" id="previewDays"></span><span class="preview-media "></span></div></section>
+  <section class="vg-social">
+   <header class="vg-social-head"><i class="fa fa-star"></i><div><h2>Avisos de festejos y saludos</h2><p>Programa mensajes que recorrerán la pantalla de derecha a izquierda.</p></div></header>
+   <div class="vg-form">
+    <input type="hidden" name="social_avisos_json" id="socialAvisosJson" value="[]"><input type="hidden" id="socialEditIndex" value="">
+    <input type="hidden" name="social_aviso_activo" id="socialActivo" value="1">
+    <div class="vg-field"><label>Tipo de aviso</label><select name="social_tipo" id="socialTipo"><option value="FESTEJO" selected>Festejo</option><option value="SALUDO" >Saludo</option><option value="INFORMATIVO" >Informativo</option></select></div>
+    <div class="vg-field"><label>Icono animado</label><select id="socialIcono"><option value="star">Estrella</option><option value="heart">Corazón</option><option value="gift">Regalo</option><option value="birthday-cake">Cumpleaños</option><option value="bell">Campana</option><option value="smile-o">Sonrisa</option><option value="info-circle">Información</option></select></div>
+    <div class="vg-field"><label>Emoji del aviso</label><select id="socialEmoji"><option value="">Sin emoji</option><option value="🎉">🎉 Fiesta</option><option value="🎂">🎂 Cumpleaños</option><option value="🎁">🎁 Regalo</option><option value="🥳">🥳 Celebración</option><option value="✨">✨ Destello</option><option value="❤️">❤️ Corazón</option><option value="👏">👏 Aplausos</option><option value="📢">📢 Anuncio</option><option value="😊">😊 Sonrisa</option></select></div>
+    <div class="vg-field"><label>GIF animado del aviso</label><input type="file" id="socialGif" accept="image/gif"><input type="hidden" id="socialGifActual" value=""><small style="color:var(--vg-muted)">Opcional, máximo 3 MB. Se guarda con esta programación.</small></div>
+    <div class="vg-field"><label>Repetir cada (minutos)</label><input type="number" name="social_intervalo_minutos" min="1" max="1440" value="30"></div>
+    <div class="vg-field vg-span"><label>Mensaje que recorrerá la pantalla</label><textarea name="social_mensaje" id="socialMensaje" placeholder="Ejemplo: ¡Feliz aniversario! Gracias por acompañarnos.">¡Celebramos contigo! Gracias por ser parte de nuestra comunidad.</textarea></div>
+    <div class="vg-field"><label>Mostrar desde la fecha</label><input type="date" name="social_desde" id="socialDesde" value="2026-10-12"><small style="color:var(--vg-muted)">Formato: día / mes / año.</small></div><div class="vg-field"><label>Mostrar hasta la fecha</label><input type="date" name="social_hasta" id="socialHasta" value="2026-10-19"><small style="color:var(--vg-muted)">Debe ser igual o posterior a la fecha inicial.</small></div>
+    <div class="vg-field"><label>Hora de inicio diaria</label><input type="time" name="social_hora_inicio" value="08:00"></div><div class="vg-field"><label>Hora de fin diaria</label><input type="time" name="social_hora_fin" value="22:00"></div>
+    <div class="vg-field"><label>Velocidad del recorrido (segundos)</label><input type="number" name="social_duracion_segundos" id="socialDuracion" min="5" max="120" value="15"><small style="color:var(--vg-muted)">Menos segundos = más rápido.</small></div>
+   </div>
+   <div class="social-demo" id="socialDemo"><div class="social-demo-track" id="socialDemoTrack"><i class="fa fa-star"></i><span id="socialDemoText">¡Celebramos contigo! Gracias por ser parte de nuestra comunidad.</span></div></div>
+   <button class="vg-add-notice" id="agregarAviso" type="button"><i class="fa fa-plus"></i> Agregar programación</button><div class="vg-notice-list" id="socialNoticeList"></div>
+  </section>
+  <div class="vg-actions"><button class="vg-save" id="guardar" type="submit"><i class="fa fa-floppy-o"></i> Guardar configuración</button></div>
+ </form>
+</main><div class="vg-toast" id="toast"></div>
+<script>
+(function(){var form=document.getElementById('vigenciaForm'),desde=document.getElementById('desde'),hasta=document.getElementById('hasta'),fechaLimitePago=document.getElementById('fechaLimitePago'),estado=document.getElementById('estado'),cliente=document.getElementById('cliente'),mensaje=document.getElementById('mensaje');
+function days(){var fecha=(fechaLimitePago&&fechaLimitePago.value)||hasta.value;if(!fecha)return 0;var a=new Date(),b=new Date(fecha+'T00:00:00');a.setHours(0,0,0,0);return Math.round((b-a)/86400000)}
+function update(){var d=days(),preview=document.getElementById('preview');document.getElementById('statDias').textContent=d;document.getElementById('statCliente').textContent=cliente.value||'Cliente';document.getElementById('statEstado').textContent=estado.value;document.getElementById('previewText').textContent=mensaje.value;document.getElementById('previewTitle').textContent=d<0?'Servicio vencido:':'Renovación próxima:';document.getElementById('previewDays').textContent=d<0?'Venció hace '+Math.abs(d)+' día'+(Math.abs(d)===1?'':'s'):(d===0?'Vence hoy':'Quedan '+d+' día'+(d===1?'':'s'));preview.className='preview-banner '+(d<0?'expired':d<=7?'urgent':d>30?'info':'');document.getElementById('daysCard').classList.toggle('danger',d<0)}
+[desde,hasta,fechaLimitePago,estado,cliente,mensaje].forEach(function(el){if(el)el.addEventListener('input',update)});document.getElementById('periodo').addEventListener('change',function(){if(!this.value)return;var base=new Date((desde.value||new Date().toISOString().slice(0,10))+'T00:00:00');base.setMonth(base.getMonth()+Number(this.value));hasta.value=base.toISOString().slice(0,10);update()});update();
+var vigenciaEmoji=document.getElementById('vigenciaEmoji'),vigenciaGif=document.getElementById('vigenciaGif'),previewMedia=document.querySelectorAll('#preview .preview-media');
+function previewEmoji(){previewMedia.forEach(function(media){media.innerHTML='';if(vigenciaEmoji.value){media.textContent=vigenciaEmoji.value;media.classList.add('show')}else media.classList.remove('show')})}
+vigenciaEmoji.addEventListener('change',previewEmoji);vigenciaGif.addEventListener('change',function(){var file=this.files&&this.files[0];if(!file){previewEmoji();return}if(file.type!=='image/gif'){alert('Seleccione una imagen GIF válida.');this.value='';previewEmoji();return}if(file.size>3145728){alert('El GIF no puede superar los 3 MB.');this.value='';previewEmoji();return}var url=URL.createObjectURL(file);previewMedia.forEach(function(media){var img=document.createElement('img');img.alt='';img.src=url;media.innerHTML='';media.appendChild(img);media.classList.add('show')})});
+var socialTipo=document.getElementById('socialTipo'),socialMensaje=document.getElementById('socialMensaje'),socialDuracion=document.getElementById('socialDuracion'),socialDemo=document.getElementById('socialDemo'),socialTrack=document.getElementById('socialDemoTrack');function updateSocial(){socialDemo.className='social-demo '+socialTipo.value.toLowerCase();document.getElementById('socialDemoText').textContent=socialMensaje.value||'Escribe el mensaje del aviso';socialTrack.style.animationDuration=Math.max(5,Number(socialDuracion.value)||15)+'s'}[socialTipo,socialMensaje,socialDuracion].forEach(function(el){el.addEventListener('input',updateSocial)});updateSocial();
+ form.addEventListener('submit',function(e){e.preventDefault();var btn=document.getElementById('guardar'),add=document.getElementById('agregarAviso'),toast=document.getElementById('toast');btn.disabled=true;btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Guardando...';fetch('/controllers/ComunicadosVigenciaGuardar.php',{method:'POST',body:new FormData(form),credentials:'same-origin'}).then(function(r){return r.json().then(function(data){return {ok:r.ok,data:data}})}).then(function(result){toast.textContent=result.data.message;toast.className='vg-toast show'+(result.ok?'':' error');if(result.ok)setTimeout(function(){location.reload()},900)}).catch(function(){toast.textContent='No se pudo conectar con el servidor.';toast.className='vg-toast show error'}).finally(function(){btn.disabled=false;btn.innerHTML='<i class="fa fa-floppy-o"></i> Guardar comunicado';if(add){add.disabled=false;if(document.getElementById('socialEditIndex').value==='')add.innerHTML='<i class="fa fa-plus"></i> Agregar programación'}setTimeout(function(){toast.classList.remove('show')},4500)})});})();
+</script>
+<script>
+(function(){
+ var form=document.getElementById('vigenciaForm'),hidden=document.getElementById('socialAvisosJson'),list=document.getElementById('socialNoticeList'),edit=document.getElementById('socialEditIndex');
+ var notices=[];try{notices=JSON.parse(hidden.value||'[]')}catch(e){notices=[]}if(!Array.isArray(notices))notices=[];notices.forEach(function(n){n.activo=true});
+ var q=function(n){return form.querySelector('[name="'+n+'"]')},icon=document.getElementById('socialIcono'),emoji=document.getElementById('socialEmoji'),gif=document.getElementById('socialGif'),gifActual=document.getElementById('socialGifActual'),active=document.getElementById('socialActivo');
+ var socialDesdeInput=q('social_desde'),socialHastaInput=q('social_hasta');function ordenarFechas(){if(!socialDesdeInput||!socialHastaInput)return;socialHastaInput.min=socialDesdeInput.value||'';if(socialDesdeInput.value&&socialHastaInput.value&&socialHastaInput.value<socialDesdeInput.value)socialHastaInput.value=socialDesdeInput.value}if(socialDesdeInput){socialDesdeInput.addEventListener('change',ordenarFechas);socialDesdeInput.addEventListener('input',ordenarFechas)}ordenarFechas();
+ icon.addEventListener('change',function(){var demo=document.querySelector('#socialDemoTrack i');if(demo)demo.className='fa fa-'+icon.value});
+ function safe(v){var d=document.createElement('div');d.textContent=v||'';return d.innerHTML}function sync(){hidden.value=JSON.stringify(notices)}
+ function estadoAviso(n){var actual="2026-10-12 23:27",hoy=actual.slice(0,10),hora=actual.slice(11,16);if(hoy<n.desde)return'Programado';if(hoy>n.hasta)return'Finalizado';var hi=n.hora_inicio||'00:00',hf=n.hora_fin||'23:59',enHora=hi<=hf?(hora>=hi&&hora<=hf):(hora>=hi||hora<=hf);return enHora?'Activo ahora':'Fuera de horario'}
+ function render(){sync();if(!notices.length){list.innerHTML='<div class="vg-notice-empty"><i class="fa fa-calendar-plus-o"></i> Todavía no hay avisos programados.</div>';return}list.innerHTML=notices.map(function(n,i){return '<article class="vg-notice-item"><span class="vg-notice-icon">'+(n.emoji?safe(n.emoji):'<i class="fa fa-'+safe(n.icono||'star')+'"></i>')+'</span><div class="vg-notice-copy"><strong>'+safe(n.mensaje)+'</strong><small>'+safe(n.desde)+' al '+safe(n.hasta)+' · '+safe(n.hora_inicio)+'–'+safe(n.hora_fin)+' · cada '+Number(n.intervalo)+' min · '+(n.gif?'GIF · ':'')+safe(estadoAviso(n))+'</small></div><div class="vg-notice-tools"><button class="vg-edit" type="button" data-edit="'+i+'" title="Editar aviso"><i class="fa fa-pencil"></i></button><button class="vg-delete" type="button" data-delete="'+i+'" title="Eliminar aviso"><i class="fa fa-trash"></i></button></div></article>'}).join('')}
+ function read(){return{id:'aviso-'+Date.now(),activo:true,tipo:q('social_tipo').value,icono:icon.value,emoji:emoji.value,gif:gifActual.value,gif_data:'',mensaje:q('social_mensaje').value.trim(),desde:q('social_desde').value,hasta:q('social_hasta').value,hora_inicio:q('social_hora_inicio').value||'00:00',hora_fin:q('social_hora_fin').value||'23:59',intervalo:Number(q('social_intervalo_minutos').value)||30,duracion:Number(q('social_duracion_segundos').value)||15}}
+ document.getElementById('agregarAviso').addEventListener('click',function(){var button=this,n=read(),file=gif.files&&gif.files[0];if(!n.mensaje||!n.desde||!n.hasta){alert('Complete el mensaje y las fechas del aviso.');return}if(n.hasta<n.desde){n.hasta=n.desde;q('social_hasta').value=n.hasta}n.activo=true;active.checked=true;if(file&&file.size>3145728){alert('El GIF no puede superar los 3 MB.');return}function saveNotice(){var i=edit.value===''?-1:Number(edit.value),wasEdit=i>=0;if(wasEdit){n.id=notices[i].id;notices[i]=n;edit.value='';button.innerHTML='<i class="fa fa-plus"></i> Agregar programación'}else notices.push(n);gif.value='';gifActual.value='';render();button.disabled=true;button.innerHTML='<i class="fa fa-spinner fa-spin"></i> Guardando...';setTimeout(function(){form.requestSubmit()},80)}if(file){var reader=new FileReader();reader.onload=function(){n.gif_data=reader.result;saveNotice()};reader.readAsDataURL(file)}else saveNotice()});
+ list.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.delete!==undefined){
+   if(!confirm('¿Eliminar definitivamente este aviso programado?'))return;
+   notices.splice(Number(b.dataset.delete),1);edit.value='';
+   if(!notices.length){active.checked=false;q('social_mensaje').value='';document.getElementById('socialDemoText').textContent='Sin avisos programados'}
+   render();setTimeout(function(){form.requestSubmit()},80);return;
+  }
+  if(b.dataset.edit!==undefined){var i=Number(b.dataset.edit),n=notices[i];edit.value=i;active.checked=!!n.activo;q('social_tipo').value=n.tipo;icon.value=n.icono;emoji.value=n.emoji||'';gifActual.value=n.gif||'';gif.value='';q('social_mensaje').value=n.mensaje;q('social_desde').value=n.desde;q('social_hasta').value=n.hasta;q('social_hora_inicio').value=n.hora_inicio;q('social_hora_fin').value=n.hora_fin;q('social_intervalo_minutos').value=n.intervalo;q('social_duracion_segundos').value=n.duracion;document.getElementById('agregarAviso').innerHTML='<i class="fa fa-check"></i> Actualizar programación';document.querySelector('.vg-social').scrollIntoView({behavior:'smooth'})}
+ });
+ form.addEventListener('submit',function(e){
+  if(edit.value!==''){
+   var i=Number(edit.value),n=read();
+   if(!n.mensaje||!n.desde||!n.hasta){e.preventDefault();alert('Complete el mensaje y las fechas del aviso que está editando.');return}
+   if(n.hasta<n.desde){n.hasta=n.desde;q('social_hasta').value=n.hasta}
+   n.id=notices[i]&&notices[i].id?notices[i].id:n.id;n.activo=true;notices[i]=n;edit.value='';
+  }
+  notices.forEach(function(n){n.activo=true});sync();
+ },true);render();
+}());
+</script></body></html>

@@ -1,0 +1,90 @@
+import {chromium} from 'playwright';
+import assert from 'node:assert/strict';
+const voices=['alloy','ash','ballad','coral','echo','fable','nova','onyx','sage','shimmer','verse','marin','cedar'];
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1400,height:950}});
+ const requests=[];
+ await page.addInitScript(()=>{
+  window.spoken=[];
+  Object.defineProperty(window,'speechSynthesis',{value:{cancel(){},getVoices(){return []},speak(u){window.spoken.push(u.text);setTimeout(()=>u.onend&&u.onend(),5)}}});
+  window.Audio=class{play(){setTimeout(()=>this.onended&&this.onended(),20);return Promise.resolve()}pause(){}};
+  window.SpeechRecognition=class{constructor(){window.aliSpeech=this}start(){this.onstart&&this.onstart()}abort(){}say(text){const row=[{transcript:text}];row.isFinal=true;this.onresult&&this.onresult({resultIndex:0,results:[row]})}};
+ });
+ await page.route('**/api/index.php/**',async route=>{
+  const request=route.request();
+  if(request.url().endsWith('/ali/config'))return route.fulfill({json:{user:'maria',configured:true,enabled:true,model:'gpt-4.1-mini',web:true,superadmin:true,csrf:'fake-test-token'}});
+  if(request.url().endsWith('/ali/voz')){requests.push(request.postDataJSON());return route.fulfill({status:200,contentType:'audio/mpeg',body:'fake-audio-test-data'})}
+  if(request.url().endsWith('/ali/autorizar'))return route.fulfill({json:{authorized:true}});
+  if(request.method()==='POST')throw Error('Unexpected mutation');
+  return route.continue();
+ });
+ await page.goto(process.env.ALI_TEST_URL||'http://localhost/nuevo/index.html#/ventas',{waitUntil:'networkidle'});
+ await page.locator('.ali-launcher').click();
+ await page.locator('.ali-voice-card').first().waitFor();
+ assert.equal(await page.locator('.ali-voice-card').count(),13);
+ assert.equal(await page.getByLabel('Voz de ALI',{exact:true}).locator('option').count(),14);
+ assert.equal(await page.getByLabel('Estilo de voz').inputValue(),'infantil');
+ await page.getByLabel('Responder con voz',{exact:true}).uncheck();
+ for(const voice of voices){
+  await page.locator(`[data-voice="${voice}"] button`).first().click();
+  await page.waitForFunction(()=>!document.querySelector('.ali-host').__vue__.talking&&!document.querySelector('.ali-host').__vue__.voiceLoading);
+  assert.equal(requests.at(-1).voice,voice);
+  assert.equal(requests.at(-1).style,'infantil');
+  assert.equal(await page.getByLabel('Voz de ALI',{exact:true}).inputValue(),'browser','Listening must not select a voice');
+ }
+ assert.equal(new Set(requests.map(r=>r.text)).size,1,'Same phrase for comparison');
+ await page.locator('[data-voice="marin"] button').last().click();
+ await page.getByLabel('Estilo de voz').selectOption('natural');
+ await page.locator('[data-voice="marin"] button').first().click();
+ await page.waitForFunction(()=>!document.querySelector('.ali-host').__vue__.talking&&!document.querySelector('.ali-host').__vue__.voiceLoading);
+ const count=requests.length;
+ assert.equal(requests.at(-1).style,'natural');
+ await page.locator('[data-voice="marin"] button').first().click();
+ await page.waitForFunction(()=>!document.querySelector('.ali-host').__vue__.talking&&!document.querySelector('.ali-host').__vue__.voiceLoading);
+ assert.equal(requests.length,count,'Repeat preview uses cached audio');
+ await page.reload({waitUntil:'networkidle'});
+ await page.locator('.ali-launcher').click();
+ await page.getByLabel('Voz de ALI',{exact:true}).waitFor();
+ assert.equal(await page.getByLabel('Voz de ALI',{exact:true}).inputValue(),'marin');
+ assert.equal(await page.getByLabel('Estilo de voz').inputValue(),'natural');
+ await page.setViewportSize({width:393,height:852});
+ await page.screenshot({path:'.tmp-order-workbook/ali-voices-mobile.png'});
+ assert.equal(await page.evaluate(()=>{const el=document.querySelector('.ali-voice-grid');return el.scrollWidth<=el.clientWidth+1}),true);
+ await page.getByLabel('Voz de ALI',{exact:true}).selectOption('browser');
+ await page.getByLabel('Responder con voz',{exact:true}).check();
+ await page.locator('.ali-modal .close').click();
+ await page.locator('.ali-wake-toggle').click();
+ await page.evaluate(()=>window.aliSpeech.say('Hola ALI'));
+ await page.locator('.ali-goldfish').waitFor();
+ assert.match(await page.evaluate(()=>window.spoken.at(-1)),/^(Buenos días|Buenas tardes|Buenas noches), maria\..+¿En qué te puedo ayudar\?$/);
+ assert.equal(await page.locator('.ali-modal:visible').count(),0);
+ await page.waitForTimeout(300);
+ await page.clock.install();
+ await page.evaluate(()=>document.querySelector('.ali-host').__vue__.armIdle(true));
+ await page.clock.fastForward(10000);
+ await page.evaluate(()=>window.aliSpeech.onend());
+ await page.clock.runFor(500);
+ await page.clock.fastForward(9500);
+ await page.clock.runFor(500);
+ assert.equal(await page.evaluate(()=>window.spoken.at(-1)),'¿Sigues ahí? Estoy aquí para ayudarte.');
+ assert.equal(await page.locator('.ali-goldfish').count(),1);
+ await page.locator('#txtBarcode').fill('85');
+ assert.equal(await page.evaluate(()=>document.querySelector('.ali-host').__vue__._idleMisses),0,'Manual input resets both chances');
+ await page.clock.fastForward(20000);
+ await page.clock.runFor(500);
+ assert.equal(await page.locator('.ali-goldfish').count(),1);
+ await page.clock.fastForward(20000);
+ await page.clock.runFor(500);
+ assert.match(await page.evaluate(()=>window.spoken.at(-1)),/^Hasta luego, maria\./);
+ assert.equal(await page.locator('.ali-goldfish').count(),0);
+ assert.equal(await page.evaluate(()=>document.querySelector('.ali-host').__vue__.wakeEnabled),true,'Can still wake on Hola ALI');
+ await page.evaluate(()=>window.aliSpeech.say('Hola ALI'));
+ await page.clock.runFor(500);
+ assert.equal(await page.locator('.ali-goldfish').count(),1);
+ await page.evaluate(()=>window.aliSpeech.say('Frase del día'));
+ await page.clock.runFor(500);
+ assert.match(await page.evaluate(()=>window.spoken.at(-1)),/^maria, /);
+ console.log('PASS 13 previews, style/cache/persistence, mobile, authenticated user greeting, motivation command, 2 idle chances, manual reset, personal farewell and wake again. Mocked speech only; no charged calls or sales.');
+}finally{await browser.close()}
+

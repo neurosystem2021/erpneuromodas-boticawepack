@@ -1,0 +1,35 @@
+{
+    "period": {
+        "IdPlanilla": "1",
+        "IdEmpleado": "3",
+        "Periodo": "2026-10",
+        "Detalle": "{\"Sueldo\":500,\"Comision\":0,\"Asignacion\":0,\"OtrosIngresos\":0,\"CTS\":0,\"Gratificacion\":0,\"BonoGratificacion\":0,\"Vacaciones\":0,\"OtrosDescuentos\":0,\"RentaQuinta\":0,\"BasePension\":1130,\"SeguroAFP\":0,\"ComisionAFP\":0,\"AporteEmpleador\":0,\"Pension\":\"NINGUNO\",\"AportePension\":0,\"Descuentos\":0,\"Ingresos\":500,\"Neto\":500,\"Regimen\":\"GENERAL\",\"AFP\":\"\",\"Observacion\":\"\"}",
+        "Neto": "500.00",
+        "UsuarioReg": "superadmin",
+        "FechaReg": "2026-10-13 13:07:01",
+        "SueldoConfigurado": "1130.00",
+        "DniRuc": "73604150"
+    },
+    "payments": [
+        {
+            "IdPago": "1",
+            "IdPlanilla": "1",
+            "IdCliente": null,
+            "Tipo": "ADELANTO",
+            "Importe": "500.00",
+            "IdCuenta": "1",
+            "IdCajaBanco": "6",
+            "Fecha": "2026-10-13",
+            "Referencia": "543678",
+            "UsuarioReg": "superadmin",
+            "FechaReg": "2026-10-13 13:07:31",
+            "Token": "pay-1791914821462-jyumt0in1qo",
+            "Anulado": "0",
+            "UsuarioAnula": null,
+            "DatosDestino": "{\"Banco\":\"bcp\",\"NumeroCuenta\":\"4535235423523452\",\"CCI\":\"56256234523452352532\",\"Titular\":\"FIORELA DEL PILAR ALARCON RAMIREZ\",\"DiaPago\":null,\"FechaIngreso\":\"2026-09-11\",\"FechaPagoPeriodo\":\"2026-10-11\",\"FechaPrimerPago\":\"2026-10-11\",\"InicioCiclo\":\"2026-09-11\",\"FinCiclo\":\"2026-10-10\"}",
+            "CajaAnulado": "0"
+        }
+    ],
+    "reason": "User confirmed monthly salary 1130, advance 500 was mistakenly used as period salary",
+    "corrected_at": "2026-10-13T20:11:04+02:00"
+}

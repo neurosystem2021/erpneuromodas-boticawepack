@@ -1,0 +1,2 @@
+<?php
+$file=__DIR__.'/../tmp/management-browser-session.json';if(is_file($file)){$cookie=json_decode(file_get_contents($file),true);if(!empty($cookie['value'])&&strpos($cookie['value'],'managerCheck')===0){session_id($cookie['value']);session_start();$_SESSION=[];session_destroy();}unlink($file);}echo "Temporary report test session closed.\n";

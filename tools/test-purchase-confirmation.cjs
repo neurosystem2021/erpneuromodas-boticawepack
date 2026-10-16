@@ -1,0 +1,22 @@
+﻿const fs = require('fs');
+const vm = require('vm');
+const assert = require('assert');
+const source = fs.readFileSync('src/views/Movimiento.vue', 'utf8');
+const method = source.slice(source.indexOf('    async guardarMovimiento(evt)'), source.indexOf('    focusAutocomplete(ref)')).replace(/,\s*$/, '');
+const save = vm.runInNewContext('({' + method + '})').guardarMovimiento;
+(async () => {
+  let requests = 0, options;
+  const state = { inProgress: false, movimiento: { proveedor: { IdProveedor: 1 }, movimientoTipo: { CodSunat: '01' }, Moneda: 'USD', alterarProductos: 1 }, productos: [{ total: 20, stock: 5, cantidad: 1 }], idPerfil: 1, totalCart: 20, axios: { post() { requests++; return Promise.resolve({ data: { error: 'test' } }); } }, $toasted: { show() {} }, $swal: async value => { options = value; return { isDismissed: true }; } };
+  await save.call(state, { preventDefault() {} });
+  assert.strictEqual(requests, 0);
+  assert.strictEqual(state.inProgress, false);
+  assert(options.text.includes('USD 20.00'));
+  state.$swal = async () => ({ isConfirmed: true });
+  await save.call(state, { preventDefault() {} });
+  await Promise.resolve();
+  assert.strictEqual(requests, 1);
+  state.inProgress = true;
+  await save.call(state, { preventDefault() {} });
+  assert.strictEqual(requests, 1);
+  console.log('Modern confirmation: cancel, confirmed save and double-submit protection passed.');
+})().catch(error => { console.error(error); process.exit(1); });

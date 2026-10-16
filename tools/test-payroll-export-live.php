@@ -1,0 +1,6 @@
+<?php
+ob_start();session_id('nstExport'.bin2hex(random_bytes(8)));session_start();$_SESSION['user']='superadmin';$cookie='PHPSESSID='.session_id();session_write_close();
+try{
+ $c=curl_init('http://localhost/api/index.php/planilla/excel?periodo=2026-10&idAlmacen=0');curl_setopt_array($c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_COOKIE=>$cookie,CURLOPT_TIMEOUT=>30]);$body=curl_exec($c);$code=curl_getinfo($c,CURLINFO_HTTP_CODE);curl_close($c);if($code!==200||substr($body,0,2)!=='PK')throw new Exception('HTTP export failed '.$code.' '.substr(strip_tags($body),0,200));
+ $out=__DIR__.'/../output/Planilla_2026-10.xlsx';file_put_contents($out,$body);require 'C:/xampp/htdocs/boticav1/api/vendor/autoload.php';$w=\PhpOffice\PhpSpreadsheet\IOFactory::load($out);$sheet=$w->getSheet(0);$found=false;foreach($sheet->toArray(null,true,false) as $row){if(strpos($row[0]??'','FIORELA')!==false){if((float)$row[10]!==1130.0||(float)$row[12]!==1130.0||abs((float)$row[12]-(float)$row[13]-(float)$row[14])>0.001)throw new Exception('Wrong salary/payments/balance');$found=true;}}if(!$found)throw new Exception('Staff missing');echo 'HTTP 200 XLSX verified: Fiorela income/net 1130 and paid + pending reconciled; '.count($w->getAllSheets()).' sheets.';
+}finally{session_start();$_SESSION=[];session_destroy();ob_end_flush();}

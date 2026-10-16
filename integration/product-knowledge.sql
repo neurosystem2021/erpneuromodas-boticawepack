@@ -1,0 +1,30 @@
+CREATE TABLE IF NOT EXISTS Ali_ProductoFicha (
+ product_id BIGINT UNSIGNED PRIMARY KEY,
+ model VARCHAR(200) NOT NULL DEFAULT '',
+ characteristics TEXT NOT NULL,
+ used_for TEXT NOT NULL,
+ pending TEXT NOT NULL,
+ reference VARCHAR(1000) NOT NULL DEFAULT '',
+ sources_json MEDIUMTEXT NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ catalog_hash CHAR(64) NOT NULL,
+ saved_by VARCHAR(100) NOT NULL,
+ saved_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS Ali_ProductoFichaHistorial (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ product_id BIGINT UNSIGNED NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ data_json MEDIUMTEXT NOT NULL,
+ saved_by VARCHAR(100) NOT NULL,
+ saved_at DATETIME NOT NULL,
+ UNIQUE KEY product_revision(product_id,revision)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Ali_ProductoUso (
+ product_id BIGINT UNSIGNED PRIMARY KEY,
+ used_for TEXT NOT NULL,
+ revision INT UNSIGNED NOT NULL,
+ saved_by VARCHAR(100) NOT NULL,
+ saved_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

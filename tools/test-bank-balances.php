@@ -1,0 +1,11 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';require __DIR__.'/../integration/payroll/api/payroll.php';require __DIR__.'/../integration/bank-report.php';require __DIR__.'/../integration/bank-balances.php';$db=appPdoConnection();
+foreach(['Cb_SaldoBanco','Cb_SaldoBancoAuditoria'] as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM);$db->exec(str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl[1]));}
+$body=['IdCuenta'=>2,'FechaInicio'=>'2026-10-01','SaldoInicial'=>10000,'Version'=>0,'Motivo'=>'Prueba temporal de saldo inicial'];$created=nstBankSaveBalance($db,$body,'superadmin');if($created['Version']!==1)throw new Exception('Creation version');
+$report=nstBankReportData($db,'2026-10-01','2026-10-31',2);$g=$report['Cuentas'][0];if(!$g['ControlActivo']||$g['Inicial']!=10000||abs(10000+$g['Ingresos']-$g['Salidas']-$g['Saldo'])>.001)throw new Exception('Opening balance math');
+$later=nstBankReportData($db,'2026-10-13','2026-10-31',2)['Cuentas'][0];if(abs($later['Saldo']-$g['Saldo'])>.001)throw new Exception('Range changes ending balance');
+$body['Version']=1;$body['FechaInicio']='2026-10-13';$body['SaldoInicial']=20000;$body['Motivo']='Inicio de control en nueva fecha';$updated=nstBankSaveBalance($db,$body,'superadmin');$g=nstBankReportData($db,'2026-10-01','2026-10-31',2)['Cuentas'][0];foreach($g['Movimientos'] as $m)if(substr($m['FechaDoc'],0,10)<'2026-10-13')throw new Exception('Pre-control movement included');if($g['Inicial']!=20000)throw new Exception('Edited opening balance');
+$old=nstBankReportData($db,'2026-10-01','2026-10-12',2)['Cuentas'][0];if($old['ControlActivo'])throw new Exception('Future baseline applied to historical range');
+try{nstBankSaveBalance($db,$body,'superadmin');throw new Exception('Stale version accepted');}catch(InvalidArgumentException $e){}
+$bad=$body;$bad['IdCuenta']=1;try{nstBankSaveBalance($db,$bad,'superadmin');throw new Exception('Cash account accepted');}catch(InvalidArgumentException $e){}
+if((int)$db->query('SELECT COUNT(*) FROM Cb_SaldoBancoAuditoria')->fetchColumn()!==2)throw new Exception('Audit count');if($db->inTransaction())throw new Exception('Transaction leaked');echo 'Temporary tables only: opening + income - expenses, range continuity, control start date, edits/audit, stale versions and cash rejection verified.'.PHP_EOL;

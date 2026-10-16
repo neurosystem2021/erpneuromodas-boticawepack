@@ -1,63 +1,63 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="6" class="my-1">
-            <b-form-group horizontal label="Buscar" class="mb-0">
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
+<div class="nst-screen nst-screen--agentereimpresion">
+    <b-container class="bv-example-row">
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="6" class="my-1">
+          <b-form-group horizontal label="Buscar" class="mb-0">
+            <b-input-group>
+              <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <br />
+        </b-col>
+        <b-col md="6" class="my-1">
+          <b-row>
+          <b-col md="8">
+
+            <b-form-group horizontal label="Mostrar" class="mb-0">
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
             </b-form-group>
-            <br />
           </b-col>
-          <b-col md="6" class="my-1">
-            <b-row>
-            <b-col md="8">
-
-              <b-form-group horizontal label="Mostrar" class="mb-0">
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-              <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Recibos</p>
-            </b-col>
-            </b-row>
+          <b-col md="4">
+            <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Recibos</p>
           </b-col>
+          </b-row>
+        </b-col>
 
-          <b-table small
-            ref="tablaRecibos"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            @row-clicked="rowClick"
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage">
-              <template slot="Operacion" slot-scope="data">
-               {{ `${data.item.Nombre} - ${data.item.Empresa} -  ${data.item.CategoriaEmpresa} - ${data.item.Servicio}` }}
-              </template>
-              <template slot="Reimprimir" slot-scope="data">
-                  <a class="btn btn-success" target="_blank" :href="'/imprimir/recibo.php?IdComprobante=' + data.item.IdComprobante + '&preview=1'">Recibo</a>
-              </template>
-          </b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
-        </b-row>
-        <br />
-        <br />
-      </b-container>
-  </div>
+        <b-table small
+          ref="tablaRecibos"
+          :filter="filter"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          striped
+          hover
+          @row-clicked="rowClick"
+          id="my-table" 
+          :busy.sync="isBusy" 
+          :items="myProvider" 
+          :fields="fields"
+          :per-page="perPage"
+          :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+            <template slot="Operacion" slot-scope="data">
+             {{ `${data.item.Nombre} - ${data.item.Empresa} -  ${data.item.CategoriaEmpresa} - ${data.item.Servicio}` }}
+            </template>
+            <template slot="Reimprimir" slot-scope="data">
+                <a class="btn btn-success" target="_blank" :href="'/imprimir/recibo.php?IdComprobante=' + data.item.IdComprobante + '&preview=1'">Recibo</a>
+            </template>
+        </b-table>
+          <b-row>
+              <b-col md="6" class="my-1">
+                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+          </b-row>
+      </b-row></section>
+      <br />
+      <br />
+    </b-container>
+</div>
 </template>
 
 <script>

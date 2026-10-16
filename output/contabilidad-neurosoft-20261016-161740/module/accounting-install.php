@@ -1,0 +1,10 @@
+<?php
+if(PHP_SAPI!=='cli')exit(1);
+$o=getopt('',['app:','database:','apply','backup:','sha256:']);if(empty($o['app'])||empty($o['database'])){fwrite(STDERR,"Usage: php accounting-install.php --app=/path/to/erp --database=DB [--apply --backup=/private/backup.sql --sha256=HASH]\n");exit(2);}
+require rtrim($o['app'],'/\\').'/config/database.php';$db=appPdoConnection();$actual=$db->query('SELECT DATABASE()')->fetchColumn();if(!hash_equals($actual,$o['database']))throw new RuntimeException('Connected database differs from the explicitly named target.');
+$files=glob(__DIR__.'/migrations/*.up.sql');sort($files);echo 'Target: '.$actual.PHP_EOL;foreach($files as $f)echo basename($f).' '.hash_file('sha256',$f).PHP_EOL;
+if(!isset($o['apply'])){echo "Dry run only. No tables or historical rows changed.\n";exit;}
+if(empty($o['backup'])||empty($o['sha256'])||!is_file($o['backup'])||filesize($o['backup'])<100||!hash_equals(strtolower($o['sha256']),hash_file('sha256',$o['backup'])))throw new RuntimeException('Provide a verified private backup and matching SHA-256.');
+if((int)$db->query("SELECT GET_LOCK('neurosoft_accounting_migrations',10)")->fetchColumn()!==1)throw new RuntimeException('Another migration is running.');
+try{foreach($files as $f){$name=basename($f);$hash=hash_file('sha256',$f);$has=$db->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND LOWER(table_name)='co_schemaversion'");$has->execute();$old=null;if($has->fetchColumn()){$q=$db->prepare('SELECT Checksum FROM Co_SchemaVersion WHERE Version=?');$q->execute([$name]);$old=$q->fetchColumn();}if($old){if(!hash_equals($old,$hash))throw new RuntimeException('Applied migration checksum differs.');continue;}$db->exec(file_get_contents($f));$q=$db->prepare('INSERT INTO Co_SchemaVersion(Version,Checksum,AppliedAt) VALUES(?,?,?)');$q->execute([$name,$hash,date('Y-m-d H:i:s')]);echo 'Applied: '.$name.PHP_EOL;}}finally{$db->query("SELECT RELEASE_LOCK('neurosoft_accounting_migrations')");}
+echo "Accounting schema installed. Existing invoices, purchases and balances were not modified.\n";

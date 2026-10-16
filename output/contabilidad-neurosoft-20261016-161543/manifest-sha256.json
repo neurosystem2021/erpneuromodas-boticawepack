@@ -1,0 +1,307 @@
+﻿[
+    {
+        "file":  "frontend/index.html",
+        "bytes":  763,
+        "sha256":  "a5e0ad5a8765b33c17996880c9ae2ae0d4fb3f686b247e1f07f8ffe0cedb8c7b"
+    },
+    {
+        "file":  "frontend/static/beep.mp3",
+        "bytes":  15672,
+        "sha256":  "8fe29182ed395ba8a77e5a71dd93b28d132c43f034e163224855e9dde03be299"
+    },
+    {
+        "file":  "frontend/static/box.png",
+        "bytes":  1936,
+        "sha256":  "1a90bab1c323b3feae2a8de816d165e7727de3b1f0441b53cfcdcf4fa8577cf8"
+    },
+    {
+        "file":  "frontend/static/cancel.png",
+        "bytes":  1129,
+        "sha256":  "32838afd228bd45fc484fa4eeac12348136693bbf39d145bac0f8dc38e6f06ec"
+    },
+    {
+        "file":  "frontend/static/casa.png",
+        "bytes":  1591,
+        "sha256":  "9c6b12a32b268dcf1e2bf2eab9bfede09cbed43a8dd246cc49357aa957da088e"
+    },
+    {
+        "file":  "frontend/static/error.png",
+        "bytes":  1383,
+        "sha256":  "d43327dc92690a2b1904823f26d29db8d6193a0b0425596c4e201f553941e473"
+    },
+    {
+        "file":  "frontend/static/inventory.webmanifest",
+        "bytes":  365,
+        "sha256":  "06c8632684743d0de3104953827d2051c9b0dabdb594b3730236f2d4594bfbbe"
+    },
+    {
+        "file":  "frontend/static/logo.png",
+        "bytes":  62991,
+        "sha256":  "6de3b35ece04b62e32528963adc269563990680c6c8aed15ee36e56fab358e73"
+    },
+    {
+        "file":  "frontend/static/moto-delivery.png",
+        "bytes":  1560,
+        "sha256":  "954e3ca85e0b487d83b9f3cca83e32a327280a3c9b5476fe855f800562a73d88"
+    },
+    {
+        "file":  "frontend/static/moto.png",
+        "bytes":  2045,
+        "sha256":  "dfd5ad2ddc2765423beab6a8790a3e6a404bfc45c6558dda7c39950acea50477"
+    },
+    {
+        "file":  "frontend/static/no-photo.png",
+        "bytes":  5317,
+        "sha256":  "4794157c7b1abb087d122b7b8bd8fad6166f1cdef75c7dbc25731a9c34a5911a"
+    },
+    {
+        "file":  "frontend/static/nuevassoli.mp3",
+        "bytes":  16188,
+        "sha256":  "96ad182bda4d342e1673b69b80fdd20198bd9a907e65e74ff03f80127655d1c1"
+    },
+    {
+        "file":  "frontend/static/sire.png",
+        "bytes":  34184,
+        "sha256":  "f9704ce740bedc82e9720942d33998404bc23a5f18571332e7bcf9181536f23d"
+    },
+    {
+        "file":  "frontend/static/styles.css",
+        "bytes":  253,
+        "sha256":  "8d622a5c665d4b189bbb8828b4d133923df5d38fad4d3905cc66f4038c0424c2"
+    },
+    {
+        "file":  "frontend/static/success.png",
+        "bytes":  1008,
+        "sha256":  "3ed072ccd7e746cd9cc34553bd2c7a9f365b91fc666dfe6aa288b32e6650d1ff"
+    },
+    {
+        "file":  "frontend/static/ubigeo-inei.json",
+        "bytes":  176442,
+        "sha256":  "b8d79bc364055d57c7a1c0c140be97f0ff99acc0569f7995ef3b3e91fd5a059d"
+    },
+    {
+        "file":  "frontend/static/vue2-autocomplete.css",
+        "bytes":  1806,
+        "sha256":  "c20ba897a9c93311728475fa8c5d004ef0e9173e00b00dbaf2327107b45d071e"
+    },
+    {
+        "file":  "frontend/static/css/app.403422dc2fbf746841f133951aa8d335.css",
+        "bytes":  561330,
+        "sha256":  "7335c081686f4f3ac0fca1ad297875008c2041ac56fd52685ee4bd1b9174a26c"
+    },
+    {
+        "file":  "frontend/static/css/app.403422dc2fbf746841f133951aa8d335.css.map",
+        "bytes":  1044214,
+        "sha256":  "4ddc8d1753f9fc57ba4c9723601778aca89214683d79c26d5ac16e43234e99b9"
+    },
+    {
+        "file":  "frontend/static/css/nst-legacy.css",
+        "bytes":  5443,
+        "sha256":  "76150deaacd1f3528681de9549eed4e1f138a24a541931b21fc9001256dbb056"
+    },
+    {
+        "file":  "frontend/static/css/pos-layout-fix.css",
+        "bytes":  138222,
+        "sha256":  "aaf1118da9e9a140f29b6624a2f71321414c3fc3b020479a80b6fe879a39445e"
+    },
+    {
+        "file":  "frontend/static/images/ali-goldfish-talking.svg",
+        "bytes":  5100,
+        "sha256":  "aa2c15ef9dd471a3244aeae912110c077da3bd312872fe89db40685a5309e400"
+    },
+    {
+        "file":  "frontend/static/images/ali-goldfish.svg",
+        "bytes":  4540,
+        "sha256":  "cc820aec9ea6778d1e44f9357ca126f28f791f3aa657241e1163cc13a5a5c37c"
+    },
+    {
+        "file":  "frontend/static/js/app.217e0de3354a5cecce9a.js",
+        "bytes":  1847883,
+        "sha256":  "bc1c5bde8869d132f44e733456c81ca45363e39b4952812aaccbaaaea61a40c8"
+    },
+    {
+        "file":  "frontend/static/js/app.217e0de3354a5cecce9a.js.map",
+        "bytes":  5784891,
+        "sha256":  "c6d412e46cd7bfda9227fdf24156b8797a8799a5a02bd4f22168b1633abe05cf"
+    },
+    {
+        "file":  "frontend/static/js/manifest.3ad1d5771e9b13dbdad2.js",
+        "bytes":  858,
+        "sha256":  "0ccc5ee5b3895d4774462fda3e9598881a5fa985c5dfed5129249731bb26fc27"
+    },
+    {
+        "file":  "frontend/static/js/manifest.3ad1d5771e9b13dbdad2.js.map",
+        "bytes":  4973,
+        "sha256":  "ecd20149e7f6703cab9ecc0d902769327e3be792c22921b05c8dc22ddb1d0e26"
+    },
+    {
+        "file":  "frontend/static/js/nst-legacy-ui.js",
+        "bytes":  4002,
+        "sha256":  "e8c723416d363df32e2c46c1aa1da4117f53ce120aa1a7539c4819cf6c63c54e"
+    },
+    {
+        "file":  "frontend/static/js/vendor.c28e4b197f7428d662eb.js",
+        "bytes":  1419951,
+        "sha256":  "39e81bf291a4cfc175ad7a47473e9cce112d374a1bd885d0fe649e06efc9db8d"
+    },
+    {
+        "file":  "frontend/static/js/vendor.c28e4b197f7428d662eb.js.map",
+        "bytes":  5780724,
+        "sha256":  "910d0f6dbeb4687dca740b35e7b1002ee3ea8802f7bc4d24945ad436b07a43ff"
+    },
+    {
+        "file":  "frontend/static/media/beep.36b1b47.mp3",
+        "bytes":  15672,
+        "sha256":  "8fe29182ed395ba8a77e5a71dd93b28d132c43f034e163224855e9dde03be299"
+    },
+    {
+        "file":  "frontend/static/media/nuevassoli.e89ea49.mp3",
+        "bytes":  16188,
+        "sha256":  "96ad182bda4d342e1673b69b80fdd20198bd9a907e65e74ff03f80127655d1c1"
+    },
+    {
+        "file":  "frontend/static/vendor/exceljs-4.4.0.min.js",
+        "bytes":  947702,
+        "sha256":  "7e49da68588e250dbb8bba190d2caa8ab3787cc0284bda1d8b2f805c4df742c9"
+    },
+    {
+        "file":  "module/accounting-install.php",
+        "bytes":  2099,
+        "sha256":  "974ce65f68acd882f6bc74654926ade42c55f1029db3ca10ba0b271f1ade8487"
+    },
+    {
+        "file":  "module/accounting-sync.php",
+        "bytes":  830,
+        "sha256":  "dad6884b9b43fdbe83625c567dc6b0a49c1bfd514e3f1c8ab274a66081b62844"
+    },
+    {
+        "file":  "module/contabilidad.php",
+        "bytes":  376,
+        "sha256":  "e66470cb60fd649d845b76ff754d5d87afb6b61db5e8e0fc00716c2021ab0bae"
+    },
+    {
+        "file":  "module/menu.snippet.php",
+        "bytes":  137,
+        "sha256":  "bc59a08238bd54fcc522add4e3fde6dd6e0f0fd27cc9e0f48ff50259646075f7"
+    },
+    {
+        "file":  "module/README.md",
+        "bytes":  5302,
+        "sha256":  "100d6608c992bd328be6240d808eff88effcc1d04d9889c91ae88e6721ecf1b2"
+    },
+    {
+        "file":  "module/router.snippet.js",
+        "bytes":  225,
+        "sha256":  "029c6b3d14f70a820b82e5ad4e7f2baed5b2fd93f37270222d5e594a08c16218"
+    },
+    {
+        "file":  "module/api/accounting-catalog.php",
+        "bytes":  6230,
+        "sha256":  "723cf56660ac7c1b6f8448d09dee00a4c68c958227c320855e285449f7cb5186"
+    },
+    {
+        "file":  "module/api/accounting-core.php",
+        "bytes":  33939,
+        "sha256":  "7a133f9bb96c3e12fa0082a1be0a24e2d8ec245b39312c1f948b332443906bac"
+    },
+    {
+        "file":  "module/api/accounting-export.php",
+        "bytes":  10933,
+        "sha256":  "68022e63610cc2923d8e138ef9626637823701a3b4cc6b3d248ab8c0bece8468"
+    },
+    {
+        "file":  "module/api/accounting-menu.php",
+        "bytes":  914,
+        "sha256":  "e7cf5ea9c7edd2d76db4e02d092aab9678e76825b2ee9e1f586dc2b0ab554aa9"
+    },
+    {
+        "file":  "module/api/accounting-operations.php",
+        "bytes":  14080,
+        "sha256":  "f5fb17bb496d76468dfe53f4049eeb2af0c3374d27aaae4ffe09b2cddbc7a3cf"
+    },
+    {
+        "file":  "module/api/accounting-pcge2019.json",
+        "bytes":  407730,
+        "sha256":  "595f7ef617f34d1629a6417d8bf7705e8736d89fd764b75192fe6689cce39c1c"
+    },
+    {
+        "file":  "module/api/accounting-reports.php",
+        "bytes":  13083,
+        "sha256":  "03ce73d90c0c4e2b427eef0a54deb3fd437bd0848e2316a4cc4602e209175538"
+    },
+    {
+        "file":  "module/api/accounting-sources.php",
+        "bytes":  17897,
+        "sha256":  "9caa8fe389ead5421213239241c38947982ba82e0f2f01ece0f860e95641bb80"
+    },
+    {
+        "file":  "module/api/accounting.php",
+        "bytes":  7607,
+        "sha256":  "0d0c99d6129cde30d407fc76cf788e7ca6cf74ca6af3a9a99c25efb9b053f976"
+    },
+    {
+        "file":  "module/docs/DIAGNOSTICO.md",
+        "bytes":  4541,
+        "sha256":  "b4d204863117e519e9b8f4b4d62ee4201b56e488c51d708a1859fcd3b4e40026"
+    },
+    {
+        "file":  "module/docs/INSTALACION.md",
+        "bytes":  6549,
+        "sha256":  "dd6dba9930dea5bbe9ffd6a98e6485c8dc6461e309a8f9c69b1c88f3cbe88052"
+    },
+    {
+        "file":  "module/docs/MANUAL.md",
+        "bytes":  10277,
+        "sha256":  "e82ec87ad7073a9154b368bd33b368af6badccce7cce7ddb7e7d5ca0fe78a2af"
+    },
+    {
+        "file":  "module/docs/TECNICO.md",
+        "bytes":  6462,
+        "sha256":  "243bf85a93b366add8891afb258e6f5c24d3f9deb57397a0446aed54f29485d2"
+    },
+    {
+        "file":  "module/migrations/001_accounting.up.sql",
+        "bytes":  9132,
+        "sha256":  "702b00e498de76e588848df80458d649f64ebb9d2bd3736888cc89f96b8535bb"
+    },
+    {
+        "file":  "module/tests/browser-test.mjs",
+        "bytes":  7351,
+        "sha256":  "042e9561173cf567c3781af05bc6d135cf9a3177079b15264e0adda61d4c6c88"
+    },
+    {
+        "file":  "module/tests/concurrency-worker.php",
+        "bytes":  926,
+        "sha256":  "89cad3ac4c15606a459cbc7dfdb6a08a4b01bfeb2a6e10ddedbffcaa66675156"
+    },
+    {
+        "file":  "module/tests/core-test.php",
+        "bytes":  26858,
+        "sha256":  "8b4d5228324b871d1651ec030379e043b92438644b28eb5ed764b5ce081a6164"
+    },
+    {
+        "file":  "module/tests/http-test.php",
+        "bytes":  4888,
+        "sha256":  "42f78351131cba3d1b583e2203191c84c5da552ec0cce6214b4f578eb4ff0820"
+    },
+    {
+        "file":  "module/tests/utilities-test.cjs",
+        "bytes":  1555,
+        "sha256":  "17373833b27fe9808983572f8e4f62a5decfecc86b99fecfe6e3147fdb45cb41"
+    },
+    {
+        "file":  "source/router.snippet.js",
+        "bytes":  225,
+        "sha256":  "029c6b3d14f70a820b82e5ad4e7f2baed5b2fd93f37270222d5e594a08c16218"
+    },
+    {
+        "file":  "source/src/utils/accounting.js",
+        "bytes":  2327,
+        "sha256":  "5b03f5b2b7d4954472231e0f1aca049ef2aee9cab8701bf89af3f4147e18ab76"
+    },
+    {
+        "file":  "source/src/views/Contabilidad.vue",
+        "bytes":  51952,
+        "sha256":  "edd5f60b8187d8a180f7dab5aeb2d53c9d991b305523eab736fd2aece7a2298d"
+    }
+]

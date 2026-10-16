@@ -1,0 +1,10 @@
+{
+ "mode":"isolated_copy",
+ "enable_copy_writes":false,
+ "forbidden_databases":["nst","fact_nst"],
+ "snapshot_sha256":"REEMPLAZAR_CON_SHA256_DEL_SNAPSHOT",
+ "snapshot":"C:/neuro-private/migration/source-reviewed.json",
+ "backup_manifest":"C:/neuro-private/migration/backup-manifest.json",
+ "target":{"host":"127.0.0.1","port":3306,"database":"neuro_migration_test","user":"migration_copy_only","password":"CONFIGURAR_FUERA_DEL_DIRECTORIO_WEB"},
+ "source":{"host":"127.0.0.1","port":3306,"database":"fact_nst","user":"migration_source_readonly","password":"CONFIGURAR_FUERA_DEL_DIRECTORIO_WEB"}
+}

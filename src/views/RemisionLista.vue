@@ -1,107 +1,107 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
+<div class="nst-screen nst-screen--remisionlista">
+    <b-container class="bv-example-row"><div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0">Guías de remisión</h4><router-link class="btn btn-success" to="/remision">+ Nueva guía</router-link></div>
 
-        <b-row>
-          <b-col md="12" class="my-1">
-            <b-row>
-              <b-col md="4">
-                <b-form-group >
-                  <label>Fecha Referencia:</label>
-                  <b-form-input
-                    v-model="fechaReferencia"
-                    type="date"
-                    placeholder=""
-                    @input="setFechaReferencia"></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-col md="2">
-                <b-form-group label="Estado">
-                  <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
-                </b-form-group>
-                <br />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="12" class="my-1">
+          <b-row>
+            <b-col md="4">
+              <b-form-group >
+                <label>Fecha Referencia:</label>
+                <b-form-input
+                  v-model="fechaReferencia"
+                  type="date"
+                  placeholder=""
+                  @input="setFechaReferencia"></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col md="2">
+              <b-form-group label="Estado">
+                <b-form-select v-model="estadoVenta" :options="optionsEstado" @input="$refs.tablaVentas.refresh()" />
+              </b-form-group>
+              <br />
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row></section>
 
-        <b-row>
-          <b-col md="12">
-            <b-table small
-              ref="tablaVentas"
-              :filter="filter"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              striped
-              hover
-              id="tabla-ventas" 
-              :busy.sync="isBusy" 
-              :items="myProvider"  
-              :fields="fields"
-              :per-page="perPage"
-              :current-page="currentPage">
+      <section class="nst-panel nst-panel--results"><b-row>
+        <b-col md="12">
+          <b-table small
+            ref="tablaVentas"
+            :filter="filter"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            striped
+            hover
+            id="tabla-ventas" 
+            :busy.sync="isBusy" 
+            :items="myProvider"  
+            :fields="fields"
+            :per-page="perPage"
+            :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
 
-                <template slot="detalles" slot-scope="row">
-                  <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
-                    {{ row.detailsShowing ? '-' : '+'}}
-                  </b-button>
-                </template>
+              <template slot="detalles" slot-scope="row">
+                <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2">
+                  {{ row.detailsShowing ? '-' : '+'}}
+                </b-button>
+              </template>
 
-                <template slot="FechaTraslado" slot-scope="row">
-                  {{ row.item.FechaTraslado !== '0000-00-00 00:00:00' ? $moment(row.item.FechaTraslado, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD') : '' }}
-                </template>
+              <template slot="FechaTraslado" slot-scope="row">
+                {{ row.item.FechaTraslado !== '0000-00-00 00:00:00' ? $moment(row.item.FechaTraslado, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD') : '' }}
+              </template>
 
-                <template slot="row-details" slot-scope="row">
+              <template slot="row-details" slot-scope="row">
 
-                  <b-card>
+                <b-card>
 
-                    <b-row class="mb-2">
-                  <table class="table b-table table-sm prod-detalle">
-                    <thead>
-                      <tr>
-                        <th>Codigo</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Unidad</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item, index) in getDetalles(row.item.IdDocVentaRemision)" :key="index">
-                        <td>{{ item.CodigoBarra }}</td>
-                        <td>{{ item.Producto }}</td>
-                        <td>{{ item.Cantidad }}</td>
-                        <td>{{ item.CodigoMedicion }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                        <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
-                      </b-row>
-                  </b-card>
-                </template>
+                  <b-row class="mb-2">
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm prod-detalle">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Unidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in getDetalles(row.item.IdDocVentaRemision)" :key="index">
+                      <td>{{ item.CodigoBarra }}</td>
+                      <td>{{ item.Producto }}</td>
+                      <td>{{ item.Cantidad }}</td>
+                      <td>{{ item.CodigoMedicion }}</td>
+                    </tr>
+                  </tbody>
+                </table></div>
+                      <b-button v-if="row.item.Estado != '2'" style="margin-left: 30px;" variant="primary" size="sm" @click="moverAEmitidos(row.item)">Mover a emitidos</b-button>
+                    </b-row>
+                </b-card>
+              </template>
 
-                <template slot="estado" slot-scope="data">
-                  <div style="display:flex;">
-                      <img v-b-tooltip.hover v-if="data.item.Estado == 2" ref="imgSuccess" :title="data.item.Msj_sunat" src="static/success.png" width="32" height="32"/>
-                      &nbsp;&nbsp;
-                      <img v-b-tooltip.hover v-if="data.item.Msj_sunat && data.item.Estado != 2" :title="data.item.Msj_sunat"  src="static/error.png" height="32"/>
-                      &nbsp;&nbsp;
-                      <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
-                      &nbsp;&nbsp;
-                      <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
-                      &nbsp;&nbsp;
-                      <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
-                      &nbsp;&nbsp;
-                  </div>
-                </template>
+              <template slot="estado" slot-scope="data">
+                <div style="display:flex;">
+                    <img v-b-tooltip.hover v-if="data.item.Estado == 2" ref="imgSuccess" :title="data.item.Msj_sunat" src="static/success.png" width="32" height="32"/>
+                    &nbsp;&nbsp;
+                    <img v-b-tooltip.hover v-if="data.item.Msj_sunat && data.item.Estado != 2" :title="data.item.Msj_sunat"  src="static/error.png" height="32"/>
+                    &nbsp;&nbsp;
+                    <b-button v-if="estadoVenta != 2" variant="success" @click="emitirElectronico(data.item)">EMITIR</b-button>
+                    &nbsp;&nbsp;
+                    <b-button v-if="estadoVenta != 2 && data.item.NumTicket" variant="warning" @click="validarElectronico(data.item)">VALIDAR</b-button>
+                    &nbsp;&nbsp;
+                    <b-button variant="info" @click="regenerarPDF(data.item)">PDF</b-button>
+                    &nbsp;&nbsp;
+                </div>
+              </template>
 
 
-              </b-table>
-          </b-col>
-        </b-row>
-        <br />
-        <br /><br />
-      </b-container>
-  </div>
+            </b-table>
+        </b-col>
+      </b-row></section>
+      <br />
+      <br /><br />
+    </b-container>
+</div>
 </template>
 
 <script>

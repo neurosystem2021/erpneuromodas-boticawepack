@@ -1,66 +1,66 @@
 <template>
-    <div>
-      <b-form @submit="guardarOperacion" @keydown.enter="keyDownInput">
-        <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigOpe" :title="title" size="lg" ref="empresaAgenteForm" v-model="show">
-          <b-row>
-            <b-col md="6">
-              <b-form-group>
-                <label>Empresa:</label>
+<div>
+  <b-form @submit="guardarOperacion" @keydown.enter="keyDownInput">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigOpe" :title="title" size="lg" ref="empresaAgenteForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-row>
+        <b-col md="6">
+          <b-form-group>
+            <label>Empresa:</label>
+            <b-input-group>
+              <autocomplete
+                required="required"
+                :url="API + 'agente/empresa'"
+                ref="inputEmpresa"
+                anchor="Empresa"
+                label="writer"
+                style="text-transform: uppercase;"
+                :placeholder.sync="obj.empresa.Empresa"
+                :on-select="setEmpresa"
+                :onFocus="focusAutocomplete.bind(null, 'inputEmpresa')"                
+                :classes="{input: 'form-control upper'}">
+              </autocomplete>
+              <b-input-group-append>
+                <b-btn variant="primary" @click="crearEmpresa"><b>Guardar</b></b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="6">
+            <b-form-group>
+                <label>Categoria:</label>
                 <b-input-group>
-                  <autocomplete
+                <autocomplete
                     required="required"
-                    :url="API + 'agente/empresa'"
-                    ref="inputEmpresa"
-                    anchor="Empresa"
+                    :url="API + 'agente/empresa/categoria'"
+                    ref="inputCategoria"
+                    anchor="CategoriaEmpresa"
                     label="writer"
                     style="text-transform: uppercase;"
-                    :placeholder.sync="obj.empresa.Empresa"
-                    :on-select="setEmpresa"
-                    :onFocus="focusAutocomplete.bind(null, 'inputEmpresa')"                
+                    :placeholder.sync="obj.categoria.Categoria"
+                    :on-select="setCategoria"
+                    :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"                
                     :classes="{input: 'form-control upper'}">
-                  </autocomplete>
-                  <b-input-group-append>
-                    <b-btn variant="primary" @click="crearEmpresa"><b>Guardar</b></b-btn>
-                  </b-input-group-append>
+                </autocomplete>
+                <b-input-group-append>
+                    <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
+                </b-input-group-append>
                 </b-input-group>
-              </b-form-group>
-            </b-col>
-  
-            <b-col md="6">
-                <b-form-group>
-                    <label>Categoria:</label>
-                    <b-input-group>
-                    <autocomplete
-                        required="required"
-                        :url="API + 'agente/empresa/categoria'"
-                        ref="inputCategoria"
-                        anchor="CategoriaEmpresa"
-                        label="writer"
-                        style="text-transform: uppercase;"
-                        :placeholder.sync="obj.categoria.Categoria"
-                        :on-select="setCategoria"
-                        :onFocus="focusAutocomplete.bind(null, 'inputCategoria')"                
-                        :classes="{input: 'form-control upper'}">
-                    </autocomplete>
-                    <b-input-group-append>
-                        <b-btn variant="primary" @click="crearCategoria"><b>Guardar</b></b-btn>
-                    </b-input-group-append>
-                    </b-input-group>
-                </b-form-group>
-            </b-col>
-          </b-row>
-          <div slot="modal-footer" >
-            <b-btn  variant="primary" type="submit">
-              Guardar
-            </b-btn>
-            <b-btn  variant="secondary" @click="show=false">
-              Cerrar
-            </b-btn>
-          </div>
-        </b-modal>
-      </b-form>
-    </div>
-  </template>
+            </b-form-group>
+        </b-col>
+      </b-row>
+      <div slot="modal-footer" >
+        <b-btn  variant="primary" type="submit">
+          Guardar
+        </b-btn>
+        <b-btn  variant="secondary" @click="show=false">
+          Cerrar
+        </b-btn>
+      </div>
+    </b-modal>
+  </b-form>
+</div>
+</template>
   <script>
   import config from '@/store/config.js'
   

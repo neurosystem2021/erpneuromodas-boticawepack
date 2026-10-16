@@ -1,149 +1,149 @@
 <template>
-    <div>
-      <b-container fluid style="width: calc(85%);" class="bv-example-row" id="conten">
-        <b-row class="mt-2">
-            <b-col md="12" class="mb-2" v-if="visual">
-                <h4><b>ESTADO DE CAJA: </b><b-badge :variant="cajaEstado==1?'primary':'success'">{{ cajaEstado==1?'ABIERTO':'CERRADO' }}</b-badge></h4>
+<div class="nst-screen nst-screen--agentecierrecaja">
+  <b-container fluid style="width: calc(85%);" class="bv-example-row" id="conten">
+    <section class="nst-panel nst-panel--filters"><b-row class="mt-2">
+        <b-col md="12" class="mb-2" v-if="visual">
+            <h4><b>ESTADO DE CAJA: </b><b-badge :variant="cajaEstado==1?'primary':'success'">{{ cajaEstado==1?'ABIERTO':'CERRADO' }}</b-badge></h4>
+        </b-col>
+        <b-col md="3">
+            <b-input-group prepend="Usuario " class="inputLine">
+            <input
+                v-model="vendedor.NombreUsuario"
+                type="text"
+                style="width: 80px"
+                :disabled="true"
+                class="form-control" />
+            </b-input-group>
+        </b-col>
+        <b-col md="3" v-if="!visual">
+            <b-row>
+                <b-button v-if="idCajaAbierta > 0" variant="warning" @click="cerrarCaja">Cerrar Caja</b-button>
+                <b-button v-else variant="success" @click="abrirCaja">Aperturar Caja</b-button>
+                <b-button class="ml-2" v-if="idCajaAbierta > 0" variant="info" @click="registrarMov">Registrar</b-button>
+                <b-button class="ml-2" variant="primary" @click="getVendedor(1)">Actualizar</b-button>
+            </b-row>
+        </b-col>
+        <b-col md="1">
+            <b-button-group size="sm" class="ml-2">
+                    <agente-cierres></agente-cierres>
+                </b-button-group>
             </b-col>
-            <b-col md="3">
-                <b-input-group prepend="Usuario " class="inputLine">
-                <input
-                    v-model="vendedor.NombreUsuario"
-                    type="text"
-                    style="width: 80px"
-                    :disabled="true"
-                    class="form-control" />
-                </b-input-group>
-            </b-col>
-            <b-col md="3" v-if="!visual">
-                <b-row>
-                    <b-button v-if="idCajaAbierta > 0" variant="warning" @click="cerrarCaja">Cerrar Caja</b-button>
-                    <b-button v-else variant="success" @click="abrirCaja">Aperturar Caja</b-button>
-                    <b-button class="ml-2" v-if="idCajaAbierta > 0" variant="info" @click="registrarMov">Registrar</b-button>
-                    <b-button class="ml-2" variant="primary" @click="getVendedor(1)">Actualizar</b-button>
-                </b-row>
-            </b-col>
-            <b-col md="1">
-                <b-button-group size="sm" class="ml-2">
-                        <agente-cierres></agente-cierres>
-                    </b-button-group>
+        <b-col md="5" style="display: flex; justify-content: center; align-content: center;">
+            <b-row v-if="idCajaAbierta > 0">
+                <b-col md="12">
+                    <h5 class="text-primary" style="font-weight: bold;">FECHA Y HORA DE APERTURA: {{ cajaFechaApertura }}</h5>
+                    <h5 class="text-success" style="font-weight: bold;">FECHA Y HORA DE CIERRE: {{ cajaFechaCierre }}</h5>
                 </b-col>
-            <b-col md="5" style="display: flex; justify-content: center; align-content: center;">
-                <b-row v-if="idCajaAbierta > 0">
-                    <b-col md="12">
-                        <h5 class="text-primary" style="font-weight: bold;">FECHA Y HORA DE APERTURA: {{ cajaFechaApertura }}</h5>
-                        <h5 class="text-success" style="font-weight: bold;">FECHA Y HORA DE CIERRE: {{ cajaFechaCierre }}</h5>
-                    </b-col>
-                </b-row>
-            </b-col>
-        </b-row>
-        <hr>
-        <b-row v-if="!(idCajaAbierta > 0)">
-            <b-col class="text-center mt-5">
-                <h2 class="text-danger" v-show="cargaCorrecta">APERTURE SU CAJA PARA PODER REALIZAR OPERACIONES</h2>
-            </b-col>
-        </b-row>
-        <b-row v-else>
-            <b-col>
-                <b-row v-for="(entidad, index) in data" :key="index">
-                    <h5>{{ entidad.Nombre }}</h5><br>
-                        <table class="table b-table table-sm">
-                        <thead>
-                            <tr>
-                                <th class="tdgris" width="7%">Recibo</th><th class="tdgris" width="15%">Fecha</th><th class="tdgris" width="15%">Empresa</th><th class="tdgris" width="15%">Operación</th><th class="tdgris" width="20%">Cliente</th><th class="table-primary text-center" width="10%">Monto</th><th class="table-info text-center" width="10%">Comision</th><!--<th class="table-success text-center" width="10%">Total</th>--><th class="text-center" width="5%">Estado</th>
-                                <th class="text-center" width="5%">Info</th><th class="text-center" width="5%" v-if="!visual">Procesar</th><th class="text-center" width="5%" v-if="!visual">Anular</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, index) in entidad.Comprobantes" :key="index" :class="{anulado: item.Anulado}">
-                                <td>{{ item.Correlativo}}</td>
-                                <td>{{ item.FechaDoc }}</td>
-                                <td>{{ item.Empresa }}</td>
-                                <td>{{ item.CategoriaEmpresa }} <br>
-                                    <b>{{ item.Servicio }}</b>
-                                </td>
-                                <td>{{ item.Cliente }}</td>
-                                <td class="table-primary text-center">S/ {{ item.Monto | moneda }}</td>
-                                <td class="table-info text-center">S/ {{ item.Comision | moneda }} <br>
-                                    <b-badge v-if="item.Comision>0" style="font-size:0.65rem" :variant="item.ComisionIncluida==1?'primary':'success'">{{ item.ComisionIncluida==1?'INCLUIDA':'EFECTIVO' }}</b-badge>
-                                </td>
-                                <!--<td class="table-success text-center">S/ {{ item.Total | moneda }}</td>-->
-                                <td class="text-center"><b-badge style="font-size:0.8rem" :variant="item.Estado==1?'primary':(item.Estado==2?'success':'danger')">{{ item.Estado==1?'PENDIENTE':(item.Estado==2?'PROCESADO':'CANCELADO') }}</b-badge></td>
-                                <td class="text-center"><span class="btn text-info" size="sm" @click="infoComprobante(item)"><i class="fas fa-info fa-lg"></i></span></td>
-                                <td class="text-center" v-if="!visual"><span v-if="item.Estado==1 && item.Anulado==0" class="btn text-success" variant="success" size="sm" @click="procesarComprobante(item)"><i class="fas fa-check fa-lg"></i></span></td>
-                                <td class="text-center" v-if="!visual"><span v-if="!item.Anulado && item.Estado==1" class="btn text-danger" size="sm" @click="anularComprobante(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                            <td class="total text-center" colspan="5"><b>Totales {{ entidad.Nombre }}</b></td>
-                            <td class="table-primary text-center"><b>S/ {{ entidad.TotalMonto | moneda }}</b></td>
-                            <td class="table-info text-center"><b>S/ {{ entidad.TotalComision | moneda }}</b></td>
-                            <!--<td class="table-success text-center"><b>S/ {{ entidad.Total | moneda }}</b></td>-->
-                            </tr>
-                        </tfoot>
-                    </table>
-                </b-row>
-            </b-col>
-        </b-row>
-        <hr v-if="totalIngresos>0 || totalEgresos>0">
-        <b-row>
-            <b-col v-if="totalIngresos>0">
-            <h5>INGRESOS CAJA</h5>
-            <table class="table b-table table-sm">
-                <thead>
-                <tr>
-                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Ingreso</th><th class="text-center" v-if="!visual">Anular</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in ingresos" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.IdCaja }}</td>
-                    <td>{{ item.FechaReg }}</td>
-                    <td>{{ item.Concepto }}</td>
-                    <td>S/. {{ item.Importe | redondear }}</td>
-                    <td class="text-center" v-if="!visual"><span v-if="!item.Anulado" class="btn btn-sm text-danger" size="sm" @click="anularMovimiento(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
-                </tr>
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="3" class="total text-center"><b>Total Ingresos</b></td>
-                    <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
-                </tr>
-                </tfoot>
-            </table>
-            </b-col>
-            <b-col v-if="totalEgresos>0">
-            <h5>EGRESOS CAJA</h5>
-            <table class="table b-table table-sm">
-                <thead>
-                <tr>
-                    <th>ID</th><th>Fecha</th><th>Concepto</th><th>Salida</th><th class="text-center" v-if="!visual">Anular</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(item, index) in egresos" :key="index">
-                    <td>{{ item.IdCaja }}</td>
-                    <td>{{ item.FechaReg }}</td>
-                    <td>{{ item.Concepto }}</td>
-                    <td>S/. {{ item.Importe | redondear }}</td>
-                    <td class="text-center" v-if="!visual"><span v-if="!item.Anulado" class="btn btn-sm text-danger" size="sm" @click="anularMovimiento(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
-                </tr>
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="3" class="total-salida text-center"><b>Total Egresos</b></td>
-                    <td class="total-salida"><b>S/. {{ totalEgresos | redondear }}</b></td>
-                </tr>
-                </tfoot>
-            </table>
-            </b-col>
-        </b-row>
-        <b-alert v-if="idCajaAbierta > 0" variant="success" class="text-center" show><b>TOTAL EN CAJA: S/. {{ granTotal | redondear }}</b></b-alert>
-        <agente-registrar-mov ref="movimientoModal" :usuario-reg="vendedor.Usuario" :cbGuardar="cargarCaja"></agente-registrar-mov>
-      </b-container>
-    </div>
-  </template>
+            </b-row>
+        </b-col>
+    </b-row></section>
+    <hr>
+    <b-row v-if="!(idCajaAbierta > 0)">
+        <b-col class="text-center mt-5">
+            <h2 class="text-danger" v-show="cargaCorrecta">APERTURE SU CAJA PARA PODER REALIZAR OPERACIONES</h2>
+        </b-col>
+    </b-row>
+    <b-row v-else>
+        <b-col>
+            <b-row v-for="(entidad, index) in data" :key="index">
+                <h5>{{ entidad.Nombre }}</h5><br>
+                    <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
+                    <thead>
+                        <tr>
+                            <th class="tdgris" width="7%">Recibo</th><th class="tdgris" width="15%">Fecha</th><th class="tdgris" width="15%">Empresa</th><th class="tdgris" width="15%">Operación</th><th class="tdgris" width="20%">Cliente</th><th class="table-primary text-center" width="10%">Monto</th><th class="table-info text-center" width="10%">Comision</th><!--<th class="table-success text-center" width="10%">Total</th>--><th class="text-center" width="5%">Estado</th>
+                            <th class="text-center" width="5%">Info</th><th class="text-center" width="5%" v-if="!visual">Procesar</th><th class="text-center" width="5%" v-if="!visual">Anular</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in entidad.Comprobantes" :key="index" :class="{anulado: item.Anulado}">
+                            <td>{{ item.Correlativo}}</td>
+                            <td>{{ item.FechaDoc }}</td>
+                            <td>{{ item.Empresa }}</td>
+                            <td>{{ item.CategoriaEmpresa }} <br>
+                                <b>{{ item.Servicio }}</b>
+                            </td>
+                            <td>{{ item.Cliente }}</td>
+                            <td class="table-primary text-center">S/ {{ item.Monto | moneda }}</td>
+                            <td class="table-info text-center">S/ {{ item.Comision | moneda }} <br>
+                                <b-badge v-if="item.Comision>0" style="font-size:0.65rem" :variant="item.ComisionIncluida==1?'primary':'success'">{{ item.ComisionIncluida==1?'INCLUIDA':'EFECTIVO' }}</b-badge>
+                            </td>
+                            <!--<td class="table-success text-center">S/ {{ item.Total | moneda }}</td>-->
+                            <td class="text-center"><b-badge style="font-size:0.8rem" :variant="item.Estado==1?'primary':(item.Estado==2?'success':'danger')">{{ item.Estado==1?'PENDIENTE':(item.Estado==2?'PROCESADO':'CANCELADO') }}</b-badge></td>
+                            <td class="text-center"><span class="btn text-info" size="sm" @click="infoComprobante(item)"><i class="fas fa-info fa-lg"></i></span></td>
+                            <td class="text-center" v-if="!visual"><span v-if="item.Estado==1 && item.Anulado==0" class="btn text-success" variant="success" size="sm" @click="procesarComprobante(item)"><i class="fas fa-check fa-lg"></i></span></td>
+                            <td class="text-center" v-if="!visual"><span v-if="!item.Anulado && item.Estado==1" class="btn text-danger" size="sm" @click="anularComprobante(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                        <td class="total text-center" colspan="5"><b>Totales {{ entidad.Nombre }}</b></td>
+                        <td class="table-primary text-center"><b>S/ {{ entidad.TotalMonto | moneda }}</b></td>
+                        <td class="table-info text-center"><b>S/ {{ entidad.TotalComision | moneda }}</b></td>
+                        <!--<td class="table-success text-center"><b>S/ {{ entidad.Total | moneda }}</b></td>-->
+                        </tr>
+                    </tfoot>
+                </table></div>
+            </b-row>
+        </b-col>
+    </b-row>
+    <hr v-if="totalIngresos>0 || totalEgresos>0">
+    <section class="nst-panel nst-panel--results"><b-row>
+        <b-col v-if="totalIngresos>0">
+        <h5>INGRESOS CAJA</h5>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
+            <thead>
+            <tr>
+                <th>ID</th><th>Fecha</th><th>Concepto</th><th>Ingreso</th><th class="text-center" v-if="!visual">Anular</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in ingresos" :key="index" :class="{anulado: item.Anulado}">
+                <td>{{ item.IdCaja }}</td>
+                <td>{{ item.FechaReg }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+                <td class="text-center" v-if="!visual"><span v-if="!item.Anulado" class="btn btn-sm text-danger" size="sm" @click="anularMovimiento(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3" class="total text-center"><b>Total Ingresos</b></td>
+                <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
+            </tr>
+            </tfoot>
+        </table></div>
+        </b-col>
+        <b-col v-if="totalEgresos>0">
+        <h5>EGRESOS CAJA</h5>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
+            <thead>
+            <tr>
+                <th>ID</th><th>Fecha</th><th>Concepto</th><th>Salida</th><th class="text-center" v-if="!visual">Anular</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in egresos" :key="index">
+                <td>{{ item.IdCaja }}</td>
+                <td>{{ item.FechaReg }}</td>
+                <td>{{ item.Concepto }}</td>
+                <td>S/. {{ item.Importe | redondear }}</td>
+                <td class="text-center" v-if="!visual"><span v-if="!item.Anulado" class="btn btn-sm text-danger" size="sm" @click="anularMovimiento(item)"><i class="fas fa-ban fa-lg"></i></span><span v-else>-</span></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3" class="total-salida text-center"><b>Total Egresos</b></td>
+                <td class="total-salida"><b>S/. {{ totalEgresos | redondear }}</b></td>
+            </tr>
+            </tfoot>
+        </table></div>
+        </b-col>
+    </b-row></section>
+    <b-alert v-if="idCajaAbierta > 0" variant="success" class="text-center" show><b>TOTAL EN CAJA: S/. {{ granTotal | redondear }}</b></b-alert>
+    <agente-registrar-mov ref="movimientoModal" :usuario-reg="vendedor.Usuario" :cbGuardar="cargarCaja"></agente-registrar-mov>
+  </b-container>
+</div>
+</template>
   <script>
   import config from '@/store/config.js'
   import AgenteCierres from '@/components/AgenteCierres.vue'

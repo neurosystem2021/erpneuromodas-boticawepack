@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();echo json_encode($db->query('SELECT IdBoleta,Version FROM Rhu_PlanillaBoleta WHERE IdPlanilla=1')->fetchAll(PDO::FETCH_ASSOC)),"\n";

@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Date: Thu, 15 Oct 2026 18:29:11 GMT
+Server: Apache/2.4.54 (Win64) OpenSSL/1.1.1p PHP/7.4.33
+X-Powered-By: PHP/7.4.33
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: X-Requested-With, Content-Type, Accept, Origin, Authorization
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
+X-Product-Specs: items-v2
+X-Product-Specs-Path: proformas/id/12
+Content-Length: 2540
+Content-Type: application/json;charset=utf-8
+

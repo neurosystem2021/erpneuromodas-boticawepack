@@ -1,0 +1,4 @@
+<?php
+ob_start();session_id('cashsessiontest'.bin2hex(random_bytes(6)));session_start();$_SESSION=array('user'=>'superadmin','expire'=>time()+90);$sid=session_id();session_write_close();
+$ch=curl_init('http://localhost/api/index.php/movimiento/guardarMovimiento');curl_setopt_array($ch,array(CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>json_encode(array('Importe'=>0)),CURLOPT_HTTPHEADER=>array('Content-Type: application/json'),CURLOPT_COOKIE=>session_name().'='.$sid,CURLOPT_TIMEOUT=>15));$body=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
+session_id($sid);session_start();$_SESSION=array();session_destroy();if($status!==422)throw new Exception('Session validation failed HTTP '.$status);echo "PASS API recognizes authenticated session and validates request without creating movements.\n";ob_end_flush();

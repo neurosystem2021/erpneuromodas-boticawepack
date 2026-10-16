@@ -1,0 +1,9 @@
+{
+ "mode":"isolated_copy",
+ "enable_copy_writes":false,
+ "forbidden_databases":["BASE_PRODUCTIVA_DEL_HOSTING","nst","fact_nst"],
+ "snapshot":"/home/USUARIO/neuro-private/migration/source-reviewed.json",
+ "snapshot_sha256":"SHA256_REAL_DEL_SNAPSHOT",
+ "backup_manifest":"/home/USUARIO/neuro-private/migration/backup-manifest.json",
+ "target":{"host":"localhost","port":3306,"database":"USUARIO_neuro_migration_test","user":"USUARIO_migrador_copia","password":"CONFIGURAR_SOLO_EN_EL_ARCHIVO_PRIVADO"}
+}

@@ -27,15 +27,12 @@
           :onFocus="focusAutocomplete.bind(null, 'productoKit')"
           :classes="{input: 'form-control upper'}">
         </autocomplete>
-        <input v-model="loadCode"
-        @keydown.enter.prevent="loadBarcode"
-        type="text"
-        style="width:20px"
-        class="form-control"
-        placeholder="Codigo de Barra" />
       </b-input-group>
     </b-form-group>
-    <table class="table b-table table-sm">
+    <inventory-camera :embedded="true" :continuous="true" v-if="showProjectScanner" @close="showProjectScanner=false" @code="readProjectBarcode"/>
+    <section class="project-barcode-search"><label for="projectProductBarcode"><i class="fas fa-barcode" aria-hidden="true"></i> Buscar producto por código de barras</label><div class="project-barcode-controls"><input id="projectProductBarcode" v-model="loadCode" @keydown.enter.prevent="loadBarcode" type="text" class="form-control" placeholder="Escanea o escribe el código" autocomplete="off" inputmode="text"/><b-button type="button" variant="primary" :disabled="loadingBarcode || !loadCode.trim()" @click="loadBarcode"><i class="fas fa-search" aria-hidden="true"></i> Buscar</b-button><b-button type="button" variant="success" :disabled="loadingBarcode" @click="openProjectScanner"><i class="fas fa-barcode" aria-hidden="true"></i> Escanear</b-button></div><small>Usa la cámara, un lector USB o escribe el código.</small></section>
+
+    <div class="preorder-table-scroll"><table class="table b-table table-sm">
       <thead>
         <tr>
           <th>Mano de Obra</th>
@@ -51,53 +48,58 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled,'bg-facturado':prod.Pagado}">
-          <td>
+        <tr v-for="(prod, index) in productos" v-show="!prod.isDisabled" :key="index" :class="{'bg-secondary text-white': prod.isDisabled,'bg-facturado':prod.Facturado==1}">
+          <td data-label="Mano de obra">
             <input 
             @change="(e) => addManoDeObra(index, e)"
             v-if="prod.CodigoBarra != 'MANODEOBRA'" 
             v-model="prod.EsManoDeObra"
-            :disabled="prod.Pagado==1"
+            :disabled="prod.Facturado==1"
             class="form-check-input" type="checkbox" />
           </td>
-          <td>{{ prod.IdProducto }}</td>
-          <td>{{ prod.Producto }}</td>
-          <td>
+          <td data-label="Código">{{ prod.IdProducto }}</td>
+          <td data-label="Producto">{{ prod.Producto }}</td>
+          <td data-label="Precio unitario">
             <span class="hideInModal">{{ prod.Precio }}</span>
-            <input :disabled="prod.Pagado ==1" step="0.0001" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
+            <input :disabled="prod.Facturado ==1" step="0.0001" required type="number" class="form-control" v-model="prod.Precio" @input="emitUpdate" />
           </td>
-          <td>
+          <td data-label="Cantidad">
             <span class="hideInModal">{{ prod.Cantidad }}</span> 
-            <input :disabled="prod.isDisabled ==1 || prod.Pagado==1" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
+            <input :disabled="prod.isDisabled ==1 || prod.Facturado==1" required type="number" class="form-control" v-model="prod.Cantidad" @input="emitUpdate" />
           </td>
-          <td>
+          <td data-label="Total">
             <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2)}}</span>
             
           </td>
-          <td>{{ prod.MontoPagado }}</td>
-          <td>
+          <td data-label="Pagado">{{ prod.MontoPagado }}</td>
+          <td data-label="Saldo">
             <span>{{parseFloat(prod.Precio * prod.Cantidad).toFixed(2) - prod.MontoPagado }}</span>
             
           </td>
-          <td>
-             {{ prod.Pagado==1 ? 'Facturado' : ''}}
+          <td data-label="Estado">
+             {{ prod.Facturado==1 ? 'Facturado' : 'Sin comprobante'}}
           </td>
-          <td class="text-center"><b-button :disabled="prod.isDisabled==1" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
+          <td class="text-center" data-label="Acciones"><b-button :disabled="prod.isDisabled==1" variant="danger" size="sm" @click="quitarProducto(prod)">X</b-button></td>
         </tr>
       </tbody>
-    </table>
+    </table></div>
   </div>    
 </template>
 <script>
+import InventoryCamera from "@/components/InventoryCamera";
 import config from "@/store/config.js";
 
 export default {
+  components:{InventoryCamera},
+  beforeDestroy(){if(this._scanAudio){this._scanAudio.close().catch(()=>{});this._scanAudio=null;}},
   mounted() {
     this.getProductos();
   },
   data() {
     return {
       API: config.API,
+      showProjectScanner:false,
+      loadingBarcode:false,
       productosACargar: [],
       productos: [],
       loadCode: "",
@@ -176,24 +178,28 @@ export default {
         <b>${data.IdProducto} - ${data.Producto} - ${data.CodigoBarra}</b>
       `;
     },
-    loadBarcode(e) {
-      e.preventDefault();
-      let idProducto = this.loadCode;
-
-      if (idProducto) {
-        let params = { codigoBarra: idProducto };
-        this.axios
-          .get(this.API + "productos/id/" + idProducto, { params: params })
-          .then(response => {
-            if (response.data.IdProducto) {
-              this.addProducto(response.data);
-              this.loadCode = "";
-            } else {
-              this.loadCode = "";
-              this.$toasted.show("No se encontró ningun producto");
-            }
-          });
-      }
+    openProjectScanner() {
+      const Audio=window.AudioContext || window.webkitAudioContext;
+      if(Audio){try { if(!this._scanAudio)this._scanAudio=new Audio();this._scanAudio.resume().catch(()=>{}); }catch(error){} }
+      this.showProjectScanner=true;
+    },
+    readProjectBarcode(code) {
+      if(this.loadingBarcode) return;
+      this.loadCode=String(code);
+      if(this._scanAudio){try{const oscillator=this._scanAudio.createOscillator(),gain=this._scanAudio.createGain();oscillator.connect(gain);gain.connect(this._scanAudio.destination);oscillator.frequency.value=1100;gain.gain.setValueAtTime(.12,this._scanAudio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,this._scanAudio.currentTime+.15);oscillator.start();oscillator.stop(this._scanAudio.currentTime+.15);}catch(error){} }
+      this.loadBarcode();
+    },
+    async loadBarcode(e) {
+      if(e && e.preventDefault)e.preventDefault();
+      const code=String(this.loadCode || '').trim();
+      if(!code || this.loadingBarcode)return;
+      this.loadingBarcode=true;
+      try {
+        const response=await this.axios.get(this.API+'productos/id/'+encodeURIComponent(code),{params:{codigoBarra:code}});
+        if(response.data && response.data.IdProducto){this.addProducto(response.data);this.loadCode='';}
+        else this.$toasted.error('No se encontró un producto con ese código.');
+      }catch(error){this.$toasted.error('No se pudo buscar el código. Intente nuevamente.');}
+      finally{this.loadingBarcode=false;}
     },
 
     addProductoKit(data) {

@@ -1,0 +1,14 @@
+const fs=require('fs'),assert=require('node:assert/strict');
+const source=fs.readFileSync('src/utils/aliCourtesy.js','utf8').replace(/export function/g,'function');
+const {greet,motivate,farewell}=new Function(source+';return {greet:aliGreeting,motivate:aliEncouragement,farewell:aliFarewell}')();
+const date=(utc)=>new Date('2026-10-13T'+utc+'Z');
+for(const [time,salutation] of [['09:59:00','Buenas noches'],['10:00:00','Buenos días'],['16:59:00','Buenos días'],['17:00:00','Buenas tardes'],['23:59:00','Buenas tardes']])assert.ok(greet('maria',date(time)).startsWith(salutation+', maria.'),time);
+assert.ok(greet('maria',new Date('2026-10-14T00:00:00Z')).startsWith('Buenas noches, maria.'));
+assert.equal(motivate('maria',date('05:01:00')),motivate('maria',date('23:59:00')),'Same phrase throughout the Lima calendar day');
+assert.notEqual(motivate('maria',date('05:01:00')),motivate('maria',new Date('2026-10-14T05:01:00Z')),'New phrase tomorrow');
+assert.ok(!greet(null,date('17:00:00')).includes('undefined'));
+assert.ok(farewell('maria',new Date('2026-10-14T00:00:00Z')).includes('una buena noche'));
+const commands=fs.readFileSync('src/utils/aliCommands.js','utf8').replace(/export function/g,'function');
+const parse=new Function(commands+';return parseAliCommand')();
+for(const text of ['Frase del día','Dame una frase motivadora','Dime la frase de hoy','Motívame'])assert.equal(parse(text,{field:'barcode'}).type,'encouragement',text);
+console.log('PASS Lima morning/afternoon/night boundaries, daily phrase, personalization, farewell, motivation voice commands.');

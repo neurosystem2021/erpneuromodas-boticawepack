@@ -1,0 +1,13 @@
+﻿const fs=require('fs'),assert=require('assert/strict');
+const settings=fs.readFileSync('src/utils/printSettings.js','utf8').replace('export ','');
+const source=fs.readFileSync('src/utils/salePrintDelivery.js','utf8').replace(/^import .*;\s*$/m,'').replace('export default','return');
+const values=new Map(),prefs=new Map();global.localStorage={getItem:k=>prefs.get(k)};
+const read=new Function('localStorage',settings+';return readPrintSettings;')(global.localStorage);
+let calls=0,toasts=[],frames=[];const doc={getElementById:()=>null,body:{appendChild:f=>frames.push(f)},createElement:()=>({style:{},remove(){}})};
+const mixin=new Function('readPrintSettings','document','sessionStorage',source)(read,doc,{getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)});
+const ctx={axios:{post:async(url,body,options)=>{calls++;assert.equal(url,'/imprimir/usb.php');assert.equal(body.PrinterName,'bar');assert.equal(options.headers['X-Requested-With'],'XMLHttpRequest');return {data:{ok:true}}}},$toasted:{success:m=>toasts.push(m),show:m=>toasts.push(m)}};Object.assign(ctx,mixin.methods);
+(async()=>{assert.equal(await ctx.enviarImpresionVenta(25),true);assert.match(toasts[0],/bar/);assert.equal(await ctx.enviarImpresionVenta(25),false);assert.equal(calls,1);assert.equal(await ctx.enviarImpresionVenta('25&x'),false);
+ctx.axios.post=async()=>{calls++;throw Error('timeout')};assert.equal(await ctx.enviarImpresionVenta(26),false);assert.equal(frames.length,1);assert.match(frames[0].src,/IdDocVenta=26/);assert.equal(await ctx.enviarImpresionVenta(26),false);assert.equal(calls,2,'No automatic retry after unknown result');
+prefs.set('posPrintSettings',JSON.stringify({mode:'browser',printer:'bar',automatic:true}));assert.equal(await ctx.enviarImpresionVenta(27),true);assert.equal(calls,2);assert.equal(frames.length,2);
+prefs.set('posPrintSettings',JSON.stringify({automatic:false}));assert.equal(await ctx.enviarImpresionVenta(28),false);assert.equal(frames.length,2);
+console.log('PASS IMCEDEN direct printing, BAR queue, brief acknowledgement, duplicate protection, browser fallback and per-browser configuration. No real print or sale.');})();

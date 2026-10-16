@@ -1,5 +1,7 @@
 <template>
 	<div id="invoice-container">
+    <div class="quote-edit-toolbar"><button class="btn btn-primary" @click="editOpen=true">Modificar productos</button></div>
+    <b-modal v-model="editOpen" title="Modificar productos de la proforma" size="xl" hide-footer lazy modal-class="quote-product-modal"><proforma-editor v-if="editOpen" :quote-id="idProforma" embedded @cancel="editOpen=false" @saved="editOpen=false;getProforma()" /></b-modal>
 		<header class="clearfix">
 			<div id="logo">
 				<img src="/resources/images/banner-proforma.jpg">
@@ -89,7 +91,7 @@
           <tr v-for="(prod, index) in proforma.productos" :key="index">
             <td class="no">{{ index+1 }}</td>
             <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#B71C1C; font-size:1rem">{{ prod.Producto }}</h3>{{ prod.ProductoDesc }}<br v-if="prod.ProductoDesc">{{ prod.ProductoDesc2 }}<br v-if="prod.ProductoDesc2">{{ prod.ProductoDesc3 }}<br v-if="prod.ProductoDesc3">{{ prod.Descripcion }}</td>
+            <td class="desc" style="font-size:0.75rem"><h3 style="color:#B71C1C; font-size:1rem">{{ prod.Producto }}</h3><template v-if="hasSpecs(prod)"><p v-if="specNote(prod)">{{specNote(prod)}}</p><ol style="padding-left:18px;margin:5px 0;line-height:1.5"><li v-for="(item,i) in specItems(prod)" :key="i">{{item}}</li></ol></template><template v-else>{{ prod.ProductoDesc }}<br v-if="prod.ProductoDesc">{{ prod.ProductoDesc2 }}<br v-if="prod.ProductoDesc2">{{ prod.ProductoDesc3 }}<br v-if="prod.ProductoDesc3">{{ prod.Descripcion }}</template></td>
             <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
             <td class="unit" style="font-size:1.1rem"><span v-if="prod.DisabledTotal === 0">S/. {{ prod.Precio | moneda }}</span></td>
             <td class="total" style="font-size:1.1rem">
@@ -151,14 +153,17 @@
 </template>
 
 <script>
+import ProformaEditor from '@/views/ProformaEditor.vue';
 import { API } from "@/store/config.js";
 export default {
+  components:{ProformaEditor},
   mounted() {
     this.getProforma();
     this.getEmpresa();
   },
   data() {
     return {
+      editOpen:false,
       API: API,
       idProforma: this.$route.params.id,
       proforma: { productos: [] },
@@ -190,6 +195,9 @@ export default {
     }
   },
   methods: {
+    hasSpecs(prod){return (prod.Descripcion||'').includes('Características técnicas:\n')},
+    specNote(prod){return (prod.Descripcion||'').split('Características técnicas:\n')[0].trim()},
+    specItems(prod){return ((prod.Descripcion||'').split('Características técnicas:\n')[1]||'').split(/\r?\n/).map(s=>s.replace(/^\d+[.)]\s*/,'').trim()).filter(Boolean)},
     getProforma() {
       this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
         let response = res.data;
@@ -278,4 +286,9 @@ export default {
     display: none;
   }
 }
+</style>
+
+<style>
+.quote-edit-toolbar{padding:8px 0;display:flex;justify-content:flex-end}.quote-product-modal .modal-dialog{max-width:1100px!important;width:95vw!important}.quote-product-modal .modal-body{padding:8px!important;max-height:80vh;overflow:auto}.quote-product-modal .quote-editor{margin:0!important;padding:8px!important}.quote-product-modal .quote-editor h2,.quote-product-modal .quote-editor>p{display:none}
+@media print{.quote-edit-toolbar,.quote-product-modal{display:none!important}}
 </style>

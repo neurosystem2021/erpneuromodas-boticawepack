@@ -1,86 +1,85 @@
 <template>
-    <div>
-      <Menu v-if="false"></Menu>
-      <br />
-      <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
-          <b-container class="bv-example-row" fluid>
-            <b-row>
-                <b-col md="8">
-  
-                  <b-row>
-                   <b-col md="4">
-                      <b-form-group>
-                        <label>Almacen Origen:</label>
-                        <autocomplete
-                          ref="inputAlmacen"
-                          required="required"
-                          id="inputAlmacen"
-                          initValue=""
-                          :url="API + 'almacenes'"
-                          anchor="Almacen"
-                          label="writer"
-                          placeholder=""
-                          :on-select="setAlmacenOrigen"
-                          :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                          :classes="{input: 'form-control'}">
-                        </autocomplete>
-                      </b-form-group>
-                    </b-col>
-                   <b-col md="4" offset="4">
-                      <b-form-group>
-                        <label>Almacen Destino:</label>
-                        <autocomplete
-                          :key="almacenDestinoInput"
-                          ref="inputAlmacenDestino"
-                          id="inputAlmacenDestino"
-                          required="required"
-                          initValue=""
-                          :url="API + 'almacenes'"
-                          anchor="Almacen"
-                          label="writer"
-                          placeholder=""
-                          :on-select="setAlmacenDestino"
-                          :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
-                          :classes="{input: 'form-control'}">
-                        </autocomplete>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-  
+<div class="nst-screen nst-screen--traslado">
+  <Menu v-if="false"></Menu>
+  <br />
+  <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated>
+      <b-container class="bv-example-row" fluid>
+        <section class="nst-panel nst-panel--filters"><b-row>
+            <b-col cols="12">
+
+              <b-row class="nst-route-fields">
+               <b-col md="6">
+                  <b-form-group>
+                    <label>Almacen Origen:</label>
+                    <autocomplete
+                      ref="inputAlmacen"
+                      required="required"
+                      id="inputAlmacen"
+                      initValue=""
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacenOrigen"
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
                 </b-col>
-                <b-col md="4">
+               <b-col md="6">
+                  <b-form-group>
+                    <label>Almacen Destino:</label>
+                    <autocomplete
+                      :key="almacenDestinoInput"
+                      ref="inputAlmacenDestino"
+                      id="inputAlmacenDestino"
+                      required="required"
+                      initValue=""
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacenDestino"
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
                 </b-col>
-            </b-row>
-            <b-row>
-              <b-col>
-                <productos-carrito 
-                  ref="carrito"
-                  tipo="mov"
-                  @onAddProducto="onAddProducto"
-                  :showButton="false"
-                  :showPagoCon="false"
-                  :onSetProducto="onSetProducto"
-                  :setPrecio="false"
-                  :fields="fields"
-                  :bloquearInput="false"
-                ></productos-carrito>
-              </b-col>
-            </b-row>
-            <b-row align-h="center" class="text-center">
-              <b-col cols="6">
-                <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar</b-button>
-                <!--<b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>-->
-                  <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?hashMovimiento=' + ultimoMovimiento">Imprimir Último traslado</b-button>
-              </b-col>
-            </b-row>
-                  <br>
-                  <b-alert show variant="warning" v-show="smsAdvertencia" v-html="smsAdvertencia"></b-alert>
-          </b-container>
-          <br><br>
-      </b-form>
-  
-    </div>
-  </template>
+              </b-row>
+
+            </b-col>
+            
+        </b-row></section>
+        <section class="nst-panel nst-panel--products"><b-row>
+          <b-col>
+            <productos-carrito 
+              ref="carrito"
+              tipo="mov"
+              @onAddProducto="onAddProducto"
+              :showButton="false"
+              :showPagoCon="false"
+              :onSetProducto="onSetProducto"
+              :setPrecio="false"
+              :fields="fields"
+              :bloquearInput="false"
+            ></productos-carrito>
+          </b-col>
+        </b-row></section>
+        <b-row align-h="center" class="text-center nst-action-bar">
+          <b-col cols="6">
+            <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Trasladar</b-button>
+            <!--<b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/views/codigoBarra.php?hash=' + ultimoMovimiento">Código de Barra</b-button>-->
+              <b-button v-if="ultimoMovimiento" target="_blank" variant="info" size="lg" :href="'/imprimir/index.php?hashMovimiento=' + ultimoMovimiento">Imprimir Último traslado</b-button>
+          </b-col>
+        </b-row>
+              <br>
+              <b-alert show variant="warning" v-show="smsAdvertencia" v-html="smsAdvertencia"></b-alert>
+      </b-container>
+      <br><br>
+  </b-form>
+
+</div>
+</template>
   
   <script>
 import Menu from "@/components/Menu";

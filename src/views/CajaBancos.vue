@@ -1,503 +1,493 @@
 <template>
-  <b-container fluid>
-      <b-row>
-        <b-col cols="12">
-          <b-breadcrumb :items="items"></b-breadcrumb>
-       </b-col>
-      </b-row>
-    <b-tabs content-class="mt-3 mx-3" fill card pills>
-      <b-tab title="Caja Bancos">
+<b-container fluid class="nst-screen nst-screen--cajabancos">
+    <b-row>
+      <b-col cols="12">
+        <b-breadcrumb :items="items"></b-breadcrumb>
+     </b-col>
+    </b-row>
+  <b-tabs content-class="mt-3 mx-3" fill card pills>
+    <b-tab title="Caja Bancos"><template slot="title"><i class="fas fa-wallet nst-tab-icon" aria-hidden="true"></i><span>Caja Bancos</span></template>
+        <section class="nst-panel nst-panel--filters"><b-row>
+          <b-col cols="12">
+     </b-col>
+      <b-col cols="12" md="3" class="nst-finance-sidebar">
+        <div class="clsCuenta">
           <b-row>
-            <b-col cols="12">
-       </b-col>
-        <b-col cols="3">
-          <div class="clsCuenta">
-            <b-row>
-                <b-col cols="12">
-                    Cuenta:
-                    <b-form-select
-                    v-model="IdCuenta"
-                    :options="lstCuentas"
-                    @input="cargarOperaciones()"
-                    value-field="IdCuenta"
-                    text-field="Cuenta"
-                  
-                    ></b-form-select>
+              <b-col cols="12">
+                  Cuenta:
+                  <b-form-select
+                  v-model="IdCuenta"
+                  :options="lstCuentas"
+                  @input="cargarOperaciones()"
+                  value-field="IdCuenta"
+                  text-field="Cuenta"
+                
+                  ></b-form-select>
 
+              </b-col>
+              <b-col cols="12">
+                  Fecha:
+                  <input type="date" class="form-control" v-model="FechaDoc">
+              </b-col>
+              <b-col cols="12" class="mt-2 text-center">
+                  <b-button variant="success" :disabled="!IdCuenta"  @click="exportarOperaciones()"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
+                  <b-button variant="info" :disabled="!IdCuenta" @click="abrirModalNuevaOperacion()"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
+              </b-col>
+          </b-row>
+        </div>
+          </b-col>
+          <b-col cols="12" md="9" class="px-5 nst-finance-results">
+            <div class="clsCaja">
+            <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table table-hover">
+                <thead>
+                  <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
+                    <th style="border: 1px solid #ffffff;">Cuenta</th>
+                    <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
+                  </tr>
+                  <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
+                    <th style="border: 1px solid #ffffff;">ID</th>
+                    <th style="border: 1px solid #ffffff;">Usuario</th>
+                    <th style="border: 1px solid #ffffff;">Concepto</th>
+                    <th style="border: 1px solid #ffffff;">Ingresos</th>
+                    <th style="border: 1px solid #ffffff;">Salida</th>
+                    <!-- <th style="border: 1px solid #ffffff;">Saldo</th> -->
+                    <th style="border: 1px solid #ffffff;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(cajabanco,index) in lstCajaBanco" :key="index">
+                      <td>{{ cajabanco.IdCajaBanco }}</td>
+                      <td>{{ cajabanco.UsuarioReg }}</td>
+                      <td>{{ cajabanco.Concepto }}</td>
+                      <td>{{ cajabanco.Ingresos }}</td>
+                      <td>{{ cajabanco.Salida }}</td>
+                      <!-- <td>{{ (cajabanco.Ingresos?parseFloat(cajabanco.Ingresos): 0 )- (cajabanco.Salida?parseFloat(cajabanco.Salida): 0 ) }}</td> -->
+                    
+                      <td>
+                        <b-button variant="danger" @click="eliminarPago(cajabanco)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+                      </td>
+                  </tr>
+                </tbody>
+            </table></div>
+            </div>
+          </b-col>
+      </b-row></section>
+      </b-tab>  
+    <b-tab title="Gasto"><template slot="title"><i class="fas fa-arrow-circle-down nst-tab-icon" aria-hidden="true"></i><span>Gasto</span></template>
+          
+          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <section class="nst-panel nst-panel--filters"><b-row>
+              <b-col md="4" class="clsCuenta">
+                <label>Cuenta:</label>
+                <autocomplete
+                required="required"
+                ref="inputCaja"
+                :url="API + 'cuentas'"
+                anchor="Cuenta"
+                label="writer"
+                placeholder=""
+                :on-select="setCuenta" 
+                :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
+                :onInput="(val) => newDniRuc = val"
+                :classes="{input: 'form-control'}"
+                >
+                </autocomplete>
+                <br>
+                <label>Gasto:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row></section>
+          </div>
+          <template>
+            <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+      
+      <b-tab title="Ingreso"><template slot="title"><i class="fas fa-arrow-circle-up nst-tab-icon" aria-hidden="true"></i><span>Ingreso</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <section class="nst-panel nst-panel--filters"><b-row>
+              <b-col md="4" class="clsCuenta">
+                <label>Cuenta:</label>
+                <autocomplete
+                required="required"
+                ref="inputCaja2"
+                :url="API + 'cuentas'"
+                anchor="Cuenta"
+                label="writer"
+                placeholder=""
+                :on-select="setCuenta" 
+                :onFocus="focusAutocomplete.bind(null, 'inputCaja2')"
+                :onInput="(val) => newDniRuc = val"
+                :classes="{input: 'form-control'}"
+                >
+                </autocomplete>
+                <br>
+                <label>Ingreso:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Ingreso" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.IngresoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row></section>
+          </div>
+          <template>
+            <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+
+      <b-tab title="Salida"><template slot="title"><i class="fas fa-arrow-circle-down nst-tab-icon" aria-hidden="true"></i><span>Salida</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <section class="nst-panel nst-panel--filters"><b-row>
+              <b-col md="4" class="clsCuenta">
+                <label>Cuenta:</label>
+                <autocomplete
+                required="required"
+                ref="inputCaja3"
+                :url="API + 'cuentas'"
+                anchor="Cuenta"
+                label="writer"
+                placeholder=""
+                :on-select="setCuenta" 
+                :onFocus="focusAutocomplete.bind(null, 'inputCaja3')"
+                :onInput="(val) => newDniRuc = val"
+                :classes="{input: 'form-control'}"
+                >
+                </autocomplete>
+                <br>
+                <label>Salida:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Salida" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.SalidaDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row></section>
+          </div>
+          <template>
+            <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+
+      <b-tab title="Dep. Cuenta Bancaria"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Dep. Cuenta Bancaria</span></template>
+        <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
+          <div class="my-3">
+            <section class="nst-panel nst-panel--filters"><b-row>
+              <b-col md="4" class="clsCuenta">
+                <label>Cuenta:</label>
+                <autocomplete
+                required="required"
+                ref="inputCaja4"
+                :url="API + 'cuentas'"
+                anchor="Cuenta"
+                label="writer"
+                placeholder=""
+                :on-select="setCuenta" 
+                :onFocus="focusAutocomplete.bind(null, 'inputCaja4')"
+                :onInput="(val) => newDniRuc = val"
+                :classes="{input: 'form-control'}"
+                >
+                </autocomplete>
+                <br>
+                <label>Monto:</label>
+                <b-form-group>
+                  <input v-model="selectProducto.Deposito" required type="number" class="form-control" step="0.01" placeholder="S/." />
+                </b-form-group>
+                <label>N° Cuenta - Descripción:</label>
+                <b-form-group>
+                  <b-form-input v-model="selectProducto.DepositoDesc" required placeholder="Descripción"></b-form-input>
+                </b-form-group>
+              </b-col>
+            </b-row></section>
+          </div>
+          <template>
+            <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
+            <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
+          </template>
+        </b-form>
+      </b-tab>
+    
+    </b-tabs>
+ 
+  <!-- MODAL AGREGAR  PROVEEDOR-->
+  <b-modal 
+    v-model="modalRegistro" 
+    title="Agregar Tipo Caja" 
+    backdrop="static" 
+    no-close-on-backdrop
+    no-close-on-esc 
+    hide-footer
+    no-stacking
+    container="body"  
+    v-if="modalRegistro"
+    modal-class="modalCajaBancos nst-dialog"
+    size="lg" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered=""
+    >
+      <b-row>
+        <b-col :cols="aplicarLetra?7:12">
+          <b-row>
+            <b-col cols="6">
+              <b-row>
+                <b-col cols="12">
+                  Tipo Operación:
+                  <b-form-select
+                    v-model="IdTipoCajaBanco"
+                    :options="lstTipoOpe"
+                    value-field="IdTipoCajaBanco"
+                    text-field="TipoCajaBanco"
+                    @input="cambiarTipo($event)"
+                  ></b-form-select>
+                </b-col>
+                <b-col cols="12" v-if="mostrarCliente">
+                  Cliente:
+                  <autocomplete
+                      required="required"
+                      ref="inputCliente"
+                      :url="API + 'clientes'"
+                      anchor="ClienteDniRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => newDniRuc = val"
+                      :on-select="setCliente" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-col>
+                <b-col cols="12" v-if="mostrarProveedor">
+                  Proveedor
+                  <autocomplete
+                      required="required"
+                      ref="inputProveedor"
+                      :url="API + 'proveedor'"
+                      anchor="ProveedorDniRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => newRuc = val"
+                      :on-select="setProveedor" 
+                      :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-col>
+              </b-row>
+            </b-col>
+            <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
+              <b-row>
+                <b-col cols="12">
+                  Fecha Operacion: 
+                  <input type="date" class="form-control" v-model="FechaDoc">
                 </b-col>
                 <b-col cols="12">
-                    Fecha:
-                    <input type="date" class="form-control" v-model="FechaDoc">
+                  Concepto: 
+                  <input type="text" class="form-control" v-model="Concepto">
                 </b-col>
-                <b-col cols="12" class="mt-2 text-center">
-                    <b-button variant="success" :disabled="!IdCuenta"  @click="exportarOperaciones()"><i class="fa fa-file-excel" aria-hidden="true"></i> EXPORTAR</b-button>
-                    <b-button variant="info" :disabled="!IdCuenta" @click="abrirModalNuevaOperacion()"><i class="fa fa-plus" aria-hidden="true"></i> NUEVO</b-button>
+                <b-col cols="12">
+                  Importe: 
+                  <input type="number" class="form-control" v-model="Importe">
                 </b-col>
-            </b-row>
-          </div>
+              </b-row>
             </b-col>
-            <b-col cols="9" class="px-5">
-              <div class="clsCaja">
-              <table class="table table-hover">
+            <b-col cols="12" class="mt-3">
+              <div class="card">
+                <div class="card-header">Documentos a aplicar</div>
+            
+              <div class="card-body">
+              <table class="table">
                   <thead>
                     <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
-                      <th style="border: 1px solid #ffffff;">Cuenta</th>
-                      <th colspan="6" style="text-align: center;border: 1px solid #ffffff;">Caja</th>
-                    </tr>
-                    <tr style="background: #7986CB; color:#ffff;border: 1px solid #ffffff;">
-                      <th style="border: 1px solid #ffffff;">ID</th>
-                      <th style="border: 1px solid #ffffff;">Usuario</th>
-                      <th style="border: 1px solid #ffffff;">Concepto</th>
-                      <th style="border: 1px solid #ffffff;">Ingresos</th>
-                      <th style="border: 1px solid #ffffff;">Salida</th>
-                      <!-- <th style="border: 1px solid #ffffff;">Saldo</th> -->
+                      <th style="border: 1px solid #ffffff;">Id</th>
+                      <th style="border: 1px solid #ffffff;">Fecha</th>
+                      <th style="border: 1px solid #ffffff;">FechaVen</th>
+                      <th style="border: 1px solid #ffffff;">Correlativo</th>
+                      <th style="border: 1px solid #ffffff;">Total</th>
+                      <th style="border: 1px solid #ffffff;">Aplicado</th>
+                      <th style="border: 1px solid #ffffff;">Saldo</th>
                       <th style="border: 1px solid #ffffff;"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(cajabanco,index) in lstCajaBanco" :key="index">
-                        <td>{{ cajabanco.IdCajaBanco }}</td>
-                        <td>{{ cajabanco.UsuarioReg }}</td>
-                        <td>{{ cajabanco.Concepto }}</td>
-                        <td>{{ cajabanco.Ingresos }}</td>
-                        <td>{{ cajabanco.Salida }}</td>
-                        <!-- <td>{{ (cajabanco.Ingresos?parseFloat(cajabanco.Ingresos): 0 )- (cajabanco.Salida?parseFloat(cajabanco.Salida): 0 ) }}</td> -->
+                    <tr v-for="(deuda,index) in lstDeudas" :key="index" :style="{background:deuda.Aplicado==1 ? '#FBE9E7' :''}">
+                      <td>{{deuda.Id}}</td>
+                      <td>{{deuda.FechaDoc}}</td>
+                      <td>{{deuda.FechaCredito}}</td>
+                      <td>{{deuda.Correlativo}}</td>
+                      <td>{{deuda.Total}}</td>
+                      <td>{{deuda.Aplicado}}</td>
+                      <td>{{deuda.Saldo}}</td>
+                      <td>
+                        <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
+                        <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
+                        <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
+                        <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
+                      </td>
+
+                    </tr>
+                    <tr style="background: #BBDEFB; font-weight: bold; ">
+                      <td colspan="4" style="text-align: center;border: 1px solid #ffffff;">
+                        Sumatoria
+                      </td>
+                      <td style="border: 1px solid #ffffff;">
+                        {{ totalDocumentosPendientes }}
+                      </td>
+                      <td colspan="3"></td>
                       
-                        <td>
-                          <b-button variant="danger" @click="eliminarPago(cajabanco)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-                        </td>
                     </tr>
                   </tbody>
               </table>
-              </div>
+            </div>
+            </div>
             </b-col>
-        </b-row>
-        </b-tab>  
-      <b-tab title="Gasto">
-            
-            <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4" class="clsCuenta">
-                  <label>Cuenta:</label>
-                  <autocomplete
-                  required="required"
-                  ref="inputCaja"
-                  :url="API + 'cuentas'"
-                  anchor="Cuenta"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setCuenta" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
-                  :onInput="(val) => newDniRuc = val"
-                  :classes="{input: 'form-control'}"
-                  >
-                  </autocomplete>
-                  <br>
-                  <label>Gasto:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Gasto" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.GastoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template>
-              <b-btn variant="success" type="submit" @click="insertarGasto">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-        
-        <b-tab title="Ingreso">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4" class="clsCuenta">
-                  <label>Cuenta:</label>
-                  <autocomplete
-                  required="required"
-                  ref="inputCaja2"
-                  :url="API + 'cuentas'"
-                  anchor="Cuenta"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setCuenta" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputCaja2')"
-                  :onInput="(val) => newDniRuc = val"
-                  :classes="{input: 'form-control'}"
-                  >
-                  </autocomplete>
-                  <br>
-                  <label>Ingreso:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Ingreso" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.IngresoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template>
-              <b-btn variant="success" type="submit" @click="insertarIngreso">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-
-        <b-tab title="Salida">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4" class="clsCuenta">
-                  <label>Cuenta:</label>
-                  <autocomplete
-                  required="required"
-                  ref="inputCaja3"
-                  :url="API + 'cuentas'"
-                  anchor="Cuenta"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setCuenta" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputCaja3')"
-                  :onInput="(val) => newDniRuc = val"
-                  :classes="{input: 'form-control'}"
-                  >
-                  </autocomplete>
-                  <br>
-                  <label>Salida:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Salida" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.SalidaDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template>
-              <b-btn variant="success" type="submit" @click="insertarSalida">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-
-        <b-tab title="Dep. Cuenta Bancaria">
-          <b-form @submit.prevent="guardarProductos" @keydown.enter.prevent>
-            <div class="my-3">
-              <b-row>
-                <b-col md="4" class="clsCuenta">
-                  <label>Cuenta:</label>
-                  <autocomplete
-                  required="required"
-                  ref="inputCaja4"
-                  :url="API + 'cuentas'"
-                  anchor="Cuenta"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setCuenta" 
-                  :onFocus="focusAutocomplete.bind(null, 'inputCaja4')"
-                  :onInput="(val) => newDniRuc = val"
-                  :classes="{input: 'form-control'}"
-                  >
-                  </autocomplete>
-                  <br>
-                  <label>Monto:</label>
-                  <b-form-group>
-                    <input v-model="selectProducto.Deposito" required type="number" class="form-control" step="0.01" placeholder="S/." />
-                  </b-form-group>
-                  <label>N° Cuenta - Descripción:</label>
-                  <b-form-group>
-                    <b-form-input v-model="selectProducto.DepositoDesc" required placeholder="Descripción"></b-form-input>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </div>
-            <template>
-              <b-btn variant="success" type="submit" @click="insertarDeposito">Guardar</b-btn>
-              <b-btn variant="secondary" @click="show=false">Cerrar</b-btn>
-            </template>
-          </b-form>
-        </b-tab>
-      
-      </b-tabs>
-   
-    <!-- MODAL AGREGAR  PROVEEDOR-->
-    <b-modal 
-      v-model="modalRegistro" 
-      title="Agregar Tipo Caja" 
-      backdrop="static" 
-      no-close-on-backdrop
-      no-close-on-esc 
-      hide-footer
-      no-stacking
-      container="body"  
-      v-if="modalRegistro"
-      modal-class="modalCajaBancos"
-      size="lg"
-      >
-        <b-row>
-          <b-col :cols="aplicarLetra?7:12">
-            <b-row>
-              <b-col cols="6">
-                <b-row>
-                  <b-col cols="12">
-                    Tipo Operación:
-                    <b-form-select
-                      v-model="IdTipoCajaBanco"
-                      :options="lstTipoOpe"
-                      value-field="IdTipoCajaBanco"
-                      text-field="TipoCajaBanco"
-                      @input="cambiarTipo($event)"
-                    ></b-form-select>
-                  </b-col>
-                  <b-col cols="12" v-if="mostrarCliente">
-                    Cliente:
-                    <autocomplete
-                        required="required"
-                        ref="inputCliente"
-                        :url="API + 'clientes'"
-                        anchor="ClienteDniRuc"
-                        label="writer"
-                        placeholder=""
-                        :onInput="(val) => newDniRuc = val"
-                        :on-select="setCliente" 
-                        :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                        :classes="{input: 'form-control'}">
-                    </autocomplete>
-                  </b-col>
-                  <b-col cols="12" v-if="mostrarProveedor">
-                    Proveedor
-                    <autocomplete
-                        required="required"
-                        ref="inputProveedor"
-                        :url="API + 'proveedor'"
-                        anchor="ProveedorDniRuc"
-                        label="writer"
-                        placeholder=""
-                        :onInput="(val) => newRuc = val"
-                        :on-select="setProveedor" 
-                        :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
-                        :classes="{input: 'form-control'}">
-                    </autocomplete>
-                  </b-col>
-                </b-row>
-              </b-col>
-              <b-col cols="6" v-if="mostrarDatosPrincipalesOperaciones">
-                <b-row>
-                  <b-col cols="12">
-                    Fecha Operacion: 
-                    <input type="date" class="form-control" v-model="FechaDoc">
-                  </b-col>
-                  <b-col cols="12">
-                    Concepto: 
-                    <input type="text" class="form-control" v-model="Concepto">
-                  </b-col>
-                  <b-col cols="12">
-                    Importe: 
-                    <input type="number" class="form-control" v-model="Importe">
-                  </b-col>
-                </b-row>
-              </b-col>
-              <b-col cols="12" class="mt-3">
+            <b-col cols="12" class="mt-3">
                 <div class="card">
-                  <div class="card-header">Documentos a aplicar</div>
-              
+                <div class="card-header">Documentos Aplicados</div>
                 <div class="card-body">
-                <table class="table">
-                    <thead>
-                      <tr style="background: #1A237E; color:#ffff;border: 1px solid #ffffff;">
-                        <th style="border: 1px solid #ffffff;">Id</th>
-                        <th style="border: 1px solid #ffffff;">Fecha</th>
-                        <th style="border: 1px solid #ffffff;">FechaVen</th>
-                        <th style="border: 1px solid #ffffff;">Correlativo</th>
-                        <th style="border: 1px solid #ffffff;">Total</th>
-                        <th style="border: 1px solid #ffffff;">Aplicado</th>
-                        <th style="border: 1px solid #ffffff;">Saldo</th>
-                        <th style="border: 1px solid #ffffff;"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(deuda,index) in lstDeudas" :key="index" :style="{background:deuda.Aplicado==1 ? '#FBE9E7' :''}">
-                        <td>{{deuda.Id}}</td>
-                        <td>{{deuda.FechaDoc}}</td>
-                        <td>{{deuda.FechaCredito}}</td>
-                        <td>{{deuda.Correlativo}}</td>
-                        <td>{{deuda.Total}}</td>
-                        <td>{{deuda.Aplicado}}</td>
-                        <td>{{deuda.Saldo}}</td>
-                        <td>
-                          <b-button @click="pagaLetra(deuda)" :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='MO'" style="width: 100%;" variant="warning">Pagar Letra</b-button>
-                          <b-button class="mx-1 my-1" v-else style="width: 100%;" variant="success" :disabled="!Importe || bloquearAplicar" @click="aplicarPago(deuda)">Aplicar</b-button>
-                          <!-- <b-button class="mx-1 my-1" style="width: 100%;" variant="success" :disabled="!Importe" @click="aplicarPago(deuda)">Aplicar</b-button> -->
-                          <b-button :disabled="bloquearAplicar" class="mx-1 my-1" v-if="deuda.Aplicado=='0'"  style="width: 100%;" variant="info" @click="generarLetras(deuda)">Letras</b-button>
-                        </td>
-
-                      </tr>
-                      <tr style="background: #BBDEFB; font-weight: bold; ">
-                        <td colspan="4" style="text-align: center;border: 1px solid #ffffff;">
-                          Sumatoria
-                        </td>
-                        <td style="border: 1px solid #ffffff;">
-                          {{ parseFloat(
-                              lstDeudas.reduce((sum,d)=>{
-                                return sum + parseFloat(d.Total)
-                              },0)
-                          ).toFixed(2) }}
-                        </td>
-                        <td colspan="3"></td>
-                        
-                      </tr>
-                    </tbody>
-                </table>
-              </div>
-              </div>
-              </b-col>
-              <b-col cols="12" class="mt-3">
-                  <div class="card">
-                  <div class="card-header">Documentos Aplicados</div>
-                  <div class="card-body">
-                    <table class="table table-hover">
-                    <thead>
-                      <tr style="background: #7986CB; border: 1px solid #ffffff;">
-                        <th style="border: 1px solid #ffffff;">Id</th>
-                        <th style="border: 1px solid #ffffff;">Fecha</th>
-                        <th style="border: 1px solid #ffffff;">FechaVen</th>
-                        <th style="border: 1px solid #ffffff;">Correlativo</th>
-                        <th style="border: 1px solid #ffffff;">Saldo</th>
-                        <th style="border: 1px solid #ffffff;">Aplicado</th>
-                        <th style="border: 1px solid #ffffff;">Saldo Fin</th>
-                        <!-- <th></th> -->
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(deuda,index) in lstAplicado" :key="index">
-                        <td>{{deuda.Id}}</td>
-                        <td>{{deuda.FechaDoc}}</td>
-                        <td>{{deuda.FechaCredito}}</td>
-                        <td>{{deuda.Correlativo}}</td>
-                        <td>{{deuda.Total}}</td>
-                        <td>{{deuda.Aplicado}}</td>
-                        <td>{{deuda.Saldo}}</td>
-                      </tr>
-                      <tr style="background: #BBDEFB; font-weight: bold;">
-                        <td colspan="5" style="text-align: center; border: 1px solid #ffffff;">
-                          Sumatoria
-                        </td>
-                        <td style="border: 1px solid #ffffff;">
-                          {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Aplicado)
-                          },0)
-                          ).toFixed(2) }}
-                        </td>
-                        <td>
-                          {{  parseFloat(
-                            lstAplicado.reduce((sum,deuda)=>{
-                            return sum + parseFloat(deuda.Saldo)
-                          },0)
-                          ).toFixed(2) }}
-                        </td>
-                      </tr>
-                    </tbody>
-                    </table>
-                    </div>
+                  <table class="table table-hover">
+                  <thead>
+                    <tr style="background: #7986CB; border: 1px solid #ffffff;">
+                      <th style="border: 1px solid #ffffff;">Id</th>
+                      <th style="border: 1px solid #ffffff;">Fecha</th>
+                      <th style="border: 1px solid #ffffff;">FechaVen</th>
+                      <th style="border: 1px solid #ffffff;">Correlativo</th>
+                      <th style="border: 1px solid #ffffff;">Saldo</th>
+                      <th style="border: 1px solid #ffffff;">Aplicado</th>
+                      <th style="border: 1px solid #ffffff;">Saldo Fin</th>
+                      <!-- <th></th> -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(deuda,index) in lstAplicado" :key="index">
+                      <td>{{deuda.Id}}</td>
+                      <td>{{deuda.FechaDoc}}</td>
+                      <td>{{deuda.FechaCredito}}</td>
+                      <td>{{deuda.Correlativo}}</td>
+                      <td>{{deuda.Total}}</td>
+                      <td>{{deuda.Aplicado}}</td>
+                      <td>{{deuda.Saldo}}</td>
+                    </tr>
+                    <tr style="background: #BBDEFB; font-weight: bold;">
+                      <td colspan="5" style="text-align: center; border: 1px solid #ffffff;">
+                        Sumatoria
+                      </td>
+                      <td style="border: 1px solid #ffffff;">
+                        {{ totalDocumentosAplicados }}
+                      </td>
+                      <td>
+                        {{ totalSaldoDocumentos }}
+                      </td>
+                    </tr>
+                  </tbody>
+                  </table>
                   </div>
-                  <div class="card-footer">
-                    <b-button :disabled="activarBtnGuardar()" variant="success" @click="GuardarMovimiento()">Guardar</b-button>
-                    <b-button variant="warning">Cancelar</b-button>
-                  </div>
-              </b-col>
-            </b-row>
-        </b-col>
-        <b-col :cols="aplicarLetra ?5:12" v-if="aplicarLetra">
-          <b-row>
-            <b-col cols="12">
-            <h3>Letras</h3>
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Fecha</th>
-                    <th>FechaVen</th>
-                    <th>Correlativo</th>
-                    <th>Total</th>
-                    <th>Aplicado</th>
-                    <th>Saldo</th>
-                  </tr>	
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ deuda.Id }}</td>
-                    <td>{{ deuda.FechaDoc }}</td>
-                    <td>{{ deuda.FechaCredito }}</td>
-                    <td>{{ deuda.Correlativo }}</td>
-                    <td>{{ deuda.Total }}</td>
-                    <td>{{ deuda.Aplicado }}</td>
-                    <td>{{ deuda.Saldo }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </b-col>
-            <b-col cols="12">
-              <b-form-group>
-                <b-input-group>
-             <span class="mr-5"> Número Letras: </span>
-              <b-button variant="info" @click="addLetra()">+</b-button> 
-              <input type="number" disabled class="form-control" v-model="nroLetras" style="max-width: 100px;">
-              <b-button variant="warning" :disabled="nroLetras==0" @click="removeLetra()" >-</b-button> 
-              </b-input-group>
-            </b-form-group>
-            </b-col>
-            <b-col cols="12">
-              <table class="table table-hover small">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Fecha Pago</th>
-                    <th>Monto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(letra,index) in letras" :key="index">
-                    <td>{{ index+1 }}</td>
-                    <td>
-                      <input type="date" class="form-control" v-model="letra.FechaLetra">
-                      <p style="color:red">{{ letra.errorFecha }}</p>
-                    </td>
-                    <td><input type="number" step="0.0001" class="form-control"   v-model="letra.MontoLetra"></td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">Total</td>
-                    <td colspan="1">
-                        {{ 
-                          parseFloat(
-                            letras.reduce((sum, letra) => {
-                              return sum + parseFloat(letra.MontoLetra);
-                            }, 0)
-                          ).toFixed(2)  
-                        }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <p style="color:red">{{ errorLetras }}</p>
-            </b-col>
-            <b-col cols="12">
-                <b-button :disabled="letras.length==0" variant="success" @click="guardarLetras()">Guardar</b-button>
-                <b-button  variant="danger" @click="aplicarLetra=!aplicarLetra">Cancelar</b-button>
+                </div>
+                <div class="card-footer">
+                  <b-alert :show="!!errorMovimiento" variant="danger">{{ errorMovimiento }}</b-alert>
+                  <p v-if="(Number(IdTipoCajaBanco) === 1 || Number(IdTipoCajaBanco) === 2) && !lstAplicado.length" class="text-muted small">Seleccione una deuda pendiente y aplique el importe para habilitar Guardar.</p>
+                  <b-button :disabled="activarBtnGuardar() || guardandoMovimiento" variant="success" @click="GuardarMovimiento()">{{ guardandoMovimiento ? 'Guardando...' : 'Guardar' }}</b-button>
+                  <b-button variant="warning">Cancelar</b-button>
+                </div>
             </b-col>
           </b-row>
-        </b-col>
+      </b-col>
+      <b-col :cols="aplicarLetra ?5:12" v-if="aplicarLetra">
+        <b-row>
+          <b-col cols="12">
+          <h3>Letras</h3>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>FechaVen</th>
+                  <th>Correlativo</th>
+                  <th>Total</th>
+                  <th>Aplicado</th>
+                  <th>Saldo</th>
+                </tr>	
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ deuda.Id }}</td>
+                  <td>{{ deuda.FechaDoc }}</td>
+                  <td>{{ deuda.FechaCredito }}</td>
+                  <td>{{ deuda.Correlativo }}</td>
+                  <td>{{ deuda.Total }}</td>
+                  <td>{{ deuda.Aplicado }}</td>
+                  <td>{{ deuda.Saldo }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+          <b-col cols="12">
+            <b-form-group>
+              <b-input-group>
+           <span class="mr-5"> Número Letras: </span>
+            <b-button variant="info" @click="addLetra()">+</b-button> 
+            <input type="number" disabled class="form-control" v-model="nroLetras" style="max-width: 100px;">
+            <b-button variant="warning" :disabled="nroLetras==0" @click="removeLetra()" >-</b-button> 
+            </b-input-group>
+          </b-form-group>
+          </b-col>
+          <b-col cols="12">
+            <table class="table table-hover small">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Fecha Pago</th>
+                  <th>Monto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(letra,index) in letras" :key="index">
+                  <td>{{ index+1 }}</td>
+                  <td>
+                    <input type="date" class="form-control" v-model="letra.FechaLetra">
+                    <p style="color:red">{{ letra.errorFecha }}</p>
+                  </td>
+                  <td><input type="number" step="0.0001" class="form-control"   v-model="letra.MontoLetra"></td>
+                </tr>
+                <tr>
+                  <td colspan="2">Total</td>
+                  <td colspan="1">
+                      {{ 
+                        parseFloat(
+                          letras.reduce((sum, letra) => {
+                            return sum + parseFloat(letra.MontoLetra);
+                          }, 0)
+                        ).toFixed(2)  
+                      }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="color:red">{{ errorLetras }}</p>
+          </b-col>
+          <b-col cols="12">
+              <b-button :disabled="letras.length==0" variant="success" @click="guardarLetras()">Guardar</b-button>
+              <b-button  variant="danger" @click="aplicarLetra=!aplicarLetra">Cancelar</b-button>
+          </b-col>
         </b-row>
-    </b-modal>
-  </b-container>
+      </b-col>
+      </b-row>
+  </b-modal>
+</b-container>
 </template>
 
 <script>
@@ -527,6 +517,8 @@ export default {
         DepositoDesc: ""
       },
       Tipo: "",
+      guardandoMovimiento: false,
+      errorMovimiento: "",
       bloquearAplicar: false,
       errorLetras: "",
       letras: [],
@@ -565,6 +557,7 @@ export default {
   },
   methods: {
     abrirModalNuevaOperacion() {
+      this.errorMovimiento = "";
       this.modalRegistro = true;
     },
     addLetra() {
@@ -637,10 +630,18 @@ export default {
       });
     },
     setCliente(obj) {
+      this.lstDeudas = [];
+      this.lstAplicado = [];
+      this.bloquearAplicar = false;
+      this.errorMovimiento = "";
       this.Cliente = obj;
       this.getClienteDeudas();
     },
     setProveedor(obj) {
+      this.lstDeudas = [];
+      this.lstAplicado = [];
+      this.bloquearAplicar = false;
+      this.errorMovimiento = "";
       this.Proveedor = obj;
       this.getProveedorDeudas();
     },
@@ -739,6 +740,9 @@ export default {
       });
     },
     async GuardarMovimiento() {
+      if (this.guardandoMovimiento || this.activarBtnGuardar()) return;
+      this.guardandoMovimiento = true;
+      this.errorMovimiento = '';
       let data = {
         IdTipoCajaBanco: this.IdTipoCajaBanco,
         IdCuenta: this.IdCuenta,
@@ -751,10 +755,15 @@ export default {
         IdProveedor: this.Proveedor ? this.Proveedor.IdProveedor : null,
         User: sessionStorage.getItem("User")
       };
-      await this.axios.post(`${this.API}movimiento/guardarMovimiento`, data);
-      this.cargarOperaciones();
-      this.modalRegistro = false;
-      this.limpiarLuegoPago();
+      try {
+        const response = await this.axios.post(`${this.API}movimiento/guardarMovimiento`, data);
+        if (!Number(response.data)) throw new Error('El servidor no confirmó el guardado.');
+        this.limpiarLuegoPago();
+        this.$toasted.success('Movimiento guardado correctamente.');
+        try { await this.cargarOperaciones(); } catch (refreshError) { this.$toasted.show('Movimiento guardado. Actualice la lista para visualizarlo.'); }
+      } catch (error) {
+        this.errorMovimiento = (error.response && error.response.data && error.response.data.error) || error.message || 'No se pudo guardar el movimiento.';
+      } finally { this.guardandoMovimiento = false; }
     },
     limpiarLuegoPago() {
       this.bloquearAplicar = false;
@@ -989,23 +998,20 @@ export default {
         });
     },
     activarBtnGuardar() {
-      if (!!this.IdTipoCajaBanco) {
-        let tipoOperacion = this.lstTipoOpe.find(
-          v => v.IdTipoCajaBanco == this.IdTipoCajaBanco
-        );
-        let IdTipoCajaBancos = [1, 2];
-        if (IdTipoCajaBancos.includes(tipoOperacion.IdTipoCajaBanco)) {
-          return this.lstAplicado.length == 0;
-        }
-
-        // lstAplicado.length==0
-        return !this.Importe;
+      const operation = this.lstTipoOpe.find(v => Number(v.IdTipoCajaBanco) === Number(this.IdTipoCajaBanco));
+      if (!operation || !this.IdCuenta || !this.FechaDoc || !String(this.Concepto || '').trim() || !Number.isFinite(Number(this.Importe)) || Number(this.Importe) <= 0) return true;
+      if ([1, 2].includes(Number(operation.IdTipoCajaBanco))) {
+        if (!this.lstAplicado.length) return true;
+        if (Number(operation.Tipo) === 1 && !(this.Proveedor && this.Proveedor.IdProveedor)) return true;
+        if (Number(operation.Tipo) === 0 && !(this.Cliente && this.Cliente.IdCliente)) return true;
       }
-
-      return true;
+      return false;
     }
   },
   computed: {
+    totalDocumentosPendientes() { return (this.lstDeudas || []).reduce((sum, item) => sum + (Number(item.Total) || 0), 0).toFixed(2); },
+    totalDocumentosAplicados() { return (this.lstAplicado || []).reduce((sum, item) => sum + (Number(item.Aplicado) || 0), 0).toFixed(2); },
+    totalSaldoDocumentos() { return (this.lstAplicado || []).reduce((sum, item) => sum + (Number(item.Saldo) || 0), 0).toFixed(2); },
     mostrarProveedor() {
       if (this.IdTipoCajaBanco) {
         return this.lstTipoOpe.some(

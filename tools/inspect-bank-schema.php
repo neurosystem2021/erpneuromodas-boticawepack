@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$d=appPdoConnection();foreach(['Cb_Cuenta','Cb_TipoCajaBanco','Cb_CajaBanco','Ve_DocVenta'] as $table){echo $table.PHP_EOL;if(in_array($table,['Cb_Cuenta','Cb_TipoCajaBanco']))echo json_encode($d->query('SELECT * FROM '.$table)->fetchAll(PDO::FETCH_ASSOC));else echo implode(',',array_column($d->query('SHOW COLUMNS FROM '.$table)->fetchAll(PDO::FETCH_ASSOC),'Field'));echo PHP_EOL;}

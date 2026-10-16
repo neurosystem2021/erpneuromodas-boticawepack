@@ -1,354 +1,354 @@
 <template>
-    <b-container fluid>
-      <b-row>
+<b-container fluid class="nst-screen nst-screen--cargarcomprasxml">
+  <section class="nst-panel nst-panel--filters"><b-row class="nst-document-grid">
 
-      
-      <b-col md="8">
-        <b-row>
-          <b-col md="4">
-            <b-form-group>
-              <label>Tipo de Movimiento:</label>
-              <autocomplete
-                required="required"
-                ref="inputMovimiento"
-                :url="API + 'movimientos/tipos'"
-                anchor="TipoMovimiento"
-                label="writer"
-                placeholder=""
-                :on-select="setTipoMovimiento"
-                :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
-                :classes="{input: 'form-control'}">
-              </autocomplete>
-            </b-form-group>
-          </b-col>
-          <b-col md="4">
-                    <b-form-group>
-                      <label>Proveedor:</label>
-                      <input type="text" :value="Proveedor" class="form-control" readonly>
-                    </b-form-group>
-            </b-col>
-
-            <b-col md="4">
-                    <b-form-group>
-                      <label>Periodo Tributario:</label>
-                      <b-form-input v-model="movimiento.FechaPeriodoTributario"
-                        type="text"
-                        readonly="readonly"
-                        placeholder="Periodo Tributario"></b-form-input>
-                    </b-form-group>
-            </b-col>
-
-            <b-col md="4" v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
-              <b-form-group>
-                <label>Almacen Origen:</label>
-                <autocomplete
-                  ref="inputAlmacenOrigen"
-                  required="required"
-                  initValue=""
-                  :url="API + 'almacenes'"
-                  anchor="Almacen"
-                  label="writer"
-                  placeholder=""
-                  :on-select="setAlmacenOrigen"
-                  :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
-                  :classes="{input: 'form-control'}">
-                </autocomplete>
-              </b-form-group>
-            </b-col>
-
-            <b-col md="4" v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
-                    <b-form-group>
-                      <label>Almacen Destino:</label>
-                      <autocomplete
-                        ref="inputAlmacenDestino"
-                        required="required"
-                        initValue=""
-                        :url="API + 'almacenes'"
-                        anchor="Almacen"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setAlmacenDestino"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-
-            <b-col cols="12" class="mb-3" v-if="activarCargarXML">
-                Cargar XML
-                <b-form-file ref="fileInput" @change="leerXML" accept=".xml" browse-text="Cargar Archivo xml"> </b-form-file>
-            </b-col>
-            
-            
-            
-        </b-row>
+  
+  <b-col md="8" class="nst-subsection">
+    <b-row>
+      <b-col md="4">
+        <b-form-group>
+          <label>Tipo de Movimiento:</label>
+          <autocomplete
+            required="required"
+            ref="inputMovimiento"
+            :url="API + 'movimientos/tipos'"
+            anchor="TipoMovimiento"
+            label="writer"
+            placeholder=""
+            :on-select="setTipoMovimiento"
+            :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+        </b-form-group>
       </b-col>
-     <b-col md="4">
-                <b-row>
-                  <b-col md="4">
-                    <b-form-group>
-                      <label>Serie:</label>                    
-                      <b-form-input v-model="movimiento.Serie"
-                        required="required"
-                        @input="cargarNumero"
-                        type="text"
-                        ref="txtcargarNumero"
+      <b-col md="4">
+                <b-form-group>
+                  <label>Proveedor:</label>
+                  <input type="text" :value="Proveedor" class="form-control" readonly>
+                </b-form-group>
+        </b-col>
 
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Número:</label>                    
-                      <b-form-input v-model="movimiento.Numero"
-                        required="required"
-                        type="text"
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Moneda:</label>
-                      <autocomplete
-                        ref="inputMoneda"
-                        :url="API + 'monedas'"
-                        initValue="USD"
-                        anchor="Moneda"
-                        label="writer"
-                        placeholder="Moneda"
-                        :on-select="setMoneda"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
+        <b-col md="4">
+                <b-form-group>
+                  <label>Periodo Tributario:</label>
+                  <b-form-input v-model="movimiento.FechaPeriodoTributario"
+                    type="text"
+                    readonly="readonly"
+                    placeholder="Periodo Tributario"></b-form-input>
+                </b-form-group>
+        </b-col>
+
+        <b-col md="4" v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
+          <b-form-group>
+            <label>Almacen Origen:</label>
+            <autocomplete
+              ref="inputAlmacenOrigen"
+              required="required"
+              initValue=""
+              :url="API + 'almacenes'"
+              anchor="Almacen"
+              label="writer"
+              placeholder=""
+              :on-select="setAlmacenOrigen"
+              :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
+              :classes="{input: 'form-control'}">
+            </autocomplete>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="4" v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
+                <b-form-group>
+                  <label>Almacen Destino:</label>
+                  <autocomplete
+                    ref="inputAlmacenDestino"
+                    required="required"
+                    initValue=""
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacenDestino"
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
+                    :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+
+        <b-col cols="12" class="mb-3" v-if="activarCargarXML">
+            Cargar XML
+            <b-form-file ref="fileInput" @change="leerXML" accept=".xml" browse-text="Cargar Archivo xml"> </b-form-file>
+        </b-col>
+        
+        
+        
+    </b-row>
+  </b-col>
+ <b-col md="4" class="nst-subsection">
+            <b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <label>Serie:</label>                    
+                  <b-form-input v-model="movimiento.Serie"
+                    required="required"
+                    @input="cargarNumero"
+                    type="text"
+                    ref="txtcargarNumero"
+
+                    placeholder=""></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Número:</label>                    
+                  <b-form-input v-model="movimiento.Numero"
+                    required="required"
+                    type="text"
+                    placeholder=""></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Moneda:</label>
+                  <autocomplete
+                    ref="inputMoneda"
+                    :url="API + 'monedas'"
+                    initValue="USD"
+                    anchor="Moneda"
+                    label="writer"
+                    placeholder="Moneda"
+                    :on-select="setMoneda"
+                    :classes="{input: 'form-control'}">
+                  </autocomplete>
+                </b-form-group>
+              </b-col>
+              <b-col md="8">
+                <b-form-group>
+                  <label>Fecha Contable:</label>
+                  <b-form-input
+                    v-model="movimiento.MovimientoFecha"
+                    type="datetime-local"
+                    step="1"
+                    placeholder="Fecha Contable"
+                    ></b-form-input>
+
+                </b-form-group>
+                <b-form-group>
+                  <label>Fecha Stock:</label>
+                  <b-form-input
+                    v-model="movimiento.FechaStock"
+                    type="date"
+                    placeholder="Fecha Stock"
+                    ></b-form-input>
+                </b-form-group>
+                <b-form-group>
+                  <label>Tipo de cambio:</label>
+                  <input v-model.number="movimiento.TipoCambio"
+                    type="number"
+                    class="form-control"
+                    step="0.0001"
+                    placeholder="Tipo de cambio"/>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </b-col>
+
+          <b-col cols="12" v-if="mostrarAnadirProductos" class="nst-xml-detail">
+            <span>Recuerde solo añadir, en caso reconozca un producto y no lo haya podido encontrar el sistema</span>
+            <b-input-group>
+
+            
+              <autocomplete
+              ref="autocompleteProducto"
+              :url="APIProductos"
+              :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+              :onShouldRenderChild="renderChild"
+              anchor="Producto"
+              label="writer"
+              placeholder="Agregar Producto"
+              :on-select="setProducto"
+              :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+              id="txtAddProduct"
+              @keydown.native.prevent.tab="irtxtBarcode"
+              :classes="{input: 'form-control'}">
+            </autocomplete>
+            <input 
+              id="txtBarcode"
+              v-model="loadCode"
+              @keydown.prevent.tab="irtxtAddProduct"
+              @keydown.enter.prevent="loadBarcode"
+              type="text"
+              class="form-control"
+              placeholder="Codigo de Barra" />
+              <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
+            </b-input-group>
+          </b-col>
+
+          <b-col cols="12" class="mt-2 nst-xml-detail">
+           <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table width="100%" class="table">
+            <thead>
+                <tr>
+                    <th>Grupo</th>
+                    <th>Stock</th>
+                    <th>Cod. Barra</th>
+                    <th>Artículo</th>
+                    <th>Marca</th>
+                    <th></th>
+                    <th>Presentación</th>
+                    
+                    <th style="text-align: center;">Cantidad x Pres</th>
+                    <th style="text-align: center;">Cantidad</th>
+                    <th style="text-align: center;">P/ U</th>
+                   
+                    <th style="text-align: center;">Precio Venta </th>
+                    <th style="text-align: center;">SubTotal</th>
+                    <th style="text-align: center;">IGV </th>
+                    <th style="text-align: center;">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(producto,index) in lstProductos" :key="index" :style="`background: ${producto.background};`">
+                <td>
+                  <b-badge pill variant="info">
+                    {{producto.orden }}
+                  </b-badge>
+                </td>
+                <td> {{producto.stock }}</td>
+                <td class="px-2" > {{producto.CodigoBarra}} </td>
+                <td class="px-2" >{{ producto.Producto }}</td>
+                <td class="px-2" >
+                  <span >
+                    {{ producto.ProductoMarca }}
+                  </span>
+
+                  <!-- <autocomplete v-else
+                    required="required"
+                    :url="API + 'marcas'"
+                    :ref="`inputMarca${index}`"
+                    anchor="ProductoMarca"
+                    label="writer"
+                    :placeholder.sync="producto.ProductoMarca"
+                    :on-select="(val) => setMarca(val, index)"
+                    :onFocus="focusAutocomplete.bind(null, `inputMarca${index}`)"                
+                    :classes="{input: 'form-control upper'}">
+                  </autocomplete> -->
+
+                </td>
+                <td> 
+                  <b-button variant="info" v-if="producto.TienePresentacion" @click="abrirModalPresentacion(producto,index)">
+                    <i class="fas fa-list" ></i>
+                  </b-button>
+                  </td>
+                  <td> 
+                  <input type="text" v-model="producto.ProductoMedicion"  :disabled="!producto.editable" class="form-control" style="width: 120px;">
+                </td>
+                <td class="px-2" style="text-align: center;"> <input type="number" v-if="producto.esPresentacion" v-model="producto.precantidad" class="form-control" style="width: 90px;"> </td>
+                <td class="px-2" style="text-align: center;"> <input type="number" :disabled="!producto.editable"  v-if="!producto.esPresentacion" v-model="producto.cantidad" @input="camnbiarIGV(index)" class="form-control" style="width: 90px;"> </td>
+                <!-- <td class="px-2" style="text-align: center;"> PrecioCosto - {{ producto.PrecioCosto }}</td> -->
+                <td class="px-2" style="text-align: center;">
+                  <input type="number" v-model="producto.precioUnitario" v-if="producto.editable" class="form-control" style="width: 90px;" @input="camnbiarIGV(index)">
+                   <span v-else> {{ producto.precioUnitario }} </span>
+                </td>
+                <td class="px-2" style="text-align: center;"> <input type="number"  v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
+                <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad ).toFixed(2) }}</td>
+               
+                <td class="px-2" style="text-align: center;"> 
+                    <b-form-checkbox
+                      id="checkbox-1"
+                      v-model="producto.tieneIgv"
+                      value="1"
+                      unchecked-value="0"
+                      :disabled="!producto.editable"
+                      @change="camnbiarIGV(index)"
+                    >
+                    {{ producto.igv }}
+                    </b-form-checkbox>
+
+                </td>
+                
+                <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad + parseFloat(producto.igv)).toFixed(2)  }}</td>
+                <td>
+                  <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
+                  <b-button variant="success" v-else @click="nuevoProducto(producto,index)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
+                  <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
+                </td>
+              </tr>
+            </tbody>
+           </table></div>
+        </b-col>
+
+        <producto-form @productoactualizado="productoactualizado" :showButton="false" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
+                  
+
+        <b-col cols="12" md="4" class="nst-xml-detail">
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table width="100%" class="table"> 
+            <tbody>
+              <tr>
+                <td> <b>Total Factura XML</b></td>
+                <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
+              </tr>
+              <tr>
+                <td> <b>Total Factura</b></td>
+                <td style="background: rgb(245, 198, 203);"> {{ totalFactura }}</td>
+              </tr>
+            </tbody>
+          </table></div>
+        </b-col>
+        <b-col cols="12" v-if="mostrarAdvertencia" class="mt-2 nst-xml-detail">
+          <b-alert show variant="warning">
+            <li>
+              Si el Proveedor no se encuentra registrado, será incorporado al sistema mediante un registro automático.
+            </li>
+           <li>
+             Aquellos productos que no cuenten con un código de barras serán incorporados al sistema mediante un registro automático, durante el cual se les asignará un código.
+
+           </li>
+          </b-alert>
+        </b-col>
+        <b-col cols="12" style="text-align: center;" v-if="lstProductos.length class="nst-xml-detail">0">
+            <b-button variant="success" @click="registrarIngreso"> Guardar </b-button>
+        </b-col>
+        </b-row></section>
+        <b-modal v-model="modalPresentacion" size="lg" hide-footer hide-heade modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+          <div class="d-block text-center">
+            <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
+            <h5>Presentaciones</h5>
+          </div>
+          <b-row>
+            <b-col cols="6">
+               <b-card
+                  align="center"
+                  class="mb-3 contentCard"
+                  @click="cambiarPresentacion(null,'UNIDAD')"
+               >
+               <b-row>
+                  <b-col cols="6" class="nomCart">
+                    UNIDAD
                   </b-col>
-                  <b-col md="8">
-                    <b-form-group>
-                      <label>Fecha Contable:</label>
-                      <b-form-input
-                        v-model="movimiento.MovimientoFecha"
-                        type="datetime-local"
-                        step="1"
-                        placeholder="Fecha Contable"
-                        ></b-form-input>
-
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Fecha Stock:</label>
-                      <b-form-input
-                        v-model="movimiento.FechaStock"
-                        type="date"
-                        placeholder="Fecha Stock"
-                        ></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Tipo de cambio:</label>
-                      <input v-model.number="movimiento.TipoCambio"
-                        type="number"
-                        class="form-control"
-                        step="0.0001"
-                        placeholder="Tipo de cambio"/>
-                    </b-form-group>
+                  <b-col cols="6">
+                    <b>Cant.</b> 1
+                    <b>Precio.</b> {{ producto.PrecioContado }}
                   </b-col>
                 </b-row>
-              </b-col>
-
-              <b-col cols="12" v-if="mostrarAnadirProductos">
-                <span>Recuerde solo añadir, en caso reconozca un producto y no lo haya podido encontrar el sistema</span>
-                <b-input-group>
-
-                
-                  <autocomplete
-                  ref="autocompleteProducto"
-                  :url="APIProductos"
-                  :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
-                  :onShouldRenderChild="renderChild"
-                  anchor="Producto"
-                  label="writer"
-                  placeholder="Agregar Producto"
-                  :on-select="setProducto"
-                  :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-                  id="txtAddProduct"
-                  @keydown.native.prevent.tab="irtxtBarcode"
-                  :classes="{input: 'form-control'}">
-                </autocomplete>
-                <input 
-                  id="txtBarcode"
-                  v-model="loadCode"
-                  @keydown.prevent.tab="irtxtAddProduct"
-                  @keydown.enter.prevent="loadBarcode"
-                  type="text"
-                  class="form-control"
-                  placeholder="Codigo de Barra" />
-                  <b-button variant="primary" @click="loadBarcode"><i class="fas fa-search"></i></b-button>
-                </b-input-group>
-              </b-col>
-
-              <b-col cols="12" class="mt-2">
-               <table width="100%" class="table">
-                <thead>
-                    <tr>
-                        <th>Grupo</th>
-                        <th>Stock</th>
-                        <th>Cod. Barra</th>
-                        <th>Artículo</th>
-                        <th>Marca</th>
-                        <th></th>
-                        <th>Presentación</th>
-                        
-                        <th style="text-align: center;">Cantidad x Pres</th>
-                        <th style="text-align: center;">Cantidad</th>
-                        <th style="text-align: center;">P/ U</th>
-                       
-                        <th style="text-align: center;">Precio Venta </th>
-                        <th style="text-align: center;">SubTotal</th>
-                        <th style="text-align: center;">IGV </th>
-                        <th style="text-align: center;">Total</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(producto,index) in lstProductos" :key="index" :style="`background: ${producto.background};`">
-                    <td>
-                      <b-badge pill variant="info">
-                        {{producto.orden }}
-                      </b-badge>
-                    </td>
-                    <td> {{producto.stock }}</td>
-                    <td class="px-2" > {{producto.CodigoBarra}} </td>
-                    <td class="px-2" >{{ producto.Producto }}</td>
-                    <td class="px-2" >
-                      <span >
-                        {{ producto.ProductoMarca }}
-                      </span>
-
-                      <!-- <autocomplete v-else
-                        required="required"
-                        :url="API + 'marcas'"
-                        :ref="`inputMarca${index}`"
-                        anchor="ProductoMarca"
-                        label="writer"
-                        :placeholder.sync="producto.ProductoMarca"
-                        :on-select="(val) => setMarca(val, index)"
-                        :onFocus="focusAutocomplete.bind(null, `inputMarca${index}`)"                
-                        :classes="{input: 'form-control upper'}">
-                      </autocomplete> -->
-
-                    </td>
-                    <td> 
-                      <b-button variant="info" v-if="producto.TienePresentacion" @click="abrirModalPresentacion(producto,index)">
-                        <i class="fas fa-list" ></i>
-                      </b-button>
-                      </td>
-                      <td> 
-                      <input type="text" v-model="producto.ProductoMedicion"  :disabled="!producto.editable" class="form-control" style="width: 120px;">
-                    </td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" v-if="producto.esPresentacion" v-model="producto.precantidad" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;"> <input type="number" :disabled="!producto.editable"  v-if="!producto.esPresentacion" v-model="producto.cantidad" @input="camnbiarIGV(index)" class="form-control" style="width: 90px;"> </td>
-                    <!-- <td class="px-2" style="text-align: center;"> PrecioCosto - {{ producto.PrecioCosto }}</td> -->
-                    <td class="px-2" style="text-align: center;">
-                      <input type="number" v-model="producto.precioUnitario" v-if="producto.editable" class="form-control" style="width: 90px;" @input="camnbiarIGV(index)">
-                       <span v-else> {{ producto.precioUnitario }} </span>
-                    </td>
-                    <td class="px-2" style="text-align: center;"> <input type="number"  v-model="producto.PrecioContado" class="form-control" style="width: 90px;"> </td>
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad ).toFixed(2) }}</td>
-                   
-                    <td class="px-2" style="text-align: center;"> 
-                        <b-form-checkbox
-                          id="checkbox-1"
-                          v-model="producto.tieneIgv"
-                          value="1"
-                          unchecked-value="0"
-                          :disabled="!producto.editable"
-                          @change="camnbiarIGV(index)"
-                        >
-                        {{ producto.igv }}
-                        </b-form-checkbox>
-
-                    </td>
-                    
-                    <td class="px-2" style="text-align: center;">{{ parseFloat(producto.PrecioCosto * producto.cantidad + parseFloat(producto.igv)).toFixed(2)  }}</td>
-                    <td>
-                      <b-button variant="warning" v-if="producto.IdProducto" @click="editarProducto(producto)"><i  class="fa fa-edit" aria-hidden="true"></i></b-button>
-                      <b-button variant="success" v-else @click="nuevoProducto(producto,index)"> <i class="fa fa-plus" aria-hidden="true"></i></b-button>
-                      <b-button variant="danger" @click="eliminar(index)"><i  class="fa fa-trash" aria-hidden="true"></i></b-button>
-                    </td>
-                  </tr>
-                </tbody>
-               </table>
+              </b-card>
             </b-col>
-
-            <producto-form @productoactualizado="productoactualizado" :showButton="false" ref="productoFormEdit" :producto-update="productoSelect"></producto-form>
-                      
-
-            <b-col cols="12" md="4">
-              <table width="100%" class="table"> 
-                <tbody>
-                  <tr>
-                    <td> <b>Total Factura XML</b></td>
-                    <td style="background: rgb(245, 198, 203);"> {{ parseFloat(totalFacturaXML).toFixed(1) }}</td>
-                  </tr>
-                  <tr>
-                    <td> <b>Total Factura</b></td>
-                    <td style="background: rgb(245, 198, 203);"> {{ totalFactura }}</td>
-                  </tr>
-                </tbody>
-              </table>
+            <b-col cols="6" v-for="(pres,index) in producto.presentacion" :key="index">
+               <b-card
+                 align="center"
+                  class="mb-3 contentCard"
+                  @click="cambiarPresentacion(pres,'PRESENTACION')"
+               >
+               <b-row>
+                  <b-col cols="6" class="nomCart">
+                    {{pres.nombre}}
+                  </b-col>
+                  <b-col cols="6">
+                    <b>Cant.</b> {{pres.cantidad}}
+                    <b>Precio.</b> {{ pres.precio }}
+                  </b-col>
+                </b-row>
+              </b-card>
             </b-col>
-            <b-col cols="12" v-if="mostrarAdvertencia" class="mt-2">
-              <b-alert show variant="warning">
-                <li>
-                  Si el Proveedor no se encuentra registrado, será incorporado al sistema mediante un registro automático.
-                </li>
-               <li>
-                 Aquellos productos que no cuenten con un código de barras serán incorporados al sistema mediante un registro automático, durante el cual se les asignará un código.
-
-               </li>
-              </b-alert>
-            </b-col>
-            <b-col cols="12" style="text-align: center;" v-if="lstProductos.length>0">
-                <b-button variant="success" @click="registrarIngreso"> Guardar </b-button>
-            </b-col>
-            </b-row>
-            <b-modal v-model="modalPresentacion" size="lg" hide-footer hide-heade>
-              <div class="d-block text-center">
-                <h3 style="text-decoration: underline;">{{producto.Producto}}</h3>
-                <h5>Presentaciones</h5>
-              </div>
-              <b-row>
-                <b-col cols="6">
-                   <b-card
-                      align="center"
-                      class="mb-3 contentCard"
-                      @click="cambiarPresentacion(null,'UNIDAD')"
-                   >
-                   <b-row>
-                      <b-col cols="6" class="nomCart">
-                        UNIDAD
-                      </b-col>
-                      <b-col cols="6">
-                        <b>Cant.</b> 1
-                        <b>Precio.</b> {{ producto.PrecioContado }}
-                      </b-col>
-                    </b-row>
-                  </b-card>
-                </b-col>
-                <b-col cols="6" v-for="(pres,index) in producto.presentacion" :key="index">
-                   <b-card
-                     align="center"
-                      class="mb-3 contentCard"
-                      @click="cambiarPresentacion(pres,'PRESENTACION')"
-                   >
-                   <b-row>
-                      <b-col cols="6" class="nomCart">
-                        {{pres.nombre}}
-                      </b-col>
-                      <b-col cols="6">
-                        <b>Cant.</b> {{pres.cantidad}}
-                        <b>Precio.</b> {{ pres.precio }}
-                      </b-col>
-                    </b-row>
-                  </b-card>
-                </b-col>
-              </b-row>
-            </b-modal>
-    </b-container>
-  </template>
+          </b-row>
+        </b-modal>
+</b-container>
+</template>
   
   <script>
 import config from "@/store/config.js";

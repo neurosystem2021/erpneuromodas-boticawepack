@@ -101,3 +101,6 @@ new Vue({
   components: { App },
   template: '<App/>'
 })
+
+import './legacy-migrations/remision-modern.css'
+import './legacy-migrations/remision-modern.js'

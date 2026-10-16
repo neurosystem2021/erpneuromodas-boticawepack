@@ -1,183 +1,183 @@
 b-col<template>
-  <b-container fluid>
+<b-container fluid class="nst-screen nst-screen--configuraroferta">
+  <section class="nst-panel nst-panel--results"><b-row>
+    <b-col cols="12"> 
+      <h1>Ofertas</h1>
+    </b-col>
+    <b-col cols="12" style="text-align: end;"> 
+      <b-button variant="success" class="my-2" @click="abrirModalRegistro()"> Nueva Oferta </b-button>
+    </b-col>
+    <b-col cols="12"> 
+      <b-table :fields="headers" :items="lstOferta" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+        <template slot="estado" slot-scope="data">
+          {{ data.item.Estado ==1 ? "Activo" : "Inactivo" }}
+        </template>
+        <template slot="action" slot-scope="data">
+          <b-button variant="info" v-if="data.item.Estado ==1" @click="abrirEditar(data.item)"><i class="fas fa-edit"></i></b-button>
+          <b-button variant="danger" v-if="data.item.Estado ==1" @click="eliminar(data.item)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
+          <!-- {{ data.item.Estado ==1 ? "Activo" : "Inactivo" }} -->
+        </template>
+        <template slot="ProductoFlag" slot-scope="data">
+            <i v-if="data.item.ProductoFlag==1" class="fa fa-check" aria-hidden="true"></i>
+            <i v-else class="fa fa-times" aria-hidden="true"></i>
+
+        </template>
+        <template slot="MontoFlag" slot-scope="data">
+            <i v-if="data.item.MontoFlag==1" class="fa fa-check" aria-hidden="true"></i>
+            <i v-else class="fa fa-times" aria-hidden="true"></i>
+
+        </template>
+        <!-- <template slot="CantidadFlag" slot-scope="data">
+            <i v-if="data.item.CantidadFlag==1" class="fa fa-check" aria-hidden="true"></i>
+            <i v-else class="fa fa-times" aria-hidden="true"></i>
+
+        </template> -->
+      </b-table>
+    </b-col>
+
+  </b-row></section>
+  <b-modal v-model="nuevaOfertaFlag" size="lg" title="Nueva Oferta" hide-footer modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
     <b-row>
-      <b-col cols="12"> 
-        <h1>Ofertas</h1>
+      <b-col cols="12">
+            <b-form-checkbox v-model="formulario.ProductoFlag" unchecked-value="0" value="1"> Producto </b-form-checkbox>
+            <b-form-checkbox v-model="formulario.MontoFlag" unchecked-value="0" value="1"> Monto </b-form-checkbox>
+            <!-- <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox> -->
       </b-col>
-      <b-col cols="12" style="text-align: end;"> 
-        <b-button variant="success" class="my-2" @click="abrirModalRegistro()"> Nueva Oferta </b-button>
-      </b-col>
-      <b-col cols="12"> 
-        <b-table :fields="headers" :items="lstOferta">
-          <template slot="estado" slot-scope="data">
-            {{ data.item.Estado ==1 ? "Activo" : "Inactivo" }}
-          </template>
-          <template slot="action" slot-scope="data">
-            <b-button variant="info" v-if="data.item.Estado ==1" @click="abrirEditar(data.item)"><i class="fas fa-edit"></i></b-button>
-            <b-button variant="danger" v-if="data.item.Estado ==1" @click="eliminar(data.item)"><i class="fa fa-trash" aria-hidden="true"></i></b-button>
-            <!-- {{ data.item.Estado ==1 ? "Activo" : "Inactivo" }} -->
-          </template>
-          <template slot="ProductoFlag" slot-scope="data">
-              <i v-if="data.item.ProductoFlag==1" class="fa fa-check" aria-hidden="true"></i>
-              <i v-else class="fa fa-times" aria-hidden="true"></i>
+      <b-col cols="12" v-if="mostrarSiguientePaso()">
+        <b-form @submit="guardar">
+        <b-row>
+          <b-col cols="12" v-if="formulario.ProductoFlag" class="mt-3"> 
+            Producto
+            <autocomplete
+            ref="autocompleteProducto"
+            :url="APIProductos"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProducto"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+          </b-col>
+          <b-col cols="12" v-if="formulario.MontoFlag"> Monto
+            <input type="number" v-model="formulario.Monto" class="form-control">
 
-          </template>
-          <template slot="MontoFlag" slot-scope="data">
-              <i v-if="data.item.MontoFlag==1" class="fa fa-check" aria-hidden="true"></i>
-              <i v-else class="fa fa-times" aria-hidden="true"></i>
+          </b-col>
+          <!-- <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
+            <input type="number" v-model="formulario.Cantidad" class="form-control">
 
-          </template>
-          <!-- <template slot="CantidadFlag" slot-scope="data">
-              <i v-if="data.item.CantidadFlag==1" class="fa fa-check" aria-hidden="true"></i>
-              <i v-else class="fa fa-times" aria-hidden="true"></i>
+          </b-col>
+         -->
+          <b-col cols="12">
+            Descripcion
+            <textarea rows="1" v-model="formulario.Descripcion" class="form-control"  style="overflow:hidden; resize:none;"></textarea>  
+          </b-col>
+          <b-col cols="12">
+            Porcentaje
+            <input type="number" v-model="formulario.Porcentaje" class="form-control">  
+          </b-col>
+          <b-col cols="6">
+            Desde
+            <input type="date" v-model="formulario.FechaDesde" required class="form-control"> 
 
-          </template> -->
-        </b-table>
-      </b-col>
+          </b-col>
+          <b-col cols="6">
+            Hasta
+            <input type="date" v-model="formulario.FechaHasta" required class="form-control"> 
 
-    </b-row>
-    <b-modal v-model="nuevaOfertaFlag" size="lg" title="Nueva Oferta" hide-footer>
-      <b-row>
-        <b-col cols="12">
-              <b-form-checkbox v-model="formulario.ProductoFlag" unchecked-value="0" value="1"> Producto </b-form-checkbox>
-              <b-form-checkbox v-model="formulario.MontoFlag" unchecked-value="0" value="1"> Monto </b-form-checkbox>
-              <!-- <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox> -->
-        </b-col>
-        <b-col cols="12" v-if="mostrarSiguientePaso()">
-          <b-form @submit="guardar">
-          <b-row>
-            <b-col cols="12" v-if="formulario.ProductoFlag" class="mt-3"> 
-              Producto
-              <autocomplete
-              ref="autocompleteProducto"
-              :url="APIProductos"
-              :onShouldRenderChild="renderChild"
-              anchor="Producto"
-              label="writer"
-              placeholder="Agregar Producto"
-              :on-select="setProducto"
-              :onFocus="focusAutocomplete.bind(null, 'autocompleteProducto')"
-              :classes="{input: 'form-control'}">
-            </autocomplete>
-            </b-col>
-            <b-col cols="12" v-if="formulario.MontoFlag"> Monto
-              <input type="number" v-model="formulario.Monto" class="form-control">
+          </b-col>
+          <b-col cols="12">
+            Stockmax
+            <input type="number" v-model="formulario.StockMax" class="form-control">    
+          </b-col>
+          <b-col cols="12" class="mt-3"> 
+            Producto Asociado Oferta:
+            <autocomplete
+            ref="autocompleteProductoAsociado"
+            :url="APIProductos"
+            :onShouldRenderChild="renderChild"
+            anchor="Producto"
+            label="writer"
+            placeholder="Agregar Producto"
+            :on-select="setProductoAsociado"
+            :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoAsociado')"
+            :classes="{input: 'form-control'}">
+          </autocomplete>
+          </b-col>
+          <b-col cols="12" style="text-align: end;" class="mt-5"> 
+            <b-button type="submit" variant="success" >Guardar</b-button>
+            <b-button variant="danger" @click="nuevaOfertaFlag=!nuevaOfertaFlag">Cancelar</b-button>
+          </b-col>
 
-            </b-col>
-            <!-- <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
-              <input type="number" v-model="formulario.Cantidad" class="form-control">
-
-            </b-col>
-           -->
-            <b-col cols="12">
-              Descripcion
-              <textarea rows="1" v-model="formulario.Descripcion" class="form-control"  style="overflow:hidden; resize:none;"></textarea>  
-            </b-col>
-            <b-col cols="12">
-              Porcentaje
-              <input type="number" v-model="formulario.Porcentaje" class="form-control">  
-            </b-col>
-            <b-col cols="6">
-              Desde
-              <input type="date" v-model="formulario.FechaDesde" required class="form-control"> 
-
-            </b-col>
-            <b-col cols="6">
-              Hasta
-              <input type="date" v-model="formulario.FechaHasta" required class="form-control"> 
-
-            </b-col>
-            <b-col cols="12">
-              Stockmax
-              <input type="number" v-model="formulario.StockMax" class="form-control">    
-            </b-col>
-            <b-col cols="12" class="mt-3"> 
-              Producto Asociado Oferta:
-              <autocomplete
-              ref="autocompleteProductoAsociado"
-              :url="APIProductos"
-              :onShouldRenderChild="renderChild"
-              anchor="Producto"
-              label="writer"
-              placeholder="Agregar Producto"
-              :on-select="setProductoAsociado"
-              :onFocus="focusAutocomplete.bind(null, 'autocompleteProductoAsociado')"
-              :classes="{input: 'form-control'}">
-            </autocomplete>
-            </b-col>
-            <b-col cols="12" style="text-align: end;" class="mt-5"> 
-              <b-button type="submit" variant="success" >Guardar</b-button>
-              <b-button variant="danger" @click="nuevaOfertaFlag=!nuevaOfertaFlag">Cancelar</b-button>
-            </b-col>
-
-            
-          </b-row>
-        </b-form>
-        </b-col>
-        
-      </b-row>
-    </b-modal>
-    <b-modal v-model="actualizarOfertaFlag" size="lg" title="Nueva Oferta" hide-footer>
-      <b-row>
-        <b-col cols="12">
-              <b-form-checkbox v-model="formulario.ProductoFlag" unchecked-value="0" value="1"> Producto </b-form-checkbox>
-              <b-form-checkbox v-model="formulario.MontoFlag" unchecked-value="0" value="1"> Monto </b-form-checkbox>
-              <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox>
-        </b-col>
-
-        <b-col cols="12" v-if="mostrarSiguientePaso()">
-          <b-form @submit="actualizar">
-          <b-row>
-            <b-col cols="12" v-if="formulario.ProductoFlag" class="mt-3"> 
-              Producto
-              <input type="text" readonly v-model="formulario.Producto" class="form-control">
-            </b-col>
-            <b-col cols="12" v-if="formulario.MontoFlag"> Monto
-              <input type="number" v-model="formulario.Monto" class="form-control">
-
-            </b-col>
-            <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
-              <input type="number" v-model="formulario.Cantidad" class="form-control">
-
-            </b-col>
           
-            <b-col cols="12">
-              Descripcion
-              <textarea rows="1" v-model="formulario.Descripcion" class="form-control"  style="overflow:hidden; resize:none;"></textarea>  
-            </b-col>
-            <b-col cols="12">
-              Porcentaje
-              <input type="number" v-model="formulario.Porcentaje" class="form-control">  
-            </b-col>
-            <b-col cols="6">
-              Desde
-              <input type="date" v-model="formulario.FechaDesde" required class="form-control"> 
+        </b-row>
+      </b-form>
+      </b-col>
+      
+    </b-row>
+  </b-modal>
+  <b-modal v-model="actualizarOfertaFlag" size="lg" title="Nueva Oferta" hide-footer modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+    <b-row>
+      <b-col cols="12">
+            <b-form-checkbox v-model="formulario.ProductoFlag" unchecked-value="0" value="1"> Producto </b-form-checkbox>
+            <b-form-checkbox v-model="formulario.MontoFlag" unchecked-value="0" value="1"> Monto </b-form-checkbox>
+            <b-form-checkbox v-model="formulario.CantidadFlag" unchecked-value="0" value="1"> Cantidad </b-form-checkbox>
+      </b-col>
 
-            </b-col>
-            <b-col cols="6">
-              Hasta
-              <input type="date" v-model="formulario.FechaHasta" required class="form-control"> 
+      <b-col cols="12" v-if="mostrarSiguientePaso()">
+        <b-form @submit="actualizar">
+        <b-row>
+          <b-col cols="12" v-if="formulario.ProductoFlag" class="mt-3"> 
+            Producto
+            <input type="text" readonly v-model="formulario.Producto" class="form-control">
+          </b-col>
+          <b-col cols="12" v-if="formulario.MontoFlag"> Monto
+            <input type="number" v-model="formulario.Monto" class="form-control">
 
-            </b-col>
-            <b-col cols="12">
-              Stockmax
-              <input type="number" v-model="formulario.StockMax" class="form-control">    
-            </b-col>
-            <b-col cols="12" class="mt-3"> 
-              Producto Asociado
-              <input type="text" readonly v-model="formulario.ProductoAsociado" class="form-control">
-            </b-col>
-            <b-col cols="12" style="text-align: end;" class="mt-5"> 
-              <b-button type="submit" variant="success" >Guardar</b-button>
-              <b-button variant="danger" @click="actualizarOfertaFlag=!actualizarOfertaFlag">Cancelar</b-button>
-            </b-col>
-          </b-row>
-        </b-form>
-        </b-col>
+          </b-col>
+          <b-col cols="12" v-if="formulario.CantidadFlag"> Cantidad Mínima
+            <input type="number" v-model="formulario.Cantidad" class="form-control">
+
+          </b-col>
         
-      </b-row>
-    </b-modal>
-  </b-container>
+          <b-col cols="12">
+            Descripcion
+            <textarea rows="1" v-model="formulario.Descripcion" class="form-control"  style="overflow:hidden; resize:none;"></textarea>  
+          </b-col>
+          <b-col cols="12">
+            Porcentaje
+            <input type="number" v-model="formulario.Porcentaje" class="form-control">  
+          </b-col>
+          <b-col cols="6">
+            Desde
+            <input type="date" v-model="formulario.FechaDesde" required class="form-control"> 
+
+          </b-col>
+          <b-col cols="6">
+            Hasta
+            <input type="date" v-model="formulario.FechaHasta" required class="form-control"> 
+
+          </b-col>
+          <b-col cols="12">
+            Stockmax
+            <input type="number" v-model="formulario.StockMax" class="form-control">    
+          </b-col>
+          <b-col cols="12" class="mt-3"> 
+            Producto Asociado
+            <input type="text" readonly v-model="formulario.ProductoAsociado" class="form-control">
+          </b-col>
+          <b-col cols="12" style="text-align: end;" class="mt-5"> 
+            <b-button type="submit" variant="success" >Guardar</b-button>
+            <b-button variant="danger" @click="actualizarOfertaFlag=!actualizarOfertaFlag">Cancelar</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+      </b-col>
+      
+    </b-row>
+  </b-modal>
+</b-container>
 </template>
 
 <script>

@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Date: Tue, 13 Oct 2026 18:40:36 GMT
+Server: Apache/2.4.54 (Win64) OpenSSL/1.1.1p PHP/7.4.33
+X-Powered-By: PHP/7.4.33
+Content-Disposition: inline; filename="OrdenCompra_2026_5.pdf"
+Cache-Control: private, no-store
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: X-Requested-With, Content-Type, Accept, Origin, Authorization
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
+Transfer-Encoding: chunked
+Content-Type: application/pdf
+

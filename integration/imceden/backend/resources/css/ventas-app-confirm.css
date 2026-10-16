@@ -1,0 +1,13 @@
+.va-elegant-confirm{padding:18px;z-index:3200}
+.va-elegant-confirm-card{width:min(430px,100%);overflow:hidden;border:1px solid rgba(145,15,54,.15);border-radius:26px;background:#fff;box-shadow:0 28px 80px rgba(53,8,24,.32);animation:vaConfirmIn .22s ease-out}
+.va-elegant-confirm-head{display:flex;gap:14px;align-items:center;padding:22px;color:#fff;background:linear-gradient(135deg,#780b2d,#bd1742 62%,#f04b47)}
+.va-elegant-confirm-icon{display:grid;flex:0 0 54px;height:54px;place-items:center;border:1px solid rgba(255,255,255,.32);border-radius:18px;background:rgba(255,255,255,.14);font-size:24px}
+.va-elegant-confirm-head b{display:block;font-size:20px;letter-spacing:.02em}.va-elegant-confirm-head small{display:block;margin-top:4px;opacity:.88;font-size:12px}
+.va-elegant-confirm-body{padding:18px}.va-elegant-confirm-document{margin-bottom:14px;padding:13px 15px;border:1px solid #f0d4dc;border-radius:16px;background:#fff7f9;color:#6f1732}
+.va-elegant-confirm-document small,.va-elegant-confirm-data small{display:block;margin-bottom:4px;color:#8a6671;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.va-elegant-confirm-document strong{font-size:18px}.va-elegant-confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.va-elegant-confirm-data{min-width:0;padding:12px;border:1px solid #eadde1;border-radius:14px}.va-elegant-confirm-data strong{display:block;overflow:hidden;color:#291922;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.va-elegant-confirm-total{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:15px;border-radius:16px;color:#fff;background:linear-gradient(135deg,#7e0d32,#c01845)}.va-elegant-confirm-total span{font-size:12px;font-weight:800}.va-elegant-confirm-total strong{font-size:22px}
+.va-elegant-confirm-note{display:flex;gap:9px;align-items:flex-start;margin:12px 0 0;color:#725c64;font-size:12px;line-height:1.4}.va-elegant-confirm-note i{margin-top:2px;color:#bd1742}
+.va-elegant-confirm-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:10px;padding:0 18px 18px}.va-elegant-confirm-actions button{min-height:50px;border:0;border-radius:15px;font-weight:900;text-transform:uppercase}.va-elegant-confirm-review{color:#7b2842;background:#f5e9ed}.va-elegant-confirm-accept{color:#fff;background:linear-gradient(135deg,#07875c,#13b77c);box-shadow:0 9px 22px rgba(7,135,92,.22)}
+@keyframes vaConfirmIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@media(max-width:420px){.va-elegant-confirm{padding:12px}.va-elegant-confirm-card{border-radius:22px}.va-elegant-confirm-head{padding:18px}.va-elegant-confirm-body{padding:15px}.va-elegant-confirm-actions{padding:0 15px 15px}}

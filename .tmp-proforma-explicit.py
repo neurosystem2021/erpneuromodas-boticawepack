@@ -1,0 +1,4 @@
+﻿from pathlib import Path
+p=Path('src/views/Habitaciones.vue');s=p.read_text(encoding='utf-8').replace('      IdProforma: null,','      IdProforma: null,\n      proformaSeleccionada: false,',1).replace('          IdProforma: this.IdProforma','          IdProforma: this.proformaSeleccionada ? this.IdProforma : null',1).replace('      this.IdProforma = hab.IdProforma || null;','      this.IdProforma = hab.IdProforma || null;\n      this.proformaSeleccionada = false;',1)
+s=s.replace('      this.$nextTick(() => {\n        proforma.productos.map','      const projectId=this.selectProducto.IdPreOrden;\n      this.$nextTick(() => {\n        if(this.selectProducto.IdPreOrden !== projectId) return;\n        proforma.productos.map',1).replace('        this.IdProforma = proforma.IdProforma;','        this.IdProforma = proforma.IdProforma;\n        this.proformaSeleccionada = true;',1)
+p.write_text(s,encoding='utf-8')

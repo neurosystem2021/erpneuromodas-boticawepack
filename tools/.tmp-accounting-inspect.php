@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$d=appPdoConnection();foreach(['GEN_EMPRESA','Lo_Almacen'] as $t){echo $t.': '.json_encode($d->query('SHOW COLUMNS FROM `'.$t.'`')->fetchAll(PDO::FETCH_COLUMN)).PHP_EOL;}echo json_encode($d->query('SELECT * FROM GEN_EMPRESA')->fetchAll(PDO::FETCH_ASSOC),JSON_UNESCAPED_UNICODE).PHP_EOL;echo json_encode($d->query('SELECT Usuario FROM Seg_Usuario WHERE IdUsuarioPerfil=1 AND COALESCE(Anulado,0)=0')->fetchAll(PDO::FETCH_COLUMN)).PHP_EOL;

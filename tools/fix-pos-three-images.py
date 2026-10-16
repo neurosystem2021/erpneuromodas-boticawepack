@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('integration/store-catalog-gallery.php');s=p.read_text(encoding='utf-8');s=s.replace('    if ($categoria > 0)', "    if ((int)($_GET['id'] ?? 0) > 0) { $sql .= ' AND p.IdProducto=?'; $params[]=(int)$_GET['id']; }\n    if ($categoria > 0)");p.write_text(s,encoding='utf-8')
+p=Path('src/components/ProductosCarritoNuevo.vue');s=p.read_text(encoding='utf-8');s=s.replace("fetch('/api/tienda/index.php?q=' + encodeURIComponent(item.CodigoBarra || item.Producto))", "fetch('/api/tienda/index.php?id=' + encodeURIComponent(id))");s=s.replace('Array.from(new Set(photos))','photos');p.write_text(s,encoding='utf-8')

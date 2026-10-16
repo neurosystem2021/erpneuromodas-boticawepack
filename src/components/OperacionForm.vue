@@ -1,157 +1,157 @@
 <template>
-  <div>
-    <b-form @submit="guardarOperacion" @keydown.enter="keyDownInput">
-      <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigOperacion" :title="title" size="lg" ref="operacionForm" v-model="show">
-        <b-row>
-          <b-col md="6">
-            <b-form-group>
-              <label>Nombre de la operación:</label>
-              <b-form-input v-model="operacion.Operacion"
-                ref="inputNombreOperacion"
-                required="required"
-                type="text"
-                autocomplete="off"
-                style="text-transform: uppercase;"
-                :value="operacion.Operacion"
-                ></b-form-input>
-            </b-form-group>
-            <hr>
+<div>
+  <b-form @submit="guardarOperacion" @keydown.enter="keyDownInput">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigOperacion" :title="title" size="lg" ref="operacionForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-row>
+        <b-col md="6" class="nst-editor-section">
+          <b-form-group>
+            <label>Nombre de la operación:</label>
+            <b-form-input v-model="operacion.Operacion"
+              ref="inputNombreOperacion"
+              required="required"
+              type="text"
+              autocomplete="off"
+              style="text-transform: uppercase;"
+              :value="operacion.Operacion"
+              ></b-form-input>
+          </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                    v-model="operacion.RequiereCodigo"
+                    :value="1"
+                    :unchecked-value="0"
+                    >
+              Requiere código para la operación
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="operacion.RequiereCodigo">
+            <label>Nombre del código:</label>
+            <b-form-input v-model="operacion.NombreCodigo"
+              ref="inputNombreCodigo"
+              required="required"
+              type="text"
+              style="text-transform: uppercase;"
+              autocomplete="off"
+              :value="operacion.NombreCodigo"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Tipo de operación:</label>
+            <b-form-select v-model="operacion.Tipo" :options="itemsTipos" v-on:change="setTipo($event)" size="md"/>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="6">
+          <b-form-group>
+            <b-form-checkbox
+                    v-model="operacion.TieneComision"
+                    :value="1"
+                    :unchecked-value="0"
+                    >
+              Tiene comisión
+            </b-form-checkbox>
+          </b-form-group>
+
+          <div v-if="operacion.TieneComision">
             <b-form-group>
               <b-form-checkbox
-                      v-model="operacion.RequiereCodigo"
+                      v-model="operacion.Calculo"
                       :value="1"
                       :unchecked-value="0"
                       >
-                Requiere código para la operación
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group v-if="operacion.RequiereCodigo">
-              <label>Nombre del código:</label>
-              <b-form-input v-model="operacion.NombreCodigo"
-                ref="inputNombreCodigo"
-                required="required"
-                type="text"
-                style="text-transform: uppercase;"
-                autocomplete="off"
-                :value="operacion.NombreCodigo"
-                ></b-form-input>
-            </b-form-group>
-            <b-form-group>
-              <label>Tipo de operación:</label>
-              <b-form-select v-model="operacion.Tipo" :options="itemsTipos" v-on:change="setTipo($event)" size="md"/>
-            </b-form-group>
-          </b-col>
-
-          <b-col md="6">
-            <b-form-group>
-              <b-form-checkbox
-                      v-model="operacion.TieneComision"
-                      :value="1"
-                      :unchecked-value="0"
-                      >
-                Tiene comisión
+                El sistema realizará el cálculo de comisión
               </b-form-checkbox>
             </b-form-group>
 
-            <div v-if="operacion.TieneComision">
+            <div v-if="operacion.Calculo">
               <b-form-group>
                 <b-form-checkbox
-                        v-model="operacion.Calculo"
+                        v-model="operacion.ComisionFija"
                         :value="1"
                         :unchecked-value="0"
                         >
-                  El sistema realizará el cálculo de comisión
+                  Comision fija
                 </b-form-checkbox>
               </b-form-group>
-
-              <div v-if="operacion.Calculo">
-                <b-form-group>
-                  <b-form-checkbox
-                          v-model="operacion.ComisionFija"
-                          :value="1"
-                          :unchecked-value="0"
-                          >
-                    Comision fija
-                  </b-form-checkbox>
-                </b-form-group>
-                <b-form-group>
-                  <label>Comisión:</label>
-                  <input   
-                    required="required"
-                    v-model="operacion.MontoComision"
-                    type="number"
-                    class="form-control"
-                    step="0.01"
-                    />
-                </b-form-group>
-                <b-form-group v-if="!operacion.ComisionFija">
-                  <label>Comisión por cada:</label>
-                  <input   
-                    required="required"
-                    v-model="operacion.MontoMax"
-                    type="number"
-                    class="form-control"
-                    step="0.01"
-                    />
-                </b-form-group>
-              </div>
-
-              <hr v-if="operacion.Calculo">
-              <b-form-group v-if="operacion.Calculo">
-                <b-form-checkbox
-                        v-model="operacion.Ganancia"
-                        :value="1"
-                        :unchecked-value="0"
-                        >
-                  Tiene ganancia la operación
-                </b-form-checkbox>
+              <b-form-group>
+                <label>Comisión:</label>
+                <input   
+                  required="required"
+                  v-model="operacion.MontoComision"
+                  type="number"
+                  class="form-control"
+                  step="0.01"
+                  />
+              </b-form-group>
+              <b-form-group v-if="!operacion.ComisionFija">
+                <label>Comisión por cada:</label>
+                <input   
+                  required="required"
+                  v-model="operacion.MontoMax"
+                  type="number"
+                  class="form-control"
+                  step="0.01"
+                  />
               </b-form-group>
             </div>
 
-          </b-col>
-          <b-col md="12">
-            <hr>
-            <b-form-group>
+            <hr v-if="operacion.Calculo">
+            <b-form-group v-if="operacion.Calculo">
               <b-form-checkbox
-                      v-model="operacion.TieneEnlaceExterno"
+                      v-model="operacion.Ganancia"
                       :value="1"
                       :unchecked-value="0"
                       >
-                Tiene enlaces externos
+                Tiene ganancia la operación
               </b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="operacion.TieneEnlaceExterno">
-              <label>Enlace externo 1:</label>
-              <b-form-input v-model="operacion.EnlaceExterno1"
-                ref="inputEnlaceExterno1"
-                required="required"
-                type="text"
-                autocomplete="off"
-                :value="operacion.EnlaceExterno1"
-                ></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="operacion.TieneEnlaceExterno">
-              <label>Enlace externo 2:</label>
-              <b-form-input v-model="operacion.EnlaceExterno2"
-                ref="inputEnlaceExterno2"
-                type="text"
-                autocomplete="off"
-                :value="operacion.EnlaceExterno2"
-                ></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <div slot="modal-footer" >
-          <b-btn  variant="primary" type="submit">
-            Guardar
-          </b-btn>
-          <b-btn  variant="secondary" @click="show=false">
-            Cerrar
-          </b-btn>
-        </div>
-      </b-modal>
-    </b-form>
-  </div>
+          </div>
+
+        </b-col>
+        <b-col md="12" class="nst-editor-section">
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                    v-model="operacion.TieneEnlaceExterno"
+                    :value="1"
+                    :unchecked-value="0"
+                    >
+              Tiene enlaces externos
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="operacion.TieneEnlaceExterno">
+            <label>Enlace externo 1:</label>
+            <b-form-input v-model="operacion.EnlaceExterno1"
+              ref="inputEnlaceExterno1"
+              required="required"
+              type="text"
+              autocomplete="off"
+              :value="operacion.EnlaceExterno1"
+              ></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="operacion.TieneEnlaceExterno">
+            <label>Enlace externo 2:</label>
+            <b-form-input v-model="operacion.EnlaceExterno2"
+              ref="inputEnlaceExterno2"
+              type="text"
+              autocomplete="off"
+              :value="operacion.EnlaceExterno2"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <div slot="modal-footer" >
+        <b-btn  variant="primary" type="submit">
+          Guardar
+        </b-btn>
+        <b-btn  variant="secondary" @click="show=false">
+          Cerrar
+        </b-btn>
+      </div>
+    </b-modal>
+  </b-form>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'
@@ -168,6 +168,7 @@ export default {
         { value: null, text: '== SELECCIONE TIPO ==' },
         { value: 0, text: 'INGRESO DE EFECTIVO' },
         { value: 1, text: 'EGRESO DE EFECTIVO' },
+        { value: 2, text: 'CONTROL DE COBRO (SIN INGRESO NI SALIDA DE CAJA)' },
       ],
     }
   },

@@ -1,75 +1,75 @@
 <template>
-  <b-container fluid>
-    <b-row>
-        <b-col cols="12">
-            <b-row>
+<b-container fluid class="nst-screen nst-screen--buscadorcajabanco">
+  <section class="nst-panel nst-panel--filters"><b-row>
+      <b-col cols="12">
+          <b-row>
 
-                        <b-col cols="12" md="4">
-                            <label>Cuenta:</label>
-                            <autocomplete
-                            required="required"
-                            ref="inputCaja"
-                            :url="API + 'cuentas'"
-                            anchor="Cuenta"
-                            label="writer"
-                            placeholder=""
-                            :on-select="setCuenta" 
-                            :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
-                            :onInput="(val) => newDniRuc = val"
-                            :classes="{input: 'form-control'}"
-                            >
-                            </autocomplete>
-                        </b-col>
-                        <b-col cols="12" md="4">
-                            Tipo Operación:
-                            <b-form-select
-                            v-model="IdTipoCajaBanco"
-                            :options="lstTipoOpe"
-                            value-field="IdTipoCajaBanco"
-                            text-field="TipoCajaBanco"
-                            ></b-form-select>
-                        </b-col>
-                            <b-col cols="12" md="4">
-                                <b-button  @click="buscadorCajaBanco" variant="info" class="mt-3"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-                                <b-button  @click="exportarBuscadorCajaBanco" variant="success" class="mt-3">
-                                    <i class="fa fa-file-excel" aria-hidden="true"></i>
-                                    Exportar
-                                </b-button>
-                            </b-col>
-            </b-row>
-            <b-row>
-                <b-col cols="12" md="4">
-                    Fecha Inicial
-                    <input type="date" class="form-control" v-model="FechaIni">
-                </b-col>
-                <b-col cols="12" md="4">
-                    Fecha Fin
-                    <input type="date" class="form-control" v-model="FechaFin">
-                </b-col>
-            </b-row>
-            <b-row>
-                
-            </b-row>
-        </b-col>
-        <b-col cols="12">
-            <b-table class="mt-2" :fields="fields" :items="lstCajaBancos"
-                :per-page="perPage"
-                :current-page="currentPage"
-            >
-              <template slot="action" slot-scope="data">
-                <b-button variant="danger" @click="eliminarMovimiento(data.item)"> <i class="fa fa-trash" aria-hidden="true"></i></b-button>
-              </template>
-            </b-table>
+                      <b-col cols="12" md="4">
+                          <label>Cuenta:</label>
+                          <autocomplete
+                          required="required"
+                          ref="inputCaja"
+                          :url="API + 'cuentas'"
+                          anchor="Cuenta"
+                          label="writer"
+                          placeholder=""
+                          :on-select="setCuenta" 
+                          :onFocus="focusAutocomplete.bind(null, 'inputCaja')"
+                          :onInput="(val) => newDniRuc = val"
+                          :classes="{input: 'form-control'}"
+                          >
+                          </autocomplete>
+                      </b-col>
+                      <b-col cols="12" md="4">
+                          Tipo Operación:
+                          <b-form-select
+                          v-model="IdTipoCajaBanco"
+                          :options="lstTipoOpe"
+                          value-field="IdTipoCajaBanco"
+                          text-field="TipoCajaBanco"
+                          ></b-form-select>
+                      </b-col>
+                          <b-col cols="12" md="4">
+                              <b-button  @click="buscadorCajaBanco" variant="info" class="mt-3"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+                              <b-button  @click="exportarBuscadorCajaBanco" variant="success" class="mt-3">
+                                  <i class="fa fa-file-excel" aria-hidden="true"></i>
+                                  Exportar
+                              </b-button>
+                          </b-col>
+          </b-row>
+          <b-row>
+              <b-col cols="12" md="4">
+                  Fecha Inicial
+                  <input type="date" class="form-control" v-model="FechaIni">
+              </b-col>
+              <b-col cols="12" md="4">
+                  Fecha Fin
+                  <input type="date" class="form-control" v-model="FechaFin">
+              </b-col>
+          </b-row>
+          <b-row>
+              
+          </b-row>
+      </b-col>
+      <b-col cols="12">
+          <b-table class="mt-2" :fields="fields" :items="lstCajaBancos"
+              :per-page="perPage"
+              :current-page="currentPage" responsive=""
+           show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+            <template slot="action" slot-scope="data">
+              <b-button variant="danger" @click="eliminarMovimiento(data.item)"> <i class="fa fa-trash" aria-hidden="true"></i></b-button>
+            </template>
+          </b-table>
 
-             <b-pagination
-                v-model="currentPage"
-                :total-rows="lstCajaBancos.length"
-                :per-page="perPage"
-                aria-controls="my-table"
-            ></b-pagination>
-        </b-col>
-    </b-row>
-  </b-container>
+           <b-pagination
+              v-model="currentPage"
+              :total-rows="lstCajaBancos.length"
+              :per-page="perPage"
+              aria-controls="my-table"
+          ></b-pagination>
+      </b-col>
+  </b-row></section>
+</b-container>
 </template>
 
 <script>

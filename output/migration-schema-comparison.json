@@ -1,0 +1,5999 @@
+{
+  "source_file": "fact_nst_COMPLETA.sql",
+  "sha256": "22b486fd8455d36d278936e0a5148a0672610354c882d69c4163bf1442d99d21",
+  "source_tables": {
+    "Ag_Caja": {
+      "columns": {
+        "IdCaja": "int(11) NOT NULL AUTO_INCREMENT",
+        "Concepto": "text DEFAULT NULL",
+        "UsuarioReg": "varchar(250) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Importe": "float DEFAULT 0",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "IdCierre": "int(11) DEFAULT NULL",
+        "Tipo": "tinyint(1) DEFAULT NULL",
+        "AnulacionMotivo": "text DEFAULT NULL",
+        "AnulacionFecha": "datetime DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_CategoriaEmpresa": {
+      "columns": {
+        "IdCategoriaEmpresa": "int(11) NOT NULL AUTO_INCREMENT",
+        "CategoriaEmpresa": "varchar(250) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCategoriaEmpresa`)",
+        "UNIQUE KEY `CategoriaUnico` (`CategoriaEmpresa`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_CierreCaja": {
+      "columns": {
+        "IdCierreCaja": "int(11) NOT NULL AUTO_INCREMENT",
+        "FechaCierre": "datetime DEFAULT NULL",
+        "IdTurno": "tinyint(1) DEFAULT 1",
+        "Monto": "float DEFAULT NULL",
+        "Comision": "float DEFAULT NULL",
+        "UsuarioReg": "varchar(250) DEFAULT NULL",
+        "Estado": "tinyint(1) DEFAULT 1",
+        "FechaApertura": "datetime DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCierreCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_Comprobante": {
+      "columns": {
+        "IdComprobante": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdCliente": "int(11) DEFAULT NULL",
+        "IdEntidad": "int(11) DEFAULT NULL",
+        "IdServicio": "int(11) DEFAULT NULL",
+        "FechaDoc": "datetime DEFAULT NULL",
+        "Monto": "float DEFAULT NULL",
+        "Comision": "float DEFAULT NULL",
+        "ComisionValor": "float DEFAULT NULL",
+        "ComisionCada": "float DEFAULT NULL",
+        "ComisionFija": "tinyint(1) DEFAULT 0",
+        "Ganancia": "tinyint(1) DEFAULT 1",
+        "NombreCodigo": "varchar(250) DEFAULT NULL",
+        "ValorCodigo": "varchar(250) DEFAULT NULL",
+        "Telefono": "varchar(250) DEFAULT NULL",
+        "Estado": "tinyint(1) DEFAULT 1",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "Observacion": "text DEFAULT NULL",
+        "UsuarioReg": "varchar(250) DEFAULT NULL",
+        "IdCierre": "int(11) DEFAULT NULL",
+        "AnulacionMotivo": "text DEFAULT NULL",
+        "AnulacionFecha": "datetime DEFAULT NULL",
+        "NumeroOperacion": "varchar(250) DEFAULT NULL",
+        "FechaOperacion": "datetime DEFAULT NULL",
+        "TipoOperacion": "tinyint(1) DEFAULT NULL",
+        "ComisionIncluida": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdComprobante`)",
+        "KEY `idcliente` (`IdCliente`)",
+        "KEY `idservicio` (`IdServicio`)",
+        "KEY `identidad` (`IdEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_Empresa": {
+      "columns": {
+        "IdEmpresa": "int(11) NOT NULL AUTO_INCREMENT",
+        "Empresa": "varchar(250) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdEmpresa`)",
+        "UNIQUE KEY `EmpresaUnico` (`Empresa`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_EmpresasEntidad": {
+      "columns": {
+        "IdEmpresaEntidad": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdEntidad": "int(11) NOT NULL",
+        "IdEmpresa": "int(11) NOT NULL",
+        "IdCategoriaEmpresa": "int(11) NOT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdEmpresaEntidad`,`IdEntidad`,`IdEmpresa`,`IdCategoriaEmpresa`) USING BTREE",
+        "UNIQUE KEY `IdEmpresaCategoria` (`IdEmpresaEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_Entidad": {
+      "columns": {
+        "IdEntidad": "int(11) NOT NULL AUTO_INCREMENT",
+        "Nombre": "varchar(255) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Imagen": "varchar(250) DEFAULT NULL",
+        "IdCategoriaEntidad": "int(11) DEFAULT 1",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "Orden": "int(3) DEFAULT 999"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdEntidad`)",
+        "UNIQUE KEY `unico_nombre` (`Nombre`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_Operacion": {
+      "columns": {
+        "IdOperacion": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdEntidad": "int(11) DEFAULT NULL",
+        "Operacion": "varchar(255) DEFAULT NULL",
+        "MontoMax": "float DEFAULT 0",
+        "MontoComision": "float DEFAULT 0",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Calculo": "tinyint(1) DEFAULT 0",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "TieneComision": "tinyint(1) DEFAULT 0",
+        "Ganancia": "tinyint(1) DEFAULT 0",
+        "ComisionFija": "tinyint(1) DEFAULT 0",
+        "RequiereCodigo": "tinyint(1) DEFAULT 0",
+        "NombreCodigo": "varchar(255) DEFAULT NULL",
+        "Tipo": "tinyint(1) DEFAULT NULL",
+        "EnlaceExterno1": "text DEFAULT NULL",
+        "EnlaceExterno2": "text DEFAULT NULL",
+        "TieneEnlaceExterno": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdOperacion`)",
+        "KEY `identidad` (`IdEntidad`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ag_Servicio": {
+      "columns": {
+        "IdServicio": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdEmpresaEntidad": "int(11) DEFAULT NULL",
+        "Servicio": "varchar(255) DEFAULT NULL",
+        "MontoMax": "float DEFAULT NULL",
+        "MontoComision": "float DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "Calculo": "tinyint(1) DEFAULT 0",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "TieneComision": "tinyint(1) DEFAULT 0",
+        "Ganancia": "tinyint(1) DEFAULT 0",
+        "ComisionFija": "tinyint(1) DEFAULT 0",
+        "RequiereCodigo": "tinyint(1) DEFAULT 0",
+        "NombreCodigo": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdServicio`)",
+        "KEY `idempreentidad` (`IdEmpresaEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Agen_Conversacion": {
+      "columns": {
+        "IdConversacion": "int(10) unsigned NOT NULL AUTO_INCREMENT",
+        "UsuarioReg": "varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL",
+        "Titulo": "varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Nueva conversación'",
+        "Fecha": "datetime NOT NULL DEFAULT current_timestamp()",
+        "FechaModificacion": "datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdConversacion`)",
+        "KEY `idx_AgConversacion_UsuarioReg` (`UsuarioReg`)",
+        "KEY `idx_AgConversacion_FechaModificacion` (`FechaModificacion`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Agen_ConversacionDetalle": {
+      "columns": {
+        "IdConversacionDetalle": "int(10) unsigned NOT NULL AUTO_INCREMENT",
+        "IdConversacion": "int(10) unsigned NOT NULL",
+        "Rol": "enum('usuario','agente') COLLATE utf8mb4_unicode_ci NOT NULL",
+        "Texto": "text COLLATE utf8mb4_unicode_ci NOT NULL",
+        "Datos": "longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL",
+        "EsError": "tinyint(1) NOT NULL DEFAULT 0",
+        "Fecha": "datetime NOT NULL DEFAULT current_timestamp()"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdConversacionDetalle`)",
+        "KEY `idx_AgConversacionDetalle_IdConversacion` (`IdConversacion`)",
+        "CONSTRAINT `fk_AgConversacionDetalle_Conversacion` FOREIGN KEY (`IdConversacion`) REFERENCES `Agen_Conversacion` (`IdConversacion`) ON DELETE CASCADE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_CajaBanco": {
+      "columns": {
+        "IdCajaBanco": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdTipoCajaBanco": "int(11) DEFAULT NULL",
+        "IdCuenta": "int(11) DEFAULT NULL",
+        "FechaDoc": "datetime DEFAULT NULL",
+        "Concepto": "varchar(255) CHARACTER SET latin1 DEFAULT NULL",
+        "Importe": "double DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "UsuarioReg": "varchar(255) CHARACTER SET latin1 DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) CHARACTER SET latin1 DEFAULT NULL",
+        "FechaMod": "date DEFAULT NULL",
+        "IdProveedor": "int(11) NOT NULL DEFAULT 0",
+        "IdCliente": "int(11) NOT NULL DEFAULT 0",
+        "IdCierre": "int(11) DEFAULT NULL",
+        "EsDelVendedor": "tinyint(1) DEFAULT 1",
+        "IdPreOrden": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCajaBanco`)",
+        "KEY `fk_2` (`IdCuenta`)",
+        "KEY `fk_TipoBanco` (`IdTipoCajaBanco`)",
+        "CONSTRAINT `fk_2` FOREIGN KEY (`IdCuenta`) REFERENCES `Cb_Cuenta` (`IdCuenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_TipoBanco` FOREIGN KEY (`IdTipoCajaBanco`) REFERENCES `Cb_TipoCajaBanco` (`IdTipoCajaBanco`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_CajaBancoDet": {
+      "columns": {
+        "IdCajaBanco": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocDet": "int(11) NOT NULL",
+        "Importe": "float DEFAULT NULL",
+        "Hash": "varchar(255) COLLATE utf8mb4_spanish_ci DEFAULT NULL",
+        "Tipo": "varchar(45) COLLATE utf8mb4_spanish_ci NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocDet`,`IdCajaBanco`,`Tipo`)",
+        "KEY `fk1` (`IdCajaBanco`)",
+        "CONSTRAINT `fk1` FOREIGN KEY (`IdCajaBanco`) REFERENCES `Cb_CajaBanco` (`IdCajaBanco`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_CierreCaja": {
+      "columns": {
+        "IdCierreCaja": "int(11) NOT NULL AUTO_INCREMENT",
+        "FechaCierre": "datetime DEFAULT NULL",
+        "IdTurno": "int(11) DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "Ingresos": "float DEFAULT NULL",
+        "Salidas": "float DEFAULT NULL",
+        "Ventas": "float DEFAULT NULL",
+        "Total": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdCierreCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_Cuenta": {
+      "columns": {
+        "IdCuenta": "int(11) NOT NULL AUTO_INCREMENT",
+        "Cuenta": "varchar(255) CHARACTER SET latin1 DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "EsTarjeta": "tinyint(4) DEFAULT 1"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCuenta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_LetraCaja": {
+      "columns": {
+        "IdLetraCaja": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocDet": "int(11) NOT NULL",
+        "Hash": "varchar(255) DEFAULT NULL",
+        "IdCajaBanco": "int(11) NOT NULL DEFAULT 0",
+        "NumeroLetra": "int(11) NOT NULL",
+        "Importe": "float(11,2) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "FechaPago": "datetime DEFAULT NULL",
+        "Tipo": "varchar(45) NOT NULL",
+        "Cancelado": "tinyint(1) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdLetraCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Cb_TipoCajaBanco": {
+      "columns": {
+        "IdTipoCajaBanco": "int(11) NOT NULL AUTO_INCREMENT",
+        "TipoCajaBanco": "varchar(255) CHARACTER SET latin1 DEFAULT NULL",
+        "Tipo": "int(11) DEFAULT NULL",
+        "AplicaDocAPagar": "bit(1) DEFAULT NULL",
+        "AplicaDocACobrar": "bit(1) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdTipoCajaBanco`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "GEN_EMPRESA": {
+      "columns": {
+        "IDEMPRESA": "int(11) NOT NULL AUTO_INCREMENT",
+        "RAZONSOCIAL": "varchar(255) DEFAULT NULL",
+        "RUC": "varchar(255) DEFAULT NULL",
+        "DIRECCION": "text DEFAULT NULL",
+        "IGV": "float DEFAULT NULL",
+        "CONSULTARUCURL": "varchar(255) NOT NULL",
+        "CONSULTARUCTOKEN": "text NOT NULL",
+        "APPTOKEN": "text DEFAULT NULL",
+        "APPURL": "varchar(255) DEFAULT NULL",
+        "valorComision": "float DEFAULT NULL",
+        "UBIGEO": "varchar(10) DEFAULT NULL",
+        "DEPARTAMENTO": "varchar(100) DEFAULT NULL",
+        "PROVINCIA": "varchar(100) DEFAULT NULL",
+        "DISTRITO": "varchar(100) DEFAULT NULL",
+        "TELEFONO": "varchar(255) DEFAULT NULL",
+        "MerchantId": "text DEFAULT NULL",
+        "PrivateKey": "text DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IDEMPRESA`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_EmpresaConfig": {
+      "columns": {
+        "IdEmpresaConfig": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdEmpresa": "int(11) NOT NULL",
+        "MetaKey": "varchar(255) DEFAULT NULL",
+        "MetaValue": "longtext DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdEmpresaConfig`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_Impresora": {
+      "columns": {
+        "IdImpresora": "int(11) NOT NULL AUTO_INCREMENT",
+        "NombreImpresora": "varchar(255) DEFAULT NULL",
+        "Ip": "varchar(50) DEFAULT NULL",
+        "Puerto": "varchar(10) DEFAULT NULL",
+        "EsCocina": "tinyint(1) DEFAULT 0",
+        "LongitudLinea": "int(11) NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdImpresora`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_Moneda": {
+      "columns": {
+        "Moneda": "varchar(255) DEFAULT NULL",
+        "Simbolo": "varchar(10) DEFAULT NULL",
+        "TipoCambio": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_Oferta": {
+      "columns": {
+        "IdOferta": "bigint(20) NOT NULL AUTO_INCREMENT",
+        "Hash": "varchar(255) DEFAULT NULL",
+        "ProductoFlag": "tinyint(1) DEFAULT NULL",
+        "MontoFlag": "tinyint(1) DEFAULT NULL",
+        "CantidadFlag": "tinyint(1) DEFAULT NULL",
+        "IdProducto": "int(11) DEFAULT NULL",
+        "Monto": "float DEFAULT NULL",
+        "Cantidad": "float DEFAULT NULL",
+        "Descripcion": "text DEFAULT NULL",
+        "Porcentaje": "float DEFAULT NULL",
+        "FechaDesde": "date DEFAULT NULL",
+        "FechaHasta": "date DEFAULT NULL",
+        "StockMax": "float DEFAULT NULL",
+        "Estado": "tinyint(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT current_timestamp()",
+        "FechaMod": "datetime DEFAULT current_timestamp()",
+        "IdProductoAsociado": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdOferta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_Producto": {
+      "columns": {
+        "IdProducto": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdProductoMarca": "int(11) NOT NULL",
+        "IdProductoFormaFarmaceutica": "int(11) NOT NULL",
+        "IdProductoMedicion": "int(11) NOT NULL",
+        "IdProductoCategoria": "int(11) NOT NULL",
+        "Producto": "varchar(255) DEFAULT NULL",
+        "ProductoDesc": "text DEFAULT NULL",
+        "ProductoDesc2": "text DEFAULT NULL",
+        "ProductoDesc3": "text DEFAULT NULL",
+        "ProductoDescCorto": "varchar(255) DEFAULT NULL",
+        "CodigoBarra": "varchar(255) DEFAULT NULL",
+        "CodigoSunat": "varchar(8) DEFAULT NULL",
+        "Codigo": "varchar(255) DEFAULT NULL",
+        "Dosis": "varchar(255) DEFAULT NULL",
+        "PrecioContado": "float DEFAULT NULL",
+        "PrecioPorMayor": "float DEFAULT NULL",
+        "StockPorMayor": "float DEFAULT NULL",
+        "ControlaStockMinimo": "tinyint(4) DEFAULT 0",
+        "StockMinimo": "float DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL",
+        "ControlaStock": "bit(1) DEFAULT NULL",
+        "PrecioCosto": "float DEFAULT NULL",
+        "VentaEstrategica": "bit(1) DEFAULT NULL",
+        "PorcentajeUtilidad": "float DEFAULT NULL",
+        "IdBloque": "int(11) DEFAULT NULL",
+        "Genero": "varchar(45) DEFAULT NULL",
+        "Color": "varchar(255) DEFAULT NULL",
+        "Botapie": "varchar(255) DEFAULT NULL",
+        "ProductoModelo": "varchar(255) NOT NULL",
+        "ProductoPresentacion": "varchar(255) DEFAULT NULL",
+        "EsPadre": "tinyint(1) DEFAULT 0",
+        "precioConvenio": "float DEFAULT NULL",
+        "EsHabitacion": "tinyint(1) DEFAULT 0",
+        "Piso": "int(11) DEFAULT 0",
+        "EstadoHabitacion": "tinyint(1) DEFAULT 1",
+        "IdPreOrden": "int(11) DEFAULT NULL",
+        "IdClienteReserva": "int(11) DEFAULT NULL",
+        "FechaReserva": "datetime DEFAULT NULL",
+        "FechaAlquiler": "date DEFAULT NULL",
+        "Vuelo": "varchar(255) DEFAULT NULL",
+        "FechaAlquilerFin": "date DEFAULT NULL",
+        "EstaSucio": "tinyint(1) NOT NULL DEFAULT 0",
+        "PreciosPorProducto": "longtext NOT NULL",
+        "Imagen": "varchar(255) DEFAULT NULL",
+        "IdOfertaCategoria": "int(11) DEFAULT NULL",
+        "MostrarApp": "tinyint(1) DEFAULT 0",
+        "PosOferta": "int(11) DEFAULT 10000",
+        "TienePresentacion": "tinyint(1) DEFAULT 0",
+        "PorcentajeLiquidacion": "float DEFAULT 0",
+        "OpcContable": "tinyint(1) DEFAULT 0",
+        "TipoCambio": "float DEFAULT 1",
+        "PrecioCostoDolar": "float DEFAULT NULL",
+        "PrecioContadoDolar": "float DEFAULT NULL",
+        "PrecioApp": "float DEFAULT NULL",
+        "IdEmpleado": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProducto`,`IdProductoMarca`,`IdProductoFormaFarmaceutica`,`IdProductoMedicion`,`IdProductoCategoria`)",
+        "UNIQUE KEY `Producto_UNIQUE` (`Producto`)",
+        "KEY `fk_Producto_ProductoMarca1_idx` (`IdProductoMarca`)",
+        "KEY `fk_Producto_ProductoFormaFarmaceutica1_idx` (`IdProductoFormaFarmaceutica`)",
+        "KEY `fk_Producto_ProductoMedicion1_idx` (`IdProductoMedicion`)",
+        "KEY `fk_Producto_ProductoCategoria1_idx` (`IdProductoCategoria`)",
+        "CONSTRAINT `fk_Producto_ProductoCategoria1` FOREIGN KEY (`IdProductoCategoria`) REFERENCES `Gen_ProductoCategoria` (`IdProductoCategoria`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoFormaFarmaceutica1` FOREIGN KEY (`IdProductoFormaFarmaceutica`) REFERENCES `Gen_ProductoFormaFarmaceutica` (`IdProductoFormaFarmaceutica`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoMarca1` FOREIGN KEY (`IdProductoMarca`) REFERENCES `Gen_ProductoMarca` (`IdProductoMarca`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoMedicion1` FOREIGN KEY (`IdProductoMedicion`) REFERENCES `Gen_ProductoMedicion` (`IdProductoMedicion`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoBloque": {
+      "columns": {
+        "IdBloque": "int(11) NOT NULL AUTO_INCREMENT",
+        "Bloque": "varchar(255) DEFAULT NULL",
+        "PorcentajeMin": "float DEFAULT NULL",
+        "PorcentajeMax": "float DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdBloque`)",
+        "UNIQUE KEY `BLOQUE_UNIQUE` (`Bloque`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoCategoria": {
+      "columns": {
+        "IdProductoCategoria": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoCategoria": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT b'0'",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "IdProductoCategoriaSub": "int(11) DEFAULT NULL",
+        "MostrarDelivery": "tinyint(1) DEFAULT 0",
+        "IdImpresora": "int(11) DEFAULT NULL",
+        "MostrarPuntoVenta": "tinyint(1) DEFAULT 0",
+        "Orden": "int(11) DEFAULT 0",
+        "EsOferta": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoCategoria`)",
+        "UNIQUE KEY `ProductoCategoria_UNIQUE` (`ProductoCategoria`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoCompuesto": {
+      "columns": {
+        "IdProductoCompuesto": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoCompuesto": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoCompuesto`)",
+        "UNIQUE KEY `ProductoCompuesto_UNIQUE` (`ProductoCompuesto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoCompuestoDet": {
+      "columns": {
+        "Gen_Producto_IdProducto": "int(11) NOT NULL",
+        "Gen_ProductoCompuesto_IdProductoCompuesto": "int(11) NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`Gen_Producto_IdProducto`,`Gen_ProductoCompuesto_IdProductoCompuesto`)",
+        "KEY `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_ProductoCompu_idx` (`Gen_ProductoCompuesto_IdProductoCompuesto`)",
+        "KEY `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_Producto1_idx` (`Gen_Producto_IdProducto`)",
+        "CONSTRAINT `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_Producto1` FOREIGN KEY (`Gen_Producto_IdProducto`) REFERENCES `Gen_Producto` (`IdProducto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_ProductoCompues1` FOREIGN KEY (`Gen_ProductoCompuesto_IdProductoCompuesto`) REFERENCES `Gen_ProductoCompuesto` (`IdProductoCompuesto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoDet": {
+      "columns": {
+        "IdProducto": "int(11) NOT NULL",
+        "IdProductoDet": "int(11) NOT NULL",
+        "Cantidad": "float DEFAULT NULL",
+        "Precio": "double DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProducto`,`IdProductoDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoFormaFarmaceutica": {
+      "columns": {
+        "IdProductoFormaFarmaceutica": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoFormaFarmaceutica": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoFormaFarmaceutica`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoMarca": {
+      "columns": {
+        "IdProductoMarca": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoMarca": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoMarca`)",
+        "UNIQUE KEY `ProductoMarca_UNIQUE` (`ProductoMarca`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoMedicion": {
+      "columns": {
+        "IdProductoMedicion": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoMedicion": "varchar(255) DEFAULT NULL",
+        "Descripcion": "varchar(255) DEFAULT NULL",
+        "Codigo": "varchar(45) DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(45) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoMedicion`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoModelo": {
+      "columns": {
+        "IdProductoModelo": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoModelo": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProductoModelo`)",
+        "UNIQUE KEY `ProductoModelo_UNIQUE` (`ProductoModelo`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_ProductoTalla": {
+      "columns": {
+        "IdProductoTalla": "int(11) NOT NULL AUTO_INCREMENT",
+        "ProductoTalla": "varchar(255) DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProductoTalla`)",
+        "UNIQUE KEY `ProductoTalla_UNIQUE` (`ProductoTalla`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Gen_Producto_Serie": {
+      "columns": {
+        "IdProductoSerie": "bigint(20) NOT NULL AUTO_INCREMENT",
+        "IdProducto": "int(11) NOT NULL",
+        "IdDocVenta": "int(11) DEFAULT NULL",
+        "IdMovimiento": "varchar(255) DEFAULT NULL",
+        "Serie": "varchar(255) NOT NULL",
+        "Estado": "smallint(6) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT current_timestamp()",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdProductoSerie`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_Almacen": {
+      "columns": {
+        "IdAlmacen": "int(11) NOT NULL AUTO_INCREMENT",
+        "Almacen": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Direccion": "varchar(255) DEFAULT NULL",
+        "EsPrincipal": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdAlmacen`)",
+        "UNIQUE KEY `IdAlmacen_UNIQUE` (`IdAlmacen`)",
+        "UNIQUE KEY `Almacen_UNIQUE` (`Almacen`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_Impuesto": {
+      "columns": {
+        "IdImpuesto": "int(11) NOT NULL AUTO_INCREMENT",
+        "Impuesto": "varchar(255) DEFAULT NULL",
+        "VaEnDetalle": "bit(1) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdImpuesto`)",
+        "UNIQUE KEY `UNIQUE` (`Impuesto`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_Movimiento": {
+      "columns": {
+        "IdMovimientoTipo": "int(11) NOT NULL",
+        "IdProveedor": "int(11) NOT NULL",
+        "Serie": "varchar(255) NOT NULL",
+        "Numero": "int(11) NOT NULL",
+        "MovimientoFecha": "datetime DEFAULT NULL",
+        "IdAlmacenOrigen": "int(11) DEFAULT NULL",
+        "IdAlmacenDestino": "int(11) DEFAULT NULL",
+        "Observacion": "text DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL",
+        "Percepcion": "float DEFAULT NULL",
+        "FechaStock": "datetime DEFAULT NULL",
+        "EsCredito": "tinyint(1) DEFAULT NULL",
+        "FechaVenCredito": "datetime DEFAULT NULL",
+        "FechaPeriodoTributario": "int(11) NOT NULL",
+        "TipoCambio": "float DEFAULT NULL",
+        "Moneda": "varchar(255) DEFAULT NULL",
+        "PartidaDist": "varchar(255) DEFAULT NULL",
+        "PartidaProv": "varchar(255) DEFAULT NULL",
+        "PartidaDpto": "varchar(255) DEFAULT NULL",
+        "LlegadaDist": "varchar(255) DEFAULT NULL",
+        "LlegadaProv": "varchar(255) DEFAULT NULL",
+        "LlegadaDpto": "varchar(255) DEFAULT NULL",
+        "DestinatarioRazonSocial": "varchar(255) DEFAULT NULL",
+        "DestinatarioRUC": "varchar(255) DEFAULT NULL",
+        "TransporteNumPlaca": "varchar(255) DEFAULT NULL",
+        "TransporteNumContrato": "varchar(255) DEFAULT NULL",
+        "TransporteNumLicencia": "varchar(255) DEFAULT NULL",
+        "TransporteRazonSocial": "varchar(255) DEFAULT NULL",
+        "TransporteRUC": "varchar(255) DEFAULT NULL",
+        "IdDocVenta": "int(11) DEFAULT NULL",
+        "CodSunatModifica": "varchar(255) DEFAULT NULL",
+        "NroComprobanteModifica": "varchar(255) DEFAULT NULL",
+        "NotaIdMotivo": "varchar(255) DEFAULT NULL",
+        "NotaDescMotivo": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdMovimientoTipo`,`IdProveedor`,`Serie`,`Numero`)",
+        "UNIQUE KEY `unique` (`Hash`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_MovimientoDetalle": {
+      "columns": {
+        "hashMovimiento": "varchar(255) NOT NULL",
+        "IdProducto": "int(11) NOT NULL",
+        "Cantidad": "float NOT NULL",
+        "TieneIgv": "bit(1) DEFAULT NULL",
+        "Precio": "float NOT NULL",
+        "ISC": "float DEFAULT NULL",
+        "FLETE": "float DEFAULT NULL",
+        "IdLote": "int(11) DEFAULT NULL",
+        "FechaVen": "date DEFAULT NULL",
+        "PesoTotal": "varchar(255) DEFAULT NULL",
+        "Descripcion": "text NOT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`hashMovimiento`,`IdProducto`,`Precio`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_MovimientoDetalleImpuesto": {
+      "columns": {
+        "HashMovimientoDetalle": "varchar(255) DEFAULT NULL",
+        "IdImpuesto": "int(11) DEFAULT NULL",
+        "Importe": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_MovimientoTipo": {
+      "columns": {
+        "IdMovimientoTipo": "int(11) NOT NULL AUTO_INCREMENT",
+        "TipoMovimiento": "varchar(255) DEFAULT NULL",
+        "Tipo": "int(11) DEFAULT NULL",
+        "VaRegCompra": "bit(1) DEFAULT NULL",
+        "CodSunat": "varchar(255) DEFAULT NULL",
+        "TipoMovSunat": "varchar(255) DEFAULT NULL",
+        "Anulado": "tinyint(1) NOT NULL DEFAULT 0"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdMovimientoTipo`)",
+        "UNIQUE KEY `TipoMovimiento2` (`TipoMovimiento`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_OrdenCompra": {
+      "columns": {
+        "IdOrdenCompra": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdProveedor": "int(11) NOT NULL",
+        "FechaOrdenCompra": "datetime DEFAULT NULL",
+        "Total": "float DEFAULT NULL",
+        "Anio": "varchar(45) DEFAULT NULL",
+        "Numero": "varchar(45) DEFAULT NULL",
+        "Estado": "tinyint(1) DEFAULT 1",
+        "IdAlmacen": "int(11) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdOrdenCompra`,`IdProveedor`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_OrdenCompraDet": {
+      "columns": {
+        "IdOrdenCompra": "int(11) NOT NULL",
+        "IdProducto": "int(11) NOT NULL",
+        "Cantidad": "float DEFAULT NULL",
+        "Precio": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdOrdenCompra`,`IdProducto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Lo_Proveedor": {
+      "columns": {
+        "IdProveedor": "int(11) NOT NULL AUTO_INCREMENT",
+        "Proveedor": "varchar(255) DEFAULT NULL",
+        "Ruc": "varchar(255) DEFAULT NULL",
+        "Direccion": "text DEFAULT NULL",
+        "Telefono": "text DEFAULT NULL",
+        "Observacion": "text DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProveedor`)",
+        "UNIQUE KEY `UNIQUE` (`Proveedor`) USING BTREE",
+        "UNIQUE KEY `UNIQUE2` (`Ruc`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Rhu_Empleado": {
+      "columns": {
+        "IdEmpleado": "int(11) NOT NULL AUTO_INCREMENT",
+        "DniRuc": "varchar(50) DEFAULT NULL",
+        "Empleado": "text DEFAULT NULL",
+        "Direccion": "text DEFAULT NULL",
+        "Telefono": "text DEFAULT NULL",
+        "Email": "text DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 1",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdEmpleado`)",
+        "UNIQUE KEY `u_dniruc` (`DniRuc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Seg_Usuario": {
+      "columns": {
+        "Usuario": "varchar(255) NOT NULL",
+        "IdUsuarioPerfil": "int(11) NOT NULL",
+        "Limitado": "tinyint(4) DEFAULT NULL",
+        "Password": "varchar(255) DEFAULT NULL",
+        "NombreUsuario": "varchar(255) DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "IdAlmacen": "int(11) DEFAULT NULL",
+        "IdDocVentaPuntoVenta": "int(11) DEFAULT NULL",
+        "IdTipoDoc": "int(11) NOT NULL DEFAULT 0",
+        "CajaAbierta": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`Usuario`,`IdUsuarioPerfil`)",
+        "UNIQUE KEY `Usuario_UNIQUE` (`Usuario`)",
+        "KEY `fk_Usuario_UsuarioPerfil1_idx` (`IdUsuarioPerfil`)",
+        "CONSTRAINT `fk_Usuario_UsuarioPerfil1` FOREIGN KEY (`IdUsuarioPerfil`) REFERENCES `Seg_UsuarioPerfil` (`IdUsuarioPerfil`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Seg_UsuarioModulo": {
+      "columns": {
+        "IdUsuarioModulo": "int(11) NOT NULL AUTO_INCREMENT",
+        "UsuarioModulo": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdUsuarioModulo`)",
+        "UNIQUE KEY `UsuarioModulo_UNIQUE` (`UsuarioModulo`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Seg_UsuarioModulo_has_UsuarioPerfil": {
+      "columns": {
+        "IdUsuarioModulo": "int(11) NOT NULL",
+        "IdUsuarioPerfil": "int(11) NOT NULL",
+        "Lectura": "bit(1) DEFAULT NULL",
+        "Escritura": "bit(1) DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 1"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdUsuarioModulo`,`IdUsuarioPerfil`)",
+        "KEY `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioPerfil1_idx` (`IdUsuarioPerfil`)",
+        "KEY `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioModulo1_idx` (`IdUsuarioModulo`)",
+        "CONSTRAINT `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioModulo1` FOREIGN KEY (`IdUsuarioModulo`) REFERENCES `Seg_UsuarioModulo` (`IdUsuarioModulo`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioPerfil1` FOREIGN KEY (`IdUsuarioPerfil`) REFERENCES `Seg_UsuarioPerfil` (`IdUsuarioPerfil`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Seg_UsuarioPerfil": {
+      "columns": {
+        "IdUsuarioPerfil": "int(11) NOT NULL AUTO_INCREMENT",
+        "UsuarioPerfil": "varchar(255) DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdUsuarioPerfil`)",
+        "UNIQUE KEY `UsuarioPerfil_UNIQUE` (`UsuarioPerfil`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Sunat_Resumen": {
+      "columns": {
+        "IdSunatResumen": "int(11) NOT NULL AUTO_INCREMENT",
+        "Serie": "varchar(255) DEFAULT NULL",
+        "Secuencia": "int(11) DEFAULT NULL",
+        "CodSunat": "varchar(45) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdSunatResumen`)",
+        "UNIQUE KEY `IdSunatResumen_UNIQUE` (`IdSunatResumen`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVenta": {
+      "columns": {
+        "idDocVenta": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocVentaPuntoVenta": "int(11) NOT NULL",
+        "IdCliente": "int(11) NOT NULL",
+        "IdTipoDoc": "int(11) NOT NULL",
+        "IdAlmacen": "int(11) NOT NULL",
+        "Serie": "varchar(255) DEFAULT NULL",
+        "Numero": "int(11) DEFAULT NULL",
+        "FechaDoc": "datetime DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL",
+        "IdCierre": "int(11) DEFAULT NULL",
+        "EsCredito": "bit(1) DEFAULT NULL",
+        "FechaCredito": "datetime DEFAULT NULL",
+        "Estado": "tinyint(1) DEFAULT 1",
+        "Hash_cpe": "varchar(255) DEFAULT NULL",
+        "Hash_cdr": "varchar(255) DEFAULT NULL",
+        "Msj_sunat": "text DEFAULT NULL",
+        "AnuladoDesc": "varchar(255) DEFAULT NULL",
+        "Ticket": "varchar(255) DEFAULT NULL",
+        "PagoCon": "float DEFAULT NULL",
+        "CampoDireccion": "text DEFAULT NULL",
+        "IdPreOrden": "text DEFAULT NULL",
+        "LugarProcedencia": "varchar(255) DEFAULT NULL",
+        "MedioTransporte": "varchar(255) DEFAULT NULL",
+        "ProximoDestino": "varchar(255) DEFAULT NULL",
+        "SunatResponse": "longtext DEFAULT NULL",
+        "ErrorSunatResponse": "longtext DEFAULT NULL",
+        "CodSunatModifica": "varchar(255) DEFAULT NULL",
+        "NroComprobanteModifica": "varchar(255) DEFAULT NULL",
+        "NotaIdMotivo": "varchar(255) DEFAULT NULL",
+        "NotaDescMotivo": "varchar(255) DEFAULT NULL",
+        "valorComision": "float DEFAULT NULL",
+        "IdComisionista": "int(11) DEFAULT NULL",
+        "ResumenFecha": "varchar(100) DEFAULT NULL",
+        "ResumenCorrelativo": "int(11) DEFAULT NULL",
+        "ResumenResponse": "text DEFAULT NULL",
+        "PorEntregar": "tinyint(1) DEFAULT 0",
+        "BajaFecha": "varchar(100) DEFAULT NULL",
+        "BajaCorrelativo": "int(11) DEFAULT NULL",
+        "BajaMotivo": "varchar(255) DEFAULT NULL",
+        "IdPedido": "int(11) DEFAULT 0",
+        "EsDelivery": "tinyint(1) DEFAULT 0",
+        "DireccionEntrega": "text DEFAULT NULL",
+        "NombreLlevar": "varchar(250) DEFAULT NULL",
+        "GRE": "text DEFAULT NULL",
+        "NombreOrganizacion": "text DEFAULT NULL",
+        "EsOrganizacion": "tinyint(1) DEFAULT NULL",
+        "IdOferta": "int(11) DEFAULT NULL",
+        "EntregadoOfertaFlag": "tinyint(1) DEFAULT 0",
+        "IdProforma": "int(11) DEFAULT NULL",
+        "Descripcion": "text DEFAULT NULL",
+        "Garantia": "tinyint(4) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`idDocVenta`)",
+        "UNIQUE KEY `idDocVenta_UNIQUE` (`idDocVenta`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaPuntoVenta_idx` (`IdDocVentaPuntoVenta`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaCliente1_idx` (`IdCliente`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaTipoDoc1_idx` (`IdTipoDoc`)",
+        "KEY `fk_Ve_DocVenta_Lo_Almacen1_idx` (`IdAlmacen`)",
+        "CONSTRAINT `fk_Ve_DocVenta_Lo_Almacen1` FOREIGN KEY (`IdAlmacen`) REFERENCES `Lo_Almacen` (`IdAlmacen`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaCliente1` FOREIGN KEY (`IdCliente`) REFERENCES `Ve_DocVentaCliente` (`IdCliente`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaPuntoVenta` FOREIGN KEY (`IdDocVentaPuntoVenta`) REFERENCES `Ve_DocVentaPuntoVenta` (`IdDocVentaPuntoVenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaTipoDoc1` FOREIGN KEY (`IdTipoDoc`) REFERENCES `Ve_DocVentaTipoDoc` (`IdTipoDoc`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaCliente": {
+      "columns": {
+        "IdCliente": "int(11) NOT NULL AUTO_INCREMENT",
+        "Cliente": "varchar(255) DEFAULT NULL",
+        "DniRuc": "varchar(255) DEFAULT NULL",
+        "Direccion": "longtext DEFAULT NULL",
+        "Telefono": "longtext DEFAULT NULL",
+        "Email": "varchar(255) DEFAULT NULL",
+        "Anulado": "int(11) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Puntos": "float DEFAULT 0",
+        "EsVIP": "tinyint(1) DEFAULT 0",
+        "Direccion2": "varchar(255) DEFAULT NULL",
+        "Sexo": "varchar(1) DEFAULT NULL",
+        "Ocupacion": "varchar(255) DEFAULT NULL",
+        "FechaNacimiento": "date DEFAULT NULL",
+        "Nacionalidad": "varchar(255) DEFAULT NULL",
+        "Direccion3": "varchar(255) DEFAULT NULL",
+        "NombreComercial": "varchar(255) DEFAULT NULL",
+        "esComisionista": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdCliente`)",
+        "UNIQUE KEY `IdCliente_UNIQUE` (`IdCliente`)",
+        "UNIQUE KEY `CLIENTE_UNIQUE` (`Cliente`)",
+        "UNIQUE KEY `DNIRUC_UNIQUE` (`DniRuc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaDescuento": {
+      "columns": {
+        "IdDocVentaDescuento": "int(11) NOT NULL AUTO_INCREMENT",
+        "PorCada": "float DEFAULT NULL",
+        "Puntos": "float DEFAULT 1",
+        "ValorPunto": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaDescuento`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaDet": {
+      "columns": {
+        "IdDocVentaDet": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocVenta": "int(11) NOT NULL",
+        "IdProducto": "int(11) NOT NULL",
+        "Cantidad": "float DEFAULT NULL",
+        "Precio": "float DEFAULT NULL",
+        "PrecioCosto": "float DEFAULT NULL",
+        "Descuento": "float NOT NULL DEFAULT 0",
+        "FechaAlquilerFin": "datetime DEFAULT NULL",
+        "Descripcion": "text DEFAULT NULL",
+        "FechaAlquilerInicio": "datetime DEFAULT NULL",
+        "EsManoDeObra": "tinyint(1) DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaDet`)",
+        "KEY `fk_Ve_DocVentaDet_Ve_DocVenta1_idx` (`IdDocVenta`)",
+        "KEY `fk_Ve_DocVentaDet_Gen_Producto_idx` (`IdProducto`)",
+        "CONSTRAINT `fk_Ve_DocVentaDet_Gen_Producto` FOREIGN KEY (`IdProducto`) REFERENCES `Gen_Producto` (`IdProducto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVentaDet_Ve_DocVenta1` FOREIGN KEY (`IdDocVenta`) REFERENCES `Ve_DocVenta` (`idDocVenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaDetEntrega": {
+      "columns": {
+        "IdDocVentaDetEntrega": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocVentaDet": "int(11) NOT NULL",
+        "Cantidad": "int(11) NOT NULL",
+        "Fecha": "datetime NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaDetEntrega`)",
+        "KEY `IdDocVentaDet` (`IdDocVentaDet`)",
+        "CONSTRAINT `Ve_DocVentaDetEntrega_ibfk_1` FOREIGN KEY (`IdDocVentaDet`) REFERENCES `Ve_DocVentaDet` (`IdDocVentaDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaHistorialKit": {
+      "columns": {
+        "IdDocVentaHistorialKit": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocVenta": "int(11) DEFAULT NULL",
+        "IdProducto": "int(11) DEFAULT NULL",
+        "Cantidad": "double DEFAULT NULL",
+        "Precio": "double DEFAULT NULL",
+        "PrecioCosto": "double DEFAULT NULL",
+        "Descuento": "double DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaHistorialKit`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaMetodoPago": {
+      "columns": {
+        "IdMetodoPago": "int(11) NOT NULL AUTO_INCREMENT",
+        "MetodoPago": "varchar(255) DEFAULT NULL",
+        "EsTarjeta": "bit(1) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdMetodoPago`)",
+        "UNIQUE KEY `MetodoPago_UNIQUE` (`MetodoPago`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaMetodoPagoDet": {
+      "columns": {
+        "IdDocVenta": "int(11) NOT NULL",
+        "IdMetodoPago": "int(11) NOT NULL",
+        "Importe": "float(15,2) NOT NULL",
+        "NroTarjeta": "varchar(255) NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaNotaCredito": {
+      "columns": {
+        "IdDocVentaNotaCredito": "int(11) NOT NULL AUTO_INCREMENT",
+        "idDocVenta": "int(11) NOT NULL",
+        "Hash_cpe": "varchar(255) DEFAULT NULL",
+        "Hash_cdr": "varchar(255) DEFAULT NULL",
+        "Msj_sunat": "text DEFAULT NULL",
+        "Ticket": "varchar(45) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaNotaCredito`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaPuntoVenta": {
+      "columns": {
+        "IdDocVentaPuntoVenta": "int(11) NOT NULL AUTO_INCREMENT",
+        "PuntoVenta": "varchar(255) DEFAULT NULL",
+        "SerieDocVenta": "varchar(255) DEFAULT NULL",
+        "SerieImpresora": "varchar(255) DEFAULT NULL",
+        "RutaImpresora": "longtext DEFAULT NULL",
+        "Anulado": "bit(1) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "IdImpresora": "int(11) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaPuntoVenta`)",
+        "UNIQUE KEY `IdDocVentaPuntoVenta_UNIQUE` (`IdDocVentaPuntoVenta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaPuntoVentaDet": {
+      "columns": {
+        "IdDocVentaPuntoVenta": "int(11) NOT NULL",
+        "IdDocVentaTipoDoc": "int(11) NOT NULL",
+        "Serie": "varchar(45) DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaPuntoVenta`,`IdDocVentaTipoDoc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaRemision": {
+      "columns": {
+        "IdDocVentaRemision": "int(11) NOT NULL AUTO_INCREMENT",
+        "FechaReg": "datetime DEFAULT NULL",
+        "FechaTraslado": "datetime DEFAULT NULL",
+        "Observacion": "text DEFAULT NULL",
+        "CodUndPesoBruto": "varchar(10) NOT NULL DEFAULT 'KGM'",
+        "PesoBruto": "float NOT NULL",
+        "CodModalidadTraslado": "varchar(10) NOT NULL DEFAULT '01'",
+        "CodMotivoTraslado": "varchar(10) NOT NULL DEFAULT '01'",
+        "DescripcionMotivoTraslado": "varchar(255) NOT NULL",
+        "CodUbigeoOrigen": "varchar(10) NOT NULL",
+        "DireccionOrigen": "varchar(255) NOT NULL",
+        "DocumentoReferencia": "varchar(100) DEFAULT NULL",
+        "NroDocumentoCliente": "varchar(100) NOT NULL",
+        "RazonSocialCliente": "varchar(255) NOT NULL",
+        "DireccionCliente": "varchar(255) DEFAULT NULL",
+        "CodUbigeoDestino": "varchar(10) NOT NULL",
+        "DireccionDestino": "varchar(255) DEFAULT NULL",
+        "NroDocumentoTransportista": "varchar(100) NOT NULL",
+        "RazonSocialTransportista": "varchar(255) DEFAULT NULL",
+        "PlacaVehiculo": "varchar(255) DEFAULT NULL",
+        "PlacaCarreta": "varchar(255) DEFAULT NULL",
+        "NroDocChofer": "varchar(255) DEFAULT NULL",
+        "LicenciaChofer": "varchar(255) DEFAULT NULL",
+        "Serie": "varchar(255) DEFAULT NULL",
+        "Numero": "int(11) DEFAULT NULL",
+        "TotalBultos": "int(11) NOT NULL",
+        "Estado": "tinyint(1) NOT NULL DEFAULT 1",
+        "Hash_cpe": "varchar(255) DEFAULT NULL",
+        "Hash_cdr": "varchar(255) DEFAULT NULL",
+        "Msj_sunat": "text DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaRemision`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaRemisionDet": {
+      "columns": {
+        "IdDocVentaRemisionDet": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDocVentaRemision": "int(11) NOT NULL",
+        "IdProducto": "int(11) NOT NULL",
+        "Cantidad": "float NOT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdDocVentaRemisionDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_DocVentaTipoDoc": {
+      "columns": {
+        "IdTipoDoc": "int(11) NOT NULL AUTO_INCREMENT",
+        "TipoDoc": "varchar(255) DEFAULT NULL",
+        "VaRegVenta": "bit(1) DEFAULT NULL",
+        "CodSunat": "varchar(255) DEFAULT NULL",
+        "TipoDocSunat": "varchar(255) DEFAULT NULL",
+        "TieneIgv": "tinyint(1) DEFAULT 0",
+        "LimiteItems": "int(11) DEFAULT NULL",
+        "CodigoIgv": "varchar(45) DEFAULT '10'",
+        "Orden": "int(11) DEFAULT 0",
+        "EsElectronico": "tinyint(1) DEFAULT 0",
+        "Oculto": "tinyint(1) NOT NULL DEFAULT 0"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdTipoDoc`)",
+        "UNIQUE KEY `TipoDoc_UNIQUE` (`TipoDoc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_ExpertoDiagnostico": {
+      "columns": {
+        "IdDiagnostico": "int(11) NOT NULL AUTO_INCREMENT",
+        "Diagnostico": "varchar(255) NOT NULL",
+        "Problema": "text NOT NULL",
+        "Edad": "int(11) DEFAULT NULL",
+        "Observacion": "text DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdDiagnostico`)",
+        "UNIQUE KEY `ENFERMEDAD_UNIQUE` (`Diagnostico`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_ExpertoDiagnosticoSintomaDet": {
+      "columns": {
+        "IdDiagnostico": "int(11) NOT NULL",
+        "IdSintoma": "int(11) NOT NULL",
+        "Fechareg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdDiagnostico`,`IdSintoma`)",
+        "KEY `Sintomas` (`IdSintoma`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_ExpertoSintoma": {
+      "columns": {
+        "IdSintoma": "int(11) NOT NULL AUTO_INCREMENT",
+        "Sintoma": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdSintoma`)",
+        "UNIQUE KEY `SINTOMA_UNIQUE` (`Sintoma`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_ExpertoTratamiento": {
+      "columns": {
+        "IdTratamiento": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdDiagnostico": "int(11) NOT NULL",
+        "IdCompuesto": "int(11) NOT NULL",
+        "Observacion": "text DEFAULT NULL",
+        "TomasXDia": "float DEFAULT NULL",
+        "DosisXPeso": "float DEFAULT NULL",
+        "UnidadDosisXPeso": "varchar(255) DEFAULT NULL",
+        "Concentracion": "float DEFAULT NULL",
+        "NroDias": "int(11) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Hash": "varchar(255) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdTratamiento`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_PreOrden": {
+      "columns": {
+        "IdPreOrden": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdCliente": "int(11) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "UsuarioReg": "varchar(255) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Estado": "varchar(3) DEFAULT NULL",
+        "LugarProcedencia": "varchar(255) DEFAULT NULL",
+        "MedioTransporte": "varchar(255) DEFAULT NULL",
+        "ProximoDestino": "varchar(255) DEFAULT NULL",
+        "IdDocVenta": "int(11) DEFAULT NULL",
+        "FechaAlquilerFin": "datetime DEFAULT NULL",
+        "Anulado": "tinyint(1) NOT NULL DEFAULT 0",
+        "FechaAlquilerInicio": "datetime DEFAULT NULL",
+        "IdCajaBanco": "int(11) DEFAULT NULL",
+        "IdProforma": "int(11) DEFAULT NULL",
+        "Descripcion": "text DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdPreOrden`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_PreOrdenDet": {
+      "columns": {
+        "IdPreOrden": "int(11) DEFAULT NULL",
+        "IdProducto": "int(11) DEFAULT NULL",
+        "Cantidad": "int(11) DEFAULT NULL",
+        "Precio": "float DEFAULT NULL",
+        "EsManoDeObra": "tinyint(4) DEFAULT 0",
+        "Pagado": "tinyint(1) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_PreOrdenDetPago": {
+      "columns": {
+        "IdPreOrdenDetPago": "bigint(20) NOT NULL AUTO_INCREMENT",
+        "IdPreOrden": "int(11) DEFAULT NULL",
+        "IdProducto": "int(11) DEFAULT NULL",
+        "Monto": "float DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`IdPreOrdenDetPago`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_Proforma": {
+      "columns": {
+        "IdProforma": "int(11) NOT NULL AUTO_INCREMENT",
+        "Numero": "int(11) DEFAULT NULL",
+        "Anio": "int(11) DEFAULT NULL",
+        "IdCliente": "int(11) DEFAULT NULL",
+        "FechaReg": "datetime DEFAULT NULL",
+        "DiasValidos": "int(11) DEFAULT 7",
+        "UsuarioReg": "varchar(45) DEFAULT NULL",
+        "FechaMod": "datetime DEFAULT NULL",
+        "UsuarioMod": "varchar(255) DEFAULT NULL",
+        "Anulado": "tinyint(1) DEFAULT 0",
+        "Descripcion": "text DEFAULT NULL",
+        "EsFavoritoFlag": "tinyint(1) DEFAULT 0",
+        "IdDocVenta": "int(11) DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProforma`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "Ve_ProformaDet": {
+      "columns": {
+        "IdProformaDet": "int(11) NOT NULL AUTO_INCREMENT",
+        "IdProforma": "int(11) DEFAULT NULL",
+        "IdProducto": "int(11) DEFAULT NULL",
+        "DisabledTotal": "tinyint(1) DEFAULT 0",
+        "Descripcion": "text DEFAULT NULL",
+        "Cantidad": "float DEFAULT NULL",
+        "Precio": "float DEFAULT NULL",
+        "Descuento": "float DEFAULT 0"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProformaDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "prodstock": {
+      "columns": {
+        "IdProducto": "int(11) NOT NULL",
+        "ProductoMarca": "varchar(255) DEFAULT NULL",
+        "ProductoCategoria": "varchar(255) DEFAULT NULL",
+        "FormaFarmaceutica": "varchar(255) DEFAULT NULL",
+        "Producto": "varchar(255) DEFAULT NULL",
+        "Stock": "float DEFAULT NULL"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "PRIMARY KEY (`IdProducto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "remision": {
+      "columns": {
+        "id": "int(11) NOT NULL AUTO_INCREMENT",
+        "tipoDoc": "varchar(10) NOT NULL",
+        "serie": "varchar(10) NOT NULL",
+        "correlativo": "int(11) NOT NULL",
+        "fechaEmision": "datetime NOT NULL",
+        "company": "longtext DEFAULT NULL",
+        "destinatario": "longtext DEFAULT NULL",
+        "tercero": "longtext DEFAULT NULL",
+        "observacion": "varchar(255) DEFAULT NULL",
+        "docBaja": "longtext DEFAULT NULL",
+        "relDoc": "longtext DEFAULT NULL",
+        "envio": "longtext DEFAULT NULL",
+        "details": "longtext DEFAULT NULL",
+        "sunatResponse": "longtext DEFAULT NULL",
+        "errorSunatResponse": "longtext DEFAULT NULL"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "PRIMARY KEY (`id`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "tblKardex": {
+      "columns": {
+        "d1": "varchar(255) DEFAULT ' '",
+        "d2": "varchar(255) DEFAULT ' '",
+        "d3": "varchar(255) DEFAULT ' '",
+        "d4": "varchar(255) DEFAULT ' '",
+        "d5": "varchar(255) DEFAULT ' '"
+      },
+      "engine": "InnoDB",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    },
+    "tblKardexvalor": {
+      "columns": {
+        "d1": "varchar(255) DEFAULT ' '",
+        "d2": "varchar(255) DEFAULT ' '",
+        "d3": "varchar(255) DEFAULT ' '",
+        "d4": "varchar(255) DEFAULT ' '",
+        "d5": "varchar(255) DEFAULT ' '",
+        "d6": "varchar(255) DEFAULT ' '",
+        "d7": "varchar(255) DEFAULT ' '",
+        "d8": "varchar(255) DEFAULT ' '",
+        "d9": "varchar(255) DEFAULT ' '",
+        "d10": "varchar(255) DEFAULT ' '",
+        "d11": "varchar(255) DEFAULT ' '"
+      },
+      "engine": "MyISAM",
+      "keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ]
+    }
+  },
+  "target_database": "neuro_mig_test_20261015_201239_7c3c7a",
+  "mapping": [
+    {
+      "source": "Ag_Caja",
+      "target": "ag_caja",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_caja",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCaja",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_CategoriaEmpresa",
+      "target": "ag_categoriaempresa",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCategoriaEmpresa`)",
+        "UNIQUE KEY `CategoriaUnico` (`CategoriaEmpresa`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_categoriaempresa",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCategoriaEmpresa",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_categoriaempresa",
+          "Non_unique": "0",
+          "Key_name": "CategoriaUnico",
+          "Seq_in_index": "1",
+          "Column_name": "CategoriaEmpresa",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 4,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_CierreCaja",
+      "target": "ag_cierrecaja",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCierreCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_cierrecaja",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCierreCaja",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_Comprobante",
+      "target": "ag_comprobante",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdComprobante`)",
+        "KEY `idcliente` (`IdCliente`)",
+        "KEY `idservicio` (`IdServicio`)",
+        "KEY `identidad` (`IdEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_comprobante",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdComprobante",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_comprobante",
+          "Non_unique": "1",
+          "Key_name": "idcliente",
+          "Seq_in_index": "1",
+          "Column_name": "IdCliente",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_comprobante",
+          "Non_unique": "1",
+          "Key_name": "idservicio",
+          "Seq_in_index": "1",
+          "Column_name": "IdServicio",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_comprobante",
+          "Non_unique": "1",
+          "Key_name": "identidad",
+          "Seq_in_index": "1",
+          "Column_name": "IdEntidad",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 6,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_Empresa",
+      "target": "ag_empresa",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdEmpresa`)",
+        "UNIQUE KEY `EmpresaUnico` (`Empresa`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_empresa",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpresa",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_empresa",
+          "Non_unique": "0",
+          "Key_name": "EmpresaUnico",
+          "Seq_in_index": "1",
+          "Column_name": "Empresa",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 4,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_EmpresasEntidad",
+      "target": "ag_empresasentidad",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdEmpresaEntidad`,`IdEntidad`,`IdEmpresa`,`IdCategoriaEmpresa`) USING BTREE",
+        "UNIQUE KEY `IdEmpresaCategoria` (`IdEmpresaEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_empresasentidad",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpresaEntidad",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_empresasentidad",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdEntidad",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_empresasentidad",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "3",
+          "Column_name": "IdEmpresa",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_empresasentidad",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "4",
+          "Column_name": "IdCategoriaEmpresa",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_empresasentidad",
+          "Non_unique": "0",
+          "Key_name": "IdEmpresaCategoria",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpresaEntidad",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_Entidad",
+      "target": "ag_entidad",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdEntidad`)",
+        "UNIQUE KEY `unico_nombre` (`Nombre`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_entidad",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdEntidad",
+          "Collation": "A",
+          "Cardinality": "9",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_entidad",
+          "Non_unique": "0",
+          "Key_name": "unico_nombre",
+          "Seq_in_index": "1",
+          "Column_name": "Nombre",
+          "Collation": "A",
+          "Cardinality": "9",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 9,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_Operacion",
+      "target": "ag_operacion",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdOperacion`)",
+        "KEY `identidad` (`IdEntidad`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_operacion",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdOperacion",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_operacion",
+          "Non_unique": "1",
+          "Key_name": "identidad",
+          "Seq_in_index": "1",
+          "Column_name": "IdEntidad",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 4,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ag_Servicio",
+      "target": "ag_servicio",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdServicio`)",
+        "KEY `idempreentidad` (`IdEmpresaEntidad`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ag_servicio",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdServicio",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ag_servicio",
+          "Non_unique": "1",
+          "Key_name": "idempreentidad",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpresaEntidad",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 7,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Agen_Conversacion",
+      "target": "agen_conversacion",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdConversacion`)",
+        "KEY `idx_AgConversacion_UsuarioReg` (`UsuarioReg`)",
+        "KEY `idx_AgConversacion_FechaModificacion` (`FechaModificacion`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "agen_conversacion",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdConversacion",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "agen_conversacion",
+          "Non_unique": "1",
+          "Key_name": "idx_AgConversacion_UsuarioReg",
+          "Seq_in_index": "1",
+          "Column_name": "UsuarioReg",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "agen_conversacion",
+          "Non_unique": "1",
+          "Key_name": "idx_AgConversacion_FechaModificacion",
+          "Seq_in_index": "1",
+          "Column_name": "FechaModificacion",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Agen_ConversacionDetalle",
+      "target": "agen_conversaciondetalle",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdConversacionDetalle`)",
+        "KEY `idx_AgConversacionDetalle_IdConversacion` (`IdConversacion`)",
+        "CONSTRAINT `fk_AgConversacionDetalle_Conversacion` FOREIGN KEY (`IdConversacion`) REFERENCES `Agen_Conversacion` (`IdConversacion`) ON DELETE CASCADE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "agen_conversaciondetalle",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdConversacionDetalle",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "agen_conversaciondetalle",
+          "Non_unique": "1",
+          "Key_name": "idx_AgConversacionDetalle_IdConversacion",
+          "Seq_in_index": "1",
+          "Column_name": "IdConversacion",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_CajaBanco",
+      "target": "cb_cajabanco",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCajaBanco`)",
+        "KEY `fk_2` (`IdCuenta`)",
+        "KEY `fk_TipoBanco` (`IdTipoCajaBanco`)",
+        "CONSTRAINT `fk_2` FOREIGN KEY (`IdCuenta`) REFERENCES `Cb_Cuenta` (`IdCuenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_TipoBanco` FOREIGN KEY (`IdTipoCajaBanco`) REFERENCES `Cb_TipoCajaBanco` (`IdTipoCajaBanco`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_cajabanco",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCajaBanco",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "cb_cajabanco",
+          "Non_unique": "1",
+          "Key_name": "fk_2",
+          "Seq_in_index": "1",
+          "Column_name": "IdCuenta",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "cb_cajabanco",
+          "Non_unique": "1",
+          "Key_name": "fk_TipoBanco",
+          "Seq_in_index": "1",
+          "Column_name": "IdTipoCajaBanco",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 7,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_CajaBancoDet",
+      "target": "cb_cajabancodet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocDet`,`IdCajaBanco`,`Tipo`)",
+        "KEY `fk1` (`IdCajaBanco`)",
+        "CONSTRAINT `fk1` FOREIGN KEY (`IdCajaBanco`) REFERENCES `Cb_CajaBanco` (`IdCajaBanco`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_cajabancodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocDet",
+          "Collation": "A",
+          "Cardinality": "10",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "cb_cajabancodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdCajaBanco",
+          "Collation": "A",
+          "Cardinality": "10",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "cb_cajabancodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "3",
+          "Column_name": "Tipo",
+          "Collation": "A",
+          "Cardinality": "10",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "cb_cajabancodet",
+          "Non_unique": "1",
+          "Key_name": "fk1",
+          "Seq_in_index": "1",
+          "Column_name": "IdCajaBanco",
+          "Collation": "A",
+          "Cardinality": "10",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 10,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_CierreCaja",
+      "target": "cb_cierrecaja",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCierreCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_cierrecaja",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCierreCaja",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_Cuenta",
+      "target": "cb_cuenta",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCuenta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_cuenta",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCuenta",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 3,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_LetraCaja",
+      "target": "cb_letracaja",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdLetraCaja`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_letracaja",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdLetraCaja",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Cb_TipoCajaBanco",
+      "target": "cb_tipocajabanco",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdTipoCajaBanco`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "cb_tipocajabanco",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdTipoCajaBanco",
+          "Collation": "A",
+          "Cardinality": "7",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 7,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "GEN_EMPRESA",
+      "target": "gen_empresa",
+      "engine": "MyISAM",
+      "new_columns": [
+        "CELULAR",
+        "EMAIL"
+      ],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IDEMPRESA`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_empresa",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IDEMPRESA",
+          "Collation": "A",
+          "Cardinality": "1",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 1,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_EmpresaConfig",
+      "target": "gen_empresaconfig",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdEmpresaConfig`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_empresaconfig",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpresaConfig",
+          "Collation": "A",
+          "Cardinality": "9",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 9,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_Impresora",
+      "target": "gen_impresora",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdImpresora`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_impresora",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdImpresora",
+          "Collation": "A",
+          "Cardinality": "1",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 1,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_Moneda",
+      "target": "gen_moneda",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "MyISAM",
+      "target_rows": 2,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_Oferta",
+      "target": "gen_oferta",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdOferta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_oferta",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdOferta",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_Producto",
+      "target": "gen_producto",
+      "engine": "InnoDB",
+      "new_columns": [
+        "Imagen2",
+        "Imagen3",
+        "FechaOfertaInicio",
+        "FechaOfertaFin",
+        "IdProductoTalla",
+        "CodeBarModelo",
+        "PrecioWeb",
+        "PrecioAnterior",
+        "OfertaWeb",
+        "EsServicioManoObra"
+      ],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProducto`,`IdProductoMarca`,`IdProductoFormaFarmaceutica`,`IdProductoMedicion`,`IdProductoCategoria`)",
+        "UNIQUE KEY `Producto_UNIQUE` (`Producto`)",
+        "KEY `fk_Producto_ProductoMarca1_idx` (`IdProductoMarca`)",
+        "KEY `fk_Producto_ProductoFormaFarmaceutica1_idx` (`IdProductoFormaFarmaceutica`)",
+        "KEY `fk_Producto_ProductoMedicion1_idx` (`IdProductoMedicion`)",
+        "KEY `fk_Producto_ProductoCategoria1_idx` (`IdProductoCategoria`)",
+        "CONSTRAINT `fk_Producto_ProductoCategoria1` FOREIGN KEY (`IdProductoCategoria`) REFERENCES `Gen_ProductoCategoria` (`IdProductoCategoria`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoFormaFarmaceutica1` FOREIGN KEY (`IdProductoFormaFarmaceutica`) REFERENCES `Gen_ProductoFormaFarmaceutica` (`IdProductoFormaFarmaceutica`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoMarca1` FOREIGN KEY (`IdProductoMarca`) REFERENCES `Gen_ProductoMarca` (`IdProductoMarca`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Producto_ProductoMedicion1` FOREIGN KEY (`IdProductoMedicion`) REFERENCES `Gen_ProductoMedicion` (`IdProductoMedicion`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProductoMarca",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "3",
+          "Column_name": "IdProductoFormaFarmaceutica",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "4",
+          "Column_name": "IdProductoMedicion",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "5",
+          "Column_name": "IdProductoCategoria",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "0",
+          "Key_name": "Producto_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Producto",
+          "Collation": "A",
+          "Cardinality": "2847",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "fk_Producto_ProductoMarca1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoMarca",
+          "Collation": "A",
+          "Cardinality": "949",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "fk_Producto_ProductoFormaFarmaceutica1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoFormaFarmaceutica",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "fk_Producto_ProductoMedicion1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoMedicion",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "fk_Producto_ProductoCategoria1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoCategoria",
+          "Collation": "A",
+          "Cardinality": "158",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "idx_producto_oferta_pedi2",
+          "Seq_in_index": "1",
+          "Column_name": "IdOfertaCategoria",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "idx_producto_oferta_pedi2",
+          "Seq_in_index": "2",
+          "Column_name": "PosOferta",
+          "Collation": "A",
+          "Cardinality": "18",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "idx_producto_oferta_pedi2",
+          "Seq_in_index": "3",
+          "Column_name": "FechaOfertaInicio",
+          "Collation": "A",
+          "Cardinality": "18",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_producto",
+          "Non_unique": "1",
+          "Key_name": "idx_producto_oferta_pedi2",
+          "Seq_in_index": "4",
+          "Column_name": "FechaOfertaFin",
+          "Collation": "A",
+          "Cardinality": "18",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 2847,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {
+          "idx_producto_oferta_pedi2": {
+            "unique": false,
+            "columns": [
+              "IdOfertaCategoria",
+              "PosOferta",
+              "FechaOfertaInicio",
+              "FechaOfertaFin"
+            ]
+          }
+        },
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoBloque",
+      "target": "gen_productobloque",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdBloque`)",
+        "UNIQUE KEY `BLOQUE_UNIQUE` (`Bloque`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productobloque",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdBloque",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productobloque",
+          "Non_unique": "0",
+          "Key_name": "BLOQUE_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Bloque",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoCategoria",
+      "target": "gen_productocategoria",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoCategoria`)",
+        "UNIQUE KEY `ProductoCategoria_UNIQUE` (`ProductoCategoria`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productocategoria",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoCategoria",
+          "Collation": "A",
+          "Cardinality": "80",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productocategoria",
+          "Non_unique": "0",
+          "Key_name": "ProductoCategoria_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "ProductoCategoria",
+          "Collation": "A",
+          "Cardinality": "80",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 80,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoCompuesto",
+      "target": "gen_productocompuesto",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoCompuesto`)",
+        "UNIQUE KEY `ProductoCompuesto_UNIQUE` (`ProductoCompuesto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productocompuesto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoCompuesto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productocompuesto",
+          "Non_unique": "0",
+          "Key_name": "ProductoCompuesto_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "ProductoCompuesto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoCompuestoDet",
+      "target": "gen_productocompuestodet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`Gen_Producto_IdProducto`,`Gen_ProductoCompuesto_IdProductoCompuesto`)",
+        "KEY `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_ProductoCompu_idx` (`Gen_ProductoCompuesto_IdProductoCompuesto`)",
+        "KEY `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_Producto1_idx` (`Gen_Producto_IdProducto`)",
+        "CONSTRAINT `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_Producto1` FOREIGN KEY (`Gen_Producto_IdProducto`) REFERENCES `Gen_Producto` (`IdProducto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_ProductoCompues1` FOREIGN KEY (`Gen_ProductoCompuesto_IdProductoCompuesto`) REFERENCES `Gen_ProductoCompuesto` (`IdProductoCompuesto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productocompuestodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "Gen_Producto_IdProducto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productocompuestodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "Gen_ProductoCompuesto_IdProductoCompuesto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productocompuestodet",
+          "Non_unique": "1",
+          "Key_name": "fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_ProductoCompu_idx",
+          "Seq_in_index": "1",
+          "Column_name": "Gen_ProductoCompuesto_IdProductoCompuesto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productocompuestodet",
+          "Non_unique": "1",
+          "Key_name": "fk_Gen_Producto_has_Gen_ProductoCompuesto_Gen_Producto1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "Gen_Producto_IdProducto",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoDet",
+      "target": "gen_productodet",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProducto`,`IdProductoDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productodet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProductoDet",
+          "Collation": "A",
+          "Cardinality": "91",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 91,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoFormaFarmaceutica",
+      "target": "gen_productoformafarmaceutica",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoFormaFarmaceutica`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productoformafarmaceutica",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoFormaFarmaceutica",
+          "Collation": "A",
+          "Cardinality": "75",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 75,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoMarca",
+      "target": "gen_productomarca",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoMarca`)",
+        "UNIQUE KEY `ProductoMarca_UNIQUE` (`ProductoMarca`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productomarca",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoMarca",
+          "Collation": "A",
+          "Cardinality": "429",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productomarca",
+          "Non_unique": "0",
+          "Key_name": "ProductoMarca_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "ProductoMarca",
+          "Collation": "A",
+          "Cardinality": "429",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 429,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoMedicion",
+      "target": "gen_productomedicion",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoMedicion`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productomedicion",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoMedicion",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 2,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoModelo",
+      "target": "gen_productomodelo",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoModelo`)",
+        "UNIQUE KEY `ProductoModelo_UNIQUE` (`ProductoModelo`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productomodelo",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoModelo",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productomodelo",
+          "Non_unique": "0",
+          "Key_name": "ProductoModelo_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "ProductoModelo",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_ProductoTalla",
+      "target": "gen_productotalla",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoTalla`)",
+        "UNIQUE KEY `ProductoTalla_UNIQUE` (`ProductoTalla`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_productotalla",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoTalla",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "gen_productotalla",
+          "Non_unique": "0",
+          "Key_name": "ProductoTalla_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "ProductoTalla",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Gen_Producto_Serie",
+      "target": "gen_producto_serie",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProductoSerie`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "gen_producto_serie",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProductoSerie",
+          "Collation": "A",
+          "Cardinality": "518",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 518,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_Almacen",
+      "target": "lo_almacen",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdAlmacen`)",
+        "UNIQUE KEY `IdAlmacen_UNIQUE` (`IdAlmacen`)",
+        "UNIQUE KEY `Almacen_UNIQUE` (`Almacen`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_almacen",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdAlmacen",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_almacen",
+          "Non_unique": "0",
+          "Key_name": "IdAlmacen_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "IdAlmacen",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_almacen",
+          "Non_unique": "0",
+          "Key_name": "Almacen_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Almacen",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 3,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_Impuesto",
+      "target": "lo_impuesto",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdImpuesto`)",
+        "UNIQUE KEY `UNIQUE` (`Impuesto`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_impuesto",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdImpuesto",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_impuesto",
+          "Non_unique": "0",
+          "Key_name": "UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Impuesto",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 3,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_Movimiento",
+      "target": "lo_movimiento",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdMovimientoTipo`,`IdProveedor`,`Serie`,`Numero`)",
+        "UNIQUE KEY `unique` (`Hash`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_movimiento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdMovimientoTipo",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimiento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProveedor",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimiento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "3",
+          "Column_name": "Serie",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimiento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "4",
+          "Column_name": "Numero",
+          "Collation": "A",
+          "Cardinality": "3",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimiento",
+          "Non_unique": "0",
+          "Key_name": "unique",
+          "Seq_in_index": "1",
+          "Column_name": "Hash",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 3,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_MovimientoDetalle",
+      "target": "lo_movimientodetalle",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`hashMovimiento`,`IdProducto`,`Precio`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_movimientodetalle",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "hashMovimiento",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimientodetalle",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimientodetalle",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "3",
+          "Column_name": "Precio",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 4,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_MovimientoDetalleImpuesto",
+      "target": "lo_movimientodetalleimpuesto",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_MovimientoTipo",
+      "target": "lo_movimientotipo",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdMovimientoTipo`)",
+        "UNIQUE KEY `TipoMovimiento2` (`TipoMovimiento`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_movimientotipo",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdMovimientoTipo",
+          "Collation": "A",
+          "Cardinality": "14",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_movimientotipo",
+          "Non_unique": "0",
+          "Key_name": "TipoMovimiento2",
+          "Seq_in_index": "1",
+          "Column_name": "TipoMovimiento",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 14,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_OrdenCompra",
+      "target": "lo_ordencompra",
+      "engine": "MyISAM",
+      "new_columns": [
+        "UsuarioReg"
+      ],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdOrdenCompra`,`IdProveedor`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_ordencompra",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdOrdenCompra",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_ordencompra",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProveedor",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_OrdenCompraDet",
+      "target": "lo_ordencompradet",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdOrdenCompra`,`IdProducto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_ordencompradet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdOrdenCompra",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_ordencompradet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": "205",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 205,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Lo_Proveedor",
+      "target": "lo_proveedor",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProveedor`)",
+        "UNIQUE KEY `UNIQUE` (`Proveedor`) USING BTREE",
+        "UNIQUE KEY `UNIQUE2` (`Ruc`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "lo_proveedor",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProveedor",
+          "Collation": "A",
+          "Cardinality": "207",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_proveedor",
+          "Non_unique": "0",
+          "Key_name": "UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Proveedor",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "lo_proveedor",
+          "Non_unique": "0",
+          "Key_name": "UNIQUE2",
+          "Seq_in_index": "1",
+          "Column_name": "Ruc",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 207,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Rhu_Empleado",
+      "target": "rhu_empleado",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdEmpleado`)",
+        "UNIQUE KEY `u_dniruc` (`DniRuc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "rhu_empleado",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdEmpleado",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "rhu_empleado",
+          "Non_unique": "0",
+          "Key_name": "u_dniruc",
+          "Seq_in_index": "1",
+          "Column_name": "DniRuc",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Seg_Usuario",
+      "target": "seg_usuario",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`Usuario`,`IdUsuarioPerfil`)",
+        "UNIQUE KEY `Usuario_UNIQUE` (`Usuario`)",
+        "KEY `fk_Usuario_UsuarioPerfil1_idx` (`IdUsuarioPerfil`)",
+        "CONSTRAINT `fk_Usuario_UsuarioPerfil1` FOREIGN KEY (`IdUsuarioPerfil`) REFERENCES `Seg_UsuarioPerfil` (`IdUsuarioPerfil`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "seg_usuario",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "Usuario",
+          "Collation": "A",
+          "Cardinality": "17",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuario",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdUsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "17",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuario",
+          "Non_unique": "0",
+          "Key_name": "Usuario_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Usuario",
+          "Collation": "A",
+          "Cardinality": "17",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuario",
+          "Non_unique": "1",
+          "Key_name": "fk_Usuario_UsuarioPerfil1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "17",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 17,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Seg_UsuarioModulo",
+      "target": "seg_usuariomodulo",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdUsuarioModulo`)",
+        "UNIQUE KEY `UsuarioModulo_UNIQUE` (`UsuarioModulo`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "seg_usuariomodulo",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioModulo",
+          "Collation": "A",
+          "Cardinality": "30",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuariomodulo",
+          "Non_unique": "0",
+          "Key_name": "UsuarioModulo_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "UsuarioModulo",
+          "Collation": "A",
+          "Cardinality": "30",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 30,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Seg_UsuarioModulo_has_UsuarioPerfil",
+      "target": "seg_usuariomodulo_has_usuarioperfil",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdUsuarioModulo`,`IdUsuarioPerfil`)",
+        "KEY `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioPerfil1_idx` (`IdUsuarioPerfil`)",
+        "KEY `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioModulo1_idx` (`IdUsuarioModulo`)",
+        "CONSTRAINT `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioModulo1` FOREIGN KEY (`IdUsuarioModulo`) REFERENCES `Seg_UsuarioModulo` (`IdUsuarioModulo`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_UsuarioModulo_has_UsuarioPerfil_UsuarioPerfil1` FOREIGN KEY (`IdUsuarioPerfil`) REFERENCES `Seg_UsuarioPerfil` (`IdUsuarioPerfil`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "seg_usuariomodulo_has_usuarioperfil",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioModulo",
+          "Collation": "A",
+          "Cardinality": "72",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuariomodulo_has_usuarioperfil",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdUsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "72",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuariomodulo_has_usuarioperfil",
+          "Non_unique": "1",
+          "Key_name": "fk_UsuarioModulo_has_UsuarioPerfil_UsuarioPerfil1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "12",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuariomodulo_has_usuarioperfil",
+          "Non_unique": "1",
+          "Key_name": "fk_UsuarioModulo_has_UsuarioPerfil_UsuarioModulo1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioModulo",
+          "Collation": "A",
+          "Cardinality": "72",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 72,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Seg_UsuarioPerfil",
+      "target": "seg_usuarioperfil",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdUsuarioPerfil`)",
+        "UNIQUE KEY `UsuarioPerfil_UNIQUE` (`UsuarioPerfil`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "seg_usuarioperfil",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdUsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "seg_usuarioperfil",
+          "Non_unique": "0",
+          "Key_name": "UsuarioPerfil_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "UsuarioPerfil",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 6,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Sunat_Resumen",
+      "target": "sunat_resumen",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdSunatResumen`)",
+        "UNIQUE KEY `IdSunatResumen_UNIQUE` (`IdSunatResumen`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "sunat_resumen",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdSunatResumen",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "sunat_resumen",
+          "Non_unique": "0",
+          "Key_name": "IdSunatResumen_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "IdSunatResumen",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVenta",
+      "target": "ve_docventa",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`idDocVenta`)",
+        "UNIQUE KEY `idDocVenta_UNIQUE` (`idDocVenta`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaPuntoVenta_idx` (`IdDocVentaPuntoVenta`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaCliente1_idx` (`IdCliente`)",
+        "KEY `fk_Ve_DocVenta_Ve_DocVentaTipoDoc1_idx` (`IdTipoDoc`)",
+        "KEY `fk_Ve_DocVenta_Lo_Almacen1_idx` (`IdAlmacen`)",
+        "CONSTRAINT `fk_Ve_DocVenta_Lo_Almacen1` FOREIGN KEY (`IdAlmacen`) REFERENCES `Lo_Almacen` (`IdAlmacen`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaCliente1` FOREIGN KEY (`IdCliente`) REFERENCES `Ve_DocVentaCliente` (`IdCliente`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaPuntoVenta` FOREIGN KEY (`IdDocVentaPuntoVenta`) REFERENCES `Ve_DocVentaPuntoVenta` (`IdDocVentaPuntoVenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVenta_Ve_DocVentaTipoDoc1` FOREIGN KEY (`IdTipoDoc`) REFERENCES `Ve_DocVentaTipoDoc` (`IdTipoDoc`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "idDocVenta",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "0",
+          "Key_name": "idDocVenta_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "idDocVenta",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVenta_Ve_DocVentaPuntoVenta_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaPuntoVenta",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVenta_Ve_DocVentaCliente1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdCliente",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVenta_Ve_DocVentaTipoDoc1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdTipoDoc",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventa",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVenta_Lo_Almacen1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdAlmacen",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaCliente",
+      "target": "ve_docventacliente",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdCliente`)",
+        "UNIQUE KEY `IdCliente_UNIQUE` (`IdCliente`)",
+        "UNIQUE KEY `CLIENTE_UNIQUE` (`Cliente`)",
+        "UNIQUE KEY `DNIRUC_UNIQUE` (`DniRuc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventacliente",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdCliente",
+          "Collation": "A",
+          "Cardinality": "4156",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventacliente",
+          "Non_unique": "0",
+          "Key_name": "IdCliente_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "IdCliente",
+          "Collation": "A",
+          "Cardinality": "4156",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventacliente",
+          "Non_unique": "0",
+          "Key_name": "CLIENTE_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Cliente",
+          "Collation": "A",
+          "Cardinality": "4156",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventacliente",
+          "Non_unique": "0",
+          "Key_name": "DNIRUC_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "DniRuc",
+          "Collation": "A",
+          "Cardinality": "4156",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 4275,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaDescuento",
+      "target": "ve_docventadescuento",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaDescuento`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventadescuento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaDescuento",
+          "Collation": "A",
+          "Cardinality": "1",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 1,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaDet",
+      "target": "ve_docventadet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaDet`)",
+        "KEY `fk_Ve_DocVentaDet_Ve_DocVenta1_idx` (`IdDocVenta`)",
+        "KEY `fk_Ve_DocVentaDet_Gen_Producto_idx` (`IdProducto`)",
+        "CONSTRAINT `fk_Ve_DocVentaDet_Gen_Producto` FOREIGN KEY (`IdProducto`) REFERENCES `Gen_Producto` (`IdProducto`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "CONSTRAINT `fk_Ve_DocVentaDet_Ve_DocVenta1` FOREIGN KEY (`IdDocVenta`) REFERENCES `Ve_DocVenta` (`idDocVenta`) ON DELETE NO ACTION ON UPDATE NO ACTION",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaDet",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventadet",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVentaDet_Ve_DocVenta1_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVenta",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventadet",
+          "Non_unique": "1",
+          "Key_name": "fk_Ve_DocVentaDet_Gen_Producto_idx",
+          "Seq_in_index": "1",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 5,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaDetEntrega",
+      "target": "ve_docventadetentrega",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaDetEntrega`)",
+        "KEY `IdDocVentaDet` (`IdDocVentaDet`)",
+        "CONSTRAINT `Ve_DocVentaDetEntrega_ibfk_1` FOREIGN KEY (`IdDocVentaDet`) REFERENCES `Ve_DocVentaDet` (`IdDocVentaDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventadetentrega",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaDetEntrega",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventadetentrega",
+          "Non_unique": "1",
+          "Key_name": "IdDocVentaDet",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaDet",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaHistorialKit",
+      "target": "ve_docventahistorialkit",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaHistorialKit`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventahistorialkit",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaHistorialKit",
+          "Collation": "A",
+          "Cardinality": "1",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 1,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaMetodoPago",
+      "target": "ve_docventametodopago",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdMetodoPago`)",
+        "UNIQUE KEY `MetodoPago_UNIQUE` (`MetodoPago`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventametodopago",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdMetodoPago",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventametodopago",
+          "Non_unique": "0",
+          "Key_name": "MetodoPago_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "MetodoPago",
+          "Collation": "A",
+          "Cardinality": "4",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 4,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaMetodoPagoDet",
+      "target": "ve_docventametodopagodet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "InnoDB",
+      "target_rows": 4733,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaNotaCredito",
+      "target": "ve_docventanotacredito",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaNotaCredito`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventanotacredito",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaNotaCredito",
+          "Collation": "A",
+          "Cardinality": "23",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 23,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaPuntoVenta",
+      "target": "ve_docventapuntoventa",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaPuntoVenta`)",
+        "UNIQUE KEY `IdDocVentaPuntoVenta_UNIQUE` (`IdDocVentaPuntoVenta`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventapuntoventa",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaPuntoVenta",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventapuntoventa",
+          "Non_unique": "0",
+          "Key_name": "IdDocVentaPuntoVenta_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaPuntoVenta",
+          "Collation": "A",
+          "Cardinality": "2",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 2,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaPuntoVentaDet",
+      "target": "ve_docventapuntoventadet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaPuntoVenta`,`IdDocVentaTipoDoc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventapuntoventadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaPuntoVenta",
+          "Collation": "A",
+          "Cardinality": "5",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventapuntoventadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdDocVentaTipoDoc",
+          "Collation": "A",
+          "Cardinality": "10",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 10,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaRemision",
+      "target": "ve_docventaremision",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaRemision`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventaremision",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaRemision",
+          "Collation": "A",
+          "Cardinality": "1",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 1,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaRemisionDet",
+      "target": "ve_docventaremisiondet",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDocVentaRemisionDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventaremisiondet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDocVentaRemisionDet",
+          "Collation": "A",
+          "Cardinality": "11",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 11,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_DocVentaTipoDoc",
+      "target": "ve_docventatipodoc",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdTipoDoc`)",
+        "UNIQUE KEY `TipoDoc_UNIQUE` (`TipoDoc`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_docventatipodoc",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdTipoDoc",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_docventatipodoc",
+          "Non_unique": "0",
+          "Key_name": "TipoDoc_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "TipoDoc",
+          "Collation": "A",
+          "Cardinality": "6",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 6,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_ExpertoDiagnostico",
+      "target": "ve_expertodiagnostico",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDiagnostico`)",
+        "UNIQUE KEY `ENFERMEDAD_UNIQUE` (`Diagnostico`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_expertodiagnostico",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDiagnostico",
+          "Collation": "A",
+          "Cardinality": "42",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_expertodiagnostico",
+          "Non_unique": "0",
+          "Key_name": "ENFERMEDAD_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Diagnostico",
+          "Collation": "A",
+          "Cardinality": "42",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 42,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_ExpertoDiagnosticoSintomaDet",
+      "target": "ve_expertodiagnosticosintomadet",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdDiagnostico`,`IdSintoma`)",
+        "KEY `Sintomas` (`IdSintoma`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_expertodiagnosticosintomadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdDiagnostico",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_expertodiagnosticosintomadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "2",
+          "Column_name": "IdSintoma",
+          "Collation": "A",
+          "Cardinality": "151",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_expertodiagnosticosintomadet",
+          "Non_unique": "1",
+          "Key_name": "Sintomas",
+          "Seq_in_index": "1",
+          "Column_name": "IdSintoma",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 151,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_ExpertoSintoma",
+      "target": "ve_expertosintoma",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdSintoma`)",
+        "UNIQUE KEY `SINTOMA_UNIQUE` (`Sintoma`) USING BTREE",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_expertosintoma",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdSintoma",
+          "Collation": "A",
+          "Cardinality": "120",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        },
+        {
+          "Table": "ve_expertosintoma",
+          "Non_unique": "0",
+          "Key_name": "SINTOMA_UNIQUE",
+          "Seq_in_index": "1",
+          "Column_name": "Sintoma",
+          "Collation": "A",
+          "Cardinality": null,
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "YES",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 120,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_ExpertoTratamiento",
+      "target": "ve_expertotratamiento",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdTratamiento`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_expertotratamiento",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdTratamiento",
+          "Collation": "A",
+          "Cardinality": "152",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 152,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_PreOrden",
+      "target": "ve_preorden",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdPreOrden`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_preorden",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdPreOrden",
+          "Collation": "A",
+          "Cardinality": "177",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 177,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_PreOrdenDet",
+      "target": "ve_preordendet",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "MyISAM",
+      "target_rows": 508,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_PreOrdenDetPago",
+      "target": "ve_preordendetpago",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdPreOrdenDetPago`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_preordendetpago",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdPreOrdenDetPago",
+          "Collation": "A",
+          "Cardinality": "363",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 363,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_Proforma",
+      "target": "ve_proforma",
+      "engine": "MyISAM",
+      "new_columns": [
+        "WebCargado"
+      ],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProforma`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_proforma",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProforma",
+          "Collation": "A",
+          "Cardinality": "14",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 14,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "Ve_ProformaDet",
+      "target": "ve_proformadet",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProformaDet`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "ve_proformadet",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProformaDet",
+          "Collation": "A",
+          "Cardinality": "23",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 23,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "prodstock",
+      "target": "prodstock",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`IdProducto`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "prodstock",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "IdProducto",
+          "Collation": "A",
+          "Cardinality": "113",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "MyISAM",
+      "target_rows": 113,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "remision",
+      "target": "remision",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "PRIMARY KEY (`id`)",
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [
+        {
+          "Table": "remision",
+          "Non_unique": "0",
+          "Key_name": "PRIMARY",
+          "Seq_in_index": "1",
+          "Column_name": "id",
+          "Collation": "A",
+          "Cardinality": "0",
+          "Sub_part": null,
+          "Packed": null,
+          "Null": "",
+          "Index_type": "BTREE",
+          "Comment": "",
+          "Index_comment": ""
+        }
+      ],
+      "target_engine": "InnoDB",
+      "target_rows": 0,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "tblKardex",
+      "target": "tblkardex",
+      "engine": "InnoDB",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "InnoDB",
+      "target_rows": 10,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    },
+    {
+      "source": "tblKardexvalor",
+      "target": "tblkardexvalor",
+      "engine": "MyISAM",
+      "new_columns": [],
+      "missing_columns": [],
+      "changed_columns": [],
+      "source_keys": [
+        "DISABLE KEYS */",
+        "ENABLE KEYS */"
+      ],
+      "target_indexes": [],
+      "target_engine": "MyISAM",
+      "target_rows": 17,
+      "inspection_error": null,
+      "index_differences": {
+        "added": {},
+        "removed": {},
+        "changed": {}
+      },
+      "attribute_differences": [],
+      "engine_changed": false
+    }
+  ],
+  "new_tables": [
+    "ali_posoperacion",
+    "ali_productoficha",
+    "ali_productofichahistorial",
+    "ali_productouso",
+    "ali_tecnicocaso",
+    "cb_saldobanco",
+    "cb_saldobancoauditoria",
+    "crm_audit_log",
+    "crm_bot_rule",
+    "crm_campaign",
+    "crm_campaign_recipient",
+    "crm_channel_connection",
+    "crm_consent",
+    "crm_conversation",
+    "crm_customer",
+    "crm_customer_event",
+    "crm_customer_tag",
+    "crm_interaction",
+    "crm_loyalty_account",
+    "crm_loyalty_ledger",
+    "crm_message",
+    "crm_message_outbox",
+    "crm_message_template",
+    "crm_segment",
+    "crm_segment_member",
+    "crm_setting",
+    "crm_sync_run",
+    "crm_tag",
+    "crm_task",
+    "gen_producto_totales",
+    "lo_movimientoauditoria",
+    "rhu_comisionaplicacion",
+    "rhu_diarioadjunto",
+    "rhu_diarioatencion",
+    "rhu_diarioevento",
+    "rhu_diariopersonal",
+    "rhu_diariopreferencia",
+    "rhu_diariotarea",
+    "rhu_diariovinculo",
+    "rhu_planillaboleta",
+    "rhu_planillapago",
+    "rhu_planillaperiodo",
+    "rhu_planillapersonal",
+    "tienda_clientecuenta"
+  ]
+}

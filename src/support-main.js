@@ -1,0 +1,13 @@
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import BootstrapVue from 'bootstrap-vue';
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+import SupportLauncher from '@/components/SupportLauncher.vue';
+import CentroSoporte from '@/views/CentroSoporte.vue';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import '@/assets/css/diario-premium.css';
+Vue.use(VueRouter);Vue.use(BootstrapVue);Vue.use(VueAxios,axios);
+const router=new VueRouter({routes:[{path:'/soporte',component:CentroSoporte},{path:'*',redirect:'/soporte'}]});
+new Vue({router,render:h=>h('div',[h('router-view'),h(SupportLauncher)])}).$mount('#app');

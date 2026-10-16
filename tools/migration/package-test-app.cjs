@@ -1,0 +1,12 @@
+const fs=require('fs'),path=require('path'),compiler=require('vue-template-compiler');
+const dir=path.resolve('output/migration-test-app');fs.mkdirSync(dir,{recursive:true});
+const sfc=compiler.parseComponent(fs.readFileSync('src/views/MigradorHistorico.vue','utf8'));
+const script=sfc.script.content.replace(/^import .*;\s*$/gm,'').replace('export default','return');
+fs.writeFileSync(path.join(dir,'app.js'),"const config={API:'/api.php/'};const options=(()=>{"+script+"})();options.template="+JSON.stringify(sfc.template.content)+";new Vue(options).$mount('#app');");
+fs.writeFileSync(path.join(dir,'app.css'),'body{margin:0;background:#f3f6fc;font-family:Arial,sans-serif}.test-banner{background:#fff1c4;color:#624600;padding:12px;text-align:center;font-size:14px}'+sfc.styles.map(s=>s.content).join('\n'));
+fs.copyFileSync('node_modules/vue/dist/vue.min.js',path.join(dir,'vue.min.js'));
+fs.copyFileSync('integration/migration/test-api.php',path.join(dir,'api.php'));
+fs.copyFileSync('integration/migration/test-index.php',path.join(dir,'index.php'));
+fs.mkdirSync(path.join(dir,'migration'),{recursive:true});for(const file of ['Engine.php','runtime.php','schema.sql'])fs.copyFileSync('integration/migration/'+file,path.join(dir,'migration',file));
+console.log('Standalone test application packaged. No production files changed.');
+process.exit(0);

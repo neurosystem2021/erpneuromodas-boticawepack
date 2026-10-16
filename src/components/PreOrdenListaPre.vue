@@ -1,48 +1,48 @@
 <template>
-    <div>
-        <b-button @click="cargarPreOrden" variant="success" class="btnAction">Cargar Pre Orden</b-button>
+<div>
+    <b-button @click="cargarPreOrden" variant="success" class="btnAction">Cargar Pre Orden</b-button>
+    
+    <b-form >    
+        <b-modal id="modalPreOrden" 
+            title="Seleccionar Pre Orden"
+            size="lg" v-model="show"
+            header-bg-variant="dark"
+            headerTextVariant="light"
+            body-bg-variant="light"
+            body-text-variant="dark" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">           
+                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
+                <b-table 
+                    id="my-table" 
+                    striped hover 
+                    ref="tablaPreOrden"
+                    :busy.sync="isBusy" 
+                    :filter="filter"
+                    :items="myProvider" 
+                    @row-clicked="selectPreOrden"
+                    :fields="fields"
+                    :per-page="perPage"
+                    :current-page="currentPage">
+                     <template slot="imprimir" slot-scope="data">
+                        <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden">Imprimir</b-btn>
+                      </template>
+                </b-table>
+                <b-row>
+                <b-col md="6" class="my-1">
+                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+                </b-col>
+                </b-row>
+            <div slot="modal-footer" >
+                <!--<b-btn size="sm" variant="success" type="submit">
+                    Guardar
+                </b-btn>-->
+                <b-btn size="sm" variant="secondary" @click="show=false">
+                    Cerrar
+                </b-btn>
+            </div>
         
-        <b-form >    
-            <b-modal id="modalPreOrden" 
-                title="Seleccionar Pre Orden"
-                size="lg" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">           
-                    <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />  
-                    <b-table 
-                        id="my-table" 
-                        striped hover 
-                        ref="tablaPreOrden"
-                        :busy.sync="isBusy" 
-                        :filter="filter"
-                        :items="myProvider" 
-                        @row-clicked="selectPreOrden"
-                        :fields="fields"
-                        :per-page="perPage"
-                        :current-page="currentPage">
-                         <template slot="imprimir" slot-scope="data">
-                            <b-btn size="sm" variant="success" target="_blank" :href="'/imprimir/preorden.php?id=' + data.item.IdPreOrden">Imprimir</b-btn>
-                          </template>
-                    </b-table>
-                    <b-row>
-                    <b-col md="6" class="my-1">
-                        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                    </b-col>
-                    </b-row>
-                <div slot="modal-footer" >
-                    <!--<b-btn size="sm" variant="success" type="submit">
-                        Guardar
-                    </b-btn>-->
-                    <b-btn size="sm" variant="secondary" @click="show=false">
-                        Cerrar
-                    </b-btn>
-                </div>
-            
-            </b-modal>
-        </b-form>
-    </div>
+        </b-modal>
+    </b-form>
+</div>
 </template>
 <script>
 import config from "@/store/config.js";

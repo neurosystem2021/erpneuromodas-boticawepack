@@ -1,0 +1,12 @@
+const escape = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+export function yapePaymentSummary(sales, transfer = false) {
+  const field=transfer ? "Mastercard" : "Yape";
+  const rows = (sales || []).filter(sale => !Number(sale.Anulado) && String(sale.CodSunat) !== '07' && Number(sale[field]) > 0);
+  return {rows,total:rows.reduce((sum,sale) => sum + Number(sale[field]),0)};
+}
+export function yapePaymentTicket(data) {
+  const transfer=data.transfer === true,field=transfer ? "Mastercard" : "Yape",label=transfer ? "TRANSFERENCIAS" : "YAPE / PLIN";
+  const summary=yapePaymentSummary(data.sales,transfer),company=data.company || {};
+  const rows=summary.rows.map(sale => `<tr><td>${escape(sale.Serie)}-${escape(sale.Numero)}<small>Op.: ${escape(sale[transfer ? 'MastercardDesc' : 'YapeDesc'] || 'Sin operación')}</small></td><td class="amount">${Number(sale[field]).toFixed(2)}</td></tr>`).join('');
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte ${label}</title><style>@page{size:80mm 297mm;margin:4mm}*{box-sizing:border-box}body{width:72mm;margin:0 auto;color:#000;font:11px Arial}header{text-align:center}h1{font-size:17px}h2{font-size:14px}p{margin:5px 0}table{width:100%;border-collapse:collapse;table-layout:fixed}th{text-align:left;border-block:1px dashed;padding:6px 0}td{padding:7px 0;border-bottom:1px dashed #999;overflow-wrap:anywhere}tr{break-inside:avoid}th:last-child,td:last-child{width:23mm;text-align:right}small{display:block;margin-top:4px;font-size:10px}.total{display:flex;justify-content:space-between;border-block:2px solid;padding:10px 0;font-size:15px;font-weight:bold;margin-top:12px}.toolbar{text-align:center;padding:12px}@media print{.toolbar{display:none}}</style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir ticket</button></div><header><h2>${escape(company.RAZONSOCIAL || company.RazonSocial || '')}</h2><p>RUC: ${escape(company.RUC || company.Ruc || '')}</p><h1>REPORTE ${label}</h1><p>${escape(data.date)}</p><p>Vendedor: ${escape(data.seller)}</p></header><table><thead><tr><th>Comprobante / operación</th><th>Monto S/</th></tr></thead><tbody>${rows || '<tr><td colspan="2">No hay pagos en este cierre.</td></tr>'}</tbody></table><p>Comprobantes: ${summary.rows.length}</p><div class="total"><span>TOTAL ${label}</span><span>S/ ${summary.total.toFixed(2)}</span></div><p>Pagos del cierre seleccionado. No incluye comprobantes anulados.</p></body></html>`;
+}

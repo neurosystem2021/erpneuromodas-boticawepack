@@ -1,0 +1,7 @@
+{
+ "backup_file":"/home/USUARIO/neuro-private/migration/copia-antes.sql",
+ "sha256":"SHA256_REAL_DEL_RESPALDO",
+ "restored_database":"USUARIO_neuro_migration_test",
+ "restore_verified":false,
+ "authorized_copy":false
+}

@@ -1,105 +1,105 @@
 <template>
-  <b-container fluid id="conten">
+<b-container fluid id="conten" class="nst-screen nst-screen--dashboard">
 
-    <!-- ═══ HEADER ═══ -->
-    <div class="dashboard-header">
-      <div>
-        <h2 class="dashboard-title">📊 Dashboard de Reportes</h2><br>
+  <!-- ═══ HEADER ═══ -->
+  <div class="dashboard-header">
+    <div>
+      <h2 class="dashboard-title">📊 Dashboard de Reportes</h2><br>
 
-        <div class="filtro-grupo">
-          <label>Desde:</label>
-          <input type="date" class="form-control form-control-sm" v-model="fechaInicio" @input="recargarReportes" />
-          <label>Hasta:</label>
-          <input type="date" class="form-control form-control-sm" v-model="fechaFin" @input="recargarReportes" />
-        </div>
+      <div class="filtro-grupo">
+        <label>Desde:</label>
+        <input type="date" class="form-control form-control-sm" v-model="fechaInicio" @input="recargarReportes" />
+        <label>Hasta:</label>
+        <input type="date" class="form-control form-control-sm" v-model="fechaFin" @input="recargarReportes" />
       </div>
     </div>
+  </div>
 
-    <!-- ═══ KPI CARDS ═══ -->
-    <b-row class="mb-4">
-      <b-col md="3">
-        <div class="kpi-dash kpi-azul">
-          <div class="kpi-dash-icon">💰</div>
-          <div class="kpi-dash-info">
-            <div class="kpi-dash-label">Total Ventas</div>
-            <div class="kpi-dash-value">S/ {{ totalDia }}</div>
-          </div>
+  <!-- ═══ KPI CARDS ═══ -->
+  <b-row class="mb-4">
+    <b-col md="3">
+      <div class="kpi-dash kpi-azul">
+        <div class="kpi-dash-icon">💰</div>
+        <div class="kpi-dash-info">
+          <div class="kpi-dash-label">Total Ventas</div>
+          <div class="kpi-dash-value">S/ {{ totalDia }}</div>
         </div>
-      </b-col>
-      <b-col md="3">
-        <div class="kpi-dash kpi-verde">
-          <div class="kpi-dash-icon">🧾</div>
-          <div class="kpi-dash-info">
-            <div class="kpi-dash-label">Comprobantes</div>
-            <div class="kpi-dash-value">{{ totalComprobantes }}</div>
-          </div>
+      </div>
+    </b-col>
+    <b-col md="3">
+      <div class="kpi-dash kpi-verde">
+        <div class="kpi-dash-icon">🧾</div>
+        <div class="kpi-dash-info">
+          <div class="kpi-dash-label">Comprobantes</div>
+          <div class="kpi-dash-value">{{ totalComprobantes }}</div>
         </div>
-      </b-col>
-      <b-col md="3">
-        <div class="kpi-dash kpi-naranja">
-          <div class="kpi-dash-icon">📦</div>
-          <div class="kpi-dash-info">
-            <div class="kpi-dash-label">Ticket Promedio</div>
-            <div class="kpi-dash-value">S/ {{ ticketPromedio }}</div>
-          </div>
+      </div>
+    </b-col>
+    <b-col md="3">
+      <div class="kpi-dash kpi-naranja">
+        <div class="kpi-dash-icon">📦</div>
+        <div class="kpi-dash-info">
+          <div class="kpi-dash-label">Ticket Promedio</div>
+          <div class="kpi-dash-value">S/ {{ ticketPromedio }}</div>
         </div>
-      </b-col>
-      <b-col md="3">
-        <div class="kpi-dash kpi-morado">
-          <div class="kpi-dash-icon">📅</div>
-          <div class="kpi-dash-info">
-            <div class="kpi-dash-label">Días con Venta</div>
-            <div class="kpi-dash-value">{{ diasConVenta }}</div>
-          </div>
+      </div>
+    </b-col>
+    <b-col md="3">
+      <div class="kpi-dash kpi-morado">
+        <div class="kpi-dash-icon">📅</div>
+        <div class="kpi-dash-info">
+          <div class="kpi-dash-label">Días con Venta</div>
+          <div class="kpi-dash-value">{{ diasConVenta }}</div>
         </div>
-      </b-col>
-    </b-row>
+      </div>
+    </b-col>
+  </b-row>
 
-    <!-- ═══ LOADING ═══ -->
-    <div v-if="cargando" class="loading-overlay">
-      <div class="spinner-border text-primary" role="status"></div>
-      <span class="ml-2">Cargando reportes...</span>
-    </div>
+  <!-- ═══ LOADING ═══ -->
+  <div v-if="cargando" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span class="ml-2">Cargando reportes...</span>
+  </div>
 
-    <!-- ═══ GRÁFICAS FILA 1 ═══ -->
-    <b-row class="d-flex align-items-stretch">
-      <b-col cols="4" class="my-3">
-        <div class="card-dash h-100">
-          <div class="card-dash-title">📈 Ventas por Día</div>
-          <bar-chart ref="chartGraficaDias"></bar-chart>
-        </div>
-      </b-col>
-      <b-col cols="4" class="my-3">
-        <div class="card-dash h-100">
-          <div class="card-dash-title">👥 Ranking de Vendedores</div>
-          <DoughnutVendedor ref="chartGrafica"></DoughnutVendedor>
-        </div>
-      </b-col>
-      <b-col cols="4" class="my-3">
-        <div class="card-dash h-100">
-          <div class="card-dash-title">🏆 Productos Más Vendidos</div>
-          <BarChartProductos ref="barChartGrafica"></BarChartProductos>
-        </div>
-      </b-col>
-    </b-row>
+  <!-- ═══ GRÁFICAS FILA 1 ═══ -->
+  <b-row class="d-flex align-items-stretch">
+    <b-col cols="4" class="my-3">
+      <div class="card-dash h-100">
+        <div class="card-dash-title">📈 Ventas por Día</div>
+        <bar-chart ref="chartGraficaDias"></bar-chart>
+      </div>
+    </b-col>
+    <b-col cols="4" class="my-3">
+      <div class="card-dash h-100">
+        <div class="card-dash-title">👥 Ranking de Vendedores</div>
+        <DoughnutVendedor ref="chartGrafica"></DoughnutVendedor>
+      </div>
+    </b-col>
+    <b-col cols="4" class="my-3">
+      <div class="card-dash h-100">
+        <div class="card-dash-title">🏆 Productos Más Vendidos</div>
+        <BarChartProductos ref="barChartGrafica"></BarChartProductos>
+      </div>
+    </b-col>
+  </b-row>
 
-    <!-- ═══ GRÁFICAS FILA 2 ═══ -->
-    <b-row class="d-flex align-items-stretch">
-      <b-col cols="4" class="my-3">
-        <div class="card-dash h-100">
-          <div class="card-dash-title">💹 Utilidad Bruta <small class="text-muted">(rentab. &lt; 10% en rojo)</small></div>
-          <BarChartUtilidadBruta ref="barChartUtilidadBruta"></BarChartUtilidadBruta>
-        </div>
-      </b-col>
-      <b-col cols="8" class="my-3">
-        <div class="card-dash h-100">
-          <div class="card-dash-title">🛒 Compras del Período</div>
-          <BarChartCompras ref="barChartCompras"></BarChartCompras>
-        </div>
-      </b-col>
-    </b-row>
+  <!-- ═══ GRÁFICAS FILA 2 ═══ -->
+  <b-row class="d-flex align-items-stretch">
+    <b-col cols="4" class="my-3">
+      <div class="card-dash h-100">
+        <div class="card-dash-title">💹 Utilidad Bruta <small class="text-muted">(rentab. &lt; 10% en rojo)</small></div>
+        <BarChartUtilidadBruta ref="barChartUtilidadBruta"></BarChartUtilidadBruta>
+      </div>
+    </b-col>
+    <b-col cols="8" class="my-3">
+      <div class="card-dash h-100">
+        <div class="card-dash-title">🛒 Compras del Período</div>
+        <BarChartCompras ref="barChartCompras"></BarChartCompras>
+      </div>
+    </b-col>
+  </b-row>
 
-  </b-container>
+</b-container>
 </template>
 
 <script>

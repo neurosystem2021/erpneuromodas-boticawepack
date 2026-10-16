@@ -1,39 +1,39 @@
 <template>
-  <b-container >
-      <center><h4>Historial de Kits Vendidos</h4></center>
-    <b-row>
-        <b-col cols="3">
-            <b-input-group prepend="Desde:" class="mt-3">
-                <input type="date" class="form-control" v-model="fechaDesde">
-            </b-input-group>
-        </b-col>
-        <b-col cols="3">
-            <b-input-group prepend="Hasta:" class="mt-3">
-                <input type="date" class="form-control" v-model="fechaHasta">
-            </b-input-group>
-        </b-col>
-        <b-col cols="3" style="text-align: center; align-content: center;">
-                <b-button variant="info" @click="obtenerListado()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-                <b-button variant="success" @click="exportarListado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
-        </b-col>
-        <b-col cols="12">
-            <b-table 
-                :items="lstHistorial" 
-                :fields="fields"
-                :per-page="perPage"
-                :current-page="currentPage"
-            ></b-table>
+<b-container class="nst-screen nst-screen--historialventakit" >
+    <center><h4>Historial de Kits Vendidos</h4></center>
+  <section class="nst-panel nst-panel--filters"><b-row>
+      <b-col cols="3">
+          <b-input-group prepend="Desde:" class="mt-3">
+              <input type="date" class="form-control" v-model="fechaDesde">
+          </b-input-group>
+      </b-col>
+      <b-col cols="3">
+          <b-input-group prepend="Hasta:" class="mt-3">
+              <input type="date" class="form-control" v-model="fechaHasta">
+          </b-input-group>
+      </b-col>
+      <b-col cols="3" style="text-align: center; align-content: center;">
+              <b-button variant="info" @click="obtenerListado()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+              <b-button variant="success" @click="exportarListado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+      </b-col>
+      <b-col cols="12">
+          <b-table 
+              :items="lstHistorial" 
+              :fields="fields"
+              :per-page="perPage"
+              :current-page="currentPage" responsive=""
+           show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." ></b-table>
 
-            <b-pagination
-                v-model="currentPage"
-                :total-rows="lstHistorial.length"
-                :per-page="perPage"
-                aria-controls="my-table"
-            ></b-pagination>
-        </b-col>
-    </b-row>
-    <!-- {{lstHistorial}} -->
-  </b-container>
+          <b-pagination
+              v-model="currentPage"
+              :total-rows="lstHistorial.length"
+              :per-page="perPage"
+              aria-controls="my-table"
+          ></b-pagination>
+      </b-col>
+  </b-row></section>
+  <!-- {{lstHistorial}} -->
+</b-container>
 </template>
 
 <script>

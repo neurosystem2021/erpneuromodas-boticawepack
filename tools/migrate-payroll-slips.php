@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$sql=file_get_contents(__DIR__.'/../integration/payroll/slips-schema.sql');$db->exec($sql);$q=$db->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?');$q->execute(['Rhu_PlanillaPersonal','DatosLaborales']);if(!$q->fetchColumn())$db->exec('ALTER TABLE Rhu_PlanillaPersonal ADD COLUMN DatosLaborales LONGTEXT NULL');echo "Payroll slip storage ready.\n";

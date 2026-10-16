@@ -1,0 +1,2 @@
+.va-sale-panel input:not([type="email"]):not([type="date"]):not([type="number"]),.va-sale-panel textarea,.va-purchases-panel input:not([type="email"]):not([type="date"]):not([type="number"]),.va-purchases-panel textarea,.va-modal input:not([type="email"]):not([type="date"]):not([type="number"]),.va-modal textarea{text-transform:uppercase}
+.va-sale-panel input::placeholder,.va-sale-panel textarea::placeholder,.va-purchases-panel input::placeholder,.va-purchases-panel textarea::placeholder,.va-modal input::placeholder,.va-modal textarea::placeholder{text-transform:uppercase}

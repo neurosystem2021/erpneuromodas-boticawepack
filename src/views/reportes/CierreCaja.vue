@@ -1,17 +1,17 @@
 <template>
-  <b-container fluid class="px-5 py-5">
-    <b-row class="no-print">  
+  <b-container fluid class="px-5 py-5 nst-screen nst-screen--cierrecaja">
+    <section class="nst-panel nst-panel--filters"><b-row class="no-print">  
       <b-col cols="12"  lg="9" xl="9" class="no-print" order="2" order-lg="1">
         
         <b-card no-body>
           <center><h4>DETALLE CIERRE DE CAJA</h4></center>
           <b-tabs content-class="mt-3 mx-3" card fill pills>
-            <b-tab title="Ventas" active >
+            <b-tab title="Ventas" active ><template slot="title"><i class="fas fa-shopping-cart nst-tab-icon" aria-hidden="true"></i><span>Ventas</span></template>
               <div class="">
 
               
               <h5>Ventas Efectivo</h5><br>
-              <table class="table b-table table-sm">
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                       <th>Recibo</th>
@@ -33,7 +33,7 @@
                     
                     <td>
                     
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
                             <th>Codigo</th>
@@ -64,7 +64,7 @@
                             <td>{{ prod.Subtotal | redondear }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                       <div><i><small>
                       <b v-if="$route.query.noDetalle"></b>
                       <b v-else>Cliente:</b>
@@ -84,85 +84,10 @@
                     <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
-
-              <h5>Ventas Tarjeta</h5><br>
-              <table class="table b-table table-sm">
-                <thead>
-                  <tr class="thDetalle">
-                    <th>Recibo</th><th>Fecha</th>
-                    <th>U. Proforma</th>
-                    <th>U. Venta</th>
-                    <th v-if="$route.query.noDetalle">Cliente</th>
-                    <th v-else>Productos</th>
-                    <th>Detalle</th>
-                    <th>Estado</th>
-                    <th>Pagado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
-                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-                    <td>{{ item.FechaDoc }}</td>
-                    <td>{{ item.UsuarioProforma}}</td>
-                    <td>{{ item.UsuarioVenta}}</td>
-                    
-                    <td>
-                    
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
-                        <thead>
-                          <tr>
-                            <th>Codigo</th>
-                            <th>Producto</th>
-                            <!-- <th>Descripcion</th> -->
-                            <th>Cantidad</th>
-                            <th>Precio</th>
-                            <th>Descuento</th>
-                            <th v-if="item.TieneIgv">Subtotal</th>
-                            <th v-if="item.TieneIgv">IGV</th>
-                            <th>Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="(prod, index) in item.productos" :key="index">
-                            <td>{{ prod.CodigoBarra }}</td>
-                            <td class="detalle-producto">{{ prod.Producto }}</td>
-                            <!-- <td>{{ prod.Descripcion }}</td> -->
-                            <td>{{ prod.Cantidad }}</td>
-                            <td>{{ prod.Precio }}</td>
-                            <td>{{ prod.Descuento }}</td>
-                            <td v-if="item.TieneIgv">
-                              {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                            </td>
-                            <td v-if="item.TieneIgv">
-                              {{ prod.Subtotal * 0.18 | redondear}}
-                            </td>
-                            <td>{{ prod.Subtotal | redondear }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div><i><small>
-                      <b v-if="$route.query.noDetalle"></b>
-                      <b v-else>Cliente:</b>
-                      {{ item.Cliente }}</small></i></div>
-
-                    </td>
-                    <td>{{ item.VisaDesc }}</td>
-                    <td>{{ estadoVenta(item) }}</td>
-                    <td>S/. {{ item.Visa | redondear }}</td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="5"></td>
-                    <td colspan="1" class="total"><b>Total Tarjeta</b></td>
-                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
-                  </tr>
-                </tfoot>
-              </table>
+              </table></div>
 
               <h5>Ventas Yape/Plin</h5><br>
-              <table class="table b-table table-sm">
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                       <th>Recibo</th>
@@ -184,7 +109,7 @@
                     <td>{{ item.UsuarioVenta}}</td>
                     <td>
 
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
                             <th>Codigo</th>
@@ -215,7 +140,7 @@
                             <td>{{ prod.Subtotal | redondear }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                       <div><i><small>
                       <b v-if="$route.query.noDetalle"></b>
                       <b v-else>Cliente:</b> 
@@ -234,10 +159,85 @@
                     <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
+              </table></div>
+
+              <h5>Ventas Tarjeta</h5><br>
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
+                <thead>
+                  <tr class="thDetalle">
+                    <th>Recibo</th><th>Fecha</th>
+                    <th>U. Proforma</th>
+                    <th>U. Venta</th>
+                    <th v-if="$route.query.noDetalle">Cliente</th>
+                    <th v-else>Productos</th>
+                    <th>Detalle</th>
+                    <th>Estado</th>
+                    <th>Pagado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in ventasVisa" :key="index" :class="{anulado: item.Anulado}">
+                    <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+                    <td>{{ item.FechaDoc }}</td>
+                    <td>{{ item.UsuarioProforma}}</td>
+                    <td>{{ item.UsuarioVenta}}</td>
+                    
+                    <td>
+                    
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <thead>
+                          <tr>
+                            <th>Codigo</th>
+                            <th>Producto</th>
+                            <!-- <th>Descripcion</th> -->
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Descuento</th>
+                            <th v-if="item.TieneIgv">Subtotal</th>
+                            <th v-if="item.TieneIgv">IGV</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(prod, index) in item.productos" :key="index">
+                            <td>{{ prod.CodigoBarra }}</td>
+                            <td class="detalle-producto">{{ prod.Producto }}</td>
+                            <!-- <td>{{ prod.Descripcion }}</td> -->
+                            <td>{{ prod.Cantidad }}</td>
+                            <td>{{ prod.Precio }}</td>
+                            <td>{{ prod.Descuento }}</td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                            </td>
+                            <td v-if="item.TieneIgv">
+                              {{ prod.Subtotal * 0.18 | redondear}}
+                            </td>
+                            <td>{{ prod.Subtotal | redondear }}</td>
+                          </tr>
+                        </tbody>
+                      </table></div>
+                      <div><i><small>
+                      <b v-if="$route.query.noDetalle"></b>
+                      <b v-else>Cliente:</b>
+                      {{ item.Cliente }}</small></i></div>
+
+                    </td>
+                    <td>{{ item.VisaDesc }}</td>
+                    <td>{{ estadoVenta(item) }}</td>
+                    <td>S/. {{ item.Visa | redondear }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5"></td>
+                    <td colspan="1" class="total"><b>Total Tarjeta</b></td>
+                    <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
+                  </tr>
+                </tfoot>
+              </table></div>
 
               <h5>Ventas Transferencia</h5><br>
-              <table class="table b-table table-sm">
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                       <th>Recibo</th>
@@ -259,7 +259,7 @@
                     <td>{{ item.UsuarioVenta}}</td>
                     <td>
 
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
                             <th>Codigo</th>
@@ -290,7 +290,7 @@
                             <td>{{ prod.Subtotal | redondear }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                       <div><i><small>
                       <b v-if="$route.query.noDetalle"></b>
                       <b v-else>Cliente:</b> 
@@ -309,10 +309,10 @@
                     <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
+              </table></div>
 
               <h5>Ventas a Credito</h5><br>
-              <table class="table b-table table-sm">
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                     <th>Recibo</th>
@@ -332,7 +332,7 @@
                     <td>{{ item.UsuarioVenta}}</td>
                     <td>
                       
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
                             <th>Codigo</th>
@@ -363,7 +363,7 @@
                             <td>{{ prod.Subtotal | redondear }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                       <div><i><small>
                       <b v-if="$route.query.noDetalle"></b>
                       <b v-else>Cliente:</b> 
@@ -382,12 +382,12 @@
                     <td colspan="2" style="text-align: right;" class="total"><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
+              </table></div>
 
               <b-row>
               <b-col v-if="totalIngresos">
-                <h5>Ingresos</h5><br>
-                <table class="table b-table table-sm">
+                <h5>Ingresos Caja Principal</h5><br>
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Ingreso</th><th>Monto</th>
@@ -411,12 +411,24 @@
                       <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
                     </tr>
                   </tfoot>
-                </table>
+                </table></div>
               </b-col>
 
-              <b-col v-if="totalSalidas">
-                <h5>Salidas</h5><br>
-                <table class="table b-table table-sm">
+              <b-col cols="12" v-if="pagosPersonal.length">
+          <h5>Adelantos y pagos al personal — cuenta de origen</h5>
+          <p class="closing-bank-note">Este resumen muestra pagos ya incluidos en el detalle de su cuenta. No vuelve a sumar ni descontar los importes.</p>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Pagos al personal"><table class="table b-table table-sm">
+            <thead><tr class="thDetalle"><th>Fecha</th><th>Personal / concepto</th><th>Cuenta de salida</th><th>Usuario</th><th>Monto</th><th>Tratamiento en Caja Principal</th></tr></thead>
+            <tbody><tr v-for="item in pagosPersonal" :key="'personal-'+item.IdCajaBanco">
+              <td>{{ item.FechaDoc }}</td><td>{{ item.Concepto }}</td><td><b>{{ item.Cuenta }}</b></td><td>{{ item.UsuarioReg }}</td>
+              <td>S/. {{ item.Importe | redondear }}</td>
+              <td>{{ Number(item.Anulado) ? 'Anulado: no afecta el saldo' : (Number(item.IdCuenta) === 1 ? 'Incluido una sola vez en salidas de caja' : 'Solo referencia: no suma ni resta a caja') }}</td>
+            </tr></tbody>
+          </table></div>
+        </b-col>
+        <b-col v-if="totalSalidas">
+                <h5>Salidas Caja Principal</h5><br>
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
                       <th>Usuario</th><th>ID</th><th>Fecha</th><th>Salida</th><th>Monto</th>
@@ -440,20 +452,20 @@
                       <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
                     </tr>
                   </tfoot>
-                </table>
+                </table></div>
               </b-col>
       </b-row>
               <b-row>
-                <b-col v-if="totalIngresosTarjeta">
-                  <h5>Ingresos de Cuentas Bancarias </h5><br>
-                  <table class="table b-table table-sm">
+                <b-col cols="12" v-for="group in ingresosTarjetaPorCuenta" :key="group.key">
+                  <h5>Ingresos bancarios de referencia — {{ group.account }}</h5><p class="closing-bank-note">Informativo: estos movimientos no suman al saldo de Caja Principal.</p>
+                  <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                     <thead>
                       <tr class="thDetalle">
                         <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+                      <tr v-for="(item, index) in group.rows" :key="index">
                         <td>{{ item.IdCajaBanco }}</td>
                         <td>{{ item.Cuenta }}</td>
                         <td>{{ item.FechaDoc }}</td>
@@ -463,26 +475,26 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <td colspan="2"></td>
-                        <td class="total"><b>Total Ingresos Tarjetas</b></td>
-                        <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+                        <td colspan="3"></td>
+                        <td class="total"><b>Total ingresos {{ group.account }} (referencial)</b></td>
+                        <td class="total"><b>S/. {{ group.total | redondear }}</b></td>
                       </tr>
                     </tfoot>
-                  </table>
+                  </table></div>
                 </b-col>
               </b-row>
              
               <b-row>
-              <b-col v-if="totalSalidasTarjeta">
-                <h5>Salidas de Cuentas Bancarias </h5><br>
-                <table class="table b-table table-sm">
+              <b-col cols="12" v-for="group in salidasTarjetaPorCuenta" :key="group.key">
+                <h5>Salidas bancarias de referencia — {{ group.account }}</h5><p class="closing-bank-note">Informativo: estos movimientos no restan al saldo de Caja Principal.</p>
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
-                      <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                      <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(item, index) in salidasTarjeta" :key="index">
+                    <tr v-for="(item, index) in group.rows" :key="index">
                       <td>{{ item.IdCajaBanco }}</td>
                       <td>{{ item.Cuenta }}</td>
                       <td>{{ item.FechaDoc }}</td>
@@ -492,19 +504,19 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="2"></td>
-                      <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
-                      <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+                      <td colspan="3"></td>
+                      <td class="total-salida"><b>Total salidas {{ group.account }} (referencial)</b></td>
+                      <td class="total-salida"><b>S/. {{ group.total | redondear }}</b></td>
                     </tr>
                   </tfoot>
-                </table>
+                </table></div>
               </b-col>
               </b-row>
 
               <b-row>
                   <b-col v-if="totalAdelantos">
                     <h5>Descontar Adelantos</h5><br>
-                    <table class="table b-table table-sm adelantos">
+                    <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm adelantos">
                       <thead>
                         <tr>
                           <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
@@ -525,16 +537,16 @@
                           <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
                         </tr>
                       </tfoot>
-                    </table>
+                    </table></div>
                   </b-col>
               </b-row>
             </div>
             </b-tab>
-            <b-tab title="Productos" >
+            <b-tab title="Productos" ><template slot="title"><i class="fas fa-box-open nst-tab-icon" aria-hidden="true"></i><span>Productos</span></template>
               <div class="scrollVertical">
-              <h5>Resumen Por Producto
-              </h5>
-              <table class="table b-table table-sm">
+              <h5>Resumen Por Producto</h5>
+              <b-button class="mb-3" variant="info" @click="imprimirTicket(true)"><i class="fa fa-print mr-1" aria-hidden="true"></i> Ticket de productos vendidos</b-button>
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                     <th>ID</th>
@@ -564,13 +576,14 @@
                     }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
+              </table></div>
             </div>
             </b-tab>
-           <b-tab title="Yape/Plin">
+           <b-tab title="Yape/Plin"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Yape/Plin</span></template>
               <div class="scrollVertical">
                 <h5>Detalle de Ventas Pagadas con Yape/Plin</h5>
-                <table class="table b-table table-sm">
+                <b-button variant="info" class="mb-3" @click="imprimirYapeTicket(false)"><i class="fas fa-print" aria-hidden="true"></i> Ticket Yape/Plin 80 mm</b-button>
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
                       <th>Recibo</th>
@@ -578,7 +591,7 @@
                       <th>Hora</th>
                       <th>Vendedor</th>
                       <th>Cliente</th>
-                      <th>Estado</th>
+                      <th>Estado</th><th>Operación</th>
                       <th>Monto Pagado (Yape/Plin)</th>
                     </tr>
                   </thead>
@@ -589,25 +602,26 @@
                       <td>{{ formatoHora(item.FechaDoc) }}</td>
                       <td>{{ item.UsuarioVenta }}</td>
                       <td>{{ item.Cliente }}</td>
-                      <td>{{ estadoVenta(item) }}</td>
+                      <td>{{ estadoVenta(item) }}</td><td>{{ item.YapeDesc || "Sin operación" }}</td>
                       <td>S/. {{ item.Yape | redondear }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="5"></td>
+                      <td colspan="6"></td>
                       <td class="total"><b>Total Yape/Plin</b></td>
                       <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
                     </tr>
                   </tfoot>
-                </table>
+                </table></div>
               </div>
             </b-tab>
 
-            <b-tab title="Transferencias">
+            <b-tab title="Transferencias"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Transferencias</span></template>
               <div class="scrollVertical">
                 <h5>Detalle de Ventas Pagadas con Transferencia</h5>
-                <table class="table b-table table-sm">
+                <b-button variant="info" class="mb-3" @click="imprimirYapeTicket(true)"><i class="fas fa-print" aria-hidden="true"></i> Ticket Transferencias 80 mm</b-button>
+                <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                   <thead>
                     <tr class="thDetalle">
                       <th>Recibo</th>
@@ -615,7 +629,7 @@
                       <th>Hora</th>
                       <th>Vendedor</th>
                       <th>Cliente</th>
-                      <th>Estado</th>
+                      <th>Estado</th><th>Operación</th>
                       <th>Monto Pagado (Transferencia)</th>
                     </tr>
                   </thead>
@@ -626,18 +640,18 @@
                       <td>{{ formatoHora(item.FechaDoc) }}</td>
                       <td>{{ item.UsuarioVenta }}</td>
                       <td>{{ item.Cliente }}</td>
-                      <td>{{ estadoVenta(item) }}</td>
+                      <td>{{ estadoVenta(item) }}</td><td>{{ item.MastercardDesc || "Sin operación" }}</td>
                       <td>S/. {{ item.Mastercard | redondear }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="5"></td>
+                      <td colspan="6"></td>
                       <td class="total"><b>Total Transferencia</b></td>
                       <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
                     </tr>
                   </tfoot>
-                </table>
+                </table></div>
               </div>
             </b-tab>
           </b-tabs>
@@ -683,26 +697,22 @@
               <b-col cols="12" md="6" class="my-1">
               <b-button-group>
                 <b-button variant="success" @click="imprimirResumen()">Imprimir</b-button>
+              </b-button-group></b-col><b-col cols="12" class="my-1"><b-button-group>
+                <b-button variant="info" @click="imprimirTicket"><i class="fa fa-print mr-1" aria-hidden="true"></i> Imprimir ticket 80 mm</b-button>
               </b-button-group>
               </b-col>
             </b-row>
           </b-col>
         <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
-          Turno
-          
-          <b-form-select v-model="turno" :options="turnos" />
+          <div class="closing-selector"><label for="closing-shift"><i class="fas fa-clock" aria-hidden="true"></i> Turno de atención</label>
+          <catalog-filter-search v-model="turno" :options="turnos.filter(t => t.value !== null)" id-key="value" label-key="text" input-id="closing-shift" placeholder="Seleccione un turno" :clearable="false" />
+          </div>
           
         </b-col>
         <b-col cols="12" v-if="!this.$route.params.id">
-          Vendedor:
-          <b-select 
-              :options="lstVendedor"
-              value-field="Usuario"
-              text-field="NombreUsuario"
-              @input="recargarCierre"
-              v-model="IdVendedor"
-              :disabled="bloquearVendedor"
-          ></b-select>
+          <div class="closing-selector"><label for="closing-user"><i class="fas fa-user-tie" aria-hidden="true"></i> Usuario / vendedor</label>
+          <catalog-filter-search v-model="IdVendedor" :options="lstVendedor" id-key="Usuario" label-key="NombreUsuario" input-id="closing-user" placeholder="Buscar usuario..." :disabled="bloquearVendedor" :clearable="false" @input="recargarCierre" />
+          </div>
         </b-col>
             <b-col cols="12" v-if="!this.$route.params.id" class="mt-2">
               <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
@@ -711,9 +721,9 @@
               
             </b-col>
             <b-col cols="12">
-        <table class="table b-table table-sm table-striped table-bordered tableResumen">
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm table-striped table-bordered tableResumen">
           <tbody>
-            <tr>
+            <tr class="closing-summary-grand">
               <td>Gran Total S/.</td>
               <td>{{ granTotal | redondear }}</td>
             </tr>
@@ -727,15 +737,15 @@
             <tr>
               <td colspan="2"></td>
             </tr>
-            <tr>
-              <td>Ingresos S/.</td>
+            <tr class="closing-summary-income">
+              <td>Ingresos caja S/.</td>
               <td>{{ totalIngresos | redondear }} </td>
             </tr>
-            <tr>
-              <td>Salida S/.</td>
+            <tr class="closing-summary-expense">
+              <td>Salidas caja S/.</td>
               <td>{{ totalSalidas | redondear }} </td>
             </tr>
-            <tr>
+            <tr class="closing-summary-credit">
               <td>Crédito S/.</td>
               <td>{{ totalVentasCredito | redondear }} </td>
             </tr>
@@ -743,19 +753,19 @@
             <tr>
               <td colspan="2"></td>
             </tr>
-            <tr>
+            <tr class="closing-summary-cash">
               <td>Efectivo S/.</td>
               <td>{{ totalVentasEfectivo | redondear }} </td>
             </tr>
-            <tr>
-              <td>Tarjeta S/.</td>
-              <td>{{ totalVentasVisa | redondear }} </td>
-            </tr>
-            <tr>
+            <tr class="closing-summary-yape">
               <td>Yape/Plin S/.</td>
               <td>{{ totalVentasMastercard | redondear }} </td>
             </tr>
-            <tr>
+            <tr class="closing-summary-card">
+              <td>Tarjeta S/.</td>
+              <td>{{ totalVentasVisa | redondear }} </td>
+            </tr>
+            <tr class="closing-summary-transfer">
               <td>Transferencia S/.</td>
               <td>{{ totalVentasTransferencia | redondear }} </td>
             </tr>
@@ -773,7 +783,7 @@
               <td>{{ totalVentasCanje | redondear }} </td>
             </tr> -->
           </tbody>
-        </table>
+        </table></div>
       </b-col>
       </b-row>
       </b-col>
@@ -783,13 +793,13 @@
         <b-alert variant="success" class="text-center" show><b>GRAN TOTAL: S/. {{ granTotal | moneda }}</b></b-alert>
       </b-col>
     
-    </b-row>
+    </b-row></section>
 
-    <b-row class="si-print" >
+    <section class="nst-panel nst-panel--results"><b-row class="si-print" >
         <h2>Cierre Caja</h2>
-      <table class="table table-striped table-bordered">
+      <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table table-striped table-bordered">
               <tbody>
-                <tr>
+                <tr class="closing-summary-grand">
                   <td>Gran Total S/.</td>
                   <td>{{ granTotal | redondear }}</td>
                 </tr>
@@ -803,15 +813,15 @@
                 <tr>
                   <td colspan="2"></td>
                 </tr>
-                <tr>
-                  <td>Ingresos S/.</td>
+                <tr class="closing-summary-income">
+                  <td>Ingresos caja S/.</td>
                   <td>{{ totalIngresos | redondear }} </td>
                 </tr>
-                <tr>
-                  <td>Salida S/.</td>
+                <tr class="closing-summary-expense">
+                  <td>Salidas caja S/.</td>
                   <td>{{ totalSalidas | redondear }} </td>
                 </tr>
-                <tr>
+                <tr class="closing-summary-credit">
                   <td>Crédito S/.</td>
                   <td>{{ totalVentasCredito | redondear }} </td>
                 </tr>
@@ -819,19 +829,19 @@
                 <tr>
                   <td colspan="2"></td>
                 </tr>
-                <tr>
+                <tr class="closing-summary-cash">
                   <td>Efectivo S/.</td>
                   <td>{{ totalVentasEfectivo | redondear }} </td>
                 </tr>
-                <tr>
-                  <td>Tarjeta S/.</td>
-                  <td>{{ totalVentasVisa | redondear }} </td>
-                </tr>
-                <tr>
+                <tr class="closing-summary-yape">
                   <td>Yape/Plin S/.</td>
                   <td>{{ totalVentasMastercard | redondear }} </td>
                 </tr>
-                <tr>
+                <tr class="closing-summary-card">
+                  <td>Tarjeta S/.</td>
+                  <td>{{ totalVentasVisa | redondear }} </td>
+                </tr>
+                <tr class="closing-summary-transfer">
                   <td>Transferencia S/.</td>
                   <td>{{ totalVentasTransferencia | redondear }} </td>
                 </tr>
@@ -849,17 +859,17 @@
                   <td>{{ totalVentasCanje | redondear }} </td>
                 </tr> -->
               </tbody>
-            </table>
-    </b-row>
+            </table></div>
+    </b-row></section>
 
-    <b-row class="si-print" v-if="imprimirCierre">
+    <section class="nst-panel nst-panel--results"><b-row class="si-print" v-if="imprimirCierre">
        <h1> <center>Cierre Caja</center></h1>
        <h6 class="text-center" v-if="cierre.FechaCierre">Fecha: {{ cierre.FechaCierre }}</h6>
         <h6 class="text-center" v-if="cierre.IdTurno">Turno: {{ cierre.IdTurno == 1 ? 'MAÑANA' : 'TARDE' }}</h6>  
        <h6 v-if="cierre.UsuarioReg" style="font-size: 1.5em; padding: 5%;">Empleado: <b>{{ cierre.UsuarioReg }}</b></h6>
         
         <h5>Ventas Efectivo</h5><br>
-              <table class="table b-table table-sm">
+              <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
                 <thead>
                   <tr class="thDetalle">
                       <th>Recibo</th><th>Fecha</th>
@@ -876,7 +886,7 @@
                     <td>{{ item.FechaDoc }}</td>
                     <td>
                     
-                        <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                         <thead>
                           <tr>
                             <th>Producto</th>
@@ -905,7 +915,7 @@
                             <td>{{ prod.Subtotal | redondear }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table></div>
                       <div><i><small>
                       <b v-if="$route.query.noDetalle"></b>
                       <b v-else>Cliente:</b>
@@ -925,10 +935,79 @@
                     <td class="total"><b>S/. {{ totalVentasEfectivo | redondear }}</b></td>
                   </tr>
                 </tfoot>
-              </table>
+              </table></div>
 
-              <h5>Ventas Tarjeta</h5><br>
-        <table class="table b-table table-sm">
+              <h5>Ventas Yape/Plin</h5><br>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
+          <thead>
+            <tr class="thDetalle">
+                <th>Recibo</th><th>Fecha</th>
+                <th v-if="$route.query.noDetalle">Cliente</th>
+                <th v-else>Productos</th>
+                <!-- <th>Detalle</th> -->
+                <!-- <th>Estado</th> -->
+                <th>Pagado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
+              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
+              <td>{{ item.FechaDoc }}</td>
+              <td>
+
+                  <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <thead>
+                    <tr>
+                     
+                      <th>Producto</th>
+                      <!-- <th>Descripcion</th> -->
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Descuento</th>
+                      <th v-if="item.TieneIgv">Subtotal</th>
+                      <th v-if="item.TieneIgv">IGV</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prod, index) in item.productos" :key="index">
+                     
+                      <td class="detalle-producto">{{ prod.Producto }}</td>
+                      <!-- <td>{{ prod.Descripcion }}</td> -->
+                      <td>{{ prod.Cantidad }}</td>
+                      <td>{{ prod.Precio }}</td>
+                      <td>{{ prod.Descuento }}</td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
+                      </td>
+                      <td v-if="item.TieneIgv">
+                        {{ prod.Subtotal * 0.18 | redondear}}
+                      </td>
+                      <td>{{ prod.Subtotal | redondear }}</td>
+                    </tr>
+                  </tbody>
+                </table></div>
+                <div><i><small>
+                <b v-if="$route.query.noDetalle"></b>
+                <b v-else>Cliente:</b> 
+                {{ item.Cliente }}</small></i></div>
+                    
+              </td>
+              <!-- <td>{{ item.MastercardDesc }}</td> -->
+              <!-- <td>{{ estadoVenta(item) }}</td> -->
+              <td>S/. {{ item.Yape | redondear }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="total"><b>Total Yape/Plin</b></td>
+              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
+            </tr>
+          </tfoot>
+        </table></div>
+        <h5>Ventas Tarjeta</h5><br>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
               <th>Recibo</th><th>Fecha</th>
@@ -945,7 +1024,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
               
-                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                      
@@ -977,7 +1056,7 @@
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
                   </tbody>
-                </table>
+                </table></div>
                 <div><i><small>
                 <b v-if="$route.query.noDetalle"></b>
                 <b v-else>Cliente:</b>
@@ -996,78 +1075,9 @@
               <td class="total"><b>S/. {{ totalVentasVisa | redondear }}</b></td>
             </tr>
           </tfoot>
-        </table>
-        <h5>Ventas Yape/Plin</h5><br>
-        <table class="table b-table table-sm">
-          <thead>
-            <tr class="thDetalle">
-                <th>Recibo</th><th>Fecha</th>
-                <th v-if="$route.query.noDetalle">Cliente</th>
-                <th v-else>Productos</th>
-                <!-- <th>Detalle</th> -->
-                <!-- <th>Estado</th> -->
-                <th>Pagado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in ventasMastercard" :key="index" :class="{anulado: item.Anulado}">
-              <td>{{ item.TipoDoc + '-' + item.Serie + '-' + item.Numero }}</td>
-              <td>{{ item.FechaDoc }}</td>
-              <td>
-
-                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
-                  <thead>
-                    <tr>
-                     
-                      <th>Producto</th>
-                      <!-- <th>Descripcion</th> -->
-                      <th>Cantidad</th>
-                      <th>Precio</th>
-                      <th>Descuento</th>
-                      <th v-if="item.TieneIgv">Subtotal</th>
-                      <th v-if="item.TieneIgv">IGV</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(prod, index) in item.productos" :key="index">
-                     
-                      <td class="detalle-producto">{{ prod.Producto }}</td>
-                      <!-- <td>{{ prod.Descripcion }}</td> -->
-                      <td>{{ prod.Cantidad }}</td>
-                      <td>{{ prod.Precio }}</td>
-                      <td>{{ prod.Descuento }}</td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal - (prod.Subtotal * 0.18) | redondear }}
-                      </td>
-                      <td v-if="item.TieneIgv">
-                        {{ prod.Subtotal * 0.18 | redondear}}
-                      </td>
-                      <td>{{ prod.Subtotal | redondear }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div><i><small>
-                <b v-if="$route.query.noDetalle"></b>
-                <b v-else>Cliente:</b> 
-                {{ item.Cliente }}</small></i></div>
-                    
-              </td>
-              <!-- <td>{{ item.MastercardDesc }}</td> -->
-              <!-- <td>{{ estadoVenta(item) }}</td> -->
-              <td>S/. {{ item.Yape | redondear }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"></td>
-              <td class="total"><b>Total Yape/Plin</b></td>
-              <td class="total"><b>S/. {{ totalVentasMastercard | redondear }}</b></td>
-            </tr>
-          </tfoot>
-        </table>
+        </table></div>
         <h5>Ventas Transferencia</h5><br>
-        <table class="table b-table table-sm">
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
                 <th>Recibo</th><th>Fecha</th>
@@ -1084,7 +1094,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
 
-                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                    
@@ -1115,7 +1125,7 @@
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
                   </tbody>
-                </table>
+                </table></div>
                 <div><i><small>
                 <b v-if="$route.query.noDetalle"></b>
                 <b v-else>Cliente:</b> 
@@ -1134,9 +1144,9 @@
               <td class="total"><b>S/. {{ totalVentasTransferencia | redondear }}</b></td>
             </tr>
           </tfoot>
-        </table>
+        </table></div>
         <h5>Ventas a Credito</h5><br>
-        <table class="table b-table table-sm">
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
               <th>Recibo</th><th>Fecha</th>
@@ -1152,7 +1162,7 @@
               <td>{{ item.FechaDoc }}</td>
               <td>
                 
-                  <table class="tabla-detalle" v-if="!$route.query.noDetalle">
+                  <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="tabla-detalle" v-if="!$route.query.noDetalle">
                   <thead>
                     <tr>
                      
@@ -1183,7 +1193,7 @@
                       <td>{{ prod.Subtotal | redondear }}</td>
                     </tr>
                   </tbody>
-                </table>
+                </table></div>
                 <div><i><small>
                 <b v-if="$route.query.noDetalle"></b>
                 <b v-else>Cliente:</b> 
@@ -1202,11 +1212,11 @@
               <td><b>S/. {{ totalVentasCredito | moneda | redondear }}</b></td>
             </tr>
           </tfoot>
-        </table>
+        </table></div>
         <b-row>
         <b-col cols="12" v-if="totalIngresos">
-          <h5>Ingresos</h5><br>
-          <table class="table b-table table-sm">
+          <h5>Ingresos Caja Principal</h5><br>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
                 <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
@@ -1227,11 +1237,23 @@
                 <td class="total"><b>S/. {{ totalIngresos | redondear }}</b></td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
+        </b-col>
+        <b-col cols="12" v-if="pagosPersonal.length">
+          <h5>Adelantos y pagos al personal — cuenta de origen</h5>
+          <p class="closing-bank-note">Este resumen muestra pagos ya incluidos en el detalle de su cuenta. No vuelve a sumar ni descontar los importes.</p>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Pagos al personal"><table class="table b-table table-sm">
+            <thead><tr class="thDetalle"><th>Fecha</th><th>Personal / concepto</th><th>Cuenta de salida</th><th>Usuario</th><th>Monto</th><th>Tratamiento en Caja Principal</th></tr></thead>
+            <tbody><tr v-for="item in pagosPersonal" :key="'personal-'+item.IdCajaBanco">
+              <td>{{ item.FechaDoc }}</td><td>{{ item.Concepto }}</td><td><b>{{ item.Cuenta }}</b></td><td>{{ item.UsuarioReg }}</td>
+              <td>S/. {{ item.Importe | redondear }}</td>
+              <td>{{ Number(item.Anulado) ? 'Anulado: no afecta el saldo' : (Number(item.IdCuenta) === 1 ? 'Incluido una sola vez en salidas de caja' : 'Solo referencia: no suma ni resta a caja') }}</td>
+            </tr></tbody>
+          </table></div>
         </b-col>
         <b-col cols="12" v-if="totalSalidas">
-          <h5>Salidas</h5><br>
-          <table class="table b-table table-sm">
+          <h5>Salidas Caja Principal</h5><br>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
                 <th>UsuarioReg</th><th>ID</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
@@ -1253,20 +1275,20 @@
                 <td class="total-salida"><b>S/. {{ totalSalidas | redondear }}</b></td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalIngresosTarjeta">
-          <h5>Ingresos de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
+        <b-col cols="12" v-for="group in ingresosTarjetaPorCuenta" :key="group.key">
+          <h5>Ingresos bancarios de referencia — {{ group.account }}</h5><p class="closing-bank-note">Informativo: estos movimientos no suman al saldo de Caja Principal.</p>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
                 <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingresosTarjeta" :key="index">
+              <tr v-for="(item, index) in group.rows" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -1276,25 +1298,25 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total"><b>Total Ingresos Tarjetas</b></td>
-                <td class="total"><b>S/. {{ totalIngresosTarjeta | redondear }}</b></td>
+                <td colspan="3"></td>
+                <td class="total"><b>Total ingresos {{ group.account }} (referencial)</b></td>
+                <td class="total"><b>S/. {{ group.total | redondear }}</b></td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
         </b-col>
       </b-row>
       <b-row>
-        <b-col v-if="totalSalidasTarjeta">
-          <h5>Salidas de Cuentas Bancarias </h5><br>
-          <table class="table b-table table-sm">
+        <b-col cols="12" v-for="group in salidasTarjetaPorCuenta" :key="group.key">
+          <h5>Salidas bancarias de referencia — {{ group.account }}</h5><p class="closing-bank-note">Informativo: estos movimientos no restan al saldo de Caja Principal.</p>
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
             <thead>
               <tr class="thDetalle">
-                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
+                <th>ID</th><th>Cuenta</th><th>Fecha</th><th>Detalle</th><th>Salida</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in salidasTarjeta" :key="index">
+              <tr v-for="(item, index) in group.rows" :key="index">
                 <td>{{ item.IdCajaBanco }}</td>
                 <td>{{ item.Cuenta }}</td>
                 <td>{{ item.FechaDoc }}</td>
@@ -1304,18 +1326,18 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td class="total-salida"><b>Total Salidas Tarjetas</b></td>
-                <td class="total-salida"><b>S/. {{ totalSalidasTarjeta | redondear }}</b></td>
+                <td colspan="3"></td>
+                <td class="total-salida"><b>Total salidas {{ group.account }} (referencial)</b></td>
+                <td class="total-salida"><b>S/. {{ group.total | redondear }}</b></td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
         </b-col>
       </b-row>
       <b-row>
           <b-col v-if="totalAdelantos">
             <h5>Descontar Adelantos</h5><br>
-            <table class="table b-table table-sm adelantos">
+            <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm adelantos">
               <thead>
                 <tr>
                   <th>ID</th><th>Fecha</th><th>Detalle</th><th>Ingreso</th>
@@ -1336,7 +1358,7 @@
                   <td class="total"><b>S/. {{ totalAdelantos | redondear }}</b></td>
                 </tr>
               </tfoot>
-            </table>
+            </table></div>
           </b-col>
           <b-col cols="12">
 
@@ -1344,11 +1366,11 @@
           </b-col>
       </b-row>
            
-    </b-row>
+    </b-row></section>
 
-    <b-row class="printResumen" v-if="imprimirResumenProducto">
+    <section class="nst-panel nst-panel--results"><b-row class="printResumen" v-if="imprimirResumenProducto">
       RESUMEN DE PEDIDOS:
-      <table class="table b-table table-sm">
+      <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-sm">
           <thead>
             <tr class="thDetalle">
               <th>ID</th>
@@ -1378,12 +1400,16 @@
               }}</b></td>
             </tr>
           </tfoot>
-        </table>
-    </b-row>
+        </table></div>
+    </b-row></section>
   </b-container>
 
 </template>
 <script>
+import { cashClosingTicket } from "@/utils/cashClosingTicket";
+import CatalogFilterSearch from "@/components/CatalogFilterSearch.vue";
+import { yapePaymentTicket } from "@/utils/yapePaymentTicket";
+import { isMainCashMovement, partitionCashMovements, sumMovementAmounts, groupBankMovements } from "@/utils/cashAccountMovements";
 import config from "@/store/config.js";
 import CierresCaja from "@/components/CierresCaja.vue";
 import Proformas from "@/components/ProformaLista.vue";
@@ -1511,40 +1537,25 @@ export default {
     totalVentas() {
       return this.totalVentasEfectivo;
     },
+    pagosPersonal() {
+      return this.salidas.concat(this.salidasTarjeta).filter(item => /^PLANILLA\s/i.test(item.Concepto || ""));
+    },
     totalSalidas() {
-      let total = 0;
-      this.salidas.forEach(salida => {
-        if (!salida.Anulado) total += salida.Importe;
-      });
-      return total;
+      return sumMovementAmounts(this.salidas);
     },
     totalIngresos() {
-      let total = 0;
-      this.ingresos.forEach(ingreso => {
-        if (!ingreso.Anulado) total += ingreso.Importe;
-      });
-      return total;
+      return sumMovementAmounts(this.ingresos);
     },
     totalIngresosTarjeta() {
-      let total = 0;
-      this.ingresosTarjeta.forEach(ingresoTar => {
-        if (!ingresoTar.Anulado) total += ingresoTar.Importe;
-      });
-      return total;
+      return sumMovementAmounts(this.ingresosTarjeta);
     },
+    ingresosTarjetaPorCuenta() { return groupBankMovements(this.ingresosTarjeta); },
+    salidasTarjetaPorCuenta() { return groupBankMovements(this.salidasTarjeta); },
     totalSalidasTarjeta() {
-      let total = 0;
-      this.salidasTarjeta.forEach(salidaTar => {
-        if (!salidaTar.Anulado) total += salidaTar.Importe;
-      });
-      return total;
+      return sumMovementAmounts(this.salidasTarjeta);
     },
     totalAdelantos() {
-      let total = 0;
-      this.adelantos.forEach(ade => {
-        if (!ade.Anulado) total += ade.Importe;
-      });
-      return total;
+      return sumMovementAmounts(this.adelantos);
     },
     totalAdelantosActivos() {
       let total = 0;
@@ -1655,6 +1666,32 @@ export default {
           console.log(error);
           this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
         });
+    },
+    async imprimirYapeTicket(transfer = false) {
+      const popup = window.open('', '_blank', 'width=440,height=720');
+      if (!popup) { this.$toasted.error('Permita las ventanas emergentes para imprimir el ticket.'); return; }
+      popup.document.write('<p>Preparando reporte Yape/Plin...</p>');
+      try {
+        const response = await this.axios.get(this.API + 'empresa/id/' + (sessionStorage.getItem('empresa') || 1));
+        const html = yapePaymentTicket({transfer:transfer === true,company:response.data || {},sales:this.ventas,seller:this.vendedor.NombreUsuario || this.vendedor.Usuario || this.IdVendedor,date:this.cierre.FechaReg || this.cierre.Fecha || new Date().toLocaleString('es-PE')});
+        popup.document.open(); popup.document.write(html); popup.document.close();
+        popup.focus(); setTimeout(() => { if (!popup.closed) popup.print(); },250);
+      } catch (error) { popup.close(); this.$toasted.error('No se pudo preparar el reporte Yape/Plin.'); }
+    },
+    async imprimirTicket(productDetail = false) {
+      const popup = window.open('', '_blank', 'width=440,height=720');
+      if (!popup) { this.$toasted.error('Permita las ventanas emergentes para imprimir el ticket.'); return; }
+      popup.document.write('<p>Preparando cierre de caja...</p>');
+      try {
+        if (productDetail === true) {
+          await this.loadDetalles();
+          if (this.ventas.some(sale => !Number(sale.Anulado) && !Array.isArray(sale.productos))) throw new Error('No se cargaron los productos.');
+        }
+        const response = await this.axios.get(this.API + 'empresa/id/' + (sessionStorage.getItem('empresa') || 1));
+        const html = cashClosingTicket({bankMovements:this.ingresosTarjeta.map(item => Object.assign({},item,{direction:'Ingreso'})).concat(this.salidasTarjeta.map(item => Object.assign({},item,{direction:'Salida'}))),productDetail:productDetail === true,company:response.data || {},sales:this.ventas,seller:this.vendedor.NombreUsuario || this.vendedor.Usuario || this.IdVendedor,date:this.cierre.FechaReg || this.cierre.Fecha || new Date().toLocaleString('es-PE'),warehouse:this.vendedor.Almacen || '',grandTotal:this.granTotal,cash:this.totalVentasEfectivo,yape:this.totalVentasMastercard,card:this.totalVentasVisa,transfer:this.totalVentasTransferencia,credit:this.totalVentasCredito,income:this.totalIngresos,expenses:this.totalSalidas,advances:this.totalAdelantos});
+        popup.document.open(); popup.document.write(html); popup.document.close();
+        popup.focus(); setTimeout(() => { if (!popup.closed) popup.print(); }, 250);
+      } catch (error) { popup.close(); this.$toasted.error('No se pudo preparar el ticket del cierre. Intente nuevamente.'); }
     },
     imprimirResumen() {
       this.imprimirCierre = false;
@@ -1832,8 +1869,9 @@ export default {
           params: params
         })
         .then(res => {
-          this.ingresos = res.data.filter(ing => ing.EsTarjeta == 0);
-          this.ingresosTarjeta = res.data.filter(ing => ing.EsTarjeta == 1);
+          const partition = partitionCashMovements(res.data);
+          this.ingresos = partition.cash;
+          this.ingresosTarjeta = partition.bank;
         })
         .catch(err => {
           console.log(err);
@@ -1851,8 +1889,9 @@ export default {
           params: params
         })
         .then(res => {
-          this.salidas = res.data.filter(sal => sal.Tipo == 1);
-          this.salidasTarjeta = res.data.filter(sal => sal.Tipo == 0);
+          const partition = partitionCashMovements(res.data);
+          this.salidas = partition.cash;
+          this.salidasTarjeta = partition.bank;
         })
         .catch(err => {
           console.log(err);
@@ -1867,7 +1906,7 @@ export default {
           params: params
         })
         .then(res => {
-          this.adelantos = res.data;
+          this.adelantos = res.data.filter(isMainCashMovement);
         })
         .catch(err => {
           console.log(err);
@@ -1886,6 +1925,7 @@ export default {
     }
   },
   components: {
+    CatalogFilterSearch,
     CierresCaja
   }
 };

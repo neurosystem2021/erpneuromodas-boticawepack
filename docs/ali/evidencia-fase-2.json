@@ -1,0 +1,42 @@
+{
+  "phase": 2,
+  "build": "6afbe6ec3f37160cc780",
+  "manual_and_fiscal_unchanged": {
+    "live/api/index.php": true,
+    "live/api/sunat/sunat.php": true,
+    "live/imprimir/index.php": true,
+    "live/views/header.php": true,
+    "live/views/V_VentaForm.php": true,
+    "src/views/VentasFacturacion.vue": true,
+    "Ventas.vue::guardarVenta": true
+  },
+  "modified_application_files": [
+    "src/components/AliAssistant.vue",
+    "src/utils/aliCommands.js",
+    "src/views/Ventas.vue",
+    "src/components/ProductosCarritoNuevo.vue",
+    "integration/ali-api.php",
+    "integration/ali-pos-security.php"
+  ],
+  "sql_migrations": [],
+  "deployment_backup": "C:/xampp/htdocs/boticav1/.ali-phase2-backup-20261013-195621",
+  "tests": {
+    "commands": "passed",
+    "courtesy": "passed",
+    "mocked_checkout_hold": "passed",
+    "permission_contracts": "passed",
+    "private_config": "passed",
+    "voice_options": "passed",
+    "live_auth_csrf_expiry": "passed",
+    "browser_responsiveness": "passed",
+    "browser_voice_variety_idle": "passed",
+    "browser_phase2_cancellation_stop_permissions": "passed"
+  },
+  "limits": [
+    "Micrófono físico y audio real no evaluados por los tests de navegador.",
+    "La reproducción de voz pausa el reconocimiento para evitar eco. El botón de parada permanece disponible.",
+    "El despachador ALI no corrige todavía la autorización de todas las rutas heredadas.",
+    "Carrito ampliado, alta conversacional de clientes, cobro idempotente y function calling operacional pendientes de fases siguientes.",
+    "Emisión excluida por instrucción del usuario; instalación local sin certificados."
+  ]
+}

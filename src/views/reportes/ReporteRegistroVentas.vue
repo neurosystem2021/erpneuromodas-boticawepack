@@ -1,149 +1,149 @@
 <template>
-  <b-container fluid class="px-5 mb-5">
-    <b-row>
-       <b-col cols="12">
-        <b-breadcrumb :items="items"></b-breadcrumb>
-       </b-col>
-        <b-col cols="2">
-            Fecha
-            <input type="date" class="form-control" v-model="fechaInicio">
-        </b-col>
-        <b-col cols="2">
-            Fecha
-            <input type="date" class="form-control" v-model="fechaFin">
-        </b-col>
-        <b-col cols="2">
-            Almacén
-            <b-form-select v-model="almacen" 
-                 value-field="IdAlmacen"
-                 text-field="Almacen"
-                :options="lstAlmances"></b-form-select>
-        </b-col>
-        <b-col cols="1"  class="py-4">
-          <b-form-checkbox
-            id="checkbox-1"
-            v-model="declarado"
-            name="checkbox-1"
-            value="1"
-            unchecked-value="0"
-          >
-            Declarado
-          </b-form-checkbox>
-        </b-col>
-        <b-col cols="5" class="pt-4">
-            <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
-            <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
-            <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button>
-            <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button>
-            <b-button variant="secondary" @click="exportarSunat(2)"><i class="fa fa-file-archive" aria-hidden="true"></i> zip</b-button>
-        </b-col>
-        <b-col cols="12" class="mt-4 table-container">
-            <table class="table table-hover table-striped ">
-                <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Vendedor</th>
-                      <th>Fecha Doc</th>
-                      <th>Cod. Sunat</th>
-                      <th>Tipo Doc.</th>
-                      <th>Cliente</th>
-                      <th>Anulado</th>
-                      <th>Serie</th>
-                      <th>Número</th>
-                      <th>SubTotal</th>
-                      <th>IGV</th>
-                      <th>Total</th>
-                      <th></th>
-                    </tr>
-                </thead>
-                <tbody class="scrollable-tbody">
-                    <tr 
-                        v-for="(reporte,index) in lstReporte" 
-                        :key="index" 
-                        @click="abrirModalDetalle(reporte)" 
-                        :class="{'clsAnulado': reporte.Anulado == 1, 'clsVale': (reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12)}"
-                    >
-                        <td style="text-align: center;">{{reporte.idDocVenta}}</td>
-                        <td>{{reporte.UsuarioReg}}</td>
-                        <td style="text-align: center;">{{reporte.FechaDoc}}</td>
-                        <td style="text-align: center;">{{reporte.CodSunat}}</td>
-                        <td style="text-align: center;">{{reporte.TipoDoc}} 
-                            <span v-if="reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12"> 
-                              <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (NO SUMA) </span> 
-                              <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (PENDIENTE) </span> 
-                              <span style="font-weight: bold;" v-else> ({{ reporte.ComprobanteProcesado }})</span> 
-                            </span> 
-                        </td>
-                        <td style="text-align: left;">{{reporte.Cliente}}</td>
-                        <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} </td>
-                        <td style="text-align: center;">{{reporte.Serie}}</td>
-                        <td style="text-align: center;">{{reporte.Numero}}</td>
-                        <td style="text-align: center;">{{ parseFloat(reporte.SubTotal).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{ parseFloat(reporte.Igv).toFixed(2)}}</td>
-                        <td style="text-align: center;">{{ parseFloat(reporte.Total).toFixed(2)}}</td>
-                        <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop.prevent="eliminarReg(reporte)"></i> </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr style="background: #006064; color: #ffffff; font-weight: bold;">
-                        <td colspan="10">Total</td>
-                        <td style="text-align: center;">{{footerTotal}}</td>
-                        <td colspan="1"></td>
-                    </tr>
-                </tfoot>
-            </table>
-          
-        </b-col>
-    </b-row>
-    <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle" id="mdlDetalle" :title="title">
+<b-container fluid class="px-5 mb-5 nst-screen nst-screen--reporteregistroventas">
+  <section class="nst-panel nst-panel--filters"><b-row>
+     <b-col cols="12">
+      <b-breadcrumb :items="items"></b-breadcrumb>
+     </b-col>
+      <b-col cols="2">
+          Fecha
+          <input type="date" class="form-control" v-model="fechaInicio">
+      </b-col>
+      <b-col cols="2">
+          Fecha
+          <input type="date" class="form-control" v-model="fechaFin">
+      </b-col>
+      <b-col cols="2">
+          Almacén
+          <b-form-select v-model="almacen" 
+               value-field="IdAlmacen"
+               text-field="Almacen"
+              :options="lstAlmances"></b-form-select>
+      </b-col>
+      <b-col cols="1"  class="py-4">
+        <b-form-checkbox
+          id="checkbox-1"
+          v-model="declarado"
+          name="checkbox-1"
+          value="1"
+          unchecked-value="0"
+        >
+          Declarado
+        </b-form-checkbox>
+      </b-col>
+      <b-col cols="5" class="pt-4">
+          <b-button variant="info" @click="generarReporte()"><i class="fa fa-search" aria-hidden="true"></i> Generar</b-button>
+          <b-button variant="success" @click="exportar()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar</b-button>
+          <b-button variant="warning" @click="exportarDetallado()"><i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Detallado</b-button>
+          <b-button variant="default" @click="exportarSunat(1)"><i class="fa fa-file" aria-hidden="true"></i> txt</b-button>
+          <b-button variant="secondary" @click="exportarSunat(2)"><i class="fa fa-file-archive" aria-hidden="true"></i> zip</b-button>
+      </b-col>
+      <b-col cols="12" class="mt-4 table-container">
+          <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table table-hover table-striped ">
+              <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Vendedor</th>
+                    <th>Fecha Doc</th>
+                    <th>Cod. Sunat</th>
+                    <th>Tipo Doc.</th>
+                    <th>Cliente</th>
+                    <th>Anulado</th>
+                    <th>Serie</th>
+                    <th>Número</th>
+                    <th>SubTotal</th>
+                    <th>IGV</th>
+                    <th>Total</th>
+                    <th></th>
+                  </tr>
+              </thead>
+              <tbody class="scrollable-tbody">
+                  <tr 
+                      v-for="(reporte,index) in lstReporte" 
+                      :key="index" 
+                      @click="abrirModalDetalle(reporte)" 
+                      :class="{'clsAnulado': reporte.Anulado == 1, 'clsVale': (reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12)}"
+                  >
+                      <td style="text-align: center;">{{reporte.idDocVenta}}</td>
+                      <td>{{reporte.UsuarioReg}}</td>
+                      <td style="text-align: center;">{{reporte.FechaDoc}}</td>
+                      <td style="text-align: center;">{{reporte.CodSunat}}</td>
+                      <td style="text-align: center;">{{reporte.TipoDoc}} 
+                          <span v-if="reporte.IdTipoDoc == 11 || reporte.IdTipoDoc == 12"> 
+                            <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (NO SUMA) </span> 
+                            <span style="font-weight: bold;" v-if="reporte.ValeProcesado==0"> (PENDIENTE) </span> 
+                            <span style="font-weight: bold;" v-else> ({{ reporte.ComprobanteProcesado }})</span> 
+                          </span> 
+                      </td>
+                      <td style="text-align: left;">{{reporte.Cliente}}</td>
+                      <td style="text-align: center;">{{reporte.Anulado ==1 ? 'Anulado' :'Activo' }} </td>
+                      <td style="text-align: center;">{{reporte.Serie}}</td>
+                      <td style="text-align: center;">{{reporte.Numero}}</td>
+                      <td style="text-align: center;">{{ parseFloat(reporte.SubTotal).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{ parseFloat(reporte.Igv).toFixed(2)}}</td>
+                      <td style="text-align: center;">{{ parseFloat(reporte.Total).toFixed(2)}}</td>
+                      <td> <i v-if="reporte.Anulado ==0" class="fa fa-trash" style="color:red; cursor: pointer;" aria-hidden="true" @click.stop.prevent="eliminarReg(reporte)"></i> </td>
+                  </tr>
+              </tbody>
+              <tfoot>
+                  <tr style="background: #006064; color: #ffffff; font-weight: bold;">
+                      <td colspan="10">Total</td>
+                      <td style="text-align: center;">{{footerTotal}}</td>
+                      <td colspan="1"></td>
+                  </tr>
+              </tfoot>
+          </table></div>
         
-          <table class="table table-hover table-striped">
-            <thead>
-              <th>IdDocVenta</th>
-              <th>Cod. Barra</th>
-              <th>Producto</th>
-              <th>Marca</th>
-              <th>Medición</th>
-              <th>Cantidad</th>
-              <th>Precio</th>
-              <th>Descuento</th>
-              <th>Total</th>
-            </thead>
-            <tbody>
-              <tr v-for="(det,index) in detalle" :key="index" >
-                <td>{{ det.IdDocVenta }}</td>
-                <td>{{ det.CodigoBarra }}</td>
-                <td>{{ det.Producto }}</td>
-                <td>{{ det.ProductoMarca }}</td>
-                <td>{{ det.ProductoMedicion }}</td>
-                <td>{{ det.Cantidad }}</td>
-                <td>{{ det.Precio }}</td>
-                <td>{{ det.Descuento }}</td>
-                <td>{{ obtenerTotal(det) }}</td>
-              </tr>
-            </tbody>
-          </table>
-    </b-modal>
-    <b-modal v-model="seleccionarTipoFlag" title="Modos de Exportación" size="lg">
-      <table class="table">
-        <tr>
-          <td>Exportar Todos Los tipos</td>
-          <td>Se exportará <b>TODOS</b> los tipos de venta</td>
-          <td><b-button @click="exportarReporte(0)" variant="success" block>EXPORTAR TODOS</b-button></td>
-        </tr>
-        <tr>
-          <td>Exportar VALES DE CRÉDITO Y CANAJES</td>
-          <td>Se exportará solo <b>VALES DE CRÉDITO Y CANJAES</b></td>
-          <td><b-button @click="exportarReporte(1)" variant="success" block>EXPORTAR VALES Y CANJES</b-button></td>
-        </tr>
-        <tr>
-          <td>Exportar solo tipos electrónicos <b>(PARA EL CONTADOR)</b></td>
-          <td>Se exportará solo <b>(BOLETAS ELEC,FACT ELEC. Y NOTAS DE CRÉDITO ELEC.)</b></td>
-          <td><b-button @click="exportarReporte(2)" variant="success" block>EXPORTAR ELECTRONICOS FOX</b-button></td>
-        </tr>
-      </table>
-    </b-modal>
-  </b-container>
+      </b-col>
+  </b-row></section>
+  <b-modal v-model="dialogDetalle" size="lg" modal-class="modalRegVentaDetalle nst-dialog" id="mdlDetalle" :title="title" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      
+        <table class="table table-hover table-striped">
+          <thead>
+            <th>IdDocVenta</th>
+            <th>Cod. Barra</th>
+            <th>Producto</th>
+            <th>Marca</th>
+            <th>Medición</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Descuento</th>
+            <th>Total</th>
+          </thead>
+          <tbody>
+            <tr v-for="(det,index) in detalle" :key="index" >
+              <td>{{ det.IdDocVenta }}</td>
+              <td>{{ det.CodigoBarra }}</td>
+              <td>{{ det.Producto }}</td>
+              <td>{{ det.ProductoMarca }}</td>
+              <td>{{ det.ProductoMedicion }}</td>
+              <td>{{ det.Cantidad }}</td>
+              <td>{{ det.Precio }}</td>
+              <td>{{ det.Descuento }}</td>
+              <td>{{ obtenerTotal(det) }}</td>
+            </tr>
+          </tbody>
+        </table>
+  </b-modal>
+  <b-modal v-model="seleccionarTipoFlag" title="Modos de Exportación" size="lg" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+    <table class="table">
+      <tr>
+        <td>Exportar Todos Los tipos</td>
+        <td>Se exportará <b>TODOS</b> los tipos de venta</td>
+        <td><b-button @click="exportarReporte(0)" variant="success" block>EXPORTAR TODOS</b-button></td>
+      </tr>
+      <tr>
+        <td>Exportar VALES DE CRÉDITO Y CANAJES</td>
+        <td>Se exportará solo <b>VALES DE CRÉDITO Y CANJAES</b></td>
+        <td><b-button @click="exportarReporte(1)" variant="success" block>EXPORTAR VALES Y CANJES</b-button></td>
+      </tr>
+      <tr>
+        <td>Exportar solo tipos electrónicos <b>(PARA EL CONTADOR)</b></td>
+        <td>Se exportará solo <b>(BOLETAS ELEC,FACT ELEC. Y NOTAS DE CRÉDITO ELEC.)</b></td>
+        <td><b-button @click="exportarReporte(2)" variant="success" block>EXPORTAR ELECTRONICOS FOX</b-button></td>
+      </tr>
+    </table>
+  </b-modal>
+</b-container>
 </template>
 
 <script>

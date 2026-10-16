@@ -1,0 +1,13 @@
+{
+  "name": "neurorest-whatsapp-gateway",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Gateway local aislado para conectar NeuroRest CRM con WhatsApp Web",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs"
+  },
+  "dependencies": {
+    "@wppconnect-team/wppconnect": "2.2.4"
+  }
+}

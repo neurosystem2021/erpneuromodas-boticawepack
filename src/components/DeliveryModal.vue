@@ -1,178 +1,178 @@
 <template>
-    <div>
-        <b-button block @click="show=true" variant="info" class="btnAction" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
-        <b-modal id="modalPedidos" 
-            title="DELIVERY PEDI2.PE"
-            size="lg" v-model="show"
-            header-bg-variant="primary"
-            headerTextVariant="light"
-            body-bg-variant="light"
-            body-text-variant="dark"
-            centered 
-            ok-only no-close-on-backdrop
-            no-close-on-esc ok-title="Cerrar">           
-            <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row" id="conten">
-                <div>
-                <b-row>
-                    <b-col md="7">
-                        <h2>Lista de pedidos: <b-button variant="outline-info" @click="getPedidos">Actualizar Lista</b-button></h2>
-                        <table class="table table-striped">
-                        <thead>
+<div>
+    <b-button block @click="show=true" variant="info" class="btnAction" size="md" v-bind:class="{ parpadea: pedidos.length>0}"> <img src="static/logo.png" style="width: 24px" /> Delivery Pedi2.pe</b-button>
+    <b-modal id="modalPedidos" 
+        title="DELIVERY PEDI2.PE"
+        size="lg" v-model="show"
+        header-bg-variant="primary"
+        headerTextVariant="light"
+        body-bg-variant="light"
+        body-text-variant="dark"
+        centered 
+        ok-only no-close-on-backdrop
+        no-close-on-esc ok-title="Cerrar" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer">           
+        <b-container fluid style="width: calc(100% - 50px)" class="bv-example-row" id="conten">
+            <div>
+            <b-row>
+                <b-col md="7">
+                    <h2>Lista de pedidos: <b-button variant="outline-info" @click="getPedidos">Actualizar Lista</b-button></h2>
+                    <table class="table table-striped">
+                    <thead>
+                        <tr>
+                        <th scope="col" class="text-center">Código</th>
+                        <th scope="col" class="text-center">Estado</th>
+                        <th scope="col" class="text-center">Cliente</th>
+                        <th scope="col" class="text-center">Motorizado</th>
+                        <th scope="col" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                        <tbody v-for="(pedido, index) in pedidos" :key="index">
                             <tr>
-                            <th scope="col" class="text-center">Código</th>
-                            <th scope="col" class="text-center">Estado</th>
-                            <th scope="col" class="text-center">Cliente</th>
-                            <th scope="col" class="text-center">Motorizado</th>
-                            <th scope="col" class="text-center">Acciones</th>
+                                <td scope="row" class="text-center font-weight-bold">{{ pedido.IdPedido }}</td>
+                                <td v-if="pedido.Estado=='E'" class="text-center"><b-badge variant="dark">EN ESPERA</b-badge></td>
+                                <td v-else-if="pedido.Estado=='PE'" class="text-center"><b-badge variant="success">PREPARANDO</b-badge></td>
+                                <td v-else-if="pedido.Estado=='PU'" class="text-center"><b-badge variant="primary">CAMINO AL CLIENTE</b-badge></td>
+                                <td v-else-if="pedido.Estado=='UC'" class="text-center"><b-badge variant="primary">EN LA UBICACION DEL CLIENTE</b-badge></td>
+                                <td v-else class="text-center"><b-badge variant="danger">FINALIZADO</b-badge></td>
+                                <td class="text-center"><b>{{ pedido.Cliente }}</b></td>
+                                <td v-if="pedido.IdMotorizado==null" class="text-center"><b-badge variant="danger">NO ASIGNADO</b-badge></td>    
+                                <td v-else class="text-center"><b>{{ pedido.Motorizado }}</b></td>
+                                <td class="text-center">
+                                    <b-button variant="success" size="sm" v-b-toggle="''+pedido.IdPedido"><i class="fas fa-eye"></i></b-button>
+                                    <b-button v-show="pedido.Estado!='E'" :id="'popover-motorizado' + pedido.IdPedido" variant="warning" size="sm" @click="getMotorizados(pedido.IdPedido)"><i class="fas fa-bicycle"></i></b-button>
+                                    <b-popover :show.sync="pedido.showPopover" :target="'popover-motorizado' + pedido.IdPedido" :title="'Asignar motorizado al pedido : '+pedido.IdPedido">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <td class="text-center"><b>Nombre</b></td>
+                                                    <td class="text-center"><b>Estado</b></td>
+                                                    <td class="text-center"><b>Línea</b></td>
+                                                    <td class="text-center"><b>Asignación</b></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(motorizado, index) in motorizados" :key="index" style="border-top: 1px solid black; border-bottom: 1px solid black;">
+                                                    <td class="text-center font-weight-bold">{{motorizado.Motorizado}}</td>
+
+                                                    <td v-if="motorizado.ContadorViajes>0">
+                                                        <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="danger" class="text-center">EN ESTE VIAJE</b-badge>
+                                                        <b-badge v-else variant="warning" class="text-center">EN OTRO VIAJE</b-badge>
+                                                    </td>
+
+                                                    <td v-else>
+                                                        <b-badge variant="success" class="text-center">LIBRE</b-badge>     
+                                                    </td>
+
+                                                    <td v-if="motorizado.online" class="text-center"><b-badge variant="success">online</b-badge></td>
+                                                    <td v-else><b-badge variant="secondary" class="text-center">offline</b-badge></td>
+
+                                                    <td v-if="motorizado.IdMotorizado==pedido.IdMotorizado" class="text-center">
+                                                        <label>-------</label>
+                                                    </td>
+                                                    <td v-else>
+                                                        <b-button v-if="pedido.IdMotorizado== null" variant="success" size="sm" @click="asignarMotorizado(pedido.IdPedido,pedido.IdCliente,pedido.Cliente,motorizado.IdMotorizado,motorizado.Motorizado)">Asignar</b-button>
+                                                        <b-button v-else variant="warning" size="sm" @click="cambiarMotorizado(pedido.IdPedido,pedido.IdCliente,pedido.Cliente,motorizado.IdMotorizado,motorizado.Motorizado,pedido.IdMotorizado,pedido.Motorizado)">Cambiar</b-button>
+                                                    </td>         
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </b-popover>
+                                    <b-button size="sm" v-if="pedido.Estado!='F'" variant="info" @click="mostrarClienteMapa(pedido.IdPedido)"><i class="fas fa-map-marker-alt"></i></b-button>
+                                    <b-button size="sm" v-if="pedido.Estado!='E'" variant="danger" @click="cancelarPedido(pedido.IdPedido,pedido.IdCliente)"><i class="fas fa-times fa-lg"></i></b-button>
+                                </td>
                             </tr>
-                        </thead>
-                            <tbody v-for="(pedido, index) in pedidos" :key="index">
-                                <tr>
-                                    <td scope="row" class="text-center font-weight-bold">{{ pedido.IdPedido }}</td>
-                                    <td v-if="pedido.Estado=='E'" class="text-center"><b-badge variant="dark">EN ESPERA</b-badge></td>
-                                    <td v-else-if="pedido.Estado=='PE'" class="text-center"><b-badge variant="success">PREPARANDO</b-badge></td>
-                                    <td v-else-if="pedido.Estado=='PU'" class="text-center"><b-badge variant="primary">CAMINO AL CLIENTE</b-badge></td>
-                                    <td v-else-if="pedido.Estado=='UC'" class="text-center"><b-badge variant="primary">EN LA UBICACION DEL CLIENTE</b-badge></td>
-                                    <td v-else class="text-center"><b-badge variant="danger">FINALIZADO</b-badge></td>
-                                    <td class="text-center"><b>{{ pedido.Cliente }}</b></td>
-                                    <td v-if="pedido.IdMotorizado==null" class="text-center"><b-badge variant="danger">NO ASIGNADO</b-badge></td>    
-                                    <td v-else class="text-center"><b>{{ pedido.Motorizado }}</b></td>
-                                    <td class="text-center">
-                                        <b-button variant="success" size="sm" v-b-toggle="''+pedido.IdPedido"><i class="fas fa-eye"></i></b-button>
-                                        <b-button v-show="pedido.Estado!='E'" :id="'popover-motorizado' + pedido.IdPedido" variant="warning" size="sm" @click="getMotorizados(pedido.IdPedido)"><i class="fas fa-bicycle"></i></b-button>
-                                        <b-popover :show.sync="pedido.showPopover" :target="'popover-motorizado' + pedido.IdPedido" :title="'Asignar motorizado al pedido : '+pedido.IdPedido">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <td class="text-center"><b>Nombre</b></td>
-                                                        <td class="text-center"><b>Estado</b></td>
-                                                        <td class="text-center"><b>Línea</b></td>
-                                                        <td class="text-center"><b>Asignación</b></td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(motorizado, index) in motorizados" :key="index" style="border-top: 1px solid black; border-bottom: 1px solid black;">
-                                                        <td class="text-center font-weight-bold">{{motorizado.Motorizado}}</td>
-
-                                                        <td v-if="motorizado.ContadorViajes>0">
-                                                            <b-badge v-if="motorizado.IdMotorizado==pedido.IdMotorizado" variant="danger" class="text-center">EN ESTE VIAJE</b-badge>
-                                                            <b-badge v-else variant="warning" class="text-center">EN OTRO VIAJE</b-badge>
-                                                        </td>
-
-                                                        <td v-else>
-                                                            <b-badge variant="success" class="text-center">LIBRE</b-badge>     
-                                                        </td>
-
-                                                        <td v-if="motorizado.online" class="text-center"><b-badge variant="success">online</b-badge></td>
-                                                        <td v-else><b-badge variant="secondary" class="text-center">offline</b-badge></td>
-
-                                                        <td v-if="motorizado.IdMotorizado==pedido.IdMotorizado" class="text-center">
-                                                            <label>-------</label>
-                                                        </td>
-                                                        <td v-else>
-                                                            <b-button v-if="pedido.IdMotorizado== null" variant="success" size="sm" @click="asignarMotorizado(pedido.IdPedido,pedido.IdCliente,pedido.Cliente,motorizado.IdMotorizado,motorizado.Motorizado)">Asignar</b-button>
-                                                            <b-button v-else variant="warning" size="sm" @click="cambiarMotorizado(pedido.IdPedido,pedido.IdCliente,pedido.Cliente,motorizado.IdMotorizado,motorizado.Motorizado,pedido.IdMotorizado,pedido.Motorizado)">Cambiar</b-button>
-                                                        </td>         
-                                                    </tr>
-                                                </tbody>
+                            <tr> 
+                                <td colspan="5">
+                                    <b-collapse :id="''+pedido.IdPedido" class="mt-1">
+                                        <b-card>
+                                            <b-row>
+                                                <b-col md="11">
+                                                    <label>Cliente: <span class="font-weight-bold">{{pedido.Cliente}}</span></label>
+                                                    <br>  
+                                                    <label>Teléfono del cliente: <span class="font-weight-bold">{{pedido.TelefonoCliente}}</span></label>
+                                                    <br>
+                                                    <label>Dirección: <span class="font-weight-bold">{{pedido.Direccion}}</span></label>
+                                                    <br>
+                                                    <label>Referencia: <span class="font-weight-bold"> {{pedido.Referencia}}</span></label>
+                                                    <br>
+                                                    <label>Método de Pago: <span class="font-weight-bold">{{pedido.MetodoPago}}</span></label>
+                                                    <br>
+                                                    <label>Fecha y Hora de solicitud: <span class="font-weight-bold">{{$moment(pedido.FechaReg).format("YYYY-MM-DD HH:mm:ss")}}</span></label> 
+                                                </b-col>
+                                                <b-col md="1">
+                                                    <i v-b-toggle="''+pedido.IdPedido" class="fas fa-minus" style='font-size:26px;color:gray; cursor: pointer;'></i>
+                                                </b-col>
+                                            </b-row>
+                                            <br>
+                                            <b-alert show variant="info" style="font-weight:bold">Productos</b-alert>
+                                            <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                <th scope="col" class="text-center">#</th>
+                                                <th scope="col" class="text-center">Producto</th>
+                                                <th scope="col" class="text-center">Cantidad</th>
+                                                <th scope="col" class="text-center">Precio</th>
+                                                <th scope="col" class="text-center">Sub. Total</th>
+                                                <th scope="col" class="text-center">Indicaciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- <tr v-for="(detalle, index2) in JSON.parse(pedido.Productos)" :key="index2"> -->
+                                                <tr v-for="(detalle, index2) in pedido.Productos" :key="index2">
+                                                    <td scope="row" class="text-center" style="text-align: center; vertical-align: middle;">{{ index2 + 1}}</td>
+                                                    <td scope="row" class="text-center font-weight-bold" style="width:25% !important; font-size:0.8rem">{{ detalle.Producto }}</td>
+                                                    <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">{{ detalle.Cantidad }}</td>
+                                                    <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">S/ {{ detalle.Precio.toFixed(2) }}</td>
+                                                    <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">S/ {{ (detalle.Precio * detalle.Cantidad ).toFixed(2) }}</td>
+                                                    <td scope="row" style="text-align: center; vertical-align: middle; width: 170px;" v-if="detalle.Indicacion=='' || detalle.Indicacion==null"><b-badge variant="warning">No tiene</b-badge></td>
+                                                    <td scope="row" style="text-align: center; vertical-align: middle; width: 170px;" v-else>{{ detalle.Indicacion }}</td>
+                                                </tr>
+                                            </tbody>
                                             </table>
-                                        </b-popover>
-                                        <b-button size="sm" v-if="pedido.Estado!='F'" variant="info" @click="mostrarClienteMapa(pedido.IdPedido)"><i class="fas fa-map-marker-alt"></i></b-button>
-                                        <b-button size="sm" v-if="pedido.Estado!='E'" variant="danger" @click="cancelarPedido(pedido.IdPedido,pedido.IdCliente)"><i class="fas fa-times fa-lg"></i></b-button>
-                                    </td>
-                                </tr>
-                                <tr> 
-                                    <td colspan="5">
-                                        <b-collapse :id="''+pedido.IdPedido" class="mt-1">
-                                            <b-card>
-                                                <b-row>
-                                                    <b-col md="11">
-                                                        <label>Cliente: <span class="font-weight-bold">{{pedido.Cliente}}</span></label>
-                                                        <br>  
-                                                        <label>Teléfono del cliente: <span class="font-weight-bold">{{pedido.TelefonoCliente}}</span></label>
-                                                        <br>
-                                                        <label>Dirección: <span class="font-weight-bold">{{pedido.Direccion}}</span></label>
-                                                        <br>
-                                                        <label>Referencia: <span class="font-weight-bold"> {{pedido.Referencia}}</span></label>
-                                                        <br>
-                                                        <label>Método de Pago: <span class="font-weight-bold">{{pedido.MetodoPago}}</span></label>
-                                                        <br>
-                                                        <label>Fecha y Hora de solicitud: <span class="font-weight-bold">{{$moment(pedido.FechaReg).format("YYYY-MM-DD HH:mm:ss")}}</span></label> 
-                                                    </b-col>
-                                                    <b-col md="1">
-                                                        <i v-b-toggle="''+pedido.IdPedido" class="fas fa-minus" style='font-size:26px;color:gray; cursor: pointer;'></i>
-                                                    </b-col>
-                                                </b-row>
-                                                <br>
-                                                <b-alert show variant="info" style="font-weight:bold">Productos</b-alert>
-                                                <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                    <th scope="col" class="text-center">#</th>
-                                                    <th scope="col" class="text-center">Producto</th>
-                                                    <th scope="col" class="text-center">Cantidad</th>
-                                                    <th scope="col" class="text-center">Precio</th>
-                                                    <th scope="col" class="text-center">Sub. Total</th>
-                                                    <th scope="col" class="text-center">Indicaciones</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <!-- <tr v-for="(detalle, index2) in JSON.parse(pedido.Productos)" :key="index2"> -->
-                                                    <tr v-for="(detalle, index2) in pedido.Productos" :key="index2">
-                                                        <td scope="row" class="text-center" style="text-align: center; vertical-align: middle;">{{ index2 + 1}}</td>
-                                                        <td scope="row" class="text-center font-weight-bold" style="width:25% !important; font-size:0.8rem">{{ detalle.Producto }}</td>
-                                                        <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">{{ detalle.Cantidad }}</td>
-                                                        <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">S/ {{ detalle.Precio.toFixed(2) }}</td>
-                                                        <td scope="row" class="font-weight-bold" style="text-align: center; vertical-align: middle;">S/ {{ (detalle.Precio * detalle.Cantidad ).toFixed(2) }}</td>
-                                                        <td scope="row" style="text-align: center; vertical-align: middle; width: 170px;" v-if="detalle.Indicacion=='' || detalle.Indicacion==null"><b-badge variant="warning">No tiene</b-badge></td>
-                                                        <td scope="row" style="text-align: center; vertical-align: middle; width: 170px;" v-else>{{ detalle.Indicacion }}</td>
-                                                    </tr>
-                                                </tbody>
-                                                </table>
-                                                <label>Costo de delivery: <span class="font-weight-bold"> S/ {{pedido.PrecioDelivery}}</span></label>
-                                                <br>
-                                                <label>Total en productos: <span class="font-weight-bold"> S/ {{pedido.PrecioProductos}}</span></label>
-                                                <br>
-                                                <div class="text-center">
-                                                    <h2 class="font-weight-bold">Total: S/ {{ (parseFloat(pedido.PrecioDelivery)+parseFloat(pedido.PrecioProductos)).toFixed(2) }}</h2>
-                                                </div>
-                                                <br>
-                                                <div class="text-center">
-                                                    <b-button v-if="pedido.Estado == 'E'" size="lg" variant="success" @click="aceptarPedido(pedido.IdPedido,pedido.IdCliente)">Aceptar</b-button>
-                                                    <b-button v-if="pedido.Estado == 'E'" size="lg" variant="danger" @click="rechazarPedido(pedido.IdPedido)">Rechazar</b-button>
-                                                    <b-button v-if="pedido.Estado != 'E'" size="lg" variant="info" @click="volverRealizarVenta(pedido.IdPedido)">Volver a Realizar Venta</b-button>
-                                                    <b-form-text v-if="pedido.Estado != 'E'">Si no realizo la venta del pedido, puede intentarlo nuevamente. Previamente el sistema validará que no exista una venta de este pedido.</b-form-text>
-                                                </div>
-                                            </b-card>
-                                        </b-collapse>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </b-col>
-                    <b-col md="5">
-                        <b-row>
-                            <b-col md="12" style="margin-top:10px">
-                                <b-button variant="outline-primary" @click="emitirConsultaMotorizado">Mostrar Motorizados</b-button>
-                                <b-badge  variant="success" style="font-size:18px;">En Linea: {{motorizadosOnline.length}} </b-badge> 
-                            </b-col>
-                        </b-row>
-                        <hr>
-                        <b-row>
-                            <b-col md="12">
-                                <h4>MAPA TIEMPO REAL:
-                                    <b-badge v-if="mostrarMotorizados" variant="primary">MOSTRANDO MOTORIZADOS</b-badge>
-                                    <b-badge v-if="mostrarCliente" variant="info">{{mostrarCliente}}</b-badge>
-                                </h4>
-                                <div id="mapid"></div>
-                            </b-col>
-                        </b-row>
-                    </b-col>
+                                            <label>Costo de delivery: <span class="font-weight-bold"> S/ {{pedido.PrecioDelivery}}</span></label>
+                                            <br>
+                                            <label>Total en productos: <span class="font-weight-bold"> S/ {{pedido.PrecioProductos}}</span></label>
+                                            <br>
+                                            <div class="text-center">
+                                                <h2 class="font-weight-bold">Total: S/ {{ (parseFloat(pedido.PrecioDelivery)+parseFloat(pedido.PrecioProductos)).toFixed(2) }}</h2>
+                                            </div>
+                                            <br>
+                                            <div class="text-center">
+                                                <b-button v-if="pedido.Estado == 'E'" size="lg" variant="success" @click="aceptarPedido(pedido.IdPedido,pedido.IdCliente)">Aceptar</b-button>
+                                                <b-button v-if="pedido.Estado == 'E'" size="lg" variant="danger" @click="rechazarPedido(pedido.IdPedido)">Rechazar</b-button>
+                                                <b-button v-if="pedido.Estado != 'E'" size="lg" variant="info" @click="volverRealizarVenta(pedido.IdPedido)">Volver a Realizar Venta</b-button>
+                                                <b-form-text v-if="pedido.Estado != 'E'">Si no realizo la venta del pedido, puede intentarlo nuevamente. Previamente el sistema validará que no exista una venta de este pedido.</b-form-text>
+                                            </div>
+                                        </b-card>
+                                    </b-collapse>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-col>
+                <b-col md="5">
+                    <b-row>
+                        <b-col md="12" style="margin-top:10px">
+                            <b-button variant="outline-primary" @click="emitirConsultaMotorizado">Mostrar Motorizados</b-button>
+                            <b-badge  variant="success" style="font-size:18px;">En Linea: {{motorizadosOnline.length}} </b-badge> 
+                        </b-col>
                     </b-row>
-                </div>
-            </b-container>
-        </b-modal>
-    </div>
+                    <hr>
+                    <b-row>
+                        <b-col md="12">
+                            <h4>MAPA TIEMPO REAL:
+                                <b-badge v-if="mostrarMotorizados" variant="primary">MOSTRANDO MOTORIZADOS</b-badge>
+                                <b-badge v-if="mostrarCliente" variant="info">{{mostrarCliente}}</b-badge>
+                            </h4>
+                            <div id="mapid"></div>
+                        </b-col>
+                    </b-row>
+                </b-col>
+                </b-row>
+            </div>
+        </b-container>
+    </b-modal>
+</div>
 </template>
 <script>
 import config from "@/store/config.js";
@@ -524,21 +524,67 @@ export default {
             this.idEmpresa = null;
             this.empresa = {};
             this.$swal({
-              icon: "error",
-              title: "Sin servicio de delivery",
-              text: "No hay conexión con el servidor de delivery",
-              footer: "Por favor cierre sesión e ingrese nuevamente"
+              icon: "warning",
+              iconColor: "#ffbe55",
+              title: "Delivery temporalmente fuera de línea",
+              text: "No se pudo conectar con el servidor de delivery.",
+              footer: "Cierre automático en 1 segundo",
+              width: "430px",
+              padding: "1.25rem 1.35rem 1rem",
+              timer: 1000,
+              timerProgressBar: true,
+              showConfirmButton: true,
+              confirmButtonText: "Continuar trabajando",
+              buttonsStyling: false,
+              showCloseButton: true,
+              allowOutsideClick: true,
+              allowEscapeKey: true,
+              backdrop: "rgba(2, 12, 24, 0.46)",
+              customClass: {
+                container: "pos-delivery-alert-container",
+                popup: "pos-delivery-alert",
+                icon: "pos-delivery-alert-icon",
+                title: "pos-delivery-alert-title",
+                htmlContainer: "pos-delivery-alert-copy",
+                footer: "pos-delivery-alert-footer",
+                timerProgressBar: "pos-delivery-alert-progress",
+                confirmButton: "pos-delivery-alert-confirm",
+                closeButton: "pos-delivery-alert-close"
+              }
             });
           });
       } else {
         this.idEmpresa = null;
         this.empresa = {};
         this.$swal({
-          icon: "error",
-          title: "Error en la autentificación de delivery",
-          text: "No hay conexión con el servidor de delivery",
+          icon: "warning",
+          iconColor: "#ffbe55",
+          title: "Delivery temporalmente fuera de línea",
+          text: "No se pudo validar la conexión con el servicio de delivery.",
           target: document.getElementById("conten"),
-          footer: "Por favor cierre sesión e ingrese nuevamente"
+          footer: "Cierre automático en 1 segundo",
+          width: "430px",
+          padding: "1.25rem 1.35rem 1rem",
+          timer: 1000,
+          timerProgressBar: true,
+          showConfirmButton: true,
+          confirmButtonText: "Continuar trabajando",
+          buttonsStyling: false,
+          showCloseButton: true,
+          allowOutsideClick: true,
+          allowEscapeKey: true,
+          backdrop: "rgba(2, 12, 24, 0.46)",
+          customClass: {
+            container: "pos-delivery-alert-container",
+            popup: "pos-delivery-alert",
+            icon: "pos-delivery-alert-icon",
+            title: "pos-delivery-alert-title",
+            htmlContainer: "pos-delivery-alert-copy",
+            footer: "pos-delivery-alert-footer",
+            timerProgressBar: "pos-delivery-alert-progress",
+            confirmButton: "pos-delivery-alert-confirm",
+            closeButton: "pos-delivery-alert-close"
+          }
         });
       }
     },
@@ -1056,6 +1102,154 @@ export default {
   }
   100% {
     opacity: 1;
+  }
+}
+
+/* Alerta compacta de conectividad: informativa y no bloqueante. */
+.pos-delivery-alert-container {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.swal2-popup.pos-delivery-alert {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(103, 226, 245, 0.30);
+  border-radius: 22px;
+  color: #edfaff;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(8, 214, 236, 0.22), transparent 12rem),
+    radial-gradient(circle at 100% 110%, rgba(246, 56, 109, 0.18), transparent 13rem),
+    linear-gradient(145deg, #071b2a 0%, #0c2137 58%, #231628 100%);
+  box-shadow: 0 28px 70px rgba(0, 5, 16, 0.44), 0 0 28px rgba(8, 214, 236, 0.10), inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+.swal2-popup.pos-delivery-alert::before {
+  position: absolute;
+  top: 0;
+  right: 22px;
+  left: 22px;
+  height: 2px;
+  border-radius: 999px;
+  content: "";
+  background: linear-gradient(90deg, transparent, #08d6ec, #7957ff, #f6386d, transparent);
+  background-size: 220% 100%;
+  filter: drop-shadow(0 0 7px rgba(8,214,236,.55));
+  animation: deliveryAlertEnergy 1.5s ease-in-out infinite;
+}
+
+.swal2-popup .pos-delivery-alert-icon {
+  width: 3.35em;
+  height: 3.35em;
+  margin: .3em auto .55em;
+  border-width: 2px;
+  background: rgba(255,190,85,.07);
+  box-shadow: 0 0 0 7px rgba(255,190,85,.055), 0 0 26px rgba(255,190,85,.15);
+  font-size: .92rem;
+}
+
+.swal2-popup .pos-delivery-alert-title {
+  padding: 0;
+  color: #ffffff;
+  font-size: 1.18rem;
+  font-weight: 850;
+  line-height: 1.18;
+  letter-spacing: -.015em;
+}
+
+.swal2-popup .pos-delivery-alert-copy {
+  margin: .4rem 0 0;
+  padding: 0 .35rem;
+  color: #b9d4e4;
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.swal2-popup .pos-delivery-alert-footer {
+  margin: .75rem 0 0;
+  padding: .62rem 0 0;
+  border-top-color: rgba(112,220,240,.14);
+  color: #789bb0;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+
+.swal2-popup .pos-delivery-alert-progress {
+  height: 3px;
+  background: linear-gradient(90deg, #08d6ec, #4c6fff, #f6386d);
+  box-shadow: 0 0 12px rgba(8,214,236,.42);
+}
+
+.swal2-popup.pos-delivery-alert::after {
+  position: absolute;
+  top: 13px;
+  left: 17px;
+  padding: 4px 8px;
+  border: 1px solid rgba(76, 225, 239, .24);
+  border-radius: 999px;
+  content: "DELIVERY  •  CONECTIVIDAD";
+  color: #76e9f6;
+  background: rgba(5, 48, 67, .52);
+  font-size: .52rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+}
+
+.swal2-popup .swal2-actions {
+  margin: .85rem auto 0;
+}
+
+.swal2-popup .pos-delivery-alert-confirm {
+  min-height: 36px;
+  padding: 7px 17px;
+  border: 1px solid rgba(120, 235, 249, .42);
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(125deg, #0da6bf 0%, #3672e8 56%, #7157e7 100%);
+  box-shadow: 0 8px 20px rgba(30, 112, 210, .25), inset 0 1px 0 rgba(255,255,255,.24);
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .025em;
+  cursor: pointer;
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+
+.swal2-popup .pos-delivery-alert-confirm:hover,
+.swal2-popup .pos-delivery-alert-confirm:focus {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgba(30, 132, 220, .34), 0 0 0 3px rgba(69, 215, 239, .1);
+  outline: 0;
+}
+
+.swal2-popup .pos-delivery-alert-close {
+  top: 7px;
+  right: 7px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #92b9cd;
+  font-size: 1.45rem;
+  transition: color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.swal2-popup .pos-delivery-alert-close:hover {
+  color: #fff;
+  background: rgba(246, 56, 109, .18);
+  transform: rotate(5deg);
+}
+
+@keyframes deliveryAlertEnergy {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@media (max-width: 480px) {
+  .swal2-popup.pos-delivery-alert {
+    width: calc(100vw - 26px) !important;
+    padding: 1rem .85rem .75rem !important;
+    border-radius: 18px;
   }
 }
 </style>

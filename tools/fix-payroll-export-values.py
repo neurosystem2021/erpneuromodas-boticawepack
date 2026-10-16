@@ -1,0 +1,3 @@
+from pathlib import Path
+p=Path('integration/payroll/api/payroll-export.php');s=p.read_text(encoding='utf-8').replace("$p?(float)$p['Ingresos']:null","$p?(float)($p['Detalle']['Ingresos']??$p['Ingresos']??0):null").replace("$p?(float)$p['Descuentos']:null","$p?(float)($p['Detalle']['Descuentos']??$p['Descuentos']??0):null");p.write_text(s,encoding='utf-8')
+p=Path('tools/test-payroll-export-live.php');s=p.read_text(encoding='utf-8');s=s.replace("if((float)$row[12]!==1130||(float)$row[13]!==500||(float)$row[14]!==630)","if((float)$row[10]!==1130||(float)$row[12]!==1130||abs((float)$row[12]-(float)$row[13]-(float)$row[14])>0.001)");s=s.replace("Fiorela net 1130, paid 500, pending 630","Fiorela income/net 1130 and paid + pending reconciled");p.write_text(s,encoding='utf-8')

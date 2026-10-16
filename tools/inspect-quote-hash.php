@@ -1,0 +1,2 @@
+﻿<?php
+ob_start();require 'C:/xampp/htdocs/boticav1/config/database.php';require __DIR__.'/../integration/ali-product-knowledge.php';$db=appPdoConnection();ob_end_clean();$f=aliKnowledgeRead($db,4679);$p=aliKnowledgeProduct($db,4679);$matches=[];foreach([true,false] as $numeric){$v=$p;$v['IdProducto']=$numeric?(int)$v['IdProducto']:(string)$v['IdProducto'];$matches[$numeric?'integer_id':'string_id']=hash_equals($f['catalog_hash'],aliKnowledgeHash($v));}echo json_encode(['types'=>array_map('gettype',$p),'matches'=>$matches]);

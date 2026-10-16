@@ -1,0 +1,7 @@
+/* Presentation shared by the five central configuration modules. */
+.ec-hero,.vg-hero,.tag-hero,.pm-hero{background:#073e35!important;color:#fff!important}
+.ec-hero h1,.vg-hero h1,.tag-hero h1,.pm-hero h1{color:#fff!important;font-weight:900!important}
+.ec-hero p,.vg-hero p,.tag-hero p,.pm-hero p{color:#e0f5ef!important}
+.ec-page,.vg-page,.tag-page,.pm-page{padding-bottom:25px}
+.ec-page input,.vg-page input,.tag-page input,.pm-page select{font-size:13px}
+@media(max-width:600px){.ec-hero,.vg-hero,.tag-hero,.pm-hero{border-radius:14px}.ec-hero h1,.vg-hero h1,.tag-hero h1,.pm-hero h1{font-size:21px!important}}

@@ -1,0 +1,130 @@
+/*
+ * Regla visual global de la aplicación Vue.
+ * Los módulos y reportes usan superficies y colores sólidos, sin degradados.
+ */
+#app [style*="linear-gradient"],
+#app [style*="radial-gradient"] {
+  background-image: none !important;
+}
+
+/* Fondo general de módulos y reportes. */
+#app [class*="-page"] {
+  background-color: #f4f7fb !important;
+}
+
+/* Cabeceras destacadas con azul institucional sólido. */
+#app [class*="-hero"],
+#app [class*="-banner"],
+#app [class*="hero-"] {
+  background-color: #0b4f7c !important;
+}
+
+/* Encabezados de tablas. */
+#app table thead,
+#app table thead tr,
+#app table thead th {
+  background-image: none !important;
+}
+
+/* Acciones: conservar el significado del color, siempre plano. */
+#app .btn-primary,
+#app .btn-info {
+  background-color: #0879a8 !important;
+  border-color: #0879a8 !important;
+}
+
+#app .btn-success {
+  background-color: #0aa568 !important;
+  border-color: #0aa568 !important;
+}
+
+#app .btn-danger {
+  background-color: #ef4058 !important;
+  border-color: #ef4058 !important;
+}
+
+#app .btn-warning {
+  background-color: #f59e0b !important;
+  border-color: #f59e0b !important;
+}
+
+#app .btn-secondary {
+  background-color: #748391 !important;
+  border-color: #748391 !important;
+}
+
+/* Variantes activas y elementos azules que antes dependían de un degradado. */
+#app .btn[class*="generate"],
+#app button[class*="generate"],
+#app .btn[class*="primary"],
+#app button[class*="primary"],
+#app [class*="-locked"],
+#app [class*="-hero"] [class*="icon"] {
+  background-color: #0879a8 !important;
+}
+
+#app .btn[class*="export"],
+#app button[class*="export"] {
+  background-color: #0aa568 !important;
+}
+
+/* Los iconos de Font Awesome se dibujan mediante una fuente local. */
+#app .fa,
+#app .fas,
+#app .far,
+#app .fab {
+  color: inherit;
+  opacity: 1;
+}
+/* Las notificaciones deben mostrarse sobre los modales globales (z-index 10410). */
+.toasted-container,
+#toasted-container {
+  z-index: 2147483647 !important;
+}
+
+/* Contraste estable del editor de productos, incluso cuando se abre desde
+   Movimiento y hereda los estilos generales de inventario. */
+#app .product-form-modal .product-form-column {
+  border-color: #b9d0e1 !important;
+  background-color: #f8fbfe !important;
+  box-shadow: 0 8px 22px rgba(18, 65, 105, .08) !important;
+}
+
+#app .product-form-modal .form-control,
+#app .product-form-modal .custom-select,
+#app .product-form-modal .autocomplete input {
+  color: #132e4b !important;
+  border: 1.5px solid #9fbcd1 !important;
+  background-color: #ffffff !important;
+  box-shadow: inset 0 1px 3px rgba(15, 55, 88, .08), 0 2px 5px rgba(15, 55, 88, .04) !important;
+  opacity: 1 !important;
+}
+
+#app .product-form-modal textarea.form-control {
+  border-color: #91b2c9 !important;
+}
+
+#app .product-form-modal .form-control:hover,
+#app .product-form-modal .custom-select:hover,
+#app .product-form-modal .autocomplete input:hover {
+  border-color: #6599bc !important;
+}
+
+#app .product-form-modal .form-control:focus,
+#app .product-form-modal .custom-select:focus,
+#app .product-form-modal .autocomplete input:focus {
+  border-color: #087fb7 !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(8, 127, 183, .18), inset 0 1px 2px rgba(15, 55, 88, .05) !important;
+}
+
+#app .product-form-modal .form-control::placeholder,
+#app .product-form-modal .autocomplete input::placeholder {
+  color: #687d90 !important;
+  opacity: 1 !important;
+}
+
+#app .product-form-modal .product-form-image-preview {
+  border: 1.5px solid #a8c5d9 !important;
+  box-shadow: inset 0 0 0 1px #e2edf4 !important;
+}

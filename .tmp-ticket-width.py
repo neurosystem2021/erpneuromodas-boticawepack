@@ -1,0 +1,11 @@
+﻿from pathlib import Path
+p=Path('src/utils/cashClosingTicket.js');s=p.read_text(encoding='utf-8')
+s=s.replace('@page{size:80mm auto;margin:2mm}', '@page{size:80mm 297mm;margin:4mm}')
+s=s.replace('body{width:76mm;margin:0 auto;', 'html{margin:0;padding:0}body{width:72mm;max-width:100%;margin:0 auto;padding:0;')
+s=s.replace('.row span{flex:1}', '.row span{flex:1;min-width:0;overflow-wrap:anywhere}')
+s=s.replace('.row b{text-align:right;', '.row b{flex:0 0 auto;max-width:45%;overflow-wrap:anywhere;text-align:right;')
+s=s.replace('.company{font-size:12px;font-weight:bold}', '.company{font-size:12px;font-weight:bold;overflow-wrap:anywhere}')
+s=s.replace('.meta{font-size:9px;line-height:1.45}', '.meta{font-size:9px;line-height:1.45;overflow-wrap:anywhere}')
+s=s.replace('body{width:76mm;margin:0}', 'body{width:72mm;max-width:100%;margin:0 auto;padding:0}')
+p.write_text(s,encoding='utf-8')
+p=Path('tools/test-cash-closing-ticket.cjs');s=p.read_text(encoding='utf-8').replace("assert(html.includes('size:80mm auto'))", "assert(html.includes('size:80mm 297mm'));assert(html.includes('width:72mm'));assert(!html.includes('width:76mm'))");p.write_text(s,encoding='utf-8')

@@ -1,0 +1,14 @@
+{
+    "database": "nst",
+    "new_table_previously_present": false,
+    "core_tables_unchanged": [
+        "Ve_DocVenta",
+        "Ve_DocVentaDet",
+        "Ve_DocVentaMetodoPagoDet",
+        "Cb_CajaBanco",
+        "Cb_CajaBancoDet",
+        "Ve_DocVentaCliente",
+        "Gen_Producto_Serie"
+    ],
+    "migration_sha256": "2c8a7813a15add346762ddd540e997d7d63dd425d6e1fce9c801ac37fb0ad39a"
+}

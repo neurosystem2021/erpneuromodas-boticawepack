@@ -1,0 +1,12 @@
+/.env
+/api/.env
+/config/database.local.php
+/error_log
+/api/sunat/api_cpe/BETA
+/api/sunat/api_cpe/PRODUCCION
+/config/crm.ai.local.json
+/config/crm.local.php
+/config/crm.feature.local.json
+/whatsapp-gateway/.sessions/
+/whatsapp-gateway/*.log
+/whatsapp-gateway/node_modules/

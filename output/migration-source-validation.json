@@ -1,0 +1,377 @@
+{
+  "counts": {
+    "Ag_Caja": 1,
+    "Ag_CategoriaEmpresa": 4,
+    "Ag_CierreCaja": 2,
+    "Ag_Comprobante": 6,
+    "Ag_Empresa": 4,
+    "Ag_EmpresasEntidad": 5,
+    "Ag_Entidad": 9,
+    "Ag_Operacion": 4,
+    "Ag_Servicio": 7,
+    "Agen_Conversacion": 1,
+    "Agen_ConversacionDetalle": 4,
+    "Cb_CajaBanco": 4744,
+    "Cb_CajaBancoDet": 10,
+    "Cb_CierreCaja": 825,
+    "Cb_Cuenta": 3,
+    "Cb_LetraCaja": 0,
+    "Cb_TipoCajaBanco": 7,
+    "GEN_EMPRESA": 1,
+    "Gen_EmpresaConfig": 8,
+    "Gen_Impresora": 1,
+    "Gen_Moneda": 2,
+    "Gen_Oferta": 5,
+    "Gen_Producto": 2860,
+    "Gen_ProductoBloque": 0,
+    "Gen_ProductoCategoria": 81,
+    "Gen_ProductoCompuesto": 0,
+    "Gen_ProductoCompuestoDet": 0,
+    "Gen_ProductoDet": 91,
+    "Gen_ProductoFormaFarmaceutica": 75,
+    "Gen_ProductoMarca": 429,
+    "Gen_ProductoMedicion": 2,
+    "Gen_ProductoModelo": 0,
+    "Gen_ProductoTalla": 0,
+    "Gen_Producto_Serie": 512,
+    "Lo_Almacen": 3,
+    "Lo_Impuesto": 3,
+    "Lo_Movimiento": 867,
+    "Lo_MovimientoDetalle": 3338,
+    "Lo_MovimientoDetalleImpuesto": 0,
+    "Lo_MovimientoTipo": 14,
+    "Lo_OrdenCompra": 1,
+    "Lo_OrdenCompraDet": 199,
+    "Lo_Proveedor": 207,
+    "Rhu_Empleado": 5,
+    "Seg_Usuario": 16,
+    "Seg_UsuarioModulo": 29,
+    "Seg_UsuarioModulo_has_UsuarioPerfil": 71,
+    "Seg_UsuarioPerfil": 5,
+    "Sunat_Resumen": 0,
+    "Ve_DocVenta": 4638,
+    "Ve_DocVentaCliente": 4325,
+    "Ve_DocVentaDescuento": 1,
+    "Ve_DocVentaDet": 7131,
+    "Ve_DocVentaDetEntrega": 0,
+    "Ve_DocVentaHistorialKit": 1,
+    "Ve_DocVentaMetodoPago": 4,
+    "Ve_DocVentaMetodoPagoDet": 4845,
+    "Ve_DocVentaNotaCredito": 23,
+    "Ve_DocVentaPuntoVenta": 2,
+    "Ve_DocVentaPuntoVentaDet": 10,
+    "Ve_DocVentaRemision": 1,
+    "Ve_DocVentaRemisionDet": 11,
+    "Ve_DocVentaTipoDoc": 6,
+    "Ve_ExpertoDiagnostico": 42,
+    "Ve_ExpertoDiagnosticoSintomaDet": 151,
+    "Ve_ExpertoSintoma": 120,
+    "Ve_ExpertoTratamiento": 152,
+    "Ve_PreOrden": 185,
+    "Ve_PreOrdenDet": 520,
+    "Ve_PreOrdenDetPago": 370,
+    "Ve_Proforma": 248,
+    "Ve_ProformaDet": 1345,
+    "prodstock": 122,
+    "remision": 0,
+    "tblKardex": 10,
+    "tblKardexvalor": 17
+  },
+  "parse_errors": [],
+  "orphans": {
+    "Ve_DocVentaDet.IdDocVenta": 0,
+    "Ve_DocVentaMetodoPagoDet.IdDocVenta": 0,
+    "Ve_DocVentaNotaCredito.IdDocVenta": 23,
+    "Ve_DocVentaDet.IdProducto": 0,
+    "Ve_DocVenta.IdCliente": 0,
+    "Lo_MovimientoDetalle.hashMovimiento": 0,
+    "Lo_OrdenCompraDet.IdOrdenCompra": 0,
+    "Lo_MovimientoDetalle.IdProducto": 0
+  },
+  "totals": {
+    "Ve_DocVentaDet": "1360645.0644",
+    "Lo_OrdenCompra": "0",
+    "Ve_DocVentaMetodoPagoDet": "1360645.07"
+  },
+  "Ve_DocVenta_duplicate_groups": 0,
+  "Gen_Producto_duplicate_groups": 0,
+  "movement_groups": [
+    {
+      "type_id": "1",
+      "currency": "USD",
+      "cancelled": "0x00",
+      "count": 160
+    },
+    {
+      "type_id": "1",
+      "currency": "PEN",
+      "cancelled": "0x00",
+      "count": 90
+    },
+    {
+      "type_id": "4",
+      "currency": "PEN",
+      "cancelled": "0x00",
+      "count": 364
+    },
+    {
+      "type_id": "6",
+      "currency": "PEN",
+      "cancelled": "0x00",
+      "count": 61
+    },
+    {
+      "type_id": "9",
+      "currency": "PEN",
+      "cancelled": "0x00",
+      "count": 140
+    },
+    {
+      "type_id": "4",
+      "currency": "USD",
+      "cancelled": "0x00",
+      "count": 28
+    },
+    {
+      "type_id": "2",
+      "currency": "PEN",
+      "cancelled": "0x00",
+      "count": 1
+    },
+    {
+      "type_id": "9",
+      "currency": "USD",
+      "cancelled": "0x00",
+      "count": 20
+    },
+    {
+      "type_id": "6",
+      "currency": "USD",
+      "cancelled": "0x00",
+      "count": 3
+    }
+  ],
+  "movement_type_definitions": [
+    {
+      "IdMovimientoTipo": "1",
+      "TipoMovimiento": "COMPRA FACTURA",
+      "Tipo": "0",
+      "VaRegCompra": "0x01",
+      "CodSunat": "01",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "2",
+      "TipoMovimiento": "COMPRA BOLETA",
+      "Tipo": "0",
+      "VaRegCompra": "0x01",
+      "CodSunat": "03",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "3",
+      "TipoMovimiento": "COMPRA TICKET",
+      "Tipo": "0",
+      "VaRegCompra": "0x01",
+      "CodSunat": "12",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "4",
+      "TipoMovimiento": "INGRESO",
+      "Tipo": "0",
+      "VaRegCompra": "0x01",
+      "CodSunat": "0",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "5",
+      "TipoMovimiento": "SALIDA X DETERIORO",
+      "Tipo": "1",
+      "VaRegCompra": "0x01",
+      "CodSunat": "0",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "6",
+      "TipoMovimiento": "TRASLADOS",
+      "Tipo": "2",
+      "VaRegCompra": "0x01",
+      "CodSunat": "0",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "9",
+      "TipoMovimiento": "SALIDA",
+      "Tipo": "1",
+      "VaRegCompra": "0x01",
+      "CodSunat": "99",
+      "Anulado": "0"
+    },
+    {
+      "IdMovimientoTipo": "10",
+      "TipoMovimiento": "DONACION",
+      "Tipo": "1",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "11",
+      "TipoMovimiento": "SOBRANTES",
+      "Tipo": "0",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "12",
+      "TipoMovimiento": "FALTANTES",
+      "Tipo": "1",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "13",
+      "TipoMovimiento": "DEVOLUCION",
+      "Tipo": "0",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "15",
+      "TipoMovimiento": "SALIDA X VENCIMIENTO",
+      "Tipo": "1",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "16",
+      "TipoMovimiento": "RECEPCION DE DONACION",
+      "Tipo": "0",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    },
+    {
+      "IdMovimientoTipo": "17",
+      "TipoMovimiento": "GUIA REM. SALIDA VENTA",
+      "Tipo": "1",
+      "VaRegCompra": "0x00",
+      "CodSunat": "00",
+      "Anulado": "1"
+    }
+  ],
+  "sales_reconciliation": {
+    "documents_with_any_difference": 4,
+    "documents_difference_over_one_cent": 0,
+    "max_absolute_difference": "0.0040",
+    "missing_detail_documents": 0,
+    "missing_payment_documents": 0,
+    "currency": "Not declared on Ve_DocVenta; do not infer PEN without verifying application semantics."
+  },
+  "sales_groups": [
+    {
+      "type_id": "7",
+      "cancelled": "0",
+      "state": "2",
+      "credit": "0x00",
+      "count": 2614,
+      "detail_total": "763743.29",
+      "payments": "763743.29"
+    },
+    {
+      "type_id": "3",
+      "cancelled": "0",
+      "state": "1",
+      "credit": "0x00",
+      "count": 1221,
+      "detail_total": "146264.8784",
+      "payments": "146264.88"
+    },
+    {
+      "type_id": "6",
+      "cancelled": "0",
+      "state": "2",
+      "credit": "0x00",
+      "count": 634,
+      "detail_total": "357005.8960",
+      "payments": "357005.90"
+    },
+    {
+      "type_id": "7",
+      "cancelled": "1",
+      "state": "0",
+      "credit": "0x00",
+      "count": 93,
+      "detail_total": "51318.0",
+      "payments": "51318.00"
+    },
+    {
+      "type_id": "3",
+      "cancelled": "1",
+      "state": "1",
+      "credit": "0x00",
+      "count": 47,
+      "detail_total": "11906",
+      "payments": "11906.00"
+    },
+    {
+      "type_id": "9",
+      "cancelled": "0",
+      "state": "2",
+      "credit": "0x00",
+      "count": 13,
+      "detail_total": "8862",
+      "payments": "8862.00"
+    },
+    {
+      "type_id": "6",
+      "cancelled": "1",
+      "state": "0",
+      "credit": "0x00",
+      "count": 12,
+      "detail_total": "21302.0",
+      "payments": "21302.00"
+    },
+    {
+      "type_id": "8",
+      "cancelled": "0",
+      "state": "2",
+      "credit": "0x00",
+      "count": 1,
+      "detail_total": "84",
+      "payments": "84.00"
+    },
+    {
+      "type_id": "7",
+      "cancelled": "1",
+      "state": "2",
+      "credit": "0x00",
+      "count": 1,
+      "detail_total": "10",
+      "payments": "10.00"
+    },
+    {
+      "type_id": "6",
+      "cancelled": "1",
+      "state": "2",
+      "credit": "0x00",
+      "count": 1,
+      "detail_total": "129",
+      "payments": "129.00"
+    },
+    {
+      "type_id": "7",
+      "cancelled": "0",
+      "state": "1",
+      "credit": "0x00",
+      "count": 1,
+      "detail_total": "20",
+      "payments": "20.00"
+    }
+  ]
+}

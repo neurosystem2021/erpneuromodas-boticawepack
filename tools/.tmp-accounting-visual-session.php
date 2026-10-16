@@ -1,0 +1,2 @@
+<?php
+if(PHP_SAPI!=='cli')exit(1);$file=__DIR__.'/.tmp-accounting-session.json';if(($argv[1]??'')==='clear'){$data=json_decode(file_get_contents($file),true);session_id($data['id']);session_start();$_SESSION=[];session_destroy();unlink($file);exit;}session_id('accountingvisual'.bin2hex(random_bytes(12)));session_start();$_SESSION=['user'=>'admin','idPerfil'=>1,'idAlmacen'=>1,'hostUrl'=>'http://localhost','expire'=>time()+180,'permisos'=>[]];file_put_contents($file,json_encode(['id'=>session_id()]));session_write_close();echo 'Temporary visual session ready';

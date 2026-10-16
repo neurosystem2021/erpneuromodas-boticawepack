@@ -1,209 +1,209 @@
 <template>
-  <b-container>
-    <b-card class=" vh-100">
-    <b-row>
-      <b-col cols="12" md="6" lg="6" class="px-5">
-        <b-row>
-          <b-col cols="12">
-            <b-form-group  class="mt-0">
-                <label class="ocultarMovil">DOC. REMITENTE</label>
-                 <b-input-group>
-                    <input type="text"  class="form-control" v-model="remitente.docremitente">
-                    <b-button @click="buscarReminte" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
-                  </b-input-group>                                  
-            </b-form-group>
-          </b-col>
-          <b-col cols="12">
-            <b-form-group  class="mt-0">
-                <label class="ocultarMovil">RAZÓN SOCIAL</label>
-                <input type="text" v-model="remitente.razonSocial" class="form-control">
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <hr>
-        <b-row>
-                  <b-col cols="12">
-                    <b-form-group  class="mt-0">
-                        <label class="ocultarMovil">TRANSPORTISTA</label>
-                        <autocomplete
-                            required="required"
-                            :ref="`inputProveedor`"
-                            :url="API + 'proveedores'"
-                            anchor="ProveedorRuc"
-                            label="writer"
-                            placeholder=""
-                            :onInput="(val) => newDniRuc = val"
-                            :on-select="setProveedor" 
-                            :onFocus="focusAutocomplete.bind(null, `inputProveedor`)"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col cols="12">
-                    <b-form-group  class="mt-0">
-                        <label class="ocultarMovil" >DIRECCIÓN FISCAL</label>
-                        <textarea v-model="proveedor.Direccion" class="form-control"  style="field-sizing: content;"/>
-                    </b-form-group>
-                  </b-col>
-        </b-row>
-        <hr>
-        <b-row>
-                  <b-col cols="12" md="6" lg="6"> 
-                    <b-form-group  class="">
-                        <label class="ocultarMovil">DNI CHOFER</label>
-                        <b-input-group>
-                          <input type="text" v-model="chofer.documento" class="form-control">
-                          <b-button @click="buscarChofer" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
-                        </b-input-group>
-                 
-                    </b-form-group>
-                  </b-col>
-                  <b-col cols="12" md="6" lg="6"> 
-                    <b-form-group  class="">
-                        <label class="ocultarMovil">LICENCIA CHOFER</label>
-                        <input type="text" v-model="chofer.licencia"  class="form-control">
-                    </b-form-group>
-                  </b-col>
-                  <b-col cols="12">
-                    <b-form-group  class="">
-                        <label class="ocultarMovil">DATOS DEL CHOFER</label>
-                        <input type="text" v-model="chofer.razonSocial" class="form-control">
-                    </b-form-group>
-                  </b-col>
-        </b-row>
-        <hr>
-        <b-row>
-                  <b-col cols="12" md="6" lg="6"> 
-                    <b-form-group  class="mt-0">
-                        <label class="ocultarMovil">PLACA DEL VEHÍCULO</label>
-                        <input type="text" v-model="chofer.placa" class="form-control">
-                    </b-form-group>
-                  </b-col>
-                  <b-col cols="12" md="6" lg="6"> 
-                    <b-form-group  class="mt-0">
-                        <label class="ocultarMovil">MARCA</label>
-                        <input type="text"  v-model="chofer.marca" class="form-control">
-                    </b-form-group>
-                  </b-col>
-        </b-row>
-      </b-col>
-         <b-col cols="12" md="6" lg="6" class="px-5">
-            <b-row>
-              <b-col cols="12">
-                <b-form-group  class="mt-0">
-                    <label class="ocultarMovil">CLIENTE</label>
-                    <autocomplete
-                        required="required"
-                        :ref="`inputCliente`"
-                        :url="API + 'clientes'"
-                        anchor="ClienteDniRuc"
-                        label="writer"
-                        placeholder=""
-                        :onInput="(val) => newDniRuc = val"
-                        :on-select="setCliente" 
-                        :onFocus="focusAutocomplete.bind(null, `inputCliente`)"
-                        :classes="{input: 'form-control'}">
-                    </autocomplete>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <hr>
-            <b-row>
-              <!-- <b-col cols="12"> 
-                  <b-form-group  class="">
-                    <label class="ocultarMovil">UBIG ORIGEN</label>
-                    <input type="text"  class="form-control" v-model="ubigeoorigen">
-                  </b-form-group>
-              </b-col> -->
-              <b-col cols="12" md="4" lg="4"> 
-                  <b-form-group  class="">
-                    <label class="ocultarMovil">UBIG ORIGEN</label>
-                    <input type="text"  class="form-control" v-model="ubigeoorigen">
-                  </b-form-group>
-              </b-col>
-             <b-col cols="12" md="8" lg="8"> 
-                <b-form-group  class="">
-                  <label class="ocultarMovil" >DIRECCIÓN ORIGEN</label>
-                  <textarea  class="form-control" v-model="direccionorigen"  style="field-sizing: content;"/>
-                </b-form-group>
-              </b-col>
-              <b-col cols="12" md="4" lg="4"> 
-                  <b-form-group  class="">
-                    <label class="ocultarMovil">UBIG DESTINO</label>
-                    <input type="text"  class="form-control" v-model="ubigeodestino">
-                  </b-form-group>
-              </b-col>
-              <b-col cols="12" md="8" lg="8"> 
-                  <b-form-group  class="">
-                    <label class="ocultarMovil" >DIRECCIÓN DESTINO</label>
-                    <textarea  class="form-control" v-model="direcciondestino"  style="field-sizing: content;"/>
-                  </b-form-group>
-              </b-col>
-              <b-col cols="12" md="6" lg="6">
-                <b-form-group  class="">
-                    <label class="ocultarMovil">FECHA</label>
-                    <input type="date" v-model="fecha" class="form-control">
-                </b-form-group>
-              </b-col>
-              <b-col cols="12" md="6" lg="6">
-                <b-form-group  class="">
-                    <label class="ocultarMovil">NRO. GUÍA REMISIÓN</label>
-                    <input type="text" v-model="guiaremision" class="form-control">
-                </b-form-group>
-              </b-col>
-               <b-col cols="12" md="6" lg="6">
-                <b-form-group  class="">
-                    <label class="ocultarMovil">MODALIDAD</label>
-                    <b-form-select v-model="modalidad" :options="modalidades"></b-form-select>
-                </b-form-group>
-              </b-col>
-               <b-col cols="12" md="6" lg="6">
-                <b-form-group  class="">
-                    <label class="ocultarMovil">MOTIVO</label>
-                    <b-form-select v-model="motivo" :options="motivos"></b-form-select>
-                </b-form-group>
-              </b-col>
-            </b-row>
+<b-container class="nst-screen nst-screen--remisiontransportista">
+  <b-card class=" vh-100">
+  <section class="nst-panel nst-panel--filters"><b-row>
+    <b-col cols="12" md="6" lg="6" class="px-5">
+      <b-row>
+        <b-col cols="12">
+          <b-form-group  class="mt-0">
+              <label class="ocultarMovil">DOC. REMITENTE</label>
+               <b-input-group>
+                  <input type="text"  class="form-control" v-model="remitente.docremitente">
+                  <b-button @click="buscarReminte" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
+                </b-input-group>                                  
+          </b-form-group>
         </b-col>
-       
-        <b-col cols="12" class="px-5">
-                <div class="dvTitle ">
-                    <span class="spnTitle "> DETALLE</span>
-                </div>
-                <b-row>
-                    <b-col cols="12" md="4" lg="4"> 
-                         <b-form-group class="">
-                            <label>Doc. Referencia:</label>
-                            <autocomplete
-                                required="required"
-                                ref="inputDocRef"
-                                :url="API + 'ventas/lista/'+puntoVenta.IdDocVentaPuntoVenta"
-                                anchor="NroComprobante"
-                                initValue=""
-                                label="writer"
-                                placeholder=""
-                                :on-select="setDocRef"
-                                :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                        </b-form-group>
-                    </b-col>
-                    <b-col cols="12">
-                      <b-table :items="productos" :fields="fields">
-                        <template slot="Cantidad" slot-scope="data">
-                          {{ parseFloat((data.item.cantidad) * (data.item.cantidadPres)).toFixed(2) }}
-                        </template>
-                      </b-table>
-                    </b-col>
-                    <b-col style="text-align: center;" class="mt-5">
-                      <b-button variant="success" @click="generarGuiaRemision">GENERAR GUÍA REMISIÓN</b-button>
-                    </b-col>
-                </b-row>
-              </b-col>
-            
-            </b-row>
-      </b-card>
-  </b-container>
+        <b-col cols="12">
+          <b-form-group  class="mt-0">
+              <label class="ocultarMovil">RAZÓN SOCIAL</label>
+              <input type="text" v-model="remitente.razonSocial" class="form-control">
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <hr>
+      <b-row>
+                <b-col cols="12">
+                  <b-form-group  class="mt-0">
+                      <label class="ocultarMovil">TRANSPORTISTA</label>
+                      <autocomplete
+                          required="required"
+                          :ref="`inputProveedor`"
+                          :url="API + 'proveedores'"
+                          anchor="ProveedorRuc"
+                          label="writer"
+                          placeholder=""
+                          :onInput="(val) => newDniRuc = val"
+                          :on-select="setProveedor" 
+                          :onFocus="focusAutocomplete.bind(null, `inputProveedor`)"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                  <b-form-group  class="mt-0">
+                      <label class="ocultarMovil" >DIRECCIÓN FISCAL</label>
+                      <textarea v-model="proveedor.Direccion" class="form-control"  style="field-sizing: content;"/>
+                  </b-form-group>
+                </b-col>
+      </b-row>
+      <hr>
+      <b-row>
+                <b-col cols="12" md="6" lg="6"> 
+                  <b-form-group  class="">
+                      <label class="ocultarMovil">DNI CHOFER</label>
+                      <b-input-group>
+                        <input type="text" v-model="chofer.documento" class="form-control">
+                        <b-button @click="buscarChofer" variant="info" ><i class="fa fa-search" aria-hidden="true"></i></b-button>
+                      </b-input-group>
+               
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12" md="6" lg="6"> 
+                  <b-form-group  class="">
+                      <label class="ocultarMovil">LICENCIA CHOFER</label>
+                      <input type="text" v-model="chofer.licencia"  class="form-control">
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                  <b-form-group  class="">
+                      <label class="ocultarMovil">DATOS DEL CHOFER</label>
+                      <input type="text" v-model="chofer.razonSocial" class="form-control">
+                  </b-form-group>
+                </b-col>
+      </b-row>
+      <hr>
+      <b-row>
+                <b-col cols="12" md="6" lg="6"> 
+                  <b-form-group  class="mt-0">
+                      <label class="ocultarMovil">PLACA DEL VEHÍCULO</label>
+                      <input type="text" v-model="chofer.placa" class="form-control">
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12" md="6" lg="6"> 
+                  <b-form-group  class="mt-0">
+                      <label class="ocultarMovil">MARCA</label>
+                      <input type="text"  v-model="chofer.marca" class="form-control">
+                  </b-form-group>
+                </b-col>
+      </b-row>
+    </b-col>
+       <b-col cols="12" md="6" lg="6" class="px-5">
+          <b-row>
+            <b-col cols="12">
+              <b-form-group  class="mt-0">
+                  <label class="ocultarMovil">CLIENTE</label>
+                  <autocomplete
+                      required="required"
+                      :ref="`inputCliente`"
+                      :url="API + 'clientes'"
+                      anchor="ClienteDniRuc"
+                      label="writer"
+                      placeholder=""
+                      :onInput="(val) => newDniRuc = val"
+                      :on-select="setCliente" 
+                      :onFocus="focusAutocomplete.bind(null, `inputCliente`)"
+                      :classes="{input: 'form-control'}">
+                  </autocomplete>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <hr>
+          <b-row>
+            <!-- <b-col cols="12"> 
+                <b-form-group  class="">
+                  <label class="ocultarMovil">UBIG ORIGEN</label>
+                  <input type="text"  class="form-control" v-model="ubigeoorigen">
+                </b-form-group>
+            </b-col> -->
+            <b-col cols="12" md="4" lg="4"> 
+                <b-form-group  class="">
+                  <label class="ocultarMovil">UBIG ORIGEN</label>
+                  <input type="text"  class="form-control" v-model="ubigeoorigen">
+                </b-form-group>
+            </b-col>
+           <b-col cols="12" md="8" lg="8"> 
+              <b-form-group  class="">
+                <label class="ocultarMovil" >DIRECCIÓN ORIGEN</label>
+                <textarea  class="form-control" v-model="direccionorigen"  style="field-sizing: content;"/>
+              </b-form-group>
+            </b-col>
+            <b-col cols="12" md="4" lg="4"> 
+                <b-form-group  class="">
+                  <label class="ocultarMovil">UBIG DESTINO</label>
+                  <input type="text"  class="form-control" v-model="ubigeodestino">
+                </b-form-group>
+            </b-col>
+            <b-col cols="12" md="8" lg="8"> 
+                <b-form-group  class="">
+                  <label class="ocultarMovil" >DIRECCIÓN DESTINO</label>
+                  <textarea  class="form-control" v-model="direcciondestino"  style="field-sizing: content;"/>
+                </b-form-group>
+            </b-col>
+            <b-col cols="12" md="6" lg="6">
+              <b-form-group  class="">
+                  <label class="ocultarMovil">FECHA</label>
+                  <input type="date" v-model="fecha" class="form-control">
+              </b-form-group>
+            </b-col>
+            <b-col cols="12" md="6" lg="6">
+              <b-form-group  class="">
+                  <label class="ocultarMovil">NRO. GUÍA REMISIÓN</label>
+                  <input type="text" v-model="guiaremision" class="form-control">
+              </b-form-group>
+            </b-col>
+             <b-col cols="12" md="6" lg="6">
+              <b-form-group  class="">
+                  <label class="ocultarMovil">MODALIDAD</label>
+                  <b-form-select v-model="modalidad" :options="modalidades"></b-form-select>
+              </b-form-group>
+            </b-col>
+             <b-col cols="12" md="6" lg="6">
+              <b-form-group  class="">
+                  <label class="ocultarMovil">MOTIVO</label>
+                  <b-form-select v-model="motivo" :options="motivos"></b-form-select>
+              </b-form-group>
+            </b-col>
+          </b-row>
+      </b-col>
+     
+      <b-col cols="12" class="px-5">
+              <div class="dvTitle ">
+                  <span class="spnTitle "> DETALLE</span>
+              </div>
+              <b-row>
+                  <b-col cols="12" md="4" lg="4"> 
+                       <b-form-group class="">
+                          <label>Doc. Referencia:</label>
+                          <autocomplete
+                              required="required"
+                              ref="inputDocRef"
+                              :url="API + 'ventas/lista/'+puntoVenta.IdDocVentaPuntoVenta"
+                              anchor="NroComprobante"
+                              initValue=""
+                              label="writer"
+                              placeholder=""
+                              :on-select="setDocRef"
+                              :onFocus="focusAutocomplete.bind(null, 'inputDocRef')"
+                              :classes="{input: 'form-control'}">
+                          </autocomplete>
+                      </b-form-group>
+                  </b-col>
+                  <b-col cols="12">
+                    <b-table :items="productos" :fields="fields" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+                      <template slot="Cantidad" slot-scope="data">
+                        {{ parseFloat((data.item.cantidad) * (data.item.cantidadPres)).toFixed(2) }}
+                      </template>
+                    </b-table>
+                  </b-col>
+                  <b-col style="text-align: center;" class="mt-5">
+                    <b-button variant="success" @click="generarGuiaRemision">GENERAR GUÍA REMISIÓN</b-button>
+                  </b-col>
+              </b-row>
+            </b-col>
+          
+          </b-row></section>
+    </b-card>
+</b-container>
 </template>
 
 <script>

@@ -1,122 +1,122 @@
 <template>
-  <div>
-    <b-form @submit="guardarServicio" @keydown.enter="keyDownInput">
-      <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigServicio" :title="title" size="lg" ref="servicioForm" v-model="show">
-        <b-row>
-          <b-col md="6">
-            <b-form-group>
-              <label>Nombre del Servicio:</label>
-              <b-form-input v-model="servicio.NombreServicio"
-                ref="inputNombreServicio"
-                required="required"
-                type="text"
-                autocomplete="off"
-                style="text-transform: uppercase;"
-                :value="servicio.NombreServicio"
-                ></b-form-input>
-            </b-form-group>
-            <hr>
+<div>
+  <b-form @submit="guardarServicio" @keydown.enter="keyDownInput">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalConfigServicio" :title="title" size="lg" ref="servicioForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-row>
+        <b-col md="6" class="nst-editor-section">
+          <b-form-group>
+            <label>Nombre del Servicio:</label>
+            <b-form-input v-model="servicio.NombreServicio"
+              ref="inputNombreServicio"
+              required="required"
+              type="text"
+              autocomplete="off"
+              style="text-transform: uppercase;"
+              :value="servicio.NombreServicio"
+              ></b-form-input>
+          </b-form-group>
+          <hr>
+          <b-form-group>
+            <b-form-checkbox
+                    v-model="servicio.RequiereCodigo"
+                    :value="1"
+                    :unchecked-value="0"
+                    >
+              Requiere código para la operación
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="servicio.RequiereCodigo">
+            <label>Nombre del código:</label>
+            <b-form-input v-model="servicio.NombreCodigo"
+              ref="inputNombreCodigo"
+              required="required"
+              type="text"
+              style="text-transform: uppercase;"
+              autocomplete="off"
+              :value="servicio.NombreCodigo"
+              ></b-form-input>
+          </b-form-group>
+        </b-col>
+
+        <b-col md="6">
+          <b-form-group>
+            <b-form-checkbox
+                    v-model="servicio.TieneComision"
+                    :value="1"
+                    :unchecked-value="0"
+                    >
+              Tiene comisión
+            </b-form-checkbox>
+          </b-form-group>
+
+          <div v-if="servicio.TieneComision">
             <b-form-group>
               <b-form-checkbox
-                      v-model="servicio.RequiereCodigo"
+                      v-model="servicio.Calculo"
                       :value="1"
                       :unchecked-value="0"
                       >
-                Requiere código para la operación
-              </b-form-checkbox>
-            </b-form-group>
-            <b-form-group v-if="servicio.RequiereCodigo">
-              <label>Nombre del código:</label>
-              <b-form-input v-model="servicio.NombreCodigo"
-                ref="inputNombreCodigo"
-                required="required"
-                type="text"
-                style="text-transform: uppercase;"
-                autocomplete="off"
-                :value="servicio.NombreCodigo"
-                ></b-form-input>
-            </b-form-group>
-          </b-col>
-
-          <b-col md="6">
-            <b-form-group>
-              <b-form-checkbox
-                      v-model="servicio.TieneComision"
-                      :value="1"
-                      :unchecked-value="0"
-                      >
-                Tiene comisión
+                El sistema realizará el cálculo de comisión
               </b-form-checkbox>
             </b-form-group>
 
-            <div v-if="servicio.TieneComision">
+            <div v-if="servicio.Calculo">
               <b-form-group>
                 <b-form-checkbox
-                        v-model="servicio.Calculo"
+                        v-model="servicio.ComisionFija"
                         :value="1"
                         :unchecked-value="0"
                         >
-                  El sistema realizará el cálculo de comisión
+                  Comision Fija
                 </b-form-checkbox>
               </b-form-group>
-
-              <div v-if="servicio.Calculo">
-                <b-form-group>
-                  <b-form-checkbox
-                          v-model="servicio.ComisionFija"
-                          :value="1"
-                          :unchecked-value="0"
-                          >
-                    Comision Fija
-                  </b-form-checkbox>
-                </b-form-group>
-                <b-form-group>
-                  <label>Comisión</label>
-                  <input   
-                    required="required"
-                    v-model="servicio.MontoComision"
-                    type="number"
-                    class="form-control"
-                    step="0.01"
-                    />
-                </b-form-group>
-                <b-form-group v-if="!servicio.ComisionFija">
-                  <label>Comisión por cada</label>
-                  <input   
-                    required="required"
-                    v-model="servicio.MontoMax"
-                    type="number"
-                    class="form-control"
-                    step="0.01"
-                    />
-                </b-form-group>
-              </div>
-
-              <hr v-if="servicio.Calculo">
-              <b-form-group v-if="servicio.Calculo">
-                <b-form-checkbox
-                        v-model="servicio.Ganancia"
-                        :value="1"
-                        :unchecked-value="0"
-                        >
-                  Tiene ganancia el servicio
-                </b-form-checkbox>
+              <b-form-group>
+                <label>Comisión</label>
+                <input   
+                  required="required"
+                  v-model="servicio.MontoComision"
+                  type="number"
+                  class="form-control"
+                  step="0.01"
+                  />
+              </b-form-group>
+              <b-form-group v-if="!servicio.ComisionFija">
+                <label>Comisión por cada</label>
+                <input   
+                  required="required"
+                  v-model="servicio.MontoMax"
+                  type="number"
+                  class="form-control"
+                  step="0.01"
+                  />
               </b-form-group>
             </div>
 
-          </b-col>
-        </b-row>
-        <div slot="modal-footer" >
-          <b-btn  variant="primary" type="submit">
-            Guardar
-          </b-btn>
-          <b-btn  variant="secondary" @click="show=false">
-            Cerrar
-          </b-btn>
-        </div>
-      </b-modal>
-    </b-form>
-  </div>
+            <hr v-if="servicio.Calculo">
+            <b-form-group v-if="servicio.Calculo">
+              <b-form-checkbox
+                      v-model="servicio.Ganancia"
+                      :value="1"
+                      :unchecked-value="0"
+                      >
+                Tiene ganancia el servicio
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+
+        </b-col>
+      </b-row>
+      <div slot="modal-footer" >
+        <b-btn  variant="primary" type="submit">
+          Guardar
+        </b-btn>
+        <b-btn  variant="secondary" @click="show=false">
+          Cerrar
+        </b-btn>
+      </div>
+    </b-modal>
+  </b-form>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'

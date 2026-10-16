@@ -1,0 +1,12 @@
+﻿from pathlib import Path
+p=Path('integration/management-report/views/ReporteGerencial.php');s=p.read_text(encoding='utf-8')
+s=s.replace('<table id="mg-types"></table></div><button','<table id="mg-types"></table></div><h3 style="font-size:17px;margin-top:18px">Clasificación por movimiento</h3><p>Puedes distinguir compras y traslados aunque compartan el mismo tipo de operación.</p><div class="mg-scroll"><table id="mg-entry-types"></table></div><button')
+s=s.replace("let report=null,applied='',busy=false,mapping={};","let report=null,applied='',busy=false,mapping={},entryMapping={};")
+s=s.replace('clasificacion:mapping});','clasificacion:mapping,movimientos:entryMapping});')
+needle="$('mg-notes').replaceChildren();"
+insert="""table('mg-entry-types',['Fecha','Concepto','Importe','Tratamiento'],[]);const entryBody=$('mg-entry-types').tBodies[0];report.caja.filter(entry=>!['ingreso','cobro_digital'].includes(entry.categoria)).forEach(entry=>{const tr=entryBody.insertRow();cell(tr,entry.fecha);cell(tr,entry.concepto);cell(tr,money(entry.importe));const td=cell(tr,'');const select=document.createElement('select');select.dataset.entry=entry.id;select.setAttribute('aria-label','Clasificación del movimiento '+entry.id);[['gasto','Gasto operativo'],['personal','Pago de personal'],['proveedor','Pago a proveedor'],['traslado','Traslado interno'],['otro','Salida no operativa'],['pendiente','Pendiente de clasificar']].forEach(([value,text])=>{const option=document.createElement('option');option.value=value;option.textContent=text;select.appendChild(option);});select.value=entry.categoria;select.addEventListener('change',()=>{select.dataset.changed='1';$('mg-excel').disabled=true;status('Aplica la clasificación para recalcular el reporte.');});td.appendChild(select);});
+"""
+s=s.replace(needle,insert+needle)
+s=s.replace("mapping[select.dataset.type]=select.value;});generate();", "mapping[select.dataset.type]=select.value;});$('mg-entry-types').querySelectorAll('select[data-changed]').forEach(select=>{entryMapping[select.dataset.entry]=select.value;});generate();")
+p.write_text(s,encoding='utf-8')
+p=Path('tools/test-management-report.php');s=p.read_text(encoding='utf-8').replace("'proyeccion'=>30]","'proyeccion'=>30,'clasificacion'=>[5=>'traslado']]").replace("$f['clasificacion']=[99=>'gasto'];","$f['clasificacion']=[5=>'traslado',99=>'gasto'];");p.write_text(s,encoding='utf-8')

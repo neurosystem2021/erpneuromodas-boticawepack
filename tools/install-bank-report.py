@@ -1,0 +1,3 @@
+from pathlib import Path
+p=Path('integration/bank-index.php');s=Path('C:/xampp/htdocs/boticav1/api/index.php').read_text(encoding='utf-8');needle='$registerPayroll($app);';assert needle in s;s=s.replace(needle,needle+"\n$registerBankReport=require __DIR__.'/bank-report.php';$registerBankReport($app);");p.write_text(s,encoding='utf-8')
+p=Path('integration/bank-header.php');s=Path('C:/xampp/htdocs/boticav1/views/header.php').read_text(encoding='utf-8');needle='<li><a href="<?php echo BuscadorCajaBanco; ?>">Buscador de Caja y Banco</a></li>';assert needle in s;s=s.replace(needle,needle+'\n            <li><a href="<?php echo SITE_URL; ?>views/ReporteBancos.php">Reporte de bancos</a></li>');p.write_text(s,encoding='utf-8')

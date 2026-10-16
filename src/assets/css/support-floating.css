@@ -1,0 +1,17 @@
+.support-float-control{position:fixed;z-index:13000;display:flex;align-items:center;gap:4px;max-width:calc(100vw - 16px);touch-action:none;user-select:none}
+.support-float-control .support-floating-button{position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;background:linear-gradient(135deg,#e63851,#bb1837)!important;border:1px solid #ef9ba6;border-radius:14px;min-height:46px;padding:10px 14px;box-shadow:0 5px 16px #b51d3730;cursor:grab;white-space:nowrap}
+.support-float-control .support-floating-button:hover{background:linear-gradient(135deg,#ed405a,#a91230)!important}
+.support-float-control .support-floating-button b{background:white;color:#b51d37;border-color:#ed8b9a;right:0}
+.support-float-control .support-dock-button{display:flex;align-items:center;justify-content:center;min-height:34px;width:28px;padding:0;border:1px solid #e4b9c1;background:#fff5f6;color:#b0203e;border-radius:9px;font:700 20px Arial;cursor:pointer;box-shadow:0 3px 9px #77273a15}
+.support-float-control.is-docked{gap:2px;max-width:66px}
+.support-float-control.is-docked .support-floating-button{width:42px;min-width:42px;min-height:46px;padding:8px;border-left:0;border-radius:0 13px 13px 0}
+.support-float-control.is-docked .support-floating-button>span{display:none}
+.support-float-control.is-docked .support-floating-button svg{width:25px;height:25px}
+.support-float-control.is-docked .support-dock-button{width:20px;min-height:30px;font-size:17px;border-radius:7px}
+.support-float-control.is-docked .support-floating-button b{min-width:18px;padding:2px;font-size:10px;top:-4px}
+.support-float-control.is-docked.is-right{flex-direction:row-reverse}
+.support-float-control.is-docked.is-right .support-floating-button{border-left:1px solid #ef9ba6;border-right:0;border-radius:13px 0 0 13px}
+.support-float-control.is-dragging,.support-float-control.is-dragging .support-floating-button{cursor:grabbing}
+.support-launcher .support-launcher-panel,.support-launcher .support-alert-toast{right:auto;bottom:auto}
+.support-launcher .support-alert-toast{border-left-color:#d82d49}
+@media(prefers-reduced-motion:reduce){.support-float-control *{transition:none!important}}

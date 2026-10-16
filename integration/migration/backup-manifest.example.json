@@ -1,0 +1,7 @@
+{
+ "backup_file":"C:/neuro-private/migration/target-before.sql",
+ "sha256":"REEMPLAZAR_CON_SHA256_REAL",
+ "restored_database":"neuro_migration_test",
+ "restore_verified":false,
+ "authorized_copy":false
+}

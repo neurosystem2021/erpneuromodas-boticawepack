@@ -1,0 +1,9 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();
+$order=$db->query('SELECT o.*,p.Proveedor,p.Ruc AS RucProveedor,p.Direccion AS DireccionProveedor,a.Almacen FROM Lo_OrdenCompra o JOIN Lo_Proveedor p ON p.IdProveedor=o.IdProveedor JOIN Lo_Almacen a ON a.IdAlmacen=o.IdAlmacen WHERE o.IdOrdenCompra=29')->fetch(PDO::FETCH_ASSOC);
+$items=$db->query('SELECT d.*,p.Producto,p.Codigo,m.ProductoMarca FROM Lo_OrdenCompraDet d JOIN Gen_Producto p ON p.IdProducto=d.IdProducto LEFT JOIN Gen_ProductoMarca m ON m.IdProductoMarca=p.IdProductoMarca WHERE d.IdOrdenCompra=29')->fetchAll(PDO::FETCH_ASSOC);
+$company=$db->query('SELECT RAZONSOCIAL,RUC,DIRECCION FROM Gen_Empresa LIMIT 1')->fetch(PDO::FETCH_ASSOC);
+$source=file_get_contents(__DIR__.'/../integration/purchase-order-premium/api/sunat/plugins/dompdf/purchaseOrderReport.php');$source=str_replace('__DIR__',var_export('C:/xampp/htdocs/boticav1/api/sunat/plugins/dompdf',true),$source);eval('?>'.$source);
+$html=purchaseOrderReportHtml(['ordencompra'=>$order,'detalle'=>$items,'empresa'=>$company,'txtNRO_DOCUMENTO_EMPRESA'=>$company['RUC']]);
+$workspace=realpath(__DIR__.'/..');if(!is_dir($workspace.'/output/pdf'))mkdir($workspace.'/output/pdf',0777,true);file_put_contents($workspace.'/.tmp-purchase-order.html',$html);
+chdir('C:/xampp/htdocs/boticav1/api/sunat/plugins/dompdf');require_once 'lib/html5lib/Parser.php';require_once 'lib/php-font-lib/src/FontLib/Autoloader.php';require_once 'lib/php-svg-lib/src/autoload.php';require_once 'src/Autoloader.php';Dompdf\Autoloader::register();$pdf=new Dompdf\Dompdf();$pdf->set_paper('A4','portrait');$pdf->load_html($html);$pdf->render();file_put_contents($workspace.'/output/pdf/OrdenCompra_2026_5.pdf',$pdf->output());echo 'PDF generated; creator: '.$order['UsuarioReg'].'; products: '.count($items).PHP_EOL;

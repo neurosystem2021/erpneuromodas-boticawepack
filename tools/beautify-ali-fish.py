@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('src/components/AliAssistant.vue');s=p.read_text(encoding='utf-8');a=s.index('<svg viewBox="0 0 180 120"');b=s.index('</svg>',a)+len('</svg>');s=s[:a]+'''<img class="ali-fish-art" src="static/images/ali-goldfish.svg" alt="ALI, pececito dorado sonriente">'''+s[b:];s=s.replace('.ali-goldfish svg{','.ali-goldfish .ali-fish-art{');s=s.replace('.ali-goldfish svg,.ali-fish-tail{','.ali-goldfish .ali-fish-art,.ali-fish-tail{');s=s.replace('width:140px;height:95px;animation:aliFishSwim','width:160px;height:117px;animation:aliFishSwim');s=s.replace('width:100px;height:70px','width:125px;height:92px');p.write_text(s,encoding='utf-8')
+p=Path('static/images/ali-goldfish.svg');p.write_text(p.read_text(encoding='utf-8-sig'),encoding='utf-8')

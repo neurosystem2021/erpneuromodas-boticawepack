@@ -1,297 +1,297 @@
 <template>
-    <div>
-      <b-container fluid class="bv-example-row" id="conten">
-        <b-row>
-            <b-col md="7" style="border-right: 2px solid #E6E6E6; padding: 20px;">
-                <b-row>
-                    <b-col md="12">
-                        <b-row v-if="!inCharge" style="display: contents !important;">
-                            <div v-if="entidades.length > 0" style="overflow-x: scroll; display: inline-flex;width: -webkit-fill-available;">
-                                <b-col class="text-center" v-for="(entidad, index) in entidades" :key="index" @click="setEntidad(entidad)" :class="{'seleccionEntidad': idEntidadSelect == entidad.IdEntidad }" style="cursor:pointer">
-                                    <b-img style="border-radius: 10px;" fluid :src="'/resources/images/agente/'+entidad.Imagen" @error="setAltImg" alt="" width="80%" ></b-img><br>
-                                    <label style="font-size: 0.85rem "><b>{{ entidad.Nombre }}</b></label>
-                                </b-col>
-                            </div>
-                            <div v-else>
-                                <h5 class="text-info">NO TIENE ENTIDADES AGREGADAS</h5>
-                            </div>
-                        </b-row>
-                        <b-row v-else>
-                            <vue-simple-spinner size="huge"></vue-simple-spinner>
-                        </b-row>
-                    </b-col>
-                </b-row>
-                <hr>
-                <b-row v-if="idEntidadSelect!=null">
-                    <b-col md="2" style="border-right: 2px solid #E6E6E6;">
-                        <b-button block variant="success" size="sm" @click="setOperacionesEntidad(1)" :class="{'seleccionEntidadOpcion': opcionEntidad == 1 }">OPERACIONES</b-button>
-                        <b-button block variant="primary" size="sm" @click="setServiciosEntidad(2)" :class="{'seleccionEntidadOpcion': opcionEntidad == 2 }">SERVICIOS</b-button>
-                    </b-col>
-                    
-                    <b-col md="10" class="centrarOperacion" style="border-bottom: 2px solid #E6E6E6;">
-                        <b-row v-if="opcionEntidad==2" style="display: contents !important;">
-                            <b-col md="12">
-                                <b-row v-if="!inChargeServicios">
-                                    <b-col md="7">
-                                        <b-form-group>
-                                            <b-input-group>
-                                                <b-form-input ref="inputSearchEmpresa" v-model="busquedaEmpresa" placeholder="Buscar empresa" @input="(val)=>{debounceInput(val); inChargeEmpresas = true; empresas = [];}" autocomplete="off" />
-                                                <b-input-group-append>
-                                                <b-btn ref="btnLimpiarEmpresa" :disabled="!busquedaEmpresa" @click="()=>{  busquedaEmpresa = ''; getEmpresas(); } ">Limpiar</b-btn>
-                                                </b-input-group-append>
-                                            </b-input-group>
-                                        </b-form-group>
-                                    </b-col>
-                                    <b-col md="5">
-                                        <b-input-group prepend="Categorias" class="inputLine">
-                                            <b-form-select v-model="idCategoriaEmpresaSelect" :options="itemsCategoriaEmpresa" v-on:change="setCategoriaEmpresa($event)" size="md"/>
-                                        </b-input-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row v-else class="centrarOperacion">
-                                    <vue-simple-spinner size="large"></vue-simple-spinner>
-                                </b-row>
+<div class="nst-screen nst-screen--agenteoperacion">
+  <b-container fluid class="bv-example-row" id="conten">
+    <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="7" style="border-right: 2px solid #E6E6E6; padding: 20px;">
+            <b-row>
+                <b-col md="12">
+                    <b-row v-if="!inCharge" style="display: contents !important;">
+                        <div v-if="entidades.length > 0" style="overflow-x: scroll; display: inline-flex;width: -webkit-fill-available;">
+                            <b-col class="text-center" v-for="(entidad, index) in entidades" :key="index" @click="setEntidad(entidad)" :class="{'seleccionEntidad': idEntidadSelect == entidad.IdEntidad }" style="cursor:pointer">
+                                <b-img style="border-radius: 10px;" fluid :src="'/resources/images/agente/'+entidad.Imagen" @error="setAltImg" alt="" width="80%" ></b-img><br>
+                                <label style="font-size: 0.85rem "><b>{{ entidad.Nombre }}</b></label>
                             </b-col>
-                        </b-row>
-                        <b-row v-if="opcionEntidad==1" style="display: contents !important;">
-                            <b-col md="12" v-if="operacion.tieneEnlaceExterno">
-                                <h6 v-if="operacion.enlaceExterno1!=''"><b>Enlace 1: </b><a :href="operacion.enlaceExterno1" target="blank"> Abrir enlace de operación</a></h6>
-                                <h6 v-if="operacion.enlaceExterno2!=''"><b>Enlace 2: </b><a :href="operacion.enlaceExterno2" target="blank"> Abrir enlace de operación</a></h6>
-                            </b-col>
-                        </b-row>
-                    </b-col>            
-                </b-row>
-                <hr>
-                <b-row style="height: 46vh;">
-                    <b-col md="12">
-                        <b-row v-if="opcionEntidad == 2" style="height: 46vh;">
-                            <b-col md="12">
-                                <b-row v-if="!inChargeEmpresas" style="overflow-y: scroll; height: 46vh;">
-                                    <b-col md="12">
-                                        <b-row v-if="empresas.length>0" >
-                                            <b-col cols="3" class="text-center" v-for="(empresa, index) in empresas" :key="index" @click="setEmpresaEntidad(empresa)" style="cursor:pointer; padding: 2px;" :class="{'seleccionEmpresaEntidad': idEmpresaEntidadSelect == empresa.IdEmpresaEntidad }">
-                                                <div style="cursor:pointer;">
-                                                    <b-img style="border-radius: 10px;" fluid :src="'/resources/images/agente/'+empresa.Imagen" @error="setAltImg" alt="" width="70%" ></b-img>
-                                                    <div>
-                                                        <label style="font-size: 1vw "><b>{{ empresa.Empresa }}</b></label>
-                                                    </div>
-                                                    <div style="margin-top: -10px !important;">
-                                                        <label style="font-size: 0.8vw;" class="text-primary"><b>{{ empresa.CategoriaEmpresa }}</b></label>
-                                                    </div>
-                                                </div>
-                                            </b-col>
-                                        </b-row>
-                                        <b-row v-else class="centrarOperacion">
-                                            <h5 class="text-info">NO SE ENCONTRARON RESULTADOS</h5> 
-                                        </b-row>
-                                    </b-col>
-                                </b-row>
-                                <b-row v-else class="centrarOperacion" style="height: 46vh;">
-                                    <vue-simple-spinner size="huge"></vue-simple-spinner>
-                                </b-row>
-                            </b-col>
-                        </b-row>
-                    </b-col>
-                </b-row>
-
-            </b-col>
-            
-            <b-col md="5">
-                <b-form @submit="guardarOperacion" @keydown.enter="prevent">
-                    <b-row>
+                        </div>
+                        <div v-else>
+                            <h5 class="text-info">NO TIENE ENTIDADES AGREGADAS</h5>
+                        </div>
+                    </b-row>
+                    <b-row v-else>
+                        <vue-simple-spinner size="huge"></vue-simple-spinner>
+                    </b-row>
+                </b-col>
+            </b-row>
+            <hr>
+            <b-row v-if="idEntidadSelect!=null">
+                <b-col md="2" style="border-right: 2px solid #E6E6E6;">
+                    <b-button block variant="success" size="sm" @click="setOperacionesEntidad(1)" :class="{'seleccionEntidadOpcion': opcionEntidad == 1 }">OPERACIONES</b-button>
+                    <b-button block variant="primary" size="sm" @click="setServiciosEntidad(2)" :class="{'seleccionEntidadOpcion': opcionEntidad == 2 }">SERVICIOS</b-button>
+                </b-col>
+                
+                <b-col md="10" class="centrarOperacion" style="border-bottom: 2px solid #E6E6E6;">
+                    <b-row v-if="opcionEntidad==2" style="display: contents !important;">
                         <b-col md="12">
-                            <b-row>
-                                <b-col md="6">
-                                    <b-input-group prepend="Usuario " class="mt-2 inputLine">
-                                        <input
-                                            v-model="vendedor.NombreUsuario"
-                                            type="text"
-                                            style="width: 80px"
-                                            :disabled="true"
-                                            class="form-control" />
-                                    </b-input-group>
-                                </b-col>
-                                <b-col md="5" style="display: flex; justify-content: center;align-items: center;">
-                                    <b-row>
-                                        <b-col md="12" v-if="idCajaAbierta > 0">
-                                           <label class="text-success" style="font-weight: bold; margin: 0 !important;">CAJA APERTURADA <br>{{ cajaFechaApertura }}</label>  
-                                        </b-col>
-                                        <b-col md="12" v-else>
-                                            <h6 class="text-danger" v-show="cargaCorrecta">NO EXISTE CAJA ABIERTA</h6>
-                                        </b-col>
-                                    </b-row>
-                                </b-col>
-                                <b-col md="1" style="display: flex; justify-content: center;align-items: center;">
-                                    <b-button size="sm" @click="actualizarVendedor" variant="outline-primary"><i class="fas fa-redo fa-lg"></i></b-button>
-                                </b-col>
-                            </b-row>
-                            <b-row>
-                                <b-col md="12">
-                                    <b-form-group style="margin: 0 !important;">
-                                        <b-input-group prepend="Cliente" class="mt-2 inputLine">
-                                            <clientes-form txtButton="Editar" v-if="operacion.cliente.IdCliente && operacion.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="operacion.cliente"></clientes-form>
-                                            <autocomplete
-                                                required="required"
-                                                ref="inputCliente"
-                                                :url="API + 'clientes'"
-                                                anchor="ClienteDniRuc"
-                                                label="writer"
-                                                placeholder=""
-                                                :onInput="(val) => newDniRuc = val"
-                                                :on-select="setCliente" 
-                                                :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                                                :classes="{input: 'form-control'}">
-                                            </autocomplete>
+                            <b-row v-if="!inChargeServicios">
+                                <b-col md="7">
+                                    <b-form-group>
+                                        <b-input-group>
+                                            <b-form-input ref="inputSearchEmpresa" v-model="busquedaEmpresa" placeholder="Buscar empresa" @input="(val)=>{debounceInput(val); inChargeEmpresas = true; empresas = [];}" autocomplete="off" />
                                             <b-input-group-append>
-                                                <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                            <b-btn ref="btnLimpiarEmpresa" :disabled="!busquedaEmpresa" @click="()=>{  busquedaEmpresa = ''; getEmpresas(); } ">Limpiar</b-btn>
                                             </b-input-group-append>
                                         </b-input-group>
-                                    </b-form-group>    
+                                    </b-form-group>
+                                </b-col>
+                                <b-col md="5">
+                                    <b-input-group prepend="Categorias" class="inputLine">
+                                        <b-form-select v-model="idCategoriaEmpresaSelect" :options="itemsCategoriaEmpresa" v-on:change="setCategoriaEmpresa($event)" size="md"/>
+                                    </b-input-group>
+                                </b-col>
+                            </b-row>
+                            <b-row v-else class="centrarOperacion">
+                                <vue-simple-spinner size="large"></vue-simple-spinner>
+                            </b-row>
+                        </b-col>
+                    </b-row>
+                    <b-row v-if="opcionEntidad==1" style="display: contents !important;">
+                        <b-col md="12" v-if="operacion.tieneEnlaceExterno">
+                            <h6 v-if="operacion.enlaceExterno1!=''"><b>Enlace 1: </b><a :href="operacion.enlaceExterno1" target="blank"> Abrir enlace de operación</a></h6>
+                            <h6 v-if="operacion.enlaceExterno2!=''"><b>Enlace 2: </b><a :href="operacion.enlaceExterno2" target="blank"> Abrir enlace de operación</a></h6>
+                        </b-col>
+                    </b-row>
+                </b-col>            
+            </b-row>
+            <hr>
+            <b-row style="height: 46vh;">
+                <b-col md="12">
+                    <b-row v-if="opcionEntidad == 2" style="height: 46vh;">
+                        <b-col md="12">
+                            <b-row v-if="!inChargeEmpresas" style="overflow-y: scroll; height: 46vh;">
+                                <b-col md="12">
+                                    <b-row v-if="empresas.length>0" >
+                                        <b-col cols="3" class="text-center" v-for="(empresa, index) in empresas" :key="index" @click="setEmpresaEntidad(empresa)" style="cursor:pointer; padding: 2px;" :class="{'seleccionEmpresaEntidad': idEmpresaEntidadSelect == empresa.IdEmpresaEntidad }">
+                                            <div style="cursor:pointer;">
+                                                <b-img style="border-radius: 10px;" fluid :src="'/resources/images/agente/'+empresa.Imagen" @error="setAltImg" alt="" width="70%" ></b-img>
+                                                <div>
+                                                    <label style="font-size: 1vw "><b>{{ empresa.Empresa }}</b></label>
+                                                </div>
+                                                <div style="margin-top: -10px !important;">
+                                                    <label style="font-size: 0.8vw;" class="text-primary"><b>{{ empresa.CategoriaEmpresa }}</b></label>
+                                                </div>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                    <b-row v-else class="centrarOperacion">
+                                        <h5 class="text-info">NO SE ENCONTRARON RESULTADOS</h5> 
+                                    </b-row>
+                                </b-col>
+                            </b-row>
+                            <b-row v-else class="centrarOperacion" style="height: 46vh;">
+                                <vue-simple-spinner size="huge"></vue-simple-spinner>
+                            </b-row>
+                        </b-col>
+                    </b-row>
+                </b-col>
+            </b-row>
+
+        </b-col>
+        
+        <b-col md="5">
+            <b-form @submit="guardarOperacion" @keydown.enter="prevent">
+                <b-row>
+                    <b-col md="12">
+                        <b-row>
+                            <b-col md="6">
+                                <b-input-group prepend="Usuario " class="mt-2 inputLine">
+                                    <input
+                                        v-model="vendedor.NombreUsuario"
+                                        type="text"
+                                        style="width: 80px"
+                                        :disabled="true"
+                                        class="form-control" />
+                                </b-input-group>
+                            </b-col>
+                            <b-col md="5" style="display: flex; justify-content: center;align-items: center;">
+                                <b-row>
+                                    <b-col md="12" v-if="idCajaAbierta > 0">
+                                       <label class="text-success" style="font-weight: bold; margin: 0 !important;">CAJA APERTURADA <br>{{ cajaFechaApertura }}</label>  
+                                    </b-col>
+                                    <b-col md="12" v-else>
+                                        <h6 class="text-danger" v-show="cargaCorrecta">NO EXISTE CAJA ABIERTA</h6>
+                                    </b-col>
+                                </b-row>
+                            </b-col>
+                            <b-col md="1" style="display: flex; justify-content: center;align-items: center;">
+                                <b-button size="sm" @click="actualizarVendedor" variant="outline-primary"><i class="fas fa-redo fa-lg"></i></b-button>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col md="12">
+                                <b-form-group style="margin: 0 !important;">
+                                    <b-input-group prepend="Cliente" class="mt-2 inputLine">
+                                        <clientes-form txtButton="Editar" v-if="operacion.cliente.IdCliente && operacion.cliente.DniRuc != '00000000'" idModal="editCliente" @onAddCliente="setCliente" :editCliente="operacion.cliente"></clientes-form>
+                                        <autocomplete
+                                            required="required"
+                                            ref="inputCliente"
+                                            :url="API + 'clientes'"
+                                            anchor="ClienteDniRuc"
+                                            label="writer"
+                                            placeholder=""
+                                            :onInput="(val) => newDniRuc = val"
+                                            :on-select="setCliente" 
+                                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                                            :classes="{input: 'form-control'}">
+                                        </autocomplete>
+                                        <b-input-group-append>
+                                            <clientes-form :ruc="newDniRuc" @onAddCliente="setCliente"></clientes-form>
+                                        </b-input-group-append>
+                                    </b-input-group>
+                                </b-form-group>    
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col md="7">
+                                <b-input-group prepend="Telefono " class="mt-2 inputLine">
+                                    <input
+                                        v-model="operacion.telefono"
+                                        type="text"
+                                        style="width: 80px"
+                                        required
+                                        placeholder="Número de contacto del cliente"
+                                        class="form-control" />
+                                </b-input-group>
+                            </b-col>
+                        </b-row>
+                    </b-col>
+                </b-row>
+                <hr>
+                <b-row v-if="idEmpresaEntidadSelect==null && opcionEntidad!=1">
+                    <b-col md="12" class="text-center">
+                        <br>
+                        <br>
+                        <br>
+                        <h4 class="text-danger">SELECCIONE UN SERVICIO / OPERACION</h4>
+                    </b-col>  
+                </b-row>
+                <b-row v-if="opcionEntidad==1 || idEmpresaEntidadSelect!=null">
+                    <b-col md="12">
+                            <label style="font-size: 1.05rem"><b>NUEVA OPERACION: <span class="text-info">{{ nombreEntidadSelect }}</span></b></label>
+                            <b-row>
+                                <b-col>
+                                    <b-input-group prepend="Operación" class="mt-2 inputLineOperacion">
+                                            <autocomplete
+                                                required="required"
+                                                ref="inputTipoOperacion"
+                                                :url="API + (opcionEntidad==2?'agente/entidad/empresa/servicio':'agente/entidad/operacion')"
+                                                :customParams="{IdEmpresaEntidad: idEmpresaEntidadSelect, SoloData: 1, IdEntidad: idEntidadSelect}"
+                                                :anchor="(opcionEntidad==2?'Servicio':'Operacion')"
+                                                initValue=""
+                                                class="font-weight-bold"
+                                                label="writer"
+                                                placeholder=""
+                                                :on-select="setTipoOperacion" 
+                                                :onFocus="focusAutocompleteOperacion.bind(null, 'inputTipoOperacion')"
+                                                :classes="{input: 'form-control'}">
+                                            </autocomplete>
+                                    </b-input-group>
                                 </b-col>
                             </b-row>
                             <b-row>
-                                <b-col md="7">
-                                    <b-input-group prepend="Telefono " class="mt-2 inputLine">
+                                <b-col>
+                                    <b-input-group prepend="Monto " class="mt-2 inputLineNumber">
                                         <input
-                                            v-model="operacion.telefono"
-                                            type="text"
+                                            v-model="operacion.monto"
+                                            type="number"
                                             style="width: 80px"
+                                            step="0.01"
+                                            min="0"
                                             required
-                                            placeholder="Número de contacto del cliente"
+                                            @input="(val) => changeMonto(val.target.value,1)"
+                                            placeholder="Monto de la operación (S/)"
                                             class="form-control" />
                                     </b-input-group>
                                 </b-col>
                             </b-row>
-                        </b-col>
-                    </b-row>
-                    <hr>
-                    <b-row v-if="idEmpresaEntidadSelect==null && opcionEntidad!=1">
-                        <b-col md="12" class="text-center">
-                            <br>
-                            <br>
-                            <br>
-                            <h4 class="text-danger">SELECCIONE UN SERVICIO / OPERACION</h4>
-                        </b-col>  
-                    </b-row>
-                    <b-row v-if="opcionEntidad==1 || idEmpresaEntidadSelect!=null">
-                        <b-col md="12">
-                                <label style="font-size: 1.05rem"><b>NUEVA OPERACION: <span class="text-info">{{ nombreEntidadSelect }}</span></b></label>
-                                <b-row>
-                                    <b-col>
-                                        <b-input-group prepend="Operación" class="mt-2 inputLineOperacion">
-                                                <autocomplete
-                                                    required="required"
-                                                    ref="inputTipoOperacion"
-                                                    :url="API + (opcionEntidad==2?'agente/entidad/empresa/servicio':'agente/entidad/operacion')"
-                                                    :customParams="{IdEmpresaEntidad: idEmpresaEntidadSelect, SoloData: 1, IdEntidad: idEntidadSelect}"
-                                                    :anchor="(opcionEntidad==2?'Servicio':'Operacion')"
-                                                    initValue=""
-                                                    class="font-weight-bold"
-                                                    label="writer"
-                                                    placeholder=""
-                                                    :on-select="setTipoOperacion" 
-                                                    :onFocus="focusAutocompleteOperacion.bind(null, 'inputTipoOperacion')"
-                                                    :classes="{input: 'form-control'}">
-                                                </autocomplete>
-                                        </b-input-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row>
-                                    <b-col>
-                                        <b-input-group prepend="Monto " class="mt-2 inputLineNumber">
-                                            <input
-                                                v-model="operacion.monto"
-                                                type="number"
-                                                style="width: 80px"
-                                                step="0.01"
-                                                min="0"
-                                                required
-                                                @input="(val) => changeMonto(val.target.value,1)"
-                                                placeholder="Monto de la operación (S/)"
-                                                class="form-control" />
-                                        </b-input-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row v-if="operacion.tieneComision == 1" style="margin-bottom: -10px;">
-                                    <b-col md="6">
-                                        <b-input-group prepend="Comision " class="mt-2 inputLineNumber">
-                                            <input
-                                                v-model="operacion.comision"
-                                                :disabled = "operacion.calculo == 1"
-                                                type="number"
-                                                style="width: 75px !important"
-                                                step="0.01"
-                                                min="0"
-                                                @input="(val) => changeMonto(val.target.value,2)"
-                                                placeholder="Comision de la operación (S/)"
-                                                class="form-control" />
-                                        </b-input-group>
-                                    </b-col>
-                                    <b-col v-if="operacion.tieneComision == 1 && operacion.calculo == 1" md="6" class="mt-3" style="display: flex; align-items: center; justify-content: start;">
-                                        <h6 v-if="operacion.comisionFija == 0" style="margin-left: 25px; font-size: 0.85rem;">Por cada S/ {{ operacion.montoMax | moneda }}, será S/ {{ operacion.montoComision | moneda }} <i v-if="operacion.ganancia==1" class="fas fa-arrow-up fa-lg text-success ml-1"></i></h6>
-                                        <h6 v-else style="margin-left: 25px; font-size: 0.85rem;">Tiene una comisión fija de S/ {{ operacion.montoComision | moneda }} </h6>
-                                    </b-col>
-                                    <b-col md="12" class="mt-2" style="display: flex; align-items: center; justify-content: start;" v-if="opcionEntidad==1 && operacion.tipo > 0">
-                                        <b-form-group>
-                                            <b-form-checkbox style="margin-left: 5px;"
-                                                    v-model="operacion.comisionIncluida"
-                                                    :value="1"
-                                                    :unchecked-value="0"
-                                                    >
-                                                <b>Comision Incluida en Operación</b>
-                                            </b-form-checkbox>
-                                        </b-form-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row v-if="operacion.requiereCodigo" class="mt-2">
-                                    <b-col>
-                                        <b-form-group>
-                                            <b-input-group :prepend="getCapitalize(operacion.nombreCodigo)" class="mt-2 inputLineRequerido">
-                                                <input
-                                                    v-model="operacion.codigo"
-                                                    type="text"
-                                                    style="width: 80px"
-                                                    required
-                                                    :placeholder="'Ingrese ' + operacion.nombreCodigo"
-                                                    class="form-control" />
-                                            </b-input-group>
-                                        </b-form-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row class="mt-1">
-                                    <b-col>
-                                        <b-input-group prepend="Observación " class="mt-2 inputLineText">
-                                            <textarea
-                                                v-model="operacion.observacion"
-                                                placeholder="Observación de la operación"
-                                                rows="1"
-                                                style="text-transform: uppercase;"
-                                                class="form-control">
-                                            </textarea>
-                                        </b-input-group>
-                                    </b-col>
-                                </b-row>
-                                <b-row v-if="operacion.total > 0">
-                                    <b-col class="text-center mt-3">
-                                        <h4>TOTAL A RECIBIR: S/ {{ operacion.total | moneda }}</h4>
-                                    </b-col>
-                                </b-row>
-
-                                <b-row align-h="center" class="text-center">
-                                <b-col cols="12">
-                                    <br>
-                                    <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Guardar Operación</b-button>
-                                    <br />
-                                    <br />
+                            <b-row v-if="operacion.tieneComision == 1" style="margin-bottom: -10px;">
+                                <b-col md="6">
+                                    <b-input-group prepend="Comision " class="mt-2 inputLineNumber">
+                                        <input
+                                            v-model="operacion.comision"
+                                            :disabled = "operacion.calculo == 1"
+                                            type="number"
+                                            style="width: 75px !important"
+                                            step="0.01"
+                                            min="0"
+                                            @input="(val) => changeMonto(val.target.value,2)"
+                                            placeholder="Comision de la operación (S/)"
+                                            class="form-control" />
+                                    </b-input-group>
+                                </b-col>
+                                <b-col v-if="operacion.tieneComision == 1 && operacion.calculo == 1" md="6" class="mt-3" style="display: flex; align-items: center; justify-content: start;">
+                                    <h6 v-if="operacion.comisionFija == 0" style="margin-left: 25px; font-size: 0.85rem;">Por cada S/ {{ operacion.montoMax | moneda }}, será S/ {{ operacion.montoComision | moneda }} <i v-if="operacion.ganancia==1" class="fas fa-arrow-up fa-lg text-success ml-1"></i></h6>
+                                    <h6 v-else style="margin-left: 25px; font-size: 0.85rem;">Tiene una comisión fija de S/ {{ operacion.montoComision | moneda }} </h6>
+                                </b-col>
+                                <b-col md="12" class="mt-2" style="display: flex; align-items: center; justify-content: start;" v-if="opcionEntidad==1 && operacion.tipo > 0">
+                                    <b-form-group>
+                                        <b-form-checkbox style="margin-left: 5px;"
+                                                v-model="operacion.comisionIncluida"
+                                                :value="1"
+                                                :unchecked-value="0"
+                                                >
+                                            <b>Comision Incluida en Operación</b>
+                                        </b-form-checkbox>
+                                    </b-form-group>
                                 </b-col>
                             </b-row>
-                        </b-col>
-                    </b-row>
-                </b-form>
-            </b-col>
-        </b-row>
-      </b-container>
-    </div>
+                            <b-row v-if="operacion.requiereCodigo" class="mt-2">
+                                <b-col>
+                                    <b-form-group>
+                                        <b-input-group :prepend="getCapitalize(operacion.nombreCodigo)" class="mt-2 inputLineRequerido">
+                                            <input
+                                                v-model="operacion.codigo"
+                                                type="text"
+                                                style="width: 80px"
+                                                required
+                                                :placeholder="'Ingrese ' + operacion.nombreCodigo"
+                                                class="form-control" />
+                                        </b-input-group>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                            <b-row class="mt-1">
+                                <b-col>
+                                    <b-input-group prepend="Observación " class="mt-2 inputLineText">
+                                        <textarea
+                                            v-model="operacion.observacion"
+                                            placeholder="Observación de la operación"
+                                            rows="1"
+                                            style="text-transform: uppercase;"
+                                            class="form-control">
+                                        </textarea>
+                                    </b-input-group>
+                                </b-col>
+                            </b-row>
+                            <b-row v-if="operacion.total > 0">
+                                <b-col class="text-center mt-3">
+                                    <h4>TOTAL A RECIBIR: S/ {{ operacion.total | moneda }}</h4>
+                                </b-col>
+                            </b-row>
+
+                            <b-row align-h="center" class="text-center">
+                            <b-col cols="12">
+                                <br>
+                                <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Guardar Operación</b-button>
+                                <br />
+                                <br />
+                            </b-col>
+                        </b-row>
+                    </b-col>
+                </b-row>
+            </b-form>
+        </b-col>
+    </b-row></section>
+  </b-container>
+</div>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'

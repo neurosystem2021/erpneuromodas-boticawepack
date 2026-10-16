@@ -1,58 +1,58 @@
 <template>
-  <div>
-    <!-- Modal Component -->
-    <b-form @submit="guardarImpresora" @keydown.enter="keyDownInput" autocomplete="off">
-    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show">
-        <b-col md="6">
-          <b-form-group>
-            <label>Nombre:</label>
-            <b-form-input
-              v-model="impresora.NombreImpresora"
-              @input="(val) => impresora.NombreImpresora = val && val.toUpperCase()"
-              type="text"
-              required="required"
-              ></b-form-input>
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Direccion IP:</label>
-            <b-form-input
-              v-model="impresora.Ip"
-              type="text"
-              required="required"
-              ></b-form-input>
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-group>
-            <label>Puerto:</label>
-            <b-form-input
-              v-model="impresora.Puerto"
-              type="number"
-              required="required"
-              ></b-form-input>
-          </b-form-group>
-        </b-col>
-        <b-col md="6">
-          <b-form-checkbox
-            v-model="impresora.EsCocina"
-            :value="1"
-            :unchecked-value="0">
-            Es Cocina
-          </b-form-checkbox>
-        </b-col>
-        <div slot="modal-footer">
-        <b-btn variant="primary" type="submit">
-           Guardar
-         </b-btn>
-         <b-btn  variant="secondary" @click="show=false">
-           Cerrar
-         </b-btn>
-       </div>
-    </b-modal>
-    </b-form>
-  </div>
+<div>
+  <!-- Modal Component -->
+  <b-form @submit="guardarImpresora" @keydown.enter="keyDownInput" autocomplete="off">
+  <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalProducto" :title="title" size="lg" ref="productoForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-col md="6">
+        <b-form-group>
+          <label>Nombre:</label>
+          <b-form-input
+            v-model="impresora.NombreImpresora"
+            @input="(val) => impresora.NombreImpresora = val && val.toUpperCase()"
+            type="text"
+            required="required"
+            ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="6">
+        <b-form-group>
+          <label>Direccion IP:</label>
+          <b-form-input
+            v-model="impresora.Ip"
+            type="text"
+            required="required"
+            ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="6">
+        <b-form-group>
+          <label>Puerto:</label>
+          <b-form-input
+            v-model="impresora.Puerto"
+            type="number"
+            required="required"
+            ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="6">
+        <b-form-checkbox
+          v-model="impresora.EsCocina"
+          :value="1"
+          :unchecked-value="0">
+          Es Cocina
+        </b-form-checkbox>
+      </b-col>
+      <div slot="modal-footer">
+      <b-btn variant="primary" type="submit">
+         Guardar
+       </b-btn>
+       <b-btn  variant="secondary" @click="show=false">
+         Cerrar
+       </b-btn>
+     </div>
+  </b-modal>
+  </b-form>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'

@@ -1,84 +1,84 @@
 <template>
-  <div>
-    <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="4" class="my-1">
+<div class="nst-screen nst-screen--deudaclientes">
+  <h2 align-h="center" class="text-center" >Reporte Deuda de Clientes</h2>
+    <b-container class="bv-example-row">
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="4" class="my-1">
+          <b-form-group>
+                <label>Buscar:</label>
+            
+            <b-input-group>
+              <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <br />
+        </b-col>
+        <b-col md="4">
+          <b-form-group>
+                <label>Almacen:</label>
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    initValue=""
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacen" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+        </b-col>
+        <b-col md="4" class="my-1">
+          <b-row>
+          <b-col md="8">
+
             <b-form-group>
-                  <label>Buscar:</label>
-              
-              <b-input-group>
-                <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
-                <b-input-group-append>
-                  <b-btn :disabled="!filter" @click="filter = ''">Limpiar</b-btn>
-                </b-input-group-append>
-              </b-input-group>
+                <label>Mostrar:</label>
+              <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
             </b-form-group>
-            <br />
           </b-col>
           <b-col md="4">
-            <b-form-group>
-                  <label>Almacen:</label>
-                  <autocomplete
-                      required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      initValue=""
-                      label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                      :classes="{input: 'form-control'}">
-                  </autocomplete>
-                </b-form-group>
+           <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
           </b-col>
-          <b-col md="4" class="my-1">
-            <b-row>
-            <b-col md="8">
+          </b-row>
+        </b-col>
 
-              <b-form-group>
-                  <label>Mostrar:</label>
-                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="4">
-             <!-- <p style="margin-top: 6px;">de <b class="text-success">{{ this.totalRows }}</b> Artículos</p>-->
-            </b-col>
-            </b-row>
+        <b-table small
+          ref="tablaProductos"
+          :filter="filter"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          striped
+          hover
+          id="my-table" 
+          :busy.sync="isBusy" 
+          :items="myProvider" 
+          :fields="fields"
+          :per-page="perPage"
+          :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+          <template slot="action"  slot-scope="data">
+             <pago-deuda @registro="recargarTabla" :Cliente="data.item"> </pago-deuda>
+          </template> 
+        </b-table>
+          <b-row>
+              <b-col md="6" class="my-1">
+                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+              </b-col>
+          </b-row>
+      </b-row></section>
+      <b-row align-h="center" class="text-center nst-action-bar">
+          <b-col cols="4">
+            <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
           </b-col>
-
-          <b-table small
-            ref="tablaProductos"
-            :filter="filter"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            striped
-            hover
-            id="my-table" 
-            :busy.sync="isBusy" 
-            :items="myProvider" 
-            :fields="fields"
-            :per-page="perPage"
-            :current-page="currentPage">
-            <template slot="action"  slot-scope="data">
-               <pago-deuda @registro="recargarTabla" :Cliente="data.item"> </pago-deuda>
-            </template> 
-          </b-table>
-            <b-row>
-                <b-col md="6" class="my-1">
-                    <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-                </b-col>
-            </b-row>
-        </b-row>
-        <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/deudaclientes2?idalmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
-            </b-col>
-        </b-row>
-        <br /><br />
-      </b-container>
-  </div>
+      </b-row>
+      <br /><br />
+    </b-container>
+</div>
 </template>
 
 <script>

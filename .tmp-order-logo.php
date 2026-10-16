@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();echo json_encode($db->query("SELECT MetaKey,MetaValue FROM Gen_EmpresaConfig WHERE MetaKey='logo_principal'")->fetchAll(PDO::FETCH_ASSOC)),"\n";echo json_encode($db->query('SELECT IdOrdenCompra,Anio,Numero,UsuarioReg FROM Lo_OrdenCompra WHERE IdOrdenCompra=29')->fetch(PDO::FETCH_ASSOC)),"\n";

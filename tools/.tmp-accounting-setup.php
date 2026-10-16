@@ -1,0 +1,8 @@
+﻿<?php
+if(PHP_SAPI!=='cli')exit(1);
+require 'C:/xampp/htdocs/boticav1/config/database.php';require __DIR__.'/../integration/accounting/api/accounting-core.php';require __DIR__.'/../integration/accounting/api/accounting-catalog.php';
+$db=appPdoConnection();if($db->query('SELECT DATABASE()')->fetchColumn()!=='nst')throw new RuntimeException('Wrong database');$s=new CoService($db,'superadmin',true);$e=$db->query('SELECT RAZONSOCIAL,RUC FROM GEN_EMPRESA WHERE IDEMPRESA=1')->fetch(PDO::FETCH_ASSOC);$q=$db->prepare('SELECT Id FROM Co_Company WHERE Ruc=?');$q->execute([$e['RUC']]);$id=$q->fetchColumn();if(!$id)$id=$s->company(['name'=>$e['RAZONSOCIAL'],'ruc'=>$e['RUC'],'regime'=>'other','obligation'=>'none'])['id'];$id=(int)$id;
+$q=$db->prepare('SELECT COUNT(*) FROM Co_Account WHERE CompanyId=?');$q->execute([$id]);if(!$q->fetchColumn())$s->importAccounts($id,coOfficialCatalog());
+foreach(['admin','superadmin'] as $user){$q=$db->prepare('SELECT Usuario FROM Seg_Usuario WHERE Usuario=? AND IdUsuarioPerfil=1 AND COALESCE(Anulado,0)=0');$q->execute([$user]);if($q->fetchColumn())$s->member($id,['username'=>$user,'role'=>'admin']);}
+foreach($db->query('SELECT IdAlmacen,Almacen FROM Lo_Almacen WHERE COALESCE(Anulado,0)=0')->fetchAll(PDO::FETCH_ASSOC) as $b){$q=$db->prepare('SELECT Id FROM Co_Branch WHERE WarehouseId=?');$q->execute([$b['IdAlmacen']]);if(!$q->fetchColumn())$s->branch($id,['name'=>$b['Almacen'],'warehouseId'=>$b['IdAlmacen']]);}
+$s->period($id,'2026-10');echo 'Company, PCGE 1754 accounts, branches and admin access ready. Tax configuration awaits review; no historical movements imported.'.PHP_EOL;

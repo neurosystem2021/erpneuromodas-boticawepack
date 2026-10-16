@@ -1,0 +1,13 @@
+.connection-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.connection-panel .disconnect {
+  background: #c62828;
+}
+
+.connection-panel button:disabled {
+  cursor: wait;
+  opacity: .6;
+}

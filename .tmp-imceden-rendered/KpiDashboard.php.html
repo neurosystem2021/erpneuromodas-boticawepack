@@ -1,0 +1,1692 @@
+  
+  <!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KPI / Inteligencia de Negocio</title>
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../resources/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/dataTables.bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../resources/css/main.css">
+<script src="../resources/js/jquery-3.2.1.min.js"></script>
+<script src="../resources/js/main.js"></script>
+<script src="../resources/js/bootstrap.js"></script>
+<script src="../resources/js/jquery.dataTables.js"></script>
+<script src="../resources/js/dataTables.bootstrap.js"></script>
+<script src="../resources/js/bootstrap-notify.js"></script>
+<!-- <script src="../resources/js/jquery.print.js"></script> -->
+<script src="../resources/js/jspdf.min.js"></script>
+<script src="../resources/js/jspdf.plugin.autotable.js"></script>
+<script src="../resources/js/FileSaver.js"></script>
+
+
+<!-- Add this to <head> -->
+<!--<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>-->
+
+<!-- development version, includes helpful console warnings -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!-- production version, optimized for size and speed -->
+<!--<script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+
+<!-- VUE SELECT -->
+<script src="https://cdn.jsdelivr.net/npm/vue-select@3.20.2/dist/vue-select.min.js"></script>
+<script>Vue.component('v-select', VueSelect.VueSelect);</script>
+
+<!-- AXIOS GET/POST -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- Add this after vue.js -->
+<!--<script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+<script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>-->
+
+
+  <style>
+  :root{--wine:#74102c;--red:#bd163b;--coral:#f24b43;--ink:#18263c;--muted:#68758a;--paper:#fff;--line:#ecd3d9;--green:#0fa66b;--amber:#eea317;--danger:#dc294f}
+  *{box-sizing:border-box}.kpi-app{min-height:calc(100vh - 70px);padding:28px;background:radial-gradient(circle at 10% 0,#ffe8e9,transparent 27%),linear-gradient(135deg,#fff9f7,#fff 50%,#fff0ea);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+  .kpi-shell{max-width:1540px;margin:auto}.kpi-hero{display:flex;align-items:center;gap:18px;padding:24px 28px;border-radius:28px;color:#fff;background:linear-gradient(110deg,#650c29,#ae1538 54%,#f14b42);box-shadow:0 18px 50px rgba(111,14,42,.22)}
+  .kpi-hero-icon{display:grid;width:66px;height:66px;place-items:center;border:1px solid #ffffff61;border-radius:20px;background:#ffffff18;font-size:30px}.kpi-hero-copy{flex:1}.kpi-hero small{font-weight:900;letter-spacing:2px}.kpi-hero h1{margin:5px 0 2px;font-size:30px;font-weight:900}.kpi-hero p{margin:0;color:#ffe9ea}.kpi-hero-actions{display:flex;gap:9px}.kpi-btn{border:0;border-radius:13px;padding:12px 17px;font-weight:850;cursor:pointer}.kpi-btn-light{color:var(--wine);background:#fff}.kpi-btn-green{color:#fff;background:var(--green)}
+  .kpi-filters{display:grid;grid-template-columns:repeat(8,minmax(120px,1fr));gap:10px;margin:18px 0;padding:18px;border:1px solid var(--line);border-radius:22px;background:#ffffffed;box-shadow:0 9px 30px #6d153015}.kpi-field label{display:block;margin:0 0 5px;color:#7c5260;font-size:10px;font-weight:900;text-transform:uppercase}.kpi-field input,.kpi-field select{width:100%;height:42px;border:1px solid #e4c6ce;border-radius:11px;padding:0 10px;background:#fff;color:var(--ink)}.kpi-filter-action{align-self:end;height:42px;color:#fff;background:linear-gradient(135deg,var(--wine),var(--red))}
+  .kpi-tabs{position:sticky;z-index:30;top:0;display:flex;gap:7px;overflow:auto;margin-bottom:18px;padding:9px;border-radius:17px;background:#fff;box-shadow:0 8px 24px #4a0d2118}.kpi-tab{white-space:nowrap;border:0;border-radius:11px;padding:10px 14px;background:#f7ecef;color:#6b3445;font-weight:850}.kpi-tab.active{color:#fff;background:linear-gradient(135deg,var(--wine),var(--red))}
+  .kpi-panel{display:none}.kpi-panel.active{display:block}.kpi-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:13px}.kpi-card{position:relative;overflow:hidden;min-height:135px;padding:18px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 10px 28px #4d102013}.kpi-card:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:linear-gradient(var(--wine),var(--coral))}.kpi-card i{color:var(--red);font-size:21px}.kpi-card span{display:block;margin:12px 0 5px;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase}.kpi-card strong{font-size:24px;font-weight:950}.kpi-card small{display:block;margin-top:6px;color:var(--muted)}.positive{color:var(--green)!important}.negative{color:var(--danger)!important}.financial-hidden{filter:blur(6px);user-select:none}
+  .kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}.kpi-box{overflow:hidden;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 10px 30px #4d102012}.kpi-box.wide{grid-column:1/-1}.kpi-box-head{display:flex;align-items:center;gap:10px;padding:17px 20px;border-bottom:1px solid #f1dde2}.kpi-box-head i{color:var(--red)}.kpi-box-head h2{flex:1;margin:0;font-size:17px;font-weight:900}.kpi-box-head small{color:var(--muted)}
+  .kpi-chart{display:flex;align-items:end;gap:7px;height:265px;padding:35px 18px 25px}.kpi-bar{display:flex;flex:1;min-width:17px;height:100%;flex-direction:column;justify-content:end;align-items:center;gap:7px}.kpi-bar i{display:block;width:74%;min-height:3px;border-radius:8px 8px 2px 2px;background:linear-gradient(#f34b48,#a81039);box-shadow:0 5px 10px #a8103930}.kpi-bar small{overflow:hidden;max-width:58px;color:var(--muted);font-size:9px;white-space:nowrap}.kpi-horizontal{padding:17px}.kpi-hrow{display:grid;grid-template-columns:minmax(100px,1fr) 3fr 90px;gap:10px;align-items:center;margin:10px 0;font-size:12px}.kpi-hrow>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kpi-track{height:10px;border-radius:10px;background:#f3e6e9}.kpi-track i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--wine),var(--coral))}.kpi-hrow b{text-align:right}.kpi-progress{height:14px;margin-top:14px;border-radius:14px;background:#f3dde3}.kpi-progress i{display:block;height:100%;border-radius:14px;background:linear-gradient(90deg,var(--red),var(--coral))}
+  .kpi-table-wrap{overflow:auto;max-height:610px}.kpi-table{width:100%;border-collapse:collapse;font-size:12px}.kpi-table th{position:sticky;z-index:2;top:0;padding:13px 11px;color:#fff;background:var(--wine);text-align:left;white-space:nowrap}.kpi-table td{padding:11px;border-bottom:1px solid #f1e2e5;white-space:nowrap}.kpi-table tr:nth-child(even){background:#fff8f8}.kpi-table tr:hover{background:#fff0ed}.kpi-badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:900}.is-danger{color:#a41135;background:#ffdbe3}.is-warning{color:#895500;background:#fff0c3}.is-success{color:#08734a;background:#d7f7e9}.is-info{color:#743048;background:#f3dfe6}
+  .kpi-alerts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:18px}.kpi-alert{display:flex;gap:13px;padding:16px;border-radius:16px;background:#fff5f3;border-left:5px solid var(--red)}.kpi-alert i{font-size:22px}.kpi-alert strong,.kpi-alert small{display:block}.kpi-alert small{margin-top:4px;color:var(--muted)}.kpi-alert.success{border-color:var(--green)}.kpi-alert.warning{border-color:var(--amber)}
+  .kpi-empty{padding:40px;color:var(--muted);text-align:center}.kpi-loading{position:fixed;z-index:9999;inset:0;display:grid;place-items:center;background:#2c071bc4;color:#fff;font-size:18px;font-weight:900}.kpi-loading div{text-align:center}.kpi-loading i{display:block;margin-bottom:12px;font-size:42px}.hidden{display:none!important}
+  /* Identidad del modo escritorio: azul NeuroModas. El rojo queda reservado para alertas. */
+  .kpi-app{background:radial-gradient(circle at 10% 0,#dceeff,transparent 27%),linear-gradient(135deg,#f5faff,#fff 50%,#eaf6ff)}
+  .kpi-hero{background:linear-gradient(110deg,#062751,#07518b 54%,#159bd7);box-shadow:0 18px 50px rgba(7,60,111,.22)}
+  .kpi-btn-light{color:#073d73}.kpi-filter-action,.kpi-tab.active{background:linear-gradient(135deg,#082d5c,#0876b9)}
+  .kpi-filters{border-color:#cddfeb;box-shadow:0 9px 30px #073c6f15}.kpi-field label{color:#416687}.kpi-field input,.kpi-field select{border-color:#bfd5e6}
+  .kpi-tabs{box-shadow:0 8px 24px #073c6f18}.kpi-tab{color:#274f73;background:#eaf3fa}
+  .kpi-card,.kpi-box{border-color:#cddfeb;box-shadow:0 10px 28px #073c6f13}.kpi-card:before{background:linear-gradient(#082d5c,#159bd7)}.kpi-card i,.kpi-box-head i{color:#0876b9}.kpi-box-head{border-bottom-color:#dbe8f2}
+  .kpi-bar i{background:linear-gradient(#20a6df,#075495);box-shadow:0 5px 10px #07549530}.kpi-track{background:#e3eef6}.kpi-track i,.kpi-progress i{background:linear-gradient(90deg,#07518b,#20a6df)}.kpi-progress{background:#dcebf5}
+  .kpi-table td{border-bottom-color:#dce8f1}.kpi-table tr:nth-child(even){background:#f5faff}.kpi-table tr:hover{background:#e8f5ff}.is-info{color:#164f7d;background:#dceefa}
+  @media(max-width:1200px){.kpi-filters{grid-template-columns:repeat(4,1fr)}.kpi-cards{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.kpi-app{padding:12px}.kpi-hero{align-items:flex-start;padding:19px}.kpi-hero h1{font-size:22px}.kpi-hero-icon{display:none}.kpi-hero-actions{flex-direction:column}.kpi-filters{grid-template-columns:repeat(2,1fr)}.kpi-cards{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:1fr}.kpi-alerts{grid-template-columns:1fr}}@media print{nav,.kpi-filters,.kpi-tabs,.kpi-hero-actions{display:none!important}.kpi-app{padding:0;background:#fff}.kpi-panel{display:block!important;break-before:page}.kpi-box{box-shadow:none}}
+  </style>
+<style id="eden-kpi-petrol-theme">
+:root{--petrol:#075247;--petrol-dark:#043b35;--petrol-light:#0a806d}
+.kpi-app{background:radial-gradient(circle at 10% 0,#dff5ef,transparent 28%),linear-gradient(135deg,#f4fbf9,#fff 52%,#eaf7f3)!important}
+.kpi-hero{background:linear-gradient(110deg,var(--petrol-dark),var(--petrol) 55%,var(--petrol-light))!important;box-shadow:0 18px 50px rgba(7,82,71,.22)!important}
+.kpi-btn-light{color:var(--petrol)!important}.kpi-btn-green,.kpi-filter-action,.kpi-tab.active{color:#fff!important;background:linear-gradient(135deg,var(--petrol-dark),var(--petrol-light))!important}
+.kpi-filters{grid-template-columns:repeat(7,minmax(120px,1fr))!important;border-color:#cce4de!important;box-shadow:0 9px 30px rgba(7,82,71,.09)!important}.kpi-field label{color:#35685f!important}.kpi-field input,.kpi-field select{border-color:#b9d9d1!important}
+.kpi-tabs{box-shadow:0 8px 24px rgba(7,82,71,.11)!important}.kpi-tab{color:#285d54!important;background:#e8f5f1!important}.kpi-tab.active{color:#fff!important}
+.kpi-card,.kpi-box{border-color:#cce4de!important;box-shadow:0 10px 28px rgba(7,82,71,.09)!important}.kpi-card:before{background:linear-gradient(var(--petrol-dark),var(--petrol-light))!important}.kpi-card i,.kpi-box-head i{color:var(--petrol)!important}.kpi-box-head{border-bottom-color:#d9ebe6!important}
+.kpi-bar i,.kpi-track i,.kpi-progress i{background:linear-gradient(90deg,var(--petrol),#11a18a)!important}.kpi-track,.kpi-progress{background:#dfeeea!important}
+.kpi-table th{background:var(--petrol)!important}.kpi-table td{border-bottom-color:#dcebe7!important}.kpi-table tr:nth-child(even){background:#f3faf8!important}.kpi-table tr:hover{background:#e5f5f0!important}.is-info{color:#075247!important;background:#dff3ed!important}
+@media(max-width:1200px){.kpi-filters{grid-template-columns:repeat(4,1fr)!important}}@media(max-width:760px){.kpi-filters{grid-template-columns:repeat(2,1fr)!important}}
+</style>
+<link rel="stylesheet" href="/resources/css/imceden-nst-theme.css?v=20261010">
+</head>
+<body>
+<script>
+  async function consultaPago() {
+    try {
+      const url = 'https://admin.factura.vip:5000/api/v1/sistema/aviso?Url=localhost';
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.success) {
+        setTimeout(() => {
+          if (document.getElementsByTagName("iframe")[0]) {
+            document.getElementsByTagName("iframe")[0].style.height = ($(window).height() - 120) + 'px';
+          }
+          let divAviso = document.getElementById("avisoPago");
+          divAviso.style.display = "block";
+          divAviso.className = data.clase;
+          divAviso.insertAdjacentHTML('afterbegin', "<marquee scrollamount='13' direction='left' style='font-size: 1.8rem; font-weight: bold; margin-bottom: -4px;'><span id='avisoPagoLabel'></span></marquee>");
+          document.getElementById("avisoPagoLabel").innerHTML = data.msg;
+          if (data.pago == 1) {
+            let btnPago = document.getElementById("botonPago")
+            btnPago.style.display = "block";
+          }
+
+        }, 1000);
+
+      }
+    } catch (error) {
+      console.log("Error en consulta super admin");
+    }
+  }
+  consultaPago();
+</script>
+
+<script>
+  function datos() {
+    fetch('https://deperu.com/api/rest/cotizaciondolar.json')
+      .then(res => res.json())
+      .then(data => {
+        var cotizacion = data.Cotizacion[0];
+        var compra = cotizacion.Compra;
+        var venta = cotizacion.Venta;
+
+        if ($.isNumeric(compra) && $.isNumeric(venta)) {
+          $('#compra').html(compra)
+          $('#venta').html(venta)
+        }
+      })
+  }
+  datos();
+</script>
+<style>
+  .erp-topbar {
+        --erp-navy: #050914;
+        --erp-blue: #2563ff;
+        --erp-cyan: #00e5ff;
+    --erp-mint: #42e8b4;
+        --erp-ruby: #ff3154;
+        --erp-wine: #160b1b;
+        --erp-gold: #00e5ff;
+        --erp-champagne: #e9fbff;
+    --erp-line: rgba(0, 229, 255, 0.28);
+    position: relative;
+    z-index: 1040;
+    min-height: 66px;
+    margin: 0 !important;
+    padding: 0 16px;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 0 20px 20px;
+    text-transform: uppercase;
+    background:
+      radial-gradient(circle at 5% -90%, rgba(0, 229, 255, 0.25), transparent 34%),
+      radial-gradient(circle at 92% 180%, rgba(255, 49, 84, 0.25), transparent 40%),
+      linear-gradient(112deg, #040812 0%, #071522 48%, #170b19 100%) !important;
+    box-shadow: 0 14px 34px rgba(1, 7, 17, 0.42), inset 0 1px 0 rgba(125, 238, 255, 0.09), inset 0 -1px 0 rgba(0, 229, 255, 0.19);
+    isolation: isolate;
+  }
+
+  .erp-topbar::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    content: "";
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(105deg, transparent 10%, rgba(113, 237, 255, 0.13) 26%, transparent 42%) -70vw 0 / 70vw 100% no-repeat,
+      linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.19), rgba(132, 87, 255, 0.18), rgba(255, 49, 84, 0.18), transparent) 0 100% / 100% 1px no-repeat;
+    animation: erpHeaderSweep 6.6s ease-in-out infinite;
+  }
+
+  .erp-topbar::after {
+    position: absolute;
+    z-index: 0;
+    right: 4%;
+    bottom: -1px;
+    left: 4%;
+    height: 2px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--erp-cyan), #8457ff, var(--erp-ruby), transparent);
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.56));
+  }
+
+  .erp-topbar > .container-fluid {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    min-height: 66px;
+    align-items: center;
+    padding: 0;
+  }
+
+  .erp-topbar .navbar-header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    margin: 0;
+  }
+
+  .erp-topbar .navbar-brand {
+    position: relative;
+    height: auto;
+    margin: 0 13px 0 0 !important;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 229, 255, 0.30);
+    border-radius: 12px;
+    color: #ffffff !important;
+    line-height: 1;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.055em;
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.30);
+    background: linear-gradient(145deg, rgba(7, 30, 45, 0.92), rgba(40, 13, 32, 0.82));
+    box-shadow: 0 7px 18px rgba(1, 8, 18, 0.30), inset 0 1px 0 rgba(125, 238, 255, 0.13);
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .erp-topbar .navbar-brand::before {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    border-radius: 50%;
+    content: "";
+    vertical-align: 2px;
+    background: var(--erp-mint);
+    box-shadow: 0 0 0 4px rgba(66, 232, 180, 0.12), 0 0 14px var(--erp-mint);
+    animation: erpStatusPulse 1.8s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-brand:hover,
+  .erp-topbar .navbar-brand:focus {
+    border-color: rgba(0, 229, 255, 0.72);
+    box-shadow: 0 9px 24px rgba(3, 127, 181, 0.24), 0 0 18px rgba(255, 49, 84, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .erp-topbar #myNavbar {
+    display: flex !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: auto !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: visible !important;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .erp-topbar .navbar-nav {
+    display: flex;
+    flex: 1 1 auto;
+    float: none;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .erp-topbar .navbar-nav::before,
+  .erp-topbar .navbar-nav::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .erp-topbar .navbar-nav > li {
+    float: none;
+    font-size: 12px !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a {
+    --erp-button-a: rgba(69, 9, 26, 0.94);
+    --erp-button-b: rgba(151, 20, 54, 0.84);
+    --erp-button-c: rgba(205, 113, 43, 0.62);
+    position: relative;
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 10px 9px;
+    overflow: hidden;
+    border: 1px solid rgba(247, 200, 112, 0.32);
+    border-radius: 13px;
+    color: rgba(255, 248, 231, 0.96) !important;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1;
+    letter-spacing: 0.015em;
+    white-space: nowrap;
+    background: linear-gradient(118deg, var(--erp-button-a), var(--erp-button-b), var(--erp-button-c)) !important;
+    background-size: 220% 220% !important;
+    box-shadow: 0 8px 20px rgba(42, 3, 15, 0.30), 0 0 0 1px rgba(255, 216, 139, 0.04), inset 0 1px 0 rgba(255, 239, 207, 0.20), inset 0 -1px 0 rgba(255, 173, 75, 0.12);
+    animation: erpButtonFlow 5.2s ease-in-out infinite;
+    isolation: isolate;
+    transition: transform 0.22s cubic-bezier(.2, .8, .2, 1), border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n + 2) > a {
+    --erp-button-a: rgba(48, 14, 20, 0.96);
+    --erp-button-b: rgba(124, 44, 23, 0.88);
+    --erp-button-c: rgba(221, 148, 53, 0.62);
+    animation-delay: -1.4s;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n + 3) > a {
+    --erp-button-a: rgba(71, 9, 39, 0.96);
+    --erp-button-b: rgba(158, 18, 63, 0.86);
+    --erp-button-c: rgba(211, 77, 37, 0.68);
+    animation-delay: -2.8s;
+  }
+
+  .erp-topbar .navbar-nav > li > a::before {
+    position: absolute;
+    top: -70%;
+    left: -55%;
+    width: 35%;
+    height: 240%;
+    content: "";
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 235, 190, 0.58), transparent);
+    transform: rotate(22deg) translateX(-220%);
+    animation: erpButtonSheen 6.4s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::before,
+  .erp-topbar .navbar-nav > li.open > a::before {
+    animation-duration: 1.35s;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    position: absolute;
+    z-index: 0;
+    inset: 1px;
+    border: 1px solid rgba(255, 227, 166, 0.18);
+    border-radius: 11px;
+    content: "";
+    pointer-events: none;
+    box-shadow: inset 0 0 16px rgba(255, 198, 92, 0.05);
+    animation: erpButtonEdge 3.2s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-nav > li > a > .fa {
+    margin-right: 6px;
+    color: #ffd98d;
+    font-size: 13px;
+    text-shadow: 0 0 13px rgba(242, 189, 98, 0.68);
+    transition: transform 0.22s ease, color 0.22s ease;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover,
+  .erp-topbar .navbar-nav > li > a:focus,
+  .erp-topbar .navbar-nav > li.open > a,
+  .erp-topbar .navbar-nav > li.open > a:hover,
+  .erp-topbar .navbar-nav > li.open > a:focus,
+  .erp-topbar .navbar-nav > li.erp-current > a {
+    border-color: rgba(255, 221, 151, 0.78);
+    color: #ffffff !important;
+    background: linear-gradient(120deg, rgba(128, 11, 42, 0.96), rgba(220, 29, 65, 0.92), rgba(225, 151, 52, 0.82)) !important;
+    background-size: 220% 220% !important;
+    box-shadow: 0 12px 28px rgba(164, 14, 51, 0.40), 0 0 20px rgba(242, 189, 98, 0.16), 0 0 0 1px rgba(255, 225, 164, 0.20), inset 0 1px 0 rgba(255, 247, 229, 0.32);
+    transform: translateY(-3px) scale(1.025);
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover > .fa,
+  .erp-topbar .navbar-nav > li.open > a > .fa,
+  .erp-topbar .navbar-nav > li.erp-current > a > .fa {
+    color: #ffffff;
+    transform: translateY(-1px) scale(1.08);
+  }
+
+  .erp-topbar .caret {
+    margin-left: 7px;
+    border-top-color: #ffd98d !important;
+    transition: transform 0.24s ease;
+  }
+
+  .erp-topbar .open > a .caret {
+    transform: rotate(180deg);
+  }
+
+  .erp-topbar .dropdown-menu {
+    top: calc(100% + 9px);
+    min-width: 270px;
+    max-width: min(360px, calc(100vw - 24px));
+    max-height: calc(100vh - 92px);
+    margin: 0;
+    padding: 9px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgba(242, 189, 98, 0.34);
+    border-radius: 15px;
+    background:
+      radial-gradient(circle at 90% 0, rgba(219, 31, 67, 0.18), transparent 55%),
+      linear-gradient(145deg, rgba(29, 12, 18, 0.98), rgba(11, 10, 14, 0.99)) !important;
+    box-shadow: 0 24px 55px rgba(28, 2, 11, 0.54), 0 0 24px rgba(242, 189, 98, 0.08), inset 0 1px 0 rgba(255, 233, 191, 0.10);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transform-origin: top center;
+  }
+
+  .erp-topbar .open > .dropdown-menu {
+    animation: erpDropdownIn 0.24s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    position: relative;
+    display: flex;
+    min-height: 37px;
+    align-items: center;
+    margin: 2px 0;
+    padding: 8px 12px 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    border-color: rgba(242, 189, 98, 0.07);
+    color: rgba(255, 241, 215, 0.92) !important;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: 0.025em;
+    white-space: normal;
+    background: linear-gradient(100deg, rgba(132, 17, 49, 0.18), rgba(199, 89, 35, 0.11), rgba(255, 220, 153, 0.035)) !important;
+    background-size: 220% 100% !important;
+    animation: erpSubmenuFlow 7.2s ease-in-out infinite;
+    transition: color 0.18s ease, transform 0.18s ease, border-color 0.18s ease, background 0.18s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::before {
+    position: absolute;
+    left: 7px;
+    width: 3px;
+    height: 14px;
+    border-radius: 999px;
+    content: "";
+    background: linear-gradient(var(--erp-gold), var(--erp-ruby));
+    box-shadow: 0 0 10px rgba(242, 189, 98, 0.58);
+    opacity: 0.35;
+    transform: scaleY(0.45);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover,
+  .erp-topbar .dropdown-menu > li > a:focus,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link {
+    border-color: rgba(255, 221, 151, 0.30);
+    color: #ffffff !important;
+    background: linear-gradient(90deg, rgba(179, 21, 56, 0.40), rgba(214, 122, 43, 0.25)) !important;
+    box-shadow: 0 7px 16px rgba(88, 4, 27, 0.24), inset 0 1px 0 rgba(255, 238, 202, 0.10);
+    transform: translateX(5px);
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::before,
+  .erp-topbar .dropdown-menu > li > a:focus::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::before {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  .erp-topbar .dropdown-menu .divider {
+    height: 1px;
+    margin: 7px 7px;
+    overflow: hidden;
+    background: linear-gradient(90deg, transparent, rgba(242, 189, 98, 0.38), rgba(219, 31, 67, 0.28), transparent);
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: linear-gradient(var(--erp-gold), var(--erp-ruby));
+  }
+
+  .erp-topbar .erp-market {
+    display: flex;
+    min-height: 40px;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 2px;
+    padding: 5px 9px;
+    border: 1px solid rgba(242, 189, 98, 0.22);
+    border-radius: 11px;
+    color: #fff0cf;
+    font-size: 9.5px;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: 0.035em;
+    white-space: nowrap;
+    background: linear-gradient(145deg, rgba(91, 12, 35, 0.56), rgba(34, 15, 19, 0.62));
+  }
+
+  .erp-topbar .erp-logo-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .erp-topbar .erp-nav-logo {
+    display: block;
+    width: 104px;
+    max-height: 43px;
+    margin: 0 0 0 5px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.28));
+    transition: transform 0.25s ease, filter 0.25s ease;
+  }
+
+  .erp-topbar .erp-nav-logo:hover {
+    filter: drop-shadow(0 7px 14px rgba(242, 189, 98, 0.30));
+    transform: translateY(-2px) scale(1.025);
+  }
+
+  .erp-topbar .navbar-toggle {
+    margin: 10px 0 10px auto;
+    padding: 10px;
+    border: 1px solid rgba(242, 189, 98, 0.46) !important;
+    border-radius: 11px;
+    background: linear-gradient(145deg, rgba(189, 20, 57, 0.72), rgba(219, 139, 46, 0.55)) !important;
+    box-shadow: 0 9px 20px rgba(77, 4, 24, 0.34), inset 0 1px 0 rgba(255, 240, 210, 0.20);
+  }
+
+  .erp-topbar .navbar-toggle .icon-bar {
+    width: 22px;
+    height: 2px;
+    border-radius: 999px;
+    background: #fff3da !important;
+    box-shadow: 0 0 8px rgba(242, 189, 98, 0.60);
+  }
+
+  @keyframes erpHeaderSweep {
+    0%, 58%, 100% { background-position: -70vw 0, 0 100%; }
+    78% { background-position: 150vw 0, 0 100%; }
+  }
+
+  @keyframes erpDropdownIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes erpButtonFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpButtonSheen {
+    0%, 58%, 100% { transform: rotate(22deg) translateX(-220%); opacity: 0; }
+    64% { opacity: 0.85; }
+    78% { transform: rotate(22deg) translateX(520%); opacity: 0; }
+  }
+
+  @keyframes erpButtonEdge {
+    0%, 100% {
+      border-color: rgba(255, 227, 166, 0.14);
+      box-shadow: inset 0 0 13px rgba(255, 198, 92, 0.04), 0 0 0 rgba(242, 189, 98, 0);
+    }
+    50% {
+      border-color: rgba(255, 227, 166, 0.42);
+      box-shadow: inset 0 0 18px rgba(255, 198, 92, 0.09), 0 0 13px rgba(242, 189, 98, 0.14);
+    }
+  }
+
+  @keyframes erpSubmenuFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpStatusPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.68; transform: scale(0.72); }
+  }
+
+  @media (max-width: 1440px) {
+    .erp-topbar {
+      min-height: 60px;
+      padding: 0 12px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .erp-topbar > .container-fluid {
+      display: block;
+      min-height: 60px;
+    }
+
+    .erp-topbar .navbar-header {
+      float: none;
+      width: 100%;
+      min-height: 60px;
+    }
+
+    .erp-topbar .navbar-brand {
+      order: 1;
+      margin-right: auto !important;
+    }
+
+    .erp-topbar .navbar-toggle {
+      display: block !important;
+      order: 2;
+      margin-right: 0;
+      margin-left: auto;
+    }
+
+    .erp-topbar #myNavbar {
+      display: none !important;
+      width: 100%;
+      max-height: calc(100vh - 74px) !important;
+      margin: 0;
+      padding: 8px 0 13px;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      border-top: 1px solid rgba(242, 189, 98, 0.20);
+      background: rgba(17, 8, 13, 0.66);
+    }
+
+    .erp-topbar #myNavbar.in {
+      display: block !important;
+      animation: erpMobileMenuIn 0.24s ease both;
+    }
+
+    .erp-topbar .navbar-nav {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .erp-topbar .navbar-nav > li {
+      width: 100%;
+    }
+
+    .erp-topbar .navbar-nav > li > a {
+      width: 100%;
+      min-height: 43px;
+      justify-content: flex-start;
+      padding: 11px 13px;
+    }
+
+    .erp-topbar .dropdown-menu,
+    .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+      position: static;
+      float: none;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      max-height: none;
+      margin: 5px 0 0;
+      padding: 6px;
+      border-radius: 11px;
+      background: rgba(30, 11, 18, 0.70) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 229, 182, 0.07);
+    }
+
+    .erp-topbar .erp-market {
+      min-height: 43px;
+      margin: 0;
+    }
+
+    .erp-topbar .erp-logo-item {
+      display: none;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .erp-topbar {
+      padding: 0 8px;
+    }
+
+    .erp-topbar .navbar-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .erp-topbar .navbar-brand {
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+  }
+
+  @keyframes erpMobileMenuIn {
+    from { opacity: 0; transform: translateY(-7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .erp-topbar,
+    .erp-topbar *,
+    .erp-topbar *::before,
+    .erp-topbar *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  /* Neurosoft Tech Surface v2: interacción de superficie completa */
+  .erp-topbar .navbar-nav > li > a {
+    --tech-a: #00e5ff;
+    --tech-b: #2563ff;
+    --tech-c: #ff3154;
+    position: relative !important;
+    z-index: 0;
+    isolation: isolate;
+    overflow: hidden !important;
+    border-color: rgba(77, 220, 242, 0.25) !important;
+    color: #edfaff !important;
+    text-shadow: 0 1px 10px rgba(0, 229, 255, 0.12) !important;
+    background: linear-gradient(145deg, rgba(10, 27, 41, 0.96), rgba(24, 15, 31, 0.96)) !important;
+    background-size: auto !important;
+    box-shadow: 0 7px 18px rgba(0, 4, 12, 0.30), inset 0 1px 0 rgba(144, 239, 255, 0.08) !important;
+    animation: none !important;
+    transition: transform 0.30s cubic-bezier(.2,.85,.25,1), border-color 0.30s ease, box-shadow 0.30s ease, color 0.30s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(2n) > a {
+    --tech-a: #17d7d4;
+    --tech-b: #1678ff;
+    --tech-c: #7b57ff;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(3n) > a {
+    --tech-a: #00d8ff;
+    --tech-b: #654dff;
+    --tech-c: #ff3154;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(5n) > a {
+    --tech-a: #26e2c4;
+    --tech-b: #1684ff;
+    --tech-c: #e62b70;
+  }
+
+  .erp-topbar .navbar-nav > li > a::before {
+    position: absolute !important;
+    z-index: -1 !important;
+    inset: -1px !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border-radius: inherit !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(110deg, var(--tech-a) 0%, var(--tech-b) 48%, var(--tech-c) 100%) !important;
+    background-size: 220% 100% !important;
+    transform: translate3d(-102%, 0, 0) !important;
+    transform-origin: left center !important;
+    animation: none !important;
+    transition: transform 0.48s cubic-bezier(.16,1,.3,1) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    position: absolute !important;
+    z-index: 1 !important;
+    inset: 1px !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border: 1px solid rgba(122, 231, 255, 0.10) !important;
+    border-radius: 11px !important;
+    opacity: 0.55 !important;
+    pointer-events: none !important;
+    background: transparent !important;
+    box-shadow: inset 0 0 13px rgba(0, 229, 255, 0.05) !important;
+    transform: none !important;
+    animation: none !important;
+    transition: border-color 0.28s ease, box-shadow 0.28s ease, opacity 0.28s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover,
+  .erp-topbar .navbar-nav > li > a:focus,
+  .erp-topbar .navbar-nav > .open > a,
+  .erp-topbar .navbar-nav > .open > a:hover,
+  .erp-topbar .navbar-nav > .open > a:focus,
+  .erp-topbar .navbar-nav > li > a.erp-current,
+  .erp-topbar .navbar-nav > li.erp-current > a {
+    color: #ffffff !important;
+    border-color: rgba(129, 240, 255, 0.82) !important;
+    background: linear-gradient(145deg, rgba(10, 27, 41, 0.98), rgba(24, 15, 31, 0.98)) !important;
+    box-shadow: 0 12px 25px rgba(0, 174, 224, 0.24), 0 0 18px rgba(255, 49, 84, 0.16), inset 0 1px 0 rgba(255,255,255,0.22) !important;
+    transform: translateY(-2px) scale(1.025) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::before,
+  .erp-topbar .navbar-nav > li > a:focus::before,
+  .erp-topbar .navbar-nav > .open > a::before,
+  .erp-topbar .navbar-nav > li > a.erp-current::before,
+  .erp-topbar .navbar-nav > li.erp-current > a::before {
+    transform: translate3d(0, 0, 0) !important;
+    animation: erpTechSurface 2.3s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::after,
+  .erp-topbar .navbar-nav > li > a:focus::after,
+  .erp-topbar .navbar-nav > .open > a::after,
+  .erp-topbar .navbar-nav > li > a.erp-current::after,
+  .erp-topbar .navbar-nav > li.erp-current > a::after {
+    border-color: rgba(238, 253, 255, 0.68) !important;
+    opacity: 1 !important;
+    box-shadow: inset 0 0 14px rgba(255,255,255,0.13), 0 0 11px rgba(0,229,255,0.42), 0 0 17px rgba(255,49,84,0.20) !important;
+    animation: erpTechEdge 1.55s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a .fa,
+  .erp-topbar .navbar-nav > li > a .glyphicon {
+    display: inline-flex !important;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    border: 1px solid rgba(0, 229, 255, 0.22);
+    border-radius: 7px;
+    color: #66efff !important;
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.06);
+    transition: color .25s ease, background .25s ease, transform .32s cubic-bezier(.2,.9,.2,1), box-shadow .25s ease !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover .fa,
+  .erp-topbar .navbar-nav > li > a:focus .fa,
+  .erp-topbar .navbar-nav > .open > a .fa,
+  .erp-topbar .navbar-nav > li > a.erp-current .fa,
+  .erp-topbar .navbar-nav > li.erp-current > a .fa,
+  .erp-topbar .navbar-nav > li > a:hover .glyphicon,
+  .erp-topbar .navbar-nav > li > a:focus .glyphicon,
+  .erp-topbar .navbar-nav > .open > a .glyphicon,
+  .erp-topbar .navbar-nav > li > a.erp-current .glyphicon,
+  .erp-topbar .navbar-nav > li.erp-current > a .glyphicon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.48);
+    background: rgba(255,255,255,.15);
+    box-shadow: 0 0 13px rgba(255,255,255,.24);
+    transform: rotate(-5deg) scale(1.10);
+  }
+
+  .erp-topbar .caret {
+    color: #62edff !important;
+    border-top-color: currentColor !important;
+    filter: drop-shadow(0 0 4px rgba(0,229,255,.48));
+    transition: transform .28s ease, color .28s ease !important;
+  }
+
+  .erp-topbar .open > a .caret,
+  .erp-topbar a:hover .caret {
+    color: #ffffff !important;
+    transform: rotate(180deg);
+  }
+
+  .erp-topbar .dropdown-menu {
+    border-color: rgba(0, 229, 255, 0.25) !important;
+    background:
+      radial-gradient(circle at 12% 0, rgba(0,229,255,.13), transparent 42%),
+      radial-gradient(circle at 100% 100%, rgba(255,49,84,.13), transparent 46%),
+      linear-gradient(145deg, rgba(5,17,29,.985), rgba(17,10,25,.985)) !important;
+    box-shadow: 0 22px 46px rgba(0,5,14,.48), 0 0 22px rgba(0,229,255,.08), inset 0 1px 0 rgba(131,236,255,.10) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    --sub-a: rgba(0, 213, 239, .76);
+    --sub-b: rgba(43, 95, 255, .76);
+    --sub-c: rgba(255, 49, 84, .68);
+    position: relative !important;
+    z-index: 0;
+    isolation: isolate;
+    min-height: 38px;
+    padding-left: 43px !important;
+    overflow: hidden !important;
+    border-color: rgba(83, 218, 240, .14) !important;
+    color: #dff9ff !important;
+    background: linear-gradient(135deg, rgba(12,31,45,.86), rgba(28,16,34,.86)) !important;
+    background-size: auto !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+    animation: none !important;
+    transition: transform .30s cubic-bezier(.2,.85,.25,1), border-color .28s ease, box-shadow .28s ease, color .28s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::before {
+    position: absolute !important;
+    z-index: -1 !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    content: "" !important;
+    border-radius: inherit !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(105deg, var(--sub-a), var(--sub-b), var(--sub-c)) !important;
+    background-size: 220% 100% !important;
+    transform: translate3d(-102%,0,0) !important;
+    transform-origin: left center !important;
+    animation: none !important;
+    transition: transform .42s cubic-bezier(.16,1,.3,1) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::after {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 12px;
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,229,255,.28);
+    border-radius: 7px;
+    content: "\f105";
+    color: #68efff;
+    font-family: FontAwesome;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    background: rgba(0,229,255,.08);
+    box-shadow: inset 0 0 9px rgba(0,229,255,.08);
+    transform: translateY(-50%);
+    transition: color .25s ease, background .25s ease, border-color .25s ease, transform .3s cubic-bezier(.2,.85,.25,1), box-shadow .25s ease;
+  }
+
+  .erp-topbar .navbar-nav > li:nth-child(1) .dropdown-menu > li > a::after { content: "\f1b2"; }
+  .erp-topbar .navbar-nav > li:nth-child(2) .dropdown-menu > li > a::after { content: "\f0d1"; }
+  .erp-topbar .navbar-nav > li:nth-child(3) .dropdown-menu > li > a::after { content: "\f07a"; }
+  .erp-topbar .navbar-nav > li:nth-child(4) .dropdown-menu > li > a::after { content: "\f15c"; }
+  .erp-topbar .navbar-nav > li:nth-child(5) .dropdown-menu > li > a::after { content: "\f080"; }
+  .erp-topbar .navbar-nav > li:nth-child(6) .dropdown-menu > li > a::after { content: "\f09d"; }
+  .erp-topbar .navbar-nav > li:nth-child(7) .dropdown-menu > li > a::after { content: "\f0c0"; }
+  .erp-topbar .navbar-nav > li:nth-child(8) .dropdown-menu > li > a::after { content: "\f132"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-barcode) .dropdown-menu > li > a::after { content: "\f1b2"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-clipboard) .dropdown-menu > li > a::after { content: "\f0d1"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-cart-plus) .dropdown-menu > li > a::after { content: "\f07a"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-file) .dropdown-menu > li > a::after { content: "\f15c"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-bar-chart) .dropdown-menu > li > a::after { content: "\f080"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-credit-card-alt) .dropdown-menu > li > a::after { content: "\f09d"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-users) .dropdown-menu > li > a::after { content: "\f0c0"; }
+  .erp-topbar .navbar-nav > li:has(> a .fa-shield) .dropdown-menu > li > a::after { content: "\f132"; }
+
+  .erp-topbar .dropdown-menu > li > a:hover,
+  .erp-topbar .dropdown-menu > li > a:focus,
+  .erp-topbar .dropdown-menu > li > a.erp-current,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link {
+    color: #ffffff !important;
+    border-color: rgba(116,235,255,.56) !important;
+    background: linear-gradient(135deg, rgba(12,31,45,.92), rgba(28,16,34,.92)) !important;
+    box-shadow: 0 8px 17px rgba(0,170,220,.15), inset 0 1px 0 rgba(255,255,255,.12) !important;
+    transform: translateX(4px) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::before,
+  .erp-topbar .dropdown-menu > li > a:focus::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current::before,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::before {
+    transform: translate3d(0,0,0) !important;
+    animation: erpTechSurface 2.15s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::after,
+  .erp-topbar .dropdown-menu > li > a:focus::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::after {
+    color: #ffffff;
+    border-color: rgba(255,255,255,.58);
+    background: rgba(255,255,255,.16);
+    box-shadow: 0 0 12px rgba(255,255,255,.24);
+    transform: translateY(-50%) rotate(-7deg) scale(1.08);
+  }
+
+  /* Iconos semánticos: cada submenú comunica su función real. */
+  .erp-topbar .dropdown-menu > li > a::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon {
+    position: absolute !important;
+    z-index: 2;
+    top: 50%;
+    left: 12px;
+    display: inline-flex !important;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    border: 1px solid rgba(0,229,255,.28);
+    border-radius: 7px;
+    color: #68efff !important;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    text-shadow: 0 0 9px rgba(0,229,255,.42);
+    background: rgba(0,229,255,.08);
+    box-shadow: inset 0 0 9px rgba(0,229,255,.08);
+    transform: translateY(-50%);
+    transition: color .25s ease, background .25s ease, border-color .25s ease, transform .3s cubic-bezier(.2,.85,.25,1), box-shadow .25s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a:focus > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link > .erp-submenu-icon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.58);
+    background: rgba(255,255,255,.16);
+    box-shadow: 0 0 12px rgba(255,255,255,.24), inset 0 0 9px rgba(255,255,255,.10);
+    transform: translateY(-50%) rotate(-7deg) scale(1.08);
+  }
+
+  .erp-topbar .dropdown-menu .divider {
+    background: linear-gradient(90deg, transparent, rgba(0,229,255,.40), rgba(255,49,84,.34), transparent) !important;
+  }
+
+  .erp-topbar .dropdown-menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--erp-cyan), #5b63ff, var(--erp-ruby)) !important;
+  }
+
+  .erp-topbar .erp-market {
+    border-color: rgba(0,229,255,.20) !important;
+    color: #dffaff !important;
+    background: linear-gradient(145deg, rgba(8,29,44,.88), rgba(35,14,35,.84)) !important;
+    box-shadow: inset 0 1px 0 rgba(139,239,255,.08), 0 6px 15px rgba(0,5,14,.22);
+  }
+
+  .erp-topbar .erp-nav-logo:hover {
+    filter: drop-shadow(0 7px 13px rgba(0,229,255,.22)) drop-shadow(0 0 8px rgba(255,49,84,.16)) !important;
+  }
+
+  .erp-topbar .navbar-toggle {
+    border-color: rgba(0,229,255,.42) !important;
+    background: linear-gradient(125deg, rgba(0,190,225,.78), rgba(55,77,245,.78), rgba(238,42,88,.72)) !important;
+    background-size: 220% 100% !important;
+    box-shadow: 0 9px 20px rgba(0,94,150,.26), inset 0 1px 0 rgba(255,255,255,.20) !important;
+    animation: erpTechSurface 3.2s ease-in-out infinite !important;
+  }
+
+  .erp-topbar .navbar-toggle .icon-bar {
+    background: #ffffff !important;
+    box-shadow: 0 0 8px rgba(0,229,255,.62) !important;
+  }
+
+  @media (max-width: 1440px) {
+    .erp-topbar #myNavbar {
+      border-top-color: rgba(0,229,255,.18) !important;
+      background: linear-gradient(145deg, rgba(4,17,29,.96), rgba(22,10,26,.96)) !important;
+    }
+
+    .erp-topbar .dropdown-menu,
+    .erp-topbar .navbar-nav > li:nth-last-child(-n+5) > .dropdown-menu {
+      background: linear-gradient(145deg, rgba(6,24,38,.94), rgba(25,11,29,.94)) !important;
+      box-shadow: inset 0 1px 0 rgba(112,232,255,.08) !important;
+    }
+  }
+
+  /* Acabado Signature: profundidad, luz reactiva y color funcional. */
+  .erp-topbar {
+    background-size: 100% 100%, 100% 100%, 160% 100% !important;
+    backdrop-filter: saturate(1.25) blur(18px);
+    -webkit-backdrop-filter: saturate(1.25) blur(18px);
+    animation: erpHeaderAurora 11s ease-in-out infinite;
+  }
+
+  .erp-topbar .navbar-brand {
+    border-color: rgba(78,226,246,.34) !important;
+    background:
+      radial-gradient(circle at 16% 22%, rgba(63,255,208,.15), transparent 35%),
+      linear-gradient(140deg, rgba(5,33,48,.96), rgba(37,12,35,.90)) !important;
+    box-shadow: 0 8px 20px rgba(0,5,14,.30), inset 0 1px 0 rgba(167,244,255,.15), inset 0 -1px 0 rgba(255,49,84,.10) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a {
+    border-color: rgba(73,213,236,.23) !important;
+    background:
+      linear-gradient(145deg, rgba(8,27,41,.97), rgba(24,14,31,.97)) !important;
+    box-shadow: 0 8px 20px rgba(0,4,12,.31), inset 0 1px 0 rgba(151,240,255,.09), inset 0 -1px 0 rgba(255,49,84,.045) !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a::after {
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.31), rgba(119,235,255,.10) 24%, transparent 48%) !important;
+    opacity: 0 !important;
+  }
+
+  .erp-topbar .navbar-nav > li > a:hover::after,
+  .erp-topbar .navbar-nav > li > a:focus::after,
+  .erp-topbar .navbar-nav > .open > a::after,
+  .erp-topbar .navbar-nav > li.erp-current > a::after {
+    opacity: 1 !important;
+  }
+
+  .erp-topbar .dropdown-menu {
+    padding: 10px !important;
+    border-color: rgba(91,225,245,.30) !important;
+    background:
+      radial-gradient(circle at 12% -5%, rgba(0,229,255,.17), transparent 40%),
+      radial-gradient(circle at 103% 105%, rgba(255,49,84,.17), transparent 44%),
+      linear-gradient(145deg, rgba(4,17,29,.988), rgba(19,9,26,.99)) !important;
+    box-shadow: 0 28px 58px rgba(0,4,13,.56), 0 0 30px rgba(0,229,255,.10), inset 0 1px 0 rgba(168,242,255,.13), inset 0 -1px 0 rgba(255,49,84,.11) !important;
+    backdrop-filter: blur(24px) saturate(1.22) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(1.22) !important;
+  }
+
+  .erp-topbar .dropdown-menu::before {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    left: 15px;
+    height: 2px;
+    border-radius: 999px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, #23e7ff, #7763ff, #ff3154, transparent);
+    background-size: 220% 100%;
+    filter: drop-shadow(0 0 7px rgba(0,229,255,.48));
+    animation: erpTechSurface 3s ease-in-out infinite;
+  }
+
+  .erp-topbar .dropdown-menu > li {
+    transform-origin: top center;
+  }
+
+  .erp-topbar .open > .dropdown-menu > li {
+    animation: erpSubmenuReveal .34s cubic-bezier(.2,.85,.25,1) both;
+    animation-delay: calc(var(--menu-index, 0) * 22ms);
+  }
+
+  .erp-topbar .dropdown-menu > li > a {
+    margin: 3px 0 !important;
+    border-color: rgba(94,211,232,.13) !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, rgba(9,30,44,.90), rgba(27,15,35,.89)) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 4px 11px rgba(0,3,10,.11) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a::after {
+    position: absolute !important;
+    z-index: 1 !important;
+    inset: 0 !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: inherit !important;
+    content: "" !important;
+    pointer-events: none !important;
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.22), transparent 46%) !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+    transform: none !important;
+    transition: opacity .24s ease !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover::after,
+  .erp-topbar .dropdown-menu > li > a:focus::after,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link::after {
+    border: 0 !important;
+    background: radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(255,255,255,.22), transparent 46%) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-cyan {
+    --sub-a: rgba(0,213,239,.78);
+    --sub-b: rgba(43,95,255,.77);
+    --sub-c: rgba(113,78,255,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-violet {
+    --sub-a: rgba(111,77,255,.79);
+    --sub-b: rgba(181,54,235,.73);
+    --sub-c: rgba(255,49,111,.68);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-emerald {
+    --sub-a: rgba(18,196,154,.79);
+    --sub-b: rgba(0,160,210,.73);
+    --sub-c: rgba(37,99,255,.68);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-amber {
+    --sub-a: rgba(231,151,44,.82);
+    --sub-b: rgba(241,91,62,.76);
+    --sub-c: rgba(238,46,100,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a.erp-tone-rose {
+    --sub-a: rgba(242,53,96,.80);
+    --sub-b: rgba(174,48,181,.75);
+    --sub-c: rgba(92,74,255,.70);
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon {
+    --icon-color: #69efff;
+    --icon-rgb: 0,229,255;
+    border-color: rgba(var(--icon-rgb),.38) !important;
+    color: var(--icon-color) !important;
+    text-shadow: 0 0 10px rgba(var(--icon-rgb),.56) !important;
+    background: linear-gradient(145deg, rgba(var(--icon-rgb),.18), rgba(var(--icon-rgb),.07)) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.11), 0 0 12px rgba(var(--icon-rgb),.12) !important;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-violet {
+    --icon-color: #b9a7ff;
+    --icon-rgb: 139,92,246;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-emerald {
+    --icon-color: #66f1c7;
+    --icon-rgb: 24,211,160;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-amber {
+    --icon-color: #ffc36a;
+    --icon-rgb: 245,158,58;
+  }
+
+  .erp-topbar .dropdown-menu > li > a > .erp-submenu-icon.erp-icon-rose {
+    --icon-color: #ff8ba2;
+    --icon-rgb: 255,66,111;
+  }
+
+  .erp-topbar .dropdown-menu > li > a:hover > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a:focus > .erp-submenu-icon,
+  .erp-topbar .dropdown-menu > li > a.erp-current-link > .erp-submenu-icon {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.68) !important;
+    background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.11)) !important;
+    box-shadow: 0 0 16px rgba(var(--icon-rgb),.52), inset 0 1px 0 rgba(255,255,255,.30) !important;
+    transform: translateY(-50%) rotate(-8deg) scale(1.12) !important;
+  }
+
+  @keyframes erpHeaderAurora {
+    0%, 100% { background-position: 0 0, 0 0, 0% 50%; }
+    50% { background-position: 0 0, 0 0, 100% 50%; }
+  }
+
+  @keyframes erpSubmenuReveal {
+    from { opacity: 0; transform: translateY(-7px) scale(.985); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  @keyframes erpTechSurface {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes erpTechEdge {
+    0%, 100% { opacity: .72; filter: brightness(1); }
+    50% { opacity: 1; filter: brightness(1.28); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .erp-topbar .navbar-nav > li > a::before,
+    .erp-topbar .navbar-nav > li > a::after,
+    .erp-topbar .dropdown-menu > li > a::before,
+    .erp-topbar .dropdown-menu > li > a::after {
+      animation: none !important;
+      transition-duration: .01ms !important;
+    }
+  }
+</style>
+
+<script>
+  // Evita que el navbar se cierre al hacer clic en un dropdown
+  $(document).on('click', '.navbar-collapse.in .dropdown-toggle', function(e) {
+    e.stopPropagation(); // evita que el evento burbujee y cierre el navbar
+  });
+
+  $(function() {
+    var currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+
+    $('#myNavbar a[href]').each(function() {
+      var href = $(this).attr('href');
+      if (!href || href === '#' || href.indexOf('javascript:') === 0) {
+        return;
+      }
+
+      var target = document.createElement('a');
+      target.href = href;
+      var targetPath = target.pathname.toLowerCase().replace(/\/+$/, '');
+
+      if (targetPath && targetPath === currentPath) {
+        $(this).addClass('erp-current-link');
+        $(this).closest('.dropdown').addClass('erp-current');
+      }
+    });
+
+    var submenuIconRules = [
+      [/categorias.*impresoras/, 'fa-tags'],
+      [/modificar.*producto/, 'fa-pencil-square-o'],
+      [/cargar.*xml/, 'fa-file-code-o'],
+      [/articulos.*movimiento/, 'fa-line-chart'],
+      [/nuevo.*kardex/, 'fa-book'],
+      [/listado.*ordenes/, 'fa-list-alt'],
+      [/nueva.*orden/, 'fa-cart-arrow-down'],
+      [/confrontacion/, 'fa-balance-scale'],
+      [/registro.*movimiento/, 'fa-random'],
+      [/registro.*compras/, 'fa-shopping-basket'],
+      [/traslado|tralado/, 'fa-exchange'],
+      [/^stock$/, 'fa-cubes'],
+      [/punto.*venta/, 'fa-desktop'],
+      [/^clientes?$/, 'fa-users'],
+      [/pre.*orden/, 'fa-clock-o'],
+      [/oferta/, 'fa-tags'],
+      [/proyect.*empleado/, 'fa-id-badge'],
+      [/ventas?.*delivery/, 'fa-motorcycle'],
+      [/ventas?.*vendedor/, 'fa-user-circle'],
+      [/registro.*ventas?/, 'fa-file-text-o'],
+      [/registro.*proyectos?/, 'fa-briefcase'],
+      [/proyectos?.*tarapaca/, 'fa-building-o'],
+      [/reporte.*cierre/, 'fa-calculator'],
+      [/cierre.*caja/, 'fa-lock'],
+      [/reimpresion/, 'fa-print'],
+      [/u\.?\s*bruta.*usuario/, 'fa-user-plus'],
+      [/utilidad/, 'fa-line-chart'],
+      [/guia.*remision/, 'fa-truck'],
+      [/historial/, 'fa-history'],
+      [/facturacion.*electronica/, 'fa-file-text'],
+      [/pagina.*cliente/, 'fa-external-link'],
+      [/consulta.*cpe/, 'fa-search'],
+      [/dashboard/, 'fa-tachometer'],
+      [/estadistico/, 'fa-pie-chart'],
+      [/stock.*minimo/, 'fa-level-down'],
+      [/deuda.*clientes?/, 'fa-user-times'],
+      [/deuda.*proveedores?/, 'fa-truck'],
+      [/ranking/, 'fa-trophy'],
+      [/comisionistas?/, 'fa-percent'],
+      [/^reportes?$/, 'fa-bar-chart'],
+      [/buscador.*caja/, 'fa-search'],
+      [/caja.*banco/, 'fa-credit-card'],
+      [/^operaciones?$/, 'fa-cogs'],
+      [/configuracion/, 'fa-sliders'],
+      [/^usuarios?$/, 'fa-user-circle-o']
+    ];
+
+    var parentFallbackIcons = {
+      'fa-barcode': 'fa-cube',
+      'fa-clipboard': 'fa-exchange',
+      'fa-cart-plus': 'fa-file-text-o',
+      'fa-file': 'fa-file-text',
+      'fa-bar-chart': 'fa-bar-chart',
+      'fa-credit-card-alt': 'fa-credit-card',
+      'fa-users': 'fa-cogs',
+      'fa-shield': 'fa-shield'
+    };
+
+    $('#myNavbar .dropdown-menu > li > a').each(function() {
+      var submenuLink = $(this);
+      var normalizedLabel = submenuLink.text().toLowerCase();
+
+      if (normalizedLabel.normalize) {
+        normalizedLabel = normalizedLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      normalizedLabel = normalizedLabel.replace(/\s+/g, ' ').trim();
+      var selectedIcon = '';
+
+      $.each(submenuIconRules, function(_, rule) {
+        if (!selectedIcon && rule[0].test(normalizedLabel)) {
+          selectedIcon = rule[1];
+        }
+      });
+
+      if (!selectedIcon) {
+        var parentToggleIcon = submenuLink.closest('.dropdown').children('.dropdown-toggle').find('.fa').first();
+        $.each(parentFallbackIcons, function(parentClass, fallbackIcon) {
+          if (!selectedIcon && parentToggleIcon.hasClass(parentClass)) {
+            selectedIcon = fallbackIcon;
+          }
+        });
+      }
+
+      var iconTone = 'cyan';
+      var violetIcons = ['fa-users', 'fa-user-circle', 'fa-user-circle-o', 'fa-user-plus', 'fa-user-times', 'fa-id-badge', 'fa-briefcase', 'fa-building-o'];
+      var emeraldIcons = ['fa-line-chart', 'fa-bar-chart', 'fa-pie-chart', 'fa-tachometer', 'fa-calculator', 'fa-percent', 'fa-credit-card', 'fa-shopping-basket', 'fa-cubes'];
+      var amberIcons = ['fa-clock-o', 'fa-tag', 'fa-tags', 'fa-truck', 'fa-motorcycle', 'fa-exchange', 'fa-cart-arrow-down', 'fa-history'];
+      var roseIcons = ['fa-lock', 'fa-shield', 'fa-print', 'fa-level-down'];
+
+      if ($.inArray(selectedIcon, violetIcons) !== -1) {
+        iconTone = 'violet';
+      } else if ($.inArray(selectedIcon, emeraldIcons) !== -1) {
+        iconTone = 'emerald';
+      } else if ($.inArray(selectedIcon, amberIcons) !== -1) {
+        iconTone = 'amber';
+      } else if ($.inArray(selectedIcon, roseIcons) !== -1) {
+        iconTone = 'rose';
+      }
+
+      submenuLink.children('.fa').remove();
+      submenuLink.addClass('erp-tone-' + iconTone);
+      submenuLink.parent().css('--menu-index', submenuLink.parent().index());
+      $('<i>', {
+        'class': 'fa ' + (selectedIcon || 'fa-circle-o') + ' erp-submenu-icon erp-icon-' + iconTone,
+        'aria-hidden': 'true'
+      }).prependTo(submenuLink);
+    });
+
+    $('.erp-topbar .navbar-nav > li > a, #myNavbar .dropdown-menu > li > a')
+      .on('mousemove', function(event) {
+        var bounds = this.getBoundingClientRect();
+        this.style.setProperty('--light-x', Math.round(event.clientX - bounds.left) + 'px');
+        this.style.setProperty('--light-y', Math.round(event.clientY - bounds.top) + 'px');
+      })
+      .on('mouseleave', function() {
+        this.style.setProperty('--light-x', '50%');
+        this.style.setProperty('--light-y', '50%');
+      });
+  });
+</script>
+
+<nav class="navbar navbar-default erp-topbar">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://localhost/index.php">NEUROSOFT</a>
+    </div>
+    <div class="collapse navbar-collapse navbar-rigth" id="myNavbar">
+      <ul class="nav navbar-nav">
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-barcode" aria-hidden="true"></i> Producto
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/views/Gen_ProductoForm.php" class="text-primary-color"><i class="fa fa-"></i>Modificar Producto</a></li>
+            <li><a href="/views/Gen_ProductosSinMovimiento.php" class="text-primary-color"><i class="fa fa-clock-o"></i>Productos sin movimiento</a></li>
+            <li><a href="/views/Gen_Impresora.php" class="text-primary-color"><i class="fa fa-"></i>Categorias / Impresoras</a></li>
+            <!--<li><a href="http://localhost/views/Gen_ProductoMarcaForm.php" >Marca</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoFormaFarmaceuticaForm.php">Forma Farmaceutica</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoModelo.php">Modelo</a></li>
+          <li><a href="http://localhost/views/Gen_ProductoMedicionForm.php">Medicion</a></li>
+          <li><a href="http://localhost/views/Gen_ProductoCategoriaForm.php">Categoria</a></li>-->
+            <!--<li><a href="http://localhost/views/Gen_ProductoCompuestoForm.php">Compuesto</a></li>-->
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-clipboard"></i> Logistica
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/Lo_InventarioForm.php">REGISTRO DE COMPRAS</a></li>
+            <li><a href="http://localhost/views/Lo_MovimientoXML.php">CARGAR COMPRAS XML</a></li>
+            <li><a href="http://localhost/views/Lo_Traslado.php">TRALADOS</a></li>
+            <!--<li><a href="http://localhost/views/Lo_GenerarCodigoBarra.php">CODIGO DE BARRA</a></li>-->
+            <li role="separator" class="divider"></li>
+            <!--<li class="dropdown-header">KARDEX CONTABLE</li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexform.php?Tipo=0">1. KARDEX</a></li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexvalorizadoform.php?Tipo=0">1. KARDEX VALORIZADO</a></li>-->
+            <!--<li class="dropdown-header">KARDEX FECHA STOCK</li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexform.php?Tipo=1">1. KARDEX</a></li>-->
+            <!--<li><a href="http://localhost/views/lo_kardexvalorizadoform.php?Tipo=1">2. KARDEX VALORIZADO</a></li>-->
+            <li><a href="/views/lo_reportemasmovimiento.php">ARTICULOS CON MAS MOVIMIENTOS</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/views/lo_kardex.php">NUEVO KARDEX</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/Lo_ReporteStockForm.php"></a></li>
+            <li><a href="http://localhost/views/Lo_ReporteStockForm.php">STOCK</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/lo_ordenes.php">LISTADO ORDENES COMPRA</a></li>
+            <li><a href="http://localhost/views/lo_ordencompra.php">NUEVA ORDEN COMPRA</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="navli"><a href="/views/lo_confrontacion.php">Confrontación de Inventario</a></li>
+            <!-- <li><a href="http://localhost/views/lo_regmovimiento.php">REGISTRO DE MOVIMIENTO</a></li> -->
+            <li><a href="http://localhost/views/ReporteRegMovimiento.php">REGISTRO DE MOVIMIENTO </a></li>
+<li><a href="/views/ReporteSireMovimiento.php">SIRE COMPRAS</a></li>
+
+            <!--<li><a href="http://localhost/views/lo_regcompracontable.php">REGISTRO DE COMPRA CONTABLE</a></li>-->
+            <li role="separator" class="divider"></li>
+            <!--<li><a href="http://localhost/views/Lo_BuscarVencimiento.php">PRODUCTOS POR VENCER</a></li>-->
+          </ul>
+        </li>
+
+        <!--<li><a href="http://localhost/views/V_ExpertoForm.php">Sistema Experto</a></li>-->
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cart-plus"></i> Ventas
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/V_VentaForm.php">Punto de venta</a></li>
+<li><a href="/views/VentasApp.php">VENTAS APP</a></li>
+<li><a href="/views/TiendaVirtual.php">TIENDA VIRTUAL</a></li>
+<li><a href="/views/ReporteSireVentas.php">SIRE VENTAS</a></li>
+            <li><a href="http://localhost/views/V_VentaCliente.php">Clientes </a></li>
+            <li><a href="http://localhost/views/V_PreOrden.php">Pre Orden</a></li>
+            <li><a href="http://localhost/views/V_RegOferta.php">Registro Ofertas</a></li>
+            <li><a href="/views/proyectos.php?id=1">Proyectos TARAPACA</a></li>
+            <!-- <li><a href="/views/proyectos.php?id=2">Proyectos </a></li> -->
+            <li><a href="/views/reg_proyectos.php">Registro de Proyectos</a></li>
+            <li role="separator" class="divider"></li>
+            <!-- <li><a href="http://localhost/views/ve_regventaform.php">Registro de Ventas</a></li> -->
+            <li><a href="http://localhost/views/ReporteRegistroVentas.php">Registro de Ventas </a></li>
+            <li><a href="http://localhost/views/ReporteProyectosEmpleado.php">Registro Proyects - Empleado </a></li>
+            <li><a href="http://localhost/views/VentasDelivery.php">Registro de Ventas Delivery</a></li>
+            <li><a href="http://localhost/views/ve_regventaformvendedor.php">Registro de Ventas VENDEDOR</a></li>
+            <li><a href="http://localhost/views/ve_cierreform.php">Cierre de Caja</a></li>
+            <li><a href="http://localhost//views/v_cierrereporte.php">Reporte Cierre de Caja</a></li>
+            <!--<li><a href="http://localhost/views/ve_cambiopreciobloque.php">Cambio de precio por bloque</a></li>-->
+            <li role="separator" class="divider"></li>
+            <li><a href="http://localhost/views/ve_reimpresionDocumentos.php">Reimpresión de Documentos</a></li>
+            <li><a href="http://localhost/views/ReportUtilidadBruta.php">Reporte Utilidad Bruta</a></li>
+            <!-- <li><a href="http://localhost/views/ReportUtilidadBrutaPorVendedor.php">Reporte Utilidad Bruta Por Vendedor</a></li> -->
+            <li><a href="http://localhost/views/ReporteUtilidadBrutaPorUsuario.php">REPORTE U. BRUTA POR USUARIO</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/views/remision.php">Generar guía de Remisión</a></li>
+            <li><a href="http://localhost/views/Ve_HistorialVentaKit.php">Historial Venta Kit</a></li>
+          </ul>
+        </li>
+
+                  <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-file" aria-hidden="true"></i> Facturación
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/views/facturacion.php"> Facturación Electrónica </a></li>
+              <li><a href="/api/sunat/pag_cliente/" target="_blank"> Página Cliente </a></li>
+              <li><a href="http://emision.factura.vip/" target="_blank"> Consulta CPE </a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="/views/remisionLista.php"> Emitir guía de Remisión</a></li>
+            </ul>
+
+          </li>
+                          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-bar-chart" aria-hidden="true"></i> Reportes
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="http://localhost/views/Dashboard.php"> Dashboard</a></li>
+<li><a href="/views/KpiDashboard.php">DASHBOARD KPI</a></li>
+<li><a href="/views/KpiDashboard.php#ventas">KPI VENTAS</a></li>
+<li><a href="/views/KpiDashboard.php#productos">KPI PRODUCTOS</a></li>
+<li><a href="/views/KpiDashboard.php#inventario">KPI INVENTARIO</a></li>
+<li><a href="/views/KpiDashboard.php#vendedores">KPI VENDEDORES</a></li>
+<li><a href="/views/KpiDashboard.php#clientes">KPI CLIENTES</a></li>
+<li><a href="/views/KpiDashboard.php#sucursales">KPI SUCURSALES</a></li>
+<li><a href="/views/KpiDashboard.php#alertas">KPI ALERTAS</a></li>
+
+              <li><a href="/views/reporteestadistico.php"> Reporte Estadistico </a></li>
+              <li><a href="/views/reportehuespedes.php"> Registro de Proyectos </a></li>
+              <li><a href="/views/reportestockminimo.php"> Reporte Stock Mínimo </a></li>
+              <li><a href="/views/reportesdeudacliente.php"> Reporte Deuda Clientes </a></li>
+              <li><a href="/views/reportesdeudaproveedor.php"> Reporte Deuda Proveedores </a></li>
+              <li><a href="/views/reportesrankingclientes.php"> Reporte Ranking Clientes </a></li>
+              <li><a href="/views/comisionistas.php"> Reporte Comisionistas </a></li>
+              <li><a href="/views/reportes.php">REPORTES</a></li>
+            </ul>
+          </li>
+        
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-credit-card-alt" aria-hidden="true"></i> Caja y Banco
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://localhost/views/CajaBancos.php"> Caja y Banco</a></li>
+            <!-- <li><a href="http://localhost/views/FrmCb_CajaBancoBuscador.php">Buscador de Caja y Banco</a></li> -->
+            <li><a href="http://localhost/views/BuscadorCajaBanco.php">Buscador de Caja y Banco</a></li>
+          </ul>
+
+        </li>
+
+
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-users" aria-hidden="true"></i> Multi Agente
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/views/Ag_Operacion.php"> Operaciones</a></li>
+            <li><a href="/views/Ag_Reimpresion.php">Reimpresión de Recibos</a></li>
+            <li><a href="/views/Ag_CierreCaja.php">Cierre de Caja</a></li>
+            <li><a href="/views/Ag_Configuracion.php">Configuración</a></li>
+          </ul>
+        </li>
+
+
+                  <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-shield" aria-hidden="true"></i> Seguridad
+              <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <!-- <li><a href="http://localhost/views/Seg_UsuarioForm.php">Usuarios</a></li> -->
+              <li><a href="http://localhost/views/V_Usuario.php">Usuarios</a></li>
+            </ul>
+          </li>
+                        <li><a href="/views/CRM.php"><i class="fa fa-comments"></i> CRM</a></li>
+        <li class="dropdown">
+          <a href="http://localhost/controllers/logout.php"> <i class="fa fa-sign-out" aria-hidden="true"></i></a>
+        </li>
+        <li>
+          <div class="erp-market">
+            Compra: <span id="compra"></span></br>
+            Venta : <span id="venta"></span>
+          </div>
+        </li>
+        <li class="navli erp-logo-item">
+          <img class="erp-nav-logo" src="/resources/images/neurologo.png" alt="Neurosoft">
+        </li>
+      </ul>
+      <!-- <ul class="nav navbar-nav navbar-right"> -->
+      <!-- <li><a href=""><i class="fa fa-user-circle"></i> Usuario</a></li> -->
+      <!-- <li><a href=""><i class="fa fa-sign-out"></i> Cerrar Sesion</a></li> -->
+      <!-- </ul> -->
+    </div>
+  </div>
+</nav>
+
+<div id="avisoPago" style="display: none; margin-top: -13px; margin-bottom: 0 !important; padding: 0 !important; text-align: center; ">
+  <a id="botonPago" href="#" class="text-center font-size: 1.8rem; font-weight: bold;" data-toggle="modal" data-target="#modalPagoFact" style="color:red; font-size: 1.6rem; display:none"><i class="fa fa-hand-o-right" aria-hidden="true"></i><b> PAGAR AQUI </b><i class="fa fa-hand-o-left" aria-hidden="true"></i></a>
+</div>
+<div class="modal fade" id="modalPagoFact" tabindex="-1" role="dialog" aria-labelledby="modalPagoFact" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 65% !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel"><b>METODOS DE PAGO NEUROSYSTEM PERU S.A.C.</b></h4>
+      </div>
+      <div class="modal-body">
+        <div>
+          <img src="https://admin.factura.vip:5000/img/config/metodosdepago.jpg" alt="Metodos de Pago NeuroSystem" style="width: -webkit-fill-available;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="loading"></div>
+
+<script>
+  sessionStorage.clear();
+  sessionStorage.setItem('User', "admin");
+  sessionStorage.setItem('IdPerfil', "1")
+  sessionStorage.setItem('IdAlmacen', "1")
+  sessionStorage.setItem('HostUrl', "http://localhost/")
+</script>
+
+<!-- NST PREMIUM MODULE ADAPTER -->
+<link rel="stylesheet" href="/nuevo/static/css/nst-legacy.css?v=1791673826">
+<script defer src="/nuevo/static/js/nst-legacy-ui.js?v=1791673826"></script>
+<!-- END NST PREMIUM MODULE ADAPTER -->
+<main class="kpi-app"><div class="kpi-shell">
+  <section class="kpi-hero"><div class="kpi-hero-icon"><i class="fa fa-line-chart"></i></div><div class="kpi-hero-copy"><small>EDEN COMPANY &middot; INTELIGENCIA AUTOMOTRIZ</small><h1>Dashboard KPI</h1><p>Ventas, rentabilidad, productos e inventario en una sola vista.</p></div><div class="kpi-hero-actions"><button class="kpi-btn kpi-btn-light" id="printBtn"><i class="fa fa-file-pdf-o"></i> PDF / Imprimir</button><button class="kpi-btn kpi-btn-green" data-export="productos"><i class="fa fa-file-excel-o"></i> Excel</button></div></section>
+  <form class="kpi-filters" id="filters"><div class="kpi-field"><label>Desde</label><input type="date" name="desde"></div><div class="kpi-field"><label>Hasta</label><input type="date" name="hasta"></div><div class="kpi-field"><label>Almacén / sucursal</label><select name="almacen"><option value="0">Todos</option></select></div><div class="kpi-field"><label>Categoría</label><select name="categoria"><option value="0">Todas</option></select></div><div class="kpi-field"><label>Marca</label><select name="marca"><option value="0">Todas</option></select></div><div class="kpi-field"><label>Vendedor</label><select name="vendedor"><option value="">Todos</option></select></div><button class="kpi-btn kpi-filter-action"><i class="fa fa-filter"></i> Aplicar</button></form>
+  <nav class="kpi-tabs" id="tabs"><button data-tab="resumen" class="kpi-tab active">Dashboard</button><button data-tab="ventas" class="kpi-tab">Ventas</button><button data-tab="productos" class="kpi-tab">Productos</button><button data-tab="inventario" class="kpi-tab">Inventario</button><button data-tab="vendedores" class="kpi-tab">Vendedores</button><button data-tab="clientes" class="kpi-tab">Clientes</button><button data-tab="sucursales" class="kpi-tab">Sucursales</button><button data-tab="alertas" class="kpi-tab">Alertas</button></nav>
+  <section class="kpi-panel active" data-panel="resumen"><div class="kpi-cards" id="summaryCards"></div><div class="kpi-grid"><article class="kpi-box wide"><header class="kpi-box-head"><i class="fa fa-area-chart"></i><h2>Evolución de ventas</h2><small id="periodLabel"></small></header><div class="kpi-chart" id="evolutionChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><i class="fa fa-trophy"></i><h2>Productos líderes</h2></header><div class="kpi-horizontal" id="topChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><i class="fa fa-bullseye"></i><h2>Meta mensual</h2><button class="kpi-btn hidden" id="editMeta">Editar meta</button></header><div class="kpi-horizontal" id="goalBox"></div></article></div></section>
+  <section class="kpi-panel" data-panel="ventas"><div class="kpi-grid"><article class="kpi-box"><header class="kpi-box-head"><h2>Ventas por día de semana</h2></header><div class="kpi-horizontal" id="weekdayChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><h2>Ventas por hora</h2></header><div class="kpi-horizontal" id="hourChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><h2>Medios de pago</h2></header><div class="kpi-horizontal" id="paymentChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><h2>Devoluciones / notas de crédito</h2></header><div id="returnSummary"></div></article><article class="kpi-box wide"><header class="kpi-box-head"><h2>Detalle de devoluciones</h2><button class="kpi-btn kpi-btn-green" data-export="devoluciones">Excel</button></header><div class="kpi-table-wrap" id="returnTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="productos"><div class="kpi-grid"><article class="kpi-box"><header class="kpi-box-head"><h2>Ventas por categor&iacute;a</h2></header><div class="kpi-horizontal" id="categoryChart"></div></article><article class="kpi-box"><header class="kpi-box-head"><h2>Ventas por marca</h2></header><div class="kpi-horizontal" id="brandChart"></div></article><article class="kpi-box wide"><header class="kpi-box-head"><h2>Ventas por modelo</h2></header><div class="kpi-horizontal" id="modelChart"></div></article><article class="kpi-box wide"><header class="kpi-box-head"><h2>Productos por categor&iacute;a, marca y modelo</h2><button class="kpi-btn kpi-btn-green" data-export="productos">Excel</button></header><div class="kpi-table-wrap" id="productTable"></div></article><article class="kpi-box wide"><header class="kpi-box-head"><h2>Productos menos vendidos / sin movimiento</h2></header><div class="kpi-table-wrap" id="lowProductTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="inventario"><div class="kpi-cards" id="inventoryCards"></div><div class="kpi-grid"><article class="kpi-box wide"><header class="kpi-box-head"><h2>Inventario, rotación y sell-through</h2><button class="kpi-btn kpi-btn-green" data-export="inventario">Excel</button></header><div class="kpi-table-wrap" id="inventoryTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="vendedores"><div class="kpi-grid"><article class="kpi-box wide"><header class="kpi-box-head"><h2>Ranking de vendedores</h2><button class="kpi-btn kpi-btn-green" data-export="vendedores">Excel</button></header><div class="kpi-table-wrap" id="sellerTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="clientes"><div class="kpi-grid"><article class="kpi-box wide"><header class="kpi-box-head"><h2>Ranking y comportamiento de clientes</h2><button class="kpi-btn kpi-btn-green" data-export="clientes">Excel</button></header><div class="kpi-table-wrap" id="clientTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="sucursales"><div class="kpi-grid"><article class="kpi-box wide"><header class="kpi-box-head"><h2>Comparativo por sucursal / almacén</h2><button class="kpi-btn kpi-btn-green" data-export="sucursales">Excel</button></header><div class="kpi-table-wrap" id="branchTable"></div></article></div></section>
+  <section class="kpi-panel" data-panel="alertas"><article class="kpi-box"><header class="kpi-box-head"><i class="fa fa-bell"></i><h2>Alertas inteligentes por reglas</h2></header><div class="kpi-alerts" id="alerts"></div></article></section>
+</div></main><div class="kpi-loading" id="loading"><div><i class="fa fa-circle-o-notch fa-spin"></i>Analizando indicadores…</div></div>
+<script>
+(function(){'use strict';const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s)),money=v=>'S/ '+Number(v||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2}),num=v=>Number(v||0).toLocaleString('es-PE',{maximumFractionDigits:2}),esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])),today=new Date(),form=$('#filters');let state=null,catalogsLoaded=false;
+const local=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)};form.desde.value=local(new Date(today.getFullYear(),today.getMonth(),1));form.hasta.value=local(today);
+function query(){return new URLSearchParams(new FormData(form)).toString()}function badge(v){const c=v==='Saludable'||v==='Alta'?'is-success':v==='Bajo'||v==='Media'?'is-warning':v==='Agotado'||v==='Crítico'?'is-danger':'is-info';return `<span class="kpi-badge ${c}">${esc(v)}</span>`}function financial(v){return state.permissions.financial?money(v):'<span class="financial-hidden">S/ 99,999</span>'}
+function card(icon,label,value,foot='',cls=''){return `<article class="kpi-card"><i class="fa fa-${icon}"></i><span>${label}</span><strong class="${cls}">${value}</strong><small>${foot}</small></article>`}function bars(rows,label='etiqueta',value='venta',currency=true,limit=12){rows=(rows||[]).slice(0,limit);const max=Math.max(1,...rows.map(r=>Number(r[value]||0)));return rows.length?rows.map(r=>`<div class="kpi-hrow"><span title="${esc(r[label])}">${esc(r[label])}</span><div class="kpi-track"><i style="width:${Math.max(1,Number(r[value]||0)/max*100)}%"></i></div><b>${currency?money(r[value]):num(r[value])}</b></div>`).join(''):'<div class="kpi-empty">Sin datos en este periodo.</div>'}
+function table(rows,cols){if(!rows||!rows.length)return '<div class="kpi-empty">Sin datos en este periodo.</div>';return `<table class="kpi-table"><thead><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.map((r,i)=>`<tr>${cols.map(c=>`<td>${typeof c[2]==='function'?c[2](r,i):esc(r[c[0]])}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+function select(name,rows){const el=form.elements[name],value=el.value;el.innerHTML='<option value="'+(name==='vendedor'?'':'0')+'">Todos</option>'+rows.map(r=>`<option value="${esc(r.id)}">${esc(r.nombre)}</option>`).join('');el.value=value}
+function render(){const s=state.summary,delta=s.variacion>=0?'positive':'negative';$('#summaryCards').innerHTML=card('money','Venta neta',money(s.venta),`${s.variacion>=0?'+':''}${num(s.variacion)}% vs periodo anterior`,delta)+card('line-chart','Utilidad bruta',financial(s.utilidad),`Margen ${num(s.margen)}%`)+card('ticket','Tickets',num(s.tickets),'Comprobantes válidos')+card('shopping-bag','Unidades',num(s.prendas),'Unidades vendidas')+card('calculator','Ticket promedio',money(s.ticket_promedio),'Venta neta / tickets')+card('percent','Descuentos',money(s.descuento),'Total otorgado');
+$('#periodLabel').textContent=state.filters.fromDate+' al '+state.filters.toDate;const evo=state.evolution,max=Math.max(1,...evo.map(r=>+r.venta));$('#evolutionChart').innerHTML=evo.length?evo.map(r=>`<div class="kpi-bar" title="${esc(r.fecha)}: ${money(r.venta)}"><b>${evo.length<16?num(r.venta):''}</b><i style="height:${Math.max(2,+r.venta/max*100)}%"></i><small>${esc(r.fecha.slice(5))}</small></div>`).join(''):'<div class="kpi-empty">Sin ventas</div>';$('#topChart').innerHTML=bars(state.top,'producto','unidades',false,8);
+const g=s.meta;$('#goalBox').innerHTML=`<h3>${money(g.actual)} de ${money(g.objetivo)}</h3><div class="kpi-progress"><i style="width:${Math.min(100,g.porcentaje)}%"></i></div><p><b>${num(g.porcentaje)}%</b> alcanzado · faltan ${money(g.faltante)}</p>`;$('#editMeta').classList.toggle('hidden',!state.permissions.admin);if(!state.permissions.financial){$$('.kpi-card').forEach(x=>{if(/Utilidad|Margen/i.test(x.textContent))x.querySelector('small')?.classList.add('financial-hidden')})}
+$('#weekdayChart').innerHTML=bars(state.weekdays,'dia','venta');$('#hourChart').innerHTML=bars(state.hours,'hora','venta');$('#paymentChart').innerHTML=bars(state.payments,'medio','importe');$('#returnSummary').innerHTML='<div class="kpi-cards" style="padding:18px;grid-template-columns:repeat(3,1fr)">'+card('undo','Notas',state.return_summary.cantidad)+card('money','Monto',money(state.return_summary.importe))+card('percent','Sobre venta',num(state.return_summary.porcentaje)+'%')+'</div>';
+$('#returnTable').innerHTML=table(state.returns,[['documento','Nota de crédito'],['referencia','Documento modificado'],['motivo','Motivo'],['vendedor','Vendedor'],['sucursal','Sucursal'],['unidades','Unidades',r=>num(r.unidades)],['importe','Importe',r=>money(r.importe)]]);
+$('#categoryChart').innerHTML=bars(state.dimensions.categorias);$('#brandChart').innerHTML=bars(state.dimensions.marcas);$('#modelChart').innerHTML=bars(state.dimensions.modelos);
+$('#productTable').innerHTML=table(state.top,[['rank','#',(r,i)=>i+1],['codigo','Codigo'],['producto','Producto'],['categoria','Categoria'],['marca','Marca'],['modelo','Modelo'],['unidades','Unidades',r=>num(r.unidades)],['venta','Venta',r=>money(r.venta)],['descuento','Descuento',r=>money(r.descuento)],['costo','Costo',r=>financial(r.costo)],['utilidad','Utilidad',r=>financial(r.utilidad)],['margen','Margen',r=>num(r.margen)+'%']]);
+$('#lowProductTable').innerHTML=table(state.low_products,[['codigo','Codigo'],['producto','Producto'],['categoria','Categoria'],['marca','Marca'],['modelo','Modelo'],['stock','Stock',r=>num(r.stock)],['unidades_periodo','Vendidos',r=>num(r.unidades_periodo)],['ultima_venta','Ultima venta'],['dias_sin_venta','Dias sin movimiento',r=>r.dias_sin_venta===null?'Nunca':num(r.dias_sin_venta)],['valor','Valor stock',r=>financial(r.valor)],['rotacion','Rotacion',r=>badge(r.rotacion)]]);
+const inv=state.inventory_summary;$('#inventoryCards').innerHTML=card('cubes','Valor inventario',financial(inv.valor),'Stock × costo')+card('exclamation-triangle','Stock crítico',num(inv.criticos),'Igual o menor al mínimo')+card('ban','Agotados',num(inv.agotados),'Stock en cero')+card('clock-o','Inmovilizado',financial(inv.inmovilizado),'Más de 90 días sin venta');
+$('#inventoryTable').innerHTML=table(state.inventory,[['codigo','Codigo'],['producto','Producto'],['categoria','Categoria'],['marca','Marca'],['modelo','Modelo'],['almacen','Almacen'],['stock','Stock',r=>num(r.stock)],['stock_minimo','Minimo',r=>num(r.stock_minimo)],['estado','Estado',r=>badge(r.estado)],['ultima_venta','Ultima venta'],['dias_sin_venta','Dias sin venta',r=>r.dias_sin_venta===null?'Nunca':num(r.dias_sin_venta)],['valor','Valor',r=>financial(r.valor)],['sell_through','Sell through',r=>num(r.sell_through)+'%'],['rotacion','Rotacion',r=>badge(r.rotacion)]]);
+$('#sellerTable').innerHTML=table(state.sellers,[['rank','#',(r,i)=>i+1],['nombre','Vendedor'],['tickets','Tickets'],['unidades','Unidades',r=>num(r.unidades)],['venta','Venta',r=>money(r.venta)],['ticket','Ticket promedio',r=>money(+r.venta/(+r.tickets||1))],['utilidad','Utilidad',r=>financial(r.utilidad)],['descuento','Descuento',r=>money(r.descuento)]]);
+$('#clientTable').innerHTML=table(state.clients,[['rank','#',(r,i)=>i+1],['documento','Documento'],['cliente','Cliente'],['compras','Compras'],['venta','Compra total',r=>money(r.venta)],['promedio','Promedio línea',r=>money(r.promedio)],['primera_compra','Primera compra'],['ultima_compra','Última compra']]);
+$('#branchTable').innerHTML=table(state.branches,[['sucursal','Sucursal'],['tickets','Tickets'],['unidades','Unidades',r=>num(r.unidades)],['venta','Ventas',r=>money(r.venta)],['ticket','Ticket promedio',r=>money(+r.venta/(+r.tickets||1))],['utilidad','Utilidad',r=>financial(r.utilidad)],['margen','Margen',r=>num(+r.venta?+r.utilidad/+r.venta*100:0)+'%']]);
+$('#alerts').innerHTML=state.alerts.length?state.alerts.map(a=>`<div class="kpi-alert ${esc(a.level)}"><i class="fa fa-${a.level==='success'?'check-circle':a.level==='warning'?'exclamation-triangle':'bell'}"></i><div><strong>${esc(a.title)}</strong><small>${esc(a.detail)}</small></div></div>`).join(''):'<div class="kpi-empty">No hay alertas para los filtros elegidos.</div>';
+if(!catalogsLoaded){select('almacen',state.catalogs.almacenes);select('categoria',state.catalogs.categorias);select('marca',state.catalogs.marcas);select('vendedor',state.catalogs.vendedores);catalogsLoaded=true}}
+async function load(){const loading=$('#loading');loading.classList.remove('hidden');try{const res=await fetch('/api/index.php/kpi/dashboard?'+query(),{credentials:'same-origin'}),json=await res.json();if(!res.ok)throw new Error(json.error+(json.detail?' '+json.detail:''));state=json;render()}catch(e){alert(e.message||'No se pudieron cargar los KPI.')}finally{loading.classList.add('hidden')}}
+function activate(name){if(!['resumen','ventas','productos','inventario','vendedores','clientes','sucursales','alertas'].includes(name))name='resumen';$$('.kpi-tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));$$('.kpi-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===name));if(location.hash!=='#'+name)history.replaceState(null,'','#'+name)}
+form.addEventListener('submit',e=>{e.preventDefault();load()});$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)activate(b.dataset.tab)});window.addEventListener('hashchange',()=>activate(location.hash.slice(1)));$('#printBtn').onclick=()=>window.print();$$('[data-export]').forEach(b=>b.onclick=()=>{location.href='/api/index.php/kpi/exportar?seccion='+encodeURIComponent(b.dataset.export)+'&'+query()});$('#editMeta').onclick=async()=>{const value=prompt('Meta mensual en soles:',state.summary.meta.objetivo);if(value===null)return;const body=new URLSearchParams({meta:value}),res=await fetch('/api/index.php/kpi/meta',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}),json=await res.json();if(!res.ok)return alert(json.error);load()};activate(location.hash.slice(1));load();
+})();
+</script></body></html>

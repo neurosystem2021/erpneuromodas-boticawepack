@@ -1,81 +1,81 @@
 <template>
-  <div>
-    <b-btn v-b-modal="idModal || 'modal2'" variant="primary">{{
-      txtButton || "Nuevo"
-    }}</b-btn>
-    <!-- Modal Component -->
-    <b-form @submit="guardarEmpleado" ref="form">
-      <b-modal
-        :id="idModal || 'modal2'"
-        title="Nuevo Empleado"
-        size="lg"
-        ref="empleadoForm"
-        v-model="show2"
-        @shown="shownEmpleadoForm"
-      >
-        <b-row>
-          <b-col md="12">
-            <b-form-group>
-              <label>DNI / RUC:</label>
-              <b-input-group>
-                <b-form-input
-                  required="required"
-                  v-model="empleado.DniRuc"
-                  type="number"
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group>
-              <label>Nombre del Empleado:</label>
+<div>
+  <b-btn v-b-modal="idModal || 'modal2'" variant="primary">{{
+    txtButton || "Nuevo"
+  }}</b-btn>
+  <!-- Modal Component -->
+  <b-form @submit="guardarEmpleado" ref="form">
+    <b-modal
+      :id="idModal || 'modal2'"
+      title="Nuevo Empleado"
+      size="lg"
+      ref="empleadoForm"
+      v-model="show2"
+      @shown="shownEmpleadoForm" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered=""
+    >
+      <b-row>
+        <b-col md="12" class="nst-editor-section">
+          <b-form-group>
+            <label>DNI / RUC:</label>
+            <b-input-group>
               <b-form-input
                 required="required"
-                v-model="empleado.Empleado"
-                type="text"
+                v-model="empleado.DniRuc"
+                type="number"
               ></b-form-input>
-            </b-form-group>
-            <b-form-group>
-              <label>Dirección 1:</label>
-              <b-form-input
-                v-model="empleado.Direccion"
-                type="text"
-              ></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-form-group>
-              <label>Teléfono:</label>
-              <b-form-input
-                v-model="empleado.Telefono"
-                type="text"
-              ></b-form-input>
-            </b-form-group>
-          </b-col>
-          
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-form-group>
-              <label>Correo Electrónico:</label>
-              <b-form-input
-                v-model="empleado.Email"
-                type="email"
-              ></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
+              <b-input-group-append>
+                <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group>
+            <label>Nombre del Empleado:</label>
+            <b-form-input
+              required="required"
+              v-model="empleado.Empleado"
+              type="text"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <label>Dirección 1:</label>
+            <b-form-input
+              v-model="empleado.Direccion"
+              type="text"
+            ></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-form-group>
+            <label>Teléfono:</label>
+            <b-form-input
+              v-model="empleado.Telefono"
+              type="text"
+            ></b-form-input>
+          </b-form-group>
+        </b-col>
+        
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-form-group>
+            <label>Correo Electrónico:</label>
+            <b-form-input
+              v-model="empleado.Email"
+              type="email"
+            ></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
-        <div slot="modal-footer">
-          <b-btn variant="primary" type="submit"> Guardar </b-btn>
-          <b-btn variant="secondary" @click="show2 = false"> Close </b-btn>
-        </div>
-      </b-modal>
-    </b-form>
-  </div>
+      <div slot="modal-footer">
+        <b-btn variant="primary" type="submit"> Guardar </b-btn>
+        <b-btn variant="secondary" @click="show2 = false"> Close </b-btn>
+      </div>
+    </b-modal>
+  </b-form>
+</div>
 </template>
 <script>
 import config from "@/store/config.js";

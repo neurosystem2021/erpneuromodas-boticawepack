@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('tools/test-product-guide-browser.mjs');s=p.read_text(encoding='utf-8').replace("await page.getByRole('button',{name:'Usar producto seleccionado',exact:true}).click();assert.equal", "await page.getByRole('button',{name:'Usar producto seleccionado',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.product-query-device input').value==='CAMARA EXACT-123');assert.equal");p.write_text(s,encoding='utf-8')

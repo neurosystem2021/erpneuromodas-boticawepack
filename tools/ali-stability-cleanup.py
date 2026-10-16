@@ -1,0 +1,4 @@
+﻿from pathlib import Path
+p=Path('src/components/AliAssistant.vue');s=p.read_text(encoding='utf-8');a=s.index(' scheduleWake(){');b=s.index(' startWake(){',a);s=s[:a]+''' scheduleWake(){clearTimeout(this._wakeTimer);if(this.wakeEnabled&&!this._speaking){this.micState='restarting';this._wakeTimer=setTimeout(()=>this.startWake(),150)}},
+''' +s[b:];s=s.replace("if(job!==this._voiceJob||this._aliUtterance!==voice)return;this._aliUtterance=null;", "if(job!==this._voiceJob||this._aliUtterance!==voice)return;clearTimeout(this._speechTimer);this._aliUtterance=null;",1);s=s.replace('this.talking=false;this.talking=false;', 'this.talking=false;');p.write_text(s,encoding='utf-8')
+p=Path('src/utils/aliCommands.js');s=p.read_text(encoding='utf-8');s=s.replace("if(previous&&age<2000)candidates.push(normalize(previous)+' '+text);", "if(/^(hola|ola)$/.test(normalize(previous))&&age<2000)candidates.push(normalize(previous)+' '+text);",1);p.write_text(s,encoding='utf-8')

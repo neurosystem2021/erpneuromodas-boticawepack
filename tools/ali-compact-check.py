@@ -1,0 +1,7 @@
+from pathlib import Path
+p=Path('.tmp-order-workbook/test-ali-contextual-pos.mjs');s=p.read_text(encoding='utf-8')
+s=s.replace("await p.evaluate(()=>window.contextSpeech.say('escriba codigo de barra'));", "await p.evaluate(()=>{const ref=window.contextPOS.$refs.carrito0;window.contextCart=Array.isArray(ref)?ref[0]:ref;const a=window.contextCart.$refs.autocompleteProducto;window.contextCart.query='camaras';a.setValue('camaras');a.showList=true;window.contextSpeech.say('Buscar producto por código')});",1)
+s=s.replace("await p.waitForFunction(()=>document.activeElement.id==='txtBarcode');", "await p.waitForFunction(()=>document.activeElement.id==='txtBarcode');assert.equal(await p.locator('#txtAddProduct').inputValue(),'');assert.equal(await p.evaluate(()=>window.contextCart.$refs.autocompleteProducto.showList),false);assert.equal(await p.locator('.ali-goldfish').innerText(),'ALI\\nTe escucho');assert.equal(await p.locator('.ali-goldfish p,.ali-goldfish small').count(),0);",1)
+s=s.replace("await p.waitForTimeout(500);await p.evaluate(()=>{const ref=window.contextPOS.$refs.carrito0", "await p.waitForFunction(()=>document.querySelector('#txtBarcode').value==='');await p.waitForTimeout(500);await p.evaluate(()=>{const ref=window.contextPOS.$refs.carrito0",1)
+s=s.replace("console.log('PASS real barcode", "console.log('PASS compact fish, exact barcode command, name search cleared, barcode cleared after accept, real barcode",1)
+p.write_text(s,encoding='utf-8')

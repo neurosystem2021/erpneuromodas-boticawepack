@@ -39,7 +39,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         }
       },
       sourceMap: config.build.productionSourceMap,
-      parallel: true
+      parallel: false
     }),
     // extract css into its own file
     new ExtractTextPlugin({
@@ -110,6 +110,10 @@ const webpackConfig = merge(baseWebpackConfig, {
 
     // copy custom static assets
     new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../node_modules/exceljs/dist/exceljs.min.js'),
+        to: config.build.assetsSubDirectory + '/vendor/exceljs-4.4.0.min.js'
+      },
       {
         from: path.resolve(__dirname, '../static'),
         to: config.build.assetsSubDirectory,

@@ -1,0 +1,44 @@
+/* PHP catalogues, registers and editors use the NST premium visual language. */
+body.nst-legacy-page { color: #234a5e; background: radial-gradient(ellipse at 0 0, #e1f6f5, transparent 50%), #f2f7fb; font-family: 'Segoe UI', Arial, sans-serif; }
+.nst-legacy-heading { position: relative; margin: 22px 24px 18px; padding: 22px 26px; border: 1px solid #23586a; border-radius: 18px; color: white; background: radial-gradient(ellipse at 0 0, #106275, transparent 65%), linear-gradient(115deg, #082a3a, #182740); box-shadow: 0 10px 30px #12394d16; }
+.nst-legacy-heading small { color: #78e0de; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; }
+.nst-legacy-heading h1 { margin: 6px 0; color: white; font-size: 25px; font-weight: 700; }
+.nst-legacy-heading p { margin: 0; color: #bfd4de; font-size: 12px; }
+.nst-legacy-badge { position: absolute; right: 24px; top: 30px; padding: 9px 13px; border: 1px solid #74d7d755; border-radius: 8px; color: #b1f4ee; font-size: 10px; letter-spacing: 1px; }
+.nst-legacy-content { width: calc(100% - 48px) !important; max-width: none !important; margin: 0 24px 20px !important; padding: 22px !important; border: 1px solid #d8e6ee; border-radius: 17px; background: #fff; box-shadow: 0 8px 24px #123c500c; }
+.nst-legacy-content label, .nst-legacy-page .modal label { margin-bottom: 7px; color: #4a6a7c; font-size: 12px; font-weight: 700; }
+.nst-legacy-content .form-control, .nst-legacy-page .modal .form-control { height: 42px; padding: 9px 12px; border: 1px solid #cedfe8; border-radius: 9px; color: #254d61; background: #fbfdff; box-shadow: none; font-size: 13px; }
+.nst-legacy-content textarea.form-control { height: auto; min-height: 85px; }
+.nst-legacy-content .form-control:focus, .nst-legacy-page .modal .form-control:focus { border-color: #1ba5b3; box-shadow: 0 0 0 3px #1ba5b31a; }
+.nst-legacy-content .btn, .nst-legacy-page .modal .btn { padding: 10px 16px; border-radius: 9px; font-size: 12px; font-weight: 700; }
+.nst-legacy-content .btn-primary, .nst-legacy-content .btn-info, .nst-legacy-page .modal .btn-primary { color: white; border-color: #0c95b1; background: linear-gradient(120deg, #079eae, #167be1); }
+.nst-legacy-content .btn-success, .nst-legacy-page .modal .btn-success { color: white; border-color: #078f83; background: linear-gradient(120deg, #078b84, #0baf91); }
+.nst-legacy-content .table { font-size: 12px; color: #2b5063; }
+.nst-legacy-content .table thead th { padding: 13px 11px; border: 0; color: #effcff; background: #103e54; font-weight: 700; }
+.nst-legacy-content .table tbody td { padding: 12px 11px; border-color: #e3edf3; vertical-align: middle; }
+.nst-legacy-content .table-striped > tbody > tr:nth-of-type(odd) { background: #f3f8fb; }
+.nst-legacy-content .table-hover > tbody > tr:hover { background: #eaf7f8; }
+.nst-legacy-content .dataTables_wrapper { overflow-x: auto; padding: 6px 0; }
+.nst-legacy-content .pagination > li > a { margin: 0 2px; border: 0; border-radius: 7px; color: #087e96; background: #edf5f8; }
+.nst-legacy-content .pagination > .active > a { color: white; background: #0c879d; }
+.nst-legacy-content .nav-tabs { display: flex; gap: 5px; overflow-x: auto; padding: 7px; border: 1px solid #d8e7ef; border-radius: 12px; background: #edf5f8; }
+.nst-legacy-content .nav-tabs > li > a { margin: 0; border: 0; border-radius: 9px; color: #416b7e; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.nst-legacy-content .nav-tabs > li.active > a { color: white; border: 0; background: linear-gradient(120deg, #079eae, #167be1); }
+.nst-legacy-page .modal-content { border: 1px solid #d0e4ec; border-radius: 17px; box-shadow: 0 25px 70px #123b4d44; }
+.nst-legacy-page .modal-header { padding: 20px; border: 0; border-radius: 16px 16px 0 0; color: white; background: linear-gradient(115deg, #0b4759, #172641); }
+.nst-legacy-page .modal-header .close { color: white; opacity: 1; text-shadow: none; }
+.nst-legacy-page .modal-title { font-size: 18px; font-weight: 700; }
+.nst-legacy-page .modal-body { padding: 22px; background: #f4f9fc; }
+.nst-legacy-page .modal-footer { padding: 15px 22px; border-color: #e1ebf1; }
+@media (max-width: 767px) { .nst-legacy-heading { margin: 12px 10px; padding: 18px; } .nst-legacy-heading h1 { font-size: 20px; } .nst-legacy-badge { display: none; } .nst-legacy-content { width: calc(100% - 20px) !important; margin: 0 10px 12px !important; padding: 14px !important; } }
+@media print { .nst-legacy-heading { display: none; } .nst-legacy-content { width: 100% !important; margin: 0 !important; padding: 0 !important; border: 0; box-shadow: none; } }
+/* Compact screens without decorative module headings. */
+.nst-legacy-heading { display: none; }
+.nst-legacy-content { width: calc(100% - 20px) !important; margin: 8px 10px !important; padding: 12px !important; border-radius: 10px; }
+.nst-legacy-content .form-control, .nst-legacy-page .modal .form-control { height: 34px; padding: 5px 9px; border-radius: 7px; }
+.nst-legacy-content label, .nst-legacy-page .modal label { margin-bottom: 4px; }
+.nst-legacy-content .form-group, .nst-legacy-page .modal .form-group { margin-bottom: 9px; }
+.nst-legacy-content .btn, .nst-legacy-page .modal .btn { padding: 6px 11px; border-radius: 7px; }
+.nst-legacy-content .table thead th, .nst-legacy-content .table tbody td { padding: 8px; }
+.nst-legacy-page .modal-header, .nst-legacy-page .modal-body { padding: 13px 17px; }
+.nst-legacy-page .modal-footer { padding: 9px 17px; }

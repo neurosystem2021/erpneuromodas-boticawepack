@@ -1,227 +1,227 @@
 <template>
-  <div>
-    <b-card no-body>
-      <b-tabs v-model="tabActive" pills card>
+<div class="nst-screen nst-screen--estadisticas">
+  <b-card no-body>
+    <b-tabs v-model="tabActive" pills card>
 
-        <!-- ═══════════════ TAB: VENTAS POR DÍA ═══════════════ -->
-        <b-tab title="Ventas Por Dia" @click="cambioOpcion(0)" active>
-          <b-container fluid>
+      <!-- ═══════════════ TAB: VENTAS POR DÍA ═══════════════ -->
+      <b-tab title="Ventas Por Dia" @click="cambioOpcion(0)" active><template slot="title"><i class="fas fa-shopping-cart nst-tab-icon" aria-hidden="true"></i><span>Ventas Por Dia</span></template>
+        <b-container fluid>
 
-            <!-- Filtros arriba -->
-            <b-row class="mb-3">
-              <b-col md="3">
-                <b-form-group label="Almacén:">
-                  <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group label="Seleccione Año:">
-                  <b-form-select v-model="anioSelect" :options="anios" @change="setAnio($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group label="Seleccione Mes:">
-                  <b-form-select v-model="mesSelect" :options="meses" @change="setMes($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group label="Tipo Comprobante:">
-                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
-                </b-form-group>
-              </b-col>
-            </b-row>
+          <!-- Filtros arriba -->
+          <section class="nst-panel nst-panel--filters"><b-row class="mb-3">
+            <b-col md="3">
+              <b-form-group label="Almacén:">
+                <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="3">
+              <b-form-group label="Seleccione Año:">
+                <b-form-select v-model="anioSelect" :options="anios" @change="setAnio($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="3">
+              <b-form-group label="Seleccione Mes:">
+                <b-form-select v-model="mesSelect" :options="meses" @change="setMes($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="3">
+              <b-form-group label="Tipo Comprobante:">
+                <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
+              </b-form-group>
+            </b-col>
+          </b-row></section>
 
-            <!-- Layout principal: KPIs izquierda | Gráfica+Tabla derecha -->
-            <b-row>
+          <!-- Layout principal: KPIs izquierda | Gráfica+Tabla derecha -->
+          <section class="nst-panel nst-panel--results"><b-row>
 
-              <!-- Columna KPI (izquierda) -->
-              <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
+            <!-- Columna KPI (izquierda) -->
+            <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
+              <b-card class="kpi-card text-center border-primary">
+                <div class="kpi-label">💰 Total del Mes</div>
+                <div class="kpi-value text-primary">S/ {{ kpiDia.total }}</div>
+              </b-card>
+              <b-card class="kpi-card text-center border-success">
+                <div class="kpi-label">📈 Día Mayor Venta</div>
+                <div class="kpi-value text-success">Día {{ kpiDia.mejorDia }}</div>
+                <small class="text-muted kpi-small">S/ {{ kpiDia.mejorValor }}</small>
+              </b-card>
+              <b-card class="kpi-card text-center border-warning">
+                <div class="kpi-label">📊 Promedio Diario</div>
+                <div class="kpi-value text-warning">S/ {{ kpiDia.promedio }}</div>
+              </b-card>
+              <b-card class="kpi-card text-center border-info">
+                <div class="kpi-label">📅 Días con Venta</div>
+                <div class="kpi-value text-info">{{ kpiDia.diasConVenta }}</div>
+              </b-card>
+            </b-col>
+
+            <!-- Columna Gráfica + Tabla (derecha) -->
+            <b-col md="10">
+              <h5 class="font-weight-bold">Valor de venta por día</h5>
+              <bar-chart ref="chartGrafica" id="grafico" :altura="550"></bar-chart>
+
+              <b-table class="mt-3" :items="tablaDias" :fields="camposDia" small striped hover bordered responsive show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+                <template slot="Total" slot-scope="data">
+                  <span :class="parseFloat(data.item.Total) < kpiDia.promedioRaw * 0.5 ? 'text-danger font-weight-bold' : ''">
+                    S/ {{ data.item.Total }}
+                  </span>
+                </template>
+                <template slot="estado" slot-scope="data">
+                  <b-badge :variant="parseFloat(data.item.Total) >= kpiDia.promedioRaw ? 'success' : 'warning'">
+                    {{ parseFloat(data.item.Total) >= kpiDia.promedioRaw ? '▲ Sobre promedio' : '▼ Bajo promedio' }}
+                  </b-badge>
+                </template>
+              </b-table>
+            </b-col>
+
+          </b-row></section>
+        </b-container>
+      </b-tab>
+
+      <!-- ═══════════════ TAB: VENTAS POR MES ═══════════════ -->
+      <b-tab title="Ventas Por Mes" @click="cambioOpcion(1)"><template slot="title"><i class="fas fa-shopping-cart nst-tab-icon" aria-hidden="true"></i><span>Ventas Por Mes</span></template>
+        <b-container fluid>
+
+          <section class="nst-panel nst-panel--filters"><b-row class="mb-3">
+            <b-col md="4">
+              <b-form-group label="Almacén:">
+                <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+              <b-form-group label="Seleccione Año:">
+                <b-form-select v-model="anioSelect" :options="anios" @change="setAnioMes($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+              <b-form-group label="Tipo Comprobante:">
+                <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
+              </b-form-group>
+            </b-col>
+          </b-row></section>
+
+          <section class="nst-panel nst-panel--results"><b-row>
+
+            <!-- Columna KPI (izquierda) -->
+            <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
+              <b-card class="kpi-card text-center border-primary">
+                <div class="kpi-label">💰 Total del Año</div>
+                <div class="kpi-value text-primary">S/ {{ kpiMes.total }}</div>
+              </b-card>
+              <b-card class="kpi-card text-center border-success">
+                <div class="kpi-label">🏆 Mejor Mes</div>
+                <div class="kpi-value text-success">{{ kpiMes.mejorMes }}</div>
+                <small class="text-muted kpi-small">S/ {{ kpiMes.mejorValor }}</small>
+              </b-card>
+              <b-card class="kpi-card text-center border-warning">
+                <div class="kpi-label">📊 Promedio Mensual</div>
+                <div class="kpi-value text-warning">S/ {{ kpiMes.promedio }}</div>
+              </b-card>
+              <b-card class="kpi-card text-center border-danger">
+                <div class="kpi-label">📉 Mes más Bajo</div>
+                <div class="kpi-value text-danger">{{ kpiMes.peorMes }}</div>
+                <small class="text-muted kpi-small">S/ {{ kpiMes.peorValor }}</small>
+              </b-card>
+            </b-col>
+
+            <!-- Columna Gráfica + Tabla (derecha) -->
+            <b-col md="10">
+              <h5 class="font-weight-bold">Valor de venta por mes</h5>
+              <bar-chart ref="chartGraficaMes" id="graficoMes":altura="450"></bar-chart>
+
+              <b-table class="mt-3" :items="tablaMeses" :fields="camposMes" small striped hover bordered responsive show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+                <template slot="Total" slot-scope="data">
+                  S/ {{ data.item.Total }}
+                </template>
+                <template slot="Participacion" slot-scope="data">
+                  <b-progress :value="data.item.PorcentajeRaw" max="100" show-value variant="info" height="20px" />
+                </template>
+              </b-table>
+            </b-col>
+
+          </b-row></section>
+        </b-container>
+      </b-tab>
+
+      <!-- ═══════════════ TAB: VENTAS POR RANGO ═══════════════ -->
+      <b-tab title="Ventas Por Rango" @click="cambioOpcion(2)"><template slot="title"><i class="fas fa-shopping-cart nst-tab-icon" aria-hidden="true"></i><span>Ventas Por Rango</span></template>
+        <b-container fluid>
+
+          <section class="nst-panel nst-panel--filters"><b-row class="mb-3">
+            <b-col md="3">
+              <b-form-group label="Almacén:">
+                <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="2">
+              <b-form-group label="Fecha Inicio:">
+                <b-form-input v-model="fechaDesde" type="date" />
+              </b-form-group>
+            </b-col>
+            <b-col md="2">
+              <b-form-group label="Fecha Fin:">
+                <b-form-input v-model="fechaHasta" type="date" />
+              </b-form-group>
+            </b-col>
+            <b-col md="3">
+              <b-form-group label="Tipo Comprobante:">
+              <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
+              </b-form-group>
+            </b-col>
+            <b-col md="2" class="text-center">
+              <b-form-group><br>
+                <b-button @click="fechaRango" variant="success" size="lg">Generar</b-button>
+              </b-form-group>
+            </b-col>
+          </b-row></section>
+
+          <section class="nst-panel nst-panel--results"><b-row>
+
+            <!-- Columna KPI (izquierda) -->
+            <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
+              <template v-if="kpiRango.total > 0">
                 <b-card class="kpi-card text-center border-primary">
-                  <div class="kpi-label">💰 Total del Mes</div>
-                  <div class="kpi-value text-primary">S/ {{ kpiDia.total }}</div>
+                  <div class="kpi-label">💰 Total del Rango</div>
+                  <div class="kpi-value text-primary">S/ {{ kpiRango.total }}</div>
                 </b-card>
                 <b-card class="kpi-card text-center border-success">
-                  <div class="kpi-label">📈 Día Mayor Venta</div>
-                  <div class="kpi-value text-success">Día {{ kpiDia.mejorDia }}</div>
-                  <small class="text-muted kpi-small">S/ {{ kpiDia.mejorValor }}</small>
+                  <div class="kpi-label">📈 Mejor Día</div>
+                  <div class="kpi-value text-success">{{ kpiRango.mejorDia }}</div>
+                  <small class="text-muted kpi-small">S/ {{ kpiRango.mejorValor }}</small>
                 </b-card>
                 <b-card class="kpi-card text-center border-warning">
                   <div class="kpi-label">📊 Promedio Diario</div>
-                  <div class="kpi-value text-warning">S/ {{ kpiDia.promedio }}</div>
+                  <div class="kpi-value text-warning">S/ {{ kpiRango.promedio }}</div>
                 </b-card>
                 <b-card class="kpi-card text-center border-info">
-                  <div class="kpi-label">📅 Días con Venta</div>
-                  <div class="kpi-value text-info">{{ kpiDia.diasConVenta }}</div>
+                  <div class="kpi-label">📅 Días Analizados</div>
+                  <div class="kpi-value text-info">{{ kpiRango.dias }}</div>
                 </b-card>
-              </b-col>
+              </template>
+              <div v-else class="text-muted text-center mt-3" style="font-size:0.85rem;">
+                Genere un rango para ver los indicadores
+              </div>
+            </b-col>
 
-              <!-- Columna Gráfica + Tabla (derecha) -->
-              <b-col md="10">
-                <h5 class="font-weight-bold">Valor de venta por día</h5>
-                <bar-chart ref="chartGrafica" id="grafico" :altura="550"></bar-chart>
+            <!-- Columna Gráfica + Tabla (derecha) -->
+            <b-col md="10">
+              <h5 class="font-weight-bold">Valor de venta por rango</h5>
+              <line-chart ref="chartGraficaRango" id="graficoRango"></line-chart>
 
-                <b-table class="mt-3" :items="tablaDias" :fields="camposDia" small striped hover bordered responsive>
-                  <template slot="Total" slot-scope="data">
-                    <span :class="parseFloat(data.item.Total) < kpiDia.promedioRaw * 0.5 ? 'text-danger font-weight-bold' : ''">
-                      S/ {{ data.item.Total }}
-                    </span>
-                  </template>
-                  <template slot="estado" slot-scope="data">
-                    <b-badge :variant="parseFloat(data.item.Total) >= kpiDia.promedioRaw ? 'success' : 'warning'">
-                      {{ parseFloat(data.item.Total) >= kpiDia.promedioRaw ? '▲ Sobre promedio' : '▼ Bajo promedio' }}
-                    </b-badge>
-                  </template>
-                </b-table>
-              </b-col>
-
-            </b-row>
-          </b-container>
-        </b-tab>
-
-        <!-- ═══════════════ TAB: VENTAS POR MES ═══════════════ -->
-        <b-tab title="Ventas Por Mes" @click="cambioOpcion(1)">
-          <b-container fluid>
-
-            <b-row class="mb-3">
-              <b-col md="4">
-                <b-form-group label="Almacén:">
-                  <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-form-group label="Seleccione Año:">
-                  <b-form-select v-model="anioSelect" :options="anios" @change="setAnioMes($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-form-group label="Tipo Comprobante:">
-                  <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
-                </b-form-group>
-              </b-col>
-            </b-row>
-
-            <b-row>
-
-              <!-- Columna KPI (izquierda) -->
-              <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
-                <b-card class="kpi-card text-center border-primary">
-                  <div class="kpi-label">💰 Total del Año</div>
-                  <div class="kpi-value text-primary">S/ {{ kpiMes.total }}</div>
-                </b-card>
-                <b-card class="kpi-card text-center border-success">
-                  <div class="kpi-label">🏆 Mejor Mes</div>
-                  <div class="kpi-value text-success">{{ kpiMes.mejorMes }}</div>
-                  <small class="text-muted kpi-small">S/ {{ kpiMes.mejorValor }}</small>
-                </b-card>
-                <b-card class="kpi-card text-center border-warning">
-                  <div class="kpi-label">📊 Promedio Mensual</div>
-                  <div class="kpi-value text-warning">S/ {{ kpiMes.promedio }}</div>
-                </b-card>
-                <b-card class="kpi-card text-center border-danger">
-                  <div class="kpi-label">📉 Mes más Bajo</div>
-                  <div class="kpi-value text-danger">{{ kpiMes.peorMes }}</div>
-                  <small class="text-muted kpi-small">S/ {{ kpiMes.peorValor }}</small>
-                </b-card>
-              </b-col>
-
-              <!-- Columna Gráfica + Tabla (derecha) -->
-              <b-col md="10">
-                <h5 class="font-weight-bold">Valor de venta por mes</h5>
-                <bar-chart ref="chartGraficaMes" id="graficoMes":altura="450"></bar-chart>
-
-                <b-table class="mt-3" :items="tablaMeses" :fields="camposMes" small striped hover bordered responsive>
-                  <template slot="Total" slot-scope="data">
-                    S/ {{ data.item.Total }}
-                  </template>
-                  <template slot="Participacion" slot-scope="data">
-                    <b-progress :value="data.item.PorcentajeRaw" max="100" show-value variant="info" height="20px" />
-                  </template>
-                </b-table>
-              </b-col>
-
-            </b-row>
-          </b-container>
-        </b-tab>
-
-        <!-- ═══════════════ TAB: VENTAS POR RANGO ═══════════════ -->
-        <b-tab title="Ventas Por Rango" @click="cambioOpcion(2)">
-          <b-container fluid>
-
-            <b-row class="mb-3">
-              <b-col md="3">
-                <b-form-group label="Almacén:">
-                  <b-form-select v-model="idAlmacen" :options="almacenes" @change="setAlmacen($event)" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="2">
-                <b-form-group label="Fecha Inicio:">
-                  <b-form-input v-model="fechaDesde" type="date" />
-                </b-form-group>
-              </b-col>
-              <b-col md="2">
-                <b-form-group label="Fecha Fin:">
-                  <b-form-input v-model="fechaHasta" type="date" />
-                </b-form-group>
-              </b-col>
-              <b-col md="3">
-                <b-form-group label="Tipo Comprobante:">
-                <b-form-select v-model="idTipoDoc" :options="opcionesTipoDoc" size="md" />
-                </b-form-group>
-              </b-col>
-              <b-col md="2" class="text-center">
-                <b-form-group><br>
-                  <b-button @click="fechaRango" variant="success" size="lg">Generar</b-button>
-                </b-form-group>
-              </b-col>
-            </b-row>
-
-            <b-row>
-
-              <!-- Columna KPI (izquierda) -->
-              <b-col md="2" class="d-flex flex-column" style="gap: 12px;">
-                <template v-if="kpiRango.total > 0">
-                  <b-card class="kpi-card text-center border-primary">
-                    <div class="kpi-label">💰 Total del Rango</div>
-                    <div class="kpi-value text-primary">S/ {{ kpiRango.total }}</div>
-                  </b-card>
-                  <b-card class="kpi-card text-center border-success">
-                    <div class="kpi-label">📈 Mejor Día</div>
-                    <div class="kpi-value text-success">{{ kpiRango.mejorDia }}</div>
-                    <small class="text-muted kpi-small">S/ {{ kpiRango.mejorValor }}</small>
-                  </b-card>
-                  <b-card class="kpi-card text-center border-warning">
-                    <div class="kpi-label">📊 Promedio Diario</div>
-                    <div class="kpi-value text-warning">S/ {{ kpiRango.promedio }}</div>
-                  </b-card>
-                  <b-card class="kpi-card text-center border-info">
-                    <div class="kpi-label">📅 Días Analizados</div>
-                    <div class="kpi-value text-info">{{ kpiRango.dias }}</div>
-                  </b-card>
+              <b-table v-if="tablaRango.length > 0" class="mt-3" :items="tablaRango" :fields="camposRango" small striped hover bordered responsive show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+                <template slot="Total" slot-scope="data">
+                  S/ {{ data.item.Total }}
                 </template>
-                <div v-else class="text-muted text-center mt-3" style="font-size:0.85rem;">
-                  Genere un rango para ver los indicadores
-                </div>
-              </b-col>
+              </b-table>
+            </b-col>
 
-              <!-- Columna Gráfica + Tabla (derecha) -->
-              <b-col md="10">
-                <h5 class="font-weight-bold">Valor de venta por rango</h5>
-                <line-chart ref="chartGraficaRango" id="graficoRango"></line-chart>
+          </b-row></section>
+        </b-container>
+      </b-tab>
 
-                <b-table v-if="tablaRango.length > 0" class="mt-3" :items="tablaRango" :fields="camposRango" small striped hover bordered responsive>
-                  <template slot="Total" slot-scope="data">
-                    S/ {{ data.item.Total }}
-                  </template>
-                </b-table>
-              </b-col>
-
-            </b-row>
-          </b-container>
-        </b-tab>
-
-      </b-tabs>
-    </b-card>
-  </div>
+    </b-tabs>
+  </b-card>
+</div>
 </template>
 
 <script>

@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$l=json_decode(file_get_contents(__DIR__.'/../../output/migration-copy-location.json'),true);$c=json_decode(file_get_contents($l['profile']),true);$name=$c['target']['database'];$user=$c['target']['user'];if(!preg_match('/^neuro_mig_test_[a-zA-Z0-9_]+$/',$name)||!preg_match('/^mig_[a-f0-9]+$/',$user))exit(1);$db=appPdoConnection();$db->exec('GRANT SHOW VIEW ON `'.$name.'`.* TO '.$db->quote($user)."@'localhost'");echo "Copy schema inspection permission granted.\n";

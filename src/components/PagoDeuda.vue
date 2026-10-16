@@ -1,164 +1,164 @@
 <template>
-    <div>
-        <b-button @click="show=true" variant="danger" class="btnAction">Pago Deuda</b-button>
-        
-        <b-form @submit="guardarPago">    
-            <b-modal id="modalConfigVenta" 
-                title="Cobrar deuda cliente" 
-                size="lg" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">
-                
-                <b-row class="mb-1">
-                    <b-col><label for="input-cliente">Cliente:</label>
-                        <b-input-group>
-                            <autocomplete
-                                required="required"
-                                ref="inputCliente"
-                                :url="API + 'clientes'"
-                                anchor="ClienteDniRuc"
-                                label="writer"
-                                placeholder=""
-                                :onInput="(val) => newDniRuc = val"
-                                :on-select="cargarDeuda" 
-                                :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                        </b-input-group>
-                    </b-col>
-                </b-row>
-                <b-row class="mb-1">
-                    <b-col><label for="input-fecha">Fecha:</label>
-                        <b-form-input v-model="cajaBanco.FechaDoc"
-                            required
-                            id="input-fecha"
-                            type="date"
-                            placeholder=""></b-form-input>
-                    </b-col>
-                    <b-col>
-                        <b-form-group>
-                            <label>Vendedor:</label>
-                            <autocomplete
-                                required
-                                ref="inputVendedor"
-                                :url="API + 'usuarios'"
-                                anchor="NombreUsuario"
-                                label="writer"
-                                :on-select="setVendedor" 
-                                :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                                :classes="{input: 'form-control'}">
-                            </autocomplete>
-                        </b-form-group>
-                    </b-col>
-                </b-row>
-                <b-row class="mb-1">
-                    <b-col><label for="input-concepto">Concepto:</label>
-                        <b-form-input v-model="cajaBanco.Concepto"
-                            id="input-concepto"
-                            required
-                            type="text"
-                            placeholder=""></b-form-input>
-                    </b-col>
-                </b-row>
-                <br>
-                <b-row class="mb-1">
-                    <b-col>
-                        <table class="table b-table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha</th>
-                                    <th>FechaVen</th>
-                                    <th>Tipo</th>
-                                    <th>Correlativo</th>
-                                    <th>Total</th>
-                                    <th>Aplicado</th>
-                                    <th>Apli. Nota</th>
-                                    <th>Saldo</th>
-                                    <th class="text-center">Aplicar</th>
-                                    <th class="text-center">Cuenta</th>
-                                </tr>
-                            </thead>
-                            <tbody v-for="(item, index) in documentos" :key="index">
-                                <tr class="table-info">
-                                    <td class="text-center">{{ item.IdDocVenta }}</td>
-                                    <td>{{ item.FechaDoc }}</td>
-                                    <td>{{ item.FechaCredito }}</td>
-                                    <td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
-                                    <td v-else-if="item.IdTipoDoc==7">BOLETA ELEC.</td>
-                                    <td v-else>OTRO</td>
-                                    <td>{{ item.Correlativo }}</td>
-                                    <td>{{ (item.Total).toFixed(2) }}</td>
-                                    <td  class="text-center">{{ (item.Aplicado).toFixed(2) }}</td>
-                                    <td>{{(item.NotaCreApli).toFixed(2)}}</td>
-                                    <td>{{ (item.Saldo).toFixed(2) }}</td>
-                                    <td>
-                                        <input v-model="item.aplicar"
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            class="form-control"
-                                            placeholder="0"/>
-                                    </td>
-                                    <td>
-                                        <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
-                                    </td>   
-                                </tr>
-                                <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
-                                    <td class="text-right">{{ item2.IdDocVenta }}</td>
-                                    <td>{{ item2.FechaDoc }}</td>
-                                    <td></td>
-                                    <td>NOTA DE CREDITO ELEC.</td>
-                                    <td>{{ item2.Serie+'-'+item2.Numero }}</td>
-                                    <td>{{ (item2.Total).toFixed(2) }}</td>
-                                </tr>   
-                                 <br> 
-                            </tbody>
-                        </table>
-                        <br>
-                        <div class="float-right">
-                            <b-btn size="sm" variant="success" type="submit">
-                                Guardar
-                            </b-btn>
-                            <b-btn size="sm" variant="secondary" @click="show=false">
-                                Cerrar
-                            </b-btn>
-                        </div>
-                        <hr>
-                        <br><br>
-                        <table class="table b-table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha Pago</th>
-                                     <th>Cuenta</th>
-                                    <th>Concepto</th>
-                                    <th>Importe</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(pago, index) in pagos" :key="index">
-                                    <td>{{ pago.IdCajaBanco }}</td>
-                                    <td>{{ pago.FechaDoc }}</td>
-                                    <td>{{ pago.Cuenta }}</td>
-                                    <td>{{ pago.Concepto }}</td>
-                                    <td>{{ pago.Importe.toFixed(2) }}</td>
-                                    <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </b-col>
-                </b-row>
-                <div slot="modal-footer" >
-                    
-                </div>
+<div>
+    <b-button @click="show=true" variant="danger" class="btnAction">Pago Deuda</b-button>
+    
+    <b-form @submit="guardarPago">    
+        <b-modal id="modalConfigVenta" 
+            title="Cobrar deuda cliente" 
+            size="lg" v-model="show"
+            header-bg-variant="dark"
+            headerTextVariant="light"
+            body-bg-variant="light"
+            body-text-variant="dark" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
             
-            </b-modal>
-        </b-form>
-    </div>
+            <b-row class="mb-1">
+                <b-col><label for="input-cliente">Cliente:</label>
+                    <b-input-group>
+                        <autocomplete
+                            required="required"
+                            ref="inputCliente"
+                            :url="API + 'clientes'"
+                            anchor="ClienteDniRuc"
+                            label="writer"
+                            placeholder=""
+                            :onInput="(val) => newDniRuc = val"
+                            :on-select="cargarDeuda" 
+                            :onFocus="focusAutocomplete.bind(null, 'inputCliente')"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row class="mb-1">
+                <b-col><label for="input-fecha">Fecha:</label>
+                    <b-form-input v-model="cajaBanco.FechaDoc"
+                        required
+                        id="input-fecha"
+                        type="date"
+                        placeholder=""></b-form-input>
+                </b-col>
+                <b-col>
+                    <b-form-group>
+                        <label>Vendedor:</label>
+                        <autocomplete
+                            required
+                            ref="inputVendedor"
+                            :url="API + 'usuarios'"
+                            anchor="NombreUsuario"
+                            label="writer"
+                            :on-select="setVendedor" 
+                            :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
+                            :classes="{input: 'form-control'}">
+                        </autocomplete>
+                    </b-form-group>
+                </b-col>
+            </b-row>
+            <b-row class="mb-1">
+                <b-col><label for="input-concepto">Concepto:</label>
+                    <b-form-input v-model="cajaBanco.Concepto"
+                        id="input-concepto"
+                        required
+                        type="text"
+                        placeholder=""></b-form-input>
+                </b-col>
+            </b-row>
+            <br>
+            <b-row class="mb-1">
+                <b-col>
+                    <table class="table b-table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>FechaVen</th>
+                                <th>Tipo</th>
+                                <th>Correlativo</th>
+                                <th>Total</th>
+                                <th>Aplicado</th>
+                                <th>Apli. Nota</th>
+                                <th>Saldo</th>
+                                <th class="text-center">Aplicar</th>
+                                <th class="text-center">Cuenta</th>
+                            </tr>
+                        </thead>
+                        <tbody v-for="(item, index) in documentos" :key="index">
+                            <tr class="table-info">
+                                <td class="text-center">{{ item.IdDocVenta }}</td>
+                                <td>{{ item.FechaDoc }}</td>
+                                <td>{{ item.FechaCredito }}</td>
+                                <td v-if="item.IdTipoDoc==6">FACTURA ELEC.</td>
+                                <td v-else-if="item.IdTipoDoc==7">BOLETA ELEC.</td>
+                                <td v-else>OTRO</td>
+                                <td>{{ item.Correlativo }}</td>
+                                <td>{{ (item.Total).toFixed(2) }}</td>
+                                <td  class="text-center">{{ (item.Aplicado).toFixed(2) }}</td>
+                                <td>{{(item.NotaCreApli).toFixed(2)}}</td>
+                                <td>{{ (item.Saldo).toFixed(2) }}</td>
+                                <td>
+                                    <input v-model="item.aplicar"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        class="form-control"
+                                        placeholder="0"/>
+                                </td>
+                                <td>
+                                    <b-form-select v-model="item.cuenta" :options="cuentas" class="mb-3" size="md"/>
+                                </td>   
+                            </tr>
+                            <tr v-for="(item2, index2) in item.NotasCredito" :key="index2" class="h6 small" >
+                                <td class="text-right">{{ item2.IdDocVenta }}</td>
+                                <td>{{ item2.FechaDoc }}</td>
+                                <td></td>
+                                <td>NOTA DE CREDITO ELEC.</td>
+                                <td>{{ item2.Serie+'-'+item2.Numero }}</td>
+                                <td>{{ (item2.Total).toFixed(2) }}</td>
+                            </tr>   
+                             <br> 
+                        </tbody>
+                    </table>
+                    <br>
+                    <div class="float-right">
+                        <b-btn size="sm" variant="success" type="submit">
+                            Guardar
+                        </b-btn>
+                        <b-btn size="sm" variant="secondary" @click="show=false">
+                            Cerrar
+                        </b-btn>
+                    </div>
+                    <hr>
+                    <br><br>
+                    <table class="table b-table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha Pago</th>
+                                 <th>Cuenta</th>
+                                <th>Concepto</th>
+                                <th>Importe</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(pago, index) in pagos" :key="index">
+                                <td>{{ pago.IdCajaBanco }}</td>
+                                <td>{{ pago.FechaDoc }}</td>
+                                <td>{{ pago.Cuenta }}</td>
+                                <td>{{ pago.Concepto }}</td>
+                                <td>{{ pago.Importe.toFixed(2) }}</td>
+                                <td><b-btn size="sm" variant="success" :href="'/imprimir/pagocredito.php?idCajaBanco=' + pago.IdCajaBanco" target="_blank">Imprimir</b-btn></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </b-col>
+            </b-row>
+            <div slot="modal-footer" >
+                
+            </div>
+        
+        </b-modal>
+    </b-form>
+</div>
 </template>
 <script>
 import config from "@/store/config.js";

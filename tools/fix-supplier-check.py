@@ -1,0 +1,7 @@
+from pathlib import Path
+p=Path('integration/order-supplier/api/purchase-order-report.php')
+s=p.read_text(encoding='utf-8-sig').replace("($o['FechaRecojo'] ?: 'Por coordinar')","(($o['FechaRecojo'] ?? '') ?: 'Por coordinar')")
+p.write_text(s,encoding='utf-8')
+p=Path('tools/verify-supplier-order.php');s=p.read_text().replace("__DIR__.'/../integration/order-supplier/api/purchase-order-report.php'","'C:/xampp/htdocs/boticav1/api/purchase-order-report.php'");p.write_text(s)
+p=Path('tools/test-purchase-order-creator.php');s=p.read_text().replace('integration/purchase-order-premium/api/order-create.php','integration/order-supplier/api/order-create.php');s=s.replace("session_start();session_destroy();", "session_start();$_SESSION['user']='second-user';session_write_close();$db->exec('DELETE FROM Lo_OrdenCompraDet');$db->exec('DELETE FROM Lo_OrdenCompra');$second=$callback(new CreatorRequest,new CreatorResponse);if($second['status']!==200 || $db->query('SELECT UsuarioReg FROM Lo_OrdenCompra')->fetchColumn()!=='second-user')throw new Exception('Second user failed');session_start();unset($_SESSION['user']);session_write_close();if($callback(new CreatorRequest,new CreatorResponse)['status']!==401)throw new Exception('Missing session accepted');session_start();$_SESSION['user']='   ';session_write_close();if($callback(new CreatorRequest,new CreatorResponse)['status']!==401)throw new Exception('Blank creator accepted');session_start();session_destroy();")
+p.write_text(s)

@@ -1,82 +1,83 @@
 <template>
-    <div>
-        <b-button @click="show=true" variant="primary" class="btnAction" style="background: #808080 ;">Configurar</b-button>
-        
-        <b-form @submit="guardarConfigVenta">    
-            <b-modal id="modalConfigVenta" 
-                title="Configurar Venta" 
-                size="md" v-model="show"
-                header-bg-variant="dark"
-                headerTextVariant="light"
-                body-bg-variant="light"
-                body-text-variant="dark">
+<div>
+    <b-button @click="show=true" variant="primary" class="btnAction" style="background: #808080 ;">Configurar</b-button>
+    
+    <b-form @submit="guardarConfigVenta">    
+        <b-modal id="modalConfigVenta" 
+            title="Configurar Venta" 
+            size="md" v-model="show"
+            header-bg-variant="dark"
+            headerTextVariant="light"
+            body-bg-variant="light"
+            body-text-variant="dark" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
 
-                <b-row class="mb-1">
-                    <b-col><label for="input-porcada">Por la compra de:</label></b-col>
-                    <b-col>
-                        <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="porCada"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            placeholder=""></b-form-input>
-                        </b-input-group>
-                    </b-col>
-                </b-row>
-                <b-row class="mb-1">
-                    <b-col><label for="input-porcada">El cliente gana:</label></b-col>
-                    <b-col>
-                        <b-input-group size="sm" append="punto(s)">
-                        <b-form-input v-model="puntos"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="1"
-                            placeholder=""></b-form-input>
-                        </b-input-group>
-                    </b-col>
-                </b-row>
-                <b-row class="mb-1">
-                    <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
-                    <b-col>
-                        <b-input-group size="sm" prepend="S/. ">
-                        <b-form-input v-model="valorPunto"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            placeholder=""></b-form-input>
-                        </b-input-group>
-                    </b-col>
-                </b-row>
-                <b-row class="mb-1">
-                    <b-col><label for="input-porcada">% Pago de comision:</label></b-col>
-                    <b-col>
-                        <b-input-group size="sm" prepend="% ">
-                        <input v-model="valorComision"
-                            id="input-porcada"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            class="form-control"
-                            placeholder=""/>
-                            <b-button size="sm" text="Button" variant="success" @click="guardarConfigComision">Ok</b-button>
-                        </b-input-group>
-                    </b-col>
-                </b-row>
-                <div slot="modal-footer" >
-                    <b-btn size="sm" variant="success" type="submit">
-                        Guardar
-                    </b-btn>
-                    <b-btn size="sm" variant="secondary" @click="show=false">
-                        Cerrar
-                    </b-btn>
-                </div>
-            
-            </b-modal>
-        </b-form>
-    </div>
+            <b-row class="mb-1">
+                <b-col><label for="input-porcada">Por la compra de:</label></b-col>
+                <b-col>
+                    <b-input-group size="sm" prepend="S/. ">
+                    <b-form-input v-model="porCada"
+                        id="input-porcada"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        placeholder=""></b-form-input>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row class="mb-1">
+                <b-col><label for="input-porcada">El cliente gana:</label></b-col>
+                <b-col>
+                    <b-input-group size="sm" append="punto(s)">
+                    <b-form-input v-model="puntos"
+                        id="input-porcada"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder=""></b-form-input>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row class="mb-1">
+                <b-col><label for="input-porcada">Cada punto vale:</label></b-col>
+                <b-col>
+                    <b-input-group size="sm" prepend="S/. ">
+                    <b-form-input v-model="valorPunto"
+                        id="input-porcada"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        placeholder=""></b-form-input>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row class="mb-1">
+                <b-col><label for="input-porcada">% Pago de comision:</label></b-col>
+                <b-col>
+                    <b-input-group size="sm" prepend="% ">
+                    <input v-model="valorComision"
+                        id="input-porcada"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="form-control"
+                        placeholder=""/>
+                        <b-button size="sm" text="Button" variant="success" @click="guardarConfigComision">Ok</b-button>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+            <div class="mt-3 p-3 border rounded"><strong>ALI · Asistente de ventas</strong><p class="mb-2">Comandos de voz, información de productos y conexión con OpenAI.</p><b-button type="button" variant="info" @click="show=false; $root.$emit('ali:open')">Abrir ALI y configurar IA</b-button></div>
+            <div slot="modal-footer" >
+                <b-btn size="sm" variant="success" type="submit">
+                    Guardar
+                </b-btn>
+                <b-btn size="sm" variant="secondary" @click="show=false">
+                    Cerrar
+                </b-btn>
+            </div>
+        
+        </b-modal>
+    </b-form>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'

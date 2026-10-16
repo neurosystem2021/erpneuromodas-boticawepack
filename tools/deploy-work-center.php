@@ -1,0 +1,21 @@
+<?php
+if (PHP_SAPI!=='cli') exit;
+$root=dirname(__DIR__);$target='C:/xampp/htdocs/boticav1';
+require $target.'/config/database.php';
+$expected=array('support-service.php'=>'776bd23265a5eb3db731aaebb24da31bed4a1ede3deff312b2cf082bb33d3ebc','support-api.php'=>'5840d7644caafaF6ca943314d5ea7181dc212cbf0cff07c63be915445e77c8f3','diario-api.php'=>'732ccee057c248a0f8876a42d76f89fcfbbc70353859c9c3e490ad72a0ddcfa4');
+foreach($expected as $file=>$hash)if(!hash_equals(strtolower($hash),hash_file('sha256',$target.'/api/'.$file)))throw new RuntimeException('Installed file changed: '.$file);
+$backup=$target.'/storage/work-center-backups/'.date('Ymd-His');if(!is_dir($backup))mkdir($backup,0700,true);file_put_contents(dirname($backup).'/.htaccess',"Require all denied\nDeny from all\n");
+$db=appPdoConnection();file_put_contents($backup.'/diario-schema.sql',$db->query('SHOW CREATE TABLE Rhu_DiarioTarea')->fetch(PDO::FETCH_NUM)[1]);
+foreach(array('Archivada'=>'TINYINT NOT NULL DEFAULT 0','ArchivadaPor'=>'VARCHAR(255) NULL','ArchivadaFecha'=>'DATETIME NULL') as $column=>$definition){$s=$db->prepare('SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=\'Rhu_DiarioTarea\' AND column_name=?');$s->execute(array($column));if(!$s->fetchColumn())$db->exec('ALTER TABLE Rhu_DiarioTarea ADD COLUMN '.$column.' '.$definition);}
+$cfg=require 'C:/xampp/support-private/runtime.php';if(!preg_match('/^[a-z0-9_]+$/',$cfg['database']))throw new RuntimeException('Invalid support schema');$support=appPdoConnection();$support->exec('USE `'.$cfg['database'].'`');
+if((int)$support->query("SELECT GET_LOCK('factura_support_migrations',10)")->fetchColumn()!==1)throw new RuntimeException('Migration lock unavailable');
+try{
+ $migration=$root.'/integration/helpdesk/migrations/008_ticket_archive.up.sql';$version=basename($migration);$hash=hash_file('sha256',$migration);$s=$support->prepare('SELECT checksum FROM support_schema_versions WHERE version=?');$s->execute(array($version));$old=$s->fetchColumn();
+ if($old){if(!hash_equals($old,$hash))throw new RuntimeException('Archive migration changed');}
+ else{foreach(array('support_tickets','support_satisfaction_surveys') as $table)file_put_contents($backup.'/'.$table.'.sql',$support->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM)[1]);$support->exec(file_get_contents($migration));$s=$support->prepare('INSERT INTO support_schema_versions(version,checksum,applied_at) VALUES(?,?,?)');$s->execute(array($version,$hash,date('Y-m-d H:i:s')));}
+}finally{$support->query("SELECT RELEASE_LOCK('factura_support_migrations')");}
+$files=array('support-activity.php'=>'integration/helpdesk/support-activity.php','diario-avances.php'=>'integration/diario/diario-avances.php','support-service.php'=>'integration/helpdesk/support-service.php','support-api.php'=>'integration/helpdesk/support-api.php','diario-api.php'=>'integration/diario/diario-api.php');
+foreach($files as $name=>$source){$dest=$target.'/api/'.$name;if(is_file($dest))copy($dest,$backup.'/'.$name);$tmp=$dest.'.work-center-tmp';if(!copy($root.'/'.$source,$tmp)||!hash_equals(hash_file('sha256',$root.'/'.$source),hash_file('sha256',$tmp))||!rename($tmp,$dest))throw new RuntimeException('Deployment failed: '.$name);}
+$ui=$root.'/output/support-ui';$dest=$target.'/support-ui';$assets=array();foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ui,FilesystemIterator::SKIP_DOTS)) as $file)if($file->isFile())$assets[]=$file->getPathname();usort($assets,function($a,$b){return (basename($a)==='index.html')<=>(basename($b)==='index.html');});
+foreach($assets as $source){$relative=substr($source,strlen($ui)+1);$file=$dest.'/'.$relative;if(is_file($file)&&hash_file('sha256',$source)===hash_file('sha256',$file))continue;if(is_file($file)){if(!is_dir(dirname($backup.'/support-ui/'.$relative)))mkdir(dirname($backup.'/support-ui/'.$relative),0700,true);copy($file,$backup.'/support-ui/'.$relative);}if(!is_dir(dirname($file)))mkdir(dirname($file),0755,true);copy($source,$file);if(hash_file('sha256',$source)!==hash_file('sha256',$file))throw new RuntimeException('Support asset checksum failed');}
+echo 'Work center installed: progress, urgent reminders, ratings and finished-only archive. Backup: '.$backup.PHP_EOL;

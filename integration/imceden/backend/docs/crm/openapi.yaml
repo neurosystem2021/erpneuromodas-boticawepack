@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: NeuroRest CRM API
+  version: 0.1.0
+servers:
+  - url: /api/crm/index.php
+paths:
+  /:
+    get:
+      summary: Consulta un recurso CRM mediante el parámetro route
+      parameters:
+        - in: query
+          name: route
+          required: true
+          schema:
+            type: string
+            enum: [health, dashboard, customers, segments, tasks, campaigns, sync/status]
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 100 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 200 }
+      responses:
+        "200": { description: Respuesta correcta }
+        "401": { description: Sesión requerida }
+        "403": { description: Permiso insuficiente }
+        "404": { description: CRM deshabilitado o recurso inexistente }
+        "500": { description: Error interno sin detalles sensibles }

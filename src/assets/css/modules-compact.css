@@ -1,0 +1,43 @@
+/* Compact imceden-style workspace: controls and results come first. */
+.nst-premium { padding: 8px 10px 12px; background: #f3f7fa; }
+.nst-panel { margin-bottom: 9px; padding: 11px 12px; border-radius: 11px; box-shadow: 0 3px 12px #123c5006; }
+.nst-subsection, .nst-document-grid > .nst-subsection { margin-bottom: 0; padding: 10px 12px; border-radius: 9px; background: #f8fbfd; }
+.nst-screen .form-group { margin-bottom: 8px; }
+.nst-screen label, .nst-screen legend { margin-bottom: 4px; font-size: 12px; line-height: 1.3; }
+.nst-screen .form-control, .nst-screen .custom-select { min-height: 34px; height: 34px; padding: 5px 9px; border-radius: 7px; font-size: 12px; }
+.nst-screen textarea.form-control { height: auto; min-height: 64px; }
+.nst-screen .btn { min-height: 32px; padding: 6px 11px; border-radius: 7px; font-size: 12px; }
+.nst-screen .input-group-text { padding: 5px 9px; }
+.nst-screen .table thead th { padding: 9px 8px; font-size: 11px; }
+.nst-screen .table tbody td { padding: 7px 8px; font-size: 12px; }
+.nst-screen .table .form-control { min-height: 30px; height: 30px; padding: 4px 7px; }
+.nst-screen .table tbody .btn { min-height: 28px; padding: 4px 8px; }
+.nst-screen .table-responsive, .nst-screen .table { margin-bottom: 8px; }
+.nst-screen--movimiento .nst-document-grid, .nst-screen--cargarcomprasxml .nst-document-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.nst-document-grid > .nst-subsection:nth-child(2) > .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 12px; margin: 0; }
+.nst-document-grid > .nst-subsection:nth-child(2) > .row > [class*='col'] { display: contents; }
+.nst-document-grid > .nst-subsection:nth-child(2) .form-group { min-width: 0; }
+.nst-tax-options { margin: 0 0 8px !important; padding: 6px 10px !important; }
+.nst-action-bar { margin-bottom: 9px; padding: 7px 10px; border-radius: 9px; }
+.nst-action-bar .btn { min-height: 34px; min-width: 130px; }
+.nst-screen .pos-search-toolbar { margin-bottom: 8px; padding: 8px 0; border-radius: 9px; }
+.nst-screen .pos-search-hint { padding-top: 4px; }
+.nst-screen .pos-cart-summary { flex-basis: 310px; margin-top: 7px; border-radius: 9px; }
+.nst-screen .pos-cart-summary .nst-grand-total td { padding: 10px 8px; font-size: 16px; }
+.nst-empty-state { padding: 18px 12px; gap: 5px; }
+.nst-empty-state > i { width: 34px; height: 34px; margin-bottom: 0; font-size: 16px; border-radius: 10px; }
+.nst-empty-state strong { font-size: 12px; }
+.nst-screen .nav-pills { padding: 4px; gap: 4px; border-radius: 9px; }
+.nst-screen .nav-pills .nav-link { padding: 6px 10px; font-size: 12px; }
+.nst-screen .tab-content { padding-top: 8px; }
+.nst-screen .pagination { padding-top: 7px; margin-bottom: 0; }
+.nst-screen--almacen .suma-stock { min-height: 84px; padding: 10px !important; gap: 3px; border-radius: 9px; }
+.nst-screen--almacen .suma-stock > div { font-size: 22px; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-header { padding: 12px 17px; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-body { padding: 13px 17px; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-footer { padding: 9px 17px; }
+.nst-dialog:not(.pos-product-editor-modal) .form-control, .nst-dialog:not(.pos-product-editor-modal) .custom-select { min-height: 35px; padding: 6px 9px; }
+.nst-dialog .nst-editor-section { padding: 12px; margin-bottom: 9px; }
+@media (max-width: 1100px) { .nst-screen--movimiento .nst-document-grid, .nst-screen--cargarcomprasxml .nst-document-grid { grid-template-columns: 1fr; } }
+@media (max-width: 767px) { .nst-premium { padding: 6px; } .nst-panel { padding: 9px; } .nst-document-grid > .nst-subsection:nth-child(2) > .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nst-screen .pos-cart-summary { flex-basis: 100%; } }
+@media print { .nst-premium, .nst-panel { padding: 0; } }

@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('src/components/ProductoAsesorIA.vue');s=p.read_text(encoding='utf-8');button='<button type="button" @click="show=false;closeGuide()">Cerrar</button>';s=s.replace(button,'');s=s.replace(' </section>\n</b-modal>', ' <div class="product-guide-footer">'+button+'</div>\n </section>\n</b-modal>');s=s.replace('</style>', '.product-guide-footer{display:flex;justify-content:flex-end;padding-top:15px;margin-top:15px;border-top:1px solid #dce4f2}\n</style>');p.write_text(s,encoding='utf-8')

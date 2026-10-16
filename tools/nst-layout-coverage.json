@@ -1,0 +1,482 @@
+[
+  {
+    "file": "src/views/Movimiento.vue",
+    "panels": 3,
+    "dialogs": 2,
+    "scriptSha256": "99f4244091d498af7c124baec7b4985f723937d694a24c9e36edce5a3e3d3b88"
+  },
+  {
+    "file": "src/views/Almacen.vue",
+    "panels": 3,
+    "dialogs": 2,
+    "scriptSha256": "830be70a3fd1cba991ca0daa8e04d3f74f565579fe161d4ca436071985480c2c"
+  },
+  {
+    "file": "src/views/VentaReimpresion.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "402a4ecdd97b588bc3443b1ff9b9e361da0dc46b2133b0ad9e17f8022b29c279"
+  },
+  {
+    "file": "src/views/VentasFacturacion.vue",
+    "panels": 2,
+    "dialogs": 1,
+    "scriptSha256": "fbfbd27a4d4cb4044769109f87d6c6b2df00bf8ad62fd271205b05e40533c037"
+  },
+  {
+    "file": "src/views/Clientes.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "4b9c699175997072e7c64a28e4ec0dc7d4eab168506901ab7d9c7d5b638a40cc"
+  },
+  {
+    "file": "src/views/Habitaciones.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "435eaeb05a5d7642e1e6c74eef591d8acb2b4638a9dbe51e5a50e017022d2686"
+  },
+  {
+    "file": "src/views/AgenteOperacion.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "00c109c8ae98676d9833d7069298c838adddf6fcd73b88995f15e2f3f2dbf16b"
+  },
+  {
+    "file": "src/views/AgenteCierreCaja.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "224b61b5e5da13ea0cbba8478204b6b05624bc251a9400567a22f0689c35a956"
+  },
+  {
+    "file": "src/views/AgenteGeneral.vue",
+    "panels": 5,
+    "dialogs": 0,
+    "scriptSha256": "885bc476366d66c903b93b8e328b7ae5acf30640683eaf8d1eacd5170be4ae67"
+  },
+  {
+    "file": "src/views/AgenteReimpresion.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "8a97db9de4c7ec7bc7ce61225c59fcb81e8250f74d73cd2b7f72f0660f792fee"
+  },
+  {
+    "file": "src/views/Traslado.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "e5d5e2e192afe75cf534ab2dcf329f745585d70ebad638230f63bad6a3b57548"
+  },
+  {
+    "file": "src/views/ConfigurarOferta.vue",
+    "panels": 1,
+    "dialogs": 2,
+    "scriptSha256": "283539ac10a178a4e6c83f6c53c9417a320e43f2d68f8ea7863f2d760cd42458"
+  },
+  {
+    "file": "src/views/OrdenCompra.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "af40373adafff0aa9f90cad50decd7dca874add88d01e1a0ed210d59dec21291"
+  },
+  {
+    "file": "src/views/BuscadorCajaBanco.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "f99ba82eb3227f7200304c33867b9da49567d669a6c9347cf9662713348edd2c"
+  },
+  {
+    "file": "src/views/Usuario.vue",
+    "panels": 1,
+    "dialogs": 5,
+    "scriptSha256": "1a0ba4890b737fedaa268989b5879f7c2f1829e7c32d79328607d21bb19bd014"
+  },
+  {
+    "file": "src/views/CajaBancos.vue",
+    "panels": 5,
+    "dialogs": 1,
+    "scriptSha256": "e5041935664b351999911bdba325692ebfecd0c954bf8fb2ba3816c563ca0a1e"
+  },
+  {
+    "file": "src/views/RemisionTransportista.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "d0f6d07272ea4f7d44e0f0783e1594d5ecca93528b90cab0343b2bbdff6e3b01"
+  },
+  {
+    "file": "src/views/AgenteChat.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "a3e4de84cb3bb59d04f574734bd50f7874b313b0debe032b42120bdc37a48f86"
+  },
+  {
+    "file": "src/views/reportes/Ordenes.vue",
+    "panels": 2,
+    "dialogs": 2,
+    "scriptSha256": "7dde851781dc0e6072d73168d5e86b9cdbe1642d182645409cac7411ff08b19b"
+  },
+  {
+    "file": "src/views/reportes/Ventas.vue",
+    "panels": 2,
+    "dialogs": 1,
+    "scriptSha256": "85a94a9a59331e191525f78c9a9a806b1409e4cff6753a7223942bf73d1faa61"
+  },
+  {
+    "file": "src/views/reportes/StockMinimo.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "d74ed2b1627e78842be43d285df63db63bd9a6a3636eea4750257a4117823267"
+  },
+  {
+    "file": "src/views/reportes/Comisionistas.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "866a3509be508f9f24914c42e9548e17971cd47c738b036e2a9bae137546ad43"
+  },
+  {
+    "file": "src/views/reportes/DeudaClientes.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "d1300e726e25f8d1a7173504fd06606b98dab60e17264d38328bafa7848223e0"
+  },
+  {
+    "file": "src/views/reportes/DeudaProveedores.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "20cb45e0fb6c4f7019df8004d7193dcb4f77003bb32852aa33651ce014d95e50"
+  },
+  {
+    "file": "src/views/reportes/RankingClientes.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "96ce42fdaea7c1a67b09f4130ae813e4230abbdf8f475508409d2938c30c4b85"
+  },
+  {
+    "file": "src/views/reportes/CierreCaja.vue",
+    "panels": 4,
+    "dialogs": 0,
+    "scriptSha256": "113d89f344471f05d585f288e29b9b55c2c300173e3b48d28860d996dcfa4c76"
+  },
+  {
+    "file": "src/views/reportes/ReporteCierreCaja.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "b4b84dffe9d0dc94627e4ee5ed3e8d0d73b74e26ef42bc631e2e158a2ccab998"
+  },
+  {
+    "file": "src/views/reportes/Kardex.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "26ff0f63c343c408a65495ae64b141e217dee2a051330e63650ac7039335fb76"
+  },
+  {
+    "file": "src/views/reportes/RegistroHuespedes.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "171f4a7543f71e51f177eb151b38c84067b40b7e0639b8c67868a84566ad41e9"
+  },
+  {
+    "file": "src/views/reportes/Articulosmovimientos.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "74408f68fcab357c43e49884a3027bad1f504809f01c978cf2dad31a97874219"
+  },
+  {
+    "file": "src/views/reportes/PorEntregar.vue",
+    "panels": 2,
+    "dialogs": 2,
+    "scriptSha256": "9ec62ce73d745154e9967858277341de0efd0f4b99d1f188171b39052e218f66"
+  },
+  {
+    "file": "src/views/Remision.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "a33bb9e25d0601631b5996b21bfb2f2b16f0fff206e9eac9489567565b15c60a"
+  },
+  {
+    "file": "src/views/RemisionLista.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "8bd4f2b3c0089d3cfa5af9e057f15f07406ce4e22fc50f3a9c57c77077960d6f"
+  },
+  {
+    "file": "src/views/reportes/Estadisticas.vue",
+    "panels": 6,
+    "dialogs": 0,
+    "scriptSha256": "606a8faf135247a6d7d1cc59fa83c307dc17eb00637022f1902501c5140d0354"
+  },
+  {
+    "file": "src/views/reportes/ReporteProyectos.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "ed7718d92875c8554b33486ee97b7d6d1af654cee17c1cd428cc29e0d41520a8"
+  },
+  {
+    "file": "src/views/reportes/ReporteUtilidadBruta.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "dd6256307cd4ce0a3e0fb3ec044db9340e1bcbc9f318bb86b47c59a5983824c5"
+  },
+  {
+    "file": "src/views/reportes/Confrontacion.vue",
+    "panels": 2,
+    "dialogs": 0,
+    "scriptSha256": "c4b93f32874f202cd4c4f2a9ca50985970285bf9a16c28d77ea4402de2496bef"
+  },
+  {
+    "file": "src/views/reportes/HistorialVentaKit.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "42bdf6977fb95583a0a1f3af4e5b87b5a3f43f6c536a985e241c7d699af7a379"
+  },
+  {
+    "file": "src/views/reportes/ReporteUtilidadBrutaPorUsuario.vue",
+    "panels": 1,
+    "dialogs": 0,
+    "scriptSha256": "035a47a976b094e2234bbf47c4999e4df934d9e0301c781342f37b20cdbb1cd5"
+  },
+  {
+    "file": "src/views/CargarComprasXml.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "b3137cb61f5ee77dc5169ec62fe8c13fad872e9e95617e7d8618221008016541"
+  },
+  {
+    "file": "src/views/reportes/ReporteRegMovimiento.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "12a0df61ebbe7052f520c47f1e3da4ca4a6d9c802f0fc7cabf674d505759d246"
+  },
+  {
+    "file": "src/views/reportes/ReporteRegistroVentas.vue",
+    "panels": 1,
+    "dialogs": 2,
+    "scriptSha256": "635609ed0181d4e830c4070c861f2a8770287a99389faeba046f04e58cc16a53"
+  },
+  {
+    "file": "src/views/reportes/Dashboard.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "5360fea0b6ebb64c1c93751389351d0ee0994a26411a13f19887c10e5cea7530"
+  },
+  {
+    "file": "src/views/reportes/VentasDelivery.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "614ee85eb3953b1c923f5d1e0772b5675b6465cc08317872c6caae3c3284308f"
+  },
+  {
+    "file": "src/views/reportes/ReporteProyectosEmpleado.vue",
+    "panels": 1,
+    "dialogs": 1,
+    "scriptSha256": "7dfd13d81f4b614b77df60a9e31030b60c04cb20d430141a3444dfdd61831d38"
+  },
+  {
+    "file": "src/components/AgenteCierres.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "c6ce403037854604706c354303bc8a07bb9daa0526acf4ab9d2f598acbc76a16"
+  },
+  {
+    "file": "src/components/AgenteRegistrarMov.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "c6a67798817f2ed01d2adea28b91483eedbb7d53ccdc34d3a76d8ba0843bfa37"
+  },
+  {
+    "file": "src/components/AutoComplete.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "6d6f57ece8ab6e0e839cd85bb14f4f571ecfb87fcb3968acc0ec9697283216aa"
+  },
+  {
+    "file": "src/components/CarritoConfrontacion.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "72a7c8fcaf1fb3f9d6c81399b8989624f3dd370ef76fed5454a7e93ab163ec6e"
+  },
+  {
+    "file": "src/components/CategoriaForm.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "9b55b754a5c3a73c71d0a742cc707497bab0f820489e31c387cad32a03beddc7"
+  },
+  {
+    "file": "src/components/CategoriaImpresoraForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "cda39450b5db257a4d4ca468db9ebf01c00489ebc7e05517cbee9d6823616dbd"
+  },
+  {
+    "file": "src/components/CierresCaja.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "d3a02d53bf04deb7c6795103dbe4f6321b844702cf71cce35967075900c552ad"
+  },
+  {
+    "file": "src/components/ClientesForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "f6d72ab8f867f90e8c02fd04e0c3b42e4d533f121b05a29fc54d81a0c7750755"
+  },
+  {
+    "file": "src/components/ClientesFormEdit.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "e8bef4cacecfd6a5590f547382f3f5540f2e6fddff4504f9d7333f76e4a3f027"
+  },
+  {
+    "file": "src/components/CodigoMultiple.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "e00c4b0eb0343007ece58a65fa41555ccb32c866a6b9fa1c1df7d500e1074f09"
+  },
+  {
+    "file": "src/components/ConfigVenta.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "f585457e83e573b90b6e48ac07721123d867442c70b4cf3543f0b3914e6cd449"
+  },
+  {
+    "file": "src/components/DeliveryModal.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "56b930705087f25cea1c7195ca61fdff6db3197d55a1c6502900bd5a9d78ad1d"
+  },
+  {
+    "file": "src/components/EmpleadoForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "7c828bcc62d1c1f1bcc5263c1bef2c31c6d7472a384f8e90807a10ef78515f3f"
+  },
+  {
+    "file": "src/components/EmpresaAgenteForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "feb8f722020fa4de8ab1076e416ad3d5aeda7ba84889cf4cd59c5980e76237a9"
+  },
+  {
+    "file": "src/components/HelloWorld.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "192746810b146103627159322b02f212c70aa79f0a1e0901e40ae6e7c2c607b4"
+  },
+  {
+    "file": "src/components/ImpresoraForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "d0066be959ea74fbd596263573aa4683b9522a0214c91140c14614ff49933d78"
+  },
+  {
+    "file": "src/components/MarcaForm.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "141e1fb763b9d531527c619b10e744e958b680ee2ec4d6d045d93f5e7635897f"
+  },
+  {
+    "file": "src/components/Menu.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "3da3c069cb3ef0b10a119bbdb97abc749942b39d69178224f2e2dca36bcee175"
+  },
+  {
+    "file": "src/components/ModeloForm.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "ea508ca84fc6461fdd1306d7f614aa40c051fde0974a22faf0aad4e3c7b7aa3c"
+  },
+  {
+    "file": "src/components/Movimiento.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "9f5c5139d220011cac877f033776af33b64e838b2ef936b32cd78816a0699861"
+  },
+  {
+    "file": "src/components/OperacionForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "1a8f3d55ca5097bbc638f2806243fd53779e2a330a061aa073626b100e127091"
+  },
+  {
+    "file": "src/components/PagoDeuda.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "897f513d4fe8c3afb8912790155ad840abeb896e90e21ab2a16499e6237b01b2"
+  },
+  {
+    "file": "src/components/PagosComisionista.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "a91e9b096fe764511f283aaf7c58f3ec74f1d98009b92252ce761689080e2bdb"
+  },
+  {
+    "file": "src/components/PreOrdenFormDet.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "d3d67a0c6b2458799c7eb95d2520a69648ea941fa953025ef3aecbc6ff4c0727"
+  },
+  {
+    "file": "src/components/PreOrdenLista.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "2b42198123ed7b22108bbd9c9b65e3621d1e9bb41fac1780bd916aeb1f03f7b7"
+  },
+  {
+    "file": "src/components/PreOrdenListaPre.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "9eaab4801908775a78371d6a6dfc3cf11721d87a8b2d515f9b56e68bf1186769"
+  },
+  {
+    "file": "src/components/ProductoForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "30f78fe81fa36278b049c55ea2963fe8e99031f1d0f34fb296b4524104982687"
+  },
+  {
+    "file": "src/components/ProductoFormDet.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "fcb199916f688a865805716c954835bb85ef2fe31b21d598ed4e14a06b9b89e7"
+  },
+  {
+    "file": "src/components/ProductoKardex.vue",
+    "panels": 0,
+    "dialogs": 0,
+    "scriptSha256": "a8f48f4311082b1d2d963bb3375f34107d71156540b682f1e39801d0925aee00"
+  },
+  {
+    "file": "src/components/ProductosCarrito.vue",
+    "panels": 0,
+    "dialogs": 5,
+    "scriptSha256": "3f040ae7487ce48e4b3c99ea26f48d6c057dcdb4d00af27288531b880e3fd840"
+  },
+  {
+    "file": "src/components/ProductosCarritoNuevo.vue",
+    "panels": 0,
+    "dialogs": 4,
+    "scriptSha256": "60445ccceef1df042a7cff20000ae945e7bfb63ad6bbd769b9dbd35b255f3f26"
+  },
+  {
+    "file": "src/components/ProformaLista.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "03a4630587f7be3328590fbedb75b383b95cb9236cd0829352a76df85ec07cbc"
+  },
+  {
+    "file": "src/components/ProveedoresForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "b887cbcc69924d38c991ab2ee05b040e6ca45716b3ba170272cd7e29e218cd72"
+  },
+  {
+    "file": "src/components/ProveedoresTabla.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "24e44b2ef63a804c0719de7563f68f73a32c96cad5ce63347c2942da0127bbdc"
+  },
+  {
+    "file": "src/components/ServicioForm.vue",
+    "panels": 0,
+    "dialogs": 1,
+    "scriptSha256": "bc4c461e84a8f4dc376dfe8e5d23eb59221d2136e994bdd34da1eddd963d3474"
+  }
+]

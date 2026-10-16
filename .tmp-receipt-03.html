@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BOLETA DE VENTA ELECTRONICA B012-00000001</title>
+<style>
+:root{--ink:#000;--muted:#222;--brand:#000;--brand-dark:#000;--soft:#fff;--line:#777}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#e9e5e7}
+body{padding:18px}
+.receipt-actions{text-align:center;margin-bottom:12px}.receipt-actions button{border:0;border-radius:10px;background:#164f67;color:white;padding:11px 18px;font-weight:bold;cursor:pointer}
+.ticket{width:80mm;max-width:100%;margin:0 auto;padding:3.2mm;background:#fff;box-shadow:0 10px 32px #2c17222c;font-size:9px;font-weight:600;line-height:1.22}
+.brand{text-align:center}.brand img{display:block;width:68mm;height:28mm;max-width:100%;margin:0 auto 2mm;object-fit:contain;object-position:center;filter:grayscale(1) brightness(.57) contrast(8)}
+.company{font-size:11px;font-weight:900;line-height:1.2}.company-meta{margin-top:.7mm;color:var(--muted);font-size:8px;font-weight:700;line-height:1.3}
+.document{margin:2.5mm 0 2mm;padding:2.2mm 2mm;border:1.5px solid var(--brand);border-radius:3mm;background:var(--soft);text-align:center}
+.document-type{color:var(--brand-dark);font-size:10px;font-weight:900;letter-spacing:.35px}.document-number{margin-top:.6mm;color:var(--brand);font-size:14px;font-weight:900;letter-spacing:.5px}
+.meta{margin-bottom:2mm;padding:1.8mm 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.row{display:flex;margin:.45mm 0;gap:1.5mm}.label{flex:0 0 19mm;color:var(--ink);font-size:7.4px;font-weight:900}.value{flex:1;min-width:0;font-size:8.3px;font-weight:800;overflow-wrap:anywhere}
+.items{width:100%;table-layout:fixed;border-collapse:collapse}.items th{padding:.9mm .45mm;border-bottom:1.5px solid var(--brand-dark);font-size:7px;font-weight:900;line-height:1.1;text-align:left}.items td{padding:.9mm .45mm;border-bottom:1px dashed var(--line);font-size:8.2px;font-weight:700;line-height:1.15;vertical-align:top}.items .qty{width:8mm;text-align:center}.items .unit,.items .amount{width:15mm;text-align:right;white-space:nowrap}.product-name{font-size:9.2px;font-weight:900;line-height:1.12;overflow-wrap:anywhere}.product-code{margin-top:.25mm;color:var(--muted);font-size:7px;font-weight:700;line-height:1.1}
+.summary{margin:1.3mm 0 1mm auto;width:45mm}.summary-row{display:flex;padding:.35mm 0;justify-content:space-between;font-size:8.3px}.summary-row span:first-child{color:var(--ink);font-weight:800}.summary-row strong{font-size:9.3px;font-weight:900}.summary-total{display:flex;margin-top:.8mm;padding:1.5mm 1.7mm;justify-content:space-between;border-top:2px solid #000;border-bottom:3px double #000;color:#000;background:#fff;font-size:15px;line-height:1;font-weight:900;letter-spacing:.2px}
+.words{margin:1.3mm 0;padding:1.3mm;border-left:.8mm solid var(--brand);background:var(--soft);font-size:7.5px;line-height:1.25}.payment{padding:1mm 0;border-bottom:1px dashed var(--line);font-size:8px;line-height:1.35}.payment-title{margin:.7mm 0 .3mm;font-weight:900}.payment-row{display:flex;justify-content:space-between;gap:2mm}.operation{color:var(--muted);font-size:6.8px;overflow-wrap:anywhere}
+.validation{display:grid;margin-top:1.5mm;grid-template-columns:24mm 1fr;gap:2mm;align-items:center}.qr{width:24mm;height:24mm}.legal{color:var(--muted);font-size:6.8px;line-height:1.25}.legal strong{color:var(--ink)}
+.footer{margin-top:3mm;padding-top:2.5mm;border-top:1px dashed var(--line);text-align:center;font-size:8px;line-height:1.45}.thanks{margin-top:2mm;color:var(--brand);font-size:10px;font-weight:900;letter-spacing:.3px}
+@media(max-width:420px){body{padding:0;background:#fff}.ticket{width:100%;min-height:100vh;box-shadow:none}}
+@media print{@page{size:80mm 297mm;margin:4mm}html,body{width:72mm!important;max-width:100%!important;height:auto!important;min-height:0!important;background:#fff}body{padding:0}.ticket{width:72mm;max-width:100%;height:auto;min-height:0;margin:0;padding:0;box-shadow:none;break-inside:auto;page-break-inside:auto}.items tr,.validation,.summary-total{break-inside:avoid}.no-print,#printers,#printer{display:none!important}body>br{display:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="no-print receipt-actions"><button type="button" onclick="window.nstPrintReceipt ? window.nstPrintReceipt() : window.print()">Imprimir comprobante</button></div>
+<main class="ticket">
+  <header class="brand">
+    <img src="/resources/images/logo-ticket.png" alt="Logo">
+    <div class="company">CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C.</div>
+    <div class="company-meta"><strong>RUC 20573027125</strong><br>JR. 28 DE JULIO NRO. 313 CENT C.U HUANUCO (FRENTE AL GRIFO TORRES) HUANUCO - HUANUCO - HUANUCO<br>HUANUCO - HUANUCO - HUANUCO</div>
+  </header>
+
+  <section class="document">
+    <div class="document-type">BOLETA DE VENTA ELECTRONICA</div>
+    <div class="document-number">B012-00000001</div>
+  </section>
+
+  <section class="meta">
+    <div class="row"><span class="label">FECHA EMISIÓN</span><span class="value">12/10/2026 12:00:00</span></div>
+    <div class="row"><span class="label">CLIENTE</span><span class="value">CLIENTE DE PRUEBA</span></div>
+    <div class="row"><span class="label">DNI / RUC</span><span class="value">00000000</span></div>
+    <div class="row"><span class="label">DIRECCIÓN</span><span class="value">DIRECCION DE PRUEBA</span></div>
+          </section>
+
+  <table class="items">
+    <thead><tr><th>DESCRIPCIÓN</th><th class="qty">CANT.</th><th class="unit">P. UNIT.</th><th class="amount">IMPORTE</th></tr></thead>
+    <tbody>
+          <tr>
+        <td><div class="product-name">1. PRODUCTO &lt;PRUEBA&gt;</div><div class="product-code">UNIDAD</div></td>
+        <td class="qty">2</td>
+        <td class="unit">S/ 10.00</td>
+        <td class="amount"><strong>S/ 20.00</strong></td>
+      </tr>
+          <tr>
+        <td><div class="product-name">2. SEGUNDO PRODUCTO</div><div class="product-code">UNIDAD</div></td>
+        <td class="qty">1</td>
+        <td class="unit">S/ 30.00</td>
+        <td class="amount"><strong>S/ 30.00</strong></td>
+      </tr>
+        </tbody>
+  </table>
+
+  <section class="summary">
+    <div class="summary-row"><span>SUBTOTAL</span><strong>S/ 48.00</strong></div>
+    <div class="summary-row"><span>OP. GRAVADA</span><strong>S/ 40.68</strong></div><div class="summary-row"><span>IGV (18%)</span><strong>S/ 7.32</strong></div>    <div class="summary-row"><span>DESCUENTO</span><strong>- S/ 2.00</strong></div>    <div class="summary-total"><span>TOTAL</span><span>S/ 48.00</span></div>
+  </section>
+
+  <div class="words"><strong>SON:</strong> CUARENTA Y OCHO  CON 00/100 SOLES</div>
+  <section class="payment">
+    <div><strong>VENDEDOR:</strong> PRUEBA</div>
+    <div><strong>FORMA DE PAGO:</strong> CONTADO</div>
+    <div class="payment-title">MÉTODO(S) DE PAGO</div>
+          <div class="payment-row"><span>Efectivo</span><strong>S/ 20.00</strong></div>
+                <div class="payment-row"><span>Yape / Plin</span><strong>S/ 28.00</strong></div>
+      <div class="operation">Operación / referencia: TEST-123</div>        <div class="payment-row"><span>RECIBIDO</span><strong>S/ 50.00</strong></div>
+    <div class="payment-row"><span>VUELTO</span><strong>S/ 2.00</strong></div>
+      </section>
+
+  <section class="validation">
+    <img class="qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAREAAAERAQMAAABmWgHNAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACQ0lEQVRogeVZsZHDMAyjL0XKjOBRPJo9mkbJCClT5MwnAUrK/28As4hOFpQCR0EgZXbhWBwRw2tt+2l3f+JjzrDShDGfZGA3u79icCxaDvhotkpj7sHBDkb8cM7c34+n8eMFMJ/gZ2Oe+HHe3knaRTCRG7loWMS5uAQG5yKGR2CgEK2Ox9+zo4cpPYzcWJkic/irmWqYisXflnfBbeywf6GHuYX0hRhEiqyOYWSKxw6cC2FMkZDqn3fBcztIU8pifNTFJBWxOGmK4Vg4gLSmjIHb84KGDUorAEfgyZ0yxiINgpha7Jc/NmamUBpEMWX6YAVSE+j9yBbzRhiT0te6GDitgFe9w7xRxmTu5z0YcaLsiQHE5Kx7JEUMI63Oy4YVwGyb94UoBvyE2bcyfZjR/o5/UMWw0HHc+viKc/HpSVEcqmJSE4xi4GUFqgiaG0UxyP3wP9XUCWnY2OWKHdwvixlCCLc3leIB3+u8C0Qx8D/leDYcCENuwP56r3dUMW9DM29agW769tMqRDEs53fWuUdhoAmRKcMnaGIQSANa/17q41ywoy+LqTo3xSDbmqUJt/Q/nhjooSimatnq3vIuONDDD8xXD0QRs/CpAjao9epu+cwUabqYiqUXeeCnHAFJ08XMPraXB/Bs6aLsSe5+97rFMKN7m0P+9G5Hq3cdZQzfrdi8N6vWHiqA736mMGaZHiDiJGbeg9KYKneRG610Yu/vF7oYngsKIfpaoYc2Xi/JjyiGekj133282JcmkB9RzIXjB6irpS7M268FAAAAAElFTkSuQmCC" alt="Código QR del comprobante">
+    <div class="legal"><strong>Autorizado mediante resolución de intendencia SUNAT.</strong><br>Representación impresa de la BOLETA DE VENTA ELECTRONICA.<br><strong>CONSULTA WEB:</strong><br>http://emision.factura.vip</div>
+  </section>
+
+  <footer class="footer">Conserve este comprobante para cualquier consulta o reclamo.<br>JR. 28 DE JULIO NRO. 313 CENT C.U HUANUCO (FRENTE AL GRIFO TORRES) HUANUCO - HUANUCO - HUANUCO<div class="thanks">¡GRACIAS POR SU PREFERENCIA!</div><div>DESARROLLADO POR<br><strong>neurosoft.com.pe</strong></div></footer>
+</main>
+</body>
+</html>

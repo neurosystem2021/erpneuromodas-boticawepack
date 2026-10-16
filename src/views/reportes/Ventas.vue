@@ -1,156 +1,156 @@
 <template>
-  <div>
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col md="10" class="my-1">
-            <b-row>
-              <b-col md="4">
-                <b-form-group>
-                  <label>Almacen:</label>
+<div class="nst-screen nst-screen--ventas">
+    <b-container class="bv-example-row">
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="10" class="my-1">
+          <b-row>
+            <b-col md="4">
+              <b-form-group>
+                <label>Almacen:</label>
+                <autocomplete
+                    required="required"
+                    ref="inputAlmacen"
+                    :url="API + 'almacenes'"
+                    anchor="Almacen"
+                    initValue="VENTA"
+                    label="writer"
+                    placeholder=""
+                    :on-select="setAlmacen" 
+                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                    :classes="{input: 'form-control'}">
+                </autocomplete>
+              </b-form-group>
+              <b-form-group>
+                <label>Fecha Inicio:</label>
+                <b-form-input v-model="fechaInicio"
+                  type="date"
+                  placeholder=""
+                  @input="val => generateFilter('fechaInicio', val) "></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col md="4">
+              <b-row>
+                <b-col md="6">
+                  <b-form-group>
+                      <label>Tipo de Venta:</label>
+                      <autocomplete
+                          required="required"
+                          ref="inputTipoVenta"
+                          :url="API + 'ventas/tipos'"
+                          anchor="TipoDoc"
+                          label="writer"
+                          placeholder=""
+                          :on-select="setTipoVenta" 
+                          :onInput="(val) => !val ? setTipoVenta() : false"
+                          :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
+                          :classes="{input: 'form-control'}">
+                      </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="6">
+                  <b-form-group label="Declarado">
+                    <b-form-radio-group id="btnradios1"
+                        buttons
+                        v-model="declarado"
+                        :options="[{ text: 'SI', value: 1 }, { text: 'NO', value: 0 }]"
+                        @input="val => generateFilter('declarado', val) "
+                        name="radiosBtnDefault" />
+                  </b-form-group>
+                </b-col>
+                <b-col md="12">
+                  <b-form-group>
+                    <label>Fecha Fin:</label>
+                    <b-form-input v-model="fechaFin"
+                      type="date"
+                      placeholder=""
+                      @input="val => generateFilter('fechaFin', val) "></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+              
+              
+            </b-col>
+            <b-col md="4">
+              <b-form-group>
+                  <label>Vendedor:</label>
                   <autocomplete
                       required="required"
-                      ref="inputAlmacen"
-                      :url="API + 'almacenes'"
-                      anchor="Almacen"
-                      initValue="VENTA"
+                      ref="inputVendedor"
+                      :url="API + 'usuarios'"
+                      anchor="NombreUsuario"
                       label="writer"
-                      placeholder=""
-                      :on-select="setAlmacen" 
-                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
+                      :on-select="setVendedor" 
+                      :onInput="(val) => !val ? generateFilter('vendedor', val) : false"
+                      :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
                       :classes="{input: 'form-control'}">
                   </autocomplete>
-                </b-form-group>
-                <b-form-group>
-                  <label>Fecha Inicio:</label>
-                  <b-form-input v-model="fechaInicio"
-                    type="date"
-                    placeholder=""
-                    @input="val => generateFilter('fechaInicio', val) "></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-col md="4">
-                <b-row>
-                  <b-col md="6">
-                    <b-form-group>
-                        <label>Tipo de Venta:</label>
-                        <autocomplete
-                            required="required"
-                            ref="inputTipoVenta"
-                            :url="API + 'ventas/tipos'"
-                            anchor="TipoDoc"
-                            label="writer"
-                            placeholder=""
-                            :on-select="setTipoVenta" 
-                            :onInput="(val) => !val ? setTipoVenta() : false"
-                            :onFocus="focusAutocomplete.bind(null, 'inputTipoVenta')"
-                            :classes="{input: 'form-control'}">
-                        </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="6">
-                    <b-form-group label="Declarado">
-                      <b-form-radio-group id="btnradios1"
-                          buttons
-                          v-model="declarado"
-                          :options="[{ text: 'SI', value: 1 }, { text: 'NO', value: 0 }]"
-                          @input="val => generateFilter('declarado', val) "
-                          name="radiosBtnDefault" />
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="12">
-                    <b-form-group>
-                      <label>Fecha Fin:</label>
-                      <b-form-input v-model="fechaFin"
-                        type="date"
-                        placeholder=""
-                        @input="val => generateFilter('fechaFin', val) "></b-form-input>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-                
-                
-              </b-col>
-              <b-col md="4">
-                <b-form-group>
-                    <label>Vendedor:</label>
-                    <autocomplete
-                        required="required"
-                        ref="inputVendedor"
-                        :url="API + 'usuarios'"
-                        anchor="NombreUsuario"
-                        label="writer"
-                        :on-select="setVendedor" 
-                        :onInput="(val) => !val ? generateFilter('vendedor', val) : false"
-                        :onFocus="focusAutocomplete.bind(null, 'inputVendedor')"
-                        :classes="{input: 'form-control'}">
-                    </autocomplete>
-                </b-form-group>
-                <div class="total-ventas">
-                  S/ {{ ventasAcumuladas || '0.00' }}
-                </div>
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col md="2" class="my-1">
-            <b-row>
-              <b-col md="12">
-                <b-form-group label="Limpiar Filtros">
-                  <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
-                </b-form-group>
-                <b-form-group label="Mostrar">
-                  <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
-                </b-form-group>
-                <br />
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-        <b-row>
-          
-          <b-col md="12">
-            <b-table small
-              ref="tablaVentas"
-              :filter="filter"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              striped
-              hover
-              @row-clicked="rowClick"
-              id="tabla-ventas" 
-              :busy.sync="isBusy" 
-              :items="myProvider" 
-              :fields="fields"
-              :per-page="perPage"
-              :current-page="currentPage">
-
-                <template slot="stock" slot-scope="data">
-                  <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
-                    {{ getStock(data.item.IdProducto) }}
-                  </div>
-                </template>
-
-              </b-table>
-          </b-col>
-          <b-row>
-              <b-col md="6" class="my-1">
-                  <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-              </b-col>
+              </b-form-group>
+              <div class="total-ventas">
+                S/ {{ ventasAcumuladas || '0.00' }}
+              </div>
+            </b-col>
           </b-row>
-        </b-row>
-        <br />
-        <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+        </b-col>
+        <b-col md="2" class="my-1">
+          <b-row>
+            <b-col md="12">
+              <b-form-group label="Limpiar Filtros">
+                <b-button :disabled="!filter" @click="limpiarFiltros">Limpiar</b-button>
+              </b-form-group>
+              <b-form-group label="Mostrar">
+                <b-form-select :options="pageOptions" v-model="perPage" @input="currentPage = 1"/>
+              </b-form-group>
+              <br />
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row></section>
+      <section class="nst-panel nst-panel--results"><b-row>
+        
+        <b-col md="12">
+          <b-table small
+            ref="tablaVentas"
+            :filter="filter"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            striped
+            hover
+            @row-clicked="rowClick"
+            id="tabla-ventas" 
+            :busy.sync="isBusy" 
+            :items="myProvider" 
+            :fields="fields"
+            :per-page="perPage"
+            :current-page="currentPage" responsive="" show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." >
+
+              <template slot="stock" slot-scope="data">
+                <div :class="getStock(data.item.IdProducto) > 0 ? 'table-success' : 'table-danger'" @click.stop="() => false">
+                  {{ getStock(data.item.IdProducto) }}
+                </div>
+              </template>
+
+            </b-table>
+        </b-col>
+        <b-row>
+            <b-col md="6" class="my-1">
+                <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
             </b-col>
         </b-row>
-        <br /><br />
-      </b-container>
+      </b-row></section>
+      <br />
+      <b-row align-h="center" class="text-center nst-action-bar">
+          <b-col cols="4">
+            <b-button variant="success" size="lg" :href="'/api/index.php/reporte/stock?idAlmacen=' + almacen.IdAlmacen" target="_blank">Exportar</b-button>
+          </b-col>
+      </b-row>
+      <br /><br />
+    </b-container>
 
-      <b-modal id="kardex" size="lg" modal-class="modal-xl" v-model="showVenta" title="Kardex de producto">
-        <b-alert show variant="warning">titulo</b-alert>
-        <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
-      </b-modal>
-  </div>
+    <b-modal id="kardex" size="lg" modal-class="modal-xl nst-dialog" v-model="showVenta" title="Kardex de producto" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-alert show variant="warning">titulo</b-alert>
+      <!--<producto-kardex :producto="productoSelect" :kardex="kardexSelect"></producto-kardex>-->
+    </b-modal>
+</div>
 </template>
 
 <script>

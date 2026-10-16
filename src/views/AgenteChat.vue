@@ -1,299 +1,299 @@
 <template>
-  <div class="agente-page" :class="{ 'modo-nocturno': modoNocturno }">
-    <!-- ===== Panel lateral: Historial de conversaciones ===== -->
-    <div class="historial-panel" :class="{ colapsado: !panelAbierto }">
-      <div class="historial-header">
-        <button
-          class="btn-toggle-panel"
-          type="button"
-          title="Mostrar/ocultar historial"
-          @click="panelAbierto = !panelAbierto"
-        >
-          <span>{{ panelAbierto ? '⟨' : '⟩' }}</span>
-        </button>
-        <span v-if="panelAbierto" class="historial-titulo">Historial</span>
-      </div>
-
+<div class="agente-page nst-screen nst-screen--agentechat" :class="{ 'modo-nocturno': modoNocturno }">
+  <!-- ===== Panel lateral: Historial de conversaciones ===== -->
+  <div class="historial-panel" :class="{ colapsado: !panelAbierto }">
+    <div class="historial-header">
       <button
-        v-if="panelAbierto"
+        class="btn-toggle-panel"
         type="button"
-        class="btn-nueva-conversacion"
-        @click="nuevaConversacion"
+        title="Mostrar/ocultar historial"
+        @click="panelAbierto = !panelAbierto"
       >
-        + Nueva conversación
+        <span>{{ panelAbierto ? '⟨' : '⟩' }}</span>
       </button>
-
-      <div v-if="panelAbierto" class="historial-lista">
-        <div v-if="historial.length === 0" class="historial-vacio">
-          <small>Aún no hay conversaciones guardadas</small>
-        </div>
-
-        <div
-          v-for="item in historialOrdenado"
-          :key="item.IdConversacion"
-          class="historial-item"
-          :class="{ activo: item.IdConversacion === conversacionActualId }"
-          @click="cargarConversacion(item.IdConversacion)"
-        >
-          <div class="historial-item-texto">
-            <span class="historial-item-titulo">{{ item.Titulo }}</span>
-            <small class="historial-item-fecha">{{ formatearFecha(item.FechaModificacion) }}</small>
-          </div>
-          <button
-            type="button"
-            class="btn-borrar-historial"
-            title="Eliminar del historial"
-            @click.stop="eliminarConversacion(item.IdConversacion)"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
+      <span v-if="panelAbierto" class="historial-titulo">Historial</span>
     </div>
 
-    <!-- ===== Chat principal ===== -->
-    <div class="agente-card">
-      <div class="agente-header">
-        <div class="agente-header-title">
-          <span class="agente-avatar">
-            <span class="agente-avatar-glow"></span>
-            <span class="agente-avatar-icon">✦</span>
-          </span>
-          <div>
-            <h5 class="mb-0">Agente Inteligente POS</h5>
-            <small class="agente-subtitle">Pregunta sobre ventas, productos, vendedores o clientes</small>
-          </div>
-        </div>
-        <div class="header-acciones">
-          <button
-            type="button"
-            class="btn-modo-nocturno"
-            :class="{ activo: modoNocturno }"
-            :aria-pressed="modoNocturno"
-            title="Alternar modo nocturno"
-            @click="alternarModoNocturno"
-          >
-            <span class="modo-nocturno-icon">{{ modoNocturno ? '☀️' : '🌙' }}</span>
-          </button>
-          <b-button
-            v-if="mensajes.length > 1"
-            variant="outline-secondary"
-            size="sm"
-            class="btn-limpiar"
-            :disabled="cargando"
-            @click="limpiarChat"
-          >
-            <span class="icon-limpiar">↺</span> Limpiar
-          </b-button>
-        </div>
+    <button
+      v-if="panelAbierto"
+      type="button"
+      class="btn-nueva-conversacion"
+      @click="nuevaConversacion"
+    >
+      + Nueva conversación
+    </button>
+
+    <div v-if="panelAbierto" class="historial-lista">
+      <div v-if="historial.length === 0" class="historial-vacio">
+        <small>Aún no hay conversaciones guardadas</small>
       </div>
 
-      <div class="chat-container" ref="chatBox">
-        <div
-          v-for="msg in mensajes"
-          :key="msg.id"
-          :class="['chat-row', msg.rol === 'usuario' ? 'usuario' : 'agente']"
+      <div
+        v-for="item in historialOrdenado"
+        :key="item.IdConversacion"
+        class="historial-item"
+        :class="{ activo: item.IdConversacion === conversacionActualId }"
+        @click="cargarConversacion(item.IdConversacion)"
+      >
+        <div class="historial-item-texto">
+          <span class="historial-item-titulo">{{ item.Titulo }}</span>
+          <small class="historial-item-fecha">{{ formatearFecha(item.FechaModificacion) }}</small>
+        </div>
+        <button
+          type="button"
+          class="btn-borrar-historial"
+          title="Eliminar del historial"
+          @click.stop="eliminarConversacion(item.IdConversacion)"
         >
-          <span v-if="msg.rol !== 'usuario'" class="bubble-avatar" :class="{ 'is-error': msg.esError }">
-            {{ msg.esError ? '!' : '✦' }}
-          </span>
-
-          <div :class="['chat-message', msg.esError ? 'es-error' : '']">
-            <div class="message-content">
-              <strong class="message-autor">{{ msg.rol === 'usuario' ? 'Tú' : 'Agente IA' }}</strong>
-              <p class="mb-1 texto-mensaje">{{ msg.texto }}</p>
-
-              <div v-if="msg.grafico" class="vista-toggle">
-                <button
-                  type="button"
-                  class="btn-vista"
-                  :class="{ activo: msg.vista === 'tabla' }"
-                  @click="msg.vista = 'tabla'"
-                >
-                  ☰ Tabla
-                </button>
-                <button
-                  type="button"
-                  class="btn-vista"
-                  :class="{ activo: msg.vista === 'grafico' }"
-                  @click="msg.vista = 'grafico'"
-                >
-                  📊 Gráfico
-                </button>
-              </div>
-
-              <div
-                v-if="msg.datos && msg.datos.length > 0 && (!msg.grafico || msg.vista === 'tabla')"
-                class="tabla-wrapper"
-              >
-                <b-table
-                  :items="msg.datos"
-                  small
-                  bordered
-                  striped
-                  responsive
-                  class="mt-2 bg-white tabla-resultados"
-                ></b-table>
-              </div>
-
-              <div v-if="msg.grafico && msg.vista === 'grafico'" class="grafico-contenedor">
-
-                <!-- Barras horizontales (ranking) -->
-                <div v-if="msg.grafico.tipo === 'barras'" class="grafico-barras">
-                  <div v-for="(fila, idx) in msg.grafico.filas" :key="idx" class="grafico-fila">
-                    <span class="grafico-etiqueta" :title="fila.etiqueta">{{ fila.etiqueta }}</span>
-                    <div class="grafico-barra-track">
-                      <div class="grafico-barra" :style="{ width: fila.porcentaje + '%' }"></div>
-                    </div>
-                    <span class="grafico-valor">{{ formatearNumero(fila.valor) }}</span>
-                  </div>
-                </div>
-
-                <!-- Líneas (series por fecha) -->
-                <div v-else-if="msg.grafico.tipo === 'lineas'" class="grafico-lineas">
-                  <svg
-                    :viewBox="`0 0 ${msg.grafico.anchoSvg} ${msg.grafico.altoSvg}`"
-                    class="grafico-svg-lineas"
-                    preserveAspectRatio="none"
-                  >
-                    <path :d="msg.grafico.pathD" class="linea-trazo" fill="none"></path>
-                    <circle
-                      v-for="(p, idx) in msg.grafico.puntos"
-                      :key="idx"
-                      :cx="p.x"
-                      :cy="p.y"
-                      r="3"
-                      class="linea-punto"
-                    >
-                      <title>{{ p.etiqueta }}: {{ formatearNumero(p.valor) }}</title>
-                    </circle>
-                  </svg>
-                  <div class="grafico-lineas-etiquetas">
-                    <span v-for="(p, idx) in msg.grafico.puntosVisibles" :key="idx" class="linea-etiqueta">
-                      {{ p.etiqueta }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Pastel / Dona (proporciones) -->
-                <div v-else-if="msg.grafico.tipo === 'pastel'" class="grafico-pastel">
-                  <svg viewBox="0 0 150 150" class="grafico-svg-pastel">
-                    <circle
-                      v-for="(seg, idx) in msg.grafico.segmentos"
-                      :key="idx"
-                      cx="75"
-                      cy="75"
-                      :r="msg.grafico.radio"
-                      fill="none"
-                      :stroke="seg.color"
-                      stroke-width="26"
-                      :stroke-dasharray="seg.dasharray"
-                      :stroke-dashoffset="seg.dashoffset"
-                      transform="rotate(-90 75 75)"
-                    >
-                      <title>{{ seg.etiqueta }}: {{ seg.porcentaje }}%</title>
-                    </circle>
-                  </svg>
-                  <div class="grafico-pastel-leyenda">
-                    <div v-for="(seg, idx) in msg.grafico.segmentos" :key="idx" class="leyenda-item">
-                      <span class="leyenda-color" :style="{ backgroundColor: seg.color }"></span>
-                      <span class="leyenda-etiqueta" :title="seg.etiqueta">{{ seg.etiqueta }}</span>
-                      <span class="leyenda-valor">{{ seg.porcentaje }}%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Barras comparativas / agrupadas (2+ columnas numéricas) -->
-                <div v-else-if="msg.grafico.tipo === 'comparativas'" class="grafico-comparativo">
-                  <div class="grafico-comparativo-leyenda">
-                    <span v-for="(c, idx) in msg.grafico.colores" :key="idx" class="leyenda-item">
-                      <span class="leyenda-color" :style="{ backgroundColor: c.color }"></span>
-                      <span class="leyenda-etiqueta">{{ c.campo }}</span>
-                    </span>
-                  </div>
-                  <div v-for="(fila, idx) in msg.grafico.filas" :key="idx" class="grafico-comparativo-fila">
-                    <span class="grafico-etiqueta" :title="fila.etiqueta">{{ fila.etiqueta }}</span>
-                    <div class="grafico-comparativo-barras">
-                      <div
-                        v-for="(v, i2) in fila.valores"
-                        :key="i2"
-                        class="grafico-barra-track comparativo-track"
-                      >
-                        <div class="grafico-barra" :style="{ width: v.porcentaje + '%', background: v.color }"></div>
-                      </div>
-                    </div>
-                    <div class="grafico-comparativo-valores">
-                      <span v-for="(v, i2) in fila.valores" :key="i2" class="grafico-valor-mini">
-                        {{ formatearNumero(v.valor) }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <small v-if="msg.hora" class="hora-mensaje">{{ msg.hora }}</small>
-            </div>
-          </div>
-
-          <span v-if="msg.rol === 'usuario'" class="bubble-avatar usuario-avatar">Tú</span>
-        </div>
-
-        <div v-if="cargando" class="chat-row agente">
-          <span class="bubble-avatar">✦</span>
-          <div class="chat-message">
-            <div class="message-content typing-content">
-              <span class="typing-dots">
-                <span></span><span></span><span></span>
-              </span>
-              <span class="typing-label">Consultando datos...</span>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="mensajes.length === 0" class="chat-vacio text-center py-4">
-          <div class="chat-vacio-icon">✦</div>
-          <p class="mb-0">No hay mensajes todavía.</p>
-          <small>Escribe una pregunta para empezar</small>
-        </div>
+          ✕
+        </button>
       </div>
-
-      <b-form @submit.prevent="enviarConsulta" class="form-consulta">
-        <b-input-group class="input-group-consulta">
-          <b-form-input
-            v-model="pregunta"
-            :placeholder="escuchando ? 'Escuchando...' : 'Ej. ¿Qué producto se vendió más este mes?'"
-            :disabled="cargando"
-            ref="inputPregunta"
-            autocomplete="off"
-            class="input-pregunta"
-            @keydown.enter.exact.prevent="enviarConsulta"
-          ></b-form-input>
-          <b-input-group-append>
-            <button
-              v-if="reconocimientoVozDisponible"
-              type="button"
-              class="btn-microfono"
-              :class="{ activo: escuchando }"
-              :disabled="cargando"
-              :title="escuchando ? 'Detener dictado' : 'Buscar por voz'"
-              @click="alternarReconocimientoVoz"
-            >
-              <span v-if="escuchando" class="mic-ondas">
-                <span></span><span></span><span></span>
-              </span>
-              <span v-else class="mic-icon">🎤</span>
-            </button>
-            <b-button type="submit" class="btn-enviar" :disabled="cargando || !pregunta.trim()">
-              <span v-if="cargando" class="spinner-enviar"></span>
-              <span v-else>Enviar ➤</span>
-            </b-button>
-          </b-input-group-append>
-        </b-input-group>
-        <small v-if="errorVoz" class="error-voz">{{ errorVoz }}</small>
-      </b-form>
     </div>
   </div>
+
+  <!-- ===== Chat principal ===== -->
+  <div class="agente-card">
+    <div class="agente-header">
+      <div class="agente-header-title">
+        <span class="agente-avatar">
+          <span class="agente-avatar-glow"></span>
+          <span class="agente-avatar-icon">✦</span>
+        </span>
+        <div>
+          <h5 class="mb-0">Agente Inteligente POS</h5>
+          <small class="agente-subtitle">Pregunta sobre ventas, productos, vendedores o clientes</small>
+        </div>
+      </div>
+      <div class="header-acciones">
+        <button
+          type="button"
+          class="btn-modo-nocturno"
+          :class="{ activo: modoNocturno }"
+          :aria-pressed="modoNocturno"
+          title="Alternar modo nocturno"
+          @click="alternarModoNocturno"
+        >
+          <span class="modo-nocturno-icon">{{ modoNocturno ? '☀️' : '🌙' }}</span>
+        </button>
+        <b-button
+          v-if="mensajes.length > 1"
+          variant="outline-secondary"
+          size="sm"
+          class="btn-limpiar"
+          :disabled="cargando"
+          @click="limpiarChat"
+        >
+          <span class="icon-limpiar">↺</span> Limpiar
+        </b-button>
+      </div>
+    </div>
+
+    <div class="chat-container" ref="chatBox">
+      <div
+        v-for="msg in mensajes"
+        :key="msg.id"
+        :class="['chat-row', msg.rol === 'usuario' ? 'usuario' : 'agente']"
+      >
+        <span v-if="msg.rol !== 'usuario'" class="bubble-avatar" :class="{ 'is-error': msg.esError }">
+          {{ msg.esError ? '!' : '✦' }}
+        </span>
+
+        <div :class="['chat-message', msg.esError ? 'es-error' : '']">
+          <div class="message-content">
+            <strong class="message-autor">{{ msg.rol === 'usuario' ? 'Tú' : 'Agente IA' }}</strong>
+            <p class="mb-1 texto-mensaje">{{ msg.texto }}</p>
+
+            <div v-if="msg.grafico" class="vista-toggle">
+              <button
+                type="button"
+                class="btn-vista"
+                :class="{ activo: msg.vista === 'tabla' }"
+                @click="msg.vista = 'tabla'"
+              >
+                ☰ Tabla
+              </button>
+              <button
+                type="button"
+                class="btn-vista"
+                :class="{ activo: msg.vista === 'grafico' }"
+                @click="msg.vista = 'grafico'"
+              >
+                📊 Gráfico
+              </button>
+            </div>
+
+            <div
+              v-if="msg.datos && msg.datos.length > 0 && (!msg.grafico || msg.vista === 'tabla')"
+              class="tabla-wrapper"
+            >
+              <b-table
+                :items="msg.datos"
+                small
+                bordered
+                striped
+                responsive
+                class="mt-2 bg-white tabla-resultados"
+               show-empty empty-text="No hay registros para los filtros seleccionados." empty-filtered-text="No se encontraron coincidencias." ></b-table>
+            </div>
+
+            <div v-if="msg.grafico && msg.vista === 'grafico'" class="grafico-contenedor">
+
+              <!-- Barras horizontales (ranking) -->
+              <div v-if="msg.grafico.tipo === 'barras'" class="grafico-barras">
+                <div v-for="(fila, idx) in msg.grafico.filas" :key="idx" class="grafico-fila">
+                  <span class="grafico-etiqueta" :title="fila.etiqueta">{{ fila.etiqueta }}</span>
+                  <div class="grafico-barra-track">
+                    <div class="grafico-barra" :style="{ width: fila.porcentaje + '%' }"></div>
+                  </div>
+                  <span class="grafico-valor">{{ formatearNumero(fila.valor) }}</span>
+                </div>
+              </div>
+
+              <!-- Líneas (series por fecha) -->
+              <div v-else-if="msg.grafico.tipo === 'lineas'" class="grafico-lineas">
+                <svg
+                  :viewBox="`0 0 ${msg.grafico.anchoSvg} ${msg.grafico.altoSvg}`"
+                  class="grafico-svg-lineas"
+                  preserveAspectRatio="none"
+                >
+                  <path :d="msg.grafico.pathD" class="linea-trazo" fill="none"></path>
+                  <circle
+                    v-for="(p, idx) in msg.grafico.puntos"
+                    :key="idx"
+                    :cx="p.x"
+                    :cy="p.y"
+                    r="3"
+                    class="linea-punto"
+                  >
+                    <title>{{ p.etiqueta }}: {{ formatearNumero(p.valor) }}</title>
+                  </circle>
+                </svg>
+                <div class="grafico-lineas-etiquetas">
+                  <span v-for="(p, idx) in msg.grafico.puntosVisibles" :key="idx" class="linea-etiqueta">
+                    {{ p.etiqueta }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Pastel / Dona (proporciones) -->
+              <div v-else-if="msg.grafico.tipo === 'pastel'" class="grafico-pastel">
+                <svg viewBox="0 0 150 150" class="grafico-svg-pastel">
+                  <circle
+                    v-for="(seg, idx) in msg.grafico.segmentos"
+                    :key="idx"
+                    cx="75"
+                    cy="75"
+                    :r="msg.grafico.radio"
+                    fill="none"
+                    :stroke="seg.color"
+                    stroke-width="26"
+                    :stroke-dasharray="seg.dasharray"
+                    :stroke-dashoffset="seg.dashoffset"
+                    transform="rotate(-90 75 75)"
+                  >
+                    <title>{{ seg.etiqueta }}: {{ seg.porcentaje }}%</title>
+                  </circle>
+                </svg>
+                <div class="grafico-pastel-leyenda">
+                  <div v-for="(seg, idx) in msg.grafico.segmentos" :key="idx" class="leyenda-item">
+                    <span class="leyenda-color" :style="{ backgroundColor: seg.color }"></span>
+                    <span class="leyenda-etiqueta" :title="seg.etiqueta">{{ seg.etiqueta }}</span>
+                    <span class="leyenda-valor">{{ seg.porcentaje }}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Barras comparativas / agrupadas (2+ columnas numéricas) -->
+              <div v-else-if="msg.grafico.tipo === 'comparativas'" class="grafico-comparativo">
+                <div class="grafico-comparativo-leyenda">
+                  <span v-for="(c, idx) in msg.grafico.colores" :key="idx" class="leyenda-item">
+                    <span class="leyenda-color" :style="{ backgroundColor: c.color }"></span>
+                    <span class="leyenda-etiqueta">{{ c.campo }}</span>
+                  </span>
+                </div>
+                <div v-for="(fila, idx) in msg.grafico.filas" :key="idx" class="grafico-comparativo-fila">
+                  <span class="grafico-etiqueta" :title="fila.etiqueta">{{ fila.etiqueta }}</span>
+                  <div class="grafico-comparativo-barras">
+                    <div
+                      v-for="(v, i2) in fila.valores"
+                      :key="i2"
+                      class="grafico-barra-track comparativo-track"
+                    >
+                      <div class="grafico-barra" :style="{ width: v.porcentaje + '%', background: v.color }"></div>
+                    </div>
+                  </div>
+                  <div class="grafico-comparativo-valores">
+                    <span v-for="(v, i2) in fila.valores" :key="i2" class="grafico-valor-mini">
+                      {{ formatearNumero(v.valor) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <small v-if="msg.hora" class="hora-mensaje">{{ msg.hora }}</small>
+          </div>
+        </div>
+
+        <span v-if="msg.rol === 'usuario'" class="bubble-avatar usuario-avatar">Tú</span>
+      </div>
+
+      <div v-if="cargando" class="chat-row agente">
+        <span class="bubble-avatar">✦</span>
+        <div class="chat-message">
+          <div class="message-content typing-content">
+            <span class="typing-dots">
+              <span></span><span></span><span></span>
+            </span>
+            <span class="typing-label">Consultando datos...</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="mensajes.length === 0" class="chat-vacio text-center py-4">
+        <div class="chat-vacio-icon">✦</div>
+        <p class="mb-0">No hay mensajes todavía.</p>
+        <small>Escribe una pregunta para empezar</small>
+      </div>
+    </div>
+
+    <b-form @submit.prevent="enviarConsulta" class="form-consulta">
+      <b-input-group class="input-group-consulta">
+        <b-form-input
+          v-model="pregunta"
+          :placeholder="escuchando ? 'Escuchando...' : 'Ej. ¿Qué producto se vendió más este mes?'"
+          :disabled="cargando"
+          ref="inputPregunta"
+          autocomplete="off"
+          class="input-pregunta"
+          @keydown.enter.exact.prevent="enviarConsulta"
+        ></b-form-input>
+        <b-input-group-append>
+          <button
+            v-if="reconocimientoVozDisponible"
+            type="button"
+            class="btn-microfono"
+            :class="{ activo: escuchando }"
+            :disabled="cargando"
+            :title="escuchando ? 'Detener dictado' : 'Buscar por voz'"
+            @click="alternarReconocimientoVoz"
+          >
+            <span v-if="escuchando" class="mic-ondas">
+              <span></span><span></span><span></span>
+            </span>
+            <span v-else class="mic-icon">🎤</span>
+          </button>
+          <b-button type="submit" class="btn-enviar" :disabled="cargando || !pregunta.trim()">
+            <span v-if="cargando" class="spinner-enviar"></span>
+            <span v-else>Enviar ➤</span>
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
+      <small v-if="errorVoz" class="error-voz">{{ errorVoz }}</small>
+    </b-form>
+  </div>
+</div>
 </template>
 
 <script>

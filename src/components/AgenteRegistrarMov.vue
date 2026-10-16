@@ -1,53 +1,53 @@
 <template>
-    <div>
-      <b-form @submit="guardarMovimiento" @keydown.enter="keyDownInput">
-        <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalMovimiento" :title="title" size="lg" ref="movimientoForm" v-model="show">
-          <b-row>
-            <b-col md="6">
-                <b-form-group>
-                    <label>Tipo de Movimiento</label>
-                    <b-form-select v-model="movimiento.Tipo" :options="itemsTipos" v-on:change="setTipo($event)" size="md"  required="required"/>
-                </b-form-group>
-              <hr>
-            </b-col>
-  
-            <b-col md="6">
-                <b-form-group>
-                <label>Importe</label>
-                <input   
-                    required="required"
-                    v-model="movimiento.Importe"
-                    type="number"
-                    class="form-control"
-                    step="0.1"
-                    />
-                </b-form-group>
-  
-            </b-col>
-            <b-col md="12">
-                <b-form-group>
-                    <label>Concepto:</label>
-                    <b-form-textarea 
-                    rows="4"
-                    v-model="movimiento.Concepto"
-                    required="required"
-                    style="text-transform: uppercase;"
-                    />
-                </b-form-group>
-            </b-col>
-          </b-row>
-          <div slot="modal-footer" >
-            <b-btn  variant="success" type="submit">
-              Guardar
-            </b-btn>
-            <b-btn  variant="secondary" @click="show=false">
-              Cerrar
-            </b-btn>
-          </div>
-        </b-modal>
-      </b-form>
-    </div>
-  </template>
+<div>
+  <b-form @submit="guardarMovimiento" @keydown.enter="keyDownInput">
+    <b-modal :no-close-on-esc="true" no-close-on-backdrop id="modalMovimiento" :title="title" size="lg" ref="movimientoForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-row>
+        <b-col md="6">
+            <b-form-group>
+                <label>Tipo de Movimiento</label>
+                <b-form-select v-model="movimiento.Tipo" :options="itemsTipos" v-on:change="setTipo($event)" size="md"  required="required"/>
+            </b-form-group>
+          <hr>
+        </b-col>
+
+        <b-col md="6">
+            <b-form-group>
+            <label>Importe</label>
+            <input   
+                required="required"
+                v-model="movimiento.Importe"
+                type="number"
+                class="form-control"
+                step="0.1"
+                />
+            </b-form-group>
+
+        </b-col>
+        <b-col md="12">
+            <b-form-group>
+                <label>Concepto:</label>
+                <b-form-textarea 
+                rows="4"
+                v-model="movimiento.Concepto"
+                required="required"
+                style="text-transform: uppercase;"
+                />
+            </b-form-group>
+        </b-col>
+      </b-row>
+      <div slot="modal-footer" >
+        <b-btn  variant="success" type="submit">
+          Guardar
+        </b-btn>
+        <b-btn  variant="secondary" @click="show=false">
+          Cerrar
+        </b-btn>
+      </div>
+    </b-modal>
+  </b-form>
+</div>
+</template>
   <script>
   import config from '@/store/config.js'
   

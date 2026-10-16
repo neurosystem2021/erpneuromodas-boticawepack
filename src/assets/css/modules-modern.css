@@ -1,0 +1,129 @@
+/* NST module layouts, adapted from the latest imceden operations/report suite. */
+.nst-workspace { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.nst-screen { padding: 0 !important; }
+.nst-screen > .container, .nst-screen > .container-fluid, .nst-screen > form > .container, .nst-screen > form > .container-fluid { width: 100% !important; max-width: none; padding: 0; }
+.nst-screen > br, .nst-screen > form > br, .nst-screen > h2, .nst-screen > .breadcrumb { display: none; }
+.nst-panel { margin: 0 0 18px; padding: 20px; border: 1px solid #d8e7ee; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(13, 58, 77, .055); }
+.nst-panel-heading { display: flex; align-items: center; gap: 11px; margin: -2px 0 19px; padding-bottom: 15px; border-bottom: 1px solid #e8f0f4; }
+.nst-panel-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 11px; color: #078b9b; background: #e7f6f7; font-size: 14px; }
+.nst-panel-heading h2 { margin: 0 0 3px; color: #173e52; font-size: 15px; font-weight: 750; line-height: 1.3; }
+.nst-panel-heading p { margin: 0; color: #78909e; font-size: 11px; line-height: 1.4; }
+.nst-panel--results .nst-panel-icon { color: #4566b6; background: #edf1fe; }
+.nst-panel--products .nst-panel-icon { color: #0a897c; background: #e3f7f0; }
+.nst-screen .form-group { margin-bottom: 15px; }
+.nst-screen .form-control, .nst-screen .custom-select { min-height: 43px; padding: 10px 12px; border-radius: 10px; background: #f9fcfe; font-weight: 500; }
+.nst-screen .custom-select { padding-right: 28px; }
+.nst-screen .form-control::placeholder { color: #8ba0af; font-weight: 400; }
+.nst-screen .form-control:focus { background: white; }
+.nst-screen label, .nst-screen legend { font-weight: 700; }
+.nst-screen .btn:focus-visible, .nst-dialog .btn:focus-visible { outline: 3px solid #27b9cf; outline-offset: 3px; }
+.nst-screen .btn[disabled], .nst-dialog .btn[disabled] { cursor: not-allowed; opacity: .5; box-shadow: none; }
+.nst-screen .input-group { flex-wrap: nowrap; }
+.nst-screen .input-group > .autocomplete { min-width: 0; flex: 1 1 auto; }
+.nst-screen .input-group-append .btn { height: 100%; }
+.nst-screen .custom-control-label { color: #356374; font-size: 12px; line-height: 24px; }
+.nst-screen .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before { background: #0b9f9e; border-color: #0b9f9e; }
+.nst-screen .table thead th { padding: 13px 12px; background: #103e54; color: #ecf9fd; border-bottom: 0; font-size: 11px; letter-spacing: .15px; white-space: nowrap; }
+.nst-screen .table thead th.table-success { background: #145d59; color: #e6fff8; }
+.nst-screen .table thead th.table-info { background: #155b75; color: #e8faff; }
+.nst-screen .table thead th.table-danger { background: #4b4264; color: #fff1fa; }
+.nst-screen .table thead th.table-warning { background: #675a33; color: #fff7d9; }
+.nst-screen .table tbody td { padding: 12px; line-height: 1.5; border-top: 1px solid #e7eff4; }
+.nst-screen .table tbody tr { transition: background .15s; }
+.nst-screen .table tbody .btn { padding: 7px 10px; border-radius: 8px; }
+.nst-screen .table .form-control { min-height: 36px; padding: 7px 9px; }
+.nst-table-scroll, .nst-screen .table-responsive { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid #deebf1; border-radius: 12px; background: white; }
+.nst-table-scroll > .table, .nst-screen .table-responsive > .table { margin: 0; }
+.nst-screen .table-responsive { margin-bottom: 16px; }
+.nst-screen .pagination { flex-wrap: wrap; gap: 4px; padding: 14px 0 0; }
+.nst-screen .page-link { border: 0; border-radius: 8px !important; background: #eaf3f7; }
+.nst-screen .page-item.active .page-link { color: white; background: #0c879d; }
+.nst-action-bar { justify-content: flex-end !important; margin: 0 0 18px; padding: 15px 18px; border: 1px solid #d2e8e9; border-radius: 14px; background: linear-gradient(110deg, #edf9f7, #eef4fb); }
+.nst-action-bar > [class*='col'] { flex: 0 1 auto; width: auto; max-width: 100%; text-align: right; }
+.nst-action-bar .btn { min-width: 150px; min-height: 44px; margin: 3px; }
+.nst-inline-panel { padding: 15px; border: 1px solid #dce8ef; border-radius: 13px; background: white; }
+.nst-subsection { margin-bottom: 15px; padding: 18px; border: 1px solid #dfebf0; border-radius: 14px; background: linear-gradient(145deg, #f8fcfd, #f4f8fc); }
+.nst-subsection-title { display: flex; align-items: center; gap: 8px; margin: 0 0 17px; color: #28576b; font-size: 12px; font-weight: 750; }
+.nst-subsection-title i { color: #0a9ca8; }
+.nst-screen--movimiento .nst-document-grid, .nst-screen--cargarcomprasxml .nst-document-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(380px, 1fr); gap: 18px; margin: 0; align-items: start; }
+.nst-document-grid > [class*='col'] { width: auto; max-width: none; padding: 0; }
+.nst-document-grid > .nst-subsection { padding: 18px; }
+.nst-document-grid > .nst-xml-detail { grid-column: 1 / -1; width: 100%; }
+.nst-document-grid > .nst-xml-detail > .custom-file { margin: 10px 0 20px; }
+.nst-screen--movimiento > div:nth-child(3) { margin-bottom: 12px; }
+.nst-tax-options { display: flex; align-items: center; gap: 25px; margin: -4px 0 18px !important; padding: 12px 18px !important; border-radius: 12px; background: #eaf6f6; border: 1px solid #d3e9e9; }
+.nst-tax-options .form-group { margin: 0; }
+.nst-screen--traslado .nst-route-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.nst-screen--traslado .nst-route-fields > [class*='col'] { width: 100%; max-width: none; padding: 0; margin: 0; }
+.nst-screen--almacen .suma-stock { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-height: 125px; padding: 16px !important; border: 1px solid #bddfdc; border-radius: 14px; color: #175367 !important; background: linear-gradient(135deg, #e5f7f4, #e8f2fb) !important; box-shadow: none; }
+.nst-screen--almacen .suma-stock b { color: #4b7284; font-size: 12px; line-height: 1.5; }
+.nst-screen--almacen .suma-stock > div { font-size: 26px; font-weight: 800; color: #087f8b; }
+.nst-screen--almacen .suma-stock br { display: none; }
+.nst-screen--almacen .suma-stock .btn { align-self: center; margin: 0 !important; padding: 6px 16px; background: white; border: 1px solid #bededc; color: #137c82; }
+.nst-screen--cajabancos .clsCuenta, .nst-screen--cajabancos .clsCaja { height: auto !important; min-height: 180px; padding: 20px !important; border: 1px solid #d8e7ee !important; border-radius: 14px !important; background: #f6fafc !important; box-shadow: none !important; }
+.nst-screen .nav-pills { gap: 6px; padding: 8px; border: 1px solid #dbe8ef; border-radius: 13px; background: #eef5f8; }
+.nst-screen .nav-pills .nav-link { color: #476b7e; font-weight: 700; }
+.nst-screen .nav-pills .nav-link.active { color: white; }
+.nst-tab-icon { margin-right: 8px; color: #109aa8; }
+.nav-link.active .nst-tab-icon { color: #b5f7f0; }
+.nst-screen .tab-content { padding: 16px 0 0; }
+.nst-screen .breadcrumb { margin: 0 0 16px; border-radius: 10px; font-size: 12px; background: #e9f3f7; }
+.nst-screen .autocomplete { position: relative; width: 100%; }
+.nst-screen .autocomplete ul { z-index: 50; max-height: 340px; padding: 6px; border: 1px solid #cde3eb; border-radius: 12px; background: white; box-shadow: 0 16px 34px #113b5226; }
+.nst-screen .autocomplete ul li a { display: block; padding: 10px 12px; border-radius: 8px; color: #234e63; font-size: 12px; }
+.nst-screen .autocomplete ul li a:hover, .nst-screen .autocomplete ul li.focus-list a { color: #075a6b; background: #e3f6f7; }
+.nst-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 36px 20px; color: #73909f; text-align: center; font-size: 12px; }
+.nst-empty-state > i { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 4px; border-radius: 15px; color: #47aab4; background: #edf8f9; font-size: 22px; }
+.nst-empty-state strong { color: #365e70; font-size: 14px; }
+/* Line items share a compact search toolbar and a clear financial summary. */
+.nst-screen .pos-search-toolbar { align-items: start; margin-bottom: 15px; padding: 14px 0; border: 1px solid #d7e9ee; border-radius: 13px; background: #f0f8fa; }
+.nst-screen .pos-product-search-control { display: flex; align-items: stretch; }
+.nst-screen .pos-product-name-search .autocomplete { flex: 1; min-width: 0; }
+.nst-screen .pos-product-name-search .pos-search-voice { flex-shrink: 0; margin-left: 5px; }
+.nst-screen .pos-search-group { margin: 0; }
+.nst-screen .pos-search-hint { padding: 7px 2px 0; color: #6d8b99; font-size: 10px; font-weight: 500; }
+.nst-screen .pos-cart-summary { margin: 12px 0 0 auto; padding: 0; flex: 0 0 360px; max-width: 100%; border: 1px solid #cce5e9; border-radius: 14px; overflow: hidden; background: #f1f9fa; }
+.nst-screen .pos-cart-summary .table { margin: 0; background: transparent; }
+.nst-screen .pos-cart-summary .table td { border: 0; background: transparent; color: #315969; }
+.nst-screen .pos-cart-summary .table td:last-child { text-align: right; font-weight: 750; }
+.nst-screen .pos-cart-summary .nst-grand-total td { color: white; background: linear-gradient(110deg, #0b5c69, #0c7f8d); font-size: 18px; padding-top: 17px; padding-bottom: 17px; }
+.nst-screen .pos-cart-summary .nst-grand-total td:first-child { background: #0b5c69; }
+.nst-screen .pos-cart-summary .nst-grand-total td:last-child { background: #0c7f8d; }
+/* Dialogs keep the product editor's existing premium layout, and modernize peers. */
+.nst-dialog:not(.pos-product-editor-modal) .modal-content { border: 1px solid #d3e6ed; border-radius: 19px; background: white; box-shadow: 0 28px 80px #062f4b40; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-header { align-items: center; padding: 19px 23px; border: 0; border-radius: 18px 18px 0 0; background: radial-gradient(ellipse at 0 0, #106275, transparent 65%), linear-gradient(115deg, #082a3a, #182740); color: white; }
+.nst-dialog .modal-title { font-size: 18px; font-weight: 750; }
+.nst-dialog .modal-header .close { color: #d4f9fa; opacity: 1; text-shadow: none; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-body { padding: 23px; color: #234a5d; background: #f5f9fc; }
+.nst-dialog:not(.pos-product-editor-modal) .modal-footer { padding: 14px 23px; border-top: 1px solid #e0ebf1; border-radius: 0 0 18px 18px; background: white; }
+.nst-dialog:not(.pos-product-editor-modal) label, .nst-dialog:not(.pos-product-editor-modal) legend { color: #416579; font-size: 12px; font-weight: 700; }
+.nst-dialog:not(.pos-product-editor-modal) .form-control, .nst-dialog:not(.pos-product-editor-modal) .custom-select { min-height: 43px; padding: 9px 12px; border: 1px solid #cddfe8; border-radius: 10px; color: #244c60; background: white; font-size: 13px; }
+.nst-dialog .form-control:focus { border-color: #1ba5b3; box-shadow: 0 0 0 3px #1ba5b31a; }
+.nst-dialog .btn { min-height: 38px; padding: 8px 15px; border-radius: 9px; font-size: 12px; font-weight: 700; }
+.nst-dialog .btn-primary, .nst-dialog .btn-info { background: linear-gradient(120deg, #079eae, #167be1); border-color: #0c93b1; }
+.nst-dialog .btn-success { background: linear-gradient(120deg, #078b84, #0baf91); border-color: #07958b; }
+.nst-dialog .table { border-radius: 10px; background: white; font-size: 12px; }
+.nst-dialog .table thead th { padding: 12px; border: 0; color: white; background: #153f54; }
+.nst-dialog .table td { padding: 11px; border-color: #e4edf3; }
+.nst-dialog .nst-editor-section { padding: 17px; margin-bottom: 14px; border: 1px solid #dce9ef; border-radius: 13px; background: white; }
+.nst-dialog .nst-editor-section h3 { margin: 0 0 17px; padding-bottom: 12px; border-bottom: 1px solid #e7eff4; color: #17667b; font-size: 13px; font-weight: 750; }
+.nst-dialog .nst-editor-section--identity { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; }
+.nst-dialog .nst-editor-section--identity h3, .nst-dialog .nst-editor-section--identity .nst-field-wide { grid-column: 1 / -1; }
+.nst-dialog .contentCard { border-radius: 13px; border: 1px solid #d4e7ec; box-shadow: 0 5px 15px #16455b0a; }
+@media (max-width: 1100px) { .nst-screen--movimiento .nst-document-grid, .nst-screen--cargarcomprasxml .nst-document-grid { grid-template-columns: 1fr; } }
+@media (max-width: 767px) {
+  .nst-panel { margin-bottom: 12px; padding: 15px 12px; border-radius: 14px; }
+  .nst-panel-heading { margin-bottom: 15px; }
+  .nst-panel-heading h2 { font-size: 14px; }
+  .nst-panel-heading p { font-size: 10px; }
+  .nst-screen--traslado .nst-route-fields { grid-template-columns: 1fr; gap: 4px; }
+  .nst-screen .pos-cart-summary { flex-basis: 100%; }
+  .nst-screen--cajabancos .nst-finance-sidebar, .nst-screen--cajabancos .nst-finance-results { flex: 0 0 100%; max-width: 100%; padding: 0 12px !important; margin-bottom: 12px; }
+  .nst-action-bar { padding: 10px; }
+  .nst-action-bar > [class*='col'] { width: 100%; }
+  .nst-action-bar .btn { width: 100%; margin: 4px 0; }
+  .nst-dialog:not(.pos-product-editor-modal) .modal-body { padding: 16px; }
+  .nst-dialog .nst-editor-section--identity { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .nst-screen .table tbody tr { transition: none; } }
+@media print { .nst-panel { margin: 0 0 10px; padding: 0; border: 0; box-shadow: none; } .nst-panel-heading, .nst-action-bar { display: none; } .nst-table-scroll, .nst-screen .table-responsive { overflow: visible; border: 0; } }

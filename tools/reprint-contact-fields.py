@@ -1,0 +1,2 @@
+from pathlib import Path
+p=Path('integration/reprint-index.php');s=p.read_text(encoding='utf-8');start=s.index("$app->get('/ventas',");end=s.index("$app->get(",start+15);block=s[start:end];needle='Ve_DocVentaCliente.DniRuc, Ve_DocVentaCliente.DniRuc, Ve_DocVentaCliente.Direccion,';assert needle in block;block=block.replace(needle,'Ve_DocVentaCliente.DniRuc, Ve_DocVentaCliente.Telefono, Ve_DocVentaCliente.Email, Ve_DocVentaCliente.Direccion,',1);p.write_text(s[:start]+block+s[end:],encoding='utf-8')

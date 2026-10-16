@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();foreach(['Rhu_Empleado','Cb_Cuenta','Cb_CajaBanco','Cb_TipoCajaBanco','Seg_Usuario','Ve_DocVenta'] as $t){echo "$t\n";foreach($db->query("SHOW COLUMNS FROM $t")->fetchAll(PDO::FETCH_ASSOC) as $c)echo $c['Field'].' '.$c['Type']."\n";}echo "TYPES\n";echo json_encode($db->query('SELECT IdTipoCajaBanco,TipoCajaBanco,Tipo FROM Cb_TipoCajaBanco')->fetchAll(PDO::FETCH_ASSOC));echo "\nACCOUNTS\n";echo json_encode($db->query('SELECT * FROM Cb_Cuenta')->fetchAll(PDO::FETCH_ASSOC));

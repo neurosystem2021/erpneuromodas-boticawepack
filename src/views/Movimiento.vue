@@ -1,264 +1,277 @@
 <template>
-  <div style="padding: 0 2%;">
-    <Menu v-if="false"></Menu>
-    <br />
-    <div style="text-align: end;">
-      <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
-    </div>
-    <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
-        <b-container class="bv-example-row" fluid>
-          <b-row>
-              <b-col md="8">
+<div style="padding: 0 2%;" class="nst-screen nst-screen--movimiento">
+  <Menu v-if="false"></Menu>
+  <div class="purchase-toolbar">
+    <b-button type="button" variant="outline-info"
+      :aria-expanded="mostrarDatosDocumento ? 'true' : 'false'"
+      aria-controls="datos-proveedor-factura"
+      @click="mostrarDatosDocumento = !mostrarDatosDocumento">
+      <i :class="mostrarDatosDocumento ? 'fas fa-eye-slash' : 'fas fa-eye'" aria-hidden="true"></i>
+      {{ mostrarDatosDocumento ? 'Ocultar' : 'Mostrar' }} datos del proveedor y factura
+    </b-button>
+    <pedido-excel-import :movement="movimiento" :igvflag="igvflag" />
+    <b-button variant="info" @click="abrirModalOrdenCompra">Orden de Compra</b-button>
+  </div>
+  <b-form @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated @keydown.enter="prevent">
+      <b-container class="bv-example-row" fluid>
+        <section v-show="mostrarDatosDocumento" class="nst-panel nst-panel--filters">
+          <b-row id="datos-proveedor-factura" v-show="mostrarDatosDocumento" @invalid.native.capture="mostrarDatosDocumento = true" class="nst-document-grid">
+            <b-col md="8" class="nst-subsection">
 
-                <b-row>
-                  <b-col md="4">
-                    <b-form-group>
-                      <label>Tipo de Movimiento:</label>
+              <b-row>
+                <b-col md="4">
+                  <b-form-group>
+                    <label>Tipo de Movimiento:</label>
+                    <autocomplete
+                      required="required"
+                      ref="inputMovimiento"
+                      :url="API + 'movimientos/tipos'"
+                      anchor="TipoMovimiento"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setTipoMovimiento"
+                      :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="8">
+                  <b-form-group>
+                    <label>Proveedor:</label>
+                    <b-input-group>
                       <autocomplete
                         required="required"
-                        ref="inputMovimiento"
-                        :url="API + 'movimientos/tipos'"
-                        anchor="TipoMovimiento"
+                        ref="inputProveedor"
+                        :url="API + 'proveedores'"
+                        anchor="ProveedorRuc"
                         label="writer"
                         placeholder=""
-                        :on-select="setTipoMovimiento"
-                        :onFocus="focusAutocomplete.bind(null, 'inputMovimiento')"
+                        :onInput="(val) => newRuc = val"                          
+                        :on-select="setProveedor"
+                        :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
                         :classes="{input: 'form-control'}">
                       </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="8">
-                    <b-form-group>
-                      <label>Proveedor:</label>
-                      <b-input-group>
-                        <autocomplete
-                          required="required"
-                          ref="inputProveedor"
-                          :url="API + 'proveedores'"
-                          anchor="ProveedorRuc"
-                          label="writer"
-                          placeholder=""
-                          :onInput="(val) => newRuc = val"                          
-                          :on-select="setProveedor"
-                          :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
-                          :classes="{input: 'form-control'}">
-                        </autocomplete>
 
-                        <b-input-group-append>
-                          <!--<proveedores-tabla></proveedores-tabla>-->
-                          <proveedores-form :ruc="newRuc"></proveedores-form>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
+                      <b-input-group-append>
+                        <!--<proveedores-tabla></proveedores-tabla>-->
+                        <proveedores-form :ruc="newRuc"></proveedores-form>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-form-group>
+                </b-col>
+              </b-row>
 
-                <b-row>
-                  <b-col md="3">
-                    <b-form-group>
-                      <label>Periodo Tributario:</label>
-                      <b-form-input v-model="movimiento.FechaPeriodoTributario"
-                        type="text"
-                        readonly="readonly"
-                        placeholder="Periodo Tributario"></b-form-input>
-                    </b-form-group>
-                    
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group
-                      v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
-                      <label>Almacen Origen:</label>
-                      <autocomplete
-                        ref="inputAlmacenOrigen"
-                        required="required"
-                        initValue=""
-                        :url="API + 'almacenes'"
-                        anchor="Almacen"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setAlmacenOrigen"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group
-                      v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
-                      <label>Almacen Destino:</label>
-                      <autocomplete
-                        ref="inputAlmacenDestino"
-                        required="required"
-                        initValue=""
-                        :url="API + 'almacenes'"
-                        anchor="Almacen"
-                        label="writer"
-                        placeholder=""
-                        :on-select="setAlmacenDestino"
-                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="3">
-                    <b-form-group label="Credito: ">
-                      <b-form-checkbox 
-                        v-model="movimiento.EsCredito"
-                        :value="1"
-                        :unchecked-value="0">
-                        Pago pendiente
-                      </b-form-checkbox>
-                      <b-form-input v-model="movimiento.FechaVenCredito"
-                        v-if="movimiento.EsCredito"
-                        type="date"
-                        placeholder="Fecha Vencimiento"></b-form-input>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
+              <b-row>
+                <b-col md="3">
+                  <b-form-group>
+                    <label>Periodo Tributario:</label>
+                    <b-form-input v-model="movimiento.FechaPeriodoTributario"
+                      type="text"
+                      readonly="readonly"
+                      placeholder="Periodo Tributario"></b-form-input>
+                  </b-form-group>
+                  
+                </b-col>
+                <b-col md="3">
+                  <b-form-group
+                    v-if="movimiento.movimientoTipo.Tipo == 1 || movimiento.movimientoTipo.Tipo == 2">
+                    <label>Almacen Origen:</label>
+                    <autocomplete
+                      ref="inputAlmacenOrigen"
+                      required="required"
+                      initValue=""
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacenOrigen"
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacenOrigen')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="3">
+                  <b-form-group
+                    v-if="movimiento.movimientoTipo.Tipo == 0 || movimiento.movimientoTipo.Tipo == 2">
+                    <label>Almacen Destino:</label>
+                    <autocomplete
+                      ref="inputAlmacenDestino"
+                      required="required"
+                      initValue=""
+                      :url="API + 'almacenes'"
+                      anchor="Almacen"
+                      label="writer"
+                      placeholder=""
+                      :on-select="setAlmacenDestino"
+                      :onFocus="focusAutocomplete.bind(null, 'inputAlmacenDestino')"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="3">
+                  <b-form-group label="Credito: ">
+                    <b-form-checkbox 
+                      v-model="movimiento.EsCredito"
+                      :value="1"
+                      :unchecked-value="0">
+                      Pago pendiente
+                    </b-form-checkbox>
+                    <b-form-input v-model="movimiento.FechaVenCredito"
+                      v-if="movimiento.EsCredito"
+                      type="date"
+                      placeholder="Fecha Vencimiento"></b-form-input>
+                  </b-form-group>
+                </b-col>
+              </b-row>
 
-                <b-row v-if="!isTraslado">
-                  <b-col md="6">
-                    <b-form-group>
-                      <b-form-checkbox id="alterar-productos"
-                        v-model="movimiento.alterarProductos"
-                        :value="1"
-                        :unchecked-value="0">
-                        Alterar precio productos
-                      </b-form-checkbox>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-            
-              </b-col>
-              <b-col md="4">
-                <b-row>
-                  <b-col md="4">
-                    <b-form-group>
-                      <label>Serie:</label>                    
-                      <b-form-input v-model="movimiento.Serie"
-                        required="required"
-                        @input="cargarNumero"
-                        type="text"
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Número:</label>                    
-                      <b-form-input v-model="movimiento.Numero"
-                        required="required"
-                        type="text"
-                        placeholder=""></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Moneda:</label>
-                      <autocomplete
-                        ref="inputMoneda"
-                        :url="API + 'monedas'"
-                        initValue="USD"
-                        anchor="Moneda"
-                        label="writer"
-                        placeholder="Moneda"
-                        :on-select="setMoneda"
-                        :classes="{input: 'form-control'}">
-                      </autocomplete>
-                    </b-form-group>
-                  </b-col>
-                  <b-col md="8">
-                    <b-form-group>
-                      <label>Fecha Contable:</label>
-                      <b-form-input
-                        v-model="movimiento.MovimientoFecha"
-                        type="datetime-local"
-                        step="1"
-                        placeholder="Fecha Contable"
-                        ></b-form-input>
+              <b-row v-if="!isTraslado">
+                <b-col md="6">
+                  <b-form-group>
+                    <b-form-checkbox id="alterar-productos"
+                      v-model="movimiento.alterarProductos"
+                      :value="1"
+                      :unchecked-value="0">
+                      Alterar precio productos
+                    </b-form-checkbox>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+          
+            </b-col>
+            <b-col md="4" class="nst-subsection">
+              <b-row>
+                <b-col md="4">
+                  <b-form-group>
+                    <label>Serie:</label>                    
+                    <b-form-input v-model="movimiento.Serie"
+                      required="required"
+                      @input="cargarNumero"
+                      type="text"
+                      placeholder=""></b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                    <label>Número:</label>                    
+                    <b-form-input v-model="movimiento.Numero"
+                      required="required"
+                      type="text"
+                      placeholder=""></b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                    <label>Moneda:</label>
+                    <autocomplete
+                      ref="inputMoneda"
+                      :url="API + 'monedas'"
+                      initValue="USD"
+                      anchor="Moneda"
+                      label="writer"
+                      placeholder="Moneda"
+                      :on-select="setMoneda"
+                      :classes="{input: 'form-control'}">
+                    </autocomplete>
+                  </b-form-group>
+                </b-col>
+                <b-col md="8">
+                  <b-form-group>
+                    <label>Fecha Contable:</label>
+                    <b-form-input
+                      v-model="movimiento.MovimientoFecha"
+                      type="datetime-local"
+                      step="1"
+                      placeholder="Fecha Contable"
+                      ></b-form-input>
 
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Fecha Stock:</label>
-                      <b-form-input
-                        v-model="movimiento.FechaStock"
-                        type="date"
-                        placeholder="Fecha Stock"
-                        ></b-form-input>
-                    </b-form-group>
-                    <b-form-group>
-                      <label>Tipo de cambio:</label>
-                      <input v-model.number="movimiento.TipoCambio"
-                        type="number"
-                        class="form-control"
-                        step="0.0001"
-                        placeholder="Tipo de cambio"/>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-              </b-col>
-          </b-row>
-          <b-row class="px-3">
+                  </b-form-group>
+                  <b-form-group>
+                    <label>Fecha Stock:</label>
+                    <b-form-input
+                      v-model="movimiento.FechaStock"
+                      type="date"
+                      placeholder="Fecha Stock"
+                      ></b-form-input>
+                  </b-form-group>
+                  <b-form-group>
+                    <label>Tipo de cambio:</label>
+                    <input v-model.number="movimiento.TipoCambio"
+                      type="number"
+                      class="form-control"
+                      step="0.0001"
+                      placeholder="Tipo de cambio"/>
+                  </b-form-group>
+                </b-col>
+              </b-row>
+            </b-col>
+        </b-row></section>
+        <section class="nst-panel nst-panel--filters"><b-row class="px-3 nst-tax-options">
+          <b-form-group>
+                    <b-form-checkbox 
+                      v-model="movimiento.gravadaflag"
+                      :value="1"
+                      :unchecked-value="0">
+                      GRAVADA
+                    </b-form-checkbox>
+                  </b-form-group>
             <b-form-group>
-                      <b-form-checkbox 
-                        v-model="movimiento.gravadaflag"
-                        :value="1"
-                        :unchecked-value="0">
-                        GRAVADA
-                      </b-form-checkbox>
-                    </b-form-group>
-              <b-form-group>
-                      <b-form-checkbox
-                        v-model="movimiento.igvflag"
-                        :value="1"
-                        :unchecked-value="0">
-                        IGV
-                      </b-form-checkbox>
-                    </b-form-group>
-          </b-row>
-          <b-row>
-            <b-col>
-              <productos-carrito 
-                ref="carrito"
-                @onAddProducto="onAddProducto" 
-                :tipoCambio="movimiento.TipoCambio"
-                :fields="fields"
-                tipo="mov"
-                :gravadaflag ="movimiento.gravadaflag"
-                :igvflag ="movimiento.igvflag"
-                ></productos-carrito>
-            </b-col>
-          </b-row>
-          <b-row align-h="center" class="text-center">
-            <b-col cols="4">
-              <b-button variant="success" size="lg" type="submit" :disabled="inProgress">Guardar</b-button>
-              <b-button v-if="ultimoMovimiento" @click="abrirModalImprimir()" variant="info" size="lg">Código de Barra</b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <br><br>
-    </b-form>
-    <b-modal v-model="imprimirCodigoBarra" size="lg" hide-footer>
-      <b-form @submit="imprimirCodigoMulti">
-        <b-row>
-          <b-col cols="12">
-            <b-table :items="lstProductos" :fields="headerProductoEntregado">
-              <template slot="cantidad" slot-scope="data">
-                <input type="number" required v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
-              </template>
-            </b-table>
-          </b-col>
-          <b-col cols="12">
-            <b-button type="submit" variant="success"> Imprimir</b-button>
-            <b-button variant="danger" @click="imprimirCodigoBarra=!imprimirCodigoBarra"> Cerrar</b-button>
+                    <b-form-checkbox
+                      v-model="movimiento.igvflag"
+                      :value="1"
+                      :unchecked-value="0">
+                      IGV
+                    </b-form-checkbox>
+                  </b-form-group>
+        <div class="purchase-save-bar">
+          <div class="purchase-save-content">
+            <b-button class="purchase-save-button" variant="success" size="lg" type="submit" :disabled="inProgress">
+              <i class="fas fa-save" aria-hidden="true"></i>
+              <span>{{ inProgress ? 'Guardando...' : 'Guardar' }}</span>
+              <strong aria-live="polite">{{ movimiento.Moneda }} {{ totalCart | redondear }}</strong>
+            </b-button>
+            <b-button v-if="ultimoMovimiento" @click="abrirModalImprimir()" variant="info" size="lg">Código de Barra</b-button>
+          </div>
+        </div>
+        </b-row></section>
+        <section class="nst-panel nst-panel--products"><b-row>
+          <b-col>
+            <productos-carrito 
+              ref="carrito"
+              @onAddProducto="onAddProducto" 
+              :tipoCambio="movimiento.TipoCambio"
+              :fields="fields"
+              tipo="mov"
+              :gravadaflag ="movimiento.gravadaflag"
+              :igvflag ="movimiento.igvflag"
+              ></productos-carrito>
           </b-col>
         </b-row>
-      </b-form>
-    </b-modal>
 
-     <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc>
-          <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
-            <template slot="action" slot-scope="data">
-              <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+        </section>
+      </b-container>
+  </b-form>
+  <b-modal v-model="imprimirCodigoBarra" size="lg" hide-footer modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+    <b-form @submit="imprimirCodigoMulti">
+      <b-row>
+        <b-col cols="12">
+          <b-table :items="lstProductos" :fields="headerProductoEntregado">
+            <template slot="cantidad" slot-scope="data">
+              <input type="number" required v-model="data.item.cantidad" class="form-control" style="max-width: 120px;">
             </template>
           </b-table>
-    </b-modal>
-  </div>
+        </b-col>
+        <b-col cols="12">
+          <b-button type="submit" variant="success"> Imprimir</b-button>
+          <b-button variant="danger" @click="imprimirCodigoBarra=!imprimirCodigoBarra"> Cerrar</b-button>
+        </b-col>
+      </b-row>
+    </b-form>
+  </b-modal>
+
+   <b-modal v-model="modalMovimientos" id="modalOrdenCompra" no-close-on-backdrop no-close-on-esc modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+        <b-table :items="productosInf"  :fields="fieldsOrdenCompra">
+          <template slot="action" slot-scope="data">
+            <b-button variant="info" @click="addPreOrdenCompra(data.item)"><i class="fa fa-plus" aria-hidden="true"></i></b-button>
+          </template>
+        </b-table>
+  </b-modal>
+</div>
 </template>
 
 <script>
@@ -268,6 +281,7 @@ import ProductosCarrito from "@/components/ProductosCarrito";
 import ProveedoresForm from "@/components/ProveedoresForm";
 import { mapState, mapActions } from "vuex";
 import config from "@/store/config.js";
+import PedidoExcelImport from '@/components/PedidoExcelImport';
 
 export default {
   mounted() {
@@ -275,6 +289,7 @@ export default {
   },
   data() {
     return {
+      mostrarDatosDocumento: true,
       ordenCompra: {},
       modalMovimientos: false,
       productosInf: [],
@@ -341,7 +356,8 @@ export default {
     ...mapState({
       proveedoresFiltrados: state => state.proveedoresFiltrados,
       almacenes: state => state.almacenesFiltrados,
-      productos: state => state.cart.productos
+      productos: state => state.cart.productos,
+      totalCart: state => state.cart.totalCart
     })
   },
   methods: {
@@ -451,6 +467,7 @@ export default {
       return false;
     },
     cargarNumero() {
+      this.movimiento.Serie = String(this.movimiento.Serie || '').toUpperCase();
       this.axios
         .get(this.API + "movimientos/numero", {
           params: {
@@ -588,8 +605,9 @@ export default {
     getAlmacenes(value) {
       this.buscarAlmacenes(value);
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
+      if (this.inProgress) return;
       this.inProgress = true;
 
       if (this.isTraslado || this.isSalida) {
@@ -642,8 +660,26 @@ export default {
         return;
       }
 
-      let r = confirm("¿Desea Guardar el Movimiento?");
-      if (r == true) {
+      let confirmation;
+      try {
+        confirmation = await this.$swal({
+          icon: 'question',
+          title: 'CONFIRMAR MOVIMIENTO',
+          text: 'TOTAL ' + this.movimiento.Moneda + ' ' + Number(this.totalCart || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' · REVISA LOS DATOS ANTES DE GUARDAR.',
+          showCancelButton: true,
+          confirmButtonText: 'SÍ, GUARDAR',
+          cancelButtonText: 'VOLVER A REVISAR',
+          confirmButtonColor: '#009f7a',
+          cancelButtonColor: '#64748b',
+          focusCancel: true,
+          allowOutsideClick: false,
+          customClass: 'purchase-confirmation'
+        });
+      } catch (error) {
+        this.inProgress = false;
+        return;
+      }
+      if (confirmation && (confirmation.value || confirmation.isConfirmed)) {
         this.lstProductos = this.productos;
         this.axios
           .post(this.API + "movimientos", {
@@ -682,6 +718,7 @@ export default {
     }
   },
   components: {
+    PedidoExcelImport,
     Menu,
     ProductosCarrito,
     ProveedoresForm
@@ -689,6 +726,93 @@ export default {
 };
 </script>
 <style>
+.nst-screen--movimiento .purchase-save-bar {
+  justify-content: center !important;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.nst-screen--movimiento .nst-tax-options {
+  align-items: center;
+  gap: 14px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.nst-screen--movimiento .nst-tax-options .form-group { margin-bottom: 0; }
+.nst-screen--movimiento .nst-tax-options .purchase-save-button.btn { min-height: 44px; width: 350px; padding: 6px 14px; }
+.nst-screen--movimiento .purchase-save-bar .purchase-save-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  text-align: center;
+}
+.nst-screen--movimiento .purchase-save-button.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 390px;
+  max-width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 18px;
+  border: 2px solid #5bdcb1;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #009f7a, #12bb83);
+  box-shadow: 0 4px 0 #087c61, 0 7px 16px #079b7926;
+  font-size: 16px;
+  font-weight: 800;
+}
+.nst-screen--movimiento .purchase-save-button strong {
+  padding-left: 18px;
+  border-left: 1px solid #ffffff70;
+  white-space: nowrap;
+}
+.nst-screen--movimiento .pos-cart-summary {
+  flex: 0 1 auto;
+  margin: 6px auto 0;
+  border: 0;
+  background: transparent;
+}
+.nst-screen--movimiento .pos-cart-summary tbody {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.nst-screen--movimiento .pos-cart-summary tr {
+  display: flex;
+  align-items: center;
+}
+.nst-screen--movimiento .pos-cart-summary td {
+  padding: 4px 6px;
+}
+.nst-screen--movimiento .pos-cart-summary .nst-grand-total {
+  display: none;
+}
+.nst-screen--movimiento .purchase-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.nst-screen--movimiento .purchase-toolbar > .btn:first-child {
+  margin-right: auto;
+}
+.nst-screen--movimiento .purchase-toolbar .btn {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  white-space: nowrap;
+}
+@media (max-width: 650px) {
+  .nst-screen--movimiento .purchase-toolbar {
+    flex-wrap: wrap;
+  }
+}
 #modalOrdenCompra .modal-dialog {
   min-width: 70% !important;
 }

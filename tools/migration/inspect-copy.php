@@ -1,0 +1,6 @@
+<?php
+require __DIR__.'/../../integration/migration/runtime.php';
+$c=neuroMigrationConfig();$t=$c['target'];$db=new PDO('mysql:host='.$t['host'].';port='.$t['port'].';dbname='.$t['database'].';charset=utf8mb4',$t['user'],$t['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+$tables=$db->query('SELECT TABLE_NAME,TABLE_TYPE,ENGINE,TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() ORDER BY TABLE_NAME')->fetchAll(PDO::FETCH_ASSOC);$out=['database'=>$t['database'],'tables'=>[]];
+foreach($tables as $table){$name=$table['TABLE_NAME'];if(!preg_match('/^[A-Za-z0-9_]+$/',$name))exit(1);$table['columns']=$db->query('SHOW FULL COLUMNS FROM `'.$name.'`')->fetchAll(PDO::FETCH_ASSOC);$table['indexes']=$db->query('SHOW INDEX FROM `'.$name.'`')->fetchAll(PDO::FETCH_ASSOC);$table['ddl']=$db->query('SHOW CREATE TABLE `'.$name.'`')->fetch(PDO::FETCH_NUM)[1];$table['rows']=(int)$db->query('SELECT COUNT(*) FROM `'.$name.'`')->fetchColumn();$out['tables'][$name]=$table;}
+file_put_contents(__DIR__.'/../../output/migration-copy-schema.json',json_encode($out,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));echo json_encode(['database'=>$t['database'],'tables'=>count($tables),'inspection_errors'=>0]),PHP_EOL;

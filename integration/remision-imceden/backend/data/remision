@@ -1,0 +1,18 @@
+CREATE TABLE `neurofac_rojas`.`Ve_DocVentaRemision` (
+  `IdDocVentaRemision` INT(11) NOT NULL AUTO_INCREMENT,
+  `IdDocVenta` INT(11) NOT NULL,
+  `FechaReg` DATETIME NULL,
+  `FechaTraslado` DATETIME NULL,
+  `DireccionPartida` VARCHAR(255) NULL,
+  `DistritoPartida` VARCHAR(255) NULL,
+  `ProvinciaPartida` VARCHAR(255) NULL,
+  `DepartamentoPartida` VARCHAR(255) NULL,
+  `DireccionLlegada` VARCHAR(255) NULL,
+  `DistritoLlegada` VARCHAR(255) NULL,
+  `ProvinciaLlegada` VARCHAR(255) NULL,
+  `DepartamentoLlegada` VARCHAR(255) NULL,
+  `RazonSocialDestinatario` VARCHAR(255) NULL,
+  `RucDestinatario` VARCHAR(255) NULL,
+  `MarcaPlacaTransporte` VARCHAR(255) NULL,
+  `LicenciaConductor` VARCHAR(255) NULL,
+  PRIMARY KEY (`IdDocVentaRemision`));

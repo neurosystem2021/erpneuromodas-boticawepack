@@ -1,0 +1,96 @@
+CENTRAL DE SOPORTE - INTEGRACION NST
+14/10/2026, horario de Lima.
+
+INSTALADO EN LOCALHOST
+Entrada desde el boton flotante Soporte en las pantallas Vue de NST, incluida Venta.
+El acceso del menu superior se retiro. Se conserva el enlace administrativo del diario.
+Entrada directa: http://localhost/views/support.php
+Datos centrales en factura_support_local, separados de la BD ERP nst.
+Configuracion no sensible de enlace local: C:/xampp/support-private/runtime.php.
+La autenticacion reutiliza la sesion NST y verifica usuario activo en cada peticion.
+No se cambia el perfil ERP de ningun usuario ni se migran tareas historicas del diario.
+
+FUNCIONES DISPONIBLES
+- Tickets con codigo SOP-AAAA-NNNNNN unico, fecha, categoria, modulo y prioridad.
+- Empresa autorizada, solicitante actual, descripcion y filtros por rango de fechas.
+- Estados, asignacion, historial auditable y version para actualizaciones concurrentes.
+- Conversaciones publicas y notas internas filtradas en servidor.
+- Registro de tiempo trabajado y primera respuesta PUBLICA del equipo.
+- Cliente confirma/cierra/reabre; encuesta por ciclo de resolucion.
+- Indicadores basicos reales, conteos completos y distribucion por tecnico.
+- Categorias editables y registro de instalaciones mediante clave publica.
+- Gestion de accesos por empresa para supervisor, tecnico, administrador y solicitante.
+
+ROLES LOCALES INICIALES
+Superadmin NST (perfil ERP 1): administracion central.
+Perfil PROGRAMADOR: tecnico local, ve asignados y sus solicitudes propias.
+Otros administradores ERP: administradores de su empresa local, no superadmins globales.
+Demas usuarios: solicitantes, ven sus propios tickets.
+Los permisos de soporte son independientes del ERP. El instalador no sobrescribe
+concesiones existentes; altas posteriores requieren acceso explicito desde superadmin.
+Los tecnicos necesitan membresia habilitada POR CADA empresa y ticket asignado.
+
+REPLICACION
+output/support-connector-nst.zip contiene el proxy, generador de claves, instalador,
+manual y UI compilada en un directorio separado. Sin configuracion privada ni datos.
+El conector se instala en CADA cliente. No conectar sus bases directamente a la central.
+El paquete se probo en un ERP ficticio aislado, no en servidores de clientes reales.
+El runtime comprobado no tiene sodium habilitado: la implementacion usa OpenSSL
+RSA-SHA256, disponible en NST. Esta decision reemplaza Ed25519 propuesto inicialmente.
+Solicitudes firmadas con clave de la instalacion, TLS verificado y nonce antireplay.
+Para las pruebas actuales la central esta en localhost. Antes de conectar un cliente
+externo necesita un dominio HTTPS accesible desde sus servidores. No se expone ni
+se publica automaticamente esta computadora en internet.
+
+LIMITES Y SIGUIENTES FASES
+Esta entrega implementa fase 1 y parte de la operacion de fase 2/encuestas.
+No declarar terminados los cuatro modulos del proyecto:
+- Adjuntos de tickets de soporte y transporte remoto: pendientes; los adjuntos del
+  diario anterior conservan su funcionamiento y no se trasladan automaticamente.
+- Auditoria de acceso privilegiado y politicas avanzadas de rotacion de claves:
+  pendientes de completar.
+- SLA contractual, horarios/feriados/pausas, escalamiento automatico y worker:
+  pendientes. Los promedios actuales son minutos transcurridos, NO cumplimiento SLA.
+- Dashboard avanzado de calidad, alertas de mala calificacion, Excel/PDF: pendientes.
+- Base de conocimiento e integraciones correo/WhatsApp: pendientes.
+- No se conectaron las 50 empresas; requiere aprovisionamiento e instalacion de
+  conector por servidor, inventario de origenes y pruebas piloto.
+Antes de publicar la central: endurecer login ERP heredado, configurar limites/rate
+limits, HTTPS, respaldos y claves/rotacion; revisar y probar el entorno de cada cliente.
+No se enviaron correos ni mensajes WhatsApp ni se alteraron facturacion o SUNAT.
+
+VALIDACION EJECUTADA
+php tools/test-support-service.php: BD temporal, aislamiento entre dos empresas,
+usuario repetido en dos instalaciones, roles, asignacion, notas internas,
+idempotencia de mensajes, estados/versiones, encuesta y firma/replay.
+php tools/test-helpdesk-migrations.php: migraciones nuevas, FK compuestas, rollback.
+node tools/test-support-browser.mjs: bundle compilado, detalle, conversacion,
+creacion con CSRF, indicadores y ancho movil, HTTP simulado.
+php tools/test-support-connector-package.php: claves privadas fuera de webroot,
+manifest publico, firma RSA e instalacion en ERP ficticio; no contactos remotos.
+php tools/test-support-installed.php: endpoints instalados con sesion; sin crear tickets.
+
+RECUPERACION
+Backups de archivos en boticav1/.support-backup-* y .ali-speed-backup-*.
+No ejecutar migrations DOWN sobre datos reales. Desactivar acceso nuevo y restaurar
+archivos respaldados conserva los datos de soporte en su BD separada.
+
+ACTUALIZACION: BOTON FLOTANTE Y AVISOS
+- Boton Soporte global en NST. Formulario rapido reconoce empresa, usuario y sede.
+- Conserva la venta/pantalla actual: no cambia la ruta ni ejecuta acciones de ventas.
+- Avisos persistidos para equipo habilitado por empresa y para el solicitante.
+- Contador sin leer, bandeja, toast de 15 segundos y sonido opcional tras interaccion.
+- Polling cada 20 segundos con navegador abierto; no es un servicio push externo.
+- Tecnico ve cola no asignada de empresas autorizadas y puede aceptar con bloqueo.
+- Al aceptar queda en atencion; otro tecnico no puede tomarlo simultaneamente.
+- Primera respuesta publica, resolucion desde creacion y trabajo registrado visibles
+  al cliente. No equivalen a SLA contractual ni a un cronometro laboral automatico.
+- Resolucion avisa al cliente para confirmar, reabrir o calificar; la encuesta
+  separa rapidez, trato y solucion. La encuesta pertenece al ciclo de resolucion.
+- Leer ticket reconoce sus avisos solo para el destinatario de esa sesion.
+- Notas y avisos internos se filtran por permisos tambien al consultar avisos.
+- El paquete replicable incluye widget.js para el encabezado de ERPs heredados,
+  sin reemplazar su frontend. Abre soporte en una ventana superpuesta a la venta.
+Prueba: node tools/test-support-floating.mjs valida con HTTP simulado cliente,
+central, avisos, tiempos, encuesta y conservacion de pantalla. Backend validado
+con dos empresas y pruebas de bloqueo de asignacion y privacidad de avisos.

@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('src/components/ProductoAsesorIA.vue');s=p.read_text(encoding='utf-8').replace('class="product-guide-answer"><div','class="product-guide-answer" ref="technicalAnswer"><div');s=s.replace("this.query(true).finally(()=>{this.question=detail})", "this.query(true).finally(()=>{this.question=detail;this.$nextTick(()=>{if(this.$refs.technicalAnswer)this.$refs.technicalAnswer.scrollIntoView({behavior:'smooth',block:'start'})})})");p.write_text(s,encoding='utf-8')

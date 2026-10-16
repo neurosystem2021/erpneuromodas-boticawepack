@@ -1,22 +1,22 @@
 <template>
-  <div>
-      <b-btn v-b-modal.modal1>click</b-btn>
-      <!-- Modal Component -->
-      <b-modal id="modal1" title="Tabla" size="lg">
-        <b-table 
-          id="my-table" 
-          :busy.sync="isBusy" 
-          :items="myProvider" 
-          :fields="fields"
-          :per-page="perPage"
-          :current-page="currentPage"></b-table>
-        <b-row>
-          <b-col md="6" class="my-1">
-            <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-          </b-col>
-        </b-row>
-      </b-modal>
-  </div>
+<div>
+    <b-btn v-b-modal.modal1>click</b-btn>
+    <!-- Modal Component -->
+    <b-modal id="modal1" title="Tabla" size="lg" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <b-table 
+        id="my-table" 
+        :busy.sync="isBusy" 
+        :items="myProvider" 
+        :fields="fields"
+        :per-page="perPage"
+        :current-page="currentPage"></b-table>
+      <b-row>
+        <b-col md="6" class="my-1">
+          <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+        </b-col>
+      </b-row>
+    </b-modal>
+</div>
 </template>
 
 <script>

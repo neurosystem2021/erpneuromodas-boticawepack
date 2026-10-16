@@ -1,89 +1,91 @@
 <template>
-    <div>
-        <Menu v-if="false"></Menu>
+<div class="nst-screen nst-screen--ordencompra">
+    <Menu v-if="false"></Menu>
 
-        <br />
-        <b-container class="bv-example-row">
-            <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
-                <b-row>
-                    <b-col md="10">
-                        <b-row>
-                            <b-col md="4">
-                                <b-form-group>
-                                    <label>Almacen:</label>
-                                    <autocomplete
-                                        required="required"
-                                        ref="inputAlmacen"
-                                        :url="API + 'almacenes'"
-                                        anchor="Almacen"
-                                        label="writer"
-                                        placeholder=""
-                                        :on-select="setAlmacen"
-                                        :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
-                                        :classes="{input: 'form-control'}">
-                                    </autocomplete>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="5">
-                                <b-form-group>
-                                <label>Proveedor:</label>
-                                <b-input-group>
-                                    <autocomplete
+    <br />
+    <b-container class="bv-example-row">
+        <pedido-excel-import :movement="movimiento" destination="order" @select-supplier="selectExcelSupplier" @select-warehouse="setAlmacen" />
+        <b-form @submit="guardarMovimiento" @keydown.enter="evt => evt.preventDefault()">
+            <section class="nst-panel nst-panel--filters"><b-row>
+                <b-col cols="12">
+                    <b-row>
+                        <b-col md="4">
+                            <b-form-group>
+                                <label>Almacen:</label>
+                                <autocomplete
                                     required="required"
-                                    ref="inputProveedor"
-                                    :url="API + 'proveedores'"
-                                    anchor="ProveedorRuc"
+                                    ref="inputAlmacen"
+                                    :url="API + 'almacenes'"
+                                    anchor="Almacen"
                                     label="writer"
-                                    placeholder=""                          
-                                    :on-select="setProveedor"
-                                    :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                                    placeholder=""
+                                    :on-select="setAlmacen"
+                                    :onFocus="focusAutocomplete.bind(null, 'inputAlmacen')"
                                     :classes="{input: 'form-control'}">
-                                    </autocomplete>
-                                </b-input-group>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="3">
-                                <b-form-group>
-                                    <label>Adquiridos:</label><br>
-                                    <b-button variant="success" :disabled="movimiento.almacen.IdAlmacen==0 || movimiento.proveedor.IdProveedor==0" @click="cargarProducto">Buscar Productos</b-button>
+                                </autocomplete>
                             </b-form-group>
-                            </b-col>
-                        </b-row>
-                    </b-col>
-                </b-row>
-                <b-row>
-                    <b-col>
-                        <productos-carrito
-                            @onAddProducto="onAddProducto"
-                            :setPrecio="true"
-                            ref="carrito"
-                            :isVentas="false"
-                            :isOrdenCompra="true"
-                            :showButton="false"
-                            :bloquearInput="false"
-                            :fields="carrito.fields"
-                            :idAlmacen="movimiento.almacen.IdAlmacen"
-                            :onSetProducto="onSetProducto">
+                        </b-col>
+                        <b-col md="5">
+                            <b-form-group>
+                            <label>Proveedor:</label>
+                            <b-input-group>
+                                <autocomplete
+                                required="required"
+                                ref="inputProveedor"
+                                :url="API + 'proveedores'"
+                                anchor="ProveedorRuc"
+                                label="writer"
+                                placeholder=""                          
+                                :on-select="setProveedor"
+                                :onFocus="focusAutocomplete.bind(null, 'inputProveedor')"
+                                :classes="{input: 'form-control'}">
+                                </autocomplete>
+                            </b-input-group>
+                            </b-form-group>
+                        </b-col>
+                        <b-col md="3">
+                            <b-form-group>
+                                <label>Adquiridos:</label><br>
+                                <b-button variant="success" :disabled="movimiento.almacen.IdAlmacen==0 || movimiento.proveedor.IdProveedor==0" @click="cargarProducto">Buscar Productos</b-button>
+                        </b-form-group>
+                        </b-col>
+                    </b-row>
+                </b-col>
+            </b-row></section>
+            <section class="nst-panel nst-panel--products"><b-row>
+                <b-col>
+                    <productos-carrito
+                        @onAddProducto="onAddProducto"
+                        :setPrecio="true"
+                        ref="carrito"
+                        :isVentas="false"
+                        :isOrdenCompra="true"
+                        :showButton="false"
+                        :bloquearInput="false"
+                        :fields="carrito.fields"
+                        :idAlmacen="movimiento.almacen.IdAlmacen"
+                        :onSetProducto="onSetProducto">
 
-                        </productos-carrito>
-                    </b-col>
-                </b-row>
-                <b-row align-h="center" class="text-center">
-                    <b-col cols="8">
-                        <br />
-                        <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Generar Orden</b-button>
-                        <br />
-                        <br />
-                    </b-col>
-                </b-row>
-            </b-form>
-        </b-container>
-    </div>
+                    </productos-carrito>
+                </b-col>
+            </b-row></section>
+            <b-row align-h="center" class="text-center nst-action-bar">
+                <b-col cols="8">
+                    <br />
+                    <b-button type="submit" :disabled="inProgress" variant="success" size="lg">Generar Orden</b-button>
+                    <br />
+                    <br />
+                </b-col>
+            </b-row>
+        </b-form>
+    </b-container>
+</div>
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
 import ProductosCarrito from "@/components/ProductosCarrito";
+import PedidoExcelImport from '@/components/PedidoExcelImport';
 
 export default {
   beforeMount() {
@@ -137,6 +139,10 @@ export default {
     })
   },
   methods: {
+    selectExcelSupplier(supplier) {
+      this.movimiento.proveedor = supplier;
+      this.$refs.inputProveedor.setValue(supplier.ProveedorRuc || supplier.Proveedor || supplier.Ruc || '');
+    },
     ...mapActions({
       aplicarDescuento: "aplicarDescuentoGeneral",
       limpiarCart: "limpiarCarrito",
@@ -204,8 +210,9 @@ export default {
         });
       }
     },
-    guardarMovimiento(evt) {
+    async guardarMovimiento(evt) {
       evt.preventDefault();
+      if (this.inProgress) return;
       this.inProgress = true;
 
       if (!this.movimiento.proveedor.IdProveedor) {
@@ -222,6 +229,29 @@ export default {
 
       if (!this.productos.length) {
         this.$toasted.show("No ha seleccionado ningun producto");
+        this.inProgress = false;
+        return;
+      }
+
+      try {
+        const pending = new Set();
+        for (let start = 0; start < this.productos.length; start += 100) {
+          const response = await this.axios.get(this.API + 'productos/proveedores-reposicion', {
+            params: { idAlmacen: this.movimiento.almacen.IdAlmacen, idProductos: this.productos.slice(start, start + 100).map(product => product.IdProducto) }
+          });
+          if (!Array.isArray(response.data)) throw new Error('No se pudieron comprobar las órdenes pendientes.');
+          response.data.forEach(product => { if (Number(product.OrdenesPendientes) > 0) pending.add(Number(product.IdProducto)); });
+        }
+        if (pending.size) {
+          for (let index = this.productos.length - 1; index >= 0; index--) {
+            if (pending.has(Number(this.productos[index].IdProducto))) this.$store.commit('ELIMINAR_PRODUCTO', index);
+          }
+          this.$toasted.show(pending.size + ' productos omitidos porque ya tienen una orden pendiente. Revisa los restantes y vuelve a generar la orden.');
+          this.inProgress = false;
+          return;
+        }
+      } catch (error) {
+        this.$toasted.error('No se pudieron comprobar las órdenes pendientes. Intenta nuevamente.');
         this.inProgress = false;
         return;
       }
@@ -271,7 +301,7 @@ export default {
         })
         .catch(error => {
           console.log(error);
-          this.$toasted.show("Ha ocurrido un error, vuelva a intentarlo");
+          this.$toasted.error((error.response && error.response.data && error.response.data.msg) || "No se pudo generar la orden. Intenta nuevamente.");
           this.inProgress = false;
         });
     },
@@ -281,6 +311,7 @@ export default {
     }
   },
   components: {
+    PedidoExcelImport,
     ProductosCarrito
   }
 };

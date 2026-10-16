@@ -1,219 +1,219 @@
 <template>
-    <div>
-      <br>
-        <b-container fluid style="width: calc(100% - 20px)" class="bv-example-row">
-          <b-row class="text-center">
-            <b-col>
-              <h3>Registro de Ordenes de Compra</h3>
-            </b-col>
-          </b-row>
-          <hr>
-          <b-row>
-            <b-col md="2" class="my-1">
-              <b-form-group>
-                <label><b>Estado:</b></label>
-                <b-form-select v-model="estadoSelect" :options="estadoData" class="mb-3" v-on:change="cambioEstado($event)"/>
-              </b-form-group>
-            </b-col>
-            <b-col md="3" class="my-1">
-              <b-form-group>
-                <label>Fecha Inicio:</label>
-                <b-form-input
-                  v-model="fechaDesde"
-                  type="date"
-                  step="1"
-                  placeholder="Fecha Inicio"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col md="3" class="my-1">
-              <b-form-group>
-                <label>Fecha Fin:</label>
-                <b-form-input
-                  v-model="fechaHasta"
-                  type="date"
-                  step="1"
-                  placeholder="Fecha Inicio"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col md="4" class="my-1">
-                <br>
-              <b-button variant="success" size="md" @click="verArticulos">Generar</b-button>
-            </b-col>
-          </b-row>
+<div class="nst-screen nst-screen--ordenes">
+  <br>
+    <b-container fluid style="width: calc(100% - 20px)" class="bv-example-row">
+      <b-row class="text-center">
+        <b-col>
+          <h3>Registro de Ordenes de Compra</h3>
+        </b-col>
+      </b-row>
+      <hr>
+      <section class="nst-panel nst-panel--filters"><b-row>
+        <b-col md="2" class="my-1">
+          <b-form-group>
+            <label><b>Estado:</b></label>
+            <b-form-select v-model="estadoSelect" :options="estadoData" class="mb-3" v-on:change="cambioEstado($event)"/>
+          </b-form-group>
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-form-group>
+            <label>Fecha Inicio:</label>
+            <b-form-input
+              v-model="fechaDesde"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio"></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="3" class="my-1">
+          <b-form-group>
+            <label>Fecha Fin:</label>
+            <b-form-input
+              v-model="fechaHasta"
+              type="date"
+              step="1"
+              placeholder="Fecha Inicio"></b-form-input>
+          </b-form-group>
+        </b-col>
+        <b-col md="4" class="my-1">
+            <br>
+          <b-button variant="success" size="md" @click="verArticulos">Generar</b-button>
+        </b-col>
+      </b-row></section>
 
-          <b-row>
-            <table class="table b-table table-striped table-hover table-sm">
-              <thead>
-                <tr>
-                  <th class="text-center" style="width: 4% !important">ID</th>
-                  <th>Correlativo</th>
-                  <th>Fecha</th>
-                  <th>Ruc</th>
-                  <th>Proveedor</th>
-                  <th>Total</th>
-                  <th>Ver</th>
-                  <th>Editar</th>
-                  <th colspan="2" class="text-center">Reporte</th>
-                  <th>Anular</th>
-                </tr>
-              </thead>
+      <section class="nst-panel nst-panel--results"><b-row>
+        <div class="nst-table-scroll" tabindex="0" role="region" aria-label="Tabla de resultados"><table class="table b-table table-striped table-hover table-sm">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 4% !important">ID</th>
+              <th>Correlativo</th>
+              <th>Fecha</th>
+              <th>Ruc</th>
+              <th>Proveedor</th>
+              <th>Total</th>
+              <th>Ver</th>
+              <th>Editar</th>
+              <th colspan="2" class="text-center">Reporte</th>
+              <th>Anular</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(prod, i) in productosInf" :key="i">
+              <td class="text-center" :class="{'table-danger': prod.Estado == 0}" style="width: 5% !important;">{{ prod.IdOrdenCompra }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Correlativo }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}">{{ prod.FechaOrdenCompra }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Ruc }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Proveedor }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}">S/ {{ prod.Total | moneda }}</td>
+              <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
+              <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="info" v-if="prod.Estado == 1" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
+              <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
+              <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra/id?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
+              <td :class="{'table-danger': prod.Estado == 0}"><b-button  v-if="prod.Estado == 1" variant="danger" @click="anularOrden(prod)"><i class="fas fa-ban"></i> Anular</b-button></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </b-row></section>
+      <b-modal size="lg" id="modalDetalle" ref="modalDetalle" :title="'Orden de Compra: '+infoOrden.Correlativo" ok-only ok-title="Cerrar" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+        <b-row>
+          <b-col md="6">
+            <table>
               <tbody>
-                <tr v-for="(prod, i) in productosInf" :key="i">
-                  <td class="text-center" :class="{'table-danger': prod.Estado == 0}" style="width: 5% !important;">{{ prod.IdOrdenCompra }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Correlativo }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.FechaOrdenCompra }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Ruc }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}">{{ prod.Proveedor }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}">S/ {{ prod.Total | moneda }}</td>
-                  <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="primary" @click="mostrarDetalles(prod)"><i class="fas fa-eye"></i> Ver</b-button></td>
-                  <td :class="{'table-danger': prod.Estado == 0}"><b-button variant="info" v-if="prod.Estado == 1" @click="openEditar(prod)"><i class="fas fa-pencil-alt"></i> Editar</b-button></td>
-                  <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-warning" @click="generarPdf(prod.IdOrdenCompra)" ><i class="fas fa-file-pdf"></i> Pdf</a></td>
-                  <td :class="{'table-danger': prod.Estado == 0}"><a v-if="prod.Estado == 1" class="btn btn-success" target="_blank" :href="'/api/index.php/reporte/ordencompra/id?idordencompra=' + prod.IdOrdenCompra"><i class="fas fa-file-excel"></i> Excel</a></td>
-                  <td :class="{'table-danger': prod.Estado == 0}"><b-button  v-if="prod.Estado == 1" variant="danger" @click="anularOrden(prod)"><i class="fas fa-ban"></i> Anular</b-button></td>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">RUC</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Ruc }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Proveedor</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Proveedor }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Dirección</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Direccion }}</td>
                 </tr>
               </tbody>
             </table>
-          </b-row>
-          <b-modal size="lg" id="modalDetalle" ref="modalDetalle" :title="'Orden de Compra: '+infoOrden.Correlativo" ok-only ok-title="Cerrar">
-            <b-row>
-              <b-col md="6">
-                <table>
-                  <tbody>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">RUC</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Ruc }}</td>
-                    </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Proveedor</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Proveedor }}</td>
-                    </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Dirección</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Direccion }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-col>
+          </b-col>
 
-              <b-col md="6">
-                <table>
-                  <tbody>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Almacen</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Almacen }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+        </b-row>
+        <br>
+        <b-row>
+          <b-col md="12">
+            <table class="table b-table table-sm table-striped">
+                <thead>
                     <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Almacen</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Almacen }}</td>
+                        <th class="text-center">Codigo</th>
+                        <th class="text-center">Producto</th>
+                        <th class="text-center">Laboratorio</th>
+                        <th class="text-center">Forma</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Precio</th>
+                        <th class="text-center">Total</th>
                     </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
+                </thead>
+                <tbody>
+                    <tr v-for="(prod, i) in detalle" :key="i">
+                        <td class="text-center">{{ prod.CodigoBarra }}</td>
+                        <td class="text-center">{{ prod.Producto }}</td>
+                        <td class="text-center">{{ prod.ProductoMarca }}</td>
+                        <td class="text-center">{{ prod.ProductoFormaFarmaceutica }}</td>
+                        <td class="text-center">{{ prod.Cantidad }}</td>
+                        <td class="text-center">{{ prod.Precio }}</td>
+                        <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
                     </tr>
-                  </tbody>
-                </table>
-              </b-col>
-            </b-row>
-            <br>
-            <b-row>
-              <b-col md="12">
-                <table class="table b-table table-sm table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Codigo</th>
-                            <th class="text-center">Producto</th>
-                            <th class="text-center">Laboratorio</th>
-                            <th class="text-center">Forma</th>
-                            <th class="text-center">Cantidad</th>
-                            <th class="text-center">Precio</th>
-                            <th class="text-center">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(prod, i) in detalle" :key="i">
-                            <td class="text-center">{{ prod.CodigoBarra }}</td>
-                            <td class="text-center">{{ prod.Producto }}</td>
-                            <td class="text-center">{{ prod.ProductoMarca }}</td>
-                            <td class="text-center">{{ prod.ProductoFormaFarmaceutica }}</td>
-                            <td class="text-center">{{ prod.Cantidad }}</td>
-                            <td class="text-center">{{ prod.Precio }}</td>
-                            <td class="text-center">{{ (prod.Precio *  prod.Cantidad) | moneda }}</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                      <td colspan="5"></td>
-                      <td class="text-center"><b>TOTAL</b></td>
-                      <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{infoOrden.Total | moneda}} </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </b-col>
-            </b-row>
-          </b-modal>
-          <b-form @submit="actualizarDet" validated @keydown.enter="prevent">
-          <b-modal size="lg" id="modalEdicion" ref="modalEdicion" :title="'Editar detalle Compra: '+infoOrden.Correlativo" ok-only ok-title="Cerrar">
-            <b-row>
-              <b-col md="6">
-                <table>
-                  <tbody>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">RUC</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Ruc }}</td>
-                    </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Proveedor</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Proveedor }}</td>
-                    </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Dirección</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Direccion }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-col>
+                </tbody>
+                <tfoot>
+                <tr>
+                  <td colspan="5"></td>
+                  <td class="text-center"><b>TOTAL</b></td>
+                  <td class="table-success text-center" style="vertical-align: middle !important;">S/ {{infoOrden.Total | moneda}} </td>
+                </tr>
+              </tfoot>
+            </table>
+          </b-col>
+        </b-row>
+      </b-modal>
+      <b-form @submit="actualizarDet" validated @keydown.enter="prevent">
+      <b-modal size="lg" id="modalEdicion" ref="modalEdicion" :title="'Editar detalle Compra: '+infoOrden.Correlativo" ok-only ok-title="Cerrar" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+        <b-row>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">RUC</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Ruc }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Proveedor</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Proveedor }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Dirección</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Direccion }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
 
-              <b-col md="6">
-                <table>
-                  <tbody>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Almacen</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Almacen }}</td>
-                    </tr>
-                    <tr>
-                      <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
-                      <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-col>
-            </b-row>
-            <br>
-            <b-row>
-              <b-col md="12">
-                <productos-carrito
-                  @onAddProducto="onAddProducto"
-                  :setPrecio="true"
-                  ref="carrito"
-                  :isVentas="false"
-                  :isOrdenCompra="true"
-                  :showButton="false"
-                  :bloquearInput="false"
-                  :fields="carrito.fields"
-                  :idAlmacen="infoOrden.IdAlmacen"
-                  :onSetProducto="onSetProducto">
-                </productos-carrito>
-              </b-col>
-            </b-row>
-            <div slot="modal-footer" >
-            <b-btn  variant="success" :disabled="inProgress" type="submit">
-              Actualizar
-            </b-btn>
-            <b-btn  variant="secondary" @click="()=>{$refs.modalEdicion.hide()}">
-              Cerrar
-            </b-btn>
-          </div>
-          </b-modal>
-          </b-form>
+          <b-col md="6">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Almacen</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.Almacen }}</td>
+                </tr>
+                <tr>
+                  <td class="celda" style="font-weight:bold; width:35% !important;">Fecha</td>
+                  <td class="celda" style="text-transform: uppercase">: {{ infoOrden.FechaOrdenCompra }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </b-col>
+        </b-row>
+        <br>
+        <b-row>
+          <b-col md="12">
+            <productos-carrito
+              @onAddProducto="onAddProducto"
+              :setPrecio="true"
+              ref="carrito"
+              :isVentas="false"
+              :isOrdenCompra="true"
+              :showButton="false"
+              :bloquearInput="false"
+              :fields="carrito.fields"
+              :idAlmacen="infoOrden.IdAlmacen"
+              :onSetProducto="onSetProducto">
+            </productos-carrito>
+          </b-col>
+        </b-row>
+        <div slot="modal-footer" >
+        <b-btn  variant="success" :disabled="inProgress" type="submit">
+          Actualizar
+        </b-btn>
+        <b-btn  variant="secondary" @click="()=>{$refs.modalEdicion.hide()}">
+          Cerrar
+        </b-btn>
+      </div>
+      </b-modal>
+      </b-form>
 
-        </b-container>
-    </div>
+    </b-container>
+</div>
 </template>
 <script>
 import config from "@/store/config.js";
@@ -227,7 +227,7 @@ export default {
     return {
       API: config.API,
       productosInf: [],
-      fechaDesde: this.$moment().format("YYYY-01-01"),
+      fechaDesde: this.$moment().startOf("month").format("YYYY-MM-DD"),
       fechaHasta: this.$moment().format("YYYY-MM-DD"),
       detalle: [],
       detalleEdit: [],
@@ -282,8 +282,9 @@ export default {
       inProgress: false,
       estadoData: [
         { value: -1, text: "TODOS" },
-        { value: 0, text: "ACTIVOS" },
-        { value: 1, text: "ANULADOS" }
+        { value: 1, text: "PENDIENTES" },
+        { value: 0, text: "ANULADOS" },
+        { value: 2, text: "RECIBIDOS" }
       ],
       estadoSelect: -1
     };
@@ -310,23 +311,10 @@ export default {
       add: "agregarProducto"
     }),
     cambioEstado() {},
-    async generarPdf(IdOrdenCompra) {
-      console.log("IdOrdenCompra", IdOrdenCompra);
-      await this.axios(`${this.API}reporte/ordencomprapdf`, {
-        params: {
-          id: IdOrdenCompra
-        }
-      }).then(res => {
-        if (res.data) {
-          console.log(res.data);
-          let url = res.data;
-          url = url.replace(/\\/g, "");
-          if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "http://" + url; // O "https://" si es necesario
-          }
-          window.open(url, "_blank");
-        }
-      });
+    generarPdf(IdOrdenCompra) {
+      const url = `${this.API}reporte/ordencomprapdf?id=${encodeURIComponent(IdOrdenCompra)}&inline=1`;
+      const preview = window.open(url, "_blank");
+      if (!preview) window.location.assign(url);
     },
     actualizarDet(e) {
       e.preventDefault();

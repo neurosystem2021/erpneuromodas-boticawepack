@@ -1,0 +1,2 @@
+<?php
+ob_start();session_save_path(__DIR__.'/../tmp/support-sessions');session_id('quote-readonly-'.bin2hex(random_bytes(6)));session_start();$_SESSION['user']='superadmin';$_SESSION['expire']=time()+60;$_SERVER['REQUEST_METHOD']='GET';if(isset($argv[1]))$_GET['q']=$argv[1];session_write_close();register_shutdown_function(function(){if(session_status()===PHP_SESSION_ACTIVE)session_destroy();});require 'C:/xampp/htdocs/boticav1/api/proforma-edit.php';

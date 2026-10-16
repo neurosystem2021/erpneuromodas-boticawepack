@@ -1,0 +1,11 @@
+﻿from pathlib import Path
+p=Path('integration/ali-product-knowledge.php');s=p.read_text(encoding='utf-8').replace("function aliKnowledgeHash($product){return", "function aliKnowledgeHash($product){$product['IdProducto']=(int)$product['IdProducto'];return");needle="  $now=(new DateTimeImmutable";s=s.replace(needle,"  $sync=$db->prepare('UPDATE Gen_Producto SET ProductoDesc=? WHERE IdProducto=? AND Anulado=0');$sync->execute([$text,$id]);$product['ProductoDesc']=$text;\n"+needle,1);p.write_text(s,encoding='utf-8')
+p=Path('integration/ali-characteristics.php');s=p.read_text(encoding='utf-8');a=s.index('function aliRegisterProformaKnowledge');s=s[:a]+'''function aliRegisterProformaKnowledge($app){$app->add(function($q,$r,$next)use($app){
+ $path=$q->getUri()->getPath();
+ if($q->getMethod()==='POST'&&preg_match('~/proformas$~',$path)){try{$q=$q->withParsedBody(aliProformaKnowledge($app->getContainer()['db'],$q->getParsedBody()));}catch(Throwable $e){return $r->withJson(['error'=>'No se pudieron recuperar las características guardadas. Intenta nuevamente.'],503);}}
+ $response=$next($q,$r);
+ if($q->getMethod()==='GET'&&preg_match('~/proformas/id/\\d+$~',$path)&&$response->getStatusCode()===200){$data=json_decode((string)$response->getBody(),true);if(is_array($data)&&!empty($data['productos'])){try{$missing=[];foreach($data['productos'] as $i=>$item)if(strpos($item['Descripcion']??'','Características técnicas:')===false)$missing[$i]=$item;if($missing){$enriched=aliProformaKnowledge($app->getContainer()['db'],['productos'=>array_values($missing)]);foreach(array_keys($missing) as $j=>$i)$data['productos'][$i]=$enriched['productos'][$j];return $response->withJson($data);}}catch(Throwable $e){return $response;}}}
+ return $response;
+});}
+''';p.write_text(s,encoding='utf-8')
+p=Path('tools/test-product-knowledge.php');s=p.read_text(encoding='utf-8').replace("==='','original catalog description untouched'", "===aliCharacteristicText($second->data['knowledge']['characteristics']),'reviewed characteristics synced into catalog'");s=s.replace("knowledgeCheck($first->status===200", "knowledgeCheck(aliKnowledgeHash(['IdProducto'=>'1'])===aliKnowledgeHash(['IdProducto'=>1]),'numeric ids canonicalized');knowledgeCheck($first->status===200");p.write_text(s,encoding='utf-8')

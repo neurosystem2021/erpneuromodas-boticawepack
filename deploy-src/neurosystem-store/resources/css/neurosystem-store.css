@@ -1,0 +1,27 @@
+
+:root{--purple:#cf1d30!important;--purple-dark:#9e1524!important;--purple-mid:#e8273c!important;--gold:#cf1d30!important;--green:#cf1d30!important;--ink:#292a31!important;--muted:#777681!important;--line:#eedfe2!important}
+body{background:#faf8f9!important;color:#292a31!important}
+body>header,.store-admin-bar{background:#fff!important;color:#292a31!important;border-bottom:3px solid #d51c30!important;box-shadow:0 5px 24px #6b142410!important}
+body>header .head{padding:24px 28px!important}
+#brand{color:#c7192d!important;font-size:clamp(26px,3vw,42px)!important;letter-spacing:-1px!important}
+#tagline,.store-admin-title span{color:#66616b!important;font-size:13px!important;letter-spacing:1.2px!important}
+.brand-logo{background:#fff!important;object-fit:contain!important;max-width:220px!important;height:100px!important;border:1px solid #f0e0e3!important}
+.store-admin-logo{object-fit:contain!important;background:#fff!important}
+.store-admin-actions button,.store-admin-actions a,.search-button,.voice-search,.add,.detail-add,.checkout,.auth-submit,.cats-arrow,.floating-cart,.cart-btn,.account-btn{background:#d51c30!important;color:#fff!important;border-color:#d51c30!important;box-shadow:0 5px 14px #ca203022!important}
+.store-admin-actions button:hover,.add:hover,.search-button:hover{background:#b61729!important}
+.cart-icon{background:#fff!important;color:#cf1d30!important}.cart-badge{border-color:#cf1d30!important;color:#cf1d30!important;background:#fff!important}
+.store-promo-heading{background:#fff!important;color:#292a31!important;border:1px solid #efdfe2!important;box-shadow:none!important}
+.store-promo-heading:before,.card:before{background:#d51c30!important}
+.store-promo-message span{color:#c7192d!important;letter-spacing:1.5px!important}
+.store-promo-message:before{content:'▣';display:inline-grid;place-items:center;margin-right:12px;width:34px;height:34px;border:2px solid #d51c30;border-radius:8px;color:#d51c30;font-size:25px}
+.store-main-navigation a{color:#4a3038!important;background:#fff!important;border-color:#efdfe2!important}
+.store-main-navigation a:hover,.store-main-navigation a.is-active{background:#d51c30!important;color:#fff!important;border-color:#d51c30!important}
+.store-nav-panel{background:#fff!important;color:#292a31!important;border-color:#efdfe2!important}.store-nav-panel p{color:#6a5b61!important}.store-company-details span{background:#fff4f5!important;color:#54323b!important}
+.promo-carousel{background:#fff!important;border:1px solid #f0dfe3!important}.promo-image{object-fit:contain!important;background:#fff!important}.promo-backdrop{display:none!important}.promo-corner-label{display:none!important}.promo-arrow{background:#fff!important;color:#d51c30!important;border-color:#e6c9cf!important}.promo-dots button.is-active{background:#d51c30!important}
+.tools,.card,.panel,.auth-card{background:#fff!important;border-color:#ecdfe3!important}.card{box-shadow:0 6px 20px #5c192409!important}.photo,.pic{background:#fff8f9!important}.meta,.price,.product-price,.zoom{color:#c7192d!important}.photo img,.pic img{object-fit:contain!important}
+.cats button{background:#fff!important;color:#6a3e48!important;border-color:#ecd5db!important}.cats button.on,.cats button.active{background:#d51c30!important;color:#fff!important}
+.floating-cart strong,.floating-cart b,.floating-cart small,.cart-label strong,.cart-label small,.account-btn small{color:#fff!important}
+.search-wrap input:focus{border-color:#d51c30!important;box-shadow:0 0 0 3px #d51c3012!important}
+@media(max-width:640px){body>header .head{padding:18px 16px!important}.brand-logo{max-width:125px!important;height:70px!important}#brand{font-size:25px!important}.store-admin-actions{gap:6px!important}.store-admin-actions button,.store-admin-actions a{font-size:12px!important;padding:10px!important}.store-promo-heading{gap:12px!important}.store-promo-message span{font-size:15px!important}}
+
+.promo-carousel{height:auto!important;aspect-ratio:3/1;min-height:0!important}.promo-carousel:before{background:#d51c30!important}.promo-slide:after{display:none!important}.promo-image{filter:none!important}.store-nav-option{background:#fff5f6!important;color:#6a303e!important;border-color:#eed7dd!important}.store-nav-close{background:#d51c30!important;color:white!important}

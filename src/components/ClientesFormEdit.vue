@@ -1,92 +1,92 @@
 <template>
-  <div>
-    <!-- Modal Component -->
-    <b-form @submit="guardarCliente">    
-    <b-modal id="modal1" title="Editar Cliente" size="lg" ref="clienteForm" v-model="show">
-      <b-row>
-        <b-col md="12">
+<div>
+  <!-- Modal Component -->
+  <b-form @submit="guardarCliente">    
+  <b-modal id="modal1" title="Editar Cliente" size="lg" ref="clienteForm" v-model="show" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+    <b-row>
+      <b-col md="12" class="nst-editor-section">
+        <b-form-group>
+          <label>DNI / RUC:</label>
+          <b-input-group>
+            <b-form-input 
+              required="required"
+              v-model="cliente.DniRuc"></b-form-input>
+            <b-input-group-append>
+              <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group>
+          <label>Nombre del Cliente:</label>
+          <b-form-input 
+              required="required"
+              v-model="cliente.Cliente"
+              type="text"></b-form-input>
+        </b-form-group>
+        <b-form-group>
+          <label>Nombre Comercial:</label>
+          <b-form-input 
+              required="required"
+              v-model="cliente.NombreComercial"
+              type="text"></b-form-input>
+        </b-form-group>
+        <b-form-group>
+          <label>Dirección:</label>
+          <b-form-input 
+            v-model="cliente.Direccion"
+            type="text"></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-row>
+    <b-row>
+        <b-col>
           <b-form-group>
-            <label>DNI / RUC:</label>
-            <b-input-group>
+              <label>Teléfono:</label>
               <b-form-input 
-                required="required"
-                v-model="cliente.DniRuc"></b-form-input>
-              <b-input-group-append>
-                <b-btn variant="info" @click="consultarDNIRUC">Buscar </b-btn>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group>
-            <label>Nombre del Cliente:</label>
-            <b-form-input 
-                required="required"
-                v-model="cliente.Cliente"
-                type="text"></b-form-input>
-          </b-form-group>
-          <b-form-group>
-            <label>Nombre Comercial:</label>
-            <b-form-input 
-                required="required"
-                v-model="cliente.NombreComercial"
-                type="text"></b-form-input>
-          </b-form-group>
-          <b-form-group>
-            <label>Dirección:</label>
-            <b-form-input 
-              v-model="cliente.Direccion"
+              v-model="cliente.Telefono"
               type="text"></b-form-input>
           </b-form-group>
         </b-col>
-      </b-row>
-      <b-row>
-          <b-col>
-            <b-form-group>
-                <label>Teléfono:</label>
-                <b-form-input 
-                v-model="cliente.Telefono"
-                type="text"></b-form-input>
-            </b-form-group>
-          </b-col>
-          <b-col>
-            <b-form-group>
-                <label>Correo Electrónico:</label>
-                <b-form-input 
-                v-model="cliente.Email"
-                type="email"></b-form-input>
-            </b-form-group>
-          </b-col>
-      </b-row>
-      <b-row>
         <b-col>
-          <b-form-checkbox id="checkbox1"
-                     v-model="cliente.EsVIP"
-                     :value="1"
-                     :unchecked-value="0">
-            Marcar si es un cliente VIP
-          </b-form-checkbox>
+          <b-form-group>
+              <label>Correo Electrónico:</label>
+              <b-form-input 
+              v-model="cliente.Email"
+              type="email"></b-form-input>
+          </b-form-group>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <b-form-checkbox id="checkbox2"
-                     v-model="cliente.esComisionista"
-                     :value="1"
-                     :unchecked-value="0">
-            Marcar si es un comisionista
-          </b-form-checkbox>
-        </b-col>
-      </b-row>
-      <div slot="modal-footer" >
-        <b-btn  variant="primary" type="submit">
-           Guardar
-         </b-btn>
-         <b-btn  variant="secondary" @click="show=false">
-           Close
-         </b-btn>
-       </div>
-    </b-modal>
-    </b-form>
-  </div>
+    </b-row>
+    <b-row>
+      <b-col>
+        <b-form-checkbox id="checkbox1"
+                   v-model="cliente.EsVIP"
+                   :value="1"
+                   :unchecked-value="0">
+          Marcar si es un cliente VIP
+        </b-form-checkbox>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <b-form-checkbox id="checkbox2"
+                   v-model="cliente.esComisionista"
+                   :value="1"
+                   :unchecked-value="0">
+          Marcar si es un comisionista
+        </b-form-checkbox>
+      </b-col>
+    </b-row>
+    <div slot="modal-footer" >
+      <b-btn  variant="primary" type="submit">
+         Guardar
+       </b-btn>
+       <b-btn  variant="secondary" @click="show=false">
+         Close
+       </b-btn>
+     </div>
+  </b-modal>
+  </b-form>
+</div>
 </template>
 <script>
 import config from '@/store/config.js'

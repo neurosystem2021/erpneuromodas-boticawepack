@@ -1,201 +1,91 @@
 <template>
-  <b-container fluid>
-    <h1 class="my-2"> UTILIDAD BRUTA VENTAS</h1>
+<b-container fluid class="nst-screen nst-screen--reporteutilidadbrutaporusuario mb-5">
+  <h1 class="my-3">Utilidad bruta de servicios</h1>
+  <p>Venta menos descuentos y costo registrado. Incluye todos los productos marcados como servicio.</p>
+  <section class="nst-panel nst-panel--filters">
     <b-row>
-        <b-col cols="3">
-            Desde:
-            <input type="date" v-model="fechaInicio" class="form-control">
-        </b-col>
-        <b-col cols="3">
-            Hasta:
-            <input type="date" v-model="fechaFin" class="form-control">
-        </b-col>
-        <b-col cols="3">
-            Usuario: 
-            <b-select 
-                :options="lstUsuario" 
-                value-field="Usuario"
-                text-field="NombreUsuario"
-                v-model="usuarioReg"
-            />
-        </b-col>
-        <b-col cols="3">
-          <b-form-checkbox
-           
-            value="1"
-            unchecked-value="0"
-            v-model="ServicioFlag"
-          >
-            Servicios
-          </b-form-checkbox>
-
-
-          <b-form-checkbox
-            value="1"
-            unchecked-value="0"
-            v-model="MercaderiaFlag"
-          >
-            Mercaderías
-          </b-form-checkbox>
-        </b-col> 
-        <b-col cols="12" class="mt-2"> 
-            <b-button variant="success" @click="getReporteUtilidadPorUsuario()">Generar</b-button>
-            <b-button variant="danger" @click="exportar()">Exportar PDF</b-button>
-        </b-col>
-        <b-col cols="12" class="mt-5"> 
-          <b-table :fields="fields" :items="lstReporte" :per-page="perPage"
-          :current-page="currentPage"/>
-          
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="lstReporte.length"
-            :per-page="perPage" 
-            aria-controls="my-table"
-          ></b-pagination>
-          
-         <table width="100%" v-if="lstReporte.length>0">
-          <thead>
-            <tr>
-              <th  colspan="5">Resumen</th>
-            
-              <th>Sum Total Venta</th>
-              <th>Sum Total Costo</th>
-              <th>Sum Utilidad Bruta</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-                <tr>
-                <th colspan="5">
-                </th>
-                <td><strong class="sumTotalVenta">
-                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
-                        return sum+parseFloat(reporte.TotalVenta)
-                    },0)).toFixed(2) }}
-                </strong></td>
-                <td><strong class="sumTotalCosto">
-                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
-                        return sum+parseFloat(reporte.TotalCosto)
-                    },0)).toFixed(2) }}
-                </strong></td>
-                <td><strong class="sumUtilidadBruta">
-                    {{ parseFloat(lstReporte.reduce((sum,reporte)=>{
-                        return sum+parseFloat(reporte.UtilidadBruta)
-                    },0)).toFixed(2) }}
-                </strong></td>
-                </tr>
-            </tbody>
-         </table>
-        </b-col>
+      <b-col cols="12" md="3"><label for="profit-start">Desde</label><input id="profit-start" type="date" v-model="fechaInicio" class="form-control"></b-col>
+      <b-col cols="12" md="3"><label for="profit-end">Hasta</label><input id="profit-end" type="date" v-model="fechaFin" class="form-control"></b-col>
+      <b-col cols="12" md="3"><label for="profit-user">Usuario</label><b-form-select id="profit-user" :options="lstUsuario" value-field="Usuario" text-field="NombreUsuario" v-model="usuarioReg" /></b-col>
+      <b-col cols="12" md="3" class="pt-4"><b-form-checkbox value="1" unchecked-value="0" v-model="ServicioFlag">Servicios</b-form-checkbox><b-form-checkbox value="1" unchecked-value="0" v-model="MercaderiaFlag">Mercaderías</b-form-checkbox></b-col>
+      <b-col cols="12" class="my-3"><b-button variant="info" :disabled="loading" @click="generar">{{ loading ? 'Consultando…' : 'Generar reporte' }}</b-button> <b-button variant="success" :disabled="loading || !lstReporte.length || dirty" @click="exportarCsv">Exportar Excel (CSV)</b-button></b-col>
     </b-row>
-  </b-container>
+    <b-alert :show="!!error" variant="danger">{{ error }}</b-alert>
+    <b-alert :show="dirty" variant="warning">Los filtros cambiaron. Genera el reporte para actualizar los resultados.</b-alert>
+    <template v-if="generated">
+      <p><strong>{{ periodo }}</strong></p>
+      <b-row class="my-3">
+        <b-col cols="12" md="4"><div class="profit-total"><span>Venta neta</span><strong>{{ money(totales.TotalVenta) }}</strong></div></b-col>
+        <b-col cols="12" md="4"><div class="profit-total"><span>Costo</span><strong>{{ money(totales.TotalCosto) }}</strong></div></b-col>
+        <b-col cols="12" md="4"><div class="profit-total"><span>Utilidad bruta</span><strong>{{ money(totales.UtilidadBruta) }}</strong></div></b-col>
+      </b-row>
+      <h2 class="h5">Resumen por usuario</h2>
+      <b-table :fields="summaryFields" :items="porUsuario" responsive show-empty empty-text="No hay ventas para los filtros seleccionados." />
+      <h2 class="h5 mt-4">Detalle por servicio, fecha y usuario</h2>
+      <b-table id="service-profit-detail" :fields="fields" :items="lstReporte" :per-page="20" :current-page="currentPage" responsive show-empty empty-text="No hay ventas para los filtros seleccionados." />
+      <b-pagination v-if="lstReporte.length > 20" v-model="currentPage" :total-rows="lstReporte.length" :per-page="20" aria-controls="service-profit-detail" />
+      <p class="text-muted">Se excluyen ventas anuladas y documentos de tipo 11. Si el servicio no tiene costo registrado, la utilidad coincide con la venta neta. Los gastos generales no se descuentan en este reporte.</p>
+    </template>
+  </section>
+</b-container>
 </template>
-
 <script>
-import config from "@/store/config.js";
-import momemnt from "moment";
+import config from '@/store/config.js';
 export default {
   data() {
+    const currency = value => this.money(value);
     return {
-      perPage: 10,
-      currentPage: 1,
-      lstReporte: [],
-      API: config.API,
-      fechaInicio: "",
-      fechaFin: "",
-      usuarioReg: "",
-      ServicioFlag: 1,
-      MercaderiaFlag: 1,
-      lstUsuario: [],
-      fields: [
-        { label: "Fecha", key: "FechaReg" },
-        { label: "Id Producto", key: "IdProducto" },
-        { label: "Producto", key: "Producto" },
-        { label: "Cantidad", key: "Cantidad" },
-        { label: "Prom. Precio Costo", key: "PrecioCosto" },
-        { label: "Prom. Precio Venta", key: "PrecioVenta" },
-        { label: "Total Venta", key: "TotalVenta" },
-        { label: "Total Costo", key: "TotalCosto" },
-        { label: "Utilidad Bruta", key: "UtilidadBruta" }
-      ]
+      fechaInicio: this.$moment().startOf('month').format('YYYY-MM-DD'), fechaFin: this.$moment().format('YYYY-MM-DD'),
+      usuarioReg: '', ServicioFlag: '1', MercaderiaFlag: '0', lstUsuario: [{ Usuario: '', NombreUsuario: 'TODOS LOS USUARIOS' }],
+      lstReporte: [], currentPage: 1, loading: false, error: '', generated: false, applied: '', periodo: '',
+      summaryFields: [{ key: 'UsuarioReg', label: 'Usuario' }, { key: 'TotalVenta', label: 'Venta neta', formatter: currency }, { key: 'TotalCosto', label: 'Costo', formatter: currency }, { key: 'UtilidadBruta', label: 'Utilidad bruta', formatter: currency }],
+      fields: [{ key: 'FechaReg', label: 'Fecha' }, { key: 'UsuarioReg', label: 'Usuario' }, { key: 'Producto', label: 'Servicio / producto' }, { key: 'Cantidad', label: 'Cantidad' }, { key: 'TotalVenta', label: 'Venta neta', formatter: currency }, { key: 'TotalCosto', label: 'Costo', formatter: currency }, { key: 'UtilidadBruta', label: 'Utilidad bruta', formatter: currency }]
     };
   },
-  mounted() {
-    this.cargarUsuarios();
-    this.fechaInicio = this.$moment()
-      .startOf("day")
-      .format("YYYY-MM-DD");
-
-    this.fechaFin = this.$moment().format("YYYY-MM-DD");
-    this.usuarioReg = sessionStorage.getItem("User");
+  computed: {
+    filtros() { return { fechaInicio: this.fechaInicio, fechaFin: this.fechaFin, usuarioReg: this.usuarioReg, ServicioFlag: this.ServicioFlag, MercaderiaFlag: this.MercaderiaFlag }; },
+    dirty() { return this.generated && this.applied !== JSON.stringify(this.filtros); },
+    totales() { return this.sumar(this.lstReporte); },
+    porUsuario() {
+      const groups = {};
+      this.lstReporte.forEach(row => { const user = row.UsuarioReg || '(Sin usuario)'; if (!groups[user]) groups[user] = []; groups[user].push(row); });
+      return Object.keys(groups).sort().map(user => Object.assign({ UsuarioReg: user }, this.sumar(groups[user])));
+    }
   },
+  mounted() { this.cargarUsuarios(); this.generar(); },
   methods: {
+    money(value) { return 'S/ ' + Number(value || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
+    sumar(rows) { return rows.reduce((sum, row) => { ['TotalVenta', 'TotalCosto', 'UtilidadBruta'].forEach(key => { sum[key] += Number(row[key]) || 0; }); return sum; }, { TotalVenta: 0, TotalCosto: 0, UtilidadBruta: 0 }); },
     async cargarUsuarios() {
-      await this.axios.get(`${this.API}lstusuarios`).then(response => {
-        if (response.data) {
-          this.lstUsuario = response.data;
-        }
-      });
+      try { const response = await this.axios.get(config.API + 'lstusuarios'); if (Array.isArray(response.data)) this.lstUsuario = [{ Usuario: '', NombreUsuario: 'TODOS LOS USUARIOS' }].concat(response.data); }
+      catch (e) { this.$toasted.error('No se pudo cargar la lista de usuarios.'); }
     },
-    async getReporteUtilidadPorUsuario() {
-      this.lstReporte = [];
-      const inicio = this.$moment(this.fechaInicio, "YYYY-MM-DD");
-      const fin = this.$moment(this.fechaFin, "YYYY-MM-DD");
-      const diffMeses = fin.diff(inicio, "months", true);
-      if (diffMeses > 3) {
-        this.$toasted.error("El rango de fechas no puede ser mayor a 3 meses");
-
-        return;
-      }
-
-      let filtro = {
-        params: {
-          fechaInicio: this.fechaInicio,
-          fechaFin: this.fechaFin,
-          ServicioFlag: this.ServicioFlag,
-          MercaderiaFlag: this.MercaderiaFlag,
-          usuarioReg: this.usuarioReg
-        }
-      };
-      await this.axios
-        .get(`${this.API}reporte/utlidadbruta/usuario`, filtro)
-        .then(response => {
-          if (response.data) {
-            this.lstReporte = response.data;
-          }
-        });
+    async generar() {
+      if (this.loading) return;
+      if (!this.fechaInicio || !this.fechaFin || this.fechaInicio > this.fechaFin) { this.error = 'Selecciona un rango de fechas válido.'; return; }
+      if (String(this.ServicioFlag) !== '1' && String(this.MercaderiaFlag) !== '1') { this.error = 'Selecciona servicios o mercaderías.'; return; }
+      this.loading = true; this.error = '';
+      const filters = Object.assign({}, this.filtros);
+      try {
+        const response = await this.axios.get(config.API + 'reporte/utlidadbruta/usuario', { params: filters });
+        if (!Array.isArray(response.data)) throw new Error('invalid report');
+        this.lstReporte = response.data; this.currentPage = 1; this.generated = true; this.applied = JSON.stringify(filters);
+        this.periodo = filters.fechaInicio + ' al ' + filters.fechaFin + ' · ' + (filters.usuarioReg || 'Todos los usuarios') + ' · ' + (String(filters.ServicioFlag) === '1' ? 'Servicios' : '') + (String(filters.MercaderiaFlag) === '1' ? ' Mercaderías' : '');
+      } catch (e) { this.error = 'No se pudo generar el reporte. Revisa la conexión e inténtalo nuevamente.'; }
+      finally { this.loading = false; }
     },
-    async exportar() {
-      const inicio = this.$moment(this.fechaInicio, "YYYY-MM-DD");
-      const fin = this.$moment(this.fechaFin, "YYYY-MM-DD");
-      const diffMeses = fin.diff(inicio, "months", true);
-      if (diffMeses > 3) {
-        this.$toasted.error("El rango de fechas no puede ser mayor a 3 meses");
-
-        return;
-      }
-      await this.axios(`${this.API}reporte/utlidadbruta/usuario/exportar`, {
-        params: {
-          fechaInicio: this.fechaInicio,
-          fechaFin: this.fechaFin,
-          ServicioFlag: this.ServicioFlag,
-          MercaderiaFlag: this.MercaderiaFlag,
-          usuarioReg: this.usuarioReg
-        }
-      }).then(res => {
-        if (res) {
-          let url = res.data;
-          url = url.replace(/\\/g, "");
-          if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "http://" + url; // O "https://" si es necesario
-          }
-          window.open(url, "_blank");
-        }
-      });
+    exportarCsv() {
+      const clean = value => '"' + String(value == null ? '' : value).replace(/^[=+@\-]/, "'").replace(/"/g, '""') + '"';
+      const rows = [['UTILIDAD BRUTA', this.periodo], ['RESUMEN POR USUARIO'], ['Usuario', 'Venta neta', 'Costo', 'Utilidad bruta']];
+      this.porUsuario.forEach(row => rows.push([row.UsuarioReg, row.TotalVenta.toFixed(2), row.TotalCosto.toFixed(2), row.UtilidadBruta.toFixed(2)]));
+      rows.push(['TOTAL', this.totales.TotalVenta.toFixed(2), this.totales.TotalCosto.toFixed(2), this.totales.UtilidadBruta.toFixed(2)], [], ['DETALLE'], ['Fecha', 'Usuario', 'Servicio / producto', 'Cantidad', 'Venta neta', 'Costo', 'Utilidad bruta']);
+      this.lstReporte.forEach(row => rows.push([row.FechaReg, row.UsuarioReg, row.Producto, row.Cantidad, row.TotalVenta, row.TotalCosto, row.UtilidadBruta]));
+      const url = URL.createObjectURL(new Blob(['\uFEFF' + rows.map(row => row.map(clean).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a'); link.href = url; link.download = 'utilidad-servicios.csv'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
   }
 };
 </script>
-
-<style>
+<style scoped>
+.profit-total{padding:18px;margin-bottom:12px;border:1px solid #c9dfe5;border-radius:12px;background:#f0f9fa;display:flex;flex-direction:column;gap:8px}.profit-total strong{font-size:1.6rem;color:#00596b}
 </style>

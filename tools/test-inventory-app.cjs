@@ -1,0 +1,67 @@
+const fs = require('fs'), vm = require('vm'), assert = require('assert'), compiler = require('vue-template-compiler'), Vue = require('vue');
+const scan = {};
+vm.runInNewContext(fs.readFileSync('src/utils/inventoryScan.js', 'utf8').replace(/export function /g, 'function ') + '\nthis.createScanConsensus=createScanConsensus;this.inventoryQuantity=inventoryQuantity;', scan);
+const accept = scan.createScanConsensus();
+assert.strictEqual(accept('001', 0), false);
+assert.strictEqual(accept('002', 100), false);
+assert.strictEqual(accept('001', 200), false);
+assert.strictEqual(accept('001', 300), false);
+assert.strictEqual(accept('001', 400), '001');
+assert.strictEqual(accept('001', 2400), false);
+assert.strictEqual(scan.inventoryQuantity(''), null);
+assert.strictEqual(scan.inventoryQuantity(-1), null);
+assert.strictEqual(scan.inventoryQuantity('0'), 0);
+assert.strictEqual(scan.inventoryQuantity('1.125'), 1.125);
+let posts = 0, downloads = 0, stopped = 0;
+const storage = new Map();
+const browser = { matchMedia: () => ({ matches: false }), addEventListener() {}, removeEventListener() {}, isSecureContext: true };
+const document = { hidden: false, body: { appendChild() {} }, createElement: () => ({ click() { downloads++; }, remove() {} }), addEventListener() {}, removeEventListener() {} };
+function loadComponent(file, extras = {}) {
+  const parsed = compiler.parseComponent(fs.readFileSync(file, 'utf8'));
+  const compiled = compiler.compileToFunctions(parsed.template.content);
+  const errors = compiler.compile(parsed.template.content).errors;
+  assert.deepStrictEqual(errors, []);
+  const context = Object.assign({ config: { API: '/api/' }, InventoryCamera: {}, inventoryQuantity: scan.inventoryQuantity, createScanConsensus: scan.createScanConsensus, component: null, sessionStorage: { getItem: () => 'test-user' }, localStorage: { setItem: (key, value) => storage.set(key, value), getItem: key => storage.get(key) }, window: browser, navigator: {}, document, setTimeout, clearTimeout }, extras);
+  vm.runInNewContext(parsed.script.content.replace(/^import .*;?\r?$/gm, '').replace('export default', 'component ='), context);
+  return { options: Object.assign({}, context.component, compiled), context };
+}
+(async () => {
+  const loaded = loadComponent('src/views/reportes/Confrontacion.vue');
+  const view = new Vue(loaded.options);
+  view.axios = { get: async url => ({ data: url.includes('almacenes') ? [{ IdAlmacen: 9, Almacen: 'OTRO' }, { IdAlmacen: 4, Almacen: 'TARAPACÁ' }] : [] }), post: async () => { posts++; return { data: '<script>location.href="http://localhost/api/reporte/Confrontacion%20Inv.%202026-10-10.xlsx";</script>' }; } };
+  view.$swal = async () => ({ isConfirmed: true });
+  await loaded.options.mounted.call(view);
+  assert.strictEqual(view.warehouseId, '4', 'Must choose TARAPACA by name, not hardcoded ID');
+  const product = { IdProducto: 1, CodigoBarra: '001', Producto: 'CAMARA' };
+  view.addProduct(product, false);
+  assert.strictEqual(view.pending, 1);
+  await view.generateReport(false);
+  assert.strictEqual(posts, 0, 'Uncounted products must block report');
+  view.addProduct(product, true); view.addProduct(product, true);
+  assert.strictEqual(view.products.length, 1);
+  assert.strictEqual(view.products[0].cantidad, 2, 'Scans increment count without duplicating');
+  view.setQuantity(view.products[0], '0');
+  assert.strictEqual(view.counted, 1, 'Explicit zero is a valid count');
+  view.saveDraft(); view.products = []; view.restoreDraft();
+  assert.strictEqual(view.products[0].cantidad, 0, 'Draft must preserve explicit zero');
+  await view.generateReport(false);
+  assert.strictEqual(downloads, 1); assert.strictEqual(posts, 1); assert.strictEqual(view.products.length, 1, 'Download must preserve count');
+  const errors = [];
+  Vue.config.errorHandler = error => errors.push(error); Vue.config.silent = true;
+  view._render(); assert.strictEqual(errors.length, 0, errors.map(error => error.message).join(';'));
+  // Stale product search results must not replace a newer search.
+  view._searchVersion = 5; view.results = []; await view.searchProducts(4); assert.strictEqual(view.results.length, 0);
+  // Closing while permission is pending must release any stream returned later.
+  let grant;
+  const track = { stop() { stopped++; } };
+  const stream = { getTracks: () => [track], getVideoTracks: () => [track] };
+  browser.BarcodeDetector = function () {}; browser.BarcodeDetector.getSupportedFormats = async () => ['code_128'];
+  const cameraLoaded = loadComponent('src/components/InventoryCamera.vue', { Quagga: {}, navigator: { mediaDevices: { getUserMedia: () => new Promise(resolve => { grant = resolve; }) } } });
+  const camera = new Vue(cameraLoaded.options);
+  const starting = camera.start(); await new Promise(resolve => setImmediate(resolve));
+  camera.stop(); grant(stream); await starting;
+  assert.strictEqual(stopped, 1, 'Cancelled permission must not leave camera running');
+  view.$destroy(); camera.$destroy();
+  console.log('Inventory app passed: templates, TARAPACA selection, scan consensus, repeated counts, zero vs pending, draft, report download, stale searches and camera cleanup.');
+  process.exit(0);
+})().catch(error => { console.error(error); process.exit(1); });

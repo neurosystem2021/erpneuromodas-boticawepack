@@ -1,0 +1,14 @@
+.input-group > .autocomplete-wrapper {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 1%;
+    margin-bottom: 0;
+}
+.upper {
+    text-transform: uppercase;
+}
+
+.modal-cliente .modal{
+	z-index: 1070 !important;
+}

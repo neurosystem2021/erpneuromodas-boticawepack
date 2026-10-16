@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('src/components/ProductosCarritoNuevo.vue');s=p.read_text(encoding='utf-8');s=s.replace('let total = parseFloat(this.productos[index].subtotal);','let total = parseFloat(this.getSubtotal(index));\n      const igv = parseFloat(this.getIgv(index)) || 0;',1);s=s.replace('total += parseFloat(this.productos[index].igv);','total += igv;',1);p.write_text(s,encoding='utf-8')
