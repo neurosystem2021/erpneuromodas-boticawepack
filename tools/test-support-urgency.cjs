@@ -4,7 +4,7 @@ const sfc=compiler.parseComponent(fs.readFileSync('src/components/SupportLaunche
 const options=new Function('config','urgentReminderMs','pendingUrgentTickets','urgentAnnouncement',sfc.script.content.replace(/^import .*;\s*$/gm,'').replace('export default','return'))({API:'/api/'},helper.urgentReminderMs,helper.pendingUrgentTickets,helper.urgentAnnouncement);
 const storage=new Map();global.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)};
 let voices=0,beeps=0,clock=100000;const original=Date.now;Date.now=()=>clock;
-global.window={speechSynthesis:{speaking:false,pending:false,getVoices:()=>[{lang:'es-PE'}],speak:()=>voices++},SpeechSynthesisUtterance:function(text){this.text=text}};
+global.CustomEvent=function(type){this.type=type};global.window={dispatchEvent:e=>assert.equal(e.type,'support:urgent-alert'),speechSynthesis:{speaking:false,pending:false,getVoices:()=>[{lang:'es-PE'}],speak:()=>voices++},SpeechSynthesisUtterance:function(text){this.text=text}};
 Object.defineProperty(global,'navigator',{value:{locks:{request:async(name,fn)=>fn()}},configurable:true});
 const ticket={ticket_id:1,code:'SOP-2026-000001',priority:'critical',status:'new',version:1,technician_id:null};
 const make=()=>Object.assign({context:{principal:2,csrf:'fixture'},soundEnabled:true,urgentTickets:[ticket],urgentTotal:1,_audio:{state:'running'},beep:()=>beeps++,$root:{$emit(){}}},options.methods);

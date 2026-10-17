@@ -4,6 +4,7 @@
   <main :class="{ 'nst-workspace': $route.name !== 'Proforma', 'nst-sales-workspace': $route.name === 'Ventas' }"><router-view/></main>
   <producto-asesor-ia />
   <diario-recordatorios v-if="$route.name !== 'Ventas'" class="pos-inline-voice" />
+  <agenda-personal v-if="$route.name !== 'Proforma'" />
   <support-launcher v-if="$route.name !== 'Proforma'" />
 </div>
 </template>
@@ -12,9 +13,10 @@
 import ProductoAsesorIA from '@/components/ProductoAsesorIA.vue';
 import SupportLauncher from '@/components/SupportLauncher.vue';
 import DiarioRecordatorios from '@/components/DiarioRecordatorios.vue';
+import AgendaPersonal from '@/components/AgendaPersonal.vue';
 export default {
   name: "App",
-  components: {DiarioRecordatorios,SupportLauncher,'producto-asesor-ia':ProductoAsesorIA},
+  components: {AgendaPersonal,DiarioRecordatorios,SupportLauncher,'producto-asesor-ia':ProductoAsesorIA},
   computed: {
     modulo() {
       const titles = { Movimiento: 'Inventario y compras', Traslado: 'Traslado entre almacenes', OrdenCompra: 'Órdenes de compra', CargarComprasXml: 'Importar compras XML', Almacen: 'Stock por almacén', Productos: 'Catálogo de productos', ProductosSinMovimiento: 'Productos sin movimiento', ConfigurarOferta: 'Ofertas y promociones', Ventas: 'Punto de venta', VentaReimpresion: 'Consulta de comprobantes', VentasFacturacion: 'Facturación electrónica', Usuario: 'Usuarios y accesos', CajaBancos: 'Caja y bancos', BuscadorCajaBanco: 'Consulta de operaciones', Remision: 'Guías de remisión', RemisionLista: 'Listado de guías', Kardex: 'Kardex de productos', Articulosmovimientos: 'Artículos con más movimientos', Dashboard: 'Panel de resultados' };

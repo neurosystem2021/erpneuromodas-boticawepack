@@ -78,7 +78,7 @@ $textoQr = $empresa['ruc'] . '|' . $codigoSunat . '|' . $venta['Serie'] . '|' . 
     . number_format($igv, 2, '.', '') . '|' . number_format($total, 2, '.', '') . '|' . $fechaQr . '|'
     . $tipoDocumentoCliente . '|' . $dniRuc . '|';
 ob_start();
-QRcode::png($textoQr, null, 'Q', 6, 1);
+QRcode::png($textoQr, null, 'Q', 5, 4);
 $qrBinario = ob_get_clean();
 header('Content-Type: application/json; charset=utf-8');
 $qrImagen = @imagecreatefromstring($qrBinario);
@@ -99,6 +99,7 @@ try {
         'fuente_negrita' => $fuenteNegrita,
         'logo' => $logo,
         'qr_imagen' => $qrImagen,
+        'qr_modulo_px' => 5,
         'total_letras' => $totalLetras,
         'resolucion_sunat' => $resolucionSunat,
         'mensaje_ticket' => $mensajeTicket,

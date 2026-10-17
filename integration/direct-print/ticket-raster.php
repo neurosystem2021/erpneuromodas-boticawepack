@@ -406,8 +406,16 @@ function construirTicketRaster($venta, $productos, $empresa, $pagos, $opciones)
     ticketRasterDashedLine($imagen, $margen, $ancho - $margen, $y, $gris);
     $y += 14;
     $qr = isset($opciones['qr_imagen']) ? $opciones['qr_imagen'] : null;
-    if ($qr) imagecopyresampled($imagen, $qr, $margen, $y, 0, 0, 155, 155, imagesx($qr), imagesy($qr));
-    $xLegal = $margen + 175;
+    $qrAncho = 0;
+    if ($qr) {
+        // Keep complete square modules and the four-module white quiet zone.
+        $moduloOrigen = max(1, (int)($opciones['qr_modulo_px'] ?? 5));
+        $modulos = imagesx($qr) / $moduloOrigen;
+        $escala = max(1, min(5, (int)floor(264 / $modulos)));
+        $qrAncho = (int)($modulos * $escala);
+        imagecopyresized($imagen, $qr, $margen, $y, 0, 0, $qrAncho, $qrAncho, imagesx($qr), imagesy($qr));
+    }
+    $xLegal = $margen + max(175, $qrAncho + 16);
     $anchoLegal = $ancho - $margen - $xLegal;
     $legalY = $y + 5;
     ticketRasterDrawWrapped($imagen, $opciones['resolucion_sunat'], 13, $xLegal, $legalY, $fuenteNegrita, $negro, $anchoLegal, 'left', 18);
@@ -415,7 +423,7 @@ function construirTicketRaster($venta, $productos, $empresa, $pagos, $opciones)
     ticketRasterDrawText($imagen, 'CONSULTA WEB:', 13, $xLegal, $legalY, $fuenteNegrita, $negro);
     $legalY += 18;
     ticketRasterDrawWrapped($imagen, $opciones['consulta_web'], 13, $xLegal, $legalY, $fuenteNormal, $gris, $anchoLegal, 'left', 18);
-    $y += max(160, $legalY - $y) + 12;
+    $y += max(160, $qrAncho + 5, $legalY - $y) + 12;
 
     ticketRasterDashedLine($imagen, $margen, $ancho - $margen, $y, $gris);
     $y += 14;

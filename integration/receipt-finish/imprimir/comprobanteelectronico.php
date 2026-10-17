@@ -49,7 +49,7 @@ $textoQr = $empresa['ruc'] . '|' . $codigoComprobanteSunat . '|' . $docVenta['Se
     . number_format($igv, 2, '.', '') . '|' . number_format($total, 2, '.', '') . '|' . $fechaQr . '|'
     . $tipoDocumentoCliente . '|' . $dniRuc . '|';
 ob_start();
-QRcode::png($textoQr, null, 'Q', 7, 1);
+QRcode::png($textoQr, null, 'Q', 8, 4);
 $qrBase64 = base64_encode(ob_get_clean());
 ?>
 <!doctype html>
@@ -74,7 +74,7 @@ body{padding:18px}
 .items{width:100%;table-layout:fixed;border-collapse:collapse}.items th{padding:.9mm .45mm;border-bottom:1.5px solid var(--brand-dark);font-size:7px;font-weight:900;line-height:1.1;text-align:left}.items td{padding:.9mm .45mm;border-bottom:1px dashed var(--line);font-size:8.2px;font-weight:700;line-height:1.15;vertical-align:top}.items .qty{width:8mm;text-align:center}.items .unit,.items .amount{width:15mm;text-align:right;white-space:nowrap}.product-name{font-size:9.2px;font-weight:900;line-height:1.12;overflow-wrap:anywhere}.product-code{margin-top:.25mm;color:var(--muted);font-size:7px;font-weight:700;line-height:1.1}
 .summary{margin:1.3mm 0 1mm auto;width:45mm}.summary-row{display:flex;padding:.35mm 0;justify-content:space-between;font-size:8.3px}.summary-row span:first-child{color:var(--ink);font-weight:800}.summary-row strong{font-size:9.3px;font-weight:900}.summary-total{display:flex;margin-top:.8mm;padding:1.5mm 1.7mm;justify-content:space-between;border-top:2px solid #000;border-bottom:3px double #000;color:#000;background:#fff;font-size:15px;line-height:1;font-weight:900;letter-spacing:.2px}
 .words{margin:1.3mm 0;padding:1.3mm;border-left:.8mm solid var(--brand);background:var(--soft);font-size:7.5px;line-height:1.25}.payment{padding:1mm 0;border-bottom:1px dashed var(--line);font-size:8px;line-height:1.35}.payment-title{margin:.7mm 0 .3mm;font-weight:900}.payment-row{display:flex;justify-content:space-between;gap:2mm}.operation{color:var(--muted);font-size:6.8px;overflow-wrap:anywhere}
-.validation{display:grid;margin-top:1.5mm;grid-template-columns:24mm 1fr;gap:2mm;align-items:center}.qr{width:24mm;height:24mm}.legal{color:var(--muted);font-size:6.8px;line-height:1.25}.legal strong{color:var(--ink)}
+.validation{display:grid;margin-top:1.5mm;grid-template-columns:32mm 1fr;gap:2mm;align-items:center}.qr{width:32mm;height:32mm;image-rendering:pixelated;background:#fff}.legal{color:var(--muted);font-size:6.8px;line-height:1.25}.legal strong{color:var(--ink)}
 .footer{margin-top:3mm;padding-top:2.5mm;border-top:1px dashed var(--line);text-align:center;font-size:8px;line-height:1.45}.thanks{margin-top:2mm;color:var(--brand);font-size:10px;font-weight:900;letter-spacing:.3px}
 @media(max-width:420px){body{padding:0;background:#fff}.ticket{width:100%;min-height:100vh;box-shadow:none}}
 @media print{@page{size:80mm 297mm;margin:4mm}html,body{width:72mm!important;max-width:100%!important;height:auto!important;min-height:0!important;background:#fff}body{padding:0}.ticket{width:72mm;max-width:100%;height:auto;min-height:0;margin:0;padding:0;box-shadow:none;break-inside:auto;page-break-inside:auto}.items tr,.validation,.summary-total{break-inside:avoid}.no-print,#printers,#printer{display:none!important}body>br{display:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}

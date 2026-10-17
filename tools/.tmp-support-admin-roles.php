@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$d=appPdoConnection();$c=require 'C:/xampp/support-private/runtime.php';$d->exec('USE `'.$c['database'].'`');echo json_encode($d->query("SELECT p.external_user_id,m.role,m.active FROM support_principals p JOIN support_memberships m ON m.principal_id=p.id WHERE LOWER(p.external_user_id) IN ('admin','superadmin')")->fetchAll(PDO::FETCH_ASSOC));

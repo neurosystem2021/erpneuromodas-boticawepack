@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS Rhu_DiarioPersonal (
  Titulo VARCHAR(180) NOT NULL, Detalle TEXT NOT NULL, Fecha DATETIME NOT NULL,
  Anticipacion INT NOT NULL DEFAULT 15, Frecuencia INT NOT NULL DEFAULT 15,
  Repeticion VARCHAR(10) NOT NULL DEFAULT 'ninguna', Estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+ Recordar TINYINT(1) NOT NULL DEFAULT 1,
  Version INT NOT NULL DEFAULT 1, Anterior INT NULL, UNIQUE KEY siguiente (Anterior),
  KEY usuario_fecha (Usuario,Fecha)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

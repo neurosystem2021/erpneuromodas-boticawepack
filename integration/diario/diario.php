@@ -2,6 +2,7 @@
 if(session_status()!==PHP_SESSION_ACTIVE)session_start();
 if(empty($_SESSION['user'])||(isset($_SESSION['expire'])&&(int)$_SESSION['expire']<time())){header('Location: /');exit;}
 require_once __DIR__.'/../config/database.php';$diaryDb=appPdoConnection();$s=$diaryDb->prepare('SELECT p.UsuarioPerfil FROM Seg_Usuario u JOIN Seg_UsuarioPerfil p ON p.IdUsuarioPerfil=u.IdUsuarioPerfil WHERE u.Usuario=? AND IFNULL(u.Anulado,0)=0');$s->execute([$_SESSION['user']]);$diaryProgrammer=strcasecmp(trim((string)$s->fetchColumn()),'PROGRAMADOR')===0;
+if(!$diaryProgrammer&&strcasecmp((string)$_SESSION['user'],'superadmin')!==0){header('Location: /views/support.php');exit;}
 ?>
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diario de actividades</title>
 <link rel="stylesheet" href="/resources/font-awesome/css/font-awesome.css"><link rel="stylesheet" href="/resources/css/bootstrap.css"><link rel="stylesheet" href="/resources/css/main.css">
