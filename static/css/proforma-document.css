@@ -1,0 +1,104 @@
+/* Document typography; scoped to the proforma report. */
+.quote-page .quote-sheet.quote-systems .proposal-context .context-block > p,
+.quote-page .quote-sheet.quote-systems .proposal-context .context-block li > p {
+  font-weight: 600 !important;
+  color: #49313d !important;
+}
+.quote-page .quote-sheet.quote-systems .proposal-context .context-block h3 {
+  font-weight: 700 !important;
+}
+.quote-page .quote-sheet.quote-systems .proposal-context .context-intro > p {
+  font-weight: 700 !important;
+}
+
+/* Centre the visible ink, including the transparent image margins. */
+.quote-page .quote-sheet .quote-signature {
+  text-align: center;
+}
+.quote-page .quote-sheet .quote-rubric-space {
+  width: 220px;
+  max-width: 100%;
+  height: 80px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.quote-page .quote-sheet .quote-rubric-space img {
+  display: block;
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+  max-height: 72px;
+  margin: 0 auto;
+  position: relative;
+  left: -2px;
+}
+
+/* Keep the eyebrow and headline on the same centre line. */
+.quote-page .quote-sheet.quote-systems .quote-software-brand {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: end;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 12px 0;
+}
+.quote-page .quote-sheet.quote-systems .quote-software-brand > span {
+  align-self: center;
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 6px 16px;
+  line-height: 1.4;
+  border-radius: 5px;
+  text-align: center;
+}
+.quote-page .quote-sheet.quote-systems .quote-software-brand > strong {
+  margin: 0;
+  text-align: center;
+  line-height: 1.25;
+}
+@media screen and (max-width: 650px) {
+  .quote-page .quote-sheet.quote-systems .quote-software-brand {
+    width: 100%;
+    justify-self: center;
+    padding: 6px 0 10px;
+    gap: 8px;
+  }
+}
+@media print {
+  .quote-page .quote-sheet.quote-systems .quote-software-brand {
+    padding: 8px 0;
+    gap: 7px;
+  }
+  .quote-page .quote-sheet.quote-systems .quote-software-brand > span {
+    padding: 4px 12px;
+  }
+}
+.quote-page .quote-sheet:not(.quote-systems) .quote-products .product-copy h3{font-size:12px;font-weight:800;color:#32242b;line-height:1.45}
+.quote-page .quote-sheet:not(.quote-systems) .quote-products .product-copy p,.quote-page .quote-sheet:not(.quote-systems) .quote-products .product-copy ol,.quote-page .quote-sheet:not(.quote-systems) .quote-products .product-copy li{font-size:11px;font-weight:600;color:#46353e;line-height:1.6}
+.quote-page .quote-sheet:not(.quote-systems) .quote-products td.quantity{font-weight:700;color:#3c2933}
+.quote-featured-brand{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
+.quote-featured-brand span{font-size:10px;font-weight:800;letter-spacing:1.3px;color:#ac1c34}
+.quote-featured-brand strong{font-size:23px;line-height:1.2;color:#a51c33;font-weight:800}
+.quote-featured-products{margin:15px 0}
+.quote-featured-product{display:grid;grid-template-columns:230px minmax(0,1fr);gap:17px 22px;margin:0 0 14px;padding:18px;border:1px solid #ead5dd;border-top:3px solid #bd1d35;border-radius:7px;background:#fff}
+.featured-photo{display:flex;align-items:center;justify-content:center;min-width:0;align-self:center}
+.featured-photo img{display:block;width:100%;height:auto;max-height:210px;object-fit:contain}
+.featured-no-photo{display:block;padding:30px 15px;text-align:center;color:#72525f;font-size:12px;font-weight:600;background:#faf4f6;border-radius:6px}
+.featured-copy{min-width:0}.featured-eyebrow{display:block;color:#a5243d;font-size:9px;font-weight:800;letter-spacing:1px;margin:0 0 7px}
+.quote-page .featured-copy h2{font-size:18px;font-weight:800;color:#39232d;line-height:1.35;margin:0 0 12px;overflow-wrap:anywhere}
+.quote-page .featured-copy h3{font-size:10px;letter-spacing:.5px;font-weight:800;color:#aa1f39;margin:0 0 7px}
+.quote-page .featured-copy p,.quote-page .featured-copy li{font-size:12px;color:#49343e;font-weight:600;line-height:1.6;margin:0 0 7px;white-space:pre-line;overflow-wrap:anywhere;orphans:3;widows:3}
+.featured-copy ul{padding-left:16px;margin:5px 0}
+.featured-pricing{grid-column:1/-1;display:flex;align-items:stretch;border-top:1px solid #ead5dd;padding-top:12px;gap:10px;break-inside:avoid}
+.featured-pricing>div{padding:8px 12px;min-width:90px}.featured-pricing span{display:block;font-size:8px;letter-spacing:.6px;font-weight:800;color:#83616f;margin-bottom:5px}
+.featured-pricing strong{display:block;font-size:14px;font-weight:800;color:#412b36;font-variant-numeric:tabular-nums}
+.featured-pricing .featured-amount{margin-left:auto;background:#fff1f4;border-radius:5px;text-align:right;min-width:135px}.featured-pricing .featured-amount strong{font-size:18px;color:#b51e38}
+@media screen and (max-width:650px){.quote-featured-brand{grid-column:1;grid-row:2;align-items:flex-start;text-align:left}.quote-featured-brand strong{font-size:19px}.quote-featured-product{grid-template-columns:1fr;padding:14px;gap:15px}.featured-photo img{max-width:260px;max-height:180px}.featured-pricing{flex-wrap:wrap;gap:5px}.featured-pricing>div{min-width:70px;padding:8px}.featured-pricing .featured-amount{min-width:110px}.quote-page .featured-copy h2{font-size:17px}}
+@media print{html:has(.quote-featured),body:has(.quote-featured),#app.nst-document:has(.quote-featured){background:#fff!important;min-height:0!important;height:auto!important}.quote-featured-product{grid-template-columns:55mm minmax(0,1fr);gap:12px;padding:12px;border-radius:0;break-inside:avoid}.featured-photo img{max-height:43mm}.quote-page .featured-copy h2{font-size:15px;margin-bottom:8px}.quote-page .featured-copy p,.quote-page .featured-copy li{font-size:11.5px;line-height:1.5}.featured-pricing{padding-top:7px}.featured-pricing>div{padding:6px 9px}.featured-pricing strong{font-size:12px}.featured-pricing .featured-amount strong{font-size:14px}.quote-featured-brand strong{font-size:19px}}

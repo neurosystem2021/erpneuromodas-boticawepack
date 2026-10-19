@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('tools/.tmp-systems-name-ui.cjs');s=p.read_text(encoding='utf8').replace("await p.evaluate(()=>document.querySelector('#app').__vue__.$root.$emit('ali:product-info',{IdProducto:2297,Producto:'SISTEMA DE MARKET NEUROSOFT'}));", "await p.evaluate(()=>{document.querySelector('#app').__vue__.$root.$emit('ali:product-info',{IdProducto:2297,Producto:'SISTEMA DE MARKET NEUROSOFT'});});");p.write_text(s,encoding='utf8')

@@ -1,0 +1,2 @@
+from pathlib import Path
+p=Path('tools/.tmp-proforma-tabs-phone-ui.cjs');s=p.read_text(encoding='utf-8');s=s.replace("await p.locator('.quote-create-modal').screenshot", "await p.waitForTimeout(350);assert(await p.locator('.quote-create-modal .modal-content').isVisible(),'Preparation dialog remains visible after saving phone');await p.locator('.quote-create-modal .modal-content').screenshot");p.write_text(s,encoding='utf-8')

@@ -1,0 +1,67 @@
+PAQUETE DE BASES PARA NSTARAPACA
+
+ARCHIVOS PARA IMPORTAR
+1. fact_nstarapaca.sql: copia completa del ERP local con nombres de tablas
+   recuperados del esquema original y las migraciones nuevas.
+2. fact_nstarapaca_soporte.sql: copia completa de la base independiente de soporte.
+3. crear-bases.sql: creación de las dos bases, si el administrador del servidor
+   dispone de permisos para ello. No borra bases existentes.
+
+Incluye datos y tablas de Contabilidad, agenda personal por usuario,
+configuración, permisos, ventas, compras y demás registros de la base local.
+Funciones como el dictado, la agenda visual y los formatos nuevos también
+requieren subir el código actualizado del ERP; el SQL no instala el frontend.
+Los colores/posiciones guardados solo en el navegador no están en la base SQL.
+
+IMPORTANTE SOBRE EL DESTINO
+Estos SQL completos son para bases nuevas VACÍAS. Contienen instrucciones
+DROP/CREATE propias de una restauración. No importarlos sobre una base con
+ventas o clientes que deban conservarse. La migración de un sistema en uso
+requiere primero su respaldo y revisión; este paquete no ha tocado el servidor.
+
+IMPORTACIÓN POR SSH / MOBAXTERM
+Subir el paquete a una carpeta privada del servidor, fuera del directorio web.
+Descomprimir y comprobar los archivos:
+  sha256sum -c SHA256SUMS.txt
+
+Si las bases no existen, crearlas con el administrador del servidor o revisar
+crear-bases.sql. Importar usando el usuario MySQL autorizado:
+  mysql --default-character-set=utf8mb4 -u USUARIO -p fact_nstarapaca < fact_nstarapaca.sql
+  mysql --default-character-set=utf8mb4 -u USUARIO -p fact_nstarapaca_soporte < fact_nstarapaca_soporte.sql
+
+No cambiar todo el archivo a mayúsculas ni minúsculas. Se conservan nombres
+como GEN_EMPRESA, Gen_Producto, Seg_Usuario, Co_Company y Rhu_DiarioPersonal.
+Los textos y valores de los registros no fueron convertidos de caso.
+
+AJUSTES DE CÓDIGO ANTES DE ACTIVAR EL SERVIDOR
+referencias-php-a-revisar.csv enumera consultas PHP que Windows permite con
+un caso diferente. En Linux deben coincidir con nombres-tablas.json.
+El script normalizar-consultas-migracion.php revisa únicamente esos archivos;
+no modifica credenciales ni archivos de configuración. Ejecutarlo primero
+SIN --apply, cambiando la ruta por la ubicación real del proyecto:
+  php normalizar-consultas-migracion.php --root=/ruta/real/del/erp
+
+Solo cuando se haya revisado la salida y respaldado el servidor:
+  php normalizar-consultas-migracion.php --root=/ruta/real/del/erp --apply --backup=/ruta/privada/nueva/respaldo-codigo
+
+La carpeta de respaldo debe ser nueva y estar fuera del ERP. El script guarda
+los originales y comprueba sintaxis y hashes antes de terminar.
+
+Configurar en el servidor sus credenciales reales y DB_NAME=fact_nstarapaca;
+no copiar la conexión local de Windows/root. Para soporte, ajustar su archivo
+privado de configuración y la ruta correspondiente para Linux, usando la base
+fact_nstarapaca_soporte o el centro de soporte remoto que ya tenga configurado.
+También revisar las rutas privadas de soporte y la impresión local de Windows
+antes de activar el sitio. Una copia SQL no instala programas ni impresoras.
+
+VERIFICACIÓN REALIZADA
+- 137 tablas/vistas del ERP y 22 de soporte exportadas.
+- Los SQL originales y corregidos se restauraron en bases temporales aisladas.
+- Coinciden las filas de cada objeto y todas las definiciones de columnas.
+- Se comprobó que todos los literales de datos permanecen idénticos.
+- Se quitaron definidores locales de vistas para facilitar la importación.
+- Los nombres exactos se validaron en el SQL. Windows no permite comprobar
+  la ejecución sensible al caso de Linux: esa prueba debe hacerse al migrar,
+  antes de habilitar el sitio para los usuarios.
+
+No se importó ni cambió ninguna base del servidor durante la preparación.

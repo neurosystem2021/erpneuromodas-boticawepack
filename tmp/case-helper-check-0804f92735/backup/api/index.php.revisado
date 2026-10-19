@@ -1,0 +1,2 @@
+<?php
+$q1 = 'SELECT * FROM GEN_EMPRESA';

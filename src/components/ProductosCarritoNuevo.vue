@@ -10,7 +10,7 @@
               ref="autocompleteProducto"
               :url="APIProductos"
               :debounce="200"
-              :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1 ,limit: '25' }"
+              :customParams="{ 'sortBy':isVentas?'stock':'IdProducto', 'sortDesc': 1, limit: '25', incluirServicios: isVentas ? 1 : 0 }"
               :onShouldRenderChild="renderChild"
               anchor="Producto"
               label="writer"
@@ -1774,8 +1774,9 @@ export default {
           <div class="imceden-product-stock ${stockEstado}" title="Stock disponible">
             <strong>${stockTexto}</strong>
           </div>
+          <div class="imceden-product-barcode" title="Código de barras">${data.CodigoBarra || "S/C"}</div>
           <div class="imceden-product-name" title="Producto y código de barras">
-            <strong>${ordinal}<span class="pos-option-barcode">${data.CodigoBarra || "S/C"}</span> ${data.Producto || "Producto sin nombre"}</strong>
+            <strong>${data.Producto || "Producto sin nombre"}</strong>
           </div>
           <div class="imceden-product-detail imceden-product-category" title="Categoría">
             ${data.ProductoCategoria || ""}
@@ -1954,6 +1955,18 @@ export default {
 }
 .pos-option-barcode{display:inline-block;margin-right:8px;padding:2px 7px;border-radius:6px;background:#e4f3fa;color:#075b83;font-variant-numeric:tabular-nums;font-weight:800}
 </style>
+
+<style>
+/* Original POS columns, with barcode separated immediately before the product. */
+.pos-page .pos-product-name-search .imceden-product-row{grid-template-columns:6% 10% minmax(0,34%) 10% 10% 15% 9% 6%!important}
+.pos-page .pos-product-name-search .imceden-product-barcode{display:flex!important;align-self:stretch;align-items:center;justify-content:flex-start;min-width:0;padding:6px 10px;border-right:1px solid #e1e9f1;color:#102c52!important;text-align:left!important;font:600 12px/1.25 Roboto,Arial,sans-serif!important;font-variant-numeric:tabular-nums;white-space:normal!important;overflow-wrap:anywhere}
+.pos-page .pos-product-name-search .imceden-product-name{justify-content:flex-start!important;text-align:left!important}
+.pos-page .pos-product-name-search .imceden-product-name>strong{text-align:left!important;white-space:normal!important;text-overflow:clip!important;overflow:visible!important;overflow-wrap:anywhere}
+.pos-page .pos-product-name-search .imceden-product-name .pos-option-barcode{display:inline-block!important;width:auto!important;max-width:none!important;margin-right:8px!important;white-space:nowrap!important;color:#075b83!important}
+@media(max-width:750px){.pos-page .pos-product-name-search .imceden-product-row{grid-template-columns:40px 90px minmax(0,1fr) 65px 45px!important}.pos-page .pos-product-name-search .imceden-product-barcode{padding:5px;font-size:10px!important}}
+</style>
+
+
 <style>
 .pos-cart-component {
   position: relative;
@@ -3442,3 +3455,4 @@ export default {
 .pos-product-detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px}.pos-product-gallery{min-width:0}.pos-product-detail .pos-product-image-stage{position:relative;height:440px;min-height:0;padding:12px}.pos-product-detail .imagenGrande{width:100%;height:100%;max-height:100%;object-fit:contain}.pos-gallery-prev,.pos-gallery-next{position:absolute;top:46%;border:1px solid #dbe5ec;border-radius:50%;background:white;width:42px;height:42px;color:#079b72;font-size:30px}.pos-gallery-prev{left:8px}.pos-gallery-next{right:8px}.pos-gallery-thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto}.pos-gallery-thumbs button{padding:4px;background:white;border:2px solid #e5edf1;border-radius:12px;flex:0 0 80px;height:80px}.pos-gallery-thumbs button.selected{border-color:#00a77b}.pos-gallery-thumbs img{width:100%;height:100%;object-fit:contain}.pos-product-information>small{color:#098b75;font-weight:700}.pos-product-information h2{font-size:25px;line-height:1.3;margin:12px 0}.pos-detail-price{display:block;font-size:30px;color:#039878}.pos-detail-description{white-space:pre-line;overflow-wrap:anywhere;margin:22px 0;line-height:1.65}.pos-detail-attributes{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pos-detail-attributes>div{background:#f0f7fa;border:1px solid #deebf0;border-radius:12px;padding:12px;overflow-wrap:anywhere}.pos-detail-attributes small,.pos-detail-attributes b{display:block}.pos-detail-stock{margin-top:20px;color:#07826c;font-weight:700}@media(max-width:767px){.pos-product-detail{grid-template-columns:1fr;gap:20px}.pos-product-detail .pos-product-image-stage{height:280px}.pos-product-information h2{font-size:21px}.pos-gallery-thumbs button{flex-basis:64px;height:64px}.pos-product-image-modal .modal-body{padding:12px!important}}
 .pos-option-barcode{display:inline-block;margin-right:8px;padding:2px 7px;border-radius:6px;background:#e4f3fa;color:#075b83;font-variant-numeric:tabular-nums;font-weight:800}
 </style>
+

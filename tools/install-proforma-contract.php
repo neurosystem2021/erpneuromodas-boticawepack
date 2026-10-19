@@ -1,0 +1,14 @@
+<?php
+if(PHP_SAPI!=='cli')exit(1);$root=dirname(__DIR__);$live='C:/xampp/htdocs/boticav1';$backup='C:/xampp/accounting-private/proforma-contract-'.date('Ymd-His');mkdir($backup,0700,true);
+$installFiles=['proforma-pdf-render.php','proforma-contract-numbering.php','proforma-contract-template.php','proforma-contract-core.php','proforma-contract.php'];
+foreach($installFiles as $name){exec('C:/xampp/php/php.exe -l '.escapeshellarg($root.'/integration/proforma-edit/'.$name),$output,$status);if($status!==0)throw new RuntimeException('Invalid PHP: '.$name);}
+foreach(['consultor-jhon-rubrica-original.png','consultor-jhon-rubrica-limpia.png'] as $asset){$rubricSource=$root.'/static/images/'.$asset;$rubricTarget=$live.'/nuevo/static/images/'.$asset;if(is_file($rubricSource)){if(is_file($rubricTarget))copy($rubricTarget,$backup.'/'.$asset);if(!copy($rubricSource,$rubricTarget)||hash_file('sha256',$rubricSource)!==hash_file('sha256',$rubricTarget))throw new RuntimeException('Rubric verification failed');}}
+require $live.'/config/database.php';$db=appPdoConnection();$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+$db->exec('CREATE TABLE IF NOT EXISTS Ve_ProformaContrato(IdContrato INT NOT NULL AUTO_INCREMENT PRIMARY KEY,IdProforma INT NOT NULL,Version INT NOT NULL,Datos MEDIUMTEXT NOT NULL,SourceHash CHAR(64) NOT NULL,Usuario VARCHAR(100) NOT NULL,Fecha DATETIME NOT NULL,UNIQUE KEY ProformaVersion(IdProforma,Version)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+$db->exec('CREATE TABLE IF NOT EXISTS Ve_ContratoSerie(Anio INT NOT NULL PRIMARY KEY,Ultimo INT NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+$db->exec('CREATE TABLE IF NOT EXISTS Ve_ContratoNumero(IdProforma INT NOT NULL PRIMARY KEY,Anio INT NOT NULL,Numero INT NOT NULL,UNIQUE KEY ContratoCorrelativo(Anio,Numero)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+// Explicit user instruction: first contract in 2026 must be 200-2026.
+$db->exec('INSERT INTO Ve_ContratoSerie(Anio,Ultimo) VALUES(2026,199) ON DUPLICATE KEY UPDATE Ultimo=GREATEST(Ultimo,199)');
+$catalog=$root.'/static/data/proforma-contract-clauses.json';$catalogTarget=$live.'/nuevo/static/data/proforma-contract-clauses.json';if(is_file($catalogTarget))copy($catalogTarget,$backup.'/proforma-contract-clauses.json');if(!copy($catalog,$catalogTarget)||hash_file('sha256',$catalog)!==hash_file('sha256',$catalogTarget))throw new RuntimeException('Catalog verification failed');
+foreach($installFiles as $name){$source=$root.'/integration/proforma-edit/'.$name;$target=$live.'/api/'.$name;if(is_file($target))copy($target,$backup.'/'.$name);if(!copy($source,$target)||hash_file('sha256',$source)!==hash_file('sha256',$target))throw new RuntimeException('Install verification failed');}
+echo 'Contract draft API installed. Versioned snapshots, POS permissions and independent payment terms. No sales or cash movements created. Backup: '.$backup;

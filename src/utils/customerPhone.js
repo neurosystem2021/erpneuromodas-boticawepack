@@ -1,0 +1,1 @@
+export function customerPhoneValid(value){if(typeof value!=='string')return false;const phone=value.trim(),digits=phone.replace(/\D/g,'');return phone.length<=40&&/^\+?[0-9][0-9 ()-]*$/.test(phone)&&digits.length>=7&&digits.length<=15&&!/^0+$/.test(digits);}

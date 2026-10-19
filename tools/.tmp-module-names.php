@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';echo json_encode(appPdoConnection()->query('SELECT UsuarioModulo FROM Seg_UsuarioModulo ORDER BY UsuarioModulo')->fetchAll(PDO::FETCH_COLUMN));

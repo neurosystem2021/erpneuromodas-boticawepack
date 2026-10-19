@@ -1,0 +1,6 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store, private');header('X-Content-Type-Options: nosniff');
+try{session_start();if(empty($_SESSION['user'])||(isset($_SESSION['expire'])&&$_SESSION['expire']<time())){http_response_code(401);echo json_encode(['error'=>'Inicia sesión nuevamente.']);exit;}
+ require_once dirname(__DIR__).'/config/database.php';require_once __DIR__.'/ali-pos-security.php';require_once __DIR__.'/proforma-list-core.php';$db=appPdoConnection();$access=aliPosCapabilities($db,$_SESSION['user']);session_write_close();if(empty($access['read'])){http_response_code(403);echo json_encode(['error'=>'No tienes acceso a las proformas.']);exit;}
+ if($_SERVER['REQUEST_METHOD']!=='GET'){http_response_code(405);echo json_encode(['error'=>'Método no permitido.']);exit;}echo json_encode(quoteListData($db,quoteListInput($_GET)),JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_SUBSTITUTE);
+}catch(InvalidArgumentException $e){http_response_code(422);echo json_encode(['error'=>$e->getMessage()],JSON_UNESCAPED_UNICODE);}catch(Throwable $e){error_log('Proforma list: '.$e->getMessage());http_response_code(500);echo json_encode(['error'=>'No se pudo cargar el listado de proformas.']);}

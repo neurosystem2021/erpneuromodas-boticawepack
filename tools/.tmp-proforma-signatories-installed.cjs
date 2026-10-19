@@ -1,0 +1,43 @@
+const fs=require('fs'),assert=require('assert/strict');
+const {chromium}=require('../.tmp-order-workbook/node_modules/playwright');
+(async()=>{
+ const b=await chromium.launch({channel:'chrome',headless:true});
+ try{
+  const c=await b.newContext({viewport:{width:1440,height:1050}});
+  await c.addCookies([{name:'PHPSESSID',value:JSON.parse(fs.readFileSync('tools/.tmp-accounting-session.json')).id,domain:'localhost',path:'/'}]);
+  await c.route('**/*',r=>new URL(r.request().url()).hostname==='localhost'?r.continue():r.abort());
+  let sent;
+  await c.route('**/api/proforma-contract.php',r=>r.request().method()==='POST'?(sent=r.request().postDataJSON(),r.fulfill({json:{id:999999,version:1,url:'/api/proforma-contract.php?contrato=999999'}})):r.continue());
+  const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));
+  await p.goto('http://localhost/nuevo/index.html#/reportes/proforma/18');
+  await p.waitForSelector('.context-objective');
+  assert((await p.locator('.quote-client-meta').innerText()).includes('Consultor de TI Ing. Jhon H. Medrano Martinez'));
+  assert(!(await p.locator('.quote-client-meta').innerText()).includes('Asesor'));
+  assert.equal(await p.locator('.quote-signature strong').innerText(),'Ing. Jhon H. Medrano Martinez');
+  assert.equal(await p.locator('.quote-signature span').innerText(),'CONSULTOR DE TI');
+  assert.equal(await p.locator('.proposal-context-delivery li>p').first().evaluate(e=>getComputedStyle(e).textAlign),'justify');
+  await p.locator('.proposal-context-delivery').screenshot({path:'output/proforma-entregables-ordenados.png'});
+  assert.equal(await p.locator('.quote-rubric-space').count(),1);
+  await p.locator('.quote-footer').screenshot({path:'output/proforma-consultor-instalado.png'});
+  await p.getByRole('button',{name:'Generar contrato',exact:true}).click();
+  await p.waitForSelector('.contract-payment');
+  assert.equal(await p.getByLabel('Consultor de TI *',{exact:true}).inputValue(),'Ing. Jhon H. Medrano Martinez');
+  assert.equal(await p.getByLabel('Gerente general *',{exact:true}).inputValue(),'Blanca Martinez Bravo');
+  await p.getByLabel('Representante legal del cliente',{exact:true}).fill('Representante de prueba');assert.equal(await p.getByLabel('Número del contrato (correlativo)').inputValue(),'200-2026');await p.getByLabel('Documento del representante del cliente',{exact:true}).fill('12345678');await p.getByRole('button',{name:'Seleccionar recomendaciones del modelo'}).click();await p.waitForFunction(()=>document.querySelectorAll('.contract-clause-options input:checked').length===5);assert.equal(await p.locator('.contract-clause-options input:checked').count(),5);
+  assert.deepEqual(await p.locator('.contract-signatories strong').allTextContents(),['Ing. Jhon H. Medrano Martinez','Representante de prueba','Blanca Martinez Bravo']);
+  await p.getByLabel('Nombre o razón social del cliente *').fill('CLIENTE DE PRUEBA');
+  await p.getByLabel('DNI, RUC u otro documento *').fill('12345678');
+  await p.getByLabel('Domicilio del cliente *').fill('Domicilio de prueba');
+  await p.getByLabel('Vigencia de la licencia *').fill('Vigencia acordada con el cliente');
+  await p.getByLabel('Plazo de implementación *').fill('Plazo acordado por escrito');
+  await p.getByLabel('Revisé con el cliente los datos, importes y condiciones que se incluirán en el borrador.').check();
+  await p.getByRole('button',{name:/Generar (contrato para revisión|nueva versión del contrato)/}).click();
+  await p.waitForSelector('.contract-saved');
+  assert.equal(sent.numeroContrato,'200-2026');assert.equal(sent.compromisos.length,5);assert.equal(sent.documentoRepresentanteCliente,'12345678');assert.equal(sent.consultor,'Ing. Jhon H. Medrano Martinez');assert.equal(sent.representanteProveedor,'Blanca Martinez Bravo');assert.equal(sent.representanteCliente,'Representante de prueba');
+  await p.locator('.contract-signatories').screenshot({path:'output/contrato-tres-firmantes-instalado.png'});
+  await p.setViewportSize({width:390,height:844});
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  assert.deepEqual(errors,[]);
+  console.log('PASS installed proposal consultant/rubric space, contract defaults and left/centre/right signatories, submitted snapshot fields and mobile. Contract POST mocked; no agreement or payment saved.');
+ }finally{await b.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

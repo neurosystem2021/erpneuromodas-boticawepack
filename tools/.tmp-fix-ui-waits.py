@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('tools/.tmp-quote-attachment-ui.cjs');s=p.read_text(encoding='utf-8-sig').replace("document.querySelector('.quote-attachment-state').innerText.includes('propuesta-adicional.pdf')", "document.querySelector('.quote-attachment-state') && document.querySelector('.quote-attachment-state').innerText.includes('propuesta-adicional.pdf')");p.write_text(s,encoding='utf8')
+p=Path('tools/.tmp-systems-name-ui.cjs');s=p.read_text(encoding='utf-8-sig').replace("assert(sales.some(x=>x.search_by", "await p.waitForFunction(()=>{const el=document.querySelector('.product-knowledge-form textarea');return el && el.value.includes('Sistema de market por verificar')});assert(sales.some(x=>x.search_by");p.write_text(s,encoding='utf8')

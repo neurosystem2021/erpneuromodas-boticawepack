@@ -6,11 +6,12 @@
  <b-alert :show="!!success" variant="success">{{ success }}</b-alert>
  <section v-if="ready">
  <div class="quote-summary"><strong>{{ quote.Cliente }}</strong><span>{{ quote.Documento || quote.DniRuc }} ? Proforma {{ quote.Anio }}-{{ quote.Numero }}</span></div>
+  <cliente-telefono-rapido v-if="quotePresentation.tipo==='sistemas'" :client-id="quote.IdCliente" required :disabled="busy" @status="phoneReady=$event" @loaded="phoneUpdated" @saved="phoneUpdated"/>
   <b-form-group label="Buscar productos por nombre o código"><div class="d-flex"><b-form-input v-model="query" @input="scheduleSearch" @keyup.enter="search" placeholder="Nombre o código"/><b-button @click="search" :disabled="busy">Buscar</b-button></div></b-form-group>
   <div v-for="p in results" :key="p.IdProducto" class="quote-result"><span><b>{{ p.CodigoBarra || p.IdProducto }}</b> · {{ p.Producto }} <small>S/ {{ Number(p.PrecioContado || p.PrecioVenta || p.Precio || 0).toFixed(2) }}</small></span><b-button size="sm" @click="add(p)">{{ replacingIndex === null ? "Agregar" : "Reemplazar" }}</b-button></div>
   <small v-if="searching">Buscando...</small><small v-else-if="searched && !results.length">Sin resultados para esta búsqueda.</small>
   <p v-if="replacingIndex !== null">Elige el producto que reemplazará la fila {{ replacingIndex + 1 }}. <b-button size="sm" @click="replacingIndex=null">Cancelar cambio</b-button></p>
-  <h5>Productos</h5>
+  <proforma-presentacion v-model="quotePresentation" :disabled="busy" :products="products"/><h5>Productos</h5>
   <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Producto</th><th>Presentación</th><th>Cant.</th><th>Precio</th><th>Desc.</th><th>Subtotal</th><th></th></tr></thead><tbody><tr v-for="(p,i) in products" :key="i"><td><strong>{{ p.Producto }}</strong><small class="d-block">{{ p.CodigoBarra || p.IdProducto }}</small></td><td>{{ presentation(p) }}</td><td><b-form-input type="number" min="0.001" step="any" v-model.number="p.cantidad"/></td><td><b-form-input type="number" min="0" step="0.01" v-model.number="p.precio"/></td><td><b-form-input type="number" min="0" step="0.01" v-model.number="p.descuento"/></td><td>{{ amount(p).toFixed(2) }}</td><td class="quote-row-actions"><b-button size="sm" variant="outline-primary" title="Reemplazar producto" @click="replacingIndex=i;query='';results=[]">Cambiar</b-button><b-button size="sm" variant="danger" title="Quitar producto" @click="remove(i)"><i class="fas fa-trash"></i></b-button></td></tr></tbody></table></div>
   <div class="text-right"><strong>Total: S/ {{ total.toFixed(2) }}</strong></div>
   <div class="quote-footer"><b-button v-if="embedded" variant="secondary" :disabled="busy" @click="$emit('cancel')">Cancelar</b-button><b-button variant="success" :disabled="busy" @click="save">{{ busy ? 'Guardando...' : 'Guardar Cambios' }}</b-button><b-button v-if="!embedded" variant="outline-secondary" :href="'/nuevo/index.html#/reportes/proforma/'+quote.IdProforma" target="_blank">Ver proforma</b-button></div>
@@ -18,14 +19,18 @@
 </main>
 </template>
 <script>
+import ProformaPresentacion from "@/components/ProformaPresentacion.vue";
+import ClienteTelefonoRapido from "@/components/ClienteTelefonoRapido.vue";
 import config from '@/store/config.js';
 export default {
+ components:{ProformaPresentacion,ClienteTelefonoRapido},
  props:{quoteId:[String,Number],embedded:Boolean},
- data(){return {quote:{},products:[],results:[],replacingIndex:null,searching:false,searched:false,query:'',document:'',ready:false,busy:false,error:'',success:''};},
+ data(){return {phoneReady:false,quote:{},quotePresentation:{tipo:"productos"},products:[],results:[],replacingIndex:null,searching:false,searched:false,query:'',document:'',ready:false,busy:false,error:'',success:''};},
  beforeDestroy(){clearTimeout(this._searchTimer);this._sequence=(this._sequence||0)+1;},
  computed:{total(){return this.products.reduce((sum,p)=>sum+this.amount(p),0);}},
- async mounted(){try{const r=await this.axios.get(config.API+'proformas/id/'+(this.quoteId || this.$route.params.id));this.quote=r.data;this.products=(r.data.productos||[]).map(p=>({...p,cantidad:Number(p.Cantidad),precio:Number(p.Precio),descuento:Number(p.Descuento||0),disabledProf:Number(p.DisabledTotal||0)}));this.ready=true;}catch(e){this.error='No se pudo abrir la proforma.';}},
+ async mounted(){try{const r=await this.axios.get(config.API+'proformas/id/'+(this.quoteId || this.$route.params.id));this.quote=r.data;this.quotePresentation={tipo:r.data.Presentacion||'productos',formatoProducto:r.data.FormatoProducto||'catalogo',alcance:r.data.AlcanceSistema||'',entregables:r.data.EntregablesSistema||'',condiciones:r.data.CondicionesSistema||''};this.products=(r.data.productos||[]).map(p=>({...p,cantidad:Number(p.Cantidad),precio:Number(p.Precio),descuento:Number(p.Descuento||0),disabledProf:Number(p.DisabledTotal||0)}));this.ready=true;}catch(e){this.error='No se pudo abrir la proforma.';}},
  methods:{
+  phoneUpdated(client){this.$set(this.quote,'ClienteTelefono',client.Telefono);},
   presentation(p){try{const v=typeof p.Presentacion==='string'?JSON.parse(p.Presentacion):p.Presentacion;return (v&&v.nombre)||p.ProductoPresentacion||'UNIDAD';}catch(e){return p.ProductoPresentacion||'UNIDAD';}},
   async remove(i){const p=this.products[i];const result=await this.$swal({title:'¿Quitar producto?',text:p.Producto,icon:'warning',showCancelButton:true,confirmButtonText:'Sí, quitar',cancelButtonText:'Cancelar'});if(result.isConfirmed)this.products.splice(i,1);},
   amount(p){return (Number(p.cantidad)||0)*(Number(p.precio)||0)-(Number(p.descuento)||0);},
@@ -33,7 +38,7 @@ export default {
   scheduleSearch(){clearTimeout(this._searchTimer);this._searchTimer=setTimeout(()=>this.search(),250);},
   async search(){clearTimeout(this._searchTimer);const q=this.query.trim();const sequence=this._sequence=(this._sequence||0)+1;this.error='';this.results=[];this.searched=false;if(!q)return;this.searching=true;try{const r=await this.axios.get('/api/proforma-edit.php',{params:{q}});if(sequence!==this._sequence)return;this.results=Array.isArray(r.data)?r.data:[];this.searched=true;}catch(e){if(sequence===this._sequence)this.error='No se pudieron buscar los productos.';}finally{if(sequence===this._sequence)this.searching=false;}},
   add(p){const row={...p,Descripcion:'',cantidad:1,precio:Number(p.PrecioContado||p.PrecioVenta||p.Precio||0),descuento:0,disabledProf:0};if(this.replacingIndex===null){const existing=this.products.find(v=>String(v.IdProducto)===String(p.IdProducto));if(existing)existing.cantidad=Number(existing.cantidad)+1;else this.products.push(row);}else{row.cantidad=this.products[this.replacingIndex].cantidad;this.$set(this.products,this.replacingIndex,row);this.replacingIndex=null;}this.results=[];this.query='';this.searched=false;},
-  async save(){if(this.busy)return;this.busy=true;this.error='';this.success='';try{const token=await this.axios.get('/api/proforma-edit.php');await this.axios.post('/api/proforma-edit.php',{IdProforma:this.quote.IdProforma,cliente:{IdCliente:this.quote.IdCliente},descripcion:this.quote.Descripcion,diasValidosProf:this.quote.DiasValidos,productos:this.products},{headers:{'X-Proforma-CSRF':token.data.csrf}});this.success='Cambios guardados en la misma proforma.';this.$emit('saved');}catch(e){this.error=(e.response&&e.response.data&&e.response.data.error)||'No se pudo guardar. Tus cambios siguen en pantalla.';}finally{this.busy=false;}}
+  async save(){if(this.busy)return;if(this.quotePresentation.tipo==='sistemas'&&!this.phoneReady){this.error='Guarda un teléfono válido del cliente antes de guardar la proforma de sistemas.';return;}this.busy=true;this.error='';this.success='';try{const token=await this.axios.get('/api/proforma-edit.php');await this.axios.post('/api/proforma-edit.php',{IdProforma:this.quote.IdProforma,cliente:{IdCliente:this.quote.IdCliente},descripcion:this.quote.Descripcion,diasValidosProf:this.quote.DiasValidos,productos:this.products,presentacionProforma:this.quotePresentation},{headers:{'X-Proforma-CSRF':token.data.csrf}});this.success='Cambios guardados en la misma proforma.';this.$emit('saved');}catch(e){this.error=(e.response&&e.response.data&&e.response.data.error)||'No se pudo guardar. Tus cambios siguen en pantalla.';}finally{this.busy=false;}}
  }
 };
 </script>

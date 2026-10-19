@@ -7,12 +7,14 @@
 
     <b-modal id="modalProformas" title="Buscar Proforma" class="mdlProforma" v-model="show" size="xl"
       header-bg-variant="dark" headerTextVariant="light" body-bg-variant="light" body-text-variant="dark" modal-class="nst-dialog" body-class="nst-dialog-body" footer-class="nst-dialog-footer" centered="">
+      <div class="quote-category-tabs" role="tablist" aria-label="Tipo de proforma"><button type="button" role="tab" :aria-selected="quoteType==='productos'" :class="{active:quoteType==='productos'}" @click="changeQuoteType('productos')"><i class="fas fa-box-open" aria-hidden="true"></i> Proformas de productos</button><button type="button" role="tab" :aria-selected="quoteType==='sistemas'" :class="{active:quoteType==='sistemas'}" @click="changeQuoteType('sistemas')"><i class="fas fa-laptop-code" aria-hidden="true"></i> Proformas de sistemas</button></div>
+      <p v-if="listError" class="quote-list-error" role="alert">{{listError}}</p>
       <b-tabs pills card>
-        <b-tab title="Proformas" active><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Proformas</span></template>
+        <b-tab title="Pendientes" active><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Pendientes · {{counts.pendientes}}</span></template>
           <b-form-input v-model="filter" placeholder="Buscar" @input="currentPage = 1" />
           <div class="table-responsive table-proforma-scroll">
             <b-table :key="tableKey" v-if="show" id="table-proformas" ref="tableProformas" striped hover
-              :busy.sync="isBusy" :filter="filter" :items="myProvider" :fields="fields" :per-page="100"
+              :busy.sync="isBusy" :filter="filter" :items="myProvider" :fields="displayFields(fields)" :per-page="perPage"
               :current-page="currentPage">
 
               <template slot="EsFavoritoFlag" slot-scope="data">
@@ -22,10 +24,10 @@
                   aria-hidden="true" v-else></i>
               </template>
               <template slot="editarDocumento" slot-scope="data">
-                <b-button @click="editId=data.item.IdProforma;editOpen=true" variant="warning" size="sm" title="Editar proforma"><i class="fas fa-edit"></i></b-button>
+                <b-button :disabled="!!data.item.Facturada" @click="editId=data.item.IdProforma;editOpen=true" variant="warning" size="sm" title="Editar proforma"><i class="fas fa-edit"></i></b-button>
               </template>
               <template slot="update" slot-scope="data">
-                <b-button @click="selectProformas(data.item)" variant="success"><i
+                <b-button :disabled="!!data.item.Facturada" @click="selectProformas(data.item)" variant="success"><i
                     class="fas fa-pencil-alt"></i></b-button>
               </template>
 
@@ -34,6 +36,7 @@
                   target="_blank">Ver</b-button>
               </template>
 
+              <template slot="ClienteTelefono" slot-scope="data"><div class="quote-list-phone"><span>{{data.item.ClienteTelefono || 'Sin teléfono'}}</span><b-button size="sm" variant="outline-primary" @click="phoneClientId=data.item.IdCliente;phoneOpen=true" title="Actualizar teléfono del cliente"><i class="fas fa-phone-alt" aria-hidden="true"></i> Actualizar</b-button></div></template>
               <template slot="Total" slot-scope="data">
                 <b>{{ data.item.Total | moneda }}</b>
               </template>
@@ -63,10 +66,10 @@
             </b-btn>
           </div>
         </b-tab>
-        <b-tab title="Proformas Facturadas"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Proformas Facturadas</span></template>
+        <b-tab title="Proformas Facturadas"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Facturadas · {{counts.facturadas}}</span></template>
           <b-row class="align-items-center mb-2">
             <b-col cols="8">
-              <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFav = 1" />
+              <b-form-input v-model="filterFav" placeholder="Buscar" @input="currentPageFacturadas = 1" />
             </b-col>
             <b-col cols="4">
               <b-input-group prepend="Mostrar">
@@ -76,8 +79,8 @@
           </b-row>
 
           <div class="tablaScroll">
-            <b-table v-if="show" id="table-proformas-facturadas" ref="tableProformasFacturadas" striped hover
-              :busy.sync="isBusyFav" :filter="filterFav" :items="myProviderFacturadas" :fields="fieldsFacturadas"
+            <b-table :key="tableKey+'facturadas'" v-if="show" id="table-proformas-facturadas" ref="tableProformasFacturadas" striped hover
+              :busy.sync="isBusyFav" :filter="filterFav" :items="myProviderFacturadas" :fields="displayFields(fieldsFacturadas)"
               :per-page="perPageFav" :current-page="currentPageFacturadas">
 
               <template slot="ver" slot-scope="data">
@@ -85,6 +88,8 @@
                   target="_blank">Ver</b-button>
               </template>
 
+              <template slot="EsFavoritoFlag" slot-scope="data"><i @click="cambiarFavorito(data.item,data.item.EsFavoritoFlag?0:1)" :class="data.item.EsFavoritoFlag?'fas fa-star':'far fa-star'" style="cursor:pointer;color:#c79424" title="Cambiar favorito"></i></template>
+              <template slot="ClienteTelefono" slot-scope="data"><div class="quote-list-phone"><span>{{data.item.ClienteTelefono || 'Sin teléfono'}}</span><b-button size="sm" variant="outline-primary" @click="phoneClientId=data.item.IdCliente;phoneOpen=true" title="Actualizar teléfono del cliente"><i class="fas fa-phone-alt" aria-hidden="true"></i> Actualizar</b-button></div></template>
               <template slot="Total" slot-scope="data">
                 <b>{{ data.item.Total | moneda }}</b>
               </template>
@@ -120,24 +125,24 @@
           <b-pagination v-model="currentPageFacturadas" :total-rows="totalRowsFav"
             :per-page="perPageFav"></b-pagination>
         </b-tab>
-        <b-tab title="Proformas Favoritas"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Proformas Favoritas</span></template>
+        <b-tab title="Proformas Favoritas"><template slot="title"><i class="fas fa-layer-group nst-tab-icon" aria-hidden="true"></i><span>Favoritas · {{counts.favoritas}}</span></template>
           <b-input-group prepend="Buscar..." class="mt-2">
-            <input class="form-control" v-model="search" />
+            <input class="form-control" v-model="search" @input="currentPageFav=1" />
           </b-input-group>
           <b-form-group>
           </b-form-group>
           <div class="table-responsive table-proforma-scroll">
-            <b-table v-if="show" id="table-proformas" ref="tableProformas" :filter="filter" :items="filteredItems"
-              :fields="fieldsFavoritas" :per-page="100" :current-page="currentPageFav">
+            <b-table :key="tableKey+'favoritas'" v-if="show" id="table-proformas-favoritas" ref="tableFavoritas" :filter="search" :items="myProviderFavoritas"
+              :fields="displayFields(fieldsFavoritas)" :per-page="5" :current-page="currentPageFav">
               <!-- <template slot="EsFavoritoFlag" slot-scope="data">
                       <i @click="cambiarFavorito(data.item,0)" class="fa fa-star" style="color: #F57F17; cursor: pointer;" aria-hidden="true" v-if="data.item.EsFavoritoFlag"></i>
                       <i @click="cambiarFavorito(data.item,1)" class="far fa-star" style="cursor: pointer;" aria-hidden="true" v-else></i>
                     </template> -->
               <template slot="editarDocumento" slot-scope="data">
-                <b-button @click="editId=data.item.IdProforma;editOpen=true" variant="warning" size="sm" title="Editar proforma"><i class="fas fa-edit"></i></b-button>
+                <b-button :disabled="!!data.item.Facturada" @click="editId=data.item.IdProforma;editOpen=true" variant="warning" size="sm" title="Editar proforma"><i class="fas fa-edit"></i></b-button>
               </template>
               <template slot="update" slot-scope="data">
-                <b-button @click="selectProformas(data.item)" variant="success"><i
+                <b-button :disabled="!!data.item.Facturada" @click="selectProformas(data.item)" variant="success"><i
                     class="fas fa-pencil-alt"></i></b-button>
               </template>
 
@@ -146,6 +151,8 @@
                   target="_blank">Ver</b-button>
               </template>
 
+              <template slot="EsFavoritoFlag" slot-scope="data"><i @click="cambiarFavorito(data.item,data.item.EsFavoritoFlag?0:1)" :class="data.item.EsFavoritoFlag?'fas fa-star':'far fa-star'" style="cursor:pointer;color:#c79424" title="Cambiar favorito"></i></template>
+              <template slot="ClienteTelefono" slot-scope="data"><div class="quote-list-phone"><span>{{data.item.ClienteTelefono || 'Sin teléfono'}}</span><b-button size="sm" variant="outline-primary" @click="phoneClientId=data.item.IdCliente;phoneOpen=true" title="Actualizar teléfono del cliente"><i class="fas fa-phone-alt" aria-hidden="true"></i> Actualizar</b-button></div></template>
               <template slot="Total" slot-scope="data">
                 <b>{{ data.item.Total | moneda }}</b>
               </template>
@@ -161,7 +168,7 @@
 
             </b-table>
           </div>
-          <b-pagination v-model="currentPageFav" :total-rows="filteredItems.length" :per-page="5"
+          <b-pagination v-model="currentPageFav" :total-rows="totalFavorites" :per-page="5"
             aria-controls="my-table"></b-pagination>
         </b-tab>
       </b-tabs>
@@ -170,25 +177,22 @@
     </b-modal>
 
   </b-form>
-  <b-modal v-model="editOpen" title="Editar Proforma" size="lg" hide-footer lazy modal-class="plastifull-quote-modal" header-bg-variant="dark" header-text-variant="light"><proforma-editor v-if="editOpen" :quote-id="editId" embedded @cancel="editOpen=false" @saved="proformaSaved" /></b-modal>
+  <b-modal v-model="phoneOpen" @hidden="show=true" title="Actualizar teléfono del cliente" hide-footer size="md" lazy><cliente-telefono-rapido v-if="phoneOpen" :client-id="phoneClientId" required @saved="phoneOpen=false;tableKey++"/></b-modal>
+  <b-modal v-model="editOpen" @hidden="show=true" title="Editar Proforma" size="lg" hide-footer lazy modal-class="plastifull-quote-modal" header-bg-variant="dark" header-text-variant="light"><proforma-editor v-if="editOpen" :quote-id="editId" embedded @cancel="editOpen=false" @saved="proformaSaved" /></b-modal>
 </div>
 </template>
 <script>
 import ProformaEditor from '@/views/ProformaEditor.vue';
+import ClienteTelefonoRapido from '@/components/ClienteTelefonoRapido.vue';
 import config from "@/store/config.js";
 import { mapActions } from "vuex";
 
 export default {
-  components:{ProformaEditor},
+  components:{ProformaEditor,ClienteTelefonoRapido},
   mounted() {
     this.$emit("mounted", this.$refs.formProformaModal);
   },
   watch: {
-    items() {
-      this.axios.get(this.API + "proformas/count").then(response => {
-        this.totalRows = response.data.total;
-      });
-    },
     show() {
       if (this.show) {
         this.cargarFavoritas();
@@ -197,7 +201,7 @@ export default {
   },
   data() {
     return {
-      editOpen:false,editId:null,
+      quoteType:'productos',counts:{pendientes:0,facturadas:0,favoritas:0},totalFavorites:0,listError:'',phoneOpen:false,phoneClientId:0,editOpen:false,editId:null,
       tableKey: 0,
       API: config.API,
       show: false,
@@ -269,26 +273,22 @@ export default {
   },
   props: ["idAlmacen"],
   methods: {
-    proformaSaved(){this.editOpen=false;this.tableKey++;this.cargarFavoritas();},
+    proformaSaved(){this.editOpen=false;this.tableKey++;},
     ...mapActions({
       add: "agregarProducto",
       obtenerStok: "obtenerStock",
       limpiarCarrito: "limpiarCarrito"
     }),
-    cargarFavoritas() {
-      this.lstProformasFavoritas = [];
-      this.axios(`${this.API}proformas/favoritas`).then(response => {
-        if (response.data) {
-          this.lstProformasFavoritas = response.data;
-        }
-      });
-    },
+    changeQuoteType(type){if(this.quoteType===type)return;this.quoteType=type;this.filter='';this.filterFav='';this.search='';this.currentPage=1;this.currentPageFacturadas=1;this.currentPageFav=1;this.counts={pendientes:0,facturadas:0,favoritas:0};this.totalRows=0;this.totalRowsFav=0;this.totalFavorites=0;this.tableKey++;},
+    displayFields(fields){const out=fields.slice();if(!out.some(f=>f.key==='EsFavoritoFlag'))out.push({key:'EsFavoritoFlag',label:'Favorito',thStyle:{width:'80px'}});if(this.quoteType!=='sistemas')return out;out.splice(out.findIndex(f=>f.key==='Cliente')+1,0,{key:'ClienteTelefono',label:'Teléfono del cliente',thStyle:{width:'165px'}});return out;},
+    cargarFavoritas(){if(this.$refs.tableFavoritas)this.$refs.tableFavoritas.refresh();},
+    async quoteProvider(ctx,state){const type=this.quoteType;this.listError='';try{const r=await this.axios.get('/api/proforma-list.php',{params:{tipo:type,estado:state,q:ctx.filter||'',page:ctx.currentPage||1,limit:ctx.perPage||5}});if(type!==this.quoteType)return [];if(!ctx.filter)this.counts=r.data.counts;const total=Number(r.data.total)||0;if(state==='pendientes')this.totalRows=total;else if(state==='facturadas')this.totalRowsFav=total;else this.totalFavorites=total;return r.data.items||[];}catch(e){if(type===this.quoteType)this.listError=(e.response&&e.response.data&&e.response.data.error)||'No se pudo cargar el listado.';return [];}},
     async cambiarFavorito(item, EsFavoritoFlag) {
       item.EsFavoritoFlag = EsFavoritoFlag;
       console.log(item);
       await this.axios.put(`${this.API}proforma/cambiarfavorito`, item);
       console.log(EsFavoritoFlag);
-      this.cargarFavoritas();
+      this.tableKey++;
     },
     async selectProformas(proforma) {
       try {
@@ -302,34 +302,8 @@ export default {
         this.filter = ''; this.show = false;
       } catch (error) { this.$toasted.error('No se pudo abrir la proforma. Intenta nuevamente.'); }
     },
-    myProviderFacturadas(ctx) {
-      let promise = this.axios.get(
-        this.API +
-        "proformas/facturadas?limit=" +
-        ctx.perPage +
-        "&page=" +
-        ctx.currentPage +
-        "&filter=" +
-        (ctx.filter || "")
-      );
-
-      return promise
-        .then(result => {
-          this.actualizarTotalFacturadas(ctx.filter || "");
-          return result.data;
-        })
-        .catch(error => {
-          console.log(error);
-          return [];
-        });
-    },
-    actualizarTotalFacturadas(filter) {
-      this.axios
-        .get(this.API + "proformas/facturadas/count?filter=" + (filter || ""))
-        .then(response => {
-          this.totalRowsFav = response.data.total;
-        });
-    },
+    myProviderFacturadas(ctx){return this.quoteProvider(ctx,'facturadas');},
+    myProviderFavoritas(ctx){return this.quoteProvider(ctx,'favoritas');},
     parseVentas(idDocVenta) {
       if (!idDocVenta) return [];
       try {
@@ -346,34 +320,7 @@ export default {
     toggleExpand(idProforma) {
       this.$set(this.expandedRows, idProforma, !this.expandedRows[idProforma]);
     },
-    myProvider(ctx) {
-      // Here we don't set isBusy prop, so busy state will be handled by table itself
-      // this.isBusy = true
-      let promise = this.axios.get(
-        this.API +
-        "proformas?limit=" +
-        ctx.perPage +
-        "&page=" +
-        ctx.currentPage +
-        "&filter=" +
-        ctx.filter
-      );
-
-      return promise
-        .then(result => {
-          this.items = result.data;
-          //this.totalRows = this.items.length
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          return this.items;
-        })
-        .catch(error => {
-          // Here we could override the busy state, setting isBusy to false
-          // this.isBusy = false
-          // Returning an empty array, allows table to correctly handle busy state in case of error
-          return [];
-        });
-    },
+    myProvider(ctx){return this.quoteProvider(ctx,'pendientes');},
     eliminarProf(data) {
       this.$swal({
         target: document.getElementById("conten"),
@@ -428,7 +375,6 @@ export default {
 };
 </script>
 <style>
-css
 
 /* ── Modal: ocupa toda la ventana ── */
 #modalProformas .modal-dialog {
@@ -559,6 +505,7 @@ css
     border-radius: 0;
   }
 }
+.quote-category-tabs{display:flex;gap:8px;padding:10px 12px;background:#eaf4f7;flex-shrink:0;border-bottom:1px solid #d4e5ed}.quote-category-tabs button{display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid #c9dce5;border-radius:7px;background:white;color:#28576b;font-size:13px;font-weight:600;cursor:pointer}.quote-category-tabs button.active{background:#0b718b;color:white;border-color:#0b718b}.quote-category-tabs button:last-child.active{background:#b2223e;border-color:#b2223e}.quote-list-phone{display:flex;flex-direction:column;gap:5px;align-items:flex-start}.quote-list-phone>span{font-size:12px;white-space:nowrap}.quote-list-phone .btn{padding:4px 7px!important;min-height:25px!important;font-size:10px!important}.quote-list-error{margin:8px 12px;color:#b22640;font-size:12px}@media(max-width:600px){.quote-category-tabs{flex-wrap:wrap}.quote-category-tabs button{flex:1;font-size:11px;padding:9px}}
 </style>
 <style>
 .plastifull-quote-modal .modal-dialog{max-width:960px!important;width:95vw!important}.plastifull-quote-modal .modal-body{padding:12px!important;max-height:80vh;overflow:auto}.plastifull-quote-modal .quote-editor{padding:0!important;margin:0!important}.plastifull-quote-modal .quote-editor h2,.plastifull-quote-modal .quote-editor>p{display:none}

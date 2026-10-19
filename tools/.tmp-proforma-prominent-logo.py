@@ -1,0 +1,2 @@
+﻿from pathlib import Path
+p=Path('src/views/reportes/Proforma.vue');s=p.read_text(encoding='utf8').replace('grid-template-columns:170px minmax(0,1fr)','grid-template-columns:195px minmax(0,1fr)').replace('width:170px;max-height:78px','width:195px;max-height:90px').replace('grid-template-columns:38mm minmax(0,1fr)','grid-template-columns:44mm minmax(0,1fr)').replace('.quote-logo{width:38mm;max-height:20mm}', '.quote-logo{width:44mm;max-height:23mm}');p.write_text(s,encoding='utf8')

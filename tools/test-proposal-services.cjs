@@ -1,0 +1,73 @@
+const fs=require('fs'),assert=require('assert/strict');
+const {chromium}=require('../.tmp-order-workbook/node_modules/playwright');
+const catalog=JSON.parse(fs.readFileSync('static/data/proforma-services.json','utf8'));
+const helper=fs.readFileSync('src/utils/proformaServices.js','utf8').replace(/^import .*;\r?\n/,'').replace(/export /g,'');
+const utils=new Function('catalog',helper+';return {applyProposalServices,proformaAnnualPlan};')(catalog);const compose=utils.applyProposalServices;
+const plan=compose({condiciones:'Texto personalizado'},catalog.filter(s=>s.annualPlan).map(s=>s.id).concat('annual_billing'),{annualFee:900});const parsed=utils.proformaAnnualPlan(plan.condiciones);assert.equal(parsed.text,'Texto personalizado');assert.equal(parsed.plan.services.length,15);assert.equal(parsed.plan.price,'S/ 900.00');assert.equal(compose(plan,catalog.filter(s=>s.annualPlan).map(s=>s.id).concat('annual_billing'),{annualFee:900}).condiciones,plan.condiciones);fs.writeFileSync('output/proposal-services-fixture.json',JSON.stringify({...plan,alcance:'Propuesta de sistemas de Market / bodega.\n\nObjetivo: mejorar el control de ventas e inventario.\n\nMódulos incluidos: Punto de venta; Inventario y stock.',entregables:'Configuración inicial y capacitación acordadas.'}));
+const defaults=catalog.filter(s=>s.default).map(s=>s.id);
+assert.deepEqual(defaults.sort(),['attention247','backups','helpdesk','sunat_updates','sunat_validation'].sort());
+const current={tipo:'sistemas',alcance:'Alcance propio\n\nMódulos incluidos: Punto de venta; Inventario.',entregables:'Entrega especial',condiciones:'Licencia 3000 soles. Condición específica.'};
+const applied=compose(current,defaults);
+assert.equal(compose(applied,defaults).condiciones,applied.condiciones);
+assert.match(applied.alcance,/todos los comprobantes/);assert.match(applied.entregables,/diarias/);assert.match(applied.condiciones,/24\/7/);
+assert.equal(compose(applied,[]).condiciones,current.condiciones);
+assert.equal(compose({...applied,condiciones:applied.condiciones.replace(/\n/g,'\r\n')},defaults).condiciones,applied.condiciones);
+assert.throws(()=>compose(current,['annual_billing']),/valor anual/);
+assert.match(compose(current,['annual_billing'],{annualFee:900}).condiciones,/segundo año.*900\.00/);
+(async()=>{
+ const source=fs.readFileSync('src/components/ProformaPresentacion.vue','utf8');
+ const template=source.slice(source.indexOf('<template>')+10,source.indexOf('</template>\n<script>'));
+ const script=source.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/^import .*;\r?\n/gm,'').replace('export default','return');
+ const css=source.match(/<style scoped>([\s\S]*?)<\/style>/)[1];
+ const b=await chromium.launch({channel:'chrome',headless:true});
+ try {
+ const p=await b.newPage({viewport:{width:1000,height:1100}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.setContent('<style>'+css+'</style><div id="app"></div>');await p.addScriptTag({path:'node_modules/vue/dist/vue.js'});
+ await p.evaluate(({template,script,helper,catalog})=>{
+  const utils=new Function('catalog',helper+';return {proposalServices,defaultProposalServices,applyProposalServices};')(catalog);
+  window.savedTemplate=null;window.lastRequest=null;
+  window.fetch=async(url,options)=>{
+   if(url.includes('/ali/config'))return {ok:true,json:async()=>({configured:true,enabled:false,csrf:'fixture'})};
+   const q=JSON.parse(options.body);window.lastRequest=q;
+   if(q.mode==='proposal_catalog')return {ok:true,json:async()=>({modules:[{id:'sales',name:'Punto de venta',detail:'Ventas'},{id:'inventory',name:'Inventario',detail:'Stock'},{id:'clients',name:'Clientes',detail:'Clientes'}]})};
+   if(q.mode==='proposal_template_get')return {ok:true,json:async()=>({template:window.savedTemplate})};
+   if(q.mode==='proposal_template_save'){window.savedTemplate=q;return {ok:true,json:async()=>({ok:true})};}
+   if(q.mode==='proposal_draft')return {ok:true,json:async()=>({draft:{alcance:'Alcance redactado',entregables:'Entrega acordada',condiciones:'Condiciones acordadas',pendientes:['Confirmar cobertura.'],recomendados:q.objetivo==='recomendar'?['sales','inventory']:[],soportes_recomendados:q.objetivo==='soportes'?['attention247','helpdesk','backups','sunat_updates','sunat_validation','invalid']:[]}})};
+   throw Error('Unknown request');
+  };
+  const component=new Function('proposalServices','defaultProposalServices','applyProposalServices',script)(utils.proposalServices,utils.defaultProposalServices,utils.applyProposalServices);component.template=template;
+  window.app=new Vue({data:{value:{tipo:'sistemas',alcance:'Alcance especial del cliente',entregables:'Entrega especial',condiciones:'Licencia: S/ 3000.00.'}},components:{Proposal:component},template:'<Proposal ref="proposal" v-model="value" :products="[{IdProducto:3955,Producto:\'Sistema Market con facturación\'}]"/>'}).$mount('#app');
+ },{template,script,helper,catalog});
+ await p.waitForFunction(()=>window.app.$refs.proposal.modules.length===3);
+ assert.equal(await p.locator('.proposal-service-list input:checked').count(),5);
+ assert.equal(await p.locator('.proposal-service-list label').count(),20);
+ await p.getByRole('button',{name:'Aplicar servicios seleccionados a los textos'}).click();
+ let value=await p.evaluate(()=>window.app.value);assert.match(value.condiciones,/24\/7/);assert.match(value.condiciones,/Licencia: S\/ 3000\.00/);assert.match(value.alcance,/todos los comprobantes/);
+ await p.getByLabel('Plan anual integral de facturación electrónica',{exact:false}).check();
+ const before=await p.evaluate(()=>window.app.value);
+ await p.getByRole('button',{name:'Aplicar servicios seleccionados a los textos'}).click();
+ assert.deepEqual(await p.evaluate(()=>window.app.value),before);
+ await p.getByLabel('Valor anual del plan integral (S/)').selectOption('900');
+ await p.getByRole('button',{name:'Aplicar servicios seleccionados a los textos'}).click();
+ value=await p.evaluate(()=>window.app.value);assert.match(value.condiciones,/segundo año.*900\.00/);assert.match(value.condiciones,/no se cobra adicionalmente/);
+ await p.getByRole('button',{name:'Recomendar servicios con IA'}).click();
+ await p.waitForSelector('.proposal-services .proposal-ai-note');assert.equal(await p.evaluate(()=>window.lastRequest.objetivo),'soportes');
+ assert(!(await p.evaluate(()=>window.app.$refs.proposal.supportRecommendation)).includes('invalid'));
+ await p.getByRole('button',{name:'Usar estos servicios recomendados'}).click();
+ await p.getByRole('button',{name:'Seleccionar plan anual integral',exact:true}).click();await p.waitForFunction(()=>document.querySelectorAll('.proposal-service-list input:checked').length===16);
+ await p.getByLabel('Plan anual integral de facturación electrónica',{exact:false}).check();
+ await p.getByLabel('Consulta SUNAT / RUC',{exact:false}).check();await p.getByLabel('Consulta de identidad / RENIEC',{exact:false}).check();await p.getByLabel('Servidor VPS',{exact:false}).check();await p.getByLabel('Dominio',{exact:false}).check();await p.getByLabel('Almacenamiento',{exact:false}).check();
+ await p.getByRole('button',{name:/Mejorar presentación con IA/}).click();await p.waitForSelector('.proposal-ai-preview');
+ assert.equal(await p.evaluate(()=>window.lastRequest.anualidad_facturacion),900);
+ await p.getByLabel('Cómo aplicar').selectOption('replace');await p.getByLabel('Revisé el alcance y las condiciones ofrecidas.').check();await p.getByRole('button',{name:'Aplicar borrador a la proforma'}).click();
+ value=await p.evaluate(()=>window.app.value);assert.match(value.alcance,/Módulos incluidos:/);assert.match(value.condiciones,/RUC/);assert.match(value.condiciones,/VPS/);assert.match(value.condiciones,/900\.00/);
+ await p.getByRole('button',{name:'Guardar configuración para este producto'}).click();await p.waitForFunction(()=>window.savedTemplate!==null);
+ assert.equal(await p.evaluate(()=>window.savedTemplate.anualidad_facturacion),900);assert((await p.evaluate(()=>window.savedTemplate.soportes)).includes('storage'));
+ await p.evaluate(async()=>{window.app.value={tipo:'sistemas',alcance:'',entregables:'',condiciones:''};window.app.$refs.proposal.supportSelected=[];window.app.$refs.proposal.annualFee='';await window.app.$nextTick();await window.app.$refs.proposal.loadTemplate();});
+ await p.waitForFunction(()=>window.app.value.condiciones.includes('900.00'));assert.equal(await p.evaluate(()=>window.app.$refs.proposal.annualFee),900);
+ await p.screenshot({path:'output/proposal-services-desktop.png',fullPage:true});
+ await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ assert.deepEqual(errors,[]);
+ console.log('PASS 20 service options, confirmed defaults, idempotent composition, preservation/removal, annual fee validation without double charge, AI recommendations and whitelist, draft application, template roundtrip, mobile layout. Mock AI/API; no production writes.');
+ } finally {await b.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

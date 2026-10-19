@@ -2109,3 +2109,8 @@ body .pos-product-editor-modal .input-group:has(> .input-group-append)>.autocomp
 body .pos-product-editor-modal .input-group:has(> .autocomplete-wrapper)>.input-group-append{display:flex!important;flex:0 0 auto!important;width:auto!important;margin:0!important;align-self:stretch!important}
 body .pos-product-editor-modal .input-group:has(> .input-group-append)>.autocomplete-wrapper input{height:52px!important;min-height:52px!important;border-radius:10px!important}
 body .pos-product-editor-modal .input-group:has(> .autocomplete-wrapper)>.input-group-append>.btn{height:52px!important;min-height:52px!important;border-radius:10px!important;white-space:nowrap!important;margin:0!important;padding:0 15px!important}
+.pos-page>div:has(.pos-product-explorer-modal){position:relative!important;z-index:15060!important}
+.pos-product-explorer-modal.modal{z-index:15060!important}
+.pos-product-explorer-modal+.modal-backdrop{z-index:15050!important}
+.modal.pos-product-explorer-modal .modal-dialog.modal-lg{width:calc(100vw - 24px)!important;max-width:960px!important;min-width:0!important;margin:20px auto!important}
+@media(max-width:600px){.modal.pos-product-explorer-modal .modal-dialog.modal-lg{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;min-width:0!important;margin:8px auto!important}}

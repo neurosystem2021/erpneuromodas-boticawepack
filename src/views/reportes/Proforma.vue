@@ -1,169 +1,60 @@
 <template>
-	<div id="invoice-container">
-    <div class="quote-edit-toolbar"><button class="btn btn-primary" @click="editOpen=true">Modificar productos</button></div>
+  <div class="quote-page">
+    <nav class="quote-actions"><span>Vista de la proforma</span><button class="btn btn-primary" @click="editOpen=true">Modificar productos</button><button class="btn btn-outline-primary" @click="imprimir">Imprimir</button><button v-if="proforma.Presentacion==='sistemas'" class="btn btn-outline-primary" @click="contractOpen=true">Generar contrato</button><label class="quote-upload-button"><input type="file" accept="application/pdf,.pdf" @change="uploadAttachment" :disabled="uploadingPdf"><span>{{uploadingPdf?'Subiendo PDF...':attachment?'Cambiar PDF adjunto':'Adjuntar PDF'}}</span></label><button class="btn btn-success" @click="enviarWsp" :disabled="uploadingPdf">Enviar por WhatsApp</button></nav><div v-if="attachment || attachmentError" class="quote-attachment-state"><span v-if="attachment">PDF adicional: <a :href="attachment.url" target="_blank" rel="noopener">{{attachment.name}}</a> · Se incluirá su enlace en WhatsApp.</span><span v-if="attachmentError" role="alert">{{attachmentError}}</span></div>
     <b-modal v-model="editOpen" title="Modificar productos de la proforma" size="xl" hide-footer lazy modal-class="quote-product-modal"><proforma-editor v-if="editOpen" :quote-id="idProforma" embedded @cancel="editOpen=false" @saved="editOpen=false;getProforma()" /></b-modal>
-		<header class="clearfix">
-			<div id="logo">
-				<img src="/resources/images/banner-proforma.jpg">
-			</div>
-			<!--<div id="company">
-				<h2 class="name">{{ empresa.RAZONSOCIAL }}</h2>
-				<div>{{ empresa.DIRECCION }}</div>
-				<div>{{ empresa.TELEFONO }} - {{ empresa.CELULAR }}</div>
-				<div><a :href="'mailto:' + empresa.EMAIL">{{ empresa.EMAIL }}</a></div>
-			</div>-->
-		</header>
-		<main>
-      <div id="details" class="clearfix">
-        <div id="client">
-          <br>
-          <h5 class="to" style="color:black">PROFORMA A:</h5>
-          <table>
-            <tbody>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Cliente</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Cliente }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Documento</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.Documento }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Dirección</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.ClienteDireccion}}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Moneda</td>
-                <td class="celda" style="text-transform: uppercase">: Soles</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div id="invoice">
-          <h1>PROFORMA {{ proforma.Anio }}-{{ proforma.Numero }}</h1>
-          <div style="height:15px"></div>
-          <table>
-            <tbody>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Válido Desde</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.FechaReg?proforma.FechaReg.substring(0,10):proforma.FechaReg }}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Válido Hasta</td>
-                <td class="celda" style="text-transform: uppercase">: {{fechaHasta}}</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Forma De Pago</td>
-                <td class="celda" style="text-transform: uppercase">: CONTADO</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Plazo De Entrega</td>
-                <td class="celda" style="text-transform: uppercase">: INMEDIATO</td>
-              </tr>
-              <tr>
-                <td class="celda" style="font-weight:bold; width:40% !important;">Descripción</td>
-                <td class="celda" style="text-transform: uppercase">: {{proforma.Descripcion}}</td>
-              </tr>
-              <!--<tr>
-                <td class="celda" style="font-weight:bold; width:25% !important;">Atendido Por</td>
-                <td class="celda" style="text-transform: uppercase">: {{ proforma.UsuarioReg }}</td>
-              </tr>-->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <table border="0" cellspacing="0" cellpadding="0">
-        <thead>
-          <tr>
-            <th class="no">#</th>
-            <th></th>
-            <th class="desc">DESCRIPCIÓN</th>
-            <th class="qty">CANT.</th>
-            <th class="unit">PRECIO U.</th>
-            <th class="total">TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(prod, index) in proforma.productos" :key="index">
-            <td class="no">{{ index+1 }}</td>
-            <td><img style="max-width: 65px; max-height: 65px" :src="'/resources/images/productos/' + prod.Imagen" /></td>
-            <td class="desc" style="font-size:0.75rem"><h3 style="color:#B71C1C; font-size:1rem">{{ prod.Producto }}</h3><template v-if="hasSpecs(prod)"><p v-if="specNote(prod)">{{specNote(prod)}}</p><ol style="padding-left:18px;margin:5px 0;line-height:1.5"><li v-for="(item,i) in specItems(prod)" :key="i">{{item}}</li></ol></template><template v-else>{{ prod.ProductoDesc }}<br v-if="prod.ProductoDesc">{{ prod.ProductoDesc2 }}<br v-if="prod.ProductoDesc2">{{ prod.ProductoDesc3 }}<br v-if="prod.ProductoDesc3">{{ prod.Descripcion }}</template></td>
-            <td class="qty" style="font-size:1.1rem">{{ prod.Cantidad }}</td>
-            <td class="unit" style="font-size:1.1rem"><span v-if="prod.DisabledTotal === 0">S/. {{ prod.Precio | moneda }}</span></td>
-            <td class="total" style="font-size:1.1rem">
-              <div v-if="prod.DisabledTotal === 0">
-                S/. {{ (prod.Precio * prod.Cantidad) - prod.Descuento | redondear }}<br>
-                <span class="dsct" v-if="prod.Descuento" >Dsct: {{ prod.Descuento | moneda('S/. ') }} </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr style="font-size: 0.83rem;">
-            <td colspan="3"></td>
-            <td colspan="2" class="text-right">SUBTOTAL</td>
-            <td>S/. {{ subTotal | redondear }}</td>
-          </tr>
-          <tr v-if="descuento > 0" style="font-size: 0.83rem;">
-            <td colspan="3"></td>
-            <td colspan="2" class="text-right">DESCUENTO</td>
-            <td>S/. {{ descuento | redondear }}</td>
-          </tr>
-          <tr>
-            <td colspan="3"></td>
-            <td colspan="2" style="background:#B71C1C;color: white;" class="text-right">TOTAL</td>
-            <td style="background:#B71C1C;color:white">S/. {{ total | redondear }}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div id="accounts" style="margin-top:-10px; font-weight:bold;">
-        <img style="max-width: 100%" src="/resources/images/cuentas.png" />
-      </div>
-      <br>
-      <div id="notices">
-        <div>NOTA:</div>
-        <div class="notice">LAS PRODUCTOS SERAN ENTREGADOS MISMO EN EL LOCAL COMERCIAL</div>
-        <div class="notice">ESTA PROFORMA SOLO TIENE VALIDEZ DE <span style="font-weight:bold">{{proforma.DiasValidos}}</span> DIAS.</div>
-      </div>
-      <div>
-        <br>
-        <br>
-        <br>
-        <table>
-          <tbody>
-            <td style="border: none !important; border-top:3px  solid #B71C1C; background: white !important; width:50%"></td>
-            <td style="border: none !important; border-top:3px  solid black ; background: white !important; width:40%; text-align:center; color:black">FIRMA/SELLO DE AUTORIZACION</td>
-            <td style="border: none !important; border-top:3px  solid #B71C1C; background: white !important; width:10%"></td>
-          </tbody>
-        </table>
-      </div>
-      <div style="text-align:center">
-        <button class="btn btn-danger" id="printBtn" @click="imprimir()">IMPRIMIR</button>
-        <button class="btn btn-success" id="printBtn" @click="enviarWsp()">ENVIAR WHASTAPP</button>
-      </div>
-    </main>
-    <!--<footer>
-      Invoice was created on a computer and is valid without the signature and seal.
-    </footer>-->
-	</div>
-</template>
+    <b-modal v-model="contractOpen" title="Contrato de licencia y servicios de sistemas" size="lg" hide-footer lazy modal-class="quote-contract-modal"><proforma-contrato v-if="contractOpen" :quote-id="idProforma" :quote="proforma" /></b-modal>
+    <article id="invoice-container" class="quote-sheet" :class="{'quote-systems':proforma.Presentacion==='sistemas','quote-featured':isFeatured}">
+      <header class="quote-brand"><div v-if="proforma.Presentacion!=='sistemas'" class="quote-equipment" aria-label="Equipos de tecnología y seguridad"><div v-for="item in headerEquipment" :key="item.key" :style="{flex:item.weight}"><img :src="'/nuevo/static/images/proforma-equipment/'+item.key+'.webp'" :alt="item.label" decoding="async"></div></div><div v-if="proforma.Presentacion==='sistemas'" class="quote-software-brand"><span>PROPUESTA TECNOLÓGICA</span><strong>Soluciones para tu negocio</strong></div><img class="quote-logo" src="/nuevo/static/images/proforma-logo-color.webp" alt="NEUROSYSTEM"><div class="quote-identity"><div class="quote-company"><strong>{{ empresa.RAZONSOCIAL }}</strong><span v-if="empresa.RUC">RUC {{ empresa.RUC }}</span><span v-if="empresa.DIRECCION">{{ empresa.DIRECCION }}</span></div><div v-if="empresa.TELEFONO || empresa.CELULAR || empresa.EMAIL" class="quote-contact"><span v-if="empresa.TELEFONO"><i class="fas fa-phone-alt" aria-hidden="true"></i> {{empresa.TELEFONO}}</span><span v-if="empresa.CELULAR"><i class="fab fa-whatsapp" aria-hidden="true"></i> {{empresa.CELULAR}}</span><a v-if="empresa.EMAIL" :href="'mailto:'+empresa.EMAIL"><i class="far fa-envelope" aria-hidden="true"></i> {{empresa.EMAIL}}</a></div></div></header>
+      <div class="quote-heading"><div class="quote-document-title"><h1>{{proforma.Presentacion==='sistemas'?systemProposalTitle:'Proforma'}}</h1><strong class="quote-reference">{{ proforma.Anio }}-{{ proforma.Numero }}</strong></div><span class="quote-currency">Soles · S/</span></div>
+      <section class="quote-details"><div class="quote-client"><span class="quote-label">CLIENTE</span><h2>{{ proforma.Cliente }}</h2><div class="quote-client-meta"><span><b>Documento</b> {{ proforma.Documento || '—' }}</span><span><b>Consultor de TI</b> {{ consultantName }}</span><span v-if="proforma.Presentacion==='sistemas' &amp;&amp; proforma.ClienteTelefono"><b>Teléfono</b> {{proforma.ClienteTelefono}}</span></div><p v-if="proforma.ClienteDireccion" class="quote-client-address">{{proforma.ClienteDireccion}}</p></div><dl><div><dt>Emisión</dt><dd>{{ formatDate(proforma.FechaReg) }}</dd></div><div><dt>Válida hasta</dt><dd>{{ formatDate(fechaHasta) }}</dd></div><div><dt>Pago</dt><dd>{{proforma.Presentacion==='sistemas'?'Ver condiciones':'Contado'}}</dd></div><div><dt>Entrega</dt><dd>{{proforma.Presentacion==='sistemas'?'Según propuesta':'Inmediato'}}</dd></div></dl></section>
+      <p v-if="proforma.Descripcion" class="quote-description">{{ proforma.Descripcion }}</p>
+      <template v-if="proforma.Presentacion==='sistemas'">
+       <section v-if="proforma.AlcanceSistema" class="quote-system-scope quote-scope-compact"><h2>01 · ALCANCE DE LA SOLUCIÓN</h2><proforma-contexto :text="systemModulePresentation.text" /></section>
+       <section v-if="systemModulePresentation.modules.length" class="quote-delivery-modules">
+        <header><div><span>LO QUE INCLUYE TU SOLUCIÓN</span><h2>Módulos y funciones para la operación de tu negocio</h2></div><small>{{systemModulePresentation.modules.length}} módulos y submódulos</small></header>
+        <div class="quote-module-grid"><article v-for="module in systemModulePresentation.modules" :key="module.key" class="quote-module-card"><span class="quote-module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path v-for="(path,i) in module.paths" :key="i" :d="path"/></svg></span><div><small class="quote-module-level">{{module.parent?'SUBMÓDULO · '+module.parent:'MÓDULO'}}</small><h3>{{module.name}}</h3><p>{{module.description}}</p><ul v-if="module.features &amp;&amp; module.features.length" class="quote-module-features"><li v-for="(feature,i) in module.features" :key="i">{{feature}}</li></ul><p v-if="module.example" class="quote-module-example"><b>En tu negocio:</b> {{module.example}}</p><p class="quote-module-benefit">{{module.benefit}}</p></div></article></div>
+       </section>
+       <section class="quote-solutions"><h2>02 · Solución propuesta</h2><article v-for="(prod,index) in proforma.productos" :key="index" class="quote-solution"><header><span>{{String(index+1).padStart(2,'0')}}</span><h3>{{prod.Producto}}</h3></header><div class="product-copy"><template v-if="hasSpecs(prod)"><p v-if="specNote(prod)">{{specNote(prod)}}</p><ul><li v-for="(item,i) in specItems(prod)" :key="i">{{item}}</li></ul></template><template v-else><p v-for="(detail,i) in [prod.ProductoDesc,prod.ProductoDesc2,prod.ProductoDesc3,prod.Descripcion].filter(Boolean)" :key="i">{{detail}}</p></template></div></article></section>
+       <section v-if="proforma.EntregablesSistema" class="quote-system-scope"><h2>03 · IMPLEMENTACIÓN Y ENTREGABLES</h2><proforma-contexto :text="proforma.EntregablesSistema" kind="delivery" /></section>
+       <section v-if="annualPlanPresentation.text" class="quote-system-conditions"><h2>04 · CONDICIONES DE LA PROPUESTA</h2><proforma-contexto :text="annualPlanPresentation.text" kind="conditions" /></section>
+       <section v-if="annualPlanPresentation.plan" class="quote-annual-plan">
+        <header><div><span>CONTINUIDAD PARA TU NEGOCIO</span><h2>Plan Anual Integral</h2><p>Facturación electrónica, infraestructura y acompañamiento</p></div><div class="quote-plan-price"><small>UN SOLO VALOR ANUAL</small><strong>{{annualPlanPresentation.plan.price}}</strong><b>Primer año incluido en la licencia</b></div></header>
+        <div class="quote-plan-services"><article v-for="(service,i) in annualPlanPresentation.plan.services" :key="i"><span aria-hidden="true">✓</span><div><h3>{{service.name}}</h3><p>{{service.description}}</p></div></article></div>
+        <footer><p v-for="(term,i) in annualPlanPresentation.plan.terms" :key="i">{{term}}</p></footer>
+       </section>
+       <section class="quote-investment"><h2>05 · Inversión</h2><table class="quote-products"><thead><tr><th>Solución</th><th class="quantity">Cant.</th><th class="money">Precio unit.</th><th class="money">Importe</th></tr></thead><tbody><tr v-for="(prod,index) in proforma.productos" :key="index"><td>{{prod.Producto}}</td><td class="quantity">{{prod.Cantidad}}</td><td class="money"><span v-if="Number(prod.DisabledTotal || 0)===0">S/ {{prod.Precio | moneda}}</span></td><td class="money amount"><span v-if="Number(prod.DisabledTotal || 0)===0">S/ {{(prod.Precio*prod.Cantidad)-prod.Descuento | redondear}}</span></td></tr></tbody></table></section>
+      </template>
+<section v-if="isFeatured" class="quote-featured-products" aria-label="Productos destacados"><proforma-producto-destacado v-for="(prod,index) in proforma.productos" :key="index" :product="prod" :index="index" /></section>
+<table v-if="proforma.Presentacion!=='sistemas' &amp;&amp; !isFeatured" class="quote-products"><thead><tr><th class="line-number">N.º</th><th class="product-column">{{proforma.Presentacion==='sistemas'?'Solución / detalle de la inversión':'Producto / descripción'}}</th><th class="quantity">Cant.</th><th class="money">Precio unit.</th><th class="money">Importe</th></tr></thead><tbody><tr v-for="(prod,index) in proforma.productos" :key="index"><td class="line-number">{{ index+1 }}</td><td><div class="product-content"><div v-if="proforma.Presentacion!=='sistemas'" class="product-photo"><img v-if="prod.Imagen && !missingImages[index]" :src="'/resources/images/productos/'+prod.Imagen" @error="$set(missingImages,index,true)" alt=""><span v-else class="photo-placeholder" aria-label="Sin imagen">◇</span></div><div class="product-copy"><h3>{{ prod.Producto }}</h3><template v-if="hasSpecs(prod)"><p v-if="specNote(prod)">{{specNote(prod)}}</p><ol><li v-for="(item,i) in specItems(prod)" :key="i">{{item}}</li></ol></template><template v-else><p v-for="(detail,i) in [prod.ProductoDesc,prod.ProductoDesc2,prod.ProductoDesc3,prod.Descripcion].filter(Boolean)" :key="i">{{detail}}</p></template></div></div></td><td class="quantity">{{prod.Cantidad}}</td><td class="money"><span v-if="prod.DisabledTotal === 0">S/ {{prod.Precio | moneda}}</span></td><td class="money amount"><template v-if="prod.DisabledTotal === 0">S/ {{(prod.Precio*prod.Cantidad)-prod.Descuento | redondear}}<small v-if="prod.Descuento">Dscto. {{prod.Descuento | moneda('S/ ')}}</small></template></td></tr></tbody></table>
 
+      <section class="quote-summary"><div class="quote-validity"><strong>Gracias por confiar en nosotros</strong><p>Esta propuesta tiene una validez de {{proforma.DiasValidos}} día(s).</p></div><div class="quote-totals"><div><span>Subtotal</span><strong>S/ {{subTotal | redondear}}</strong></div><div v-if="descuento > 0"><span>Descuento</span><strong>S/ {{descuento | redondear}}</strong></div><div class="grand-total"><span>TOTAL</span><strong>S/ {{total | redondear}}</strong></div></div></section>
+      <section class="quote-payment"><h2>Información de pago</h2><img src="/resources/images/cuentas.png" alt="Cuentas bancarias de la empresa"></section>
+      <footer class="quote-footer"><div><strong>Condiciones de la propuesta</strong><p>{{proforma.Presentacion==='sistemas'?'El alcance y las condiciones corresponden exclusivamente a esta propuesta.':'Los productos se entregarán en el local comercial.'}}</p></div><div class="quote-signature"><div class="quote-rubric-space"><img src="/nuevo/static/images/consultor-jhon-rubrica-limpia.png" alt="Rúbrica de Ing. Jhon H. Medrano Martinez"></div><strong>{{consultantName}}</strong><span>CONSULTOR DE TI</span><small>Firma / rúbrica</small></div></footer>
+    </article>
+  </div>
+</template>
 <script>
 import ProformaEditor from '@/views/ProformaEditor.vue';
+import ProformaContrato from '@/components/ProformaContrato.vue';
+import ProformaProductoDestacado from '@/components/ProformaProductoDestacado.vue';
+import ProformaContexto from '@/components/ProformaContexto.vue';
+import {proformaModulePresentation,proformaSystemTitle} from '@/utils/proformaModules';
+import {proformaAnnualPlan} from '@/utils/proformaServices';
+import {DEFAULT_CONSULTANT} from '@/utils/proformaSignatories';
 import { API } from "@/store/config.js";
 export default {
-  components:{ProformaEditor},
+  components:{ProformaEditor,ProformaContrato,ProformaContexto,ProformaProductoDestacado},
   mounted() {
     this.getProforma();
     this.getEmpresa();
+    this.loadAttachment();
   },
   data() {
     return {
-      editOpen:false,
+      attachment:null,attachmentError:"",uploadingPdf:false,
+      contractOpen:false,editOpen:false,consultantName:DEFAULT_CONSULTANT,
+      headerEquipment:[{key:'gaming',label:'PC gamer y monitor',weight:1.7},{key:'laptop',label:'Laptop gamer',weight:1.2},{key:'printer',label:'Impresora Epson y tintas',weight:1.4},{key:'projector',label:'Proyector Epson',weight:1.15},{key:'pos',label:'Equipo POS completo',weight:1.55},{key:'cameras',label:'Cámaras PTZ y de seguridad',weight:1.3},{key:'network',label:'Cable de red',weight:.8}],
+      missingImages:{},
       API: API,
       idProforma: this.$route.params.id,
       proforma: { productos: [] },
@@ -172,6 +63,11 @@ export default {
     };
   },
   computed: {
+    isFeatured(){return this.proforma.Presentacion!=='sistemas' && this.proforma.FormatoProducto==='destacado';},
+    annualPlanPresentation(){return proformaAnnualPlan(this.proforma.CondicionesSistema);},
+    systemModulePresentation(){return proformaModulePresentation(this.proforma.AlcanceSistema);},
+    systemProposalTitle(){return proformaSystemTitle(this.proforma.AlcanceSistema,this.proforma.productos);},
+    scopeLines(){return this.systemModulePresentation.text.split(/\r?\n\s*\r?\n/).map(line=>line.trim().replace(/^Propuesta para\s+/i,'PROPUESTA DE SISTEMAS DE ')).filter(Boolean);},
     subTotal() {
       let sumatoria = 0;
       this.proforma.productos.forEach(prod => {
@@ -195,13 +91,14 @@ export default {
     }
   },
   methods: {
+    formatDate(value){if(!value)return '—';const bits=String(value).substring(0,10).split('-');return bits.length===3?bits.reverse().join('/'):value},
     hasSpecs(prod){return (prod.Descripcion||'').includes('Características técnicas:\n')},
     specNote(prod){return (prod.Descripcion||'').split('Características técnicas:\n')[0].trim()},
     specItems(prod){return ((prod.Descripcion||'').split('Características técnicas:\n')[1]||'').split(/\r?\n/).map(s=>s.replace(/^\d+[.)]\s*/,'').trim()).filter(Boolean)},
     getProforma() {
       this.axios.get(API + "proformas/id/" + this.idProforma).then(res => {
         let response = res.data;
-        console.log(response);
+        this.missingImages = {};
         this.proforma = res.data;
         this.fechaHasta = this.calcularFechaHasta(
           this.proforma.FechaReg.substring(0, 10),
@@ -221,10 +118,14 @@ export default {
         this.empresa = res.data;
       });
     },
+    async loadAttachment(){try{const r=await this.axios.get('/api/proforma-attachment.php',{params:{id:this.idProforma}});this.attachment=r.data.attachment;return true;}catch(e){this.attachmentError='No se pudo consultar el PDF adicional. Puedes volver a abrir la proforma.';return false;}},
+    async uploadAttachment(event){const file=event.target.files[0];if(!file)return;this.attachmentError='';if(!/\.pdf$/i.test(file.name)||file.size>8*1024*1024){this.attachmentError='Selecciona un PDF de hasta 8 MB.';event.target.value='';return;}this.uploadingPdf=true;try{const token=await this.axios.get('/api/proforma-edit.php');const body=new FormData();body.append('IdProforma',this.idProforma);body.append('pdf',file);const r=await this.axios.post('/api/proforma-attachment.php',body,{headers:{'X-Proforma-CSRF':token.data.csrf}});this.attachment=r.data.attachment;}catch(e){this.attachmentError=(e.response&&e.response.data&&e.response.data.error)||'No se pudo subir el PDF. El documento anterior se conserva.';}finally{this.uploadingPdf=false;event.target.value='';}},
     imprimir() {
       window.print();
     },
     async enviarWsp() {
+      if(this.uploadingPdf)return;
+      if(!await this.loadAttachment())return;
       const loadingSwal = this.$swal({
         title: "Cargando...",
         text: "Por favor espera...",
@@ -237,16 +138,12 @@ export default {
       });
       let data = "";
       await this.axios
-        .get(API + "enviarproformapdf", {
-          params: {
-            IdProforma: this.idProforma
-          }
-        })
+        .get("/api/proforma-pdf.php", {params:{id:this.idProforma}})
         .then(res => {
           data = res.data;
-        });
+        }).catch(e=>{this.$swal.close();this.attachmentError=(e.response&&e.response.data&&e.response.data.error)||'No se pudo preparar el PDF. Intenta nuevamente.';});
       this.$swal.close();
-      this.solicitarTelefono(data);
+      if(data)this.solicitarTelefono(data);
     },
 
     async solicitarTelefono(data) {
@@ -255,6 +152,7 @@ export default {
         title: "Ingresa tu número de teléfono",
         input: "text",
         inputPlaceholder: "Ejemplo: 987654321",
+        inputValue: (()=>{const phone=String(this.proforma.ClienteTelefono||'').replace(/\D/g,'').replace(/^51(?=\d{9}$)/,'');return /^9\d{8}$/.test(phone)?phone:'';})(),
         showCancelButton: true,
         inputValidator: value => {
           const regexTelefono = /^9\d{8}$/; // Valida que comience con 9 y tenga 9 dígitos
@@ -265,9 +163,11 @@ export default {
       });
 
       if (telefono) {
-        window.open(
-          `https://wa.me/51${telefono}?text=Para poder visualizar la proforma Ingrese al siguiente enlace ${data}`
-        );
+        const rawLink=typeof data==='string'?data:(data.url||data.link||'');
+        const quoteLink=new URL(rawLink,window.location.origin).href;
+        let message='Hola, te compartimos la proforma '+this.proforma.Anio+'-'+this.proforma.Numero+': '+quoteLink;
+        if(this.attachment)message+='\n\nDocumento adicional ('+this.attachment.name+'): '+new URL(this.attachment.url,window.location.origin).href;
+        window.open('https://wa.me/51'+telefono+'?text='+encodeURIComponent(message),'_blank','noopener');
       }
     }
   }
@@ -275,20 +175,48 @@ export default {
 </script>
 
 <style scoped>
-@import "../../assets/css/invoice.css";
-.celda {
-  text-align: left;
-  border: none !important;
-  background: white !important;
-}
-@media print {
-  #printBtn {
-    display: none;
-  }
-}
+/* Compact document with independent branding and product illustration. */
+.quote-page{padding:16px 12px 28px;background:#edf2f6;min-height:100vh;color:#213343;font-family:Arial,sans-serif;box-sizing:border-box}.quote-actions{max-width:900px;margin:0 auto 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.quote-actions>span{margin-right:auto;color:#637384;font-size:12px}.quote-actions .btn{font-size:12px;padding:7px 12px}.quote-sheet{box-sizing:border-box;width:100%;max-width:900px;margin:auto;background:#fff;padding:22px 30px;box-shadow:0 8px 40px #18344b12;border-radius:7px}.quote-brand{display:grid;grid-template-columns:195px minmax(0,1fr);gap:12px 22px;align-items:center;border-bottom:1px solid #dae3e9;padding-bottom:9px}.quote-art{grid-column:2;grid-row:1;width:100%;height:auto;object-fit:contain;object-position:center}.quote-logo{grid-column:1;grid-row:1;width:195px;max-height:90px;object-fit:contain}.quote-company{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:3px 12px;font-size:10px;color:#465967;line-height:1.35}.quote-company strong{flex-basis:100%;font-size:10px}.quote-heading{display:flex;justify-content:space-between;align-items:center;padding:10px 0}h1{margin:0;font-size:20px;font-weight:700;color:#153b50}.quote-number{text-align:right;display:flex;flex-direction:row;align-items:center;gap:13px}.quote-number strong{font-size:18px;color:#b7242c}.quote-number span{font-size:10px;color:#637384}.quote-details{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;border:1px solid #dfe7ec;border-radius:5px;padding:10px 12px;margin-bottom:12px}.quote-client h2{font-size:13px;line-height:1.3;font-weight:700;margin:0 0 5px}.quote-client p{font-size:10px;margin:2px 0;line-height:1.4}.quote-client b{font-weight:400;color:#70808d}dl{margin:0;font-size:10px}dl>div{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px solid #edf1f4}dt{font-weight:400;color:#637384}dd{margin:0;font-weight:600;text-align:right}.quote-description{font-size:11px;margin-bottom:10px}.quote-products{width:100%;border-collapse:collapse;table-layout:fixed}.quote-products th{background:#173d50;color:white;padding:8px 6px;font-size:10px;font-weight:600}.quote-products td{padding:8px 6px;border-bottom:1px solid #e1e8ee;font-size:11px;vertical-align:middle}.line-number{width:27px;text-align:center;color:#7a8995}.product-column{text-align:left}.quantity{width:42px;text-align:center}.money{width:99px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.amount{font-weight:700}.amount small{display:block;font-weight:400;font-size:9px;color:#7a8995;margin-top:3px}.product-content{display:flex;align-items:center;gap:9px}.product-photo{width:48px;min-width:48px;height:48px;display:flex;align-items:center;justify-content:center}.product-photo img{max-width:100%;max-height:100%;object-fit:contain}.photo-placeholder{font-size:23px;color:#a2b1bd;background:#f4f7f9;border-radius:5px;width:42px;height:42px;display:grid;place-items:center}.product-copy{min-width:0}.product-copy h3{font-size:11px;font-weight:600;line-height:1.35;margin:0;color:#223e51;overflow-wrap:anywhere}.product-copy p,.product-copy ol{font-size:10px;line-height:1.4;margin:3px 0 0;color:#667986;white-space:pre-line}.product-copy ol{padding-left:15px}.quote-summary{display:flex;justify-content:space-between;gap:20px;margin-top:10px;break-inside:avoid}.quote-validity{padding-top:7px;font-size:10px;color:#607583}.quote-validity strong{color:#294b5e}.quote-validity p{margin:5px 0}.quote-totals{width:245px;min-width:220px}.quote-totals>div{display:flex;justify-content:space-between;padding:6px 10px;font-size:11px}.quote-totals .grand-total{border-top:2px solid #173d50;border-bottom:2px solid #173d50;background:#edf4f7;color:#143b50;font-size:16px;margin-top:4px;padding:9px 10px}.quote-payment{margin-top:14px;break-inside:avoid}.quote-payment h2{font-size:10px;font-weight:700;color:#607583;margin-bottom:6px}.quote-payment img{width:100%;max-height:125px;object-fit:contain}.quote-footer{margin-top:16px;border-top:1px solid #dfe7ec;padding-top:10px;display:flex;justify-content:space-between;gap:20px;font-size:10px;color:#607583;break-inside:avoid}.quote-footer p{margin:5px 0}.quote-signature{min-width:200px;text-align:center;border-top:1px solid #8495a1;padding-top:6px;margin-top:24px}
+.quote-equipment{grid-column:2;grid-row:1;display:flex;align-items:center;gap:14px;min-width:0;padding:7px 0}.quote-equipment>div{min-width:0;display:flex;align-items:center;justify-content:center}.quote-equipment img{display:block;width:100%;height:105px;object-fit:contain}.quote-contact{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px 15px;padding:9px 0 5px;border-top:1px solid #edf0f3;color:#455b6b;font-size:11px;line-height:1.5}.quote-contact a{color:inherit;text-decoration:none}.quote-contact i{color:#b7242c;margin-right:5px}.quote-brand{border-bottom:2px solid #173d50}.quote-company{font-size:10px;line-height:1.5}.quote-company strong{font-size:11px;font-weight:600}.quote-heading h1{font-weight:600;letter-spacing:.2px}.quote-products th{font-weight:600;letter-spacing:.2px}.quote-products td{border-color:#e9edf0}.quote-sheet{border-radius:4px}.quote-client h2{font-weight:600}.quote-details{background:#fcfdfe;border-radius:3px}
+.quote-brand{gap:8px 22px;padding-bottom:10px;border-bottom:1px solid #ccd6dc}.quote-identity{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:22px;align-items:center}.quote-company{grid-column:auto;gap:2px 9px;line-height:1.4}.quote-company strong{font-size:10px;font-weight:700;color:#244151}.quote-company span{font-size:9px;color:#647682}.quote-contact{grid-column:auto;display:grid;grid-template-columns:1fr;gap:2px;padding:0 0 0 15px;border-top:0;border-left:1px solid #e0e6eb;font-size:10px;line-height:1.4;justify-content:start}.quote-contact i{font-size:9px;color:#a7373d;width:12px;margin-right:3px}.quote-heading{padding:10px 0 8px}.quote-document-title{display:flex;align-items:baseline;gap:12px}.quote-heading h1{font-size:18px;letter-spacing:-.2px}.quote-reference{font-size:17px;font-weight:600;color:#a7373d;border-left:1px solid #dbe2e6;padding-left:12px;font-variant-numeric:tabular-nums}.quote-currency{font-size:10px;color:#768691}.quote-details{grid-template-columns:1.2fr 1fr;align-items:center;gap:18px;padding:10px 12px;border:0;border-left:3px solid #214759;border-radius:0;background:#f5f8fa;margin-bottom:12px}.quote-label{font-size:8px;font-weight:600;letter-spacing:1.1px;color:#7a8d99}.quote-client h2{font-size:12px;margin:3px 0 5px;line-height:1.3;color:#203f50;font-weight:700}.quote-client-meta{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:10px;color:#415d6d}.quote-client-meta b{font-size:9px;font-weight:400;color:#748794;margin-right:3px}.quote-client .quote-client-address{margin:4px 0 0;font-size:9px;line-height:1.35;color:#6b7f8c}.quote-details dl{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;border-left:1px solid #dae3e9;padding-left:16px}.quote-details dl>div{display:block;padding:0;border:0}.quote-details dt{font-size:8px;text-transform:uppercase;letter-spacing:.6px;line-height:1.4;color:#7b8c97}.quote-details dd{text-align:left;font-size:10px;line-height:1.4;color:#2b495b;font-weight:600}
+@media screen and (max-width:650px){.quote-page{padding:8px 4px}.quote-sheet{padding:14px 12px}.quote-brand{grid-template-columns:1fr;gap:8px}.quote-logo{grid-column:1;grid-row:1}.quote-equipment{grid-column:1;grid-row:2;gap:8px}.quote-equipment img{height:70px}.quote-identity{grid-template-columns:1fr;gap:8px}.quote-contact{border-left:0;padding-left:0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:10px}.quote-details dl{border-left:0;padding-left:0}.quote-logo{width:125px}.quote-art{height:100px}.quote-details{gap:10px;grid-template-columns:1fr}.money{width:76px}.quantity{width:31px}.product-photo{display:none}.quote-products td{padding:8px 3px;font-size:10px}.quote-products th{padding:8px 3px;font-size:9px}.product-copy h3{font-size:10px}.quote-number{gap:5px;flex-direction:column}.quote-summary{flex-wrap:wrap}.quote-totals{margin-left:auto}.quote-footer{flex-wrap:wrap}.quote-signature{margin-left:auto}}
+@media print{.quote-page{padding:0!important;background:#fff!important;min-height:0}.quote-sheet{width:100%;max-width:none;padding:10mm!important;box-shadow:none;border-radius:0}.quote-actions{display:none!important}.quote-brand{grid-template-columns:44mm minmax(0,1fr);gap:2mm 4mm;padding-bottom:2mm}.quote-art{height:auto;max-height:none}.quote-logo{width:44mm;max-height:23mm}.quote-equipment{gap:3mm;padding:1mm 0}.quote-equipment img{height:24mm}.quote-identity{gap:5mm}.quote-contact{padding:0 0 0 3mm;font-size:9px;gap:1mm}.quote-details dl{padding-left:4mm}.quote-heading{padding:2mm 0}.quote-details{padding:2.5mm 3mm}.quote-heading{padding:2.5mm 0}.quote-details{margin-bottom:3mm;padding:2.5mm 3mm}.quote-products thead{display:table-header-group}.quote-products tr{break-inside:avoid;page-break-inside:avoid}.quote-products th{background:#e8eef2!important;color:#153b50!important;border-bottom:2px solid #153b50}.quote-products td{padding:7px 5px}.quote-products .money{color:#213343!important}.product-photo{display:flex;width:43px;min-width:43px;height:43px}.quote-totals .grand-total{color:#143b50!important;background:#edf4f7!important}.quote-payment img{max-height:29mm}.quote-brand,.quote-details,.quote-heading{break-inside:avoid}}
+
+/* Corporate red and white identity. */
+.quote-page{background:#f4f1f1;color:#352b2d}.quote-sheet{border-top:4px solid #c8202e;box-shadow:0 10px 36px #45212810}.quote-brand{border-bottom:1px solid #eadcde}.quote-company strong{color:#392b2f}.quote-company span{color:#77686d}.quote-contact{border-left-color:#eadcde;color:#5c4b51}.quote-contact i{color:#c8202e}.quote-heading{padding:12px 0 10px}.quote-heading h1{color:#b21827;font-size:21px;font-weight:700;letter-spacing:-.4px}.quote-reference{border-left-color:#e9c9ce;color:#b21827;font-size:16px;font-weight:700}.quote-currency{color:#88777d}.quote-details{background:#fff8f8;border:1px solid #f0dce0;border-left:3px solid #c8202e;border-radius:3px}.quote-label{color:#b42835}.quote-client h2{color:#3d252c}.quote-client-meta{color:#57454b}.quote-client-meta b{color:#947c84}.quote-details dl{border-left-color:#efdce0}.quote-details dt{color:#a16d78}.quote-details dd{color:#442d34}.quote-products th{background:#bd1d2b!important;color:#fff!important;font-weight:700;letter-spacing:.3px;padding-top:10px;padding-bottom:10px;border-bottom:0}.quote-products th:first-child{border-radius:3px 0 0 0}.quote-products th:last-child{border-radius:0 3px 0 0}.quote-products tbody tr:nth-child(even){background:#fffafa}.quote-products td{border-bottom-color:#f0e5e7}.quote-products .line-number{color:#b46a75}.product-copy h3{color:#443038;font-weight:600}.product-copy p,.product-copy ol{color:#7f6a72}.quote-products .money{color:#5d333e!important}.quote-products .amount{color:#ab1929!important;font-weight:700}.photo-placeholder{color:#bf9ba4;background:#f7eff1}.quote-validity{color:#8c747e}.quote-validity strong{color:#783342}.quote-totals>div{color:#70545f}.quote-totals .grand-total{background:#bd1d2b!important;color:#fff!important;border:0;border-radius:3px;padding:12px;font-size:18px;box-shadow:0 3px 9px #af1e2b15}.quote-totals .grand-total strong{color:#fff!important}.quote-payment h2{color:#8b5967;font-size:10px;letter-spacing:.5px;text-transform:uppercase}.quote-footer{border-top-color:#ebd8dd;color:#8c7480}.quote-footer strong{color:#7c4354;font-weight:600}.quote-signature{border-top-color:#caa4ae}.quote-actions .btn-primary,.quote-actions .btn-success{background:#bd1d2b;border-color:#bd1d2b;color:white}.quote-actions .btn-outline-primary{background:white;color:#b21827;border-color:#dec0c6}.quote-actions .btn:hover{background:#9c1623;border-color:#9c1623;color:white}
+@media print{.quote-sheet{border-top:3px solid #bd1d2b}.quote-products th{background:#bd1d2b!important;color:#fff!important;border-bottom:1px solid #bd1d2b;print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-details{background:#fff8f8!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-totals .grand-total{background:#bd1d2b!important;color:#fff!important;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-totals .grand-total strong{color:#fff!important}.quote-products .money{color:#5d333e!important}.quote-products .amount{color:#ab1929!important}}
+
+.quote-products th.money{color:#fff!important}
+
+.quote-software-brand{grid-column:2;grid-row:1;text-align:right;display:flex;flex-direction:column;gap:5px;padding:20px 0}.quote-software-brand span{font-size:9px;letter-spacing:1.6px;color:#aa3241}.quote-software-brand strong{font-size:18px;font-weight:500;color:#413039}.quote-system-scope>div,.quote-system-conditions{margin:12px 0 16px}.quote-system-scope h2,.quote-system-conditions h2{font-size:12px;color:#aa2334;font-weight:600;border-bottom:1px solid #efdee3;padding-bottom:6px;margin-bottom:7px;break-after:avoid}.quote-system-scope p,.quote-system-conditions p{font-size:11px;line-height:1.65;color:#57454d;white-space:pre-line;overflow-wrap:anywhere;margin:0;orphans:3;widows:3}.quote-systems .quote-products td{padding-top:12px;padding-bottom:12px}.quote-systems .quote-heading h1{font-size:19px}@media screen and (max-width:650px){.quote-software-brand{grid-column:1;grid-row:2;text-align:left;padding:5px 0}.quote-software-brand strong{font-size:16px}}
+
+.quote-upload-button{display:inline-flex;align-items:center;margin:0;padding:7px 12px;border:1px solid #dec0c6;border-radius:4px;background:white;color:#a12434;font-size:12px;cursor:pointer}.quote-upload-button input{position:absolute;width:1px;height:1px;opacity:0}.quote-upload-button:focus-within{outline:2px solid #ba3446}.quote-attachment-state{max-width:900px;margin:0 auto 10px;font-size:12px;color:#77505d;line-height:1.5}.quote-attachment-state a{color:#ac2436;text-decoration:underline}.quote-attachment-state [role=alert]{display:block;color:#b52235}@media print{.quote-attachment-state{display:none!important}}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
 </style>
 
 <style>
-.quote-edit-toolbar{padding:8px 0;display:flex;justify-content:flex-end}.quote-product-modal .modal-dialog{max-width:1100px!important;width:95vw!important}.quote-product-modal .modal-body{padding:8px!important;max-height:80vh;overflow:auto}.quote-product-modal .quote-editor{margin:0!important;padding:8px!important}.quote-product-modal .quote-editor h2,.quote-product-modal .quote-editor>p{display:none}
-@media print{.quote-edit-toolbar,.quote-product-modal{display:none!important}}
+.quote-module-card .quote-module-level{display:block;font-size:7.5px;letter-spacing:.6px;color:#a15d70;margin-bottom:4px;line-height:1.4;text-transform:uppercase}.quote-module-features{padding:0 0 0 13px;margin:8px 0;list-style:disc;color:#65535b}.quote-module-features li{font-size:10px;line-height:1.5;padding:0 0 3px}.quote-module-card .quote-module-example{border-top:1px solid #f0e3e8;padding-top:7px;margin-top:6px;font-size:9.5px;line-height:1.5;color:#7b5c69}.quote-module-example b{font-weight:600;color:#9a304b}@media print{.quote-module-features{margin:6px 0}.quote-module-features li{padding-bottom:2px}.quote-module-card .quote-module-example{padding-top:5px}}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
+</style>
+
+<style>
+.quote-systems .quote-scope-compact{margin-top:12px;margin-bottom:14px}.quote-systems .quote-scope-compact>h2{margin-top:0;margin-bottom:7px}.quote-systems .quote-scope-compact>p{margin:0 0 5px;font-size:10.5px;line-height:1.5;text-transform:uppercase}.quote-systems .quote-heading h1{font-size:18px;line-height:1.3}.quote-systems .quote-document-title{min-width:0}.quote-systems .quote-reference{flex-shrink:0}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
+</style>
+
+<style>
+.quote-delivery-modules{margin:18px 0 23px}.quote-delivery-modules>header{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:12px;break-after:avoid}.quote-delivery-modules>header span{display:block;font-size:8px;letter-spacing:1.4px;color:#aa6877;margin-bottom:5px}.quote-delivery-modules>header h2{font-size:15px;font-weight:600;color:#49333b;margin:0;line-height:1.35}.quote-delivery-modules>header small{font-size:10px;color:#9d5869;white-space:nowrap}.quote-module-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quote-module-card{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border:1px solid #ecdee3;border-radius:7px;background:linear-gradient(120deg,#fff,#fffafb);min-width:0;break-inside:avoid}.quote-module-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #f0d7df;border-radius:8px;background:#fff3f6;color:#b3243d}.quote-module-icon svg{display:block;width:21px;height:21px}.quote-module-card>div{min-width:0}.quote-module-card h3{font-size:12px;font-weight:600;line-height:1.35;color:#49333b;margin:0 0 5px;overflow-wrap:anywhere}.quote-module-card p{font-size:10.5px;line-height:1.55;color:#65535b;margin:0}.quote-module-card .quote-module-benefit{font-size:10px;line-height:1.5;color:#93747f;margin-top:5px}@media screen and (max-width:650px){.quote-module-grid{grid-template-columns:1fr}.quote-delivery-modules>header{align-items:flex-start;flex-direction:column;gap:6px}}@media print{.quote-module-card{padding:10px;border-radius:4px;background:#fff;break-inside:avoid;page-break-inside:avoid}.quote-module-grid{gap:8px}.quote-module-icon{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-delivery-modules>header h2{font-size:13px}}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
+</style>
+<style>
+.quote-product-modal .modal-dialog{max-width:1100px!important;width:95vw!important}.quote-product-modal .modal-body{padding:8px!important;max-height:80vh;overflow:auto}.quote-product-modal .quote-editor{margin:0!important;padding:8px!important}.quote-product-modal .quote-editor h2,.quote-product-modal .quote-editor>p{display:none}@media print{@page proformaA4{size:210mm 297mm;margin:2mm}.quote-page{page:proformaA4}html,body,#app.nst-document,#app.nst-document>main{margin:0!important;padding:0!important;min-width:0!important;width:100%!important;height:auto!important;min-height:0!important;page:proformaA4;background:#fff!important}.quote-product-modal{display:none!important}}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
+</style>
+
+<style>
+.quote-solutions>h2,.quote-system-scope>h2,.quote-investment>h2{font-size:12px;color:#a92134;font-weight:600;border-bottom:1px solid #eedce1;padding-bottom:7px;margin:17px 0 10px;break-after:avoid}.quote-solution{padding:12px 0 15px;border-bottom:1px solid #efe5e8}.quote-solution header{display:flex;gap:10px;align-items:baseline;margin-bottom:8px;break-after:avoid}.quote-solution header>span{font-size:10px;color:#b3263d;font-variant-numeric:tabular-nums}.quote-solution h3{font-size:12px;font-weight:600;line-height:1.5;color:#49333b;margin:0}.quote-solution .product-copy{width:100%;max-width:none}.quote-solution .product-copy p,.quote-solution .product-copy li{font-size:11px;line-height:1.65;color:#66535b;white-space:pre-line;overflow-wrap:anywhere}.quote-solution .product-copy ul{padding-left:17px;margin:6px 0 0}.quote-solution .product-copy li{padding:2px 0;break-inside:avoid}.quote-systems .quote-system-scope p{line-height:1.7}.quote-investment{margin-top:18px;break-inside:avoid}.quote-investment .quote-products{table-layout:fixed}.quote-investment .quantity{width:48px}.quote-investment .money{width:105px}.quote-systems .quote-summary{margin-top:8px}@media print{.quote-solution{break-inside:auto}.quote-solution header{break-after:avoid}.quote-solution .product-copy p{orphans:3;widows:3}}
+.quote-annual-plan{margin:20px 0;border:1px solid #e5c4cd;border-top:4px solid #bb1833;border-radius:8px;overflow:hidden;background:#fff}.quote-annual-plan>header{display:flex;justify-content:space-between;gap:20px;padding:19px 20px;background:#fff5f7;break-inside:avoid;break-after:avoid}.quote-annual-plan>header span{font-size:8px;letter-spacing:1.3px;color:#a12d44}.quote-annual-plan h2{font-size:22px;line-height:1.2;margin:6px 0;color:#a91c35;font-weight:700}.quote-annual-plan>header p{font-size:10px;margin:0;color:#70515c}.quote-plan-price{text-align:right;flex-shrink:0}.quote-plan-price small{display:block;font-size:8px;letter-spacing:.6px;color:#986774}.quote-plan-price strong{display:block;font-size:25px;line-height:1.2;color:#ac1b34;margin:5px 0}.quote-plan-price b{font-size:9px;color:#73505c;font-weight:500}.quote-plan-services{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:8px 20px}.quote-plan-services article{display:flex;align-items:flex-start;gap:8px;padding:11px 0;border-bottom:1px solid #f0e3e7;break-inside:avoid;page-break-inside:avoid;min-width:0}.quote-plan-services article>span{display:grid;place-items:center;background:#fff1f4;color:#b3203a;border-radius:50%;width:19px;height:19px;flex:0 0 19px;font-size:11px}.quote-plan-services h3{font-size:11px;line-height:1.4;color:#4b323c;margin:0 0 4px;font-weight:600}.quote-plan-services p{font-size:10px;line-height:1.5;color:#7a606b;margin:0;overflow-wrap:anywhere}.quote-annual-plan>footer{padding:12px 20px;background:#fffbfc;break-inside:avoid}.quote-annual-plan>footer p{font-size:10px;line-height:1.5;color:#73505d;margin:0 0 5px}.quote-annual-plan>footer p:last-child{margin:0}@media screen and (max-width:650px){.quote-annual-plan>header{flex-direction:column;gap:12px}.quote-plan-price{text-align:left}.quote-plan-services{grid-template-columns:1fr}}@media print{.quote-annual-plan{border-radius:4px;break-inside:avoid;page-break-inside:avoid}.quote-annual-plan>header,.quote-plan-services article>span{print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-annual-plan h2{font-size:19px}.quote-plan-price strong{font-size:22px}}
+.quote-footer .quote-signature{border-top:0;padding-top:0;text-align:center;flex:0 0 270px;max-width:100%;break-inside:avoid;page-break-inside:avoid}.quote-rubric-space{height:42px;border-bottom:1px solid #b58a97;margin-bottom:8px}.quote-signature strong{display:block;font-size:12px;line-height:1.4;color:#49333b}.quote-signature span{display:block;font-size:9px;letter-spacing:1.5px;color:#b21f38;margin-top:3px}.quote-signature small{display:block;font-size:9px;color:#8d6b78;margin-top:4px}@media screen and (max-width:650px){.quote-footer .quote-signature{flex-basis:auto;width:270px;margin-top:12px}}
+.quote-systems .quote-software-brand>span{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.6px;color:#b51c34;padding:5px 9px;border:1px solid #efd4dc;border-radius:4px;background:#fff5f7}.quote-systems .quote-software-brand>strong{display:block;font-size:25px;font-weight:750;line-height:1.2;letter-spacing:-.4px;color:#9f1b32;margin-top:9px}@media screen and (max-width:650px){.quote-systems .quote-software-brand>strong{font-size:21px}}@media print{.quote-systems .quote-software-brand>span{font-size:8px;font-weight:700;padding:3px 6px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.quote-systems .quote-software-brand>strong{font-size:20px;font-weight:700;margin-top:6px}}
+.quote-rubric-space{height:75px;display:flex;align-items:center;justify-content:center}.quote-rubric-space img{display:block;width:auto;height:auto;max-width:155px;max-height:70px;object-fit:contain}
 </style>

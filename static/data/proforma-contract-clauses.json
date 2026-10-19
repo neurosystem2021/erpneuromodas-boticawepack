@@ -1,0 +1,8 @@
+[
+  {"id":"training","name":"Capacitación del personal","text":"Capacitación del personal designado por el cliente para el uso de los módulos contratados, con coordinación de participantes, modalidad y fechas durante la implementación.","recommended":true},
+  {"id":"tutorials","name":"Material y videos tutoriales","text":"Entrega de material de orientación y acceso a los videos tutoriales disponibles correspondientes a las funciones contratadas.","recommended":true},
+  {"id":"formats","name":"Adecuación de formatos de venta","text":"Configuración de los formatos de venta disponibles en el sistema con la identificación comercial y los datos proporcionados por el cliente.","recommended":true},
+  {"id":"peripherals","name":"Configuración de equipos periféricos","text":"Configuración de los periféricos compatibles destinados al sistema, como impresoras, lectores de código de barras y equipos de cómputo facilitados por el cliente. Los equipos y accesos que se utilizarán se acuerdan antes de la instalación.","recommended":true},
+  {"id":"reports","name":"Reportes para el negocio","text":"Habilitación y orientación sobre los reportes disponibles en los módulos contratados para la consulta y el seguimiento del negocio. Los reportes adicionales se especifican en los acuerdos particulares.","recommended":true},
+  {"id":"onsite","name":"Asistencia presencial coordinada","text":"Asistencia presencial previa coordinación con el cliente. Lugar de atención, desplazamientos, fechas y costos aplicables se precisan en los acuerdos particulares.","recommended":false}
+]

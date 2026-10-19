@@ -1,0 +1,18 @@
+const fs=require('fs'),assert=require('assert/strict');
+const guide=JSON.parse(fs.readFileSync('static/data/proforma-module-guide.json','utf8'));
+const source=fs.readFileSync('src/utils/proformaModules.js','utf8').replace(/^import .*;\r?\n/,'').replace(/export function/g,'function');
+const present=new Function('guide',source+';return proformaModulePresentation;')(guide);
+const names=['Punto de venta','Catálogo de productos y servicios','Inventario y stock','Compras','Caja y bancos','Reportes de ventas','Clientes','Usuarios y accesos','TRALADOS','NUEVO KARDEX','NUEVA ORDEN COMPRA','REGISTRO DE MOVIMIENTO','Pre Orden','Reporte Utilidad Bruta','DASHBOARD KPI'];
+const result=present('Objetivo confirmado.\n\nMódulos incluidos: '+names.join('; ')+'.');
+assert.equal(result.text,'Objetivo confirmado.');assert.equal(result.modules.length,15);assert(result.modules.every(m=>m.description&&m.benefit&&m.paths.length));assert.equal(result.modules.find(m=>m.key==='transfers').name,'Traslados entre almacenes');assert(!result.modules.some(m=>m.key==='payroll'));
+assert(result.modules.every(m=>m.features.length===3&&m.example));assert.equal(result.modules.filter(m=>m.parent).length,7);
+assert.equal(present('Texto original sin lista.').text,'Texto original sin lista.');
+assert.equal(present('Módulos incluidos: STOCK; Inventario y stock.').modules.length,1);
+assert(present('Objetivo\nMódulos incluidos: Clientes.\n\nNota final confirmada.').text.includes('Nota final confirmada.'));
+assert.equal(present('Módulos incluidos: Módulo especial.').modules[0].name,'Módulo especial');
+const title=new Function('guide',source+';return proformaSystemTitle;')(guide);
+assert.equal(title('Propuesta para Market / bodega.'),'PROPUESTA DE SISTEMAS DE MARKET / BODEGA');
+assert.equal(title('',[{Producto:'Sistema a medida de market'}]),'PROPUESTA DE SISTEMAS DE MARKET');
+assert.equal(title('Propuesta para Ferretería.'),'PROPUESTA DE SISTEMAS DE FERRETERÍA');
+assert.equal(title('Alcance confirmado.'),'PROPUESTA DE SISTEMAS DE GESTIÓN EMPRESARIAL');
+console.log('PASS selected-module presentation, 15 descriptions/icons, aliases, no unselected extras, deduplication and original text preservation.');

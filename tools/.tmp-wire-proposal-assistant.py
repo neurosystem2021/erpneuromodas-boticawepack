@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('src/views/Ventas.vue');s=p.read_text(encoding='utf8').replace('<proforma-presentacion v-model="quotePresentation" :disabled="inProgress"/>','<proforma-presentacion v-model="quotePresentation" :disabled="inProgress" :active="quotePresentationOpen" :products="ventas[index] ? ventas[index].productos : []"/>',1);p.write_text(s,encoding='utf8')
+p=Path('src/views/ProformaEditor.vue');s=p.read_text(encoding='utf8').replace('<proforma-presentacion v-model="quotePresentation" :disabled="busy"/>','<proforma-presentacion v-model="quotePresentation" :disabled="busy" :products="products"/>',1);p.write_text(s,encoding='utf8')

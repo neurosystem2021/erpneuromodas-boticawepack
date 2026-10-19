@@ -1,0 +1,478 @@
+{
+  "icons": {
+    "cart": [
+      "M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6",
+      "M10 21h.01M18 21h.01"
+    ],
+    "box": [
+      "m12 3 9 5-9 5-9-5 9-5Z",
+      "M3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"
+    ],
+    "layers": [
+      "m12 3 10 5-10 5L2 8l10-5Z",
+      "m2 12 10 5 10-5M2 16l10 5 10-5"
+    ],
+    "bag": [
+      "M4 7h16l-1 14H5L4 7Z",
+      "M8 8V6a4 4 0 0 1 8 0v2"
+    ],
+    "wallet": [
+      "M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h15v12H5a3 3 0 0 1-3-3V6",
+      "M20 12h-5v5h5M16 14.5h.01"
+    ],
+    "chart": [
+      "M3 3v18h18M7 16l4-5 4 2 6-8"
+    ],
+    "users": [
+      "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-3-3.87",
+      "M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+    ],
+    "shield": [
+      "m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6l9-4Z",
+      "m8 12 3 3 5-6"
+    ],
+    "transfer": [
+      "M3 7h18m-4-4 4 4-4 4M21 17H3m4-4-4 4 4 4"
+    ],
+    "book": [
+      "M4 3h16v18H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM4 17h16M7 7h9M7 11h7"
+    ],
+    "document": [
+      "M14 2H5v20h14V7l-5-5ZM14 2v6h5M8 12h8M8 16h8"
+    ],
+    "clock": [
+      "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM12 6v6l4 2"
+    ],
+    "dashboard": [
+      "M3 3h7v7H3ZM14 3h7v7h-7ZM3 14h7v7H3ZM14 14h7v7h-7Z"
+    ],
+    "screen": [
+      "M2 3h20v14H2ZM8 21h8M12 17v4"
+    ],
+    "settings": [
+      "M4 7h16M4 17h16M8 4v6M16 14v6"
+    ],
+    "headset": [
+      "M3 14v-3a9 9 0 0 1 18 0v3M3 12h4v8H3ZM17 12h4v8h-4ZM21 20c0 2-3 2-6 2"
+    ],
+    "building": [
+      "M4 22V3h12v19M16 9h5v13M8 7h4M8 11h4M8 15h4M9 22v-3h2v3"
+    ]
+  },
+  "modules": [
+    {
+      "key": "sales",
+      "aliases": [
+        "Punto de venta"
+      ],
+      "name": "Punto de venta",
+      "icon": "cart",
+      "description": "Registra las ventas y los comprobantes de cada operación.",
+      "benefit": "Una atención más ordenada, desde la selección del producto hasta el cobro.",
+      "features": [
+        "Buscar productos por nombre o código de barras.",
+        "Registrar cantidades, precios y descuentos de la operación.",
+        "Identificar al cliente y registrar la forma de pago."
+      ],
+      "example": "Atender una compra desde la búsqueda del producto hasta su incorporación al comprobante."
+    },
+    {
+      "key": "catalog",
+      "aliases": [
+        "Catálogo de productos y servicios",
+        "Modificar Producto"
+      ],
+      "name": "Catálogo de productos y servicios",
+      "icon": "box",
+      "description": "Organiza productos, servicios, categorías, marcas y precios del catálogo.",
+      "benefit": "Facilita la consulta de la información comercial en un solo lugar.",
+      "features": [
+        "Identificar cada producto con su código, categoría, marca y modelo.",
+        "Mantener precios y presentaciones del catálogo.",
+        "Registrar descripciones e imágenes para consultar el producto."
+      ],
+      "example": "Preparar una ficha comercial consistente para que el vendedor encuentre el artículo correcto."
+    },
+    {
+      "key": "inventory",
+      "aliases": [
+        "Inventario y stock",
+        "Stock"
+      ],
+      "name": "Inventario y stock",
+      "icon": "layers",
+      "description": "Consulta las existencias de productos por almacén.",
+      "benefit": "Ayuda a revisar la disponibilidad antes de vender o reponer mercadería.",
+      "features": [
+        "Consultar la cantidad disponible de cada producto.",
+        "Revisar existencias según el almacén seleccionado.",
+        "Relacionar el código y nombre del artículo con su saldo de stock."
+      ],
+      "example": "Consultar la disponibilidad antes de comprometer una entrega al cliente."
+    },
+    {
+      "key": "purchases",
+      "aliases": [
+        "Compras",
+        "Registro de compras"
+      ],
+      "name": "Gestión de compras",
+      "icon": "bag",
+      "description": "Registra las compras, sus proveedores y los productos adquiridos.",
+      "benefit": "Mantiene organizada la información de abastecimiento del negocio.",
+      "features": [
+        "Identificar al proveedor y el documento de compra.",
+        "Detallar los productos, cantidades e importes adquiridos.",
+        "Consultar las compras registradas en la operación."
+      ],
+      "example": "Registrar el abastecimiento recibido y conservar su referencia de compra."
+    },
+    {
+      "key": "cash",
+      "aliases": [
+        "Caja y bancos",
+        "Caja y Banco"
+      ],
+      "name": "Caja y bancos",
+      "icon": "wallet",
+      "description": "Registra y consulta los movimientos de ingresos y egresos.",
+      "benefit": "Facilita el seguimiento del dinero que entra y sale de la operación.",
+      "features": [
+        "Registrar ingresos y egresos de la operación.",
+        "Identificar la cuenta o caja del movimiento.",
+        "Consultar los movimientos financieros registrados."
+      ],
+      "example": "Revisar cómo se registró un ingreso o un pago y a qué cuenta corresponde."
+    },
+    {
+      "key": "reports",
+      "aliases": [
+        "Reportes de ventas",
+        "Registro de Ventas"
+      ],
+      "name": "Reportes de ventas",
+      "icon": "chart",
+      "description": "Consulta las operaciones de venta y sus resultados comerciales.",
+      "benefit": "Permite revisar el comportamiento de las ventas con información registrada.",
+      "features": [
+        "Consultar el registro de ventas realizadas.",
+        "Revisar los documentos, clientes e importes de las operaciones.",
+        "Analizar la información comercial del período consultado."
+      ],
+      "example": "Revisar las ventas de la jornada o del período para conocer el resultado comercial."
+    },
+    {
+      "key": "clients",
+      "aliases": [
+        "Clientes"
+      ],
+      "name": "Gestión de clientes",
+      "icon": "users",
+      "description": "Registra y consulta los datos de identificación de los clientes.",
+      "benefit": "Ordena la información necesaria para la atención y los comprobantes.",
+      "features": [
+        "Registrar el nombre y documento de identificación.",
+        "Consultar la información comercial disponible del cliente.",
+        "Seleccionar al cliente al preparar la operación de venta."
+      ],
+      "example": "Recuperar los datos de un cliente que vuelve a comprar, sin capturarlos nuevamente."
+    },
+    {
+      "key": "security",
+      "aliases": [
+        "Usuarios y accesos",
+        "Usuarios"
+      ],
+      "name": "Usuarios y accesos",
+      "icon": "shield",
+      "description": "Administra usuarios y los permisos de acceso configurados para cada perfil.",
+      "benefit": "Permite organizar qué funciones puede utilizar cada persona.",
+      "features": [
+        "Registrar las cuentas de usuario del sistema.",
+        "Configurar el perfil y los accesos de cada persona.",
+        "Restringir el uso de módulos según los permisos asignados."
+      ],
+      "example": "Dar acceso al vendedor a sus funciones y reservar otras operaciones para usuarios autorizados."
+    },
+    {
+      "key": "transfers",
+      "aliases": [
+        "TRALADOS",
+        "Traslados"
+      ],
+      "name": "Traslados entre almacenes",
+      "icon": "transfer",
+      "description": "Registra el traslado de productos entre un almacén de origen y uno de destino.",
+      "benefit": "Mantiene identificados los movimientos internos de la mercadería.",
+      "features": [
+        "Identificar el almacén de origen y el de destino.",
+        "Detallar los productos y cantidades del traslado.",
+        "Conservar el registro del movimiento entre almacenes."
+      ],
+      "example": "Documentar el envío de mercadería de un almacén a otro.",
+      "parent": "Inventario y stock"
+    },
+    {
+      "key": "kardex",
+      "aliases": [
+        "NUEVO KARDEX",
+        "Kárdex",
+        "Kardex"
+      ],
+      "name": "Kárdex de productos",
+      "icon": "book",
+      "description": "Consulta las entradas, salidas y saldos de los productos.",
+      "benefit": "Ayuda a seguir el historial de movimientos del inventario.",
+      "features": [
+        "Revisar las entradas y salidas de un producto.",
+        "Consultar el saldo y la secuencia de movimientos.",
+        "Relacionar las operaciones con sus fechas y referencias."
+      ],
+      "example": "Investigar qué movimientos explican el saldo de un artículo.",
+      "parent": "Inventario y stock"
+    },
+    {
+      "key": "purchase_orders",
+      "aliases": [
+        "NUEVA ORDEN COMPRA",
+        "LISTADO ORDENES COMPRA"
+      ],
+      "name": "Órdenes de compra",
+      "icon": "document",
+      "description": "Prepara y consulta órdenes de compra con su proveedor y detalle de productos.",
+      "benefit": "Facilita la coordinación de las compras antes de su registro final.",
+      "features": [
+        "Identificar al proveedor de la orden.",
+        "Detallar los artículos, cantidades y precios solicitados.",
+        "Consultar las órdenes preparadas para la compra."
+      ],
+      "example": "Formalizar qué mercadería se solicita al proveedor antes de registrar la compra.",
+      "parent": "Gestión de compras"
+    },
+    {
+      "key": "movements",
+      "aliases": [
+        "REGISTRO DE MOVIMIENTO"
+      ],
+      "name": "Registro de movimientos",
+      "icon": "transfer",
+      "description": "Consulta los movimientos registrados de entrada y salida de productos.",
+      "benefit": "Ofrece una referencia para revisar las operaciones de almacén.",
+      "features": [
+        "Consultar las operaciones registradas de almacén.",
+        "Identificar los productos y cantidades de los movimientos.",
+        "Revisar las referencias disponibles de cada operación."
+      ],
+      "example": "Localizar el registro de una entrada o salida para revisar lo ocurrido.",
+      "parent": "Inventario y stock"
+    },
+    {
+      "key": "preorders",
+      "aliases": [
+        "Pre Orden"
+      ],
+      "name": "Preórdenes de venta",
+      "icon": "clock",
+      "description": "Prepara el detalle de una operación comercial antes de su facturación.",
+      "benefit": "Permite organizar la solicitud del cliente antes de cerrar la venta.",
+      "features": [
+        "Identificar al cliente de la solicitud.",
+        "Preparar el detalle de productos, cantidades y precios.",
+        "Mantener la operación preparada antes de su facturación."
+      ],
+      "example": "Organizar el pedido del cliente mientras se define la venta final.",
+      "parent": "Punto de venta"
+    },
+    {
+      "key": "profit",
+      "aliases": [
+        "Reporte Utilidad Bruta"
+      ],
+      "name": "Reporte de utilidad bruta",
+      "icon": "chart",
+      "description": "Compara los importes de venta y costo registrados para consultar la utilidad bruta.",
+      "benefit": "Apoya la revisión de la rentabilidad comercial del negocio.",
+      "features": [
+        "Consultar los importes de venta registrados.",
+        "Comparar las ventas con los costos registrados.",
+        "Revisar la utilidad bruta obtenida en la consulta."
+      ],
+      "example": "Identificar qué operaciones aportan utilidad según los costos que registra el negocio.",
+      "parent": "Reportes de ventas"
+    },
+    {
+      "key": "kpi",
+      "aliases": [
+        "DASHBOARD KPI",
+        "KPI VENTAS",
+        "KPI PRODUCTOS",
+        "KPI INVENTARIO"
+      ],
+      "name": "Indicadores del negocio",
+      "icon": "dashboard",
+      "description": "Reúne indicadores de ventas, rentabilidad, productos e inventario.",
+      "benefit": "Facilita una lectura general de los resultados para tomar decisiones.",
+      "features": [
+        "Revisar indicadores de ventas y rentabilidad.",
+        "Consultar información de productos e inventario.",
+        "Observar resultados por clientes, vendedores y sucursales cuando existan datos."
+      ],
+      "example": "Revisar el panorama del negocio antes de profundizar en un reporte específico.",
+      "parent": "Reportes de ventas"
+    },
+    {
+      "key": "closing",
+      "aliases": [
+        "Cierre de Caja",
+        "Reporte Cierre de Caja"
+      ],
+      "name": "Cierre de caja",
+      "icon": "wallet",
+      "description": "Registra o consulta el cierre de las operaciones de caja.",
+      "benefit": "Ayuda a revisar los importes de la jornada y su seguimiento.",
+      "features": [
+        "Identificar la operación de cierre de caja.",
+        "Revisar los importes registrados durante la jornada.",
+        "Consultar el reporte del cierre realizado."
+      ],
+      "example": "Dejar una referencia del cierre para la revisión del responsable de caja.",
+      "parent": "Caja y bancos"
+    },
+    {
+      "key": "invoicing",
+      "aliases": [
+        "Facturación Electrónica"
+      ],
+      "name": "Facturación electrónica",
+      "icon": "document",
+      "description": "Gestiona los comprobantes electrónicos de las operaciones incluidas.",
+      "benefit": "Centraliza el trabajo de emisión y consulta de comprobantes.",
+      "features": [
+        "Preparar los comprobantes de las operaciones incluidas.",
+        "Consultar los documentos electrónicos registrados.",
+        "Dar seguimiento a la información del comprobante dentro del sistema."
+      ],
+      "example": "Localizar un comprobante para revisar sus datos y su estado registrado."
+    },
+    {
+      "key": "accounting",
+      "aliases": [
+        "Contabilidad",
+        "Panel contable",
+        "Plan contable PCGE",
+        "Asientos contables",
+        "Operaciones contables del ERP",
+        "Libros y estados financieros"
+      ],
+      "name": "Gestión contable",
+      "icon": "book",
+      "description": "Organiza cuentas, asientos y consultas contables dentro del alcance contratado.",
+      "benefit": "Facilita la revisión de la información contable del negocio.",
+      "features": [
+        "Organizar las cuentas del plan contable.",
+        "Registrar y consultar los asientos contables.",
+        "Revisar los libros y consultas incluidos en el alcance."
+      ],
+      "example": "Consultar la información contable organizada para su revisión por el responsable."
+    },
+    {
+      "key": "payroll",
+      "aliases": [
+        "Planilla",
+        "Personal y planilla"
+      ],
+      "name": "Personal y planilla",
+      "icon": "users",
+      "description": "Organiza la información del personal y las operaciones de planilla.",
+      "benefit": "Reúne la gestión de personal en un espacio de trabajo definido.",
+      "features": [
+        "Mantener la información del personal.",
+        "Registrar las operaciones de planilla configuradas.",
+        "Consultar la información disponible para su revisión."
+      ],
+      "example": "Reunir los datos de personal y planilla para facilitar el trabajo administrativo."
+    },
+    {
+      "key": "crm",
+      "aliases": [
+        "CRM"
+      ],
+      "name": "Gestión comercial · CRM",
+      "icon": "users",
+      "description": "Organiza el seguimiento comercial de clientes y oportunidades.",
+      "benefit": "Facilita la continuidad de la atención y el seguimiento de cada contacto.",
+      "features": [
+        "Organizar los contactos comerciales.",
+        "Registrar información para el seguimiento de oportunidades.",
+        "Consultar el seguimiento comercial disponible."
+      ],
+      "example": "Retomar una conversación comercial con información organizada del contacto."
+    },
+    {
+      "key": "store",
+      "aliases": [
+        "Tienda virtual"
+      ],
+      "name": "Tienda virtual",
+      "icon": "screen",
+      "description": "Gestiona la presentación comercial de productos en la tienda virtual.",
+      "benefit": "Ofrece un canal adicional para mostrar el catálogo del negocio.",
+      "features": [
+        "Administrar los productos presentados en la tienda virtual.",
+        "Mantener su información comercial disponible.",
+        "Consultar la información de la operación de la tienda."
+      ],
+      "example": "Mostrar al cliente los productos que el negocio decide publicar en su catálogo virtual."
+    },
+    {
+      "key": "projects",
+      "aliases": [
+        "Proyectos",
+        "Registro de Proyectos",
+        "Proyectos TARAPACA"
+      ],
+      "name": "Gestión de proyectos",
+      "icon": "document",
+      "description": "Registra y consulta los proyectos de la operación.",
+      "benefit": "Mantiene su información organizada para facilitar el seguimiento.",
+      "features": [
+        "Registrar la información del proyecto.",
+        "Consultar los proyectos de la operación.",
+        "Mantener sus referencias para el seguimiento."
+      ],
+      "example": "Recuperar la información de un proyecto sin dispersarla en registros separados."
+    },
+    {
+      "key": "hotel",
+      "aliases": [
+        "Habitaciones"
+      ],
+      "name": "Gestión de habitaciones",
+      "icon": "building",
+      "description": "Consulta y gestiona la información de habitaciones del establecimiento.",
+      "benefit": "Facilita la organización de la operación del hospedaje.",
+      "features": [
+        "Consultar la información de habitaciones.",
+        "Organizar los registros de la operación del hospedaje.",
+        "Revisar la información disponible por habitación."
+      ],
+      "example": "Centralizar la consulta de habitaciones para apoyar la atención del establecimiento."
+    },
+    {
+      "key": "support",
+      "aliases": [
+        "Soporte"
+      ],
+      "name": "Tickets de soporte",
+      "icon": "headset",
+      "description": "Registra y consulta solicitudes de atención mediante tickets.",
+      "benefit": "Mantiene identificadas las solicitudes para facilitar su seguimiento.",
+      "features": [
+        "Registrar la solicitud de atención en un ticket.",
+        "Consultar la información de la solicitud.",
+        "Mantener la referencia del ticket para su seguimiento."
+      ],
+      "example": "Dar seguimiento a una solicitud con su identificación dentro del sistema."
+    }
+  ]
+}

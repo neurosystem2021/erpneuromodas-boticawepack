@@ -1,0 +1,177 @@
+[
+  {
+    "id": "attention247",
+    "name": "Atención 24/7",
+    "description": "Horario de atención: 24 horas, los 7 días de la semana.",
+    "target": "condiciones",
+    "text": "Atención de soporte disponible las 24 horas del día, los 7 días de la semana (24/7).",
+    "default": true,
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "helpdesk",
+    "name": "Mesa de ayuda y tickets",
+    "description": "Registro y seguimiento de solicitudes de atención.",
+    "target": "condiciones",
+    "text": "Mesa de ayuda para registrar solicitudes, identificar cada ticket y consultar su seguimiento.",
+    "default": true,
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "sunat_validation",
+    "name": "Validación de comprobantes SUNAT",
+    "description": "Envío, seguimiento y revisión de respuestas para todos los comprobantes emitidos por el sistema contratado.",
+    "target": "alcance",
+    "text": "Gestión del envío, seguimiento y consulta de la respuesta de SUNAT para todos los comprobantes electrónicos que emita el sistema contratado, con revisión de las incidencias reportadas durante su validación.",
+    "default": true,
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "sunat_updates",
+    "name": "Actualizaciones por cambios de SUNAT",
+    "description": "Adecuaciones de facturación electrónica aplicables a todos los clientes con el servicio contratado.",
+    "target": "condiciones",
+    "text": "Actualización de los componentes de facturación electrónica ante los cambios técnicos exigidos por SUNAT que correspondan al sistema contratado, para todos los clientes con el servicio vigente.",
+    "default": true,
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "remote",
+    "name": "Asistencia remota",
+    "description": "Acompañamiento mediante conexión remota autorizada por el cliente.",
+    "target": "condiciones",
+    "text": "Asistencia remota para revisar incidencias del sistema, mediante una conexión autorizada por el cliente.",
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "whatsapp",
+    "name": "Soporte por WhatsApp",
+    "description": "Canal de contacto para consultas y coordinación de soporte.",
+    "target": "condiciones",
+    "text": "Atención de consultas y coordinación de soporte por el canal de WhatsApp de la empresa.",
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "phone",
+    "name": "Atención telefónica",
+    "description": "Contacto telefónico para orientación y coordinación.",
+    "target": "condiciones",
+    "text": "Orientación y coordinación de la atención mediante los teléfonos de contacto de la empresa.",
+    "annualPlan": true
+  },
+  {
+    "id": "email",
+    "name": "Soporte por correo",
+    "description": "Recepción de consultas y documentación de incidencias.",
+    "target": "condiciones",
+    "text": "Recepción de consultas y documentación de incidencias mediante el correo de soporte acordado.",
+    "annualPlan": true
+  },
+  {
+    "id": "configuration",
+    "name": "Configuración inicial",
+    "description": "Preparación de los parámetros y módulos incluidos en la oferta.",
+    "target": "entregables",
+    "text": "Configuración inicial de los parámetros y módulos incluidos en esta propuesta, según los datos y procesos acordados con el cliente.",
+    "recommended": true,
+    "annualPlan": false
+  },
+  {
+    "id": "training",
+    "name": "Capacitación de usuarios",
+    "description": "Orientación para utilizar los procesos incluidos.",
+    "target": "entregables",
+    "text": "Capacitación de los usuarios sobre los procesos incluidos; participantes, modalidad y número de sesiones se coordinan antes de la implementación.",
+    "recommended": true,
+    "annualPlan": false
+  },
+  {
+    "id": "startup",
+    "name": "Acompañamiento en puesta en marcha",
+    "description": "Revisión de los flujos acordados al iniciar el uso del sistema.",
+    "target": "entregables",
+    "text": "Acompañamiento en la puesta en marcha y revisión conjunta de los flujos acordados al iniciar el uso del sistema.",
+    "recommended": true,
+    "annualPlan": false
+  },
+  {
+    "id": "updates",
+    "name": "Actualizaciones del sistema",
+    "description": "Precisar las actualizaciones cubiertas por la licencia o contrato.",
+    "target": "condiciones",
+    "text": "Las actualizaciones del sistema se brindan de acuerdo con la licencia y el período de cobertura definidos en el contrato.",
+    "annualPlan": true
+  },
+  {
+    "id": "backups",
+    "name": "Copias de seguridad diarias",
+    "description": "Respaldo diario de la información del sistema contratado.",
+    "target": "entregables",
+    "text": "Copias de seguridad diarias de la información del sistema contratado. El almacenamiento, la retención, los responsables y el procedimiento de recuperación se definen en la implementación.",
+    "default": true,
+    "recommended": true,
+    "annualPlan": true
+  },
+  {
+    "id": "onsite",
+    "name": "Atención presencial",
+    "description": "Visitas coordinadas, con cobertura y costos por definir.",
+    "target": "condiciones",
+    "text": "La atención presencial se coordina previamente; cobertura geográfica, desplazamientos y costos se definen en la propuesta o contrato.",
+    "annualPlan": false
+  },
+  {
+    "id": "sunat_ruc",
+    "name": "Consulta SUNAT / RUC",
+    "description": "Consulta de datos del RUC mediante el servicio contratado.",
+    "target": "alcance",
+    "text": "Consulta de datos de RUC para el registro de clientes y proveedores mediante el servicio contratado, sujeta a la disponibilidad del proveedor.",
+    "annualPlan": true
+  },
+  {
+    "id": "reniec",
+    "name": "Consulta de identidad / RENIEC",
+    "description": "Consulta de datos de identidad según el acceso autorizado del proveedor.",
+    "target": "alcance",
+    "text": "Consulta de datos de identidad para el registro de clientes mediante un proveedor con acceso autorizado. Cobertura y disponibilidad dependen del servicio contratado.",
+    "annualPlan": true
+  },
+  {
+    "id": "vps",
+    "name": "Servidor VPS",
+    "description": "Alojamiento del sistema en servidor virtual privado.",
+    "target": "entregables",
+    "text": "Servicio de servidor virtual privado (VPS) para alojar el sistema. Recursos, administración, ubicación y período contratado se detallan en las condiciones de infraestructura.",
+    "annualPlan": true
+  },
+  {
+    "id": "domain",
+    "name": "Dominio",
+    "description": "Registro o renovación del dominio acordado para el sistema.",
+    "target": "entregables",
+    "text": "Registro o renovación del dominio acordado para el sistema, sujeto a disponibilidad del nombre. Titularidad, extensión y período se especifican antes de la contratación.",
+    "annualPlan": true
+  },
+  {
+    "id": "storage",
+    "name": "Almacenamiento",
+    "description": "Espacio para información, documentos y respaldos del sistema.",
+    "target": "entregables",
+    "text": "Almacenamiento para la información, documentos y respaldos del sistema. Capacidad, retención y ampliaciones se especifican en las condiciones de infraestructura.",
+    "annualPlan": true
+  },
+  {
+    "id": "annual_billing",
+    "name": "Plan anual integral de facturación electrónica",
+    "description": "Primer año incluido en la licencia. Un valor anual para los servicios seleccionados del plan.",
+    "target": "condiciones",
+    "text": "",
+    "annualPlan": false
+  }
+]

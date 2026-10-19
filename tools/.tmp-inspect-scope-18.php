@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$s=$db->prepare('SELECT AlcanceSistema,EntregablesSistema,CondicionesSistema FROM Ve_Proforma WHERE IdProforma=?');$s->execute([18]);$quote=$s->fetch(PDO::FETCH_ASSOC);file_put_contents(__DIR__.'/../output/proforma-18-text-fixture.json',json_encode($quote,JSON_UNESCAPED_UNICODE));echo json_encode($quote,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);

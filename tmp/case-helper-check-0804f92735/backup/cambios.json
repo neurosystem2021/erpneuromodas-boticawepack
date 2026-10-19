@@ -1,0 +1,32 @@
+{
+    "api/bank-report.php": {
+        "before": "86025bb79dc1f11697d9328f06996dd2e3cc8c6cad57318023b9ac8059fcff22",
+        "after": "5525fc28589614fb38764a13ace9007a678467ea6421329b6b4ad650f5298ee3",
+        "references": 1
+    },
+    "api/index.php": {
+        "before": "e56a2c81711d2125e57c56baf59a2aeae6260213dc4a21ca09ca17c14abee127",
+        "after": "d38c0fe6d731aab71186f01437e2957af8dc152042abe3bbd62a19b8dadf1059",
+        "references": 1
+    },
+    "api/kpi.php": {
+        "before": "39703839278aee41d8bd8b621a5539053307f12fcda8101c3aa3301985b92a17",
+        "after": "19a6fbbfc70e0f3bf0ee8b04b7721bce95fba85ef32ec54d8bd86dd70740946c",
+        "references": 33
+    },
+    "api/payroll-slip.php": {
+        "before": "f150210af38a7e0ae7d35cdac6477795ffadd276b314a54287d29cb5acd0c557",
+        "after": "f962d0f58f55b236490026419e25fdaf0f43b050ca87bb6e7a74cb217a512b7b",
+        "references": 1
+    },
+    "api/purchase-order-report.php": {
+        "before": "fbab6b1b04615eee31f4e0cf0e7e9bf43ef53fa2bdc070df76e8cd2901bfab35",
+        "after": "7cd74dc9033b4bc580771eb4f3f14fc44953bedb38844226350e503ab4f96c26",
+        "references": 1
+    },
+    "api/tienda/index.php": {
+        "before": "cb4f8abe5e701571c53f67007b8d0cb118b358c7750ae47685ed5252549db360",
+        "after": "6b1b2936ae1601a8365f83f4c17f6262ea4f3d0ee41a0a10a957965f699b10a6",
+        "references": 2
+    }
+}

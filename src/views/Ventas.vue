@@ -1,5 +1,7 @@
 <template>
 <b-container class="body pos-page" fluid>
+  <buscador-productos-ia v-model="productExplorerOpen" />
+  <div class="quote-create-host"><b-modal v-model="quotePresentationOpen" title="Preparar proforma" hide-footer size="lg" modal-class="quote-create-modal"><cliente-telefono-rapido v-if="quotePresentationOpen &amp;&amp; quotePresentation.tipo==='sistemas'" :client-id="ventas[index] &amp;&amp; ventas[index].cliente ? ventas[index].cliente.IdCliente : 0" required :disabled="inProgress" @status="quotePhoneReady=$event" @loaded="quotePhoneUpdated" @saved="quotePhoneUpdated"/><proforma-presentacion v-model="quotePresentation" :disabled="inProgress" :active="quotePresentationOpen" :products="ventas[index] ? ventas[index].productos : []"/><div class="text-right"><b-button @click="quotePresentationOpen=false" :disabled="inProgress">Cancelar</b-button> <b-button variant="danger" @click="guardarProforma" :disabled="inProgress || (quotePresentation.tipo==='sistemas' &amp;&amp; (!quotePresentation.alcance.trim() || !quotePhoneReady))">{{inProgress?'Guardando...':'Crear proforma'}}</b-button></div></b-modal></div>
   <div v-if="aliCheckoutError && !aliCheckoutReview" class="ali-checkout-error" role="alert"><strong>ALIPAGO:</strong> {{ aliCheckoutError }} <button type="button" @click="aliCheckoutError=''">Cerrar</button></div>
   <section v-if="aliCheckoutReview" class="ali-checkout-panel" role="region" aria-label="Confirmación de ALIPAGO">
     <div><strong>ALIPAGO · Revisa antes de cobrar</strong><p>{{ aliCheckoutReview.summary.client }} · {{ aliCheckoutReview.summary.document }} · Serie {{ aliCheckoutReview.summary.series }}</p></div>
@@ -34,6 +36,7 @@
    <pedidos-web ref="pedidosWeb" :on-load="cargarPedidoWeb" :hide-button="true" @pending="pedidosWebPendientes = $event" />
    <b-card no-body v-if="ventas.length>0" class="pos-shell">
     <b-tabs card pills class="pos-tabs" v-model="index" justified>
+      <template slot="tabs"><li role="presentation" class="nav-item pos-product-ai-launcher"><button type="button" class="pos-product-ai-search" title="Buscar productos con IA" aria-label="Buscar productos con IA" @click.stop="productExplorerOpen=true" @keydown.stop><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5" stroke-linecap="round"/></svg><span>IA</span></button></li></template>
       <b-tab :title="`Venta ${i+1}`" v-for="(tab,i) in ventas" :key="i" class="pos-workspace">
           <b-row class="pos-sale-grid">
              <b-col md="7" class="pos-customer-panel">
@@ -407,7 +410,7 @@
             <b-row class="pos-checkout-grid">
                 <b-col cols="12" md="4" lg="3" class="text-center pos-action-panel" align-h="center">
                     <b-button class="btnAction" type="button" @click="anularPagoDelivery" variant="danger" v-if="this.$route.query.idPedido">Anular Pago Delivery</b-button>
-                    <b-button class="btnAction pos-btn-proforma" type="button" v-if="!this.$route.query.idPedido" :disabled="inProgress" @click="guardarProforma">Crear Proforma</b-button>
+                    <b-button class="btnAction pos-btn-proforma" type="button" v-if="!this.$route.query.idPedido" :disabled="inProgress" @click="quotePhoneReady=false;quotePresentation=Object.assign({tipo:'productos',alcance:'',entregables:'',condiciones:''},ventas[index].presentacionProforma || {});quotePresentationOpen=true">Crear Proforma</b-button>
                     <!-- <b-button class="btnAction" @click="guardarVenta" :disabled="inProgress" variant="success" >Efectuar Venta</b-button> -->
                     <b-button class="btnAction pos-btn-window" @click="anadirVenta">Añadir Ventana</b-button>
                     <b-button class="btnAction pos-btn-remove-window" @click="eliminarVentana" v-if="index!=0">Eliminar Ventana</b-button>
@@ -729,6 +732,9 @@
 </b-container>
 </template>
 <script>
+import ProformaPresentacion from "@/components/ProformaPresentacion.vue";
+import BuscadorProductosIA from "@/components/BuscadorProductosIA.vue";
+import ClienteTelefonoRapido from "@/components/ClienteTelefonoRapido.vue";
 import {isLaborService,laborSummary} from '@/utils/laborProducts';
 import { mapActions, mapState } from "vuex";
 import config from "@/store/config.js";
@@ -776,6 +782,7 @@ export default {
   },
   data() {
     return {
+      productExplorerOpen:false,quotePhoneReady:false,quotePresentationOpen:false,quotePresentation:{tipo:"productos",alcance:"",entregables:"",condiciones:""},
       showIssuedDocuments: false,
       pedidosWebPendientes: 0,
       modalQR: false,
@@ -2115,7 +2122,9 @@ export default {
       this.venta.IdProforma = IdProforma;
       // console.log("IdProforma", IdProforma);
     },
+    quotePhoneUpdated(client){const sale=this.ventas[this.index];if(sale&&sale.cliente&&Number(sale.cliente.IdCliente)===Number(client.IdCliente))this.$set(sale.cliente,'Telefono',client.Telefono);},
     async guardarProforma() {
+      if(this.quotePresentation.tipo==='sistemas'&&!this.quotePhoneReady){this.$toasted.error('Guarda un teléfono válido del cliente antes de crear la proforma de sistemas.');return;}
       this.venta = {};
       this.venta = { ...this.ventas[this.index] };
       this.inProgress = true;
@@ -2151,11 +2160,12 @@ export default {
 
       // this.venta.productos = this.productos;
       this.venta.diasValidosProf = this.diasValidosProf;
+      this.venta.presentacionProforma=Object.assign({},this.quotePresentation);
       const saveRequest = this.axios.post(this.API + 'proformas', this.venta);
       let saved = false;
       await saveRequest
         .then(response => {
-          saved = true;
+          saved = true;this.quotePresentationOpen=false;
           this.$toasted.success("Proforma guardada");
           window.open(
             "/nuevo/index.html#/reportes/proforma/" + response.data.insertId,
@@ -2681,6 +2691,9 @@ export default {
     }
   },
   components: {
+    'buscador-productos-ia':BuscadorProductosIA,
+    ProformaPresentacion,
+    ClienteTelefonoRapido,
     DiarioRecordatorios,
     AliAssistant,
     PedidosWeb,
@@ -5096,4 +5109,12 @@ export default {
 .ali-checkout-panel{margin:12px 16px;padding:14px 190px 14px 18px;border:2px solid #08a879;border-radius:14px;background:#effbf6;color:#173f4a;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
 .ali-checkout-panel p{margin:4px 0;flex-basis:100%;font-size:13px}.ali-checkout-panel>div:first-child{flex:1;min-width:180px}.ali-checkout-total{font-size:26px;color:#067c60}.ali-checkout-panel details{flex-basis:100%;max-height:150px;overflow:auto}.ali-checkout-panel summary{cursor:pointer}.ali-checkout-actions{display:flex;gap:8px;flex-wrap:wrap}.ali-checkout-actions button{padding:9px 13px;border:0;border-radius:8px;background:#077c67;color:white;font-weight:700}.ali-checkout-actions button:disabled{opacity:.55}.ali-checkout-actions button:nth-child(2){background:#627783}@media(max-width:767px){.ali-checkout-panel{margin:8px;padding:12px}.ali-checkout-actions{width:100%}.ali-checkout-actions button{flex:1;font-size:12px}.ali-checkout-panel>div:first-child{padding-right:95px}.ali-checkout-total{flex-basis:100%}}
 .ali-checkout-error{margin:10px 16px;padding:12px 16px;background:#fff2d9;border:1px solid #e4b866;border-radius:10px;color:#734600;font-size:14px}.ali-checkout-error button{margin-left:10px;border:0;border-radius:6px;background:#795c28;color:white;padding:5px 10px}
+</style>
+
+<style>
+.pos-page>.quote-create-host{position:relative!important;z-index:15050!important}.quote-create-modal{z-index:15050!important}.quote-create-modal .modal-dialog{max-width:740px!important;width:calc(100vw - 30px)!important;min-width:0!important}.quote-create-modal .modal-content{border-radius:12px}.quote-create-modal .modal-body{max-height:78vh;overflow:auto}
+</style>
+
+<style>
+.pos-page .pos-tabs .nav-pills .nav-item.pos-product-ai-launcher{margin-left:auto!important;flex:0 0 auto!important;display:flex;align-items:center;justify-content:flex-end;padding:0 3px}.pos-product-ai-search{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:64px;min-height:34px;padding:5px 11px;border:1px solid #64d3eb;border-radius:9px;background:linear-gradient(115deg,#087d98,#454598);color:#fff;font-size:12px;font-weight:800;line-height:1;box-shadow:0 2px 8px #00cbd522;cursor:pointer}.pos-product-ai-search:hover{background:#176a95;color:#fff}.pos-product-ai-search:focus-visible{outline:3px solid #8deaf2;outline-offset:2px}.pos-product-ai-search svg{flex-shrink:0}@media(max-width:600px){.pos-product-ai-search{min-width:56px;min-height:32px;padding:4px 8px;font-size:11px;gap:4px}}
 </style>

@@ -1,0 +1,19 @@
+{
+  "videos": [
+    {
+      "url": "https://www.youtube.com/watch?v=F9_RkPRd5XI",
+      "title": "EPSON EcoTank L3250. UNBOXING e INSTALACIÓN de la IMPRESORA",
+      "channel": "Luis Enrique Lemus Acosta",
+      "reason": "Referencia de uso del producto. Comprueba que el modelo y la variante coincidan con el equipo consultado.",
+      "match": "general"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=CDbO3DnGEUY",
+      "title": "Impresora Epson Multifuncional EcoTank L3250",
+      "channel": "Multicopy",
+      "reason": "Referencia de uso del producto. Comprueba que el modelo y la variante coincidan con el equipo consultado.",
+      "match": "general"
+    }
+  ],
+  "cached": false
+}

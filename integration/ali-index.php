@@ -2860,7 +2860,10 @@ $app->get('/productos/stock[/{idAlmacen}]', function (Request $request, Response
             $select .= " AND Gen_Producto.IdProducto IN (" . implode(',', $idProductos) . ")";
         }
 
+        // POS explicitly includes services; inventory reports retain their stock-only filter.
+        if ((int)$request->getParam('incluirServicios') !== 1) {
         $select .= "AND (Gen_Producto.ControlaStock=1 OR Gen_Producto.CodigoBarra='MANODEOBRA')";
+        }
 
         if ($request->getparam('stockminimo') == 1) {
             $select .= " AND Gen_Producto.ControlaStockMinimo = 1 ";
@@ -3978,6 +3981,7 @@ $app->post('/ventas', function (Request $request, Response $response) {
 
 $app->post('/proformas', function (Request $request, Response $response) {
     $idCliente = $request->getParam('cliente')['IdCliente'];
+    try{quoteRequireClientPhone($this->db,(int)$idCliente,$presentation['tipo']);}catch(InvalidArgumentException $e){return $response->withJson(['error'=>$e->getMessage()],422);}
     $descripcion = $request->getParam('descripcion');
     $usuarioReg = isset($request->getParam('vendedor')['Usuario']) ? $request->getParam('vendedor')['Usuario'] : 'xx';
     $diasValidos = $request->getParam('diasValidosProf') ? $request->getParam('diasValidosProf') : 7;
@@ -4039,7 +4043,7 @@ $app->get('/proformas/id/{id}', function (Request $request, Response $response, 
     try {
         //code...
 
-        $select = "SELECT Ve_Proforma.*, Ve_DocVentaCliente.Cliente, Ve_DocVentaCliente.Direccion AS ClienteDireccion, Ve_DocVentaCliente.Email AS ClienteEmail,
+        $select = "SELECT Ve_Proforma.*, Ve_DocVentaCliente.Cliente, Ve_DocVentaCliente.Direccion AS ClienteDireccion, Ve_DocVentaCliente.Email AS ClienteEmail, Ve_DocVentaCliente.Telefono AS ClienteTelefono,
     Ve_DocVentaCliente.DniRuc AS Documento, Ve_Proforma.DiasValidos
     
         FROM Ve_Proforma

@@ -3,7 +3,7 @@
   
   <main :class="{ 'nst-workspace': $route.name !== 'Proforma', 'nst-sales-workspace': $route.name === 'Ventas' }"><router-view/></main>
   <producto-asesor-ia />
-  <diario-recordatorios v-if="$route.name !== 'Ventas'" class="pos-inline-voice" />
+  <diario-recordatorios v-if="$route.name !== 'Ventas' && $route.name !== 'Proforma'" class="pos-inline-voice" />
   <agenda-personal v-if="$route.name !== 'Proforma'" />
   <support-launcher v-if="$route.name !== 'Proforma'" />
 </div>

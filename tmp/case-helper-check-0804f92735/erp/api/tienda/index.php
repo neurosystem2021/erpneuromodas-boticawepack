@@ -1,0 +1,3 @@
+<?php
+$q37 = 'SELECT * FROM GEN_EMPRESA';
+$q38 = 'SELECT * FROM GEN_EMPRESA';
