@@ -1,0 +1,69 @@
+
+> boticawebpack@1.0.0 build
+> node build/build.js
+
+(node:43948) Warning: Accessing non-existent property 'cat' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43948) Warning: Accessing non-existent property 'cd' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'chmod' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'cp' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'dirs' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'pushd' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'popd' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'echo' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'tempdir' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'pwd' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'exec' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'ls' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'find' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'grep' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'head' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'ln' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'mkdir' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'rm' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'mv' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'sed' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'set' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'sort' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'tail' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'to' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'toEnd' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'touch' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'uniq' of module exports inside circular dependency
+(node:43948) Warning: Accessing non-existent property 'which' of module exports inside circular dependency
+Hash: [1md3bdfbd8580da209afc8[39m[22m
+Version: webpack [1m3.12.0[39m[22m
+Time: [1m73351[39m[22mms
+                                              [1mAsset[39m[22m       [1mSize[39m[22m  [1mChunks[39m[22m  [1m[39m[22m           [1m[39m[22m       [1mChunk Names[39m[22m
+         [1m[33mstatic/img/pos-tech-background.e2bd465.png[39m[22m    [1m[33m5.14 MB[39m[22m        [1m[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  
+                      [1m[32mstatic/media/beep.36b1b47.mp3[39m[22m    15.7 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+           [1m[33mstatic/js/vendor.78e552047eae63b7b55d.js[39m[22m    [1m[33m1.17 MB[39m[22m       [1m0[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  vendor
+              [1m[33mstatic/js/app.212d2ca3365e3826f656.js[39m[22m    [1m[33m1.05 MB[39m[22m       [1m1[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  app
+         [1m[32mstatic/js/manifest.3ad1d5771e9b13dbdad2.js[39m[22m  800 bytes       [1m2[39m[22m  [1m[32m[emitted][39m[22m         manifest
+[1m[33mstatic/css/app.460141a99cd08ed3be9bf99be414a140.css[39m[22m     [1m[33m923 kB[39m[22m       [1m1[39m[22m  [1m[32m[emitted][39m[22m  [1m[33m[big][39m[22m  app
+                                         [1m[32mindex.html[39m[22m  590 bytes        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                    [1m[32mstatic/beep.mp3[39m[22m    15.7 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                  [1m[32mstatic/styles.css[39m[22m  196 bytes        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                       [1m[32mstatic/vue2-autocomplete.css[39m[22m    1.81 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                   [1m[32mstatic/error.png[39m[22m    1.38 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                  [1m[32mstatic/cancel.png[39m[22m    1.13 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                           [1m[32mstatic/moto-delivery.png[39m[22m    1.56 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                    [1m[32mstatic/logo.png[39m[22m      63 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                    [1m[32mstatic/casa.png[39m[22m    1.59 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                     [1m[32mstatic/box.png[39m[22m    1.94 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                    [1m[32mstatic/moto.png[39m[22m    2.04 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                 [1m[32mstatic/success.png[39m[22m    1.01 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                         [1m[32mstatic/fontawesome/all.css[39m[22m    45.7 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                [1m[32mstatic/webfonts/fa-brands-400.woff2[39m[22m    63.4 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                    [1m[32mstatic/sire.png[39m[22m    34.2 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+               [1m[32mstatic/webfonts/fa-regular-400.woff2[39m[22m      15 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                 [1m[32mstatic/webfonts/fa-solid-900.woff2[39m[22m    59.6 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                              [1m[32mstatic/nuevassoli.mp3[39m[22m    16.2 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+                                [1m[32mstatic/no-photo.png[39m[22m    5.32 kB        [1m[39m[22m  [1m[32m[emitted][39m[22m         
+
+  Build complete.
+
+  Tip: built files are meant to be served over an HTTP server.
+  Opening index.html over file:// won't work.
+

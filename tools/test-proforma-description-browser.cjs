@@ -1,0 +1,27 @@
+const assert=require('assert/strict'),fs=require('fs'),path=require('path');
+const {chromium}=require('../.tmp-order-workbook/node_modules/playwright');
+(async()=>{const browser=await chromium.launch({channel:'chrome',headless:true});try{
+ const fixture=JSON.parse(fs.readFileSync('output/proforma-description-fixture.json','utf8'));
+ const page=await browser.newPage({viewport:{width:1440,height:1050}});const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{sessionStorage.setItem('User','caja-prueba');sessionStorage.setItem('IdPerfil','16');sessionStorage.setItem('IdAlmacen','1');});
+ await page.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(url.hostname!=='localhost')return route.abort();if(process.env.IMCEDEN_PREVIEW_DIST==='1'&&url.pathname.startsWith('/nuevo/')){const base=path.resolve('dist'),file=path.resolve(base,url.pathname.slice(7));if(!file.startsWith(base+path.sep)||!fs.existsSync(file))return route.abort();return route.fulfill({path:file});}if(!url.pathname.startsWith('/api/'))return route.continue();let data=[];const p=url.pathname.replace(/\/+/g,'/');
+  if(p.includes('/proformas/id/'))data=fixture.quote;
+  else if(p.includes('/usuarios/'))data={Usuario:'caja-prueba',NombreUsuario:'Caja de prueba',IdUsuarioPerfil:16,IdAlmacen:1,Almacen:'PRINCIPAL',DescuentoActivo:0,IdDocVentaPuntoVenta:1,PuntoVenta:'PRINCIPAL'};
+  else if(p.endsWith('/cliente')||p.includes('/cliente/'))data={IdCliente:1,Cliente:'CLIENTE DE PRUEBA',DniRuc:'00000000',Puntos:0};
+  else if(p.endsWith('/productos/puntoventa/stock'))data=[{IdProducto:1,Producto:'PRODUCTO DE PRUEBA',CodigoBarra:'PRUEBA',ProductoPresentacion:'UNIDAD',ProductoMedicion:'UNIDAD',ProductoModelo:'MODELO',ProductoMarca:'MARCA',ProductoCategoria:'PRUEBA',Descripcion:'Texto de catálogo que no debe reemplazar la nota',PrecioContado:12,PrecioCosto:1,PreciosPorProducto:'[]',stock:100,ControlaStock:0}];
+  else if(p.endsWith('/ventas/numero'))data={serie:'B001',numero:1};
+  else if(p.endsWith('/ventas/tipos'))data=[{IdTipoDoc:7,TipoDoc:'BOLETA ELEC.',CodSunat:'03'}];
+  else if(p.includes('/puntoventa/id/'))data={IdDocVentaPuntoVenta:1,PuntoVenta:'PRINCIPAL'};
+  else if(p.includes('/almacenes/id/'))data={IdAlmacen:1,Almacen:'PRINCIPAL'};
+  else if(p.includes('/empresa/id/'))data={RAZONSOCIAL:'IMCEDEN · PRUEBA',RUC:'00000000000'};
+  else if(p.endsWith('/proformas/count'))data={total:0};
+  return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
+ });
+ await page.goto('http://localhost/nuevo/index.html#/reportes/proforma/'+fixture.quote.IdProforma);await page.waitForSelector('.prod-description');assert.equal(await page.locator('.prod-description').count(),2);assert.equal(await page.locator('.prod-description').first().textContent(),fixture.quote.productos[0].Descripcion);assert.equal(await page.locator('.prod-description b').count(),0);await page.screenshot({path:'output/imceden-proforma-descripcion.png',fullPage:true});
+ const baseline=errors.length;await page.goto('http://localhost/nuevo/index.html#/ventas');await page.waitForFunction(()=>{const find=v=>{if(v.$data&&'ventaActiva'in v.$data&&Array.isArray(v.ventas))return v;for(const c of v.$children||[]){const r=find(c);if(r)return r;}};window.pos=find(document.querySelector('#app').__vue__);return window.pos&&pos.ventas.length;});await page.waitForTimeout(500);
+ await page.evaluate(async list=>{await pos.cargarProforma(list);},fixture.list);await page.waitForFunction(()=>pos.ventas[pos.ventaActiva].productos.length===3);
+ const result=await page.evaluate(()=>{const v=pos.ventas[pos.ventaActiva];return {descriptions:v.productos.map(p=>p.Descripcion),presentations:v.productos.map(p=>p.ProductoPresentacion),prices:v.productos.map(p=>Number(p.precio)),quantities:v.productos.map(p=>Number(p.cantidad))};});
+ assert.deepEqual(result.descriptions,fixture.list.productos.map(p=>p.Descripcion||''));assert.deepEqual(result.presentations,['UNIDAD','UNIDAD','UNIDAD']);assert.deepEqual(result.prices,[12,18,5]);assert.deepEqual(result.quantities,[2,1,1]);
+ const fields=page.locator('textarea[aria-label="Descripción del producto"]');assert.equal(await fields.count(),3);assert.equal(await fields.first().inputValue(),fixture.list.productos[0].Descripcion);await fields.first().fill('Descripción editada por caja');assert.equal(await page.evaluate(()=>pos.ventas[pos.ventaActiva].productos[0].Descripcion),'Descripción editada por caja');assert.equal(await page.evaluate(()=>pos.ventas[pos.ventaActiva].productos[1].Descripcion),fixture.list.productos[1].Descripcion);await page.screenshot({path:'output/imceden-caja-proforma-descripcion.png',fullPage:true});
+ assert.deepEqual(errors.slice(baseline),[]);console.log('PASS compiled report displays escaped multiline notes; actual POS proforma loading fills editable item descriptions, retains duplicate-line notes and unit labels, prices and quantities. All API requests mocked; no real proforma, sale, print or WhatsApp sent.');
+}finally{await browser.close();}})().catch(error=>{console.error(error);process.exit(1);});

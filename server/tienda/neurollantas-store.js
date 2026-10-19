@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  var FALLBACK_LOGO = '/resources/images/logo.png';
+  var STORE_NAME = 'IMCEDEN';
+  var FALLBACK_LOGO = '/resources/images/imceden-store.svg?v=20261018-1';
   var SALES_TAGLINE = 'VENTA DE BATERIAS, AROS Y LLANTAS AL POR MAYOR Y MENOR';
   var storeCompany = null;
   var storeNavigationPromise = null;
@@ -32,6 +33,11 @@
   }
 
   async function applyBrand() {
+    var brandLogo = document.querySelector('.brand-logo');
+    if (brandLogo) { brandLogo.src = FALLBACK_LOGO; brandLogo.alt = STORE_NAME; }
+    var brandTitle = document.getElementById('brand');
+    if (brandTitle) brandTitle.textContent = STORE_NAME;
+    document.title = 'Tienda virtual | ' + STORE_NAME;
     try {
       var response = await fetch('/api/tienda/index.php?action=empresa', { cache: 'no-store' });
       if (!response.ok) throw new Error('No se pudo cargar la identidad de la empresa.');
@@ -39,18 +45,18 @@
       storeCompany = company;
       var logo = document.querySelector('.brand-logo');
       if (logo) {
-        logo.src = assetUrl(company.logo_principal);
-        logo.alt = company.RAZONSOCIAL || company.nombre_comercial || 'Eden Company';
+        logo.src = FALLBACK_LOGO;
+        logo.alt = STORE_NAME;
         logo.onerror = function () {
           this.onerror = null;
           this.src = FALLBACK_LOGO;
         };
       }
       var title = document.getElementById('brand');
-      if (title) title.textContent = company.RAZONSOCIAL || company.nombre_comercial || 'Eden Company';
+      if (title) title.textContent = STORE_NAME;
       var tagline = document.getElementById('tagline');
       if (tagline) tagline.textContent = SALES_TAGLINE;
-      document.title = 'Tienda virtual | ' + (company.RAZONSOCIAL || company.nombre_comercial || 'Eden Company');
+      document.title = 'Tienda virtual | ' + (STORE_NAME);
     } catch (error) {
       var fallback = document.querySelector('.brand-logo');
       if (fallback) fallback.src = FALLBACK_LOGO;
@@ -211,7 +217,7 @@
     var head = document.createElement('div');
     head.className = 'store-nav-panel-head';
     var heading = document.createElement('strong');
-    heading.textContent = company.RAZONSOCIAL || company.nombre_comercial || 'EDEN COMPANY';
+    heading.textContent = STORE_NAME;
     var close = document.createElement('button');
     close.type = 'button';
     close.className = 'store-nav-close';
@@ -262,7 +268,7 @@
 
     var message = document.createElement('div');
     message.className = 'store-promo-message';
-    message.innerHTML = '<span>EDEN COMPANY</span>';
+    message.innerHTML = '<span>IMCEDEN</span>';
 
     var navigation = document.createElement('nav');
     navigation.className = 'store-main-navigation';
@@ -314,12 +320,12 @@
         var image = document.createElement('img');
         image.className = 'promo-image';
         image.src = item.url;
-        image.alt = 'Publicidad ' + (index + 1) + ' de Eden Company';
+        image.alt = 'Publicidad ' + (index + 1) + ' de ' + STORE_NAME;
         image.loading = index === 0 ? 'eager' : 'lazy';
         image.onerror = function () { slide.remove(); };
         var badge = document.createElement('span');
         badge.className = 'promo-corner-label';
-        badge.textContent = 'EDEN COMPANY';
+        badge.textContent = STORE_NAME;
         slide.appendChild(backdrop);
         slide.appendChild(image);
         slide.appendChild(badge);

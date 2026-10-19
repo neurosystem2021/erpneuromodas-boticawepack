@@ -2,9 +2,7 @@
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 if (empty($_SESSION['user'])) { header('Location: /index.php'); exit; }
 
-require_once dirname(__DIR__) . '/models/EmpresaConfig.php';
-$config = empresaConfigObtener();
-$logo = '/' . ltrim(empresaConfigValor($config, 'logo_principal', 'resources/images/logo.png'), '/\\');
+$logo = '/resources/images/imceden-store.svg?v=20261018-1';
 $url = '/tienda/';
 ?>
 <!doctype html>
@@ -12,12 +10,12 @@ $url = '/tienda/';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tienda virtual | Eden Company</title>
+  <title>Tienda virtual | IMCEDEN</title>
   <link rel="stylesheet" href="/resources/css/tienda-flyer-manager.css?v=20261001-1">
 </head>
 <body>
   <header class="store-admin-bar">
-    <img class="store-admin-logo" src="<?php echo htmlspecialchars($logo, ENT_QUOTES, 'UTF-8'); ?>" alt="Eden Company">
+    <img class="store-admin-logo" src="<?php echo htmlspecialchars($logo, ENT_QUOTES, 'UTF-8'); ?>" alt="IMCEDEN">
     <div class="store-admin-title">
       <b>Tienda virtual</b>
       <span>Catálogo de baterías, aros, llantas y repuestos</span>
@@ -29,7 +27,7 @@ $url = '/tienda/';
     </div>
   </header>
 
-  <iframe id="storeFrame" src="<?php echo htmlspecialchars($url, ENT_QUOTES, 'UTF-8'); ?>" title="Tienda virtual Eden Company"></iframe>
+  <iframe id="storeFrame" src="<?php echo htmlspecialchars($url, ENT_QUOTES, 'UTF-8'); ?>" title="Tienda virtual IMCEDEN"></iframe>
 
   <div class="flyer-manager" id="flyerManager" aria-hidden="true">
     <section class="flyer-dialog" role="dialog" aria-modal="true" aria-labelledby="flyerTitle">

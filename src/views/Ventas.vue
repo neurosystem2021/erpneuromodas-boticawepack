@@ -1043,6 +1043,17 @@
                           <td class="table-danger  resumen-subtotal">{{ getDescuento(ventaActiva) }}</td>
                         </tr>
 
+                        <tr v-if="ventaConIgv(ventaActiva)" class="pos-tax-base">
+                          <td></td>
+                          <td class="resumen-subtotal">Op. gravada</td>
+                          <td class="resumen-subtotal">{{ getBaseGravada(ventaActiva) }}</td>
+                        </tr>
+                        <tr v-if="ventaConIgv(ventaActiva)" class="pos-tax-igv">
+                          <td></td>
+                          <td class="resumen-subtotal">IGV (18%)</td>
+                          <td class="resumen-subtotal">{{ getIgvVenta(ventaActiva) }}</td>
+                        </tr>
+
                         <tr>
                           <td>
                             <b-button class="pos-calculator-trigger" :id="`popover-calculadora-${index}`"
@@ -3036,7 +3047,7 @@ beforeDestroy() {
         // this.$refs.inputCliente.$refs.input.disabled = false;
       }
 
-      if (obj.TieneIgv) {
+      if (Number(obj.TieneIgv) === 1) {
         this.tieneIgv[this.ventaActiva] = true;
       } else {
         this.tieneIgv[this.ventaActiva] = false;
@@ -3501,6 +3512,18 @@ beforeDestroy() {
         return total + (parseFloat(prod.descuento) || 0);
       }, 0);
       return parseFloat(subtotal).toFixed(2);
+    },
+    ventaConIgv(ventaIndex = null) {
+      const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
+      return Number((this.ventas[idx].tipoVenta || {}).TieneIgv) === 1;
+    },
+    getBaseGravada(ventaIndex = null) {
+      // Igual que nstarapaca: el precio de venta ya incluye el IGV.
+      return (Number(this.getTotal(ventaIndex)) / 1.18).toFixed(2);
+    },
+    getIgvVenta(ventaIndex = null) {
+      const total = Number(this.getTotal(ventaIndex));
+      return (total - total / 1.18).toFixed(2);
     },
     getTotal(ventaIndex = null) {
       const idx = ventaIndex !== null ? ventaIndex : this.ventaActiva;
@@ -4313,7 +4336,7 @@ beforeDestroy() {
 
           prod.PreciosPorProducto = pres;
           prod.presentacion = producto.Presentacion || "UNIDAD";
-          prod.ProductoPresentacion = producto.Descripcion;
+          prod.Descripcion = producto.Descripcion == null ? "" : String(producto.Descripcion);
           prod.cantidad = producto.Cantidad;
           prod.CantidadPresentacion = producto.CantidadxPresentacion || 1;
           prod.precio = producto.Precio;

@@ -1,0 +1,22 @@
+--- a/api/index.php
++++ b/api/index.php
+@@ -2611,6 +2611,9 @@
+     $stmt->execute();
+     $selectNumero = $stmt->fetch();
+     $numero = $selectNumero['NuevoNumero'];
++    require_once __DIR__ . '/factura-igv.php';
++    $numeroFactura = imcFacturaIgvNumero($this->db, $idTipoDoc, $serie);
++    if ($numeroFactura !== null) $numero = $numeroFactura;
+     return $response->withJson(array(
+         "serie" => $serie,
+         "numero" => $numero ? $numero : 1
+@@ -3313,6 +3316,9 @@
+     $stmt->execute();
+     $selectNumero = $stmt->fetch();
+     $numero = $selectNumero['NuevoNumero'] ? $selectNumero['NuevoNumero'] : 1;
++    require_once __DIR__ . '/factura-igv.php';
++    $numeroFactura = imcFacturaIgvNumero($this->db, $idTipoDoc, $serie);
++    if ($numeroFactura !== null) $numero = $numeroFactura;
+     $productos = $request->getParam('productos');
+ 
+     $insert = "INSERT INTO Ve_DocVenta (IdDocVentaPuntoVenta,IdCliente,IdTipoDoc,IdAlmacen,Serie,Numero,FechaDoc,Anulado,FechaReg,UsuarioReg,Hash, EsCredito, FechaCredito, PagoCon, CampoDireccion, CodSunatModifica, NroComprobanteModifica, NotaIdMotivo, NotaDescMotivo, EsOrganizacion, NombreOrganizacion, Observacion, Placa)

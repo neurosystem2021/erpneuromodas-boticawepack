@@ -1,0 +1,115 @@
+{
+    "quote": {
+        "IdProforma": 100,
+        "Anio": 2026,
+        "Numero": 100,
+        "IdCliente": 1,
+        "FechaReg": "2026-10-18 12:00:00",
+        "UsuarioReg": "vendedor-prueba",
+        "DiasValidos": 7,
+        "DescripcionProforma": "",
+        "DescripcionProforma2": "",
+        "DescripcionProforma3": "",
+        "DescripcionProforma4": "",
+        "DescripcionProforma5": "",
+        "EsDescripcion": 0,
+        "EsCreditoProforma": 0,
+        "FechaCreditoProforma": null,
+        "Cliente": "CLIENTE DE PRUEBA",
+        "DniRuc": "00000000",
+        "ClienteDireccion": "",
+        "ClienteEmail": " ",
+        "productos": [
+            {
+                "IdProforma": 100,
+                "Cantidad": 2,
+                "Precio": 12,
+                "Descuento": 1,
+                "IdProducto": 1,
+                "Producto": "PRODUCTO DE PRUEBA",
+                "Descripcion": "Para el cliente: válvula de 1\/2\"\nCon adaptador del cliente y prueba d'agua <b>sin HTML<\/b>",
+                "Color": "",
+                "Genero": "",
+                "Botapie": "",
+                "ProductoModelo": "MODELO",
+                "IdProductoMarca": 1,
+                "IdProductoTalla": 1,
+                "IdProductoMedicion": "NIU",
+                "ProductoMarca": "MARCA",
+                "ProductoTalla": ""
+            },
+            {
+                "IdProforma": 100,
+                "Cantidad": 1,
+                "Precio": 18,
+                "Descuento": 0,
+                "IdProducto": 1,
+                "Producto": "PRODUCTO DE PRUEBA",
+                "Descripcion": "Otra descripción para el mismo producto",
+                "Color": "",
+                "Genero": "",
+                "Botapie": "",
+                "ProductoModelo": "MODELO",
+                "IdProductoMarca": 1,
+                "IdProductoTalla": 1,
+                "IdProductoMedicion": "NIU",
+                "ProductoMarca": "MARCA",
+                "ProductoTalla": ""
+            },
+            {
+                "IdProforma": 100,
+                "Cantidad": 1,
+                "Precio": 5,
+                "Descuento": 0,
+                "IdProducto": 1,
+                "Producto": "PRODUCTO DE PRUEBA",
+                "Descripcion": "",
+                "Color": "",
+                "Genero": "",
+                "Botapie": "",
+                "ProductoModelo": "MODELO",
+                "IdProductoMarca": 1,
+                "IdProductoTalla": 1,
+                "IdProductoMedicion": "NIU",
+                "ProductoMarca": "MARCA",
+                "ProductoTalla": ""
+            }
+        ]
+    },
+    "list": {
+        "IdProforma": "100",
+        "IdCliente": 1,
+        "DniRuc": "00000000",
+        "Cliente": "CLIENTE DE PRUEBA",
+        "UsuarioReg": "vendedor-prueba",
+        "productos": [
+            {
+                "IdProformaDet": 1,
+                "IdProforma": 100,
+                "IdProducto": 1,
+                "Cantidad": 2,
+                "Precio": 12,
+                "Descuento": 1,
+                "Descripcion": "Para el cliente: válvula de 1\/2\"\nCon adaptador del cliente y prueba d'agua <b>sin HTML<\/b>"
+            },
+            {
+                "IdProformaDet": 2,
+                "IdProforma": 100,
+                "IdProducto": 1,
+                "Cantidad": 1,
+                "Precio": 18,
+                "Descuento": 0,
+                "Descripcion": "Otra descripción para el mismo producto"
+            },
+            {
+                "IdProformaDet": 3,
+                "IdProforma": 100,
+                "IdProducto": 1,
+                "Cantidad": 1,
+                "Precio": 5,
+                "Descuento": 0,
+                "Descripcion": ""
+            }
+        ]
+    }
+}

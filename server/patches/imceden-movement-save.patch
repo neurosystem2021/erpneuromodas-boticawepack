@@ -1,0 +1,531 @@
+--- a/api/index.php
++++ b/api/index.php
+@@ -1531,524 +1531,13 @@
+ 
+ 
+ $app->post('/movimientos', function (Request $request, Response $response) {
+-    //return  $response->withJson($request->getParam('productos'));exit();
+-    // start verificar Movimiento
+-    $select = "SELECT * FROM Lo_Movimiento
+-	WHERE IdMovimientoTipo = '" . $request->getParam('movimiento')['movimientoTipo']['IdMovimientoTipo'] . "' AND IdProveedor = '" . $request->getParam('movimiento')['proveedor']['IdProveedor'] . "' AND Serie = '" . $request->getParam('movimiento')['Serie'] . "' AND Numero = '" . $request->getParam('movimiento')['Numero'] . "'";
+-
+-    $stmt = $this->db->query($select);
+-    $stmt->execute();
+-
+-    if (count($stmt->fetchAll())) {
+-        $data = array(
+-            "error" => 'Error: Movimiento duplicado'
+-        );
+-        return $response->withJson($data);
+-    }
+-    // end verificar Movimiento
+-
+-    // Vinculo opcional con una orden de compra. Estado 0 = pendiente, 2 = atendida.
+-    $movimientoParam = $request->getParam('movimiento');
+-    $idOrdenCompra = isset($movimientoParam['IdOrdenCompra']) ? intval($movimientoParam['IdOrdenCompra']) : 0;
+-    if ($idOrdenCompra > 0) {
+-        $this->db->prepare("CREATE TABLE IF NOT EXISTS Lo_OrdenCompraMovimiento (
+-            IdOrdenCompra INT NOT NULL,
+-            HashMovimiento VARCHAR(80) NOT NULL,
+-            FechaReg DATETIME NOT NULL,
+-            PRIMARY KEY (IdOrdenCompra),
+-            UNIQUE KEY UX_OrdenCompraMovimiento_Hash (HashMovimiento)
+-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8")->execute();
+-
+-        $ordenStmt = $this->db->prepare("SELECT IdOrdenCompra FROM Lo_OrdenCompra
+-            WHERE IdOrdenCompra = :idOrdenCompra AND IdProveedor = :idProveedor AND Estado = 0");
+-        $ordenStmt->execute(array(
+-            'idOrdenCompra' => $idOrdenCompra,
+-            'idProveedor' => $movimientoParam['proveedor']['IdProveedor']
+-        ));
+-        if (!$ordenStmt->fetch()) {
+-            return $response->withJson(array(
+-                'error' => 'La orden de compra ya fue atendida, no existe o no corresponde al proveedor seleccionado.'
+-            ), 409);
+-        }
+-    }
+-
+-    // start Insertar Movimiento
+-    $idMovimientoTipo = $request->getParam('movimiento')['movimientoTipo']['IdMovimientoTipo'];
+-    $idProveedor = $request->getParam('movimiento')['proveedor']['IdProveedor'];
+-    $serie = $request->getParam('movimiento')['Serie'];
+-    $numero = $request->getParam('movimiento')['Numero'];
+-    $normalizarFechaMovimiento = function ($valor) {
+-        $texto = str_replace('T', ' ', trim((string) $valor));
+-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $texto)) {
+-            $texto .= ' 00:00:00';
+-        }
+-        $fecha = DateTime::createFromFormat('!Y-m-d H:i:s', $texto);
+-        $errores = DateTime::getLastErrors();
+-        if (!$fecha || (is_array($errores) && ($errores['warning_count'] > 0 || $errores['error_count'] > 0))) {
+-            return null;
+-        }
+-        return $fecha->format('Y-m-d H:i:s');
+-    };
+-    $movimientoFecha = $normalizarFechaMovimiento($request->getParam('movimiento')['MovimientoFecha']);
+-    $almacenOrigen = $request->getParam('movimiento')['almacenOrigen']['IdAlmacen'];
+-    $almacenDestino = $request->getParam('movimiento')['almacenDestino']['IdAlmacen'];
+-    $TipoMovi = $request->getParam('movimiento')['movimientoTipo']['Tipo'];
+-    $anulado = 0;
+-    $fechaReg = getNow();
+-    $user = $request->getParam('movimiento')['user'];
+-    $usuarioReg = 'xx';
+-    if (isset($_SESSION['user'])) {
+-        $usuarioReg = $_SESSION['user'];
+-    }
+-    $usuarioReg = $user ? $user : $usuarioReg;
+-    $hash = time();
+-    // $fechaStock = $request->getParam('movimiento')['FechaStock'];
+-    $fechaStockSolicitada = isset($movimientoParam['FechaStock']) && $movimientoParam['FechaStock']
+-        ? $movimientoParam['FechaStock']
+-        : getNow();
+-    $fechaStock = $normalizarFechaMovimiento($fechaStockSolicitada);
+-    if (!$movimientoFecha || !$fechaStock) {
+-        return $response->withJson(array(
+-            'error' => 'La fecha contable o la fecha de stock no tiene un formato valido.'
+-        ), 422);
+-    }
+-    $percepcion = 0;
+-    $esCredito = $request->getParam('movimiento')['EsCredito'];
+-    $fechaVenCredito = $request->getParam('movimiento')['FechaVenCredito'] ? $request->getParam('movimiento')['FechaVenCredito'] : NULL;
+-    $fechaPeriodoTributario = $request->getParam('movimiento')['FechaPeriodoTributario'];
+-    $tipoCambio = $request->getParam('movimiento')['TipoCambio'];
+-    $moneda = $request->getParam('movimiento')['Moneda'];
+-
+-    $insert = $this->db->insert(array(
+-        'IdMovimientoTipo',
+-        'IdProveedor',
+-        'Serie',
+-        'Numero',
+-        'MovimientoFecha',
+-        'IdAlmacenOrigen',
+-        'IdAlmacenDestino',
+-        'Anulado',
+-        'FechaReg',
+-        'UsuarioReg',
+-        'Hash',
+-        'FechaStock',
+-        'Percepcion',
+-        'EsCredito',
+-        'FechaVenCredito',
+-        'FechaPeriodoTributario',
+-        'TipoCambio',
+-        'Moneda'
+-    ))
+-        ->into('Lo_Movimiento')
+-        ->values(array(
+-            $idMovimientoTipo,
+-            $idProveedor,
+-            $serie,
+-            $numero,
+-            $movimientoFecha,
+-            $almacenOrigen,
+-            $almacenDestino,
+-            $anulado,
+-            $fechaReg,
+-            $usuarioReg,
+-            $hash,
+-            $fechaStock,
+-            $percepcion,
+-            $esCredito,
+-            $fechaVenCredito,
+-            $fechaPeriodoTributario,
+-            $tipoCambio,
+-            $moneda
+-        ));
+-
+-    $insertId = $insert->execute();
+-
+-    $data = array(
+-        "hash" => $hash
+-    );
+-    // end insertar Movimiento
+-
+-    // start Movimiento Detalle
+-    $productos = $request->getParam('productos');
+-    foreach ($productos as $producto) {
+-        //if ($producto['total'] > 0) {
+-        $idProducto = $producto['IdProducto'];
+-        $cantidad = $producto['cantidad'];
+-        $tieneIgv = isset($producto['TieneIgv']) ? $producto['TieneIgv'] : 0;
+-        $precio = $producto['precio'];
+-        $nuevoPrecioContado = $producto['nuevoPrecioContado'];
+-        $idLote = isset($producto['IdLote']) ? $producto['IdLote'] : 0;
+-
+-        // aumentar precio si es en dolares
+-        $precio = $precio * $tipoCambio;
+-        $nuevoPrecioContado = $nuevoPrecioContado * $tipoCambio;
+-
+-        $insert = $this->db->insert(array('hashMovimiento', 'IdProducto', 'Cantidad', 'TieneIgv', 'Precio', 'IdLote'))
+-            ->into('Lo_MovimientoDetalle')
+-            ->values(array($hash, $idProducto, $cantidad, $tieneIgv, $precio, $idLote));
+-        $insert->execute();
+-
+-                $sql = "SELECT 1 FROM Gen_Producto_Totales WHERE IdProducto=$idProducto AND  IdAlmacen=$almacenDestino";
+-
+-        $stmt = $this->db->prepare($sql);
+-        $stmt->execute();
+-        $existeCombinacion = (bool)$stmt->fetch();
+-
+-        if ($TipoMovi == 0 || $TipoMovi == 1) {
+-            if ($TipoMovi == 0) {
+-                $sql = "SELECT 1 FROM Gen_Producto_Totales WHERE IdProducto=$idProducto AND  IdAlmacen=$almacenDestino";
+-            }
+-            if ($TipoMovi == 1) {
+-                $sql = "SELECT 1 FROM Gen_Producto_Totales WHERE IdProducto=$idProducto AND  IdAlmacen=$almacenOrigen";
+-            }
+-            // $sql = "SELECT 1 FROM Gen_Producto_Totales WHERE IdProducto=$idProducto AND  IdAlmacen=$almacenDestino";
+-            $stmt = $this->db->prepare($sql);
+-            $stmt->execute();
+-            $existeCombinacion = (bool)$stmt->fetch();
+-            if ($existeCombinacion) {
+-                if ($TipoMovi == 0) {
+-                    $dml = "UPDATE Gen_Producto_Totales SET 
+-                    TotalCompras=TotalCompras+$cantidad
+-                    WHERE IdProducto=$idProducto 
+-                    AND  IdAlmacen=$almacenDestino";
+-                    $stmt = $this->db->prepare($dml);
+-                    $updated = $stmt->execute();
+-                };
+-                if ($TipoMovi == 1) {
+-                    $dml = "UPDATE Gen_Producto_Totales SET 
+-                    TotalCompras=TotalCompras-$cantidad
+-                    WHERE IdProducto=$idProducto 
+-                    AND  IdAlmacen=$almacenOrigen";
+-                    $stmt = $this->db->prepare($dml);
+-                    $updated = $stmt->execute();
+-                };
+-            } else {
+-                $insert = $this->db->insert(array('IdAlmacen', 'IdProducto', 'TotalCompras', 'TotalVentas'))
+-                    ->into('Gen_Producto_Totales')
+-                    ->values(array($almacenDestino, $idProducto, $cantidad, 0));
+-                $insert->execute();
+-            }
+-        }
+-
+-
+-
+-        if ($TipoMovi == 2) {
+-            $sql = "SELECT 1 FROM Gen_Producto_Totales WHERE IdProducto=$idProducto AND  IdAlmacen=$almacenDestino";
+-            $stmt = $this->db->prepare($sql);
+-            $stmt->execute();
+-            $existeCombinacion = (bool)$stmt->fetch();
+-
+-
+-
+-            $dml = "UPDATE Gen_Producto_Totales SET 
+-                    TotalCompras=TotalCompras-$cantidad 
+-                    WHERE IdProducto=$idProducto 
+-                    AND  IdAlmacen=$almacenOrigen";
+-            $stmt = $this->db->prepare($dml);
+-            $stmt->execute();
+-
+-
+-            if ($existeCombinacion) {
+-                $dml = "UPDATE Gen_Producto_Totales SET 
+-                    TotalCompras=TotalCompras+$cantidad 
+-                    WHERE IdProducto=$idProducto 
+-                    AND  IdAlmacen=$almacenDestino";
+-                $stmt = $this->db->prepare($dml);
+-                $stmt->execute();
+-            } else {
+-                $insert = $this->db->insert(array('IdAlmacen', 'IdProducto', 'TotalCompras', 'TotalVentas'))
+-                    ->into('Gen_Producto_Totales')
+-                    ->values(array($almacenDestino, $idProducto, $cantidad, 0));
+-                $insert->execute();
+-            }
+-        };
+-
+-
+-        // start actualizar precioventa producto
+-        $alterarProductos = $request->getParam('movimiento')['alterarProductos'];
+-        if ($alterarProductos) {
+-            $update = $this->db->update(array("PrecioCosto" => $precio, "PrecioContado" => $nuevoPrecioContado))
+-                ->table('Gen_Producto')
+-                ->where('IdProducto', '=', $idProducto);
+-            $update->execute();
+-        }
+-        // end actualizar precioventa producto
+-        //}
+-    }
+-    // end Movimiento Detalle
+-
+-    if ($idOrdenCompra > 0) {
+-        $vinculoStmt = $this->db->prepare("INSERT INTO Lo_OrdenCompraMovimiento
+-            (IdOrdenCompra, HashMovimiento, FechaReg)
+-            VALUES (:idOrdenCompra, :hashMovimiento, :fechaReg)");
+-        $vinculoStmt->execute(array(
+-            'idOrdenCompra' => $idOrdenCompra,
+-            'hashMovimiento' => $hash,
+-            'fechaReg' => getNow()
+-        ));
+-
+-        $estadoStmt = $this->db->prepare("UPDATE Lo_OrdenCompra SET Estado = 2
+-            WHERE IdOrdenCompra = :idOrdenCompra AND Estado = 0");
+-        $estadoStmt->execute(array('idOrdenCompra' => $idOrdenCompra));
+-        $data['IdOrdenCompra'] = $idOrdenCompra;
+-        $data['ordenEstado'] = 2;
+-    }
+-
+-
+-    return $response->withJson($data);
++    require_once __DIR__ . '/guardar-movimiento.php';
++    return imcSaveMovement($this->db, $request, $response, false);
+ });
+ 
+ $app->post('/movimientos/traslado', function (Request $request, Response $response) {
+-    $movimiento = (array) $request->getParam('movimiento');
+-    $tipoRequest = isset($movimiento['movimientoTipo']) ? (array) $movimiento['movimientoTipo'] : array();
+-    $origenRequest = isset($movimiento['almacenOrigen']) ? (array) $movimiento['almacenOrigen'] : array();
+-    $destinoRequest = isset($movimiento['almacenDestino']) ? (array) $movimiento['almacenDestino'] : array();
+-    $proveedorRequest = isset($movimiento['proveedor']) ? (array) $movimiento['proveedor'] : array();
+-
+-    $idMovimientoTipo = isset($tipoRequest['IdMovimientoTipo']) ? (int) $tipoRequest['IdMovimientoTipo'] : 0;
+-    $idAlmacenOrigen = isset($origenRequest['IdAlmacen']) ? (int) $origenRequest['IdAlmacen'] : 0;
+-    $idAlmacenDestino = isset($destinoRequest['IdAlmacen']) ? (int) $destinoRequest['IdAlmacen'] : 0;
+-    $idProveedor = isset($proveedorRequest['IdProveedor']) ? (int) $proveedorRequest['IdProveedor'] : 0;
+-    $serie = isset($movimiento['Serie']) ? trim((string) $movimiento['Serie']) : '';
+-    $numero = isset($movimiento['Numero']) ? (int) $movimiento['Numero'] : 0;
+-    $tipoCambio = isset($movimiento['TipoCambio']) ? (float) $movimiento['TipoCambio'] : 1;
+-    $moneda = isset($movimiento['Moneda']) ? trim((string) $movimiento['Moneda']) : 'PEN';
+-    $periodo = isset($movimiento['FechaPeriodoTributario']) ? (int) $movimiento['FechaPeriodoTributario'] : (int) date('Ym');
+-    $productosRequest = (array) $request->getParam('productos');
+-
+-    $normalizarFecha = function ($valor) {
+-        $texto = str_replace('T', ' ', trim((string) $valor));
+-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $texto)) {
+-            $texto .= ' 00:00:00';
+-        }
+-        $fecha = DateTime::createFromFormat('!Y-m-d H:i:s', $texto);
+-        $errores = DateTime::getLastErrors();
+-        if (!$fecha || (is_array($errores) && ($errores['warning_count'] > 0 || $errores['error_count'] > 0))) {
+-            return null;
+-        }
+-        return $fecha->format('Y-m-d H:i:s');
+-    };
+-
+-    $fechaMovimiento = $normalizarFecha(isset($movimiento['MovimientoFecha']) ? $movimiento['MovimientoFecha'] : '');
+-    $fechaStock = $normalizarFecha(isset($movimiento['FechaStock']) ? $movimiento['FechaStock'] : '');
+-    if ($idMovimientoTipo <= 0 || $idAlmacenOrigen <= 0 || $idAlmacenDestino <= 0) {
+-        return $response->withJson(array('error' => 'Seleccione el tipo de traslado, el almacén origen y el almacén destino.'), 422);
+-    }
+-    if ($idAlmacenOrigen === $idAlmacenDestino) {
+-        return $response->withJson(array('error' => 'El almacén destino debe ser diferente al almacén origen.'), 422);
+-    }
+-    if ($serie === '' || $numero <= 0) {
+-        return $response->withJson(array('error' => 'Ingrese una serie y un número válidos para el traslado.'), 422);
+-    }
+-    if (!$fechaMovimiento || !$fechaStock) {
+-        return $response->withJson(array('error' => 'La fecha contable o la fecha de stock no tiene un formato válido.'), 422);
+-    }
+-    if ($tipoCambio <= 0) {
+-        return $response->withJson(array('error' => 'El tipo de cambio debe ser mayor a cero.'), 422);
+-    }
+-
+-    $detalles = array();
+-    $cantidadesPorProducto = array();
+-    foreach ($productosRequest as $productoRequest) {
+-        $producto = (array) $productoRequest;
+-        $idProducto = isset($producto['IdProducto']) ? (int) $producto['IdProducto'] : 0;
+-        $cantidad = isset($producto['cantidad']) ? round((float) $producto['cantidad'], 4) : 0;
+-        if ($idProducto <= 0 || $cantidad <= 0) {
+-            return $response->withJson(array('error' => 'Todos los productos del traslado deben tener una cantidad mayor a cero.'), 422);
+-        }
+-
+-        $precioBase = isset($producto['precio']) ? (float) $producto['precio'] : (isset($producto['PrecioCosto']) ? (float) $producto['PrecioCosto'] : 0);
+-        $detalles[] = array(
+-            'IdProducto' => $idProducto,
+-            'Cantidad' => $cantidad,
+-            'TieneIgv' => isset($producto['TieneIgv']) ? (int) $producto['TieneIgv'] : 0,
+-            'Precio' => round($precioBase * $tipoCambio, 4),
+-            'IdLote' => isset($producto['IdLote']) ? (int) $producto['IdLote'] : 0
+-        );
+-        if (!isset($cantidadesPorProducto[$idProducto])) {
+-            $cantidadesPorProducto[$idProducto] = 0;
+-        }
+-        $cantidadesPorProducto[$idProducto] = round($cantidadesPorProducto[$idProducto] + $cantidad, 4);
+-    }
+-    if (count($detalles) === 0) {
+-        return $response->withJson(array('error' => 'Agregue al menos un producto al traslado.'), 422);
+-    }
+-
+-    $usuarioSesion = isset($_SESSION['user']) ? trim((string) $_SESSION['user']) : '';
+-    $usuarioRequest = isset($movimiento['user']) ? trim((string) $movimiento['user']) : '';
+-    $usuarioReg = $usuarioRequest !== '' ? $usuarioRequest : ($usuarioSesion !== '' ? $usuarioSesion : 'sistema');
+-
+-    try {
+-        // Lo_MovimientoTipo es una tabla heredada y no tiene columna Anulado
+-        // en todas las instalaciones. El Id y el Tipo son suficientes para
+-        // validar que el movimiento seleccionado sea realmente un traslado.
+-        $tipoStmt = $this->db->prepare("SELECT TipoMovimiento, Tipo FROM Lo_MovimientoTipo
+-            WHERE IdMovimientoTipo = :idMovimientoTipo");
+-        $tipoStmt->execute(array('idMovimientoTipo' => $idMovimientoTipo));
+-        $tipo = $tipoStmt->fetch(PDO::FETCH_ASSOC);
+-        if (!$tipo || (int) $tipo['Tipo'] !== 2) {
+-            throw new InvalidArgumentException('El tipo de movimiento seleccionado no corresponde a un traslado.');
+-        }
+-
+-        $almacenStmt = $this->db->prepare("SELECT IdAlmacen, Almacen FROM Lo_Almacen
+-            WHERE IdAlmacen = :idAlmacen AND (Anulado = 0 OR Anulado IS NULL)");
+-        $almacenStmt->execute(array('idAlmacen' => $idAlmacenOrigen));
+-        $almacenOrigen = $almacenStmt->fetch(PDO::FETCH_ASSOC);
+-        $almacenStmt->execute(array('idAlmacen' => $idAlmacenDestino));
+-        $almacenDestino = $almacenStmt->fetch(PDO::FETCH_ASSOC);
+-        if (!$almacenOrigen || !$almacenDestino) {
+-            throw new InvalidArgumentException('El almacén origen o destino ya no está disponible.');
+-        }
+-
+-        $this->db->beginTransaction();
+-
+-        $duplicadoStmt = $this->db->prepare("SELECT 1 FROM Lo_Movimiento
+-            WHERE IdMovimientoTipo = :idMovimientoTipo AND Serie = :serie AND Numero = :numero
+-            LIMIT 1");
+-        $duplicadoStmt->execute(array(
+-            'idMovimientoTipo' => $idMovimientoTipo,
+-            'serie' => $serie,
+-            'numero' => $numero
+-        ));
+-        if ($duplicadoStmt->fetchColumn()) {
+-            throw new InvalidArgumentException('Ya existe un traslado con la misma serie y número.');
+-        }
+-
+-        $productoStmt = $this->db->prepare("SELECT Producto FROM Gen_Producto
+-            WHERE IdProducto = :idProducto AND (Anulado = 0 OR Anulado IS NULL)");
+-        $stockStmt = $this->db->prepare("SELECT
+-                COALESCE(TotalCompras, 0) - COALESCE(TotalVentas, 0) AS Stock
+-            FROM Gen_Producto_Totales
+-            WHERE IdProducto = :idProducto AND IdAlmacen = :idAlmacen
+-            FOR UPDATE");
+-        foreach ($cantidadesPorProducto as $idProducto => $cantidad) {
+-            $productoStmt->execute(array('idProducto' => $idProducto));
+-            $productoActual = $productoStmt->fetch(PDO::FETCH_ASSOC);
+-            if (!$productoActual) {
+-                throw new InvalidArgumentException('Uno de los productos del traslado ya no está disponible.');
+-            }
+-
+-            $stockStmt->execute(array(
+-                'idAlmacen' => $idAlmacenOrigen,
+-                'idProducto' => $idProducto
+-            ));
+-            $stock = $stockStmt->fetch(PDO::FETCH_ASSOC);
+-            $disponible = $stock ? round((float) $stock['Stock'], 4) : 0;
+-            if ($cantidad > $disponible + 0.00009) {
+-                throw new InvalidArgumentException(
+-                    'Stock insuficiente de ' . $productoActual['Producto'] . ' en ' . $almacenOrigen['Almacen'] .
+-                    '. Disponible: ' . number_format($disponible, 2, '.', '') . '.'
+-                );
+-            }
+-        }
+-
+-        // Se mantiene numérico para instalaciones donde Hash aún es BIGINT.
+-        $hash = (string) time() . str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+-        $fechaReg = getNow();
+-        $insertMovimiento = $this->db->prepare("INSERT INTO Lo_Movimiento
+-            (IdMovimientoTipo, IdProveedor, Serie, Numero, MovimientoFecha,
+-             IdAlmacenOrigen, IdAlmacenDestino, Anulado, FechaReg, UsuarioReg,
+-             Hash, FechaStock, Percepcion, EsCredito, FechaVenCredito,
+-             FechaPeriodoTributario, TipoCambio, Moneda)
+-            VALUES
+-            (:idMovimientoTipo, :idProveedor, :serie, :numero, :movimientoFecha,
+-             :idAlmacenOrigen, :idAlmacenDestino, 0, :fechaReg, :usuarioReg,
+-             :hash, :fechaStock, 0, 0, NULL, :periodo, :tipoCambio, :moneda)");
+-        $insertMovimiento->execute(array(
+-            'idMovimientoTipo' => $idMovimientoTipo,
+-            'idProveedor' => $idProveedor,
+-            'serie' => $serie,
+-            'numero' => $numero,
+-            'movimientoFecha' => $fechaMovimiento,
+-            'idAlmacenOrigen' => $idAlmacenOrigen,
+-            'idAlmacenDestino' => $idAlmacenDestino,
+-            'fechaReg' => $fechaReg,
+-            'usuarioReg' => $usuarioReg,
+-            'hash' => $hash,
+-            'fechaStock' => $fechaStock,
+-            'periodo' => $periodo,
+-            'tipoCambio' => $tipoCambio,
+-            'moneda' => $moneda !== '' ? $moneda : 'PEN'
+-        ));
+-
+-        $insertDetalle = $this->db->prepare("INSERT INTO Lo_MovimientoDetalle
+-            (hashMovimiento, IdProducto, Cantidad, TieneIgv, Precio, IdLote)
+-            VALUES (:hash, :idProducto, :cantidad, :tieneIgv, :precio, :idLote)");
+-        foreach ($detalles as $detalle) {
+-            $insertDetalle->execute(array(
+-                'hash' => $hash,
+-                'idProducto' => $detalle['IdProducto'],
+-                'cantidad' => $detalle['Cantidad'],
+-                'tieneIgv' => $detalle['TieneIgv'],
+-                'precio' => $detalle['Precio'],
+-                'idLote' => $detalle['IdLote']
+-            ));
+-        }
+-
+-        $actualizarOrigen = $this->db->prepare("UPDATE Gen_Producto_Totales
+-            SET TotalCompras = COALESCE(TotalCompras, 0) - :cantidad
+-            WHERE IdProducto = :idProducto AND IdAlmacen = :idAlmacen");
+-        $buscarDestino = $this->db->prepare("SELECT 1 FROM Gen_Producto_Totales
+-            WHERE IdProducto = :idProducto AND IdAlmacen = :idAlmacen FOR UPDATE");
+-        $actualizarDestino = $this->db->prepare("UPDATE Gen_Producto_Totales
+-            SET TotalCompras = COALESCE(TotalCompras, 0) + :cantidad
+-            WHERE IdProducto = :idProducto AND IdAlmacen = :idAlmacen");
+-        $insertarDestino = $this->db->prepare("INSERT INTO Gen_Producto_Totales
+-            (IdAlmacen, IdProducto, TotalCompras, TotalVentas)
+-            VALUES (:idAlmacen, :idProducto, :cantidad, 0)");
+-
+-        foreach ($cantidadesPorProducto as $idProducto => $cantidad) {
+-            $actualizarOrigen->execute(array(
+-                'cantidad' => $cantidad,
+-                'idProducto' => $idProducto,
+-                'idAlmacen' => $idAlmacenOrigen
+-            ));
+-            if ($actualizarOrigen->rowCount() < 1) {
+-                throw new RuntimeException('No se pudo descontar el stock del almacén origen.');
+-            }
+-
+-            $buscarDestino->execute(array(
+-                'idProducto' => $idProducto,
+-                'idAlmacen' => $idAlmacenDestino
+-            ));
+-            if ($buscarDestino->fetchColumn()) {
+-                $actualizarDestino->execute(array(
+-                    'cantidad' => $cantidad,
+-                    'idProducto' => $idProducto,
+-                    'idAlmacen' => $idAlmacenDestino
+-                ));
+-            } else {
+-                $insertarDestino->execute(array(
+-                    'idAlmacen' => $idAlmacenDestino,
+-                    'idProducto' => $idProducto,
+-                    'cantidad' => $cantidad
+-                ));
+-            }
+-        }
+-
+-        $this->db->commit();
+-        return $response->withJson(array(
+-            'ok' => true,
+-            'hash' => $hash,
+-            'tipo' => $tipo['TipoMovimiento'],
+-            'almacenOrigen' => $almacenOrigen,
+-            'almacenDestino' => $almacenDestino,
+-            'productos' => count($cantidadesPorProducto)
+-        ));
+-    } catch (InvalidArgumentException $error) {
+-        if ($this->db->inTransaction()) {
+-            $this->db->rollBack();
+-        }
+-        return $response->withJson(array('error' => $error->getMessage()), 422);
+-    } catch (Throwable $error) {
+-        if ($this->db->inTransaction()) {
+-            $this->db->rollBack();
+-        }
+-        error_log('Traslado entre almacenes: ' . $error->getMessage());
+-        return $response->withJson(array(
+-            'error' => 'No se pudo registrar el traslado. El stock no fue modificado.'
+-        ), 500);
+-    }
++    require_once __DIR__ . '/guardar-movimiento.php';
++    return imcSaveMovement($this->db, $request, $response, true);
+ });
+ 
+ $app->post('/actualizarmovimientodet', function (Request $request, Response $response) {

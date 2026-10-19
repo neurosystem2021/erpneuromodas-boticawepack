@@ -2,6 +2,7 @@
   <div class="inventory-movement-page" :class="{ 'is-data-collapsed': datosOcultos }">
     <Menu v-if="false"></Menu>
     <b-form class="inventory-movement-form" @submit="guardarMovimiento" @reset="onReset" @keyup="afe" validated novalidate>
+      <b-alert v-if="errorGuardado" ref="errorGuardado" show variant="danger" role="alert">{{ errorGuardado }}</b-alert>
         <b-container class="inventory-shell" fluid>
           <div class="inventory-heading">
             <div class="inventory-heading__icon"><i class="fas fa-boxes"></i></div>
@@ -388,6 +389,7 @@ export default {
         ]
       },
       inProgress: false,
+      errorGuardado: "",
       datosOcultos: false,
       newRuc: "",
       API: config.API,
@@ -691,8 +693,19 @@ export default {
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
       return (bytes / (1024 * 1024)).toFixed(1) + " MB";
     },
+    avisarErrorMovimiento(mensaje, referencia) {
+      this.errorGuardado = mensaje + (referencia ? " Referencia: " + referencia + "." : "");
+      this.$toasted.show(this.errorGuardado, { duration: 12000 });
+      this.$nextTick(() => {
+        const alerta = this.$refs.errorGuardado;
+        const elemento = alerta && (alerta.$el || alerta);
+        if (elemento && elemento.scrollIntoView) elemento.scrollIntoView({ block: "center", behavior: "smooth" });
+      });
+    },
     async guardarMovimiento(evt) {
       evt.preventDefault();
+      if (this.inProgress) return;
+      this.errorGuardado = "";
       const faltantes = [];
       const tipo = this.movimiento.movimientoTipo || {};
       const proveedor = this.movimiento.proveedor || {};
@@ -711,28 +724,24 @@ export default {
 
       if (faltantes.length) {
         this.datosOcultos = false;
-        this.$toasted.show("No se puede guardar. Complete: " + faltantes.join(", ") + ".", { duration: 7000 });
+        this.avisarErrorMovimiento("No se puede guardar. Complete: " + faltantes.join(", ") + ".");
         return;
       }
 
       if (!this.productos.length) {
-        this.$toasted.show("No ha seleccionado ningun producto");
+        this.avisarErrorMovimiento("No ha seleccionado ningún producto.");
         return;
       }
 
-      if (Number(tipo.Tipo) === 2) {
-        const sinStock = this.productos.find(producto =>
-          Number(producto.cantidad || 0) > Number(producto.stock || 0)
-        );
-        if (sinStock) {
-          this.$toasted.show(
-            "Stock insuficiente en " + (this.movimiento.almacenOrigen.Almacen || "el almacén origen") +
-            " para " + (sinStock.Producto || "el producto seleccionado") + ".",
-            { duration: 7000 }
-          );
-          return;
-        }
+      const cantidadInvalida = this.productos.findIndex(producto =>
+        !Number.isFinite(Number(producto.cantidad)) || Number(producto.cantidad) <= 0
+      );
+      if (cantidadInvalida >= 0) {
+        this.avisarErrorMovimiento("Revise la cantidad del producto " + (cantidadInvalida + 1) + ": debe ser mayor a cero.");
+        return;
       }
+      // The server checks current origin stock at save time. A stale stock
+      // preview must not reject a valid transfer before that check.
 
       let faltaLlenar = false;
       this.productos.forEach((prod, index) => {
@@ -742,7 +751,7 @@ export default {
       });
 
       if (faltaLlenar && this.movimiento.alterarProductos) {
-        this.$toasted.show("Falta llenar cantidad / precio");
+        this.avisarErrorMovimiento("Falta completar cantidad o precio de los productos.");
         return;
       }
 
@@ -764,6 +773,7 @@ export default {
         ? `<div><span>Origen</span><strong>${escaparResumen(this.movimiento.almacenOrigen.Almacen || "-")}</strong></div>
            <div><span>Destino</span><strong>${escaparResumen(this.movimiento.almacenDestino.Almacen || "-")}</strong></div>`
         : "";
+      this.inProgress = true;
       const confirmacion = await this.$swal({
         icon: "question",
         title: "Confirmar movimiento",
@@ -796,6 +806,7 @@ export default {
       });
 
       if (!confirmacion.isConfirmed) {
+        this.inProgress = false;
         return;
       }
 
@@ -806,18 +817,18 @@ export default {
         FechaStock: this.$moment(this.movimiento.FechaStock).format("YYYY-MM-DD HH:mm:ss")
       });
 
-        // El endpoint general ya contiene la lógica de traslado usada por el
-        // sistema. Mantener una segunda implementación provocaba que se
-        // registrara la cabecera del movimiento y luego fallara el stock.
-        const endpoint = "movimientos";
-      this.axios
+      const endpoint = "movimientos";
+      return this.axios
         .post(this.API + endpoint, {
           movimiento: movimientoEnvio,
           productos: this.productos
         })
         .then(response => {
-          if (response.data.error) {
-            this.$toasted.show(response.data.error);
+          if (!response.data || !response.data.hash || response.data.error) {
+            this.avisarErrorMovimiento(
+              response.data && response.data.error || "El servidor no confirmó el registro. Revise si el documento se guardó antes de reintentar.",
+              response.data && response.data.reference
+            );
           } else {
             this.ultimoMovimiento = response.data.hash;
             this.movimiento = this.initMovimiento();
@@ -829,10 +840,11 @@ export default {
           this.inProgress = false;
         })
         .catch(error => {
-          const mensaje = error.response && error.response.data && error.response.data.error
-            ? error.response.data.error
-            : "Ha ocurrido un error, vuelva a intentarlo";
-          this.$toasted.show(mensaje, { duration: 7000 });
+          const respuesta = error.response && error.response.data;
+          const mensaje = respuesta && respuesta.error
+            ? respuesta.error
+            : "No se recibió confirmación del servidor. Sus datos siguen en pantalla; revise si el documento se guardó antes de reintentar.";
+          this.avisarErrorMovimiento(mensaje, respuesta && respuesta.reference);
           this.inProgress = false;
         });
     },

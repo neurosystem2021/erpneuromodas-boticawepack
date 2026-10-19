@@ -103,6 +103,7 @@
                 <div class="prod-name">
                   {{ prod.Producto }} - {{ prod.CodigoBarra }}
                 </div>
+                <div v-if="prod.Descripcion" class="prod-description">{{ prod.Descripcion }}</div>
               </td>
               <td class="center">{{ getPresentacion(prod) }}</td>
               <td class="center">{{ prod.ProductoCategoria }}</td>
@@ -631,6 +632,14 @@ function imprimirPantalla() {
   font-weight: 600;
   font-size: 13px;
   color: #222;
+}
+.prod-description {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 400;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .prod-pres {
