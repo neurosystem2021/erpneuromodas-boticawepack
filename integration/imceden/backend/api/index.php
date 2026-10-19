@@ -7728,34 +7728,29 @@ $app->post('/cierrecaja', function (Request $request, Response $response) {
         }
     }
 
-    $insert = "INSERT INTO Cb_CierreCaja (FechaCierre, IdTurno, UsuarioReg, Ingresos, Salidas, Ventas, Total, Descripcion)
-        VALUES ('$fechaCierre', '$idTurno', '$usuarioReg', $ingresos, $salidas, $totalVentas, $total, :descripcion)";
-    $stmt = $this->db->prepare($insert);
-    $inserted = $stmt->execute(array(':descripcion' => $descripcionCierre));
-    $idCierreCaja = $this->db->lastInsertId();
+    // Close the same pending movements shown in the report, including earlier
+    // dates, manual vouchers and bank references. Never delete their history.
+    try {
+        $this->db->beginTransaction();
+        $stmt = $this->db->prepare("INSERT INTO Cb_CierreCaja
+            (FechaCierre, IdTurno, UsuarioReg, Ingresos, Salidas, Ventas, Total, Descripcion)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$fechaCierre, $idTurno, $usuarioReg, $ingresos, $salidas, $totalVentas, $total, $descripcionCierre]);
+        $idCierreCaja = $this->db->lastInsertId();
 
-    // Actualizar DocVenta
-    $updateVenta = "UPDATE Ve_DocVenta SET IdCierre=$idCierreCaja WHERE IdCierre IS NULL
-        AND UsuarioReg='" . $usuarioReg . "'";
-    $stmt = $this->db->prepare($updateVenta);
-    $updatedVenta = $stmt->execute();
+        $stmt = $this->db->prepare("UPDATE Ve_DocVenta SET IdCierre=?
+            WHERE IdCierre IS NULL AND LOWER(UsuarioReg)=LOWER(?)");
+        $stmt->execute([$idCierreCaja, $usuarioReg]);
 
-    // Asociar al cierre todos los movimientos del vendedor permite conservar
-    // los bancarios como referencia historica. El calculo del efectivo los
-    // excluye mediante el filtro de CAJA PRINCIPAL de los endpoints del cierre.
-    $updateCajaBanco = "UPDATE Cb_CajaBanco SET IdCierre=$idCierreCaja WHERE IdCierre IS NULL
-        AND DATE(COALESCE(FechaReg, FechaDoc))=DATE('$fechaCierre')
-        AND EsDelVendedor=1 AND UsuarioReg='" . $usuarioReg . "'";
-    $stmt = $this->db->prepare($updateCajaBanco);
-    $updatedCajaBanco = $stmt->execute();
-
-
-    // $insert = "INSERT INTO 
-    //     Cb_CajaBanco (IdTipoCajaBanco, IdCuenta, FechaDoc, Concepto, Importe, Anulado,  EsDelVendedor,  UsuarioReg) 
-    //     VALUES (4, 1, '" . getNow() . "', 'Caja Inicial', $granTotal, 0,  1, '$usuarioReg')";
-
-    // $stmt = $this->db->prepare($insert);
-    // $inserted = $stmt->execute();
+        $stmt = $this->db->prepare("UPDATE Cb_CajaBanco SET IdCierre=?
+            WHERE IdCierre IS NULL AND LOWER(UsuarioReg)=LOWER(?)");
+        $stmt->execute([$idCierreCaja, $usuarioReg]);
+        $this->db->commit();
+    } catch (Throwable $error) {
+        if ($this->db->inTransaction()) $this->db->rollBack();
+        error_log('IMCEDEN cash closing failed: '.$error->getMessage());
+        return $response->withJson(array('error' => 'No se pudo completar el cierre. Los movimientos siguen pendientes; vuelve a intentarlo.'), 500);
+    }
 
     return $response->withJson(array(
         "idTurno" => $idTurno,
@@ -7901,16 +7896,7 @@ $app->get('/cierrecaja/ingresos', function (Request $request, Response $response
 
     if ($soloBancos) {
         $select .= " AND Cb_Cuenta.IdCuenta <> " . $idCuentaCajaPrincipal;
-        if ($idCierre > 0) {
-            $select .= " AND DATE(COALESCE(Cb_CajaBanco.FechaReg, Cb_CajaBanco.FechaDoc)) = (
-                SELECT DATE(Cb_CierreCaja.FechaCierre)
-                FROM Cb_CierreCaja
-                WHERE Cb_CierreCaja.IdCierreCaja = $idCierre
-                LIMIT 1
-            )";
-        } else {
-            $select .= " AND DATE(COALESCE(Cb_CajaBanco.FechaReg, Cb_CajaBanco.FechaDoc)) = CURDATE()";
-        }
+
     } else {
         $select .= " AND Cb_Cuenta.IdCuenta = " . $idCuenta;
     }
@@ -7962,16 +7948,7 @@ $app->get('/cierrecaja/salidas', function (Request $request, Response $response,
 
     if ($soloBancos) {
         $select .= " AND Cb_Cuenta.IdCuenta <> " . $idCuentaCajaPrincipal;
-        if ($idCierre > 0) {
-            $select .= " AND DATE(COALESCE(Cb_CajaBanco.FechaReg, Cb_CajaBanco.FechaDoc)) = (
-                SELECT DATE(Cb_CierreCaja.FechaCierre)
-                FROM Cb_CierreCaja
-                WHERE Cb_CierreCaja.IdCierreCaja = $idCierre
-                LIMIT 1
-            )";
-        } else {
-            $select .= " AND DATE(COALESCE(Cb_CajaBanco.FechaReg, Cb_CajaBanco.FechaDoc)) = CURDATE()";
-        }
+
     } else {
         $select .= " AND Cb_Cuenta.IdCuenta = " . $idCuenta;
     }
