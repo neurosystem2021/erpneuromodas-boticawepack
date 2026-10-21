@@ -1,0 +1,30 @@
+{
+    "models/DBManager.php": {
+        "before": "0bcec2a8b8d2ba3dab4f913464d04c40f4f5e924be6b3d003e872758d3e2fd1d",
+        "after": "ae3369afcf1eae94771ceb001dbccc58142ef86d83015cf234bbca087ea1b583"
+    },
+    "api/index.php": {
+        "before": "e2e1470c1f0191512b7e3b784aea987227c7c93d5d8d7b66ddbd2d4c35f6a796",
+        "after": "8b3c68397cf89cf9b3924ddc369cdadc1bdda7289482ce00effdf8e17513c76a"
+    },
+    "index.php": {
+        "before": "cdd3649dc76c3ce384d6337ed074fdccf05cbd910e29bc07cfb6cc00ef9587dc",
+        "after": "31539741318bd81a05fc2e248e896963462ebd0b2fe81cc4d9ec5ffa31fe6608"
+    },
+    "controllers/validarLogin.php": {
+        "before": "398380b437419ab0da7c18f614e6e521cbd38cd8e55f7fd87d3f74b513c5f16b",
+        "after": "fa817c47f0c6baea932a914c3e84e2f7b29d5f1df588e114beddd714e1014a7c"
+    },
+    "controllers/nst-login-auth.php": {
+        "before": null,
+        "after": "d9a75403e51d0b33abc64eb495835c7c69e84260283521395a3b2f92c3cae412"
+    },
+    "resources/js/nstarapaca-login.js": {
+        "before": null,
+        "after": "8d7f31f2d1675babf0a7d5253652d805065ad62e1c354643c3f263917c6c6475"
+    },
+    "config/database.php": {
+        "before": null,
+        "after": "5941906d45479ff2fd34600827cced4e0faddcadee2fabd8690dbcaffd615371"
+    }
+}

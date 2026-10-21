@@ -1,0 +1,1 @@
+<?php return ['dbname'=>'FIXTURE_ONLY'];

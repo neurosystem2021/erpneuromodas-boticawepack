@@ -1,0 +1,27 @@
+[
+  {
+    "route": "empresa/id/1",
+    "status": 200,
+    "rows": "object"
+  },
+  {
+    "route": "productos?q=&limit=5",
+    "status": 200,
+    "rows": 5
+  },
+  {
+    "route": "ventas/tipos?q=",
+    "status": 200,
+    "rows": 5
+  },
+  {
+    "route": "movimientos/tipos?q=",
+    "status": 200,
+    "rows": 6
+  },
+  {
+    "route": "almacenes/id/1",
+    "status": 200,
+    "rows": "object"
+  }
+]

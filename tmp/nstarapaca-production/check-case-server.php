@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$c=appDatabaseConfig();$c['port']=3307;$c['dbname']='information_schema';try{$db=new PDO(appDatabaseDsn($c),$c['user'],$c['pass'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);echo json_encode($db->query('SELECT @@lower_case_table_names AS case_mode,VERSION() AS version')->fetch(PDO::FETCH_ASSOC)).PHP_EOL;}catch(Exception $e){echo json_encode(['error'=>$e->getCode()]);}

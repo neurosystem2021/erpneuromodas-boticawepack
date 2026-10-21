@@ -1,0 +1,2518 @@
+[
+    {
+        "database": "nst",
+        "objects": [
+            [
+                "ag_caja",
+                "BASE TABLE"
+            ],
+            [
+                "ag_categoriaempresa",
+                "BASE TABLE"
+            ],
+            [
+                "ag_cierrecaja",
+                "BASE TABLE"
+            ],
+            [
+                "ag_comprobante",
+                "BASE TABLE"
+            ],
+            [
+                "ag_empresa",
+                "BASE TABLE"
+            ],
+            [
+                "ag_empresasentidad",
+                "BASE TABLE"
+            ],
+            [
+                "ag_entidad",
+                "BASE TABLE"
+            ],
+            [
+                "ag_operacion",
+                "BASE TABLE"
+            ],
+            [
+                "ag_servicio",
+                "BASE TABLE"
+            ],
+            [
+                "agen_conversacion",
+                "BASE TABLE"
+            ],
+            [
+                "agen_conversaciondetalle",
+                "BASE TABLE"
+            ],
+            [
+                "ali_posoperacion",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productoficha",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productofichahistorial",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productouso",
+                "BASE TABLE"
+            ],
+            [
+                "ali_tecnicocaso",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cajabancodet",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cierrecaja",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cuenta",
+                "BASE TABLE"
+            ],
+            [
+                "cb_letracaja",
+                "BASE TABLE"
+            ],
+            [
+                "cb_saldobanco",
+                "BASE TABLE"
+            ],
+            [
+                "cb_saldobancoauditoria",
+                "BASE TABLE"
+            ],
+            [
+                "cb_tipocajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "co_account",
+                "BASE TABLE"
+            ],
+            [
+                "co_asset",
+                "BASE TABLE"
+            ],
+            [
+                "co_audit",
+                "BASE TABLE"
+            ],
+            [
+                "co_bank",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankitem",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankmatch",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankstatement",
+                "BASE TABLE"
+            ],
+            [
+                "co_branch",
+                "BASE TABLE"
+            ],
+            [
+                "co_company",
+                "BASE TABLE"
+            ],
+            [
+                "co_entry",
+                "BASE TABLE"
+            ],
+            [
+                "co_externalregister",
+                "BASE TABLE"
+            ],
+            [
+                "co_line",
+                "BASE TABLE"
+            ],
+            [
+                "co_member",
+                "BASE TABLE"
+            ],
+            [
+                "co_period",
+                "BASE TABLE"
+            ],
+            [
+                "co_schemaversion",
+                "BASE TABLE"
+            ],
+            [
+                "co_source",
+                "BASE TABLE"
+            ],
+            [
+                "co_taxdocument",
+                "BASE TABLE"
+            ],
+            [
+                "crm_audit_log",
+                "BASE TABLE"
+            ],
+            [
+                "crm_bot_rule",
+                "BASE TABLE"
+            ],
+            [
+                "crm_campaign",
+                "BASE TABLE"
+            ],
+            [
+                "crm_campaign_recipient",
+                "BASE TABLE"
+            ],
+            [
+                "crm_channel_connection",
+                "BASE TABLE"
+            ],
+            [
+                "crm_consent",
+                "BASE TABLE"
+            ],
+            [
+                "crm_conversation",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer_event",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer_tag",
+                "BASE TABLE"
+            ],
+            [
+                "crm_interaction",
+                "BASE TABLE"
+            ],
+            [
+                "crm_loyalty_account",
+                "BASE TABLE"
+            ],
+            [
+                "crm_loyalty_ledger",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message_outbox",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message_template",
+                "BASE TABLE"
+            ],
+            [
+                "crm_segment",
+                "BASE TABLE"
+            ],
+            [
+                "crm_segment_member",
+                "BASE TABLE"
+            ],
+            [
+                "crm_setting",
+                "BASE TABLE"
+            ],
+            [
+                "crm_sync_run",
+                "BASE TABLE"
+            ],
+            [
+                "crm_tag",
+                "BASE TABLE"
+            ],
+            [
+                "crm_task",
+                "BASE TABLE"
+            ],
+            [
+                "cx_auditoria",
+                "BASE TABLE"
+            ],
+            [
+                "cx_configuracion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_especificacion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_grupo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_grupoempresa",
+                "BASE TABLE"
+            ],
+            [
+                "cx_idempotencia",
+                "BASE TABLE"
+            ],
+            [
+                "cx_miembro",
+                "BASE TABLE"
+            ],
+            [
+                "cx_migracion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_obra",
+                "BASE TABLE"
+            ],
+            [
+                "cx_pedido",
+                "BASE TABLE"
+            ],
+            [
+                "cx_pedidopartida",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuesta",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuestapartida",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuestaversion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_referenciaerp",
+                "BASE TABLE"
+            ],
+            [
+                "cx_serie",
+                "BASE TABLE"
+            ],
+            [
+                "gen_empresa",
+                "BASE TABLE"
+            ],
+            [
+                "gen_empresaconfig",
+                "BASE TABLE"
+            ],
+            [
+                "gen_impresora",
+                "BASE TABLE"
+            ],
+            [
+                "gen_moneda",
+                "BASE TABLE"
+            ],
+            [
+                "gen_oferta",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto_serie",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto_totales",
+                "VIEW"
+            ],
+            [
+                "gen_productobloque",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocategoria",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuesto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuestodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productoformafarmaceutica",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomarca",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomedicion",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomodelo",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productotalla",
+                "BASE TABLE"
+            ],
+            [
+                "lo_almacen",
+                "BASE TABLE"
+            ],
+            [
+                "lo_impuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimiento",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientoauditoria",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalle",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalleimpuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientotipo",
+                "BASE TABLE"
+            ],
+            [
+                "lo_ordencompra",
+                "BASE TABLE"
+            ],
+            [
+                "lo_ordencompradet",
+                "BASE TABLE"
+            ],
+            [
+                "lo_proveedor",
+                "BASE TABLE"
+            ],
+            [
+                "prodstock",
+                "BASE TABLE"
+            ],
+            [
+                "remision",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_comisionaplicacion",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioadjunto",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioatencion",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioevento",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariopersonal",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariopreferencia",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariotarea",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariovinculo",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_empleado",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillaboleta",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillapago",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillaperiodo",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillapersonal",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuario",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo_has_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "sunat_resumen",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardex",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardexvalor",
+                "BASE TABLE"
+            ],
+            [
+                "tienda_clientecuenta",
+                "BASE TABLE"
+            ],
+            [
+                "ve_contratonumero",
+                "BASE TABLE"
+            ],
+            [
+                "ve_contratoserie",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventacliente",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadescuento",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadetentrega",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventahistorialkit",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopago",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopagodet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventanotacredito",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventapuntoventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventapuntoventadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventaremision",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventaremisiondet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventatipodoc",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnostico",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnosticosintomadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertosintoma",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertotratamiento",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preorden",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preordendet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preordendetpago",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proforma",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformaadjunto",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformacontrato",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformaplantilla",
+                "BASE TABLE"
+            ]
+        ],
+        "counts": {
+            "Gen_Empresa": "3",
+            "Gen_Producto": "2848",
+            "Ve_DocVenta": "15"
+        },
+        "companies": [
+            {
+                "IDEMPRESA": "1",
+                "RAZONSOCIAL": "CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C.",
+                "RUC": "20573027125"
+            },
+            {
+                "IDEMPRESA": "2",
+                "RAZONSOCIAL": "CONCRETERA WUANUKO MIX EIRL.",
+                "RUC": "20573152531"
+            },
+            {
+                "IDEMPRESA": "3",
+                "RAZONSOCIAL": "CONCRETERA WUANUKO MIX FULL E.I.R.L.",
+                "RUC": "20602664989"
+            }
+        ],
+        "foreign_keys": [
+            {
+                "TABLE_NAME": "agen_conversaciondetalle",
+                "COLUMN_NAME": "IdConversacion",
+                "REFERENCED_TABLE_NAME": "agen_conversacion"
+            },
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdCuenta",
+                "REFERENCED_TABLE_NAME": "cb_cuenta"
+            },
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdTipoCajaBanco",
+                "REFERENCED_TABLE_NAME": "cb_tipocajabanco"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "ParentCode",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "BranchId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "ExpenseAccount",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "AccumulatedAccount",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_audit",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_bank",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_bank",
+                "COLUMN_NAME": "Account",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_bankitem",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankitem",
+                "COLUMN_NAME": "BankId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bankitem"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "BankItemId",
+                "REFERENCED_TABLE_NAME": "co_bankitem"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_line"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "LineId",
+                "REFERENCED_TABLE_NAME": "co_line"
+            },
+            {
+                "TABLE_NAME": "co_bankstatement",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankstatement",
+                "COLUMN_NAME": "BankId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_branch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "Period",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "BranchId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "ReversalOf",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_externalregister",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "Account",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_member",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_period",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_source",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_source",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "TaxPeriod",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "cx_auditoria",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_especificacion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_grupo",
+                "COLUMN_NAME": "IdEmpresaGestion",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_grupoempresa",
+                "COLUMN_NAME": "IdGrupo",
+                "REFERENCED_TABLE_NAME": "cx_grupo"
+            },
+            {
+                "TABLE_NAME": "cx_idempotencia",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_miembro",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_obra",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_pedido",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_pedido",
+                "COLUMN_NAME": "IdVersion",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdPedido",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestapartida"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdPartida",
+                "REFERENCED_TABLE_NAME": "cx_propuestapartida"
+            },
+            {
+                "TABLE_NAME": "cx_propuesta",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdVersion",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_especificacion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEspecificacion",
+                "REFERENCED_TABLE_NAME": "cx_especificacion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuesta"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdPropuesta",
+                "REFERENCED_TABLE_NAME": "cx_propuesta"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_obra"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdObra",
+                "REFERENCED_TABLE_NAME": "cx_obra"
+            },
+            {
+                "TABLE_NAME": "cx_referenciaerp",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_serie",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoCategoria",
+                "REFERENCED_TABLE_NAME": "gen_productocategoria"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoFormaFarmaceutica",
+                "REFERENCED_TABLE_NAME": "gen_productoformafarmaceutica"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMarca",
+                "REFERENCED_TABLE_NAME": "gen_productomarca"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMedicion",
+                "REFERENCED_TABLE_NAME": "gen_productomedicion"
+            }
+        ]
+    },
+    {
+        "database": "fact_nst",
+        "objects": [
+            [
+                "cb_cajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cajabancodet",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cuenta",
+                "BASE TABLE"
+            ],
+            [
+                "cb_tipocajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "gen_empresa",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productobloque",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocategoria",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuesto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuestodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productoformafarmaceutica",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomarca",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomedicion",
+                "BASE TABLE"
+            ],
+            [
+                "lo_almacen",
+                "BASE TABLE"
+            ],
+            [
+                "lo_impuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimiento",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalle",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalleimpuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientotipo",
+                "BASE TABLE"
+            ],
+            [
+                "lo_proveedor",
+                "BASE TABLE"
+            ],
+            [
+                "prodstock",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuario",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo_has_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardex",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardexvalor",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventacliente",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopago",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopagodet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventapuntoventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventatipodoc",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnostico",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnosticosintomadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertosintoma",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertotratamiento",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preorden",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preordendet",
+                "BASE TABLE"
+            ]
+        ],
+        "counts": {
+            "Gen_Empresa": {
+                "error": "42S22"
+            },
+            "Gen_Producto": "2391",
+            "Ve_DocVenta": "66"
+        },
+        "foreign_keys": [
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdCuenta",
+                "REFERENCED_TABLE_NAME": "cb_cuenta"
+            },
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdTipoCajaBanco",
+                "REFERENCED_TABLE_NAME": "cb_tipocajabanco"
+            },
+            {
+                "TABLE_NAME": "cb_cajabancodet",
+                "COLUMN_NAME": "IdCajaBanco",
+                "REFERENCED_TABLE_NAME": "cb_cajabanco"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoCategoria",
+                "REFERENCED_TABLE_NAME": "gen_productocategoria"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoFormaFarmaceutica",
+                "REFERENCED_TABLE_NAME": "gen_productoformafarmaceutica"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMarca",
+                "REFERENCED_TABLE_NAME": "gen_productomarca"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMedicion",
+                "REFERENCED_TABLE_NAME": "gen_productomedicion"
+            },
+            {
+                "TABLE_NAME": "gen_productocompuestodet",
+                "COLUMN_NAME": "Gen_Producto_IdProducto",
+                "REFERENCED_TABLE_NAME": "gen_producto"
+            },
+            {
+                "TABLE_NAME": "gen_productocompuestodet",
+                "COLUMN_NAME": "Gen_ProductoCompuesto_IdProductoCompuesto",
+                "REFERENCED_TABLE_NAME": "gen_productocompuesto"
+            },
+            {
+                "TABLE_NAME": "seg_usuario",
+                "COLUMN_NAME": "IdUsuarioPerfil",
+                "REFERENCED_TABLE_NAME": "seg_usuarioperfil"
+            },
+            {
+                "TABLE_NAME": "seg_usuariomodulo_has_usuarioperfil",
+                "COLUMN_NAME": "IdUsuarioModulo",
+                "REFERENCED_TABLE_NAME": "seg_usuariomodulo"
+            },
+            {
+                "TABLE_NAME": "seg_usuariomodulo_has_usuarioperfil",
+                "COLUMN_NAME": "IdUsuarioPerfil",
+                "REFERENCED_TABLE_NAME": "seg_usuarioperfil"
+            },
+            {
+                "TABLE_NAME": "ve_docventa",
+                "COLUMN_NAME": "IdAlmacen",
+                "REFERENCED_TABLE_NAME": "lo_almacen"
+            },
+            {
+                "TABLE_NAME": "ve_docventa",
+                "COLUMN_NAME": "IdCliente",
+                "REFERENCED_TABLE_NAME": "ve_docventacliente"
+            },
+            {
+                "TABLE_NAME": "ve_docventa",
+                "COLUMN_NAME": "IdDocVentaPuntoVenta",
+                "REFERENCED_TABLE_NAME": "ve_docventapuntoventa"
+            },
+            {
+                "TABLE_NAME": "ve_docventa",
+                "COLUMN_NAME": "IdTipoDoc",
+                "REFERENCED_TABLE_NAME": "ve_docventatipodoc"
+            },
+            {
+                "TABLE_NAME": "ve_docventadet",
+                "COLUMN_NAME": "IdProducto",
+                "REFERENCED_TABLE_NAME": "gen_producto"
+            },
+            {
+                "TABLE_NAME": "ve_docventadet",
+                "COLUMN_NAME": "IdDocVenta",
+                "REFERENCED_TABLE_NAME": "ve_docventa"
+            }
+        ]
+    },
+    {
+        "database": "fact_wuanukomix",
+        "objects": [
+            [
+                "ag_caja",
+                "BASE TABLE"
+            ],
+            [
+                "ag_categoriaempresa",
+                "BASE TABLE"
+            ],
+            [
+                "ag_cierrecaja",
+                "BASE TABLE"
+            ],
+            [
+                "ag_comprobante",
+                "BASE TABLE"
+            ],
+            [
+                "ag_empresa",
+                "BASE TABLE"
+            ],
+            [
+                "ag_empresasentidad",
+                "BASE TABLE"
+            ],
+            [
+                "ag_entidad",
+                "BASE TABLE"
+            ],
+            [
+                "ag_operacion",
+                "BASE TABLE"
+            ],
+            [
+                "ag_servicio",
+                "BASE TABLE"
+            ],
+            [
+                "agen_conversacion",
+                "BASE TABLE"
+            ],
+            [
+                "agen_conversaciondetalle",
+                "BASE TABLE"
+            ],
+            [
+                "ali_posoperacion",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productoficha",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productofichahistorial",
+                "BASE TABLE"
+            ],
+            [
+                "ali_productouso",
+                "BASE TABLE"
+            ],
+            [
+                "ali_tecnicocaso",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cajabancodet",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cierrecaja",
+                "BASE TABLE"
+            ],
+            [
+                "cb_cuenta",
+                "BASE TABLE"
+            ],
+            [
+                "cb_letracaja",
+                "BASE TABLE"
+            ],
+            [
+                "cb_saldobanco",
+                "BASE TABLE"
+            ],
+            [
+                "cb_saldobancoauditoria",
+                "BASE TABLE"
+            ],
+            [
+                "cb_tipocajabanco",
+                "BASE TABLE"
+            ],
+            [
+                "co_account",
+                "BASE TABLE"
+            ],
+            [
+                "co_asset",
+                "BASE TABLE"
+            ],
+            [
+                "co_audit",
+                "BASE TABLE"
+            ],
+            [
+                "co_bank",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankitem",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankmatch",
+                "BASE TABLE"
+            ],
+            [
+                "co_bankstatement",
+                "BASE TABLE"
+            ],
+            [
+                "co_branch",
+                "BASE TABLE"
+            ],
+            [
+                "co_company",
+                "BASE TABLE"
+            ],
+            [
+                "co_entry",
+                "BASE TABLE"
+            ],
+            [
+                "co_externalregister",
+                "BASE TABLE"
+            ],
+            [
+                "co_line",
+                "BASE TABLE"
+            ],
+            [
+                "co_member",
+                "BASE TABLE"
+            ],
+            [
+                "co_period",
+                "BASE TABLE"
+            ],
+            [
+                "co_schemaversion",
+                "BASE TABLE"
+            ],
+            [
+                "co_source",
+                "BASE TABLE"
+            ],
+            [
+                "co_taxdocument",
+                "BASE TABLE"
+            ],
+            [
+                "crm_audit_log",
+                "BASE TABLE"
+            ],
+            [
+                "crm_bot_rule",
+                "BASE TABLE"
+            ],
+            [
+                "crm_campaign",
+                "BASE TABLE"
+            ],
+            [
+                "crm_campaign_recipient",
+                "BASE TABLE"
+            ],
+            [
+                "crm_channel_connection",
+                "BASE TABLE"
+            ],
+            [
+                "crm_consent",
+                "BASE TABLE"
+            ],
+            [
+                "crm_conversation",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer_event",
+                "BASE TABLE"
+            ],
+            [
+                "crm_customer_tag",
+                "BASE TABLE"
+            ],
+            [
+                "crm_interaction",
+                "BASE TABLE"
+            ],
+            [
+                "crm_loyalty_account",
+                "BASE TABLE"
+            ],
+            [
+                "crm_loyalty_ledger",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message_outbox",
+                "BASE TABLE"
+            ],
+            [
+                "crm_message_template",
+                "BASE TABLE"
+            ],
+            [
+                "crm_segment",
+                "BASE TABLE"
+            ],
+            [
+                "crm_segment_member",
+                "BASE TABLE"
+            ],
+            [
+                "crm_setting",
+                "BASE TABLE"
+            ],
+            [
+                "crm_sync_run",
+                "BASE TABLE"
+            ],
+            [
+                "crm_tag",
+                "BASE TABLE"
+            ],
+            [
+                "crm_task",
+                "BASE TABLE"
+            ],
+            [
+                "cx_archivoerp",
+                "BASE TABLE"
+            ],
+            [
+                "cx_areausuario",
+                "BASE TABLE"
+            ],
+            [
+                "cx_auditoria",
+                "BASE TABLE"
+            ],
+            [
+                "cx_autorizacionagenda",
+                "BASE TABLE"
+            ],
+            [
+                "cx_cajaactual",
+                "VIEW"
+            ],
+            [
+                "cx_cargaprogramada",
+                "BASE TABLE"
+            ],
+            [
+                "cx_comprasactuales",
+                "VIEW"
+            ],
+            [
+                "cx_conductor",
+                "BASE TABLE"
+            ],
+            [
+                "cx_configuracion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_disenocomponente",
+                "BASE TABLE"
+            ],
+            [
+                "cx_disenoversion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_emisorconfig",
+                "BASE TABLE"
+            ],
+            [
+                "cx_equipo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_equipobloqueo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_especificacion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_grupo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_grupoempresa",
+                "BASE TABLE"
+            ],
+            [
+                "cx_idempotencia",
+                "BASE TABLE"
+            ],
+            [
+                "cx_material",
+                "BASE TABLE"
+            ],
+            [
+                "cx_miembro",
+                "BASE TABLE"
+            ],
+            [
+                "cx_migracion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_obra",
+                "BASE TABLE"
+            ],
+            [
+                "cx_ofertaproducto",
+                "BASE TABLE"
+            ],
+            [
+                "cx_ordenescompraactuales",
+                "VIEW"
+            ],
+            [
+                "cx_pedido",
+                "BASE TABLE"
+            ],
+            [
+                "cx_pedidopartida",
+                "BASE TABLE"
+            ],
+            [
+                "cx_plantaoperacion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_proformasactuales",
+                "VIEW"
+            ],
+            [
+                "cx_programacion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_programacionresponsable",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuesta",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuestapartida",
+                "BASE TABLE"
+            ],
+            [
+                "cx_propuestaversion",
+                "BASE TABLE"
+            ],
+            [
+                "cx_recepcioninsumo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_referenciaerp",
+                "BASE TABLE"
+            ],
+            [
+                "cx_reservainsumo",
+                "BASE TABLE"
+            ],
+            [
+                "cx_reservarecurso",
+                "BASE TABLE"
+            ],
+            [
+                "cx_serie",
+                "BASE TABLE"
+            ],
+            [
+                "cx_stockpolitica",
+                "BASE TABLE"
+            ],
+            [
+                "cx_ventasactuales",
+                "VIEW"
+            ],
+            [
+                "gen_empresa",
+                "BASE TABLE"
+            ],
+            [
+                "gen_empresaconfig",
+                "BASE TABLE"
+            ],
+            [
+                "gen_impresora",
+                "BASE TABLE"
+            ],
+            [
+                "gen_moneda",
+                "BASE TABLE"
+            ],
+            [
+                "gen_oferta",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto_serie",
+                "BASE TABLE"
+            ],
+            [
+                "gen_producto_totales",
+                "VIEW"
+            ],
+            [
+                "gen_productobloque",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocategoria",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuesto",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productocompuestodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productodet",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productoformafarmaceutica",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomarca",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomedicion",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productomodelo",
+                "BASE TABLE"
+            ],
+            [
+                "gen_productotalla",
+                "BASE TABLE"
+            ],
+            [
+                "lo_almacen",
+                "BASE TABLE"
+            ],
+            [
+                "lo_impuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimiento",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientoauditoria",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalle",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientodetalleimpuesto",
+                "BASE TABLE"
+            ],
+            [
+                "lo_movimientotipo",
+                "BASE TABLE"
+            ],
+            [
+                "lo_ordencompra",
+                "BASE TABLE"
+            ],
+            [
+                "lo_ordencompradet",
+                "BASE TABLE"
+            ],
+            [
+                "lo_proveedor",
+                "BASE TABLE"
+            ],
+            [
+                "prodstock",
+                "BASE TABLE"
+            ],
+            [
+                "remision",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_comisionaplicacion",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioadjunto",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioatencion",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diarioevento",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariopersonal",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariopreferencia",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariotarea",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_diariovinculo",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_empleado",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillaboleta",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillapago",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillaperiodo",
+                "BASE TABLE"
+            ],
+            [
+                "rhu_planillapersonal",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuario",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuariomodulo_has_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "seg_usuarioperfil",
+                "BASE TABLE"
+            ],
+            [
+                "sunat_resumen",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardex",
+                "BASE TABLE"
+            ],
+            [
+                "tblkardexvalor",
+                "BASE TABLE"
+            ],
+            [
+                "tienda_clientecuenta",
+                "BASE TABLE"
+            ],
+            [
+                "ve_contratonumero",
+                "BASE TABLE"
+            ],
+            [
+                "ve_contratoserie",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventacliente",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadescuento",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventadetentrega",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventahistorialkit",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopago",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventametodopagodet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventanotacredito",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventapuntoventa",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventapuntoventadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventaremision",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventaremisiondet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_docventatipodoc",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnostico",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertodiagnosticosintomadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertosintoma",
+                "BASE TABLE"
+            ],
+            [
+                "ve_expertotratamiento",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preorden",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preordendet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_preordendetpago",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proforma",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformaadjunto",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformacontrato",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformadet",
+                "BASE TABLE"
+            ],
+            [
+                "ve_proformaplantilla",
+                "BASE TABLE"
+            ]
+        ],
+        "counts": {
+            "Gen_Empresa": "3",
+            "Gen_Producto": "2854",
+            "Ve_DocVenta": "15"
+        },
+        "companies": [
+            {
+                "IDEMPRESA": "1",
+                "RAZONSOCIAL": "CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C.",
+                "RUC": "20573027125"
+            },
+            {
+                "IDEMPRESA": "2",
+                "RAZONSOCIAL": "CONCRETERA WUANUKO MIX EIRL.",
+                "RUC": "20573152531"
+            },
+            {
+                "IDEMPRESA": "3",
+                "RAZONSOCIAL": "CONCRETERA WUANUKO MIX FULL E.I.R.L.",
+                "RUC": "20602664989"
+            }
+        ],
+        "foreign_keys": [
+            {
+                "TABLE_NAME": "agen_conversaciondetalle",
+                "COLUMN_NAME": "IdConversacion",
+                "REFERENCED_TABLE_NAME": "agen_conversacion"
+            },
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdCuenta",
+                "REFERENCED_TABLE_NAME": "cb_cuenta"
+            },
+            {
+                "TABLE_NAME": "cb_cajabanco",
+                "COLUMN_NAME": "IdTipoCajaBanco",
+                "REFERENCED_TABLE_NAME": "cb_tipocajabanco"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_account",
+                "COLUMN_NAME": "ParentCode",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "BranchId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "ExpenseAccount",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_asset",
+                "COLUMN_NAME": "AccumulatedAccount",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_audit",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_bank",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_bank",
+                "COLUMN_NAME": "Account",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_bankitem",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankitem",
+                "COLUMN_NAME": "BankId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bankitem"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "BankItemId",
+                "REFERENCED_TABLE_NAME": "co_bankitem"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_line"
+            },
+            {
+                "TABLE_NAME": "co_bankmatch",
+                "COLUMN_NAME": "LineId",
+                "REFERENCED_TABLE_NAME": "co_line"
+            },
+            {
+                "TABLE_NAME": "co_bankstatement",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_bankstatement",
+                "COLUMN_NAME": "BankId",
+                "REFERENCED_TABLE_NAME": "co_bank"
+            },
+            {
+                "TABLE_NAME": "co_branch",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "Period",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "BranchId",
+                "REFERENCED_TABLE_NAME": "co_branch"
+            },
+            {
+                "TABLE_NAME": "co_entry",
+                "COLUMN_NAME": "ReversalOf",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_externalregister",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_line",
+                "COLUMN_NAME": "Account",
+                "REFERENCED_TABLE_NAME": "co_account"
+            },
+            {
+                "TABLE_NAME": "co_member",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_period",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_company"
+            },
+            {
+                "TABLE_NAME": "co_source",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_source",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "TaxPeriod",
+                "REFERENCED_TABLE_NAME": "co_period"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "CompanyId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "co_taxdocument",
+                "COLUMN_NAME": "EntryId",
+                "REFERENCED_TABLE_NAME": "co_entry"
+            },
+            {
+                "TABLE_NAME": "cx_archivoerp",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_auditoria",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_autorizacionagenda",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_autorizacionagenda",
+                "COLUMN_NAME": "IdPedido",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_cargaprogramada",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_cargaprogramada",
+                "COLUMN_NAME": "IdProgramacion",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_disenocomponente",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_disenoversion"
+            },
+            {
+                "TABLE_NAME": "cx_disenocomponente",
+                "COLUMN_NAME": "IdDisenoVersion",
+                "REFERENCED_TABLE_NAME": "cx_disenoversion"
+            },
+            {
+                "TABLE_NAME": "cx_disenocomponente",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_material"
+            },
+            {
+                "TABLE_NAME": "cx_disenocomponente",
+                "COLUMN_NAME": "IdProducto",
+                "REFERENCED_TABLE_NAME": "cx_material"
+            },
+            {
+                "TABLE_NAME": "cx_equipobloqueo",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_equipo"
+            },
+            {
+                "TABLE_NAME": "cx_equipobloqueo",
+                "COLUMN_NAME": "IdEquipo",
+                "REFERENCED_TABLE_NAME": "cx_equipo"
+            },
+            {
+                "TABLE_NAME": "cx_especificacion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_grupo",
+                "COLUMN_NAME": "IdEmpresaGestion",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_grupoempresa",
+                "COLUMN_NAME": "IdGrupo",
+                "REFERENCED_TABLE_NAME": "cx_grupo"
+            },
+            {
+                "TABLE_NAME": "cx_idempotencia",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_miembro",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_obra",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_ofertaproducto",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_pedido",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_pedido",
+                "COLUMN_NAME": "IdVersion",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdPedido",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestapartida"
+            },
+            {
+                "TABLE_NAME": "cx_pedidopartida",
+                "COLUMN_NAME": "IdPartida",
+                "REFERENCED_TABLE_NAME": "cx_propuestapartida"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdPedido",
+                "REFERENCED_TABLE_NAME": "cx_pedido"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_pedidopartida"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdPedidoPartida",
+                "REFERENCED_TABLE_NAME": "cx_pedidopartida"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_disenoversion"
+            },
+            {
+                "TABLE_NAME": "cx_programacion",
+                "COLUMN_NAME": "IdDisenoVersion",
+                "REFERENCED_TABLE_NAME": "cx_disenoversion"
+            },
+            {
+                "TABLE_NAME": "cx_programacionresponsable",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_programacionresponsable",
+                "COLUMN_NAME": "IdProgramacion",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_propuesta",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdVersion",
+                "REFERENCED_TABLE_NAME": "cx_propuestaversion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_especificacion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestapartida",
+                "COLUMN_NAME": "IdEspecificacion",
+                "REFERENCED_TABLE_NAME": "cx_especificacion"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_propuesta"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdPropuesta",
+                "REFERENCED_TABLE_NAME": "cx_propuesta"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_obra"
+            },
+            {
+                "TABLE_NAME": "cx_propuestaversion",
+                "COLUMN_NAME": "IdObra",
+                "REFERENCED_TABLE_NAME": "cx_obra"
+            },
+            {
+                "TABLE_NAME": "cx_referenciaerp",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_reservainsumo",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_reservainsumo",
+                "COLUMN_NAME": "IdProgramacion",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_reservarecurso",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_reservarecurso",
+                "COLUMN_NAME": "IdProgramacion",
+                "REFERENCED_TABLE_NAME": "cx_programacion"
+            },
+            {
+                "TABLE_NAME": "cx_serie",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_configuracion"
+            },
+            {
+                "TABLE_NAME": "cx_stockpolitica",
+                "COLUMN_NAME": "IdEmpresa",
+                "REFERENCED_TABLE_NAME": "cx_material"
+            },
+            {
+                "TABLE_NAME": "cx_stockpolitica",
+                "COLUMN_NAME": "IdProducto",
+                "REFERENCED_TABLE_NAME": "cx_material"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoCategoria",
+                "REFERENCED_TABLE_NAME": "gen_productocategoria"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoFormaFarmaceutica",
+                "REFERENCED_TABLE_NAME": "gen_productoformafarmaceutica"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMarca",
+                "REFERENCED_TABLE_NAME": "gen_productomarca"
+            },
+            {
+                "TABLE_NAME": "gen_producto",
+                "COLUMN_NAME": "IdProductoMedicion",
+                "REFERENCED_TABLE_NAME": "gen_productomedicion"
+            }
+        ]
+    }
+]

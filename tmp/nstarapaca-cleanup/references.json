@@ -1,0 +1,153 @@
+{
+    "modules": [
+        {
+            "IdUsuarioModulo": "31",
+            "UsuarioModulo": "Concretera.php"
+        }
+    ],
+    "company_columns": [
+        {
+            "TABLE_NAME": "ag_empresa",
+            "COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "ag_empresasentidad",
+            "COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "ali_posoperacion",
+            "COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "gen_empresaconfig",
+            "COLUMN_NAME": "IdEmpresa"
+        }
+    ],
+    "company_references": {
+        "ag_empresa": "2",
+        "ag_empresasentidad": "3",
+        "ali_posoperacion": "0",
+        "gen_empresaconfig": "0"
+    },
+    "product_matches": [],
+    "company_schema": [
+        {
+            "Field": "Id",
+            "Type": "bigint(20) unsigned",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "Name",
+            "Type": "varchar(200)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "Ruc",
+            "Type": "char(11)",
+            "Null": "NO",
+            "Key": "UNI",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "Currency",
+            "Type": "char(3)",
+            "Null": "NO",
+            "Key": "",
+            "Default": "PEN",
+            "Extra": ""
+        },
+        {
+            "Field": "Regime",
+            "Type": "varchar(30)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "Obligation",
+            "Type": "varchar(12)",
+            "Null": "NO",
+            "Key": "",
+            "Default": "none",
+            "Extra": ""
+        },
+        {
+            "Field": "Config",
+            "Type": "longtext",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "Active",
+            "Type": "tinyint(4)",
+            "Null": "NO",
+            "Key": "",
+            "Default": "1",
+            "Extra": ""
+        },
+        {
+            "Field": "Version",
+            "Type": "int(11)",
+            "Null": "NO",
+            "Key": "",
+            "Default": "1",
+            "Extra": ""
+        }
+    ],
+    "config_keys": [
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "logo_gris"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "dominio"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "certificado"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "clave_certificado"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "usuario_sol"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "clave_sol"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "sunat_entorno"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "exonerado_igv"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "whatsapp_ventas"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "menu_usuarios_json"
+        },
+        {
+            "IdEmpresa": "1",
+            "MetaKey": "menu_planes_json"
+        }
+    ]
+}

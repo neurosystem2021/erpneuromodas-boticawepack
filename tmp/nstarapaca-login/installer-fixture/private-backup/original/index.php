@@ -1,0 +1,1 @@
+<html><body><script>function acceder(event) { event.preventDefault(); }</script></body></html>

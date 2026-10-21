@@ -1,0 +1,1 @@
+<?php require 'C:/xampp/htdocs/boticav1/config/database.php';$c=require 'C:/xampp/support-private/runtime.php';echo json_encode(['database'=>$c['database'],'local_installation'=>$c['local_installation'],'local_company'=>$c['local_company']]);

@@ -1,0 +1,2 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$rows=$db->query('SELECT t.IdProducto,t.IdAlmacen,t.TotalCompras-t.TotalVentas AS Cantidad,p.PrecioCosto,(SELECT COUNT(*) FROM Gen_ProductoDet d WHERE d.IdProducto=t.IdProducto) AS Componentes FROM Gen_Producto_Totales t JOIN Gen_Producto p ON p.IdProducto=t.IdProducto WHERE t.TotalCompras-t.TotalVentas<>0')->fetchAll();echo json_encode($rows).PHP_EOL;

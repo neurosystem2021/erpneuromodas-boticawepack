@@ -1,0 +1,72 @@
+{
+    "cash_links": [
+        {
+            "IdCajaBanco": "1",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "2",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "3",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "4",
+            "IdPreOrden": "176",
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "5",
+            "IdPreOrden": "174",
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "6",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "7",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        },
+        {
+            "IdCajaBanco": "8",
+            "IdPreOrden": null,
+            "Detalles": "0",
+            "Tipos": null
+        }
+    ],
+    "stock": {
+        "Filas": "8544",
+        "ConExistencia": "2",
+        "Negativos": "0"
+    },
+    "serial_states": [
+        {
+            "Estado": "1",
+            "Filas": "482",
+            "VentaRelacionada": "0",
+            "CompraRelacionada": "473"
+        },
+        {
+            "Estado": "3",
+            "Filas": "36",
+            "VentaRelacionada": "36",
+            "CompraRelacionada": "36"
+        }
+    ],
+    "product_order_links": "286"
+}

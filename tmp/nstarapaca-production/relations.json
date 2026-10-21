@@ -1,0 +1,809 @@
+{
+    "columns": {
+        "Gen_Producto_Serie": [
+            {
+                "Field": "IdProductoSerie",
+                "Type": "bigint(20)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": "auto_increment"
+            },
+            {
+                "Field": "IdProducto",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "IdDocVenta",
+                "Type": "int(11)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "IdMovimiento",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Serie",
+                "Type": "varchar(255)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Estado",
+                "Type": "smallint(6)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaReg",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": "current_timestamp()",
+                "Extra": ""
+            },
+            {
+                "Field": "UsuarioReg",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaMod",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": "current_timestamp()",
+                "Extra": "on update current_timestamp()"
+            },
+            {
+                "Field": "UsuarioMod",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Ali_PosOperacion": [
+            {
+                "Field": "Operacion",
+                "Type": "char(36)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Usuario",
+                "Type": "varchar(100)",
+                "Null": "NO",
+                "Key": "MUL",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "IdEmpresa",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "",
+                "Default": "1",
+                "Extra": ""
+            },
+            {
+                "Field": "IdAlmacen",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "PayloadHash",
+                "Type": "char(64)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Payload",
+                "Type": "longtext",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Resumen",
+                "Type": "longtext",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Estado",
+                "Type": "varchar(20)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "IdDocVenta",
+                "Type": "int(11)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Resultado",
+                "Type": "text",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "CreadoEn",
+                "Type": "datetime",
+                "Null": "NO",
+                "Key": "",
+                "Default": "current_timestamp()",
+                "Extra": ""
+            },
+            {
+                "Field": "Expira",
+                "Type": "datetime",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "ConfirmadoPor",
+                "Type": "varchar(100)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "ConfirmadoEn",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Ali_ProductoUso": [
+            {
+                "Field": "product_id",
+                "Type": "bigint(20) unsigned",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "used_for",
+                "Type": "text",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "revision",
+                "Type": "int(10) unsigned",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "saved_by",
+                "Type": "varchar(100)",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "saved_at",
+                "Type": "datetime",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Ve_ExpertoDiagnostico": [
+            {
+                "Field": "IdDiagnostico",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": "auto_increment"
+            },
+            {
+                "Field": "Diagnostico",
+                "Type": "varchar(255)",
+                "Null": "NO",
+                "Key": "UNI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Problema",
+                "Type": "text",
+                "Null": "NO",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Edad",
+                "Type": "int(11)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Observacion",
+                "Type": "text",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaReg",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "UsuarioReg",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaMod",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "UsuarioMod",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Hash",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Ve_DocVentaCliente": [
+            {
+                "Field": "IdCliente",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": "auto_increment"
+            },
+            {
+                "Field": "Cliente",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "UNI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "DniRuc",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "UNI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Direccion",
+                "Type": "longtext",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Telefono",
+                "Type": "longtext",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Email",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Anulado",
+                "Type": "int(11)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaReg",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "UsuarioReg",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaMod",
+                "Type": "datetime",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "UsuarioMod",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Puntos",
+                "Type": "float",
+                "Null": "YES",
+                "Key": "",
+                "Default": "0",
+                "Extra": ""
+            },
+            {
+                "Field": "EsVIP",
+                "Type": "tinyint(1)",
+                "Null": "YES",
+                "Key": "",
+                "Default": "0",
+                "Extra": ""
+            },
+            {
+                "Field": "Direccion2",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Sexo",
+                "Type": "varchar(1)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Ocupacion",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "FechaNacimiento",
+                "Type": "date",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Nacionalidad",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Direccion3",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "NombreComercial",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "esComisionista",
+                "Type": "int(11)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Ve_DocVentaPuntoVentaDet": [
+            {
+                "Field": "IdDocVentaPuntoVenta",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "IdDocVentaTipoDoc",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Serie",
+                "Type": "varchar(45)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            }
+        ],
+        "Cb_Cuenta": [
+            {
+                "Field": "IdCuenta",
+                "Type": "int(11)",
+                "Null": "NO",
+                "Key": "PRI",
+                "Default": null,
+                "Extra": "auto_increment"
+            },
+            {
+                "Field": "Cuenta",
+                "Type": "varchar(255)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "Anulado",
+                "Type": "bit(1)",
+                "Null": "YES",
+                "Key": "",
+                "Default": null,
+                "Extra": ""
+            },
+            {
+                "Field": "EsTarjeta",
+                "Type": "tinyint(4)",
+                "Null": "YES",
+                "Key": "",
+                "Default": "1",
+                "Extra": ""
+            }
+        ]
+    },
+    "cash_detail_types": [
+        {
+            "Tipo": "VE",
+            "Filas": "10"
+        }
+    ],
+    "cash_references": [
+        {
+            "IdCajaBanco": "1",
+            "IdPreOrden": null,
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "2",
+            "IdPreOrden": null,
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "3",
+            "IdPreOrden": null,
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "4",
+            "IdPreOrden": "176",
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "5",
+            "IdPreOrden": "174",
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "6",
+            "IdPreOrden": null,
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "7",
+            "IdPreOrden": null,
+            "IdCierre": null
+        },
+        {
+            "IdCajaBanco": "8",
+            "IdPreOrden": null,
+            "IdCierre": null
+        }
+    ],
+    "stock_view": "CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `gen_producto_totales` AS select `p`.`IdProducto` AS `IdProducto`,`a`.`IdAlmacen` AS `IdAlmacen`,coalesce(sum(`x`.`TotalCompras`),0) AS `TotalCompras`,coalesce(sum(`x`.`TotalVentas`),0) AS `TotalVentas` from ((`gen_producto` `p` join `lo_almacen` `a`) left join (select `d`.`IdProducto` AS `IdProducto`,`m`.`IdAlmacenDestino` AS `IdAlmacen`,`d`.`Cantidad` AS `TotalCompras`,0 AS `TotalVentas` from ((`lo_movimiento` `m` join `lo_movimientodetalle` `d` on(`d`.`hashMovimiento` = `m`.`Hash`)) join `lo_movimientotipo` `mt` on(`mt`.`IdMovimientoTipo` = `m`.`IdMovimientoTipo`)) where `m`.`Anulado` = 0 and `mt`.`VaRegCompra` = 1 and `m`.`MovimientoFecha` <= current_timestamp() union all select `d`.`IdProducto` AS `IdProducto`,`m`.`IdAlmacenOrigen` AS `IdAlmacenOrigen`,0 AS `0`,case when `mt`.`CodSunat` = '07' and coalesce(`m`.`NotaIdMotivo`,'') not in ('01','02','06','07') then 0 else `d`.`Cantidad` end from ((`lo_movimiento` `m` join `lo_movimientodetalle` `d` on(`d`.`hashMovimiento` = `m`.`Hash`)) join `lo_movimientotipo` `mt` on(`mt`.`IdMovimientoTipo` = `m`.`IdMovimientoTipo`)) where `m`.`Anulado` = 0 and `mt`.`VaRegCompra` = 1 and `m`.`MovimientoFecha` <= current_timestamp() union all select `d`.`IdProducto` AS `IdProducto`,`v`.`IdAlmacen` AS `IdAlmacen`,0 AS `0`,case when `td`.`CodSunat` = '07' then case when `v`.`NotaIdMotivo` in ('01','02','06','07') then -`d`.`Cantidad` else 0 end else `d`.`Cantidad` end from ((`ve_docventa` `v` join `ve_docventadet` `d` on(`d`.`IdDocVenta` = `v`.`idDocVenta`)) join `ve_docventatipodoc` `td` on(`td`.`IdTipoDoc` = `v`.`IdTipoDoc`)) where `v`.`Anulado` = 0 and `td`.`VaRegVenta` = 1 and `v`.`FechaDoc` <= current_timestamp() union all select `pd`.`IdProductoDet` AS `IdProducto`,`m`.`IdAlmacenDestino` AS `IdAlmacen`,`d`.`Cantidad` * `pd`.`Cantidad` AS `TotalCompras`,0 AS `TotalVentas` from (((`lo_movimiento` `m` join `lo_movimientodetalle` `d` on(`d`.`hashMovimiento` = `m`.`Hash`)) join `lo_movimientotipo` `mt` on(`mt`.`IdMovimientoTipo` = `m`.`IdMovimientoTipo`)) join `gen_productodet` `pd` on(`pd`.`IdProducto` = `d`.`IdProducto`)) where `m`.`Anulado` = 0 and `mt`.`VaRegCompra` = 1 and `m`.`MovimientoFecha` <= current_timestamp() union all select `pd`.`IdProductoDet` AS `IdProductoDet`,`m`.`IdAlmacenOrigen` AS `IdAlmacenOrigen`,0 AS `0`,case when `mt`.`CodSunat` = '07' and coalesce(`m`.`NotaIdMotivo`,'') not in ('01','02','06','07') then 0 else `d`.`Cantidad` * `pd`.`Cantidad` end from (((`lo_movimiento` `m` join `lo_movimientodetalle` `d` on(`d`.`hashMovimiento` = `m`.`Hash`)) join `lo_movimientotipo` `mt` on(`mt`.`IdMovimientoTipo` = `m`.`IdMovimientoTipo`)) join `gen_productodet` `pd` on(`pd`.`IdProducto` = `d`.`IdProducto`)) where `m`.`Anulado` = 0 and `mt`.`VaRegCompra` = 1 and `m`.`MovimientoFecha` <= current_timestamp() union all select `pd`.`IdProductoDet` AS `IdProductoDet`,`v`.`IdAlmacen` AS `IdAlmacen`,0 AS `0`,case when `td`.`CodSunat` = '07' then case when `v`.`NotaIdMotivo` in ('01','02','06','07') then -(`d`.`Cantidad` * `pd`.`Cantidad`) else 0 end else `d`.`Cantidad` * `pd`.`Cantidad` end from (((`ve_docventa` `v` join `ve_docventadet` `d` on(`d`.`IdDocVenta` = `v`.`idDocVenta`)) join `ve_docventatipodoc` `td` on(`td`.`IdTipoDoc` = `v`.`IdTipoDoc`)) join `gen_productodet` `pd` on(`pd`.`IdProducto` = `d`.`IdProducto`)) where `v`.`Anulado` = 0 and `td`.`VaRegVenta` = 1 and `v`.`FechaDoc` <= current_timestamp()) `x` on(`x`.`IdProducto` = `p`.`IdProducto` and `x`.`IdAlmacen` = `a`.`IdAlmacen`)) group by `p`.`IdProducto`,`a`.`IdAlmacen`",
+    "columns_references": [
+        {
+            "TABLE_NAME": "ag_caja",
+            "COLUMN_NAME": "IdCierre"
+        },
+        {
+            "TABLE_NAME": "ag_cierrecaja",
+            "COLUMN_NAME": "IdCierreCaja"
+        },
+        {
+            "TABLE_NAME": "ag_comprobante",
+            "COLUMN_NAME": "IdCierre"
+        },
+        {
+            "TABLE_NAME": "ali_posoperacion",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "cb_cajabanco",
+            "COLUMN_NAME": "IdCierre"
+        },
+        {
+            "TABLE_NAME": "cb_cajabanco",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "cb_cierrecaja",
+            "COLUMN_NAME": "IdCierreCaja"
+        },
+        {
+            "TABLE_NAME": "gen_producto",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "gen_producto_serie",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "lo_movimiento",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "lo_movimientoauditoria",
+            "COLUMN_NAME": "HashMovimiento"
+        },
+        {
+            "TABLE_NAME": "lo_movimientodetalle",
+            "COLUMN_NAME": "hashMovimiento"
+        },
+        {
+            "TABLE_NAME": "lo_movimientodetalleimpuesto",
+            "COLUMN_NAME": "HashMovimientoDetalle"
+        },
+        {
+            "TABLE_NAME": "lo_ordencompra",
+            "COLUMN_NAME": "IdOrdenCompra"
+        },
+        {
+            "TABLE_NAME": "lo_ordencompradet",
+            "COLUMN_NAME": "IdOrdenCompra"
+        },
+        {
+            "TABLE_NAME": "rhu_comisionaplicacion",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "seg_usuario",
+            "COLUMN_NAME": "IdDocVentaPuntoVenta"
+        },
+        {
+            "TABLE_NAME": "ve_contratonumero",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_docventa",
+            "COLUMN_NAME": "idDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventa",
+            "COLUMN_NAME": "IdDocVentaPuntoVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventa",
+            "COLUMN_NAME": "IdCierre"
+        },
+        {
+            "TABLE_NAME": "ve_docventa",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "ve_docventa",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_docventadescuento",
+            "COLUMN_NAME": "IdDocVentaDescuento"
+        },
+        {
+            "TABLE_NAME": "ve_docventadet",
+            "COLUMN_NAME": "IdDocVentaDet"
+        },
+        {
+            "TABLE_NAME": "ve_docventadet",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventadetentrega",
+            "COLUMN_NAME": "IdDocVentaDetEntrega"
+        },
+        {
+            "TABLE_NAME": "ve_docventadetentrega",
+            "COLUMN_NAME": "IdDocVentaDet"
+        },
+        {
+            "TABLE_NAME": "ve_docventahistorialkit",
+            "COLUMN_NAME": "IdDocVentaHistorialKit"
+        },
+        {
+            "TABLE_NAME": "ve_docventahistorialkit",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventametodopagodet",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventanotacredito",
+            "COLUMN_NAME": "IdDocVentaNotaCredito"
+        },
+        {
+            "TABLE_NAME": "ve_docventanotacredito",
+            "COLUMN_NAME": "idDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventapuntoventa",
+            "COLUMN_NAME": "IdDocVentaPuntoVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventapuntoventadet",
+            "COLUMN_NAME": "IdDocVentaPuntoVenta"
+        },
+        {
+            "TABLE_NAME": "ve_docventapuntoventadet",
+            "COLUMN_NAME": "IdDocVentaTipoDoc"
+        },
+        {
+            "TABLE_NAME": "ve_docventaremision",
+            "COLUMN_NAME": "IdDocVentaRemision"
+        },
+        {
+            "TABLE_NAME": "ve_docventaremisiondet",
+            "COLUMN_NAME": "IdDocVentaRemisionDet"
+        },
+        {
+            "TABLE_NAME": "ve_docventaremisiondet",
+            "COLUMN_NAME": "IdDocVentaRemision"
+        },
+        {
+            "TABLE_NAME": "ve_preorden",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "ve_preorden",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_preorden",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_preordendet",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "ve_preordendetpago",
+            "COLUMN_NAME": "IdPreOrdenDetPago"
+        },
+        {
+            "TABLE_NAME": "ve_preordendetpago",
+            "COLUMN_NAME": "IdPreOrden"
+        },
+        {
+            "TABLE_NAME": "ve_proforma",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_proforma",
+            "COLUMN_NAME": "IdDocVenta"
+        },
+        {
+            "TABLE_NAME": "ve_proformaadjunto",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_proformacontrato",
+            "COLUMN_NAME": "IdProforma"
+        },
+        {
+            "TABLE_NAME": "ve_proformadet",
+            "COLUMN_NAME": "IdProformaDet"
+        },
+        {
+            "TABLE_NAME": "ve_proformadet",
+            "COLUMN_NAME": "IdProforma"
+        }
+    ]
+}

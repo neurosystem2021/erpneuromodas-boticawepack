@@ -1,0 +1,7 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();$cfg=appDatabaseConfig();if($cfg['dbname']!=='nst')throw new RuntimeException('Expected nst');$out=['database'=>$cfg['dbname'],'port'=>$cfg['port'],'objects'=>[]];
+foreach($db->query('SHOW FULL TABLES')->fetchAll(PDO::FETCH_NUM) as $r){$t=$r[0];$count=$db->query('SELECT COUNT(*) FROM `'.$t.'`')->fetchColumn();$out['objects'][$t]=['type'=>$r[1],'rows'=>$count];if(preg_match('/^(ve_|lo_|cb_|ag_c|gen_producto_totales|prodstock|tblkardex|co_|sunat_)/i',$t))$out['objects'][$t]['columns']=$db->query('SHOW COLUMNS FROM `'.$t.'`')->fetchAll();}
+$out['fks']=$db->query("SELECT TABLE_NAME,COLUMN_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL")->fetchAll();
+$out['types']=$db->query('SELECT IdMovimientoTipo,TipoMovimiento,Tipo,VaRegCompra+0 AS VaRegCompra FROM Lo_MovimientoTipo')->fetchAll();
+$out['movements']=$db->query('SELECT IdMovimientoTipo,COUNT(*) AS rows_count FROM Lo_Movimiento GROUP BY IdMovimientoTipo')->fetchAll();
+file_put_contents(__DIR__.'/inventory.json',json_encode($out,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));echo json_encode(['database'=>$out['database'],'objects'=>count($out['objects']),'counts'=>array_map(function($r){return $r['rows'];},$out['objects']),'movement_types'=>$out['types'],'movements'=>$out['movements']],JSON_UNESCAPED_UNICODE).PHP_EOL;

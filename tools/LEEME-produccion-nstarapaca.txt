@@ -1,0 +1,77 @@
+NSTARAPACA - BASE PARA PRODUCCION SIN OPERACIONES COMERCIALES
+
+ARCHIVO A IMPORTAR
+fact_nstarapaca.sql
+
+CONTENIDO
+- 142 tablas y vistas, sin tablas de Concretera.
+- Nombres originales respetando mayusculas y minusculas: GEN_EMPRESA,
+  Gen_Producto, Ve_DocVenta, Lo_Movimiento, Co_Company, etc.
+- 2.848 productos, con sus atributos y precios conservados.
+- 4.275 clientes, 207 proveedores, 17 usuarios, perfiles y permisos.
+- Configuracion de empresa, almacenes, puntos de venta y demas catalogos.
+- Existencias iniciales: CERO. Las series de inventario quedan vacias.
+
+DATOS RETIRADOS SOLO DE LA COPIA
+- Compras y sus detalles, impuestos, auditoria y ordenes de compra.
+- Ventas, detalles, pagos, notas de credito y guias asociadas.
+- Preordenes y sus pagos, proformas, adjuntos y contratos relacionados.
+- Cierres de caja y registros auxiliares de kardex/stock.
+- Referencias del producto a preordenes antiguas.
+- Pagos de caja/banco vinculados a documentos retirados.
+
+Se conservan seis movimientos independientes de caja/banco y dos saldos
+iniciales bancarios: no forman parte de las ventas/compras retiradas ni
+son cierres de caja. Los catalogos de cuentas bancarias tambien se conservan.
+Se conservan los modulos y registros independientes no solicitados para
+limpieza, como contabilidad, agenda y personal.
+La base local nst no fue modificada por esta exportacion.
+
+INSTALACION
+Este SQL es de instalacion completa, NO de actualizacion. Contiene DROP/CREATE.
+Importarlo unicamente en una base nueva VACIA, nunca sobre produccion con datos.
+El respaldo completo original no se incluye en este paquete limpio.
+
+1. Subir el ZIP a una carpeta privada del servidor, fuera del directorio web.
+2. Descomprimir y comprobar los archivos:
+     sha256sum -c SHA256SUMS.txt
+3. Crear una base VACIA con el nombre autorizado por el hosting. Ejemplo:
+     CREATE DATABASE fact_nstarapaca CHARACTER SET utf8mb4
+       COLLATE utf8mb4_general_ci;
+4. Importar indicando sus credenciales reales:
+     mysql --default-character-set=utf8mb4 -u USUARIO -p fact_nstarapaca < fact_nstarapaca.sql
+5. Configurar la conexion privada del ERP con el nombre real de esa base.
+   No copiar la conexion local de XAMPP ni sus credenciales de administrador.
+
+MAYUSCULAS Y MINUSCULAS EN LINUX
+No convertir todos los nombres a mayusculas o minusculas. nombres-tablas.json
+contiene el caso exacto de cada objeto usado por este SQL.
+
+La revision del codigo local encontro 46 referencias de tablas con un caso
+diferente en siete archivos PHP. Windows permite esas diferencias; Linux puede
+rechazarlas. Antes de activar el sitio, revisar referencias-php-a-revisar.csv.
+El normalizador incluido solo corrige esas referencias y no cambia credenciales.
+Ejecutar primero SIN --apply para revisar, apuntando al codigo de nstarapaca:
+     php normalizar-consultas-migracion.php --root=/ruta/real/del/ERP
+
+Despues de revisar la salida, aplicarlo con un respaldo privado nuevo:
+     php normalizar-consultas-migracion.php --root=/ruta/real/del/ERP --apply --backup=/ruta/privada/respaldo-caso-nstarapaca
+
+El SQL no instala el codigo, logos, adjuntos ni certificados. Usar el codigo
+actual de la rama nstarapaca y configurar en el servidor los archivos y datos
+reales de facturacion electronica, series, impresoras y servicios externos.
+La base independiente del centro de soporte no esta incluida en este ZIP.
+
+VERIFICACION
+restauracion-verificada.json contiene la evidencia de restauracion y comparacion:
+- 37 tablas de operaciones vacias, stock cero y ningun objeto de Concretera.
+- Todos los datos y columnas restaurados coinciden con la copia preparada.
+- Se comprobaron todos los atributos y precios de productos contra el respaldo.
+- Los nombres de tablas base se restauraron con su caso exacto en MariaDB,
+  lower_case_table_names=2. En Windows esa modalidad convierte el nombre de
+  la vista a minusculas; el SQL mantiene Gen_Producto_Totales correctamente.
+- La ejecucion completa en Linux debe comprobarse antes de dirigir trafico:
+  Windows no reproduce la exigencia de caso de las consultas de Linux.
+
+Conservar el paquete en almacenamiento privado: contiene datos de clientes,
+usuarios y configuracion de la empresa.

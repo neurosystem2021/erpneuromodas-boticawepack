@@ -1,0 +1,544 @@
+{
+    "concretera": {
+        "cx_auditoria": {
+            "rows": "4",
+            "ddl": "CREATE TABLE `cx_auditoria` (\n  `IdAuditoria` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `Entidad` varchar(30) NOT NULL,\n  `IdEntidad` bigint(20) NOT NULL,\n  `Accion` varchar(30) NOT NULL,\n  `Usuario` varchar(100) NOT NULL,\n  `Fecha` datetime NOT NULL,\n  `Motivo` text NOT NULL,\n  `Antes` longtext DEFAULT NULL,\n  `Despues` longtext NOT NULL,\n  PRIMARY KEY (`IdAuditoria`),\n  KEY `IX_Cx_AuditEmpresa` (`IdEmpresa`,`Fecha`,`IdAuditoria`),\n  CONSTRAINT `cx_auditoria_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_configuracion": {
+            "rows": "1",
+            "ddl": "CREATE TABLE `cx_configuracion` (\n  `IdEmpresa` int(11) NOT NULL,\n  `Activo` tinyint(4) NOT NULL DEFAULT 0,\n  `Modo` varchar(12) NOT NULL DEFAULT 'PRUEBA',\n  `Version` int(11) NOT NULL DEFAULT 1,\n  `UsuarioMod` varchar(100) NOT NULL,\n  `FechaMod` datetime NOT NULL,\n  PRIMARY KEY (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_especificacion": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_especificacion` (\n  `IdEspecificacion` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdProducto` int(11) NOT NULL,\n  `Codigo` varchar(50) NOT NULL,\n  `Nombre` varchar(180) NOT NULL,\n  `Resistencia` decimal(12,4) NOT NULL,\n  `UnidadResistencia` varchar(12) NOT NULL,\n  `EdadDias` int(11) NOT NULL,\n  `SlumpMin` decimal(12,4) NOT NULL,\n  `SlumpMax` decimal(12,4) NOT NULL,\n  `UnidadSlump` varchar(8) NOT NULL,\n  `TamanoAgregado` decimal(12,4) NOT NULL,\n  `UnidadAgregado` varchar(8) NOT NULL,\n  `Descarga` varchar(15) NOT NULL,\n  `Observaciones` text NOT NULL,\n  `Version` int(11) NOT NULL DEFAULT 1,\n  `Activo` tinyint(4) NOT NULL DEFAULT 1,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  PRIMARY KEY (`IdEspecificacion`),\n  UNIQUE KEY `UX_Cx_EspecificacionEmpresa` (`IdEmpresa`,`IdEspecificacion`),\n  UNIQUE KEY `UX_Cx_EspecificacionCodigo` (`IdEmpresa`,`Codigo`),\n  CONSTRAINT `cx_especificacion_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_grupo": {
+            "rows": "1",
+            "ddl": "CREATE TABLE `cx_grupo` (\n  `IdGrupo` bigint(20) NOT NULL AUTO_INCREMENT,\n  `Codigo` varchar(50) NOT NULL,\n  `Nombre` varchar(180) NOT NULL,\n  `IdEmpresaGestion` int(11) NOT NULL,\n  `LogoPath` varchar(200) NOT NULL DEFAULT '',\n  `Activo` tinyint(4) NOT NULL DEFAULT 1,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  PRIMARY KEY (`IdGrupo`),\n  UNIQUE KEY `Codigo` (`Codigo`),\n  UNIQUE KEY `IdEmpresaGestion` (`IdEmpresaGestion`),\n  CONSTRAINT `cx_grupo_ibfk_1` FOREIGN KEY (`IdEmpresaGestion`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_grupoempresa": {
+            "rows": "2",
+            "ddl": "CREATE TABLE `cx_grupoempresa` (\n  `IdGrupo` bigint(20) NOT NULL,\n  `IdEmpresa` int(11) NOT NULL,\n  `Activo` tinyint(4) NOT NULL DEFAULT 1,\n  `DireccionFiscal` text DEFAULT NULL,\n  `Telefono` varchar(100) DEFAULT NULL,\n  `Correo` varchar(255) DEFAULT NULL,\n  `TasaImpuestoPct` decimal(7,4) DEFAULT NULL,\n  `Revision` int(11) NOT NULL DEFAULT 1,\n  `UsuarioMod` varchar(100) NOT NULL,\n  `FechaMod` datetime NOT NULL,\n  PRIMARY KEY (`IdGrupo`,`IdEmpresa`),\n  UNIQUE KEY `IdEmpresa` (`IdEmpresa`),\n  CONSTRAINT `cx_grupoempresa_ibfk_1` FOREIGN KEY (`IdGrupo`) REFERENCES `cx_grupo` (`IdGrupo`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_idempotencia": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_idempotencia` (\n  `IdEmpresa` int(11) NOT NULL,\n  `Accion` varchar(30) NOT NULL,\n  `Clave` varchar(100) NOT NULL,\n  `Huella` char(64) NOT NULL,\n  `Resultado` longtext NOT NULL,\n  `Fecha` datetime NOT NULL,\n  PRIMARY KEY (`IdEmpresa`,`Accion`,`Clave`),\n  CONSTRAINT `cx_idempotencia_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_miembro": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_miembro` (\n  `IdEmpresa` int(11) NOT NULL,\n  `Usuario` varchar(100) NOT NULL,\n  `Rol` varchar(25) NOT NULL,\n  `DescuentoMaxPct` decimal(7,4) NOT NULL DEFAULT 0.0000,\n  `Activo` tinyint(4) NOT NULL DEFAULT 1,\n  `UsuarioMod` varchar(100) NOT NULL,\n  `FechaMod` datetime NOT NULL,\n  PRIMARY KEY (`IdEmpresa`,`Usuario`),\n  CONSTRAINT `cx_miembro_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_migracion": {
+            "rows": "2",
+            "ddl": "CREATE TABLE `cx_migracion` (\n  `Version` varchar(40) NOT NULL,\n  `Sha256` char(64) NOT NULL,\n  `Fecha` datetime NOT NULL,\n  PRIMARY KEY (`Version`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_obra": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_obra` (\n  `IdObra` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdCliente` int(11) NOT NULL,\n  `Codigo` varchar(50) NOT NULL,\n  `Nombre` varchar(180) NOT NULL,\n  `Direccion` text NOT NULL,\n  `Distrito` varchar(100) NOT NULL,\n  `Provincia` varchar(100) NOT NULL,\n  `Departamento` varchar(100) NOT NULL,\n  `Ubigeo` varchar(6) DEFAULT NULL,\n  `Referencia` text NOT NULL,\n  `Contacto` varchar(180) NOT NULL,\n  `Telefono` varchar(40) NOT NULL,\n  `Accesos` text NOT NULL,\n  `VentanaAtencion` varchar(180) NOT NULL,\n  `Ubicacion` varchar(250) NOT NULL,\n  `Version` int(11) NOT NULL DEFAULT 1,\n  `Activo` tinyint(4) NOT NULL DEFAULT 1,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  `UsuarioMod` varchar(100) NOT NULL,\n  `FechaMod` datetime NOT NULL,\n  PRIMARY KEY (`IdObra`),\n  UNIQUE KEY `UX_Cx_ObraEmpresa` (`IdEmpresa`,`IdObra`),\n  UNIQUE KEY `UX_Cx_ObraCodigo` (`IdEmpresa`,`Codigo`),\n  CONSTRAINT `cx_obra_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_pedido": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_pedido` (\n  `IdPedido` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdVersion` bigint(20) NOT NULL,\n  `IdPreOrden` int(11) NOT NULL,\n  `Anio` int(11) NOT NULL,\n  `Numero` bigint(20) NOT NULL,\n  `Estado` varchar(15) NOT NULL DEFAULT 'ABIERTO',\n  `Aceptante` varchar(180) NOT NULL,\n  `FechaAceptacion` datetime NOT NULL,\n  `Evidencia` text NOT NULL,\n  `Condiciones` longtext NOT NULL,\n  `Pago` longtext NOT NULL,\n  `Instantanea` longtext NOT NULL,\n  `Moneda` char(3) NOT NULL,\n  `Base` decimal(18,2) NOT NULL,\n  `Impuesto` decimal(18,2) NOT NULL,\n  `Total` decimal(18,2) NOT NULL,\n  `EsPrueba` tinyint(4) NOT NULL,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  `IdEmpresaEmisora` int(11) DEFAULT NULL,\n  PRIMARY KEY (`IdPedido`),\n  UNIQUE KEY `UX_Cx_PedidoEmpresa` (`IdEmpresa`,`IdPedido`),\n  UNIQUE KEY `UX_Cx_PedidoVersion` (`IdVersion`),\n  UNIQUE KEY `UX_Cx_PedidoERP` (`IdPreOrden`),\n  UNIQUE KEY `UX_Cx_PedidoNumero` (`IdEmpresa`,`Anio`,`Numero`),\n  KEY `IdEmpresa` (`IdEmpresa`,`IdVersion`),\n  KEY `IX_Cx_PedidoEmisor` (`IdEmpresa`,`IdEmpresaEmisora`),\n  CONSTRAINT `cx_pedido_ibfk_1` FOREIGN KEY (`IdEmpresa`, `IdVersion`) REFERENCES `cx_propuestaversion` (`IdEmpresa`, `IdVersion`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_pedidopartida": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_pedidopartida` (\n  `IdPedidoPartida` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdPedido` bigint(20) NOT NULL,\n  `IdPartida` bigint(20) NOT NULL,\n  `IdProducto` int(11) NOT NULL,\n  `Tipo` varchar(12) NOT NULL,\n  `Unidad` varchar(8) NOT NULL,\n  `CantidadContratada` decimal(18,4) NOT NULL,\n  `CantidadPrecio` decimal(18,4) NOT NULL,\n  `PrecioUnitario` decimal(18,6) NOT NULL,\n  `DescuentoPct` decimal(7,4) NOT NULL,\n  `Incluido` tinyint(4) NOT NULL,\n  `Base` decimal(18,2) NOT NULL,\n  `Impuesto` decimal(18,2) NOT NULL,\n  `Total` decimal(18,2) NOT NULL,\n  `Instantanea` longtext NOT NULL,\n  PRIMARY KEY (`IdPedidoPartida`),\n  UNIQUE KEY `UX_Cx_PedidoPartidaEmpresa` (`IdEmpresa`,`IdPedidoPartida`),\n  UNIQUE KEY `UX_Cx_PedidoPartida` (`IdPedido`,`IdPartida`),\n  KEY `IdEmpresa` (`IdEmpresa`,`IdPedido`),\n  KEY `IdEmpresa_2` (`IdEmpresa`,`IdPartida`),\n  CONSTRAINT `cx_pedidopartida_ibfk_1` FOREIGN KEY (`IdEmpresa`, `IdPedido`) REFERENCES `cx_pedido` (`IdEmpresa`, `IdPedido`),\n  CONSTRAINT `cx_pedidopartida_ibfk_2` FOREIGN KEY (`IdEmpresa`, `IdPartida`) REFERENCES `cx_propuestapartida` (`IdEmpresa`, `IdPartida`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_propuesta": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_propuesta` (\n  `IdPropuesta` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `Anio` int(11) NOT NULL,\n  `Numero` bigint(20) NOT NULL,\n  `VersionActual` int(11) NOT NULL DEFAULT 1,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  PRIMARY KEY (`IdPropuesta`),\n  UNIQUE KEY `UX_Cx_PropuestaEmpresa` (`IdEmpresa`,`IdPropuesta`),\n  UNIQUE KEY `UX_Cx_PropuestaNumero` (`IdEmpresa`,`Anio`,`Numero`),\n  CONSTRAINT `cx_propuesta_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_propuestapartida": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_propuestapartida` (\n  `IdPartida` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdVersion` bigint(20) NOT NULL,\n  `Posicion` int(11) NOT NULL,\n  `IdProducto` int(11) NOT NULL,\n  `IdEspecificacion` bigint(20) DEFAULT NULL,\n  `Tipo` varchar(12) NOT NULL,\n  `Servicio` varchar(15) DEFAULT NULL,\n  `Descripcion` text NOT NULL,\n  `Unidad` varchar(8) NOT NULL,\n  `Cantidad` decimal(18,4) DEFAULT NULL,\n  `PrecioUnitario` decimal(18,6) NOT NULL,\n  `DescuentoPct` decimal(7,4) NOT NULL DEFAULT 0.0000,\n  `Minimo` decimal(18,4) NOT NULL DEFAULT 0.0000,\n  `Incluido` tinyint(4) NOT NULL DEFAULT 0,\n  `Instantanea` longtext NOT NULL,\n  PRIMARY KEY (`IdPartida`),\n  UNIQUE KEY `UX_Cx_PartidaEmpresa` (`IdEmpresa`,`IdPartida`),\n  UNIQUE KEY `UX_Cx_PartidaVersion` (`IdVersion`,`Posicion`),\n  KEY `IdEmpresa` (`IdEmpresa`,`IdVersion`),\n  KEY `IdEmpresa_2` (`IdEmpresa`,`IdEspecificacion`),\n  CONSTRAINT `cx_propuestapartida_ibfk_1` FOREIGN KEY (`IdEmpresa`, `IdVersion`) REFERENCES `cx_propuestaversion` (`IdEmpresa`, `IdVersion`),\n  CONSTRAINT `cx_propuestapartida_ibfk_2` FOREIGN KEY (`IdEmpresa`, `IdEspecificacion`) REFERENCES `cx_especificacion` (`IdEmpresa`, `IdEspecificacion`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_propuestaversion": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_propuestaversion` (\n  `IdVersion` bigint(20) NOT NULL AUTO_INCREMENT,\n  `IdEmpresa` int(11) NOT NULL,\n  `IdPropuesta` bigint(20) NOT NULL,\n  `Version` int(11) NOT NULL,\n  `IdProforma` int(11) NOT NULL,\n  `IdObra` bigint(20) NOT NULL,\n  `IdCliente` int(11) NOT NULL,\n  `IdAlmacen` int(11) NOT NULL,\n  `Tipo` varchar(15) NOT NULL,\n  `Estado` varchar(15) NOT NULL DEFAULT 'BORRADOR',\n  `Moneda` char(3) NOT NULL,\n  `FechaEmision` date NOT NULL,\n  `VigenteHasta` date NOT NULL,\n  `CondicionImpuesto` varchar(12) NOT NULL,\n  `TasaImpuesto` decimal(7,4) NOT NULL,\n  `PreciosIncluyenImpuesto` tinyint(4) NOT NULL DEFAULT 0,\n  `Condiciones` longtext NOT NULL,\n  `Pago` longtext NOT NULL,\n  `Instantanea` longtext NOT NULL,\n  `Base` decimal(18,2) DEFAULT NULL,\n  `Impuesto` decimal(18,2) DEFAULT NULL,\n  `Total` decimal(18,2) DEFAULT NULL,\n  `Huella` char(64) NOT NULL,\n  `Motivo` text NOT NULL,\n  `EsPrueba` tinyint(4) NOT NULL DEFAULT 1,\n  `Revision` int(11) NOT NULL DEFAULT 1,\n  `UsuarioReg` varchar(100) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  `IdEmpresaEmisora` int(11) DEFAULT NULL,\n  PRIMARY KEY (`IdVersion`),\n  UNIQUE KEY `UX_Cx_VersionEmpresa` (`IdEmpresa`,`IdVersion`),\n  UNIQUE KEY `UX_Cx_Version` (`IdPropuesta`,`Version`),\n  UNIQUE KEY `UX_Cx_VersionERP` (`IdProforma`),\n  KEY `IX_Cx_PropuestaEstado` (`IdEmpresa`,`Estado`,`FechaEmision`),\n  KEY `IdEmpresa` (`IdEmpresa`,`IdPropuesta`),\n  KEY `IdEmpresa_2` (`IdEmpresa`,`IdObra`),\n  KEY `IX_Cx_PropuestaEmisor` (`IdEmpresa`,`IdEmpresaEmisora`),\n  CONSTRAINT `cx_propuestaversion_ibfk_1` FOREIGN KEY (`IdEmpresa`, `IdPropuesta`) REFERENCES `cx_propuesta` (`IdEmpresa`, `IdPropuesta`),\n  CONSTRAINT `cx_propuestaversion_ibfk_2` FOREIGN KEY (`IdEmpresa`, `IdObra`) REFERENCES `cx_obra` (`IdEmpresa`, `IdObra`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_referenciaerp": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_referenciaerp` (\n  `IdEmpresa` int(11) NOT NULL,\n  `Entidad` varchar(15) NOT NULL,\n  `IdERP` bigint(20) NOT NULL,\n  `FechaReg` datetime NOT NULL,\n  `UsuarioReg` varchar(100) NOT NULL,\n  PRIMARY KEY (`IdEmpresa`,`Entidad`,`IdERP`),\n  UNIQUE KEY `UX_Cx_Referencia` (`Entidad`,`IdERP`),\n  CONSTRAINT `cx_referenciaerp_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        },
+        "cx_serie": {
+            "rows": "0",
+            "ddl": "CREATE TABLE `cx_serie` (\n  `IdEmpresa` int(11) NOT NULL,\n  `Tipo` varchar(12) NOT NULL,\n  `Anio` int(11) NOT NULL,\n  `Ultimo` bigint(20) NOT NULL DEFAULT 0,\n  PRIMARY KEY (`IdEmpresa`,`Tipo`,`Anio`),\n  CONSTRAINT `cx_serie_ibfk_1` FOREIGN KEY (`IdEmpresa`) REFERENCES `cx_configuracion` (`IdEmpresa`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
+        }
+    },
+    "config_columns": [
+        {
+            "Field": "IdEmpresaConfig",
+            "Type": "int(11)",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "IdEmpresa",
+            "Type": "int(11)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "MetaKey",
+            "Type": "varchar(255)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "MetaValue",
+            "Type": "longtext",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "concrete_config": [],
+    "module_columns": [
+        {
+            "Field": "IdUsuarioModulo",
+            "Type": "int(11)",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "UsuarioModulo",
+            "Type": "varchar(255)",
+            "Null": "YES",
+            "Key": "UNI",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "company_fks": [
+        {
+            "TABLE_NAME": "agen_conversaciondetalle",
+            "COLUMN_NAME": "IdConversacion",
+            "REFERENCED_TABLE_NAME": "agen_conversacion",
+            "REFERENCED_COLUMN_NAME": "IdConversacion"
+        },
+        {
+            "TABLE_NAME": "cb_cajabanco",
+            "COLUMN_NAME": "IdCuenta",
+            "REFERENCED_TABLE_NAME": "cb_cuenta",
+            "REFERENCED_COLUMN_NAME": "IdCuenta"
+        },
+        {
+            "TABLE_NAME": "cb_cajabanco",
+            "COLUMN_NAME": "IdTipoCajaBanco",
+            "REFERENCED_TABLE_NAME": "cb_tipocajabanco",
+            "REFERENCED_COLUMN_NAME": "IdTipoCajaBanco"
+        },
+        {
+            "TABLE_NAME": "co_account",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_account",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_account",
+            "COLUMN_NAME": "ParentCode",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "Code"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_branch",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "BranchId",
+            "REFERENCED_TABLE_NAME": "co_branch",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "ExpenseAccount",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "Code"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_asset",
+            "COLUMN_NAME": "AccumulatedAccount",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "Code"
+        },
+        {
+            "TABLE_NAME": "co_audit",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_bank",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_bank",
+            "COLUMN_NAME": "Account",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "Code"
+        },
+        {
+            "TABLE_NAME": "co_bankitem",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_bank",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_bankitem",
+            "COLUMN_NAME": "BankId",
+            "REFERENCED_TABLE_NAME": "co_bank",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_bankmatch",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_bankitem",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_bankmatch",
+            "COLUMN_NAME": "BankItemId",
+            "REFERENCED_TABLE_NAME": "co_bankitem",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_bankmatch",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_line",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_bankmatch",
+            "COLUMN_NAME": "LineId",
+            "REFERENCED_TABLE_NAME": "co_line",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_bankstatement",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_bank",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_bankstatement",
+            "COLUMN_NAME": "BankId",
+            "REFERENCED_TABLE_NAME": "co_bank",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_branch",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_entry",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_period",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_entry",
+            "COLUMN_NAME": "Period",
+            "REFERENCED_TABLE_NAME": "co_period",
+            "REFERENCED_COLUMN_NAME": "Period"
+        },
+        {
+            "TABLE_NAME": "co_entry",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_branch",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_entry",
+            "COLUMN_NAME": "BranchId",
+            "REFERENCED_TABLE_NAME": "co_branch",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_entry",
+            "COLUMN_NAME": "ReversalOf",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_externalregister",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_line",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_line",
+            "COLUMN_NAME": "EntryId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_line",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_line",
+            "COLUMN_NAME": "Account",
+            "REFERENCED_TABLE_NAME": "co_account",
+            "REFERENCED_COLUMN_NAME": "Code"
+        },
+        {
+            "TABLE_NAME": "co_member",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_period",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_company",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_source",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_source",
+            "COLUMN_NAME": "EntryId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "co_taxdocument",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_period",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_taxdocument",
+            "COLUMN_NAME": "TaxPeriod",
+            "REFERENCED_TABLE_NAME": "co_period",
+            "REFERENCED_COLUMN_NAME": "Period"
+        },
+        {
+            "TABLE_NAME": "co_taxdocument",
+            "COLUMN_NAME": "CompanyId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "CompanyId"
+        },
+        {
+            "TABLE_NAME": "co_taxdocument",
+            "COLUMN_NAME": "EntryId",
+            "REFERENCED_TABLE_NAME": "co_entry",
+            "REFERENCED_COLUMN_NAME": "Id"
+        },
+        {
+            "TABLE_NAME": "cx_auditoria",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_especificacion",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_grupo",
+            "COLUMN_NAME": "IdEmpresaGestion",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_grupoempresa",
+            "COLUMN_NAME": "IdGrupo",
+            "REFERENCED_TABLE_NAME": "cx_grupo",
+            "REFERENCED_COLUMN_NAME": "IdGrupo"
+        },
+        {
+            "TABLE_NAME": "cx_idempotencia",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_miembro",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_obra",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_pedido",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_propuestaversion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_pedido",
+            "COLUMN_NAME": "IdVersion",
+            "REFERENCED_TABLE_NAME": "cx_propuestaversion",
+            "REFERENCED_COLUMN_NAME": "IdVersion"
+        },
+        {
+            "TABLE_NAME": "cx_pedidopartida",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_pedido",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_pedidopartida",
+            "COLUMN_NAME": "IdPedido",
+            "REFERENCED_TABLE_NAME": "cx_pedido",
+            "REFERENCED_COLUMN_NAME": "IdPedido"
+        },
+        {
+            "TABLE_NAME": "cx_pedidopartida",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_propuestapartida",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_pedidopartida",
+            "COLUMN_NAME": "IdPartida",
+            "REFERENCED_TABLE_NAME": "cx_propuestapartida",
+            "REFERENCED_COLUMN_NAME": "IdPartida"
+        },
+        {
+            "TABLE_NAME": "cx_propuesta",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_propuestapartida",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_propuestaversion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_propuestapartida",
+            "COLUMN_NAME": "IdVersion",
+            "REFERENCED_TABLE_NAME": "cx_propuestaversion",
+            "REFERENCED_COLUMN_NAME": "IdVersion"
+        },
+        {
+            "TABLE_NAME": "cx_propuestapartida",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_especificacion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_propuestapartida",
+            "COLUMN_NAME": "IdEspecificacion",
+            "REFERENCED_TABLE_NAME": "cx_especificacion",
+            "REFERENCED_COLUMN_NAME": "IdEspecificacion"
+        },
+        {
+            "TABLE_NAME": "cx_propuestaversion",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_propuesta",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_propuestaversion",
+            "COLUMN_NAME": "IdPropuesta",
+            "REFERENCED_TABLE_NAME": "cx_propuesta",
+            "REFERENCED_COLUMN_NAME": "IdPropuesta"
+        },
+        {
+            "TABLE_NAME": "cx_propuestaversion",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_obra",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_propuestaversion",
+            "COLUMN_NAME": "IdObra",
+            "REFERENCED_TABLE_NAME": "cx_obra",
+            "REFERENCED_COLUMN_NAME": "IdObra"
+        },
+        {
+            "TABLE_NAME": "cx_referenciaerp",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "cx_serie",
+            "COLUMN_NAME": "IdEmpresa",
+            "REFERENCED_TABLE_NAME": "cx_configuracion",
+            "REFERENCED_COLUMN_NAME": "IdEmpresa"
+        },
+        {
+            "TABLE_NAME": "gen_producto",
+            "COLUMN_NAME": "IdProductoCategoria",
+            "REFERENCED_TABLE_NAME": "gen_productocategoria",
+            "REFERENCED_COLUMN_NAME": "IdProductoCategoria"
+        },
+        {
+            "TABLE_NAME": "gen_producto",
+            "COLUMN_NAME": "IdProductoFormaFarmaceutica",
+            "REFERENCED_TABLE_NAME": "gen_productoformafarmaceutica",
+            "REFERENCED_COLUMN_NAME": "IdProductoFormaFarmaceutica"
+        },
+        {
+            "TABLE_NAME": "gen_producto",
+            "COLUMN_NAME": "IdProductoMarca",
+            "REFERENCED_TABLE_NAME": "gen_productomarca",
+            "REFERENCED_COLUMN_NAME": "IdProductoMarca"
+        },
+        {
+            "TABLE_NAME": "gen_producto",
+            "COLUMN_NAME": "IdProductoMedicion",
+            "REFERENCED_TABLE_NAME": "gen_productomedicion",
+            "REFERENCED_COLUMN_NAME": "IdProductoMedicion"
+        }
+    ],
+    "triggers": []
+}

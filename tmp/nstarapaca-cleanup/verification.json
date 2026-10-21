@@ -1,0 +1,22 @@
+{
+    "active_database": "nst",
+    "objects": 142,
+    "concrete_tables": "0",
+    "companies": [
+        {
+            "IDEMPRESA": "1",
+            "RAZONSOCIAL": "CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C.",
+            "RUC": "20573027125"
+        }
+    ],
+    "concrete_permissions": "0",
+    "counts": {
+        "Gen_Producto": "2848",
+        "Ve_DocVenta": "15",
+        "Lo_Movimiento": "3",
+        "Ve_Proforma": "25",
+        "Lo_OrdenCompra": "5",
+        "Cb_CajaBanco": "8",
+        "Co_Entry": "0"
+    }
+}
