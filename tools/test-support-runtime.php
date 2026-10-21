@@ -25,7 +25,7 @@ CREATE TABLE Seg_Usuario(Usuario VARCHAR(100) PRIMARY KEY,NombreUsuario VARCHAR(
     copy('C:/xampp/htdocs/boticav1/config/database.php',$fixture.'/config/database.php');
     $connection['dbname']=$erp;
     file_put_contents($fixture.'/config/database.local.php','<?php return '.var_export($connection,true).';');chmod($fixture.'/config/database.local.php',0600);
-    foreach(['support-runtime.php','support-api.php','support-service.php','support-activity.php'] as $file)copy(__DIR__.'/../integration/helpdesk/'.$file,$fixture.'/api/'.$file);
+    foreach(['support-runtime.php','support-api.php','support-service.php','support-activity.php','support-report.php','support-performance.php','support-satisfaction.php'] as $file)copy(__DIR__.'/../integration/helpdesk/'.$file,$fixture.'/api/'.$file);
     copy(__DIR__.'/../integration/helpdesk/runtime/setup.php',$fixture.'/tools/support/setup.php');
     copy(__DIR__.'/../integration/helpdesk/runtime/config-files.php',$fixture.'/tools/support/config-files.php');
     foreach(glob(__DIR__.'/../integration/helpdesk/migrations/*.up.sql') as $file)copy($file,$fixture.'/tools/support/migrations/'.basename($file));

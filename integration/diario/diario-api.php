@@ -4,6 +4,7 @@ require_once __DIR__.'/diario-avances.php';
 require_once __DIR__.'/diario-dashboard.php';
 require_once __DIR__.'/diario-adjuntos.php';
 require_once __DIR__.'/diario-operaciones.php';
+require_once __DIR__.'/diario-ticket-report.php';
 // Activity ownership always comes from the authenticated ERP session.
 function diarioNow(){return (new DateTimeImmutable('now',new DateTimeZone('America/Lima')))->format('Y-m-d H:i:s');}
 function diarioDate($value){
@@ -124,4 +125,5 @@ return function($app){
  diarioRegisterDashboard($app,$auth);
  diarioRegisterAttachments($app,$auth);
  diarioRegisterOperations($app,$auth);
+ diarioRegisterTicketReport($app,$auth);
 };

@@ -1,0 +1,63 @@
+<template>
+ <section class="ticket-management">
+  <header><div><h2>Tickets, pendientes y archivo</h2><p>Consulta, mueve y exporta tus tareas y soportes. {{context.superadmin?'El superadmin puede consultar todo el equipo.':''}}</p></div><button @click="exportCsv" :disabled="loading || busy || !applied">Exportar reporte CSV completo</button></header>
+  <form @submit.prevent="consult" class="ticket-filters">
+   <label>Desde<input type="date" v-model="filters.from" required></label><label>Hasta<input type="date" v-model="filters.to" required></label>
+   <label v-if="context.superadmin">Usuario<select v-model="filters.user"><option value="">Todos los usuarios</option><option v-for="u in context.usuarios" :key="u.Usuario" :value="u.Usuario">{{u.NombreUsuario || u.Usuario}} · {{u.Usuario}}</option></select></label>
+   <label>Archivo<select v-model="filters.archived"><option value="active">No archivados</option><option value="only">Archivados</option><option value="all">Todos</option></select></label>
+   <label>Estado<select v-model="filters.state"><option value="all">Todos</option><option value="pending">Pendientes / en atención</option><option value="attended">Atendidos / concluidos</option><option value="cancelled">Cancelados</option></select></label>
+   <button :disabled="loading || busy">{{loading?'Consultando…':'Consultar'}}</button>
+  </form>
+  <p class="ticket-note">Rango por inicio previsto de la tarea y creación del ticket, en hora de Lima. Las evidencias y el historial se conservan al archivar.</p>
+  <p v-if="error" class="ticket-warning" role="alert">{{error}}</p><p v-if="notice" role="status">{{notice}}</p><p v-if="dirty" class="ticket-warning">Consulta para aplicar los filtros nuevos.</p>
+  <div class="ticket-summary"><span>{{total}} registros</span><span>{{summaryCount('pending')}} pendientes</span><span>{{summaryCount('attended')}} atendidos</span><span>{{selected.length}} seleccionados</span></div>
+  <div class="ticket-bulk"><button :disabled="busy || loading || dirty" @click="selectAll">Seleccionar todos del filtro</button><button @click="selected=[]" :disabled="busy">Limpiar selección</button>
+   <select v-model="action" aria-label="Acción para los seleccionados"><option value="">Elige una acción</option><option value="start">Iniciar / reanudar</option><option value="pause">Pausar tarea / esperar al cliente</option><option value="archive">Archivar terminados</option><option value="restore">Restaurar del archivo</option></select>
+   <input v-if="['start','pause'].includes(action)" v-model="reason" maxlength="2000" placeholder="Motivo del cambio" aria-label="Motivo del cambio">
+   <button :disabled="busy || loading || dirty || !selected.length || !action" @click="applyAction">{{busy?'Procesando…':'Aplicar a seleccionados'}}</button>
+  </div>
+  <div class="ticket-scroll"><table><thead><tr><th><input type="checkbox" aria-label="Seleccionar página" :checked="rows.length>0 && rows.every(isSelected)" @change="togglePage($event.target.checked)"></th><th>Referencia</th><th>Trabajo / empresa</th><th>Usuario</th><th>Estado</th><th>Inicio / creación</th><th>Archivo</th><th></th></tr></thead><tbody>
+   <tr v-for="r in rows" :key="key(r)"><td><input type="checkbox" :aria-label="'Seleccionar '+r.code" :checked="isSelected(r)" :disabled="busy" @change="toggle(r,$event.target.checked)"></td><td>{{r.code}}<small>{{r.source==='internal'?'Tarea':'Soporte'}}</small></td><td>{{r.subject}}<small>{{r.company}}</small></td><td>{{r.owner}}</td><td>{{status(r.status)}}</td><td>{{r.created_at}}</td><td>{{Number(r.archived)?'Archivado':'Activo'}}</td><td><button @click="open(r)">Ver / mover</button></td></tr>
+   <tr v-if="!rows.length"><td colspan="8">Sin registros para esta consulta.</td></tr>
+  </tbody></table></div><button v-if="next.internal || next.support" @click="more" :disabled="loading || busy || dirty">Cargar más</button>
+ </section>
+</template>
+<script>
+import config from '@/store/config';
+import {limaInput} from '@/utils/diario';
+const pending=['pendiente','en_curso','pausada','new','assigned','in_progress','waiting_customer','escalated','reopened','resolved'];
+const attended=['concluida','closed'];
+const labels={pendiente:'Pendiente',en_curso:'En curso',pausada:'Pausada',concluida:'Concluida',cancelada:'Cancelada',new:'Nuevo',assigned:'Asignado',in_progress:'En atención',waiting_customer:'Esperando al cliente',escalated:'Escalado',reopened:'Reabierto',resolved:'Por validar por el cliente',closed:'Cerrado',cancelled:'Cancelado'};
+export default {
+ props:{context:{type:Object,required:true},tasks:{type:Array,default:()=>[]}},
+ data(){const today=limaInput().slice(0,10);return {filters:{from:today.slice(0,7)+'-01',to:today,user:'',archived:'active',state:'all'},applied:null,rows:[],summaries:[],next:{internal:null,support:null},total:0,selected:[],action:'',reason:'',loading:false,busy:false,error:'',notice:'',supportContext:null};},
+ computed:{dirty(){return this.applied && JSON.stringify(this.filters)!==JSON.stringify(this.applied);}},
+ mounted(){this.consult();this._changed=()=>{if(!this.busy)this.consult();};this.$root.$on('diario:changed',this._changed);this.$root.$on('support:changed',this._changed);},
+ beforeDestroy(){this.$root.$off('diario:changed',this._changed);this.$root.$off('support:changed',this._changed);},
+ methods:{
+  key(r){return r.source+':'+r.id;},status(s){return labels[s]||s;},failure(e){return e.response&&e.response.data&&e.response.data.error||e.message||'No se pudo consultar el reporte.';},
+  summaryCount(type){return this.summaries.filter(r=>(type==='pending'?pending:attended).includes(r.status)).reduce((n,r)=>n+Number(r.total),0);},
+  async get(source,params){return (await this.axios.get(config.API+(source==='internal'?'diario/tickets-reporte':'support/report'),{params:Object.assign({mode:this.context.superadmin?'team':'mine'},params),timeout:20000})).data;},
+  async consult(){if(!this.context.user || this.loading || this.busy)return;this.loading=true;this.error='';this.selected=[];this.rows=[];this.summaries=[];this.total=0;this.next={internal:null,support:null};const filters=Object.assign({},this.filters);
+   try{for(const source of ['internal','support']){try{const data=await this.get(source,filters);this.rows=this.rows.concat(data.rows);this.summaries=this.summaries.concat(data.summary);this.total+=Number(data.total);this.next[source]=data.next;}catch(e){this.error+=(this.error?' ':'')+(source==='support'?'Soporte: ':'Tareas: ')+this.failure(e);}}this.applied=filters;}finally{this.loading=false;}
+  },
+  async more(){this.loading=true;try{for(const source of ['internal','support'])if(this.next[source]){const data=await this.get(source,Object.assign({},this.applied,{before:this.next[source]}));this.rows=this.rows.concat(data.rows);this.next[source]=data.next;}}catch(e){this.error=this.failure(e);}finally{this.loading=false;}},
+  isSelected(r){return this.selected.some(x=>this.key(x)===this.key(r));},toggle(r,on){this.selected=this.selected.filter(x=>this.key(x)!==this.key(r));if(on)this.selected.push(r);},togglePage(on){this.rows.forEach(r=>this.toggle(r,on));},
+  async allRows(){if(this.error)throw Error('Completa la consulta de ambas fuentes antes de exportar o seleccionar todo.');let all=[];for(const source of ['internal','support']){let before=null;do{const data=await this.get(source,Object.assign({},this.applied,before?{before}:{}));all=all.concat(data.rows);if(data.next && String(data.next)===String(before))throw Error('No se pudo avanzar de página.');before=data.next;}while(before);}return all;},
+  async selectAll(){this.loading=true;try{this.selected=await this.allRows();this.notice=this.selected.length+' registros seleccionados de todas las páginas.';}catch(e){this.error=this.failure(e);}finally{this.loading=false;}},
+  async applyAction(){if(this.busy||!this.selected.length||this.dirty)return;const capability={start:'can_start',pause:'can_pause',archive:'can_archive',restore:'can_restore'}[this.action];const invalid=this.selected.filter(r=>!r[capability]);if(invalid.length){this.error='La acción no está disponible para '+invalid.map(r=>r.code).join(', ')+'. Selecciona registros con estado y permisos compatibles.';return;}
+   if(['start','pause'].includes(this.action)&&!this.reason.trim()){this.error='Indica el motivo del cambio.';return;}
+   if(['archive','restore'].includes(this.action)&&!window.confirm('¿Está seguro de '+(this.action==='archive'?'archivar':'restaurar')+' '+this.selected.length+' registros seleccionados? Se conservarán sus evidencias e historial.'))return;
+   this.busy=true;this.error='';let completed=0;let failure='';const action=this.action;
+   try{if(this.selected.some(r=>r.source==='support'))this.supportContext=(await this.axios.get(config.API+'support/context',{timeout:15000})).data;
+    for(const row of this.selected){if(row.source==='internal'){const accion={start:'iniciar',pause:'pausar',archive:'archivar',restore:'restaurar'}[action];await this.axios.post(config.API+'diario/tareas/'+row.id,{accion,Version:Number(row.version),Texto:this.reason},{headers:{'X-Diario-CSRF':this.context.csrf},timeout:15000});}else{const endpoint=['archive','restore'].includes(action)?action:'transition';const body={id:row.id,version:Number(row.version),reason:this.reason,status:action==='start'?'in_progress':'waiting_customer'};await this.axios.post(config.API+'support/'+endpoint,body,{headers:{'X-Support-CSRF':this.supportContext.csrf},timeout:15000});}completed++;}
+   }catch(e){failure='Proceso detenido: '+this.failure(e)+' Consulta el estado antes de repetir.';}finally{this.busy=false;this.notice=completed+' registros actualizados.';await this.consult();this.error=failure||this.error;this.$emit('changed');}
+  },
+  async open(row){if(row.source==='support'){this.$router.push({path:'/soporte',query:{ticket:String(row.id)}});return;}let task=this.tasks.find(t=>Number(t.Id)===Number(row.id));if(!task){try{task=(await this.axios.get(config.API+'diario/tareas/'+row.id,{timeout:15000})).data;}catch(e){this.error=this.failure(e);return;}}this.$emit('open',task);},
+  async exportCsv(){this.loading=true;try{const rows=await this.allRows();const safe=v=>'"'+String(v==null?'':v).replace(/^[\s]*[=+@-]/,"'$&").replace(/"/g,'""')+'"';const lines=[['Fuente','Ticket','Trabajo','Usuario','Estado','Inicio / creación (Lima)','Cierre','Archivo','Empresa']].concat(rows.map(r=>[r.source==='internal'?'Tarea':'Soporte',r.code,r.subject,r.owner,this.status(r.status),r.created_at,r.closed_at,Number(r.archived)?'Archivado':'Activo',r.company]));const blob=new Blob(['\ufeff'+lines.map(r=>r.map(safe).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='tickets-'+this.applied.from+'-'+this.applied.to+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);this.notice='Reporte exportado: '+rows.length+' registros de todas las páginas.';}catch(e){this.error=this.failure(e);}finally{this.loading=false;}}
+ }
+};
+</script>
+<style scoped>
+.ticket-management{padding:20px;margin:18px 0;background:#fff;border:1px solid #cfdeea;border-radius:14px;color:#193d53}.ticket-management header,.ticket-filters,.ticket-bulk,.ticket-summary{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.ticket-management header{justify-content:space-between;align-items:center}.ticket-management h2{font-size:21px;margin:0 0 6px}.ticket-filters{margin:16px 0}.ticket-filters label{display:grid;gap:5px;flex:1;min-width:140px}.ticket-management button,.ticket-management input,.ticket-management select{padding:9px 12px;border:1px solid #b8cfde;border-radius:8px;background:white;color:#194d69}.ticket-management button{font-weight:600}.ticket-management button:disabled{opacity:.5}.ticket-note{font-size:13px;color:#4e687b}.ticket-warning{padding:12px;background:#fff0d9;color:#754000}.ticket-summary{margin:14px 0;font-weight:700}.ticket-summary span{padding:8px;background:#edf5fa;border-radius:6px}.ticket-scroll{overflow:auto;max-height:430px;margin:14px 0}.ticket-management table{width:100%;font-size:14px;border-collapse:collapse}.ticket-management td,.ticket-management th{padding:10px;text-align:left;border-bottom:1px solid #dce5ec}.ticket-management th{background:#eef5f8;position:sticky;top:0}.ticket-management small{display:block;color:#587283}.ticket-management td:nth-child(3){min-width:220px;overflow-wrap:anywhere}.ticket-management input[type=checkbox]{width:18px;height:18px}@media(max-width:650px){.ticket-management{padding:12px}.ticket-bulk>*{max-width:100%;width:100%}}
+</style>

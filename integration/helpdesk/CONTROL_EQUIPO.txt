@@ -1,0 +1,88 @@
+CONTROL DE TRABAJO Y SOPORTE - NSTARAPACA
+
+ACTUALIZACION
+En el repositorio PHP de produccion: git pull --ff-only origin nstarapaca.
+Incluye el frontend compilado de nuevo/ y support-ui/. No requiere migraciones
+adicionales; usa el archivo de soporte configurado y su historial de auditoria.
+La conexion privada del centro de soporte debe estar instalada para consultar SOP.
+
+USUARIO / PROGRAMADOR
+En Centro de trabajo, el tablero aparece primero. Arrastrar o usar Mover para
+iniciar, pausar o concluir con su resultado. Debajo: Tickets, pendientes y archivo.
+El boton Soporte abre un ticket SOP en el centro de atencion del cliente.
+Filtrar por fechas, estado y archivo. Seleccionar una pagina o todos los registros
+del filtro. La seleccion de todas las paginas y el CSV incluyen el resultado completo.
+Las acciones requieren estados compatibles y permisos. Una seleccion incompatible
+se rechaza antes de empezar. Si otro usuario cambia un registro, se detiene el lote,
+informa cuantos se actualizaron y solicita revisar antes de repetir.
+Iniciar/pausar requieren motivo. En soporte, pausar significa esperar al cliente;
+solo usarlo cuando corresponda. Los tickets sin tecnico se asignan desde su detalle.
+Archivar pide confirmacion, conserva evidencias e historial y solo admite tareas
+concluidas o tickets cerrados con confirmacion. Se pueden consultar y restaurar.
+
+SUPERADMIN
+Mis actividades conserva su tablero personal. Productividad del equipo permite
+consultar el equipo. Reportes e indicadores por empleado muestra el control de
+tickets, el nuevo panel de rendimiento del soporte y el dashboard de tareas internas.
+Seleccionar usuario y rango. El panel estadistico incluye el historial archivado.
+El reporte de tickets permite seleccionar no archivados, archivados o ambos.
+
+COMO LEER LOS INDICADORES
+- Tablero: mantiene las tareas activas aunque sean de periodos anteriores.
+- Reporte de tickets: rango por inicio previsto (tareas) o creacion (SOP).
+- Pendientes/atendidos: estado actual de los tickets creados en el rango y asignados.
+- Soluciones por dia: eventos reales de resolucion ocurridos en el rango. Las
+  reaperturas conservan su historial y pueden producir otra resolucion.
+  Solucion enviada significa POR VALIDAR: sigue pendiente hasta que el cliente
+  confirme que funciona y califique de 1 a 5 estrellas. Solo el cliente solicitante
+  puede cerrar. Ni superadmin ni el tecnico pueden suplir esa validacion.
+  El envio de estrellas y el cierre se guardan en una sola transaccion.
+  Se aceptan valoraciones bajas: confirmar la solucion no obliga a puntuar alto.
+  Cada reapertura requiere una nueva calificacion para poder cerrar nuevamente.
+  Los cierres historicos sin calificacion se muestran pendientes de validacion
+  en los reportes y no se pueden archivar hasta recibir la opinion del cliente.
+- Tiempo: suma de registros de trabajo de soporte dentro del rango, divididos
+  por dia en Lima. Se atribuye al autor aunque el ticket sea reasignado despues.
+- Primera respuesta humana: registrada con su autor desde esta actualizacion.
+  Avisos automaticos y notas internas no cuentan. Los historicos sin autor
+  confirmado se identifican y no se asignan a un programador por suposicion.
+- Tiempo a solucion: tiempo transcurrido desde la creacion hasta cada resolucion;
+  incluye esperas. No equivale a horas efectivamente trabajadas.
+- Opiniones: calificaciones del cliente vinculadas al tecnico que atendio.
+- Pastel: participacion en minutos de soporte declarados y registrados. Los
+  conteos y horas deben revisarse junto a complejidad, calidad y evidencias.
+- Evidencias: detalle de registros de trabajo, con enlace al ticket. Vista de hasta
+  2000 evidencias recientes; si se supera, se indica reducir el rango. Los totales
+  y cuadros diarios se calculan con todos los registros del rango.
+- Cuadro diario unificado: eventos de tareas internas por autor, conclusiones,
+  minutos de soporte, primeras respuestas y soluciones. Incluye exportacion CSV
+  del total agregado. Evidencias internas muestran hasta 500 avances recientes;
+  el cuadro diario incluye todo el rango. Cada tarea conserva su detalle completo.
+- Tareas internas: su dashboard conserva resultados, tiempos, metas, evidencia,
+  calificacion validada e historial detallado por actividad.
+
+EVALUACION MANUAL
+Solo superadmin: Evaluar -> calificacion 1 a 5, criterios, justificacion y propuesta
+(mejora, reconocimiento, revisar aumento o revisar ascenso). Se guarda el usuario
+evaluado, periodo, autor, fecha e indicadores usados. Las evaluaciones son historicas
+y se conservan en auditoria. No se cambia el cargo ni el sueldo automaticamente.
+
+SATISFACCION DEL CLIENTE
+Reporte exclusivo de superadmin por fecha de la opinion y programador que atendio.
+4-5 estrellas: satisfecho. 3: neutral. 1-2: insatisfecho. El criterio es visible.
+Incluye conteos, clientes distintos, porcentaje sobre opiniones recibidas,
+promedio, confirmacion de solucion, recomendacion, empresa, ticket y comentario.
+Se cuentan opiniones por ciclo; un cliente puede calificar varias atenciones o
+reaperturas. Los tickets sin opinion no forman parte del denominador.
+Detalle paginado de 100 opiniones y CSV con todas las paginas del filtro.
+
+VERIFICACION
+test-ticket-reports.php: paginacion, filtros, aislamiento, HTTP/CSRF, archivo,
+primera respuesta, reasignacion, evidencias y evaluacion auditada en base temporal.
+test-ticket-management-browser.mjs: confirmacion cancelada/aceptada, lote, reporte
+completo, CSV protegido, movil, pastel y evaluacion manual con HTTP simulado.
+test-support-area.php y test-diario-area.php: regresiones de historial y archivo.
+Compilaciones: npm run build y node tools/build-support-ui.cjs.
+test-customer-rating-browser.mjs: estrellas obligatorias y cierre atomico.
+test-ticket-center-bundle.mjs: pantalla compilada, confirmacion de archivo,
+movil, cuadros reales y acceso al panel de superadmin; HTTP simulado.

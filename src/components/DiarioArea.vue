@@ -16,7 +16,7 @@
 <script>
 import config from '@/store/config';
 import {limaInput,ticketNumber} from '@/utils/diario';
-const supportStates={new:'Nuevo',assigned:'Asignado, por aceptar',in_progress:'En atención',waiting_customer:'Espera del cliente',escalated:'Escalado',resolved:'Resuelto',closed:'Cerrado',reopened:'Reabierto',cancelled:'Cancelado'};
+const supportStates={new:'Nuevo',assigned:'Asignado, por aceptar',in_progress:'En atención',waiting_customer:'Espera del cliente',escalated:'Escalado',resolved:'Por validar por el cliente',closed:'Cerrado',reopened:'Reabierto',cancelled:'Cancelado'};
 const taskStates={pendiente:'Pendiente',en_curso:'En curso',pausada:'Pausada',concluida:'Concluida',cancelada:'Cancelada'};
 export default {
  props:{allTasks:{type:Array,default:null},tasks:{type:Array,default:()=>[]},periodo:{type:Object,required:true},context:{type:Object,required:true},vista:{type:String,default:'mia'},busy:{type:Boolean,default:false}},
@@ -39,7 +39,7 @@ export default {
   consultPeriod(){if(!this.draft.desde||!this.draft.hasta||this.draft.desde>this.draft.hasta){this.error='Revisa la fecha inicial y final.';return;}this.$emit('period',Object.assign({},this.draft));},
   duration(minutes){const n=Math.round(Number(minutes)||0);return Math.floor(n/60)+' h '+String(n%60).padStart(2,'0')+' min';},
   period(kind){const today=limaInput().slice(0,10);this.$emit('period',{desde:kind==='today'?today:today.slice(0,7)+'-01',hasta:today});},
-  async archive(row){if(!row.canArchive||this.savingArchive||this.busy)return;if(row.source==='internal'){this.$emit('task-archive',{task:row.task,restore:row.archived});return;}this.savingArchive=true;try{await this.axios.post(config.API+'support/'+(row.archived?'restore':'archive'),{id:row.ticket.id,version:row.ticket.version},{headers:{'X-Support-CSRF':this.supportContext.csrf},timeout:15000});await this.load();this.$root.$emit('support:changed');}catch(e){this.supportError=e.response&&e.response.data&&e.response.data.error||'No se pudo archivar. Actualiza para revisar el estado.';}finally{this.savingArchive=false;}},
+  async archive(row){if(!row.canArchive||this.savingArchive||this.busy)return;if(row.source==='internal'){this.$emit('task-archive',{task:row.task,restore:row.archived});return;}if(!row.archived&&!window.confirm('\u00bfEst\u00e1 seguro de archivar '+row.code+'? Se conservar\u00e1 el historial.'))return;this.savingArchive=true;try{await this.axios.post(config.API+'support/'+(row.archived?'restore':'archive'),{id:row.ticket.id,version:row.ticket.version},{headers:{'X-Support-CSRF':this.supportContext.csrf},timeout:15000});await this.load();this.$root.$emit('support:changed');}catch(e){this.supportError=e.response&&e.response.data&&e.response.data.error||'No se pudo archivar. Actualiza para revisar el estado.';}finally{this.savingArchive=false;}},
   openTicket(id){this.$router.push({path:'/soporte',query:{ticket:String(id)}});},
   openWork(row){if(row.source==='support')this.openTicket(row.ticket.id);else this.$emit('history',row.task);},
   async load(){if(!this.context.user)return;if(this.loading){this._reload=true;return;}this.loading=true;this.error='';this.supportError='';const filters={desde:this.periodo.desde,hasta:this.periodo.hasta,vista:this.vista,responsable:this.periodo.responsable||''};try{

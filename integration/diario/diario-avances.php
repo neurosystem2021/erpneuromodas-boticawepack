@@ -16,5 +16,6 @@ function diarioAvances($db,$identity,$input) {
     $stmt=$db->prepare('SELECT e.Id,e.Fecha,e.Accion,e.Texto,e.Usuario,t.Id tarea,t.Titulo,t.Ticket,t.TipoTrabajo,t.Estado'.$join.' ORDER BY e.Fecha DESC,e.Id DESC LIMIT 501');$stmt->execute($args);$rows=$stmt->fetchAll(PDO::FETCH_ASSOC);$limited=count($rows)>500;if($limited)array_pop($rows);
     // Full histories are available per task; the area feed displays human progress and results.
     foreach($rows as &$row)if(in_array($row['Accion'],array('editada','evaluada'),true))$row['Texto']=$row['Accion']==='editada'?'Datos de la tarea actualizados':'Resultado evaluado';unset($row);
-    return array('diario'=>$days,'avances'=>$rows,'limitado'=>$limited);
+    $stmt=$db->prepare("SELECT DATE(e.Fecha) fecha,e.Usuario usuario,COUNT(*) avances,COUNT(DISTINCT CASE WHEN e.Accion='concluida' THEN t.Id END) concluidas".$join.' GROUP BY DATE(e.Fecha),e.Usuario ORDER BY fecha,e.Usuario');$stmt->execute($args);$byUser=$stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array('diario'=>$days,'por_usuario'=>$byUser,'avances'=>$rows,'limitado'=>$limited);
 }

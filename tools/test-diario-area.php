@@ -6,6 +6,7 @@ require 'C:/xampp/htdocs/boticav1/api/vendor/autoload.php';
 $db=appPdoConnection();$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $definition=$db->query('SHOW CREATE TABLE Seg_Usuario')->fetch(PDO::FETCH_NUM)[1];$db->exec(str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$definition));
 $db->exec("INSERT INTO Seg_Usuario(Usuario,IdUsuarioPerfil,NombreUsuario,Anulado) VALUES('superadmin',1,'Superadmin fixture',0),('diario-admin',1,'Admin test',0),('diario-worker',2,'Worker test',0),('diario-other',2,'Other test',0)");
+$db->exec("CREATE TEMPORARY TABLE Seg_UsuarioPerfil(IdUsuarioPerfil INT,UsuarioPerfil VARCHAR(100),Anulado TINYINT DEFAULT 0);INSERT INTO Seg_UsuarioPerfil VALUES(1,'ADMIN',0),(2,'PROGRAMADOR',0)");
 $definition=$db->query('SHOW CREATE TABLE Rhu_Empleado')->fetch(PDO::FETCH_NUM)[1];$db->exec(str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$definition));$db->exec("INSERT INTO Rhu_Empleado(IdEmpleado,Empleado,Anulado) VALUES(999901,'Employee test',0)");
 $sql=str_replace('CREATE TABLE IF NOT EXISTS','CREATE TEMPORARY TABLE',file_get_contents(__DIR__.'/../integration/diario/schema.sql'));$db->exec($sql);$db->exec(str_replace('CREATE TABLE IF NOT EXISTS','CREATE TEMPORARY TABLE',file_get_contents(__DIR__.'/../integration/diario/upgrade-soporte.sql')));$db->exec(str_replace('CREATE TABLE IF NOT EXISTS','CREATE TEMPORARY TABLE',file_get_contents(__DIR__.'/../integration/diario/upgrade-operaciones.sql')));define('DIARIO_UPLOAD_DIR',__DIR__.'/../tmp/diario-upload-tests');
 $app=new Slim\App(['settings'=>['displayErrorDetails'=>true]]);$app->getContainer()['db']=$db;$register=require __DIR__.'/../integration/diario/diario-api.php';$register($app);
@@ -19,7 +20,7 @@ try{
  $payload=['TipoTrabajo'=>'soporte','Proyecto'=>'Fixture project','Ticket'=>'SUP-42','EstimadoMin'=>60,'Objetivo'=>10,'Unidad'=>'clientes','Puntos'=>10,'Titulo'=>'Task fixture','Indicaciones'=>'Assigned instructions','Inicio'=>diarioNow(),'Fin'=>(new DateTimeImmutable('now',new DateTimeZone('America/Lima')))->modify('+2 hours')->format('Y-m-d H:i:s'),'Responsable'=>'u:diario-worker','Repeticion'=>'diaria','Anticipacion'=>15,'Frecuencia'=>1];
  [$code,$ctx]=callDiary('GET','contexto','diario-worker');check($code===200&&!$ctx['admin']&&!isset($ctx['usuarios']),'worker metadata privacy');check($ctx['nombre']==='Worker test'&&$ctx['user']==='diario-worker'&&array_key_exists('perfil',$ctx),'session identity from authenticated account');
  [$code]=callDiary('POST','tareas','diario-worker',$payload,'bad');check($code===403,'CSRF');
- [$code]=callDiary('POST','tareas','diario-admin',array_merge($payload,['Frecuencia'=>0]));check($code===422,'zero reminder interval rejected');[$code,$created]=callDiary('POST','tareas','diario-admin',$payload);check($code===200&&$created['Id'],'admin assignment');$id=$created['Id'];
+ [$code]=callDiary('POST','tareas','superadmin',array_merge($payload,['Frecuencia'=>0]));check($code===422,'zero reminder interval rejected');[$code,$created]=callDiary('POST','tareas','superadmin',$payload);check($code===200&&$created['Id'],'admin assignment');$id=$created['Id'];
  [$code,$rows]=callDiary('GET','tareas?desde='.substr($payload['Inicio'],0,10).'&hasta='.substr($payload['Fin'],0,10),'diario-worker');check($code===200&&count($rows['tareas'])===1,'owner list');check($rows['tareas'][0]['Ticket']==='SUP-'.str_pad((string)$id,6,'0',STR_PAD_LEFT),'automatic ticket generated from unique task ID');
  [$code,$rows]=callDiary('GET','tareas?desde='.substr($payload['Inicio'],0,10).'&hasta='.substr($payload['Fin'],0,10),'diario-other');check($code===200&&count($rows['tareas'])===0,'other user isolated');
  [$code]=callDiary('POST','tareas/'.$id,'diario-other',['accion'=>'concluir','Version'=>1]);check($code===422,'cross-user mutation refused');
@@ -30,23 +31,23 @@ try{
  [$code,$result]=callDiary('POST','tareas/'.$id,'diario-worker',['accion'=>'concluir','Version'=>3,'Resultado'=>'Completed fixture','Realizado'=>8]);check($code===200&&$result['siguiente'],'complete creates recurrence');
  [$code]=callDiary('POST','tareas/'.$id,'diario-worker',['accion'=>'concluir','Version'=>3,'Resultado'=>'Completed fixture','Realizado'=>8]);check($code===422,'duplicate completion refused');check((int)$db->query('SELECT COUNT(*) FROM Rhu_DiarioTarea WHERE Anterior='.(int)$id)->fetchColumn()===1,'one recurrence only');check((float)$db->query('SELECT Objetivo FROM Rhu_DiarioTarea WHERE Anterior='.(int)$id)->fetchColumn()===10.0,'recurrence retains goal');
  [$code]=callDiary('POST','vinculo','diario-worker',['IdEmpleado'=>999901,'Usuario'=>'diario-worker']);check($code===403,'mapping admin only');
- [$code]=callDiary('POST','vinculo','diario-admin',['IdEmpleado'=>999901,'Usuario'=>'diario-worker']);check($code===200,'mapping');
- [$code,$e]=callDiary('POST','tareas','diario-admin',array_merge($payload,['Responsable'=>'e:999901']));check($code===200,'employee assignment');
+ [$code]=callDiary('POST','vinculo','superadmin',['IdEmpleado'=>999901,'Usuario'=>'diario-worker']);check($code===200,'mapping');
+ [$code,$e]=callDiary('POST','tareas','superadmin',array_merge($payload,['Responsable'=>'e:999901']));check($code===200,'employee assignment');
  [$code,$events]=callDiary('GET','tareas/'.$e['Id'].'/eventos','diario-worker');check($code===200&&count($events)===1,'linked employee access');
  [$code]=callDiary('POST','tareas/'.$e['Id'],'diario-worker',['accion'=>'nota','Version'=>1,'Texto'=>'Progress fixture']);check($code===200,'progress note');
  [$code,$reminders]=callDiary('GET','recordatorios','diario-other');check($code===200&&count($reminders['tareas'])===0,'reminders restricted to owner');
- [$code]=callDiary('POST','tareas','diario-admin',array_merge($payload,['Fin'=>'2020-01-01T00:00']));check($code===422,'invalid date range');
- [$code]=callDiary('POST','tareas','diario-admin',array_merge($payload,['Inicio'=>'2026-02-30T08:00']));check($code===422,'invalid calendar date');
+ [$code]=callDiary('POST','tareas','superadmin',array_merge($payload,['Fin'=>'2020-01-01T00:00']));check($code===422,'invalid date range');
+ [$code]=callDiary('POST','tareas','superadmin',array_merge($payload,['Inicio'=>'2026-02-30T08:00']));check($code===422,'invalid calendar date');
 
  [$code]=callDiary('POST','tareas/'.$id,'diario-worker',['accion'=>'evaluar','Version'=>4,'Calidad'=>5,'Reconocimiento'=>'Great work']);check($code===422,'workers cannot validate their own score');
- [$code]=callDiary('POST','tareas/'.$id,'diario-admin',['accion'=>'evaluar','Version'=>4,'Calidad'=>4,'Reconocimiento'=>'Good result with evidence']);check($code===200,'admin review');
- [$code,$mine]=callDiary('GET','tareas?vista=mia','diario-admin');check($code===200&&count($mine['tareas'])===0,'admin personal work view stays own');
+ [$code]=callDiary('POST','tareas/'.$id,'superadmin',['accion'=>'evaluar','Version'=>4,'Calidad'=>4,'Reconocimiento'=>'Good result with evidence']);check($code===200,'admin review');
+ [$code,$mine]=callDiary('GET','tareas?vista=mia','superadmin');check($code===200&&count($mine['tareas'])===0,'admin personal work view stays own');
  $personal=['Titulo'=>'Private fixture','Detalle'=>'Personal secret','Fecha'=>diarioNow(),'Repeticion'=>'diaria','Anticipacion'=>5,'Frecuencia'=>1];
  [$code,$saved]=callDiary('POST','personales','diario-worker',$personal);check($code===200,'personal reminder creation');$personalId=$saved['Id'];
- [$code,$list]=callDiary('GET','personales','diario-admin');check($code===200&&count($list['recordatorios'])===0,'personal privacy even from admin');
- [$code]=callDiary('POST','personales/'.$personalId,'diario-admin',['accion'=>'concluir','Version'=>1]);check($code===422,'admin cannot mutate worker personal reminder');
- [$code,$reminders]=callDiary('GET','recordatorios','diario-worker');check($code===200&&count(array_filter($reminders['tareas'],fn($t)=>($t['Tipo']??'')==='personal'))===1,'owner personal alerts');
- [$code,$reminders]=callDiary('GET','recordatorios','diario-admin');check($code===200&&count(array_filter($reminders['tareas'],fn($t)=>($t['Tipo']??'')==='personal'))===0,'no admin leak in alerts');
+ [$code,$list]=callDiary('GET','personales','superadmin');check($code===200&&count($list['recordatorios'])===0,'personal privacy even from admin');
+ [$code]=callDiary('POST','personales/'.$personalId,'superadmin',['accion'=>'concluir','Version'=>1]);check($code===422,'admin cannot mutate worker personal reminder');
+ [$code,$reminders]=callDiary('GET','recordatorios','diario-worker');check($code===200&&count(array_filter($reminders['tareas'],fn($t)=>($t['Tipo']??'')==='personal'))===0,'work alerts exclude private personal reminders');
+ [$code,$reminders]=callDiary('GET','recordatorios','superadmin');check($code===200&&count(array_filter($reminders['tareas'],fn($t)=>($t['Tipo']??'')==='personal'))===0,'no admin leak in alerts');
  [$code,$done]=callDiary('POST','personales/'.$personalId,'diario-worker',['accion'=>'concluir','Version'=>1]);check($code===200&&$done['siguiente'],'personal recurrence');
  [$code]=callDiary('POST','personales/'.$personalId,'diario-worker',['accion'=>'concluir','Version'=>1]);check($code===422,'personal duplicate completion');
 
@@ -55,7 +56,7 @@ try{
  [$code,$dashboard]=callDiary('GET','dashboard','superadmin');check($code===200&&$dashboard['resumen']['validadas']===1,'full dashboard summary');check(abs($dashboard['resumen']['logrados']-6.4)<0.001,'weighted dashboard goal score');
  [$code,$filtered]=callDiary('GET','dashboard?responsable=u:diario-worker&calidad=4','superadmin');check($code===200&&$filtered['resumen']['total']===1,'responsible and grade filters');
  [$code,$empty]=callDiary('GET','dashboard?desde=2030-01-01&hasta=2030-01-02','superadmin');check($code===200&&$empty['resumen']['total']===0,'date range filters');
- for($n=0;$n<105;$n++){$stmt=$db->prepare('INSERT INTO Rhu_DiarioTarea(Usuario,Titulo,Indicaciones,Inicio,Fin,Creador,Creada,Modificada) VALUES(?,?,?,?,?,?,?,?)');$stmt->execute(['diario-worker','=formula fixture','temporary',$payload['Inicio'],$payload['Fin'],'diario-admin',diarioNow(),diarioNow()]);}
+ for($n=0;$n<105;$n++){$stmt=$db->prepare('INSERT INTO Rhu_DiarioTarea(Usuario,Titulo,Indicaciones,Inicio,Fin,Creador,Creada,Modificada) VALUES(?,?,?,?,?,?,?,?)');$stmt->execute(['diario-worker','=formula fixture','temporary',$payload['Inicio'],$payload['Fin'],'superadmin',diarioNow(),diarioNow()]);}
  [$code,$first]=callDiary('GET','dashboard?pagina=1','superadmin');[$code,$second]=callDiary('GET','dashboard?pagina=2','superadmin');check(count($first['actividades'])===100&&$first['resumen']['total']>100&&$second['resumen']['total']===$first['resumen']['total']&&count($first['actividades'])+count($second['actividades'])===$first['resumen']['total'],'pagination preserves full summary totals');
  [$code,$unused,$csv]=callDiary('GET','reporte.csv','superadmin');check($code===200&&substr($csv,0,3)==="\xEF\xBB\xBF"&&strpos($csv,"'=formula fixture")!==false,'complete CSV with formula injection protection');
  [$code]=callDiary('GET','reporte.csv','diario-worker');check($code===403,'CSV superadmin only');
@@ -82,8 +83,8 @@ try{
  [$code]=callDiary('POST','tareas/'.$e['Id'].'/atenciones','diario-other',$contact);check($code===422,'other worker cannot register contact');
  $prefs=['titulo'=>'My work','nombres'=>['pendiente'=>'Backlog','en_curso'=>'Doing','pausada'=>'Waiting','concluida'=>'Done','cancelada'=>'Archived']];[$code]=callDiary('POST','preferencias','diario-worker',$prefs);check($code===200,'editable board headers');
  [$code,$ctx]=callDiary('GET','contexto','diario-worker');check($ctx['tablero']['nombres']['pendiente']==='Backlog','headers persist');[$code,$ctx]=callDiary('GET','contexto','diario-other');check(empty($ctx['tablero']),'headers private by user');
- foreach(['Seg_UsuarioPerfil','Seg_UsuarioModulo','Seg_UsuarioModulo_has_UsuarioPerfil'] as $table){$def=$db->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM)[1];$db->exec(str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$def));}
- $db->exec("INSERT INTO Seg_UsuarioPerfil(IdUsuarioPerfil,UsuarioPerfil,Anulado) VALUES(1,'ADMINISTRADOR',0),(2,'VENDEDOR',0)");require __DIR__.'/install-diario-profile.php';$profile=installDiaryProgrammerProfile($db);$again=installDiaryProgrammerProfile($db);check($profile===$again,'programmer profile created once');
+ foreach(['Seg_UsuarioModulo','Seg_UsuarioModulo_has_UsuarioPerfil'] as $table){$def=$db->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM)[1];$db->exec(str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$def));}
+ require __DIR__.'/install-diario-profile.php';$profile=installDiaryProgrammerProfile($db);$again=installDiaryProgrammerProfile($db);check($profile===$again,'programmer profile created once');
  $db->prepare('INSERT INTO Seg_Usuario(Usuario,IdUsuarioPerfil,Anulado) VALUES(?,?,0)')->execute(['programmer-fixture',$profile]);[$code,$ctx]=callDiary('GET','contexto','programmer-fixture');check($code===200&&$ctx['programador']&&!$ctx['admin'],'programmer not admin');check((int)$db->query('SELECT COUNT(*) FROM Seg_UsuarioModulo_has_UsuarioPerfil WHERE IdUsuarioPerfil='.(int)$profile)->fetchColumn()===1,'programmer only diary module granted');
 
  [$code]=callDiary('POST','preferencias','diario-worker',array_merge($prefs,['tema'=>'uva','acento'=>'#FACC15']));check($code===200,'theme and custom accent');[$code,$ctx]=callDiary('GET','contexto','diario-worker');check($ctx['tablero']['tema']==='uva'&&$ctx['tablero']['acento']==='#FACC15','appearance persisted');

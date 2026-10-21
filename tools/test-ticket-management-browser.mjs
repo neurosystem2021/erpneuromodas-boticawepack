@@ -1,0 +1,40 @@
+import {createRequire} from 'node:module';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const require=createRequire(new URL('../.tmp-order-workbook/package.json',import.meta.url));
+const {chromium}=require('playwright');const compiler=createRequire(import.meta.url)('vue-template-compiler');
+const component=file=>compiler.parseComponent(fs.readFileSync(file,'utf8'));
+const management=component('src/components/DiarioGestion.vue'),performance=component('src/components/DiarioPerformance.vue');
+const main=fs.readFileSync('src/views/DiarioActividades.vue','utf8');assert.ok(main.indexOf('<diario-tablero ')<main.indexOf('<diario-area '),'Board must precede statistics');
+const script=c=>c.script.content.replace(/^import .*;\s*$/gm,'').replace('export default','return');
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});page.on('pageerror',e=>console.error('Browser error:',e.message));page.on('console',m=>{if(m.type()==='error')console.error(m.text());});await page.setContent('<div id="app"></div>');await page.addScriptTag({content:fs.readFileSync('node_modules/vue/dist/vue.js','utf8')});await page.addStyleTag({content:management.styles[0].content+performance.styles[0].content});
+ await page.evaluate(({source,template})=>{
+  const m=new Function('config','limaInput',source)({API:'/api/'},()=> '2026-10-21T08:00');m.template=template;window.posts=[];window.gets=[];
+  const rows=Array.from({length:102},(_,i)=>({source:'internal',id:102-i,code:i===0?'ACT-CLOSED':'ACT-'+(102-i),subject:i===1?'=INJECT':'Fixture work',status:i===0?'concluida':'pendiente',owner:'worker',created_at:'2026-10-21 08:00:00',archived:0,version:1,can_archive:i===0,can_restore:false,can_start:i!==0,can_pause:false}));
+  window.rows=rows;Vue.prototype.axios={get:async(url,{params}={})=>{gets.push({url,params});if(url.endsWith('/context'))return {data:{csrf:'support-fixture'}};const all=url.includes('support')?[]:rows.filter(r=>params.archived==='all'||(params.archived==='only'?r.archived:!r.archived));let subset=params.before?all.filter(r=>r.id<Number(params.before)):all;return {data:{rows:subset.slice(0,100),summary:[{status:'pendiente',total:all.filter(r=>r.status==='pendiente').length}],total:all.length,next:subset.length>100?subset[99].id:null}};},post:async(url,data,options)=>{posts.push({url,data,options});const r=rows.find(r=>url.endsWith('/'+r.id));if(r){r.version++;if(data.accion==='archivar')r.archived=1;if(data.accion==='iniciar')r.status='en_curso';}return {data:{ok:true}};}};
+  window.vm=new Vue({components:{Management:m},data:{context:{user:'worker',superadmin:true,csrf:'diary-fixture',usuarios:[{Usuario:'worker',NombreUsuario:'Worker'}]}},template:'<Management :context="context"/>'}).$mount('#app');
+ },{source:script(management),template:management.template.content});
+ await page.getByLabel('Seleccionar ACT-CLOSED',{exact:true}).waitFor();const counts=await page.evaluate(()=>({posts:posts.length,rows:vm.$children[0].rows.length}));assert.equal(counts.rows,100);
+ await page.getByRole('button',{name:'Seleccionar todos del filtro',exact:true}).click();await page.waitForFunction(()=>vm.$children[0].selected.length===102);assert.ok(await page.evaluate(()=>gets.some(g=>g.params&&g.params.before)),'Selection must fetch all pages');
+ await page.getByLabel('Acción para los seleccionados').selectOption('archive');await page.getByRole('button',{name:'Aplicar a seleccionados',exact:true}).click();assert.equal(await page.evaluate(()=>posts.length),0,'Ineligible selection must not mutate');
+ await page.getByRole('button',{name:'Limpiar selección',exact:true}).click();await page.getByLabel('Seleccionar ACT-CLOSED',{exact:true}).check();
+ page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('button',{name:'Aplicar a seleccionados',exact:true}).click();assert.equal(await page.evaluate(()=>posts.length),0,'Cancelled confirmation must not archive');
+ page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Aplicar a seleccionados',exact:true}).click();await page.waitForFunction(()=>posts.length===1&&!vm.$children[0].loading);assert.equal(await page.evaluate(()=>posts[0].options.headers['X-Diario-CSRF']),'diary-fixture');
+ await page.getByLabel('Seleccionar ACT-101',{exact:true}).check();await page.getByLabel('Acción para los seleccionados').selectOption('start');await page.getByLabel('Motivo del cambio').fill('Starting verified fixture');await page.getByRole('button',{name:'Aplicar a seleccionados',exact:true}).click();await page.waitForFunction(()=>posts.length===2&&!vm.$children[0].loading);assert.equal(await page.evaluate(()=>posts[1].data.accion),'iniciar');
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Exportar reporte CSV completo',exact:true}).click();const download=await downloadPromise;const stream=await download.createReadStream();let csv='';for await(const chunk of stream)csv+=chunk.toString();assert.equal(csv.trim().split('\r\n').length,102,'Export must include all remaining pages');assert.ok(csv.includes("'=INJECT"),'CSV formula injection protection');
+ await page.setViewportSize({width:393,height:852});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Mobile management layout');
+ await page.setViewportSize({width:1440,height:1000});await page.evaluate(({source,template})=>{
+  vm.$destroy();document.body.innerHTML='<div id="app"></div>';const Chart=function(el,options){window.charts.push(options);this.destroy=()=>{};};window.charts=[];
+  const m=new Function('config','Chart','limaInput',source)({API:'/api/'},Chart,()=> '2026-10-21T08:00');m.template=template;
+  const person={id:1,user:'worker',assigned:4,pending:1,attended:3,resolved_events:3,work_minutes:120,worklogs:2,response_count:2,response_average:5,resolution_count:3,resolution_average:40,rating:4.5,ratings:2};
+  Vue.prototype.axios={get:async url=>({data:url.endsWith('/context')?{csrf:'support-fixture'}:url.endsWith('/avances')?{por_usuario:[{fecha:'2026-10-21',usuario:'worker',avances:3,concluidas:1}],avances:[]}: {from:'2026-10-01',to:'2026-10-21',team:[person],daily:[{date:'2026-10-21',user:'worker',work_minutes:120,response_count:2,resolved_events:3}],evidence:[],evidence_total:0,evidence_limited:false,unattributed_responses:1,reviews:[]}}),post:async(url,data,options)=>{posts.push({url,data,options});return {data:{ok:true}};}};
+  window.vm=new Vue({components:{Performance:m},data:{context:{superadmin:true,usuarios:[{Usuario:'worker'}]}},template:'<Performance :context="context"/>'}).$mount('#app');
+ },{source:script(performance),template:performance.template.content});
+ await page.getByRole('button',{name:'Evaluar',exact:true}).waitFor();assert.equal(await page.evaluate(()=>charts.find(c=>c.type==='pie').data.datasets[0].data[0]),120);assert.ok(await page.getByText(/históricas no tienen autor confirmado/).count());
+ await page.getByRole('button',{name:'Evaluar',exact:true}).click();await page.getByLabel('Calificación del superadmin').selectOption('4');await page.getByLabel('Propuesta').selectOption('raise_review');await page.getByLabel('Criterios aplicados').fill('Quality, complexity and evidence');await page.getByLabel('Justificación y evidencias de la evaluación').fill('Manual verified fixture evaluation');await page.getByRole('button',{name:'Guardar evaluación del período',exact:true}).click();await page.waitForFunction(()=>posts.some(p=>p.url.endsWith('performance_review')));const review=await page.evaluate(()=>posts.find(p=>p.url.endsWith('performance_review')));assert.equal(review.data.score,4);assert.equal(review.data.proposal,'raise_review');assert.equal(review.options.headers['X-Support-CSRF'],'support-fixture');
+ console.log('PASS board-first order, complete paginated selection/export, safe CSV, bulk validation, cancel/confirm archive, CSRF, state changes, mobile width, performance pie and explicit manual evaluation. Mock HTTP only.');
+}finally{await browser.close();}
+
+process.exit(0);

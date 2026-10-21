@@ -14,7 +14,7 @@ $hook = '$registerSupport=require __DIR__.\'/support-api.php\';$registerSupport(
 if (strpos($api, $hook) === false) throw new RuntimeException('Falta el registro de la API central; revisar la instalación antes de continuar.');
 $source = dirname(__DIR__, 2).'/integration/helpdesk';
 $files = [];
-foreach (['support-api.php','support-runtime.php','support-service.php','support-activity.php'] as $name) $files['api/'.$name] = $source.'/'.$name;
+foreach (['support-api.php','support-runtime.php','support-service.php','support-activity.php','support-report.php','support-performance.php','support-satisfaction.php'] as $name) $files['api/'.$name] = $source.'/'.$name;
 foreach (['setup.php','config-files.php','support.local.example.php','.htaccess','LEEME.txt'] as $name) $files['tools/support/'.$name] = $source.'/runtime/'.$name;
 foreach (glob($source.'/migrations/*.up.sql') as $file) $files['tools/support/migrations/'.basename($file)] = $file;
 $files['tools/support/support-clientes-nstarapaca.zip'] = dirname(__DIR__,2).'/output/support-clientes-nstarapaca.zip';
