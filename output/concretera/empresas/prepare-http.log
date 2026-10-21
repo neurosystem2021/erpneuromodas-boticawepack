@@ -1,0 +1,1 @@
+Isolated testsite prepared. Domain, API and UI copied from module; only connection and library paths redirected to owned fixture. Test-session injection exists only on this loopback fixture, not in delivered code.

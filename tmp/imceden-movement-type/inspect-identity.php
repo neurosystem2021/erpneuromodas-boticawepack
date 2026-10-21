@@ -1,0 +1,4 @@
+<?php
+require 'C:/xampp/htdocs/boticav1/config/database.php';$c=appDatabaseConfig();$c['dbname']='fact_imceden';$db=new PDO(appDatabaseDsn($c),$c['user'],$c['pass'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+echo json_encode($db->query('SELECT IDEMPRESA,RAZONSOCIAL,RUC FROM Gen_Empresa')->fetchAll(),JSON_UNESCAPED_UNICODE).PHP_EOL;
+echo json_encode(['active_products'=>$db->query('SELECT COUNT(*) FROM Gen_Producto WHERE Anulado=0')->fetchColumn(),'active_sale_types'=>$db->query('SELECT COUNT(*) FROM Ve_DocVentaTipoDoc WHERE Anulado=0')->fetchColumn(),'active_movement_types'=>$db->query('SELECT COUNT(*) FROM Lo_MovimientoTipo WHERE Anulado=0')->fetchColumn(),'warehouses'=>$db->query('SELECT IdAlmacen,Almacen FROM Lo_Almacen')->fetchAll()],JSON_UNESCAPED_UNICODE).PHP_EOL;

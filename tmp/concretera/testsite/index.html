@@ -1,0 +1,21 @@
+
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Concretera · NEUROSOFT</title>
+
+<link rel="stylesheet" href="/resources/css/concretera.css?v=fixture"></head><body>
+
+<main class="cx-app" id="cxApp" aria-busy="true">
+ <header class="cx-heading"><div class="cx-identity"><img src="/resources/images/wuanuko-mix-logo-transparente.png" alt="Concretera Wuanuko Mix" width="110" height="80"><div><span class="cx-kicker">NEUROSOFT · WUANUKO MIX</span><h1>Concretera</h1><p>Gestión compartida con empresa emisora elegida en cada proforma.</p></div></div><label class="cx-company">Empresa para proformar y facturar<select id="cxCompany" aria-label="Empresa emisora"></select></label></header>
+ <p id="cxIssuerInfo" class="cx-issuer-info"></p>
+ <div id="cxError" class="cx-alert cx-alert-error" role="alert" hidden></div><div id="cxSuccess" class="cx-alert cx-alert-success" role="status" hidden></div>
+ <p id="cxMode" class="cx-mode"></p>
+ <nav class="cx-tabs" aria-label="Módulos de concretera"><button type="button" data-tab="inicio" class="active">Preparación</button><button type="button" data-tab="propuestas">Cotizaciones</button><button type="button" data-tab="pedidos">Pedidos</button><button type="button" data-tab="programacion">Programar suministro</button><button type="button" data-tab="insumos">Insumos y alertas</button><button type="button" data-tab="control">Control de mezclas</button><button type="button" data-tab="operacion">Preparación operativa</button><button type="button" data-tab="obras">Obras</button><button type="button" data-tab="especificaciones">Especificaciones</button><button type="button" data-tab="auditoria">Trazabilidad</button><button type="button" data-tab="facturacion">Facturación electrónica</button><button type="button" data-tab="modulos">Módulos de empresa</button><button type="button" data-tab="configuracion">Configuración</button></nav>
+ <section id="cxContent" class="cx-content"><p>Cargando el módulo…</p></section>
+ <footer class="cx-footer">Cotización → Pedido → Programación de suministro · Inventario físico y reservas nominales separados. Guía, preparación, consumo real, recepción en obra y liquidación se incorporan en su etapa operativa.</footer>
+</main>
+<dialog id="cxDialog" class="cx-dialog"><header><h2 id="cxDialogTitle"></h2><button id="cxClose" type="button" aria-label="Cerrar">×</button></header><div id="cxDialogBody"></div></dialog>
+<script src="/resources/js/concretera-cotizacion.js?v=fixture"></script>
+<script src="/resources/js/concretera-inicio.js?v=fixture"></script>
+<script src="/resources/js/concretera-control.js?v=fixture"></script>
+<script src="/resources/js/concretera-operaciones.js?v=fixture"></script>
+<script src="/resources/js/concretera.js?v=fixture"></script></body></html>
+

@@ -1,0 +1,25 @@
+PASS Versionar sin sobrescribir precios previos
+PASS No emitir versión sustituida
+PASS Edición concurrente con versión obsoleta
+PASS Bloqueo de propuesta vencida
+PASS Impedir contratar más que lo presupuestado
+PASS Bombeo mínimo de 30 no cambia volumen contratado de 24
+PASS Precio incluido y excluido de impuesto exactos
+PASS Rechazar float de cantidades
+PASS Rechazar exceso de precisión sin truncarlo
+PASS Rollback y compensación MyISAM: INSERT INTO Ve_ProformaDet
+PASS Rollback y compensación MyISAM: INSERT INTO Cx_PropuestaPartida
+PASS Rollback y compensación MyISAM: INSERT INTO Cx_Auditoria
+PASS Fallo de pedido no deja cabecera ni aceptación huérfana
+PASS Worker concurrente finalizó
+PASS Worker concurrente finalizó
+PASS Aceptaciones concurrentes crean un solo pedido
+PASS Misma clave concurrente devuelve la misma respuesta
+PASS Worker concurrente finalizó
+PASS Worker concurrente finalizó
+PASS Aceptaciones concurrentes crean un solo pedido
+PASS Distintas claves concurrentes resuelven conflicto
+PASS Guardas identifican solo documentos vinculados
+PASS No facturar pedido de suministro desde flujo genérico
+PASS Proforma normal conserva flujo
+INTEGRITY_COMPLETE

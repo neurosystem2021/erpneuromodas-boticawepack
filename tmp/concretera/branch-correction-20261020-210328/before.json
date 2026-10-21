@@ -1,0 +1,9 @@
+{
+  "sourceImcedenBefore": "020cf6539ba91762b2fd19f23991dd679d00758f",
+  "liveWuanukomixBefore": "63c7e057e9bf8b6bf20106509f8676be065c164b",
+  "userFiles": {
+    "output/imceden-caja-proforma-descripcion.png": "5449a11cfc5de69c82d2254ffd0514145bc641b69684e2c4b04ae13723752676",
+    "output/imceden-proforma-descripcion.png": "f8ca98aeaee73df5ca301bcdb42660956295de5e0a3e22a634d0f25b05bd9cf0",
+    "tools/test-proforma-description-browser.cjs": "25162ed0423bae7ab3ef0a49a101ff23c57e222a565a2b26f42a0ee1e23fae36"
+  }
+}

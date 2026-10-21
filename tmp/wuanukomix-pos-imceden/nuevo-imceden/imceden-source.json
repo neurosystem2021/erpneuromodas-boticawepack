@@ -1,0 +1,108 @@
+{
+  "sourceBranch": "imceden",
+  "sourceCommit": "020cf6539ba91762b2fd19f23991dd679d00758f",
+  "sourceWrapperCommit": "70d633b7c7050c157bb4b61fa23d33893aa097d9",
+  "targetBranch": "wuanukomix",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "ef789921479e8d47da1689ce075b6b8a6d80be829d3c4cd3eecb5f1b206d5a39"
+    },
+    {
+      "path": "static/beep.mp3",
+      "sha256": "8fe29182ed395ba8a77e5a71dd93b28d132c43f034e163224855e9dde03be299"
+    },
+    {
+      "path": "static/box.png",
+      "sha256": "1a90bab1c323b3feae2a8de816d165e7727de3b1f0441b53cfcdcf4fa8577cf8"
+    },
+    {
+      "path": "static/cancel.png",
+      "sha256": "32838afd228bd45fc484fa4eeac12348136693bbf39d145bac0f8dc38e6f06ec"
+    },
+    {
+      "path": "static/casa.png",
+      "sha256": "9c6b12a32b268dcf1e2bf2eab9bfede09cbed43a8dd246cc49357aa957da088e"
+    },
+    {
+      "path": "static/error.png",
+      "sha256": "d43327dc92690a2b1904823f26d29db8d6193a0b0425596c4e201f553941e473"
+    },
+    {
+      "path": "static/logo.png",
+      "sha256": "6de3b35ece04b62e32528963adc269563990680c6c8aed15ee36e56fab358e73"
+    },
+    {
+      "path": "static/moto-delivery.png",
+      "sha256": "954e3ca85e0b487d83b9f3cca83e32a327280a3c9b5476fe855f800562a73d88"
+    },
+    {
+      "path": "static/moto.png",
+      "sha256": "dfd5ad2ddc2765423beab6a8790a3e6a404bfc45c6558dda7c39950acea50477"
+    },
+    {
+      "path": "static/no-photo.png",
+      "sha256": "4794157c7b1abb087d122b7b8bd8fad6166f1cdef75c7dbc25731a9c34a5911a"
+    },
+    {
+      "path": "static/nuevassoli.mp3",
+      "sha256": "96ad182bda4d342e1673b69b80fdd20198bd9a907e65e74ff03f80127655d1c1"
+    },
+    {
+      "path": "static/sire.png",
+      "sha256": "f9704ce740bedc82e9720942d33998404bc23a5f18571332e7bcf9181536f23d"
+    },
+    {
+      "path": "static/styles.css",
+      "sha256": "f19853097807d5a9008f7572ecb05d2b962d71962a36874aeacbe62463ff9642"
+    },
+    {
+      "path": "static/success.png",
+      "sha256": "3ed072ccd7e746cd9cc34553bd2c7a9f365b91fc666dfe6aa288b32e6650d1ff"
+    },
+    {
+      "path": "static/vue2-autocomplete.css",
+      "sha256": "c20ba897a9c93311728475fa8c5d004ef0e9173e00b00dbaf2327107b45d071e"
+    },
+    {
+      "path": "static/css/app.5f740912d3c2eafeca1281c415406671.css",
+      "sha256": "0697b06184a3d86042a449b69c3aca6d221369707bb020244c2b52a91ce80349"
+    },
+    {
+      "path": "static/fontawesome/all.css",
+      "sha256": "c90e2f498b7a3df49f73762b9f1104022fd4de8d06ec4aa5c240f0d7e37e959b"
+    },
+    {
+      "path": "static/img/pos-tech-background.e2bd465.png",
+      "sha256": "3185ea548d45638f97fef057d500ecbc766cd9e867705f68f233c27f697eb9f5"
+    },
+    {
+      "path": "static/js/app.419436e00859acc0d521.js",
+      "sha256": "1171c05c26b9458b710c92051c4c38579935ec2d2a61cea13d2919f565f69bcb"
+    },
+    {
+      "path": "static/js/manifest.3ad1d5771e9b13dbdad2.js",
+      "sha256": "77b87f2e8468b07df6dcb7c12fe7cedc619153bb8489b20e12fb5092136cc948"
+    },
+    {
+      "path": "static/js/vendor.78e552047eae63b7b55d.js",
+      "sha256": "0e1611608c8a17625b8b22e6289eaf553f9114b4f77a65149ae72339b0b349b0"
+    },
+    {
+      "path": "static/media/beep.36b1b47.mp3",
+      "sha256": "8fe29182ed395ba8a77e5a71dd93b28d132c43f034e163224855e9dde03be299"
+    },
+    {
+      "path": "static/webfonts/fa-brands-400.woff2",
+      "sha256": "62b5e7ae9e2ed60dcd7cb2e0823dd0884575f2176aff629f2df1e912dfae20e1"
+    },
+    {
+      "path": "static/webfonts/fa-regular-400.woff2",
+      "sha256": "1669bec36f12c35a00a2d23cf71b6061c85b8435f5c26445aab338f88dfe6629"
+    },
+    {
+      "path": "static/webfonts/fa-solid-900.woff2",
+      "sha256": "a83079124373d924ad1402fbc08d2e24d0043234d4c26565f1c368745f55f5d9"
+    }
+  ]
+}

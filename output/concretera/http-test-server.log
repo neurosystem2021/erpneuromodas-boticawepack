@@ -1,0 +1,224 @@
+[Mon Oct 19 00:37:37 2026] PHP 7.4.33 Development Server (http://127.0.0.1:8137) started
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:60050 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:60050 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:63293 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:63293 [200]: GET /index.html
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:63293 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61037 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55376 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61037 [200]: GET /resources/css/concretera.css?v=fixture
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55376 [200]: GET /resources/js/concretera.js?v=fixture
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61037 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55376 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55833 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55833 [200]: GET /api/concretera.php?action=context
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:55833 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61123 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61123 [404]: GET /favicon.ico - No error
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:61123 Closing
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:50487 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:59826 Accepted
+[Mon Oct 19 00:37:38 2026] 127.0.0.1:50008 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50487 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50487 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53503 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59826 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59826 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50008 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50008 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54325 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53503 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53503 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54325 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54325 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59631 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:64800 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57915 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59631 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59631 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:64800 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:64800 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57915 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57915 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55731 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55731 [201]: POST /api/concretera.php
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55731 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:63497 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:58798 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55924 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61723 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53761 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:63497 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:63497 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:58798 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:58798 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55924 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55924 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61723 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61723 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53761 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53761 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53417 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62960 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61039 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53417 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53417 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62960 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62960 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61039 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:61039 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53031 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53031 [201]: POST /api/concretera.php
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53031 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55799 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54590 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52575 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55015 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55799 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55799 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54590 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:54590 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52575 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52575 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55015 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55015 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57770 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50092 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57770 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57770 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:49676 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50092 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:50092 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:51120 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:51120 [201]: POST /api/concretera.php
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:51120 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59633 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55158 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57938 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:56960 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57252 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59633 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:59633 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55158 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55158 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57938 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57938 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:56960 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:56960 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57252 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:57252 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62290 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52287 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53080 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62290 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:62290 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52287 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:52287 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53080 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:53080 Closing
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55093 Accepted
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55093 [200]: GET /api/concretera.php?action=proposal&id=14&companyId=1
+[Mon Oct 19 00:37:39 2026] 127.0.0.1:55093 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:55703 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:55703 [200]: POST /api/concretera.php
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:55703 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57912 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57331 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64469 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65112 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:62483 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57912 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57912 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57331 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57331 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64469 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64469 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65112 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65112 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:62483 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:62483 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:49676 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52859 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65448 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:49676 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:49676 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52859 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52859 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65448 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:65448 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54168 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54168 [200]: GET /api/concretera.php?action=proposal&id=14&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54168 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:50590 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:50590 [200]: POST /api/concretera.php
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:50590 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:61978 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:58468 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54293 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54232 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52987 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:61978 [200]: GET /api/concretera.php?action=list&kind=obras&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:61978 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:58468 [200]: GET /api/concretera.php?action=list&kind=especificaciones&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:58468 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54293 [200]: GET /api/concretera.php?action=list&kind=propuestas&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54293 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54232 [200]: GET /api/concretera.php?action=list&kind=pedidos&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:54232 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52987 [200]: GET /api/concretera.php?action=list&kind=auditoria&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52987 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52605 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57682 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:56021 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52605 [200]: GET /api/concretera.php?action=catalog&kind=clientes&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:52605 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57682 [200]: GET /api/concretera.php?action=catalog&kind=productos&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57682 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:56021 [200]: GET /api/concretera.php?action=catalog&kind=almacenes&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:56021 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57148 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57148 [200]: GET /api/concretera.php?action=order&id=8&companyId=1
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:57148 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64736 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64736 [422]: POST /api/concretera.php
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64736 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64738 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64738 [401]: GET /api/concretera.php?action=context
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64738 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64739 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64739 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64740 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64740 [200]: GET /api/concretera.php?action=context
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64740 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64743 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64743 [403]: POST /api/concretera.php
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64743 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64746 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64746 [403]: GET /api/concretera.php?action=proposal&companyId=2&id=14
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64746 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64750 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64750 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64751 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64751 [404]: GET /api/concretera.php?action=pdf&companyId=2&kind=order&id=8
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64751 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64754 Accepted
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64754 [404]: GET /api/concretera.php?action=preview&companyId=2&kind=order&id=8
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64754 Closing
+[Mon Oct 19 00:37:40 2026] 127.0.0.1:64757 Accepted
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64757 [403]: GET /api/concretera.php?action=order&companyId=1&id=8
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64757 Closing
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64763 Accepted
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64763 Closing
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64764 Accepted
+[Mon Oct 19 00:37:41 2026] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in C:\xampp\htdocs\boticav1\api\sunat\plugins\dompdf\src\Renderer\Text.php on line 140
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64764 [200]: GET /api/concretera.php?action=pdf&companyId=1&kind=proposal&id=1
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64764 Closing
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64766 Accepted
+[Mon Oct 19 00:37:41 2026] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in C:\xampp\htdocs\boticav1\api\sunat\plugins\dompdf\src\Renderer\Text.php on line 140
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64766 [200]: GET /api/concretera.php?action=pdf&companyId=1&kind=order&id=1
+[Mon Oct 19 00:37:41 2026] 127.0.0.1:64766 Closing

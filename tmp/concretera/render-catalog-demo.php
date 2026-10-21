@@ -1,0 +1,5 @@
+﻿<?php
+if(PHP_SAPI!=='cli')exit;require __DIR__.'/../../tools/concretera/fixture.php';require __DIR__.'/../../server/concretera/api/concretera/Domain.php';require __DIR__.'/../../server/concretera/api/concretera/Pdf.php';
+$f=json_decode(file_get_contents(__DIR__.'/fixture.json'),true);if(!empty($f['removedAt']))throw new RuntimeException('Prueba retirada');$db=cxFixtureConnect($f['schema']);$s=new CxService($db,'superadmin',true);$owner=$f['guided']['owner'];$id=$db->query('SELECT MAX(IdVersion) FROM Cx_PropuestaVersion')->fetchColumn();$doc=$s->proposal($owner,$id);if(!(int)$doc['EsPrueba'])throw new RuntimeException('No es documento de prueba');
+$base='C:/xampp/htdocs/boticav1/api/sunat/plugins/dompdf';require_once $base.'/lib/php-font-lib/src/FontLib/Autoloader.php';require_once $base.'/lib/php-svg-lib/src/autoload.php';require_once $base.'/src/Autoloader.php';Dompdf\Autoloader::register();
+file_put_contents(__DIR__.'/../../output/concretera/inicio-guiado/cotizacion-catalogo-demo.pdf',cxRenderPdf(cxDocumentHtml($doc,'proposal')));echo 'PASS PDF sintético generado sin venta, cobro ni producción'.PHP_EOL;

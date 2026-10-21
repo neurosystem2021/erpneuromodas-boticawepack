@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BOLETA ELECTRONICA BDEM-00000000</title>
+<style>
+:root{--ink:#000;--muted:#222;--brand:#000;--brand-dark:#000;--soft:#fff;--line:#777}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:#e9e5e7}
+body{padding:18px}
+.receipt-actions{text-align:center;margin-bottom:12px}.receipt-actions button{border:0;border-radius:10px;background:#164f67;color:white;padding:11px 18px;font-weight:bold;cursor:pointer}
+.ticket{width:80mm;max-width:100%;margin:0 auto;padding:3.2mm;background:#fff;box-shadow:0 10px 32px #2c17222c;font-size:9px;font-weight:600;line-height:1.22}
+.brand{text-align:center}.brand img{display:block;width:56mm;height:40mm;max-width:100%;margin:0 auto 2mm;object-fit:contain;object-position:center}
+.company{font-size:11px;font-weight:900;line-height:1.2}.company-meta{margin-top:.7mm;color:var(--muted);font-size:8px;font-weight:700;line-height:1.3}
+.document{margin:2.5mm 0 2mm;padding:2.2mm 2mm;border:1.5px solid var(--brand);border-radius:3mm;background:var(--soft);text-align:center}
+.document-type{color:var(--brand-dark);font-size:10px;font-weight:900;letter-spacing:.35px}.document-number{margin-top:.6mm;color:var(--brand);font-size:14px;font-weight:900;letter-spacing:.5px}
+.meta{margin-bottom:2mm;padding:1.8mm 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.row{display:flex;margin:.45mm 0;gap:1.5mm}.label{flex:0 0 19mm;color:var(--ink);font-size:7.4px;font-weight:900}.value{flex:1;min-width:0;font-size:8.3px;font-weight:800;overflow-wrap:anywhere}
+.items{width:100%;table-layout:fixed;border-collapse:collapse}.items th{padding:.9mm .45mm;border-bottom:1.5px solid var(--brand-dark);font-size:7px;font-weight:900;line-height:1.1;text-align:left}.items td{padding:.9mm .45mm;border-bottom:1px dashed var(--line);font-size:8.2px;font-weight:700;line-height:1.15;vertical-align:top}.items .qty{width:8mm;text-align:center}.items .unit,.items .amount{width:15mm;text-align:right;white-space:nowrap}.product-name{font-size:9.2px;font-weight:900;line-height:1.12;overflow-wrap:anywhere}.product-code{margin-top:.25mm;color:var(--muted);font-size:7px;font-weight:700;line-height:1.1}
+.summary{margin:1.3mm 0 1mm auto;width:45mm}.summary-row{display:flex;padding:.35mm 0;justify-content:space-between;font-size:8.3px}.summary-row span:first-child{color:var(--ink);font-weight:800}.summary-row strong{font-size:9.3px;font-weight:900}.summary-total{display:flex;margin-top:.8mm;padding:1.5mm 1.7mm;justify-content:space-between;border-top:2px solid #000;border-bottom:3px double #000;color:#000;background:#fff;font-size:15px;line-height:1;font-weight:900;letter-spacing:.2px}
+.words{margin:1.3mm 0;padding:1.3mm;border-left:.8mm solid var(--brand);background:var(--soft);font-size:7.5px;line-height:1.25}.payment{padding:1mm 0;border-bottom:1px dashed var(--line);font-size:8px;line-height:1.35}.payment-title{margin:.7mm 0 .3mm;font-weight:900}.payment-row{display:flex;justify-content:space-between;gap:2mm}.operation{color:var(--muted);font-size:6.8px;overflow-wrap:anywhere}
+.validation{display:grid;margin-top:1.5mm;grid-template-columns:32mm 1fr;gap:2mm;align-items:center}.qr{width:32mm;height:32mm;image-rendering:pixelated;background:#fff}.legal{color:var(--muted);font-size:6.8px;line-height:1.25}.legal strong{color:var(--ink)}
+.footer{margin-top:3mm;padding-top:2.5mm;border-top:1px dashed var(--line);text-align:center;font-size:8px;line-height:1.45}.thanks{margin-top:2mm;color:var(--brand);font-size:10px;font-weight:900;letter-spacing:.3px}
+@media(max-width:420px){body{padding:0;background:#fff}.ticket{width:100%;min-height:100vh;box-shadow:none}}
+@media print{@page{size:80mm 297mm;margin:4mm}html,body{width:72mm!important;max-width:100%!important;height:auto!important;min-height:0!important;background:#fff}body{padding:0}.ticket{width:72mm;max-width:100%;height:auto;min-height:0;margin:0;padding:0;box-shadow:none;break-inside:auto;page-break-inside:auto}.items tr,.validation,.summary-total{break-inside:avoid}.no-print,#printers,#printer{display:none!important}body>br{display:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="no-print receipt-actions"><button type="button" onclick="window.nstPrintReceipt ? window.nstPrintReceipt() : window.print()">Imprimir comprobante</button></div>
+<main class="ticket">
+  <header class="brand">
+    <img src="/resources/images/wuanuko-mix-logo-transparente.png" alt="Logo">
+    <div class="company">CONCRETERA WUANUKO MIX FULL E.I.R.L.</div>
+    <div class="company-meta"><strong>RUC 20602664989</strong><br>JR. MARIANO MELGAR NRO. 146, URB. PAUCARBAMBA, AMARILIS - HUANUCO - HUANUCO (ALTURA DEL PARADERO 13)<br><br>Tel. 994316017 / 962790312</div>
+  </header>
+
+  <section class="document">
+    <div class="document-type">BOLETA ELECTRONICA</div>
+    <div class="document-number">BDEM-00000000</div>
+  </section>
+
+  <section class="meta">
+    <div class="row"><span class="label">FECHA EMISIÓN</span><span class="value">19/10/2026 12:00:00</span></div>
+    <div class="row"><span class="label">CLIENTE</span><span class="value">CLIENTE FICTICIO</span></div>
+    <div class="row"><span class="label">DNI / RUC</span><span class="value">20000000000</span></div>
+    <div class="row"><span class="label">DIRECCIÓN</span><span class="value">DIRECCION DEMO</span></div>
+        <div class="row"><span class="label">OBSERVACIÓN</span><span class="value">DATOS DE PRUEBA - SIN VALOR TRIBUTARIO</span></div>  </section>
+
+  <table class="items">
+    <thead><tr><th>DESCRIPCIÓN</th><th class="qty">CANT.</th><th class="unit">P. UNIT.</th><th class="amount">IMPORTE</th></tr></thead>
+    <tbody>
+          <tr>
+        <td><div class="product-name">1. PRODUCTO DEMO</div><div class="product-code">PRUEBA DE LOGO</div><div class="product-code"></div></td>
+        <td class="qty">1</td>
+        <td class="unit">S/ 0.00</td>
+        <td class="amount"><strong>S/ 0.00</strong></td>
+      </tr>
+        </tbody>
+  </table>
+
+  <section class="summary">
+    <div class="summary-row"><span>SUBTOTAL</span><strong>S/ 0.00</strong></div>
+    <div class="summary-row"><span>OP. EXONERADA</span><strong>S/ 0.00</strong></div>        <div class="summary-total"><span>TOTAL</span><span>S/ 0.00</span></div>
+  </section>
+
+  <div class="words"><strong>SON:</strong> CON 00/100 SOLES</div>
+  <section class="payment">
+    <div><strong>VENDEDOR:</strong> DEMO</div>
+    <div><strong>FORMA DE PAGO:</strong> CONTADO</div>
+    <div class="payment-title">MÉTODO(S) DE PAGO</div>
+          <div class="payment-row"><span>EFECTIVO</span><strong>S/ 0.00</strong></div>
+        <div class="payment-row"><span>RECIBIDO</span><strong>S/ 0.00</strong></div>
+    <div class="payment-row"><span>VUELTO</span><strong>S/ 0.00</strong></div>
+    <div style="margin-top:1mm"><strong>DESCRIPCIÓN:</strong><br>DATOS DE PRUEBA - SIN VALOR TRIBUTARIO</div>  </section>
+
+  <section class="validation">
+    <img class="qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAFoAQMAAABAK/OWAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABuUlEQVR4nO3WwXLDQAgDUP7/p9UZIwF220sWHzIj0rhr+20OlSGNcLlcLtfXFrLieufr+gmu8671muZRlxCFr3Ub6x1duSRjJNEn1m/ojOfKZSytX9NSfQLrF3QfKxF1wuOu9YLWt+vfr/++i60/1J0SH3tkMvdUrNd0zR6eXAh5UD7Wa1pTXuMGtRov61WdM6hy0vVgUo90rE90xhNqgO6G0R/Wi7oi0q75XRv3ZrA+1pzmxPrXhlsyG1iv6tCGjIOZoD/IelGzCzqMbghUn1ivaTCiqCggODKzXtL9zDMLzJbI3dZ7Ws//LSZdTWi9qpmHHv8SUH8A1mu6Jk8++2CNVpjT3vpY648PpRMYJDda7+lMolnPHq4eWVqf6VzLqBl68mAOH+tjDcx5f8uof1vv6UQZCDRtOpdfzWB9ojVhtGJeGVrlY72lo5qhYhINZgXrPZ1QUYTOOJQe2Vgf67Gr7kdlFArKeknXiGc3jJy4uGVpfarHkSAqnnHHekvXtOkddQCs39G9gZvn/LFe15xA7IaMhZ8yOsL6XNceDnzc0L0frI+1WN7NpGjyjZmO9aF2uVwu19fVD9LUa7zj6NVEAAAAAElFTkSuQmCC" alt="Código QR del comprobante">
+    <div class="legal"><strong>Autorizado mediante resolución de intendencia SUNAT.</strong><br>Representación impresa de la BOLETA ELECTRONICA.<br><strong>CONSULTA WEB:</strong><br>http://emision.factura.vip</div>
+  </section>
+
+  <footer class="footer">Conserve este comprobante para cualquier consulta o reclamo.<br>JR. MARIANO MELGAR NRO. 146, URB. PAUCARBAMBA, AMARILIS - HUANUCO - HUANUCO (ALTURA DEL PARADERO 13)<br>CEL./TEL. 994316017 / 962790312<div class="thanks">¡GRACIAS POR SU PREFERENCIA!</div><div>DESARROLLADO POR<br><strong>neurosoft.com.pe</strong></div></footer>
+</main>
+</body>
+</html>

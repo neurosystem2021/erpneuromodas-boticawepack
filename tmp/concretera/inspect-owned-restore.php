@@ -1,0 +1,8 @@
+﻿<?php
+if(PHP_SAPI!=='cli')exit;require 'C:/xampp/htdocs/boticav1/config/database.php';
+$r=json_decode(file_get_contents(__DIR__.'/../../output/concretera/respaldo-previo-limpieza.json'),true);$cfg=appDatabaseConfig();$cfg['dbname']='0';$db=new PDO(appDatabaseDsn($cfg),$cfg['user'],$cfg['pass'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+$tables=$db->query("SHOW FULL TABLES WHERE Table_type='BASE TABLE'")->fetchAll(PDO::FETCH_COLUMN);sort($tables);$proof=[];
+foreach($tables as $t){$h=[];foreach($db->query('SELECT * FROM `'.$t.'`')->fetchAll(PDO::FETCH_ASSOC) as $row)$h[]=hash('sha256',serialize($row));sort($h);$proof[$t]=['rows'=>count($h),'sha256'=>hash('sha256',implode("\n",$h))];}
+$dates=$db->query("SELECT MIN(CREATE_TIME) AS oldest,MAX(CREATE_TIME) AS newest,COUNT(*) AS tablesCount FROM information_schema.TABLES WHERE TABLE_SCHEMA='0'")->fetch(PDO::FETCH_ASSOC);
+$e=['temporarySchema'=>'0','allTableFingerprintsMatchOwnBackup'=>$proof===$r['fingerprints'],'sourceBackup'=>$r['backup'],'backupFileTime'=>date('Y-m-d H:i:s',filemtime($r['backup'].'/before.sql')),'tableCreationTimes'=>$dates,'creationExpressionInExecutedBuilder'=>"\$name='codex_wuanuko_backup_'+bin2hex(random_bytes(8));",'whySchemaZero'=>'PHP 7.4 + is numeric addition; two nonnumeric strings yielded 0 with two warnings. CREATE DATABASE succeeded; the restore then matched all 158 original tables. Intended string concatenation is dot; builder corrected.' ];
+file_put_contents(__DIR__.'/../../output/concretera/temporary-restore-proof.json',json_encode($e,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));echo json_encode($e,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE).PHP_EOL;

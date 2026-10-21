@@ -1,0 +1,5 @@
+﻿<?php
+if(PHP_SAPI!=='cli')exit;require 'C:/xampp/htdocs/boticav1/config/database.php';$db=appPdoConnection();if(appDatabaseConfig()['dbname']!=='fact_wuanukomix')throw new RuntimeException('Base inesperada');
+$out=['database'=>'fact_wuanukomix','tables'=>[],'foreignKeys'=>$db->query("SELECT TABLE_NAME,COLUMN_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL")->fetchAll(PDO::FETCH_ASSOC)];
+foreach($db->query("SHOW FULL TABLES WHERE Table_type='BASE TABLE'")->fetchAll(PDO::FETCH_COLUMN) as $t){$columns=$db->query('SHOW FULL COLUMNS FROM `'.$t.'`')->fetchAll(PDO::FETCH_ASSOC);$r=['name'=>$t,'rows'=>(int)$db->query('SELECT COUNT(*) FROM `'.$t.'`')->fetchColumn(),'columns'=>array_column($columns,'Field'),'engine'=>$db->query("SHOW TABLE STATUS WHERE Name=".$db->quote($t))->fetch(PDO::FETCH_ASSOC)['Engine']];$out['tables'][]=$r;echo $t.' '.$r['rows'].' '.implode(',',$r['columns']).PHP_EOL;}
+file_put_contents(__DIR__.'/../../output/concretera/reset-preflight.json',json_encode($out,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));

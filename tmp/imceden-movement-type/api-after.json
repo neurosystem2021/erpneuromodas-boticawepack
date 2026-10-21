@@ -1,0 +1,124 @@
+[
+  {
+    "endpoint": "ventas/tipos?q=",
+    "status": 200,
+    "rows": 6,
+    "keys": [
+      "IdTipoDoc",
+      "TipoDoc",
+      "VaRegVenta",
+      "CodSunat",
+      "TipoDocSunat",
+      "TieneIgv",
+      "LimiteItems",
+      "CodigoIgv",
+      "Orden",
+      "EsElectronico",
+      "Anulado"
+    ],
+    "types": [
+      "NOTA DE VENTA",
+      "FACTURA ELEC.",
+      "BOLETA ELEC.",
+      "TICKET SEPARACI\u00d3N DE PRENDAS",
+      "NOTA DE CREDITO ELEC.",
+      "FACTURA/IGV ELEC."
+    ]
+  },
+  {
+    "endpoint": "productos?q=&limit=5",
+    "status": 200,
+    "rows": 5,
+    "keys": [
+      "IdProducto",
+      "IdProductoMarca",
+      "IdProductoFormaFarmaceutica",
+      "IdProductoMedicion",
+      "IdProductoCategoria",
+      "IdProductoTalla",
+      "Producto",
+      "ProductoDesc",
+      "ProductoDescCorto",
+      "CodigoBarra",
+      "CodeBarModelo",
+      "Codigo"
+    ]
+  },
+  {
+    "endpoint": "movimientos/tipos?q=",
+    "status": 200,
+    "rows": 8,
+    "keys": [
+      "IdMovimientoTipo",
+      "TipoMovimiento",
+      "Tipo",
+      "VaRegCompra",
+      "CodSunat",
+      "TipoMovSunat",
+      "Anulado"
+    ],
+    "types": [
+      "COMPRA FACTURA",
+      "COMPRA BOLETA",
+      "COMPRA TICKET",
+      "INGRESO",
+      "TRASLADOS",
+      "SALIDA",
+      "DEVOLUCION DE CLIENTE",
+      "DEVOLUCION A PROVEEDOR"
+    ]
+  },
+  {
+    "endpoint": "productos/puntoventa/stock/1?q=&limit=5",
+    "status": 200,
+    "rows": 5,
+    "keys": [
+      "IdProducto",
+      "IdProductoMarca",
+      "IdProductoFormaFarmaceutica",
+      "IdProductoMedicion",
+      "IdProductoCategoria",
+      "IdProductoTalla",
+      "Producto",
+      "ProductoDesc",
+      "ProductoDescCorto",
+      "CodigoBarra",
+      "CodeBarModelo",
+      "Codigo"
+    ]
+  },
+  {
+    "endpoint": "almacenes/id/1",
+    "status": 200,
+    "rows": "object",
+    "keys": [
+      "IdAlmacen",
+      "Almacen",
+      "Anulado",
+      "FechaReg",
+      "UsuarioReg",
+      "FechaMod",
+      "UsuarioMod",
+      "Direccion",
+      "EsPrincipal"
+    ]
+  },
+  {
+    "endpoint": "puntoventa/id/1",
+    "status": 200,
+    "rows": "object",
+    "keys": [
+      "IdDocVentaPuntoVenta",
+      "PuntoVenta",
+      "SerieDocVenta",
+      "SerieImpresora",
+      "RutaImpresora",
+      "Anulado",
+      "FechaReg",
+      "UsuarioReg",
+      "FechaMod",
+      "UsuarioMod",
+      "IdImpresora"
+    ]
+  }
+]

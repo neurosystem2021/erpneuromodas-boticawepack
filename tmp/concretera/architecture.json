@@ -1,0 +1,2526 @@
+{
+    "php": "7.4.33",
+    "database": "nst",
+    "company": [
+        {
+            "IDEMPRESA": "1",
+            "RAZONSOCIAL": "CONSULTORA CONSTRUCTORA NEUROSYSTEM PERU S.A.C."
+        }
+    ],
+    "tables": {
+        "GEN_EMPRESA": {
+            "TABLE_NAME": "gen_empresa",
+            "ENGINE": "MyISAM",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IDEMPRESA",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "RAZONSOCIAL",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "RUC",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DIRECCION",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IGV",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CONSULTARUCURL",
+                    "Type": "varchar(255)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CONSULTARUCTOKEN",
+                    "Type": "text",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "APPTOKEN",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "APPURL",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "valorComision",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UBIGEO",
+                    "Type": "varchar(10)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DEPARTAMENTO",
+                    "Type": "varchar(100)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PROVINCIA",
+                    "Type": "varchar(100)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DISTRITO",
+                    "Type": "varchar(100)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "TELEFONO",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MerchantId",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrivateKey",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CELULAR",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EMAIL",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Gen_EmpresaConfig": {
+            "TABLE_NAME": "gen_empresaconfig",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdEmpresaConfig",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdEmpresa",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MetaKey",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MetaValue",
+                    "Type": "longtext",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Seg_Usuario": {
+            "TABLE_NAME": "seg_usuario",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "Usuario",
+                    "Type": "varchar(255)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdUsuarioPerfil",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Limitado",
+                    "Type": "tinyint(4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Password",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NombreUsuario",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdAlmacen",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdDocVentaPuntoVenta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdTipoDoc",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "CajaAbierta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Seg_UsuarioPerfil": {
+            "TABLE_NAME": "seg_usuarioperfil",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdUsuarioPerfil",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "UsuarioPerfil",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Seg_UsuarioModulo": {
+            "TABLE_NAME": "seg_usuariomodulo",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdUsuarioModulo",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "UsuarioModulo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Seg_UsuarioModulo_has_UsuarioPerfil": {
+            "TABLE_NAME": "seg_usuariomodulo_has_usuarioperfil",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdUsuarioModulo",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdUsuarioPerfil",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Lectura",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Escritura",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "1",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_DocVentaCliente": {
+            "TABLE_NAME": "ve_docventacliente",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdCliente",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "Cliente",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DniRuc",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Direccion",
+                    "Type": "longtext",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Telefono",
+                    "Type": "longtext",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Email",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Puntos",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsVIP",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Direccion2",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Sexo",
+                    "Type": "varchar(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Ocupacion",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaNacimiento",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Nacionalidad",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Direccion3",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NombreComercial",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "esComisionista",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Gen_Producto": {
+            "TABLE_NAME": "gen_producto",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdProducto",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdProductoMarca",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProductoFormaFarmaceutica",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProductoMedicion",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProductoCategoria",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Producto",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoDesc",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoDesc2",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoDesc3",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoDescCorto",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CodigoBarra",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CodigoSunat",
+                    "Type": "varchar(8)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Codigo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Dosis",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioContado",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioPorMayor",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "StockPorMayor",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ControlaStockMinimo",
+                    "Type": "tinyint(4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "StockMinimo",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Hash",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ControlaStock",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioCosto",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "VentaEstrategica",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PorcentajeUtilidad",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdBloque",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Genero",
+                    "Type": "varchar(45)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Color",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Botapie",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoModelo",
+                    "Type": "varchar(255)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProductoPresentacion",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsPadre",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "precioConvenio",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsHabitacion",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Piso",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "EstadoHabitacion",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "1",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdPreOrden",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdClienteReserva",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReserva",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquiler",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Vuelo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquilerFin",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EstaSucio",
+                    "Type": "tinyint(1)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "PreciosPorProducto",
+                    "Type": "longtext",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Imagen",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Imagen2",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Imagen3",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdOfertaCategoria",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MostrarApp",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "PosOferta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "10000",
+                    "Extra": ""
+                },
+                {
+                    "Field": "TienePresentacion",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "PorcentajeLiquidacion",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "OpcContable",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "TipoCambio",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "1",
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioCostoDolar",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioContadoDolar",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioApp",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaOfertaInicio",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaOfertaFin",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdEmpleado",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProductoTalla",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CodeBarModelo",
+                    "Type": "varchar(128)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioWeb",
+                    "Type": "decimal(18,4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioAnterior",
+                    "Type": "decimal(18,4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "OfertaWeb",
+                    "Type": "tinyint(4)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsServicioManoObra",
+                    "Type": "tinyint(1)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Gen_ProductoMedicion": {
+            "TABLE_NAME": "gen_productomedicion",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdProductoMedicion",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "ProductoMedicion",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Codigo",
+                    "Type": "varchar(45)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(45)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Lo_Almacen": {
+            "TABLE_NAME": "lo_almacen",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdAlmacen",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "Almacen",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "UNI",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Direccion",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsPrincipal",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_Proforma": {
+            "TABLE_NAME": "ve_proforma",
+            "ENGINE": "MyISAM",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdProforma",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "Numero",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anio",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCliente",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DiasValidos",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "7",
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(45)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsFavoritoFlag",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdDocVenta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "WebCargado",
+                    "Type": "tinyint(4)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Presentacion",
+                    "Type": "varchar(16)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "productos",
+                    "Extra": ""
+                },
+                {
+                    "Field": "AlcanceSistema",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EntregablesSistema",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CondicionesSistema",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FormatoProducto",
+                    "Type": "varchar(16)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "catalogo",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_ProformaDet": {
+            "TABLE_NAME": "ve_proformadet",
+            "ENGINE": "MyISAM",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdProformaDet",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdProforma",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProducto",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "DisabledTotal",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Cantidad",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Precio",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descuento",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_PreOrden": {
+            "TABLE_NAME": "ve_preorden",
+            "ENGINE": "MyISAM",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdPreOrden",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdCliente",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Estado",
+                    "Type": "varchar(3)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "LugarProcedencia",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MedioTransporte",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProximoDestino",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdDocVenta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquilerFin",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquilerInicio",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCajaBanco",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProforma",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_PreOrdenDet": {
+            "TABLE_NAME": "ve_preordendet",
+            "ENGINE": "MyISAM",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdPreOrden",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProducto",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Cantidad",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Precio",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsManoDeObra",
+                    "Type": "tinyint(4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Pagado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Cb_CajaBanco": {
+            "TABLE_NAME": "cb_cajabanco",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdCajaBanco",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdTipoCajaBanco",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCuenta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaDoc",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Concepto",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Importe",
+                    "Type": "double",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "date",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProveedor",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCliente",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCierre",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsDelVendedor",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "1",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdPreOrden",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_DocVenta": {
+            "TABLE_NAME": "ve_docventa",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "idDocVenta",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdDocVentaPuntoVenta",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCliente",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdTipoDoc",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdAlmacen",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Serie",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Numero",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaDoc",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Anulado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaReg",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioReg",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaMod",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "UsuarioMod",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Hash",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdCierre",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsCredito",
+                    "Type": "bit(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaCredito",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Estado",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "1",
+                    "Extra": ""
+                },
+                {
+                    "Field": "Hash_cpe",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Hash_cdr",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Msj_sunat",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "AnuladoDesc",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Ticket",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PagoCon",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CampoDireccion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdPreOrden",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "LugarProcedencia",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "MedioTransporte",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ProximoDestino",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "SunatResponse",
+                    "Type": "longtext",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ErrorSunatResponse",
+                    "Type": "longtext",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "CodSunatModifica",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NroComprobanteModifica",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NotaIdMotivo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NotaDescMotivo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "valorComision",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdComisionista",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ResumenFecha",
+                    "Type": "varchar(100)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ResumenCorrelativo",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "ResumenResponse",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PorEntregar",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "BajaFecha",
+                    "Type": "varchar(100)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "BajaCorrelativo",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "BajaMotivo",
+                    "Type": "varchar(255)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdPedido",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsDelivery",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "DireccionEntrega",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NombreLlevar",
+                    "Type": "varchar(250)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "GRE",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "NombreOrganizacion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsOrganizacion",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdOferta",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EntregadoOfertaFlag",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProforma",
+                    "Type": "int(11)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Garantia",
+                    "Type": "tinyint(4)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                }
+            ]
+        },
+        "Ve_DocVentaDet": {
+            "TABLE_NAME": "ve_docventadet",
+            "ENGINE": "InnoDB",
+            "TABLE_TYPE": "BASE TABLE",
+            "columns": [
+                {
+                    "Field": "IdDocVentaDet",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "PRI",
+                    "Default": null,
+                    "Extra": "auto_increment"
+                },
+                {
+                    "Field": "IdDocVenta",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "IdProducto",
+                    "Type": "int(11)",
+                    "Null": "NO",
+                    "Key": "MUL",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Cantidad",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Precio",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "PrecioCosto",
+                    "Type": "float",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descuento",
+                    "Type": "float",
+                    "Null": "NO",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquilerFin",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "Descripcion",
+                    "Type": "text",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "FechaAlquilerInicio",
+                    "Type": "datetime",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": null,
+                    "Extra": ""
+                },
+                {
+                    "Field": "EsManoDeObra",
+                    "Type": "tinyint(1)",
+                    "Null": "YES",
+                    "Key": "",
+                    "Default": "0",
+                    "Extra": ""
+                }
+            ]
+        }
+    },
+    "related": [
+        {
+            "TABLE_NAME": "cb_saldobancoauditoria",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "co_audit",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "crm_audit_log",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "lo_movimientoauditoria",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "ve_preorden",
+            "ENGINE": "MyISAM"
+        },
+        {
+            "TABLE_NAME": "ve_preordendet",
+            "ENGINE": "MyISAM"
+        },
+        {
+            "TABLE_NAME": "ve_preordendetpago",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "ve_proforma",
+            "ENGINE": "MyISAM"
+        },
+        {
+            "TABLE_NAME": "ve_proformaadjunto",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "ve_proformacontrato",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "ve_proformadet",
+            "ENGINE": "MyISAM"
+        },
+        {
+            "TABLE_NAME": "ve_proformaplantilla",
+            "ENGINE": "InnoDB"
+        }
+    ],
+    "candidateDatabases": []
+}

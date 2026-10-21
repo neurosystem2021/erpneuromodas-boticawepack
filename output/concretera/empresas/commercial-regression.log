@@ -1,0 +1,19 @@
+PASS A01 tarifario de seis alternativas sin sumar compra
+PASS A01 solo fc210 por 24 m3 contratados
+PASS Cálculo decimal de impuestos desde configuración ERP
+PASS Reintento de aceptación devuelve el mismo pedido
+PASS Idempotencia con datos diferentes no duplica [Esta clave ya se utilizó con otros datos. No se repitió la operación.]
+PASS A02 versiones aceptadas conservan precios y condiciones
+PASS Propuesta aceptada no se sobreescribe [Ya existe un pedido aceptado. Su contenido no se modifica; cree otra propuesta para un contrato nuevo.]
+PASS Presupuesto con metrado decimal
+PASS Volumen fraccional no se trunca al INT heredado
+PASS No se inventan cantidades enteras en la preorden heredada
+PASS Límite de descuentos del usuario [El descuento de la partida 1 supera su autorización de 5.0000%.]
+PASS Bombeo incluido no se cobra otra vez [El servicio figura incluido en las condiciones y no se puede cobrar otra vez.]
+PASS Módulo desactivado bloquea su operación [El módulo está desactivado para esta empresa.]
+PASS A22 usuario de otra empresa denegado [No tiene acceso a esta empresa.]
+PASS A22 ID de pedido ajeno no expone datos [Pedido no disponible.]
+PASS A22 ID de propuesta ajena no expone datos [Versión no disponible.]
+PASS No atribuir catálogo global a una segunda empresa [Con varias empresas, asigne referencias ERP individualmente; no se puede atribuir todo el catálogo.]
+PASS Auditoría persistida de operaciones y autorizaciones
+VERIFIED_SCHEMA codex_concretera_ab82b64513e01226

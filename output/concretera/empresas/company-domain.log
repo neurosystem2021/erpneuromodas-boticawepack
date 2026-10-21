@@ -1,0 +1,16 @@
+PASS Vincular dos RUC sin cambiar empresa previa
+PASS Registro idempotente sin duplicar empresas/grupo
+PASS Elegir emisor es obligatorio en el grupo
+PASS No elegir NEUROSYSTEM/empresa ajena como emisor
+PASS No inventar tasa tributaria cuando falta configurar
+PASS Ventas no modifica datos fiscales del emisor
+PASS Proforma y pedido conservan emisor 0 pese a parámetro de aceptación manipulado
+PASS Contexto de factura toma emisor persistido y no habilita emisión sin configurar
+PASS Proforma y pedido conservan emisor 1 pese a parámetro de aceptación manipulado
+PASS Contexto de factura toma emisor persistido y no habilita emisión sin configurar
+PASS Nueva versión no cambia el RUC de la propuesta
+PASS Nueva versión con mismo emisor conserva obra compartida
+PASS Empresa ajena no lee contexto fiscal del grupo
+PASS Cambiar perfil no altera encabezado de proformas aceptadas
+PASS Listado compartido distingue ambos emisores
+COMPANIES_COMPLETE

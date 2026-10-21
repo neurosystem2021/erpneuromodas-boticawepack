@@ -1,0 +1,21 @@
+/models/DBManager.php
+/error_log
+/api/sunat/api_cpe/BETA
+/api/sunat/api_cpe/PRODUCCION
+config/*.local.php
+config/*.local.json
+storage/
+whatsapp-gateway/node_modules/
+whatsapp-gateway/tokens/
+whatsapp-gateway/sessions/
+whatsapp-gateway/config.local.json
+whatsapp-gateway/.sessions/
+# Local deployment backups (keep on disk, exclude from Git)
+*.bak
+*.bak-*
+*.bak.*
+*backup-20*/
+*backup-20*
+
+# Wuanuko Mix: cache local de herramientas
+/tools/concretera/__pycache__/

@@ -1,0 +1,22 @@
+--- a/controllers/validarLogin.php
++++ b/controllers/validarLogin.php
+@@ -97,7 +97,7 @@
+ 
+ $results = array(
+ 	'isLogin' => $val,
+- 'redirect' => !empty($_SESSION['diario_programador']) ? '/views/diario.php' : '/views/V_VentaForm.php',
++ 'redirect' => !empty($_SESSION['diario_programador']) ? '/views/diario.php' : '/views/V_VentaForm.php?pos=imceden',
+ 	'message' => $res,
+ 	'cantidad_res' => $max_attempts - $_SESSION['failed_attempts']
+ 
+--- a/index.php
++++ b/index.php
+@@ -4208,7 +4208,7 @@
+             sessionStorage.setItem("hostUrl", "https://" + location.host);
+             sessionStorage.setItem("HostUrl", "https://" + location.host);
+             botonAcceder.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Acceso concedido</span>';
+-            window.location = res.redirect || "/views/V_VentaForm.php";
++            window.location = res.redirect || "/views/V_VentaForm.php?pos=imceden";
+           } else {
+             errorLogin.innerText = res.message;
+           }

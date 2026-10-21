@@ -1,0 +1,158 @@
+[
+  {
+    "route": "/proveedores/deudas/letras",
+    "queries": 1
+  },
+  {
+    "route": "/clientes/deudas/letras",
+    "queries": 1
+  },
+  {
+    "route": "/ListarCajaBanco",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/estadistica/dashbora/dia",
+    "queries": 1
+  },
+  {
+    "route": "/reporte/movimientos",
+    "queries": 1
+  },
+  {
+    "route": "/reporte/totalcompraporproveedor",
+    "queries": 1
+  },
+  {
+    "route": "/reporte/listarregmov",
+    "queries": 1
+  },
+  {
+    "route": "/exportar/compras/zip",
+    "queries": 1
+  },
+  {
+    "route": "/exportar/ventas/zip",
+    "queries": 1
+  },
+  {
+    "route": "/buscador_cajabanco",
+    "queries": 1
+  },
+  {
+    "route": "/proformas/favoritas",
+    "queries": 1
+  },
+  {
+    "route": "/ordencompra",
+    "queries": 1
+  },
+  {
+    "route": "/ordenCompra",
+    "queries": 1
+  },
+  {
+    "route": "/cierrecaja/salidas",
+    "queries": 2
+  },
+  {
+    "route": "/cierrecaja/ingresos/adelantos",
+    "queries": 1
+  },
+  {
+    "route": "/cierrecaja/ingresos",
+    "queries": 2
+  },
+  {
+    "route": "/cierrecaja/ventas",
+    "queries": 3
+  },
+  {
+    "route": "/cierrecaja/count",
+    "queries": 1
+  },
+  {
+    "route": "/cierrecaja/reporte",
+    "queries": 1
+  },
+  {
+    "route": "/cierrecaja",
+    "queries": 1
+  },
+  {
+    "route": "/cajabanco/detalles",
+    "queries": 1
+  },
+  {
+    "route": "/reporte/ventasproducto",
+    "queries": 1
+  },
+  {
+    "route": "/proveedores/deudas",
+    "queries": 1
+  },
+  {
+    "route": "/proveedores/deuda/count",
+    "queries": 1
+  },
+  {
+    "route": "/clientes/deuda/count",
+    "queries": 1
+  },
+  {
+    "route": "/cliente/pagos",
+    "queries": 1
+  },
+  {
+    "route": "/cliente/deudas",
+    "queries": 1
+  },
+  {
+    "route": "/proformas/count",
+    "queries": 1
+  },
+  {
+    "route": "/proformas",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/count",
+    "queries": 1
+  },
+  {
+    "route": "/ventas",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/usuario",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/total",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/busqueda",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/lista/[{idPuntoVenta}]",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/estadistica/rango",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/estadistica/mes",
+    "queries": 1
+  },
+  {
+    "route": "/ventas/estadistica/dia",
+    "queries": 1
+  },
+  {
+    "route": "/movimientos/lista",
+    "queries": 1
+  }
+]

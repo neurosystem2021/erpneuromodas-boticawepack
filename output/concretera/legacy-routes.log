@@ -1,0 +1,24 @@
+PASS ruta real GET /proformas/id/{id}
+PASS ruta real GET /proformas/productos/{id}
+PASS ruta real GET /proformas/detalle
+PASS ruta real GET /preorden/detalle
+PASS ruta real GET /preorden/proforma
+PASS ruta real GET /preorden/cajaybanco
+PASS ruta real GET /proyecto/detalle
+PASS ruta real GET /proyecto/cajaybanco/todo
+PASS ruta real GET /enviarproformapdf
+PASS ruta real POST /ventas
+PASS ruta real POST /preorden/detalle
+PASS ruta real POST /preorden/cajaybanco
+PASS ruta real POST /preorden/cajaybanco/gasto
+PASS ruta real POST /proyecto/descripcion
+PASS ruta real DELETE /proforma/anular/{id}
+PASS ruta real PUT /proforma/cambiarfavorito
+PASS listado real del POS y contadores excluyen suministro
+PASS ruta real GET /proformas
+PASS ruta real GET /proformas/count
+PASS ruta real GET /proformas/favoritas
+PASS ruta real GET /preorden
+PASS ruta real GET /preorden/count
+PASS ruta real GET /proformas/detalle
+LEGACY_COMPLETE

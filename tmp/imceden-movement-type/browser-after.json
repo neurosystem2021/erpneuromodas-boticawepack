@@ -1,0 +1,28 @@
+{
+  "checks": [
+    {
+      "label": "Movement types",
+      "anchor": "TipoMovimiento",
+      "rows": 8,
+      "visible": true,
+      "endpoint": "/api/index.php/movimientos/tipos"
+    },
+    {
+      "label": "Sale types",
+      "anchor": "TipoDoc",
+      "rows": 6,
+      "visible": true,
+      "endpoint": "/api/index.php/ventas/tipos"
+    },
+    {
+      "label": "POS products",
+      "anchor": "Producto",
+      "rows": 30,
+      "visible": true,
+      "endpoint": "/api/index.php/productos/puntoventa/stock/1"
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "writesBlocked": true
+}

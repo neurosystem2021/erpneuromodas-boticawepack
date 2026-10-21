@@ -1,0 +1,14 @@
+{
+  "unidadAditivos": "L",
+  "aclaracionesUsuario": [
+    {
+      "fecha": "2026-10-19",
+      "campo": "unidadAditivos",
+      "valor": "L",
+      "columnas": ["J", "K"],
+      "origen": "CONFIRMACION_USUARIO",
+      "textoOriginal": "el aditivo es en litros"
+    }
+  ],
+  "productosConfirmados": false
+}

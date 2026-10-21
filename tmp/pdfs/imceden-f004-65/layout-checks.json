@@ -1,0 +1,72 @@
+[
+  {
+    "case": "factura",
+    "pages": 1,
+    "items": 10,
+    "last_item": [
+      0,
+      496.78399658203125
+    ],
+    "summary": [
+      0,
+      523.0460205078125
+    ],
+    "no_overlap": true
+  },
+  {
+    "case": "boleta-multipagina",
+    "pages": 2,
+    "items": 45,
+    "last_item": [
+      1,
+      457.71600341796875
+    ],
+    "summary": [
+      1,
+      483.9790344238281
+    ],
+    "no_overlap": true
+  },
+  {
+    "case": "nota-venta",
+    "pages": 1,
+    "items": 10,
+    "last_item": [
+      0,
+      485.11700439453125
+    ],
+    "summary": [
+      0,
+      511.3790283203125
+    ],
+    "no_overlap": true
+  },
+  {
+    "case": "descripciones-largas",
+    "pages": 3,
+    "items": 15,
+    "last_item": [
+      1,
+      742.5700073242188
+    ],
+    "summary": [
+      2,
+      26.72899627685547
+    ],
+    "no_overlap": true
+  },
+  {
+    "case": "factura-una-linea",
+    "pages": 1,
+    "items": 1,
+    "last_item": [
+      0,
+      293.8999938964844
+    ],
+    "summary": [
+      0,
+      320.16302490234375
+    ],
+    "no_overlap": true
+  }
+]

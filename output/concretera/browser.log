@@ -1,0 +1,1 @@
+PASS browser: actual UI and API create work, specification, tariff, issue, accept 24 m3 and persist order; PDF links, escaped text, retained form errors, mobile layout; real endpoint rejects anonymous, CSRF and cross-company PDF/preview/API access. Synthetic isolated database only.

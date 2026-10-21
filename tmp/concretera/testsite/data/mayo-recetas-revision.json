@@ -1,0 +1,3570 @@
+{
+  "archivo": "INFORME MES DE MAYO.xlsx",
+  "sha256": "8faf1670e8bf1c3d5f236698d9b09a15ac26b418b712bfa701a75fc02ed46354",
+  "hojas": [
+    "01-05-26  (33)",
+    "04-05-26  (28)",
+    "05-05-26  (34)",
+    "06-05-26  (35)",
+    "07-05-26  (36)",
+    "08-05-26  (29)",
+    "09-05-26  (29)",
+    "11-05-26  (37)",
+    "12-05-26  (30)",
+    "13-05-26  (39)",
+    "15-05-26  (40)",
+    "16-05-26  (41)",
+    "18-05-26  (31)",
+    "19-05-26  (42)",
+    "20-05-26  (43)",
+    "21-05-26  (44)",
+    "22-05-26  (32)",
+    "23-05-26  (33)",
+    "25-05-26  (45)",
+    "26-05-26  (34)",
+    "27-05-26  (46)",
+    "28-05-26  (35)",
+    "29-05-26  (47)",
+    "30-05-26  (36)"
+  ],
+  "unidadAditivos": "L",
+  "aclaracionesUsuario": [
+    {
+      "fecha": "2026-10-19",
+      "campo": "unidadAditivos",
+      "valor": "L",
+      "columnas": [
+        "J",
+        "K"
+      ],
+      "origen": "CONFIRMACION_USUARIO",
+      "textoOriginal": "el aditivo es en litros"
+    }
+  ],
+  "productosAditivosConfirmados": false,
+  "filasHistoricas": 140,
+  "variantes": [
+    {
+      "id": "MAYO-FC-100-C-200",
+      "resistencia": "100",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "200",
+      "registros": 8,
+      "volumenHistoricoM3": "63",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "20-05-26  (43)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C13:K13",
+          "fila": 13,
+          "celdas": {
+            "resistencia": "C13",
+            "volumen": "F13",
+            "cementoPorM3": "G13",
+            "cementoCalculado": "H13",
+            "cementoUtilizadoCalculado": "I13",
+            "aditivoJ": "J13",
+            "aditivoK": "K13"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F13*G13",
+            "I": "=F13*G13",
+            "J": "=H13*1/100",
+            "K": "=H13*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C14:K14",
+          "fila": 14,
+          "celdas": {
+            "resistencia": "C14",
+            "volumen": "F14",
+            "cementoPorM3": "G14",
+            "cementoCalculado": "H14",
+            "cementoUtilizadoCalculado": "I14",
+            "aditivoJ": "J14",
+            "aditivoK": "K14"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F14*G14",
+            "I": "=F14*G14",
+            "J": "=H14*1/100",
+            "K": "=H14*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C15:K15",
+          "fila": 15,
+          "celdas": {
+            "resistencia": "C15",
+            "volumen": "F15",
+            "cementoPorM3": "G15",
+            "cementoCalculado": "H15",
+            "cementoUtilizadoCalculado": "I15",
+            "aditivoJ": "J15",
+            "aditivoK": "K15"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F15*G15",
+            "I": "=F15*G15",
+            "J": "=H15*1/100",
+            "K": "=H15*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C17:K17",
+          "fila": 17,
+          "celdas": {
+            "resistencia": "C17",
+            "volumen": "F17",
+            "cementoPorM3": "G17",
+            "cementoCalculado": "H17",
+            "cementoUtilizadoCalculado": "I17",
+            "aditivoJ": "J17",
+            "aditivoK": "K17"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F17*G17",
+            "I": "=F17*G17",
+            "J": "=H17*1/100",
+            "K": "=H17*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "30-05-26  (36)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "30-05-26  (36)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-175-C-250",
+      "resistencia": "175",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "250",
+      "registros": 13,
+      "volumenHistoricoM3": "114.0",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "28-05-26  (35)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "28-05-26  (35)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "28-05-26  (35)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "28-05-26  (35)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "6.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "11",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C14:K14",
+          "fila": 14,
+          "celdas": {
+            "resistencia": "C14",
+            "volumen": "F14",
+            "cementoPorM3": "G14",
+            "cementoCalculado": "H14",
+            "cementoUtilizadoCalculado": "I14",
+            "aditivoJ": "J14",
+            "aditivoK": "K14"
+          },
+          "volumenM3": "9.5",
+          "formulas": {
+            "H": "=F14*G14",
+            "I": "=F14*G14",
+            "J": "=H14*1/100",
+            "K": "=H14*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "30-05-26  (36)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-175-C-260",
+      "resistencia": "175",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "260",
+      "registros": 13,
+      "volumenHistoricoM3": "109.5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "20-05-26  (43)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "8.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "23-05-26  (33)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "23-05-26  (33)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "23-05-26  (33)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "9.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "8.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-175-C-280",
+      "resistencia": "175",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "280",
+      "registros": 12,
+      "volumenHistoricoM3": "89.5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "01-05-26  (33)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "01-05-26  (33)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "7.5",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "08-05-26  (29)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "08-05-26  (29)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "5.5",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "11",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "MORTERO"
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-210-C-250",
+      "resistencia": "210",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "250",
+      "registros": 6,
+      "volumenHistoricoM3": "24.0",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "1.5",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "08-05-26  (29)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "6.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "13-05-26  (39)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "1.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C18:K18",
+          "fila": 18,
+          "celdas": {
+            "resistencia": "C18",
+            "volumen": "F18",
+            "cementoPorM3": "G18",
+            "cementoCalculado": "H18",
+            "cementoUtilizadoCalculado": "I18",
+            "aditivoJ": "J18",
+            "aditivoK": "K18"
+          },
+          "volumenM3": "2.5",
+          "formulas": {
+            "H": "=F18*G18",
+            "I": "=F18*G18",
+            "J": "=H18*1/100",
+            "K": "=H18*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-210-C-260",
+      "resistencia": "210",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "260",
+      "registros": 1,
+      "volumenHistoricoM3": "5.5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "16-05-26  (41)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "5.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-210-C-270",
+      "resistencia": "210",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "270",
+      "registros": 10,
+      "volumenHistoricoM3": "85.0",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "9.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "27-05-26  (46)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "28-05-26  (35)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "30-05-26  (36)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "8.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-210-C-280",
+      "resistencia": "210",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "280",
+      "registros": 54,
+      "volumenHistoricoM3": "397.5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "01-05-26  (33)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "01-05-26  (33)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "04-05-26  (28)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "9.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "04-05-26  (28)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "04-05-26  (28)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "5.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "04-05-26  (28)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "5.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "05-05-26  (34)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "05-05-26  (34)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "05-05-26  (34)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "07-05-26  (36)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "09-05-26  (29)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "11-05-26  (37)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C13:K13",
+          "fila": 13,
+          "celdas": {
+            "resistencia": "C13",
+            "volumen": "F13",
+            "cementoPorM3": "G13",
+            "cementoCalculado": "H13",
+            "cementoUtilizadoCalculado": "I13",
+            "aditivoJ": "J13",
+            "aditivoK": "K13"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F13*G13",
+            "I": "=F13*G13",
+            "J": "=H13*1/100",
+            "K": "=H13*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "12-05-26  (30)",
+          "rango": "C14:K14",
+          "fila": 14,
+          "celdas": {
+            "resistencia": "C14",
+            "volumen": "F14",
+            "cementoPorM3": "G14",
+            "cementoCalculado": "H14",
+            "cementoUtilizadoCalculado": "I14",
+            "aditivoJ": "J14",
+            "aditivoK": "K14"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F14*G14",
+            "I": "=F14*G14",
+            "J": "=H14*1/100",
+            "K": "=H14*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "10.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "8.5",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "16-05-26  (41)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "16-05-26  (41)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "18-05-26  (31)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "19-05-26  (42)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "2",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "19-05-26  (42)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "11",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "21-05-26  (44)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "22-05-26  (32)",
+          "rango": "C16:K16",
+          "fila": 16,
+          "celdas": {
+            "resistencia": "C16",
+            "volumen": "F16",
+            "cementoPorM3": "G16",
+            "cementoCalculado": "H16",
+            "cementoUtilizadoCalculado": "I16",
+            "aditivoJ": "J16",
+            "aditivoK": "K16"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F16*G16",
+            "I": "=F16*G16",
+            "J": "=H16*1/100",
+            "K": "=H16*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "23-05-26  (33)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "9.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "23-05-26  (33)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "11",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "6",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "IMPERMEABILIZADO"
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "7",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "IMPERMEABILIZADO"
+        },
+        {
+          "hoja": "26-05-26  (34)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "29-05-26  (47)",
+          "rango": "C13:K13",
+          "fila": 13,
+          "celdas": {
+            "resistencia": "C13",
+            "volumen": "F13",
+            "cementoPorM3": "G13",
+            "cementoCalculado": "H13",
+            "cementoUtilizadoCalculado": "I13",
+            "aditivoJ": "J13",
+            "aditivoK": "K13"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F13*G13",
+            "I": "=F13*G13",
+            "J": "=H13*1/100",
+            "K": "=H13*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-210-C-290",
+      "resistencia": "210",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "290",
+      "registros": 6,
+      "volumenHistoricoM3": "39.5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "11-05-26  (37)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "11.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "11-05-26  (37)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "0.5",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "13-05-26  (39)",
+          "rango": "C5:K5",
+          "fila": 5,
+          "celdas": {
+            "resistencia": "C5",
+            "volumen": "F5",
+            "cementoPorM3": "G5",
+            "cementoCalculado": "H5",
+            "cementoUtilizadoCalculado": "I5",
+            "aditivoJ": "J5",
+            "aditivoK": "K5"
+          },
+          "volumenM3": "7.5",
+          "formulas": {
+            "H": "=F5*G5",
+            "I": "=F5*G5",
+            "J": "=H5*1/100",
+            "K": "=H5*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "IMPERMEABILIZADO"
+        },
+        {
+          "hoja": "13-05-26  (39)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "7.5",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "IMPERMEABILIZADO"
+        },
+        {
+          "hoja": "13-05-26  (39)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": "IMPERMEABILIZADO"
+        },
+        {
+          "hoja": "20-05-26  (43)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "4.5",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-245-C-305",
+      "resistencia": "245",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "305",
+      "registros": 2,
+      "volumenHistoricoM3": "5",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C6:K6",
+          "fila": 6,
+          "celdas": {
+            "resistencia": "C6",
+            "volumen": "F6",
+            "cementoPorM3": "G6",
+            "cementoCalculado": "H6",
+            "cementoUtilizadoCalculado": "I6",
+            "aditivoJ": "J6",
+            "aditivoK": "K6"
+          },
+          "volumenM3": "4",
+          "formulas": {
+            "H": "=F6*G6",
+            "I": "=F6*G6",
+            "J": "=H6*1/100",
+            "K": "=H6*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "06-05-26  (35)",
+          "rango": "C8:K8",
+          "fila": 8,
+          "celdas": {
+            "resistencia": "C8",
+            "volumen": "F8",
+            "cementoPorM3": "G8",
+            "cementoCalculado": "H8",
+            "cementoUtilizadoCalculado": "I8",
+            "aditivoJ": "J8",
+            "aditivoK": "K8"
+          },
+          "volumenM3": "1",
+          "formulas": {
+            "H": "=F8*G8",
+            "I": "=F8*G8",
+            "J": "=H8*1/100",
+            "K": "=H8*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    },
+    {
+      "id": "MAYO-FC-280-C-315",
+      "resistencia": "280",
+      "unidadResistencia": "kg/cm2",
+      "cementoKgPorM3": "315",
+      "registros": 15,
+      "volumenHistoricoM3": "133.0",
+      "porcentajeJ": "1",
+      "porcentajeK": "0.05",
+      "estado": "ANTECEDENTE_INCOMPLETO",
+      "origenes": [
+        {
+          "hoja": "01-05-26  (33)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "5",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "SIN BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "10",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C13:K13",
+          "fila": 13,
+          "celdas": {
+            "resistencia": "C13",
+            "volumen": "F13",
+            "cementoPorM3": "G13",
+            "cementoCalculado": "H13",
+            "cementoUtilizadoCalculado": "I13",
+            "aditivoJ": "J13",
+            "aditivoK": "K13"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F13*G13",
+            "I": "=F13*G13",
+            "J": "=H13*1/100",
+            "K": "=H13*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C14:K14",
+          "fila": 14,
+          "celdas": {
+            "resistencia": "C14",
+            "volumen": "F14",
+            "cementoPorM3": "G14",
+            "cementoCalculado": "H14",
+            "cementoUtilizadoCalculado": "I14",
+            "aditivoJ": "J14",
+            "aditivoK": "K14"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F14*G14",
+            "I": "=F14*G14",
+            "J": "=H14*1/100",
+            "K": "=H14*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C15:K15",
+          "fila": 15,
+          "celdas": {
+            "resistencia": "C15",
+            "volumen": "F15",
+            "cementoPorM3": "G15",
+            "cementoCalculado": "H15",
+            "cementoUtilizadoCalculado": "I15",
+            "aditivoJ": "J15",
+            "aditivoK": "K15"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F15*G15",
+            "I": "=F15*G15",
+            "J": "=H15*1/100",
+            "K": "=H15*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C16:K16",
+          "fila": 16,
+          "celdas": {
+            "resistencia": "C16",
+            "volumen": "F16",
+            "cementoPorM3": "G16",
+            "cementoCalculado": "H16",
+            "cementoUtilizadoCalculado": "I16",
+            "aditivoJ": "J16",
+            "aditivoK": "K16"
+          },
+          "volumenM3": "12",
+          "formulas": {
+            "H": "=F16*G16",
+            "I": "=F16*G16",
+            "J": "=H16*1/100",
+            "K": "=H16*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "15-05-26  (40)",
+          "rango": "C17:K17",
+          "fila": 17,
+          "celdas": {
+            "resistencia": "C17",
+            "volumen": "F17",
+            "cementoPorM3": "G17",
+            "cementoCalculado": "H17",
+            "cementoUtilizadoCalculado": "I17",
+            "aditivoJ": "J17",
+            "aditivoK": "K17"
+          },
+          "volumenM3": "10.5",
+          "formulas": {
+            "H": "=F17*G17",
+            "I": "=F17*G17",
+            "J": "=H17*1/100",
+            "K": "=H17*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C7:K7",
+          "fila": 7,
+          "celdas": {
+            "resistencia": "C7",
+            "volumen": "F7",
+            "cementoPorM3": "G7",
+            "cementoCalculado": "H7",
+            "cementoUtilizadoCalculado": "I7",
+            "aditivoJ": "J7",
+            "aditivoK": "K7"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F7*G7",
+            "I": "=F7*G7",
+            "J": "=H7*1/100",
+            "K": "=H7*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C9:K9",
+          "fila": 9,
+          "celdas": {
+            "resistencia": "C9",
+            "volumen": "F9",
+            "cementoPorM3": "G9",
+            "cementoCalculado": "H9",
+            "cementoUtilizadoCalculado": "I9",
+            "aditivoJ": "J9",
+            "aditivoK": "K9"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F9*G9",
+            "I": "=F9*G9",
+            "J": "=H9*1/100",
+            "K": "=H9*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C10:K10",
+          "fila": 10,
+          "celdas": {
+            "resistencia": "C10",
+            "volumen": "F10",
+            "cementoPorM3": "G10",
+            "cementoCalculado": "H10",
+            "cementoUtilizadoCalculado": "I10",
+            "aditivoJ": "J10",
+            "aditivoK": "K10"
+          },
+          "volumenM3": "8",
+          "formulas": {
+            "H": "=F10*G10",
+            "I": "=F10*G10",
+            "J": "=H10*1/100",
+            "K": "=H10*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C11:K11",
+          "fila": 11,
+          "celdas": {
+            "resistencia": "C11",
+            "volumen": "F11",
+            "cementoPorM3": "G11",
+            "cementoCalculado": "H11",
+            "cementoUtilizadoCalculado": "I11",
+            "aditivoJ": "J11",
+            "aditivoK": "K11"
+          },
+          "volumenM3": "8.5",
+          "formulas": {
+            "H": "=F11*G11",
+            "I": "=F11*G11",
+            "J": "=H11*1/100",
+            "K": "=H11*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        },
+        {
+          "hoja": "25-05-26  (45)",
+          "rango": "C12:K12",
+          "fila": 12,
+          "celdas": {
+            "resistencia": "C12",
+            "volumen": "F12",
+            "cementoPorM3": "G12",
+            "cementoCalculado": "H12",
+            "cementoUtilizadoCalculado": "I12",
+            "aditivoJ": "J12",
+            "aditivoK": "K12"
+          },
+          "volumenM3": "9",
+          "formulas": {
+            "H": "=F12*G12",
+            "I": "=F12*G12",
+            "J": "=H12*1/100",
+            "K": "=H12*0.05/100"
+          },
+          "formulasReconocidas": true,
+          "servicio": "CON BOMBA",
+          "observacionTecnica": null
+        }
+      ]
+    }
+  ],
+  "mapeo": {
+    "C": "Resistencia f’c",
+    "F": "Volumen de la guía (m³)",
+    "G": "Cemento de diseño por m³ (kg)",
+    "H": "Cemento calculado F×G",
+    "I": "Cemento utilizado: fórmula F×G, no medición independiente",
+    "J": "ADITIVO WR-20: H×1/100; resultado en L confirmado por el usuario; resumen de stock WG5550",
+    "K": "ADITIVO: H×0.05/100; resultado en L confirmado por el usuario; resumen de stock RETARDANTE"
+  },
+  "incidencias": [
+    "Faltan arena, piedra, agua, bases de dosificación, edad de diseño y slump.",
+    "Unidad de J/K confirmada en litros. Falta confirmar productos: WR-20 y WG5550 no se equiparan automáticamente.",
+    "Las variantes de una misma resistencia no se unifican ni se elige la última como aprobada.",
+    "El informe no contiene f’c 140 ni resultados de ensayos de laboratorio.",
+    "Los cálculos de cemento utilizado y los saldos de silos no generan consumos ni existencias actuales."
+  ],
+  "recetasAprobadasExtraidas": 0,
+  "archivoModificado": false,
+  "movimientosGenerados": 0
+}

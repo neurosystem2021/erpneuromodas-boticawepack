@@ -1,0 +1,61 @@
+{
+  "fuente": {
+    "archivo": "WhatsApp Image 2026-10-08 at 1.00.24 PM (1).jpeg",
+    "sha256": "767b5cc19b03d1c92c444608d9ac51b2456f7077b3f452c6f6725f222030266b",
+    "documento": "Cotización 077-2026",
+    "fechaDocumento": "2026-09-10",
+    "preciosActualesConfirmadosPorUsuario": "2026-10-19",
+    "impuestoIncluido": false,
+    "moneda": "PEN"
+  },
+  "productos": [
+    {
+      "codigo": "WM-FC-100",
+      "nombre": "CONCRETO PREMEZCLADO F’C 100 KG/CM2",
+      "clase": "CONCRETO",
+      "resistencia": 100,
+      "unidad": "m3",
+      "precioSinImpuesto": "340"
+    },
+    {
+      "codigo": "WM-FC-140",
+      "nombre": "CONCRETO PREMEZCLADO F’C 140 KG/CM2",
+      "clase": "CONCRETO",
+      "resistencia": 140,
+      "unidad": "m3",
+      "precioSinImpuesto": "370"
+    },
+    {
+      "codigo": "WM-FC-175",
+      "nombre": "CONCRETO PREMEZCLADO F’C 175 KG/CM2",
+      "clase": "CONCRETO",
+      "resistencia": 175,
+      "unidad": "m3",
+      "precioSinImpuesto": "390"
+    },
+    {
+      "codigo": "WM-FC-210",
+      "nombre": "CONCRETO PREMEZCLADO F’C 210 KG/CM2",
+      "clase": "CONCRETO",
+      "resistencia": 210,
+      "unidad": "m3",
+      "precioSinImpuesto": "410"
+    },
+    {
+      "codigo": "WM-FC-280",
+      "nombre": "CONCRETO PREMEZCLADO F’C 280 KG/CM2",
+      "clase": "CONCRETO",
+      "resistencia": 280,
+      "unidad": "m3",
+      "precioSinImpuesto": "450"
+    },
+    {
+      "codigo": "WM-BOMBA-PLUMA",
+      "nombre": "SERVICIO DE BOMBA PLUMA",
+      "clase": "SERVICIO",
+      "servicio": "BOMBEO",
+      "unidad": "m3",
+      "precioSinImpuesto": "60"
+    }
+  ]
+}

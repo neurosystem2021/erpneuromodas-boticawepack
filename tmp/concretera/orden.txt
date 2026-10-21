@@ -1,0 +1,511 @@
+# NEUROSOFT Concretera
+## Especificación y orden de desarrollo para Wuanuko Mix
+
+Versión 1.0. Fecha de referencia 18 de octubre de 2026, America/Lima.
+
+OBJETIVO PARA CODEX
+Implementa dentro del repositorio existente de NEUROSOFT un módulo de concretera que conecte proforma, pedido por obra, programación de vaciado, diseño aprobado de mezcla, preparación por tandas, carga de mixer, guía de despacho, recepción en obra, calidad, inventario, costos, facturación y cobranza. La guía Wuanuko Mix es la referencia principal del proceso operativo. Los otros archivos son fuentes de campos, controles e importación histórica.
+
+Empieza inspeccionando la arquitectura y las instrucciones del repositorio. Adapta esta especificación a las convenciones existentes. Construye funcionalidad comprobable por etapas y continúa con las siguientes etapas cuando sus dependencias estén resueltas. No des por completado el encargo con un menú, pantallas de ejemplo o un plan sin implementación. Registra por separado lo implementado, lo verificado y las integraciones pendientes por falta de datos o acceso.
+
+La prioridad inicial es completar un caso real desde la aceptación de una proforma hasta una carga preparada, su guía impresa, su recepción y su liquidación, con el consumo de materiales registrado una sola vez. Las recetas requieren aprobación del responsable técnico de la concretera. Los datos históricos no equivalen por sí mismos a diseños aprobados ni a pesajes certificados.
+
+## 1 Integración con el sistema existente
+
+Revisa AGENTS.md, estructura de carpetas, manifiestos de dependencias, rutas, controladores, servicios, vistas, migraciones, conexión a base de datos, autenticación, permisos, empresas, sucursales, almacenes, clientes, productos, proformas, ventas, compras, caja, cuentas por cobrar, facturación electrónica y generación de PDF. Identifica el framework y sus versiones desde el código. Esta especificación no presupone Laravel, PHP nativo, Node ni un esquema de tablas concreto.
+
+Entrega un mapa breve de reutilización: componente existente, adaptación requerida y componente nuevo. Conserva las claves de empresa, cliente, producto, documento y almacén del ERP. Las tablas de dominio propuestas más adelante son nombres orientativos. Evita crear un segundo catálogo de clientes, un segundo kardex, otra caja o un facturador paralelo.
+
+Trabaja en una rama de desarrollo identificable, respetando los cambios locales existentes. Usa migraciones aditivas, datos de demostración separados y una opción de activación del módulo por empresa. Con el módulo desactivado, los clientes de otros giros deben conservar sus flujos. Implementa las nuevas capacidades como módulos del sistema actual, salvo que la arquitectura del repositorio requiera otra solución documentada.
+
+No ejecutes operaciones destructivas para adaptar los datos. Prepara respaldo, migración, validaciones y reversión antes del despliegue. Ejecuta primero en un entorno de prueba. El despliegue a producción y la escritura de datos operativos reales requieren la autorización correspondiente. Ninguna credencial recibida para revisar el Excel debe convertirse en una contraseña inicial, semilla, comentario o archivo del repositorio.
+
+## 2 Qué muestran los archivos
+
+Se analizaron doce libros y tres imágenes. Dos imágenes son copias idénticas de la cotización 077 de 2026. Las imágenes representan dos cotizaciones distintas. El contenido del Excel y sus fórmulas se revisaron sin ejecutar macros ni recalcular los originales. El formulario de la guía se titula NOTA DE PEDIDO y contiene datos operativos sin precios. No se encontró conexión automática entre ese libro y el libro de diseños en las fórmulas y código VBA inspeccionados.
+
+| Fuente | Qué representa | Destino en NEUROSOFT |
+| Guía Wuanuko Mix | Registro, base histórica, búsqueda y dos copias de guía por carga | Despachos, trazabilidad, impresión y recepción |
+| Diseños setiembre | Composición y cálculo de dosificación por diseño y volumen | Diseños versionados y orden de preparación |
+| Control de cemento | Despachos, dosis, silos, entradas y diferencias de inventario | Consumos, reservas, conteos y kardex |
+| Informe de mayo | Consolidado diario de producción, silos y aditivos | Reportes generados desde las operaciones |
+| Aditivos setiembre | Ingreso de productos con cantidad de envases y peso | Recepciones por material y presentación |
+| Arena del señor Lucero | Viajes con volumen, placa y cantera | Recepciones de agregados y liquidación de transporte |
+| Piedra y polvillo | Volumen por viaje multiplicado por viajes de una fecha o pedido | Recepciones históricas agregadas y compras |
+| Liquidación de petróleo | Vales, cantidades, precios e importes | Combustible, conciliación y costos de equipos |
+| Control de viajes | Actividad por unidad, obra y referencias de combustible | Viajes, productividad y asignación de costos |
+| Mantenimiento | Lecturas de equipos y servicios por unidad | Flota, disponibilidad y mantenimiento |
+| Desayunos de agosto | Consumos de alimentación y liquidaciones | Gastos por trabajador, fecha y centro de costo |
+| Almuerzos de setiembre | Consumos y liquidación de alimentación | Gastos operativos y cuenta por pagar |
+| Cotizaciones 077 y 084 | Precios unitarios por resistencia y condiciones comerciales | Proformas, tarifas por obra y aceptación |
+
+Las cotizaciones presentan alternativas a precio por un m³. No representan automáticamente un pedido que compre un m³ de cada resistencia. En la cotización 077, f'c 210 figura a S/ 410 por m³ y el bombeo figura a S/ 60 por m³. En la 084, f'c 210 figura a S/ 430 por m³. Son referencias históricas de esas propuestas, no una tarifa general vigente. Mantén precios por cliente, obra, versión y vigencia.
+
+Hay condiciones de pago al contado, precios sin IGV, vigencia de quince días, solicitud con cuarenta y ocho horas de anticipación, ensayos a siete, catorce y veintiocho días y permanencia en obra de una hora. Deben almacenarse como condiciones de la propuesta aceptada. La cotización 077 señala traslado incluido; no lo extiendas automáticamente a otras cotizaciones. El plazo de una hora es una condición observada, no un límite técnico universal para cualquier concreto.
+
+## 3 Decisiones del modelo operativo
+
+Separa producto comercial, diseño técnico, programación, preparación y despacho. Un producto puede venderse con una resistencia y otras prestaciones acordadas. La receta exacta depende también de materiales, obra, condiciones, método de descarga y aprobación técnica. Una misma resistencia puede tener varios diseños.
+
+Una proforma tiene varias alternativas o partidas. Su aceptación genera un pedido de suministro con las partidas y cantidades elegidas. Un pedido puede atender varias fechas de vaciado. Una programación puede producir varias cargas. Una carga se destina a una partida, una obra y una versión de diseño, y puede componerse de varias tandas de la planta. Una carga puede generar revisiones de su documento interno, conservando una única identidad operativa. El viaje registra el movimiento del equipo y sus tiempos.
+
+Para la primera implementación, cada tanda pertenece a una carga y cada carga a un destino. Si en la operación existe división de tandas o traslado entre mixers, se necesita una operación explícita de transferencia y asignación de cantidades; no se resuelve editando la referencia original. Varias tandas dentro de la misma carga usan la misma versión de diseño, salvo una modificación técnica formal con su evidencia y disposición.
+
+La guía interna, la GRE tributaria y la factura tienen identidades y estados separados. El viaje puede existir aunque una entrega termine rechazada. La situación de calidad, la ubicación física del concreto, la conformidad comercial y el estado de cobro también deben poder evolucionar por separado.
+
+## 4 Proforma y aceptación comercial
+
+Amplía la proforma existente con tipo de propuesta: tarifario por m³ o presupuesto con metrado. En el tarifario muestra precios unitarios y no calcules un total de compra sumando alternativas. Al aceptar, solicita partidas elegidas y cantidades contratadas. En un presupuesto con metrado, calcula subtotales con las cantidades ingresadas.
+
+| Grupo | Campos necesarios |
+| Identificación | Empresa, sucursal, serie, número, versión, fecha, vigencia, vendedor y moneda |
+| Cliente y obra | Cliente existente, RUC o documento, contacto, obra, dirección, referencia y ubicación |
+| Partida de concreto | Producto, f'c y unidad, edad especificada, volumen m³, asentamiento y unidad, tamaño máximo de agregado y unidad, bombeado o caída libre |
+| Precio | Tarifa por m³, cantidad si corresponde, descuento autorizado, precio neto, impuesto y total |
+| Servicios | Bombeo, movilización, transporte, espera y otros cargos con su unidad, mínimo y condición de aplicación |
+| Condiciones | Incluye traslado, anticipación, permanencia pactada, requisitos de acceso, ensayos, vigencia y condiciones particulares |
+| Pago | Contado o crédito, adelanto pactado, vencimientos, condición para liberar producción y cuenta de cobro |
+| Aceptación | Persona que acepta, fecha, versión aceptada, partidas elegidas, evidencia o adjunto y observaciones |
+
+Valida cantidades positivas, unidades compatibles, moneda y permisos para descuentos. Si la propuesta venció, genera una nueva versión o una extensión aprobada y trazable. Una propuesta aceptada conserva su contenido. Los cambios posteriores se registran como modificación del pedido o nueva versión aceptada.
+
+El precio comercial no determina automáticamente la receta. La selección comercial define las prestaciones exigidas y la asignación técnica elige una versión compatible. Servicios por hora, por viaje, por m³ y por monto fijo requieren unidades distintas. Si el bombeo está incluido, no vuelvas a cobrarlo como servicio adicional.
+
+Registra adelantos y su aplicación mediante caja y cuentas por cobrar existentes. Distingue dinero recibido, documento del adelanto, monto aplicado y saldo disponible. El tratamiento tributario y la oportunidad de emisión de comprobantes utilizan las reglas del ERP y la configuración validada por el responsable contable. No conviertas un adelanto en una segunda venta ni una cuenta bancaria de detracciones en una regla de detracción para todos los productos.
+
+## 5 Pedido y programación de vaciado
+
+El pedido conserva el vínculo a la proforma y su versión. Sus partidas guardan prestación técnica contratada, cantidad autorizada, tarifa, servicios y condiciones. La obra contiene cliente, dirección, contacto receptor, ubicación, accesos, ventanas de atención, distancias cuando existan y restricciones de equipo. Cambiar un cliente no debe cambiar la identidad de las obras históricas.
+
+La programación registra fecha y hora requeridas, elemento a vaciar, cantidad por partida, planta, ritmo solicitado en m³/h, tipo de descarga, bomba, operador, mixers y conductores. Configura capacidad útil de cada mixer, capacidad por tanda, productividad de planta, tiempos de carga, viaje, descarga y retorno. No fijes ocho m³ como capacidad universal: la guía histórica contiene cantidades declaradas de 0,5 a 12,5 m³; esas cantidades no acreditan por sí mismas la capacidad legal o física de los vehículos.
+
+Presenta un tablero diario con filas por vaciado y sus cargas, y vistas de ocupación por planta, mixer y bomba. Antes de confirmar una asignación verifica solapamientos, disponibilidad por mantenimiento, licencia y documentos aplicables, diseño aprobado, condición de pago o crédito y existencias. Un problema debe indicar qué dato o recurso impide continuar.
+
+Calcula una propuesta de reparto usando capacidades configuradas. Ejemplo de prueba: pedido de veinticuatro m³ y capacidad útil configurada de ocho m³ genera tres cargas de ocho. Si la última carga es parcial, conserva su volumen real. Cambiar la capacidad debe cambiar el reparto, sin modificar entregas ya efectuadas.
+
+La programación reserva cantidades; no registra consumo de insumos. Reprogramar una carga sin iniciar libera su reserva anterior y crea la nueva de forma atómica. Una carga que ya se prepara, está en tránsito o fue entregada requiere su flujo de incidencia correspondiente.
+
+## 6 Diseños de mezcla y aprobación técnica
+
+Cada diseño tiene código estable, nombre, planta, obra o alcance de aplicación, resistencia y unidad, edad de referencia, asentamiento objetivo y rango, tamaño de agregado, método de descarga, materiales, condiciones de exposición cuando correspondan y documentos de laboratorio. Sus versiones contienen fecha, autor, aprobación, vigencia, motivo de cambio y restricciones.
+
+Almacena componentes por un m³ de concreto con material exacto, unidad, cantidad y base de dosificación. Para agregados distingue masa seca, masa saturada superficialmente seca o masa húmeda. Para aditivos distingue kg/m³, L/m³ o porcentaje de una masa de referencia especificada. Define si ese porcentaje se calcula sobre cemento o sobre todos los materiales cementantes. No mezcles esas bases.
+
+El catálogo de materiales conserva proveedor, marca, presentación, tipo, unidad de compra, unidad de stock, unidad de dosificación, lote, densidad cuando corresponda y ficha técnica con vigencia. El peso de bolsa se configura por presentación. Masa y volumen no se convierten con un factor genérico. La densidad aparente de un agregado para stock por m³ no se sustituye por su densidad de partículas para diseño.
+
+Estados de una versión: borrador, pendiente de revisión, aprobada, suspendida y obsoleta. Solo una versión aprobada y aplicable puede liberarse para producción. Su aprobación identifica al responsable técnico. Un cambio de dosis nominal, material o criterio técnico aprobado crea otra versión; las cargas ya preparadas mantienen la anterior. Escalar al volumen de tanda y aplicar correcciones de humedad ya previstas conserva la versión y guarda sus mediciones y resultados particulares. Un ahorro de cemento no autoriza a alterar una receta.
+
+La evidencia del archivo incluye dos diseños para f'c 210: uno de techo y otro de UTP con distintas cantidades de cemento por m³. Además, hay celdas de aditivos rotuladas en gramos cuya fórmula produce kilogramos. Importa esos diseños como borradores con incidencias de unidades. No los actives por coincidir su nombre con una resistencia del catálogo. Las resistencias de las proformas y del histórico no tienen todas una receta en los diseños aportados; conserva el catálogo comercial y exige diseño aprobado antes de preparar cada producto.
+
+El campo F5 del Excel se denomina volumen de tanda y contiene cantidades compatibles con una carga de mixer. No prueba el volumen de una amasada física de la mezcladora. Configura ambos conceptos por separado. Conserva la fecha almacenada de O5 como fecha de origen, indicando que proviene de TODAY cuando corresponda; esa caché no acredita aprobación ni autoriza usar la fecha de importación como fecha histórica. Las nuevas revisiones y aprobaciones tienen fechas fijas. Los códigos repetidos D-1 y WUANUKO-13 no son claves únicas de diseños distintos.
+
+## 7 Preparación por carga y por tanda
+
+La pantalla del plantista abre una carga programada y muestra cliente, obra, producto solicitado, diseño aprobado y versión, volumen, mixer, conductor, silos y materiales asignados. Muestra tres columnas separadas por componente: cantidad de receta, objetivo corregido para la tanda y cantidad realmente dosificada. Registra origen del dato: balanza, controlador, entrada manual declarada o cálculo histórico.
+
+| Acción | Resultado requerido |
+| Calcular preparación | Escala una versión aprobada al volumen y aplica únicamente correcciones técnicas configuradas |
+| Reservar insumos | Reserva por material y ubicación sin movimiento de kardex |
+| Iniciar tanda | Registra hora, operador, equipo, versión y condiciones de medición |
+| Registrar cantidades | Conserva objetivo, real, unidad, origen, silo o lote y diferencia |
+| Registrar control | Guarda agua, aditivos, temperatura, asentamiento y observaciones aplicables |
+| Confirmar preparación | Registra consumos una vez, libera o ajusta reservas y crea trazabilidad del concreto producido |
+| Liberar carga | Verifica condiciones técnicas y documentales necesarias para su salida |
+
+Si la carga requiere varias tandas, la suma de volúmenes asignados debe coincidir con la carga dentro de la tolerancia configurada. Cada tanda tiene su secuencia, tiempos y consumos. Permite consumir un material desde más de un silo con renglones separados. No llames pesaje real a la multiplicación de volumen por receta.
+
+Fórmulas de software para una receta aprobada, con unidades explícitas:
+
+```text
+objetivo_base_componente = dosis_por_m3 * volumen_tanda_m3
+variacion = cantidad_real - objetivo_corregido
+variacion_porcentual = 100 * variacion / objetivo_corregido
+```
+
+Si el objetivo es cero, la variación porcentual no se calcula. Una cantidad real no nula frente a objetivo cero se trata como adición no prevista, con revisión. Usa decimales exactos y redondea para la resolución de cada balanza o dosificador; conserva los valores previos al redondeo.
+
+Cuando la receta está en base saturada superficialmente seca, y humedad total y absorción están expresadas como porcentaje de masa seca, el cálculo propuesto es:
+
+```text
+masa_seca = masa_SSS_objetivo / (1 + absorcion_pct / 100)
+masa_humeda_objetivo = masa_seca * (1 + humedad_total_pct / 100)
+agua_libre_agregado = masa_seca * (humedad_total_pct - absorcion_pct) / 100
+agua_a_dosificar = agua_efectiva_objetivo
+                   - suma_agua_libre_agregados
+                   - otras_fuentes_de_agua_efectiva_previstas
+relacion_agua_cementantes = masa_agua_efectiva / masa_total_cementantes
+```
+
+Estas fórmulas requieren que la base de humedad esté identificada. No apliques la misma expresión a una medición de humedad superficial expresada sobre masa SSS. La referencia técnica es ACI E1-16, secciones 3.3.2 a 3.3.6. La aprobación de materiales, correcciones y tolerancias corresponde al responsable técnico. Para materiales fuera del alcance de la configuración aprobada, se requiere un procedimiento específico.
+
+Guarda medición de humedad por material, acopio y momento, su método y vigencia. Registra por separado agua de planta, agua en aditivos cuando proceda, agua añadida en obra y otras fuentes. No restes el agua de los agregados dos veces si el controlador ya entregó un objetivo corregido. La adición de agua en obra requiere cantidad, hora, solicitante, autorización técnica y controles posteriores definidos. Un agua objetivo negativa o datos incompletos deben generar revisión, no un reemplazo silencioso por cero.
+
+Una interrupción después de iniciar puede dejar material físicamente consumido. Registra la tanda interrumpida, cantidades reales y disposición. Si el inventario registrado no explica lo consumido, abre incidencia para regularización autorizada. Las pesadas y adiciones capturadas se conservan aunque falle la confirmación del kardex o su transacción de cierre; la tanda queda pendiente de regularización. No se vuelve a dosificar por ese fallo. No borres el hecho físico ni inventes una recepción para que cierre el formulario.
+
+## 8 La guía Wuanuko Mix como pantalla principal
+
+Construye un formulario que recupere datos de la carga y permita completar los hechos del viaje. El usuario no debe volver a escribir cliente, obra, receta ni placa si ya están asignados. La guía interna se imprime a partir de datos persistidos y su versión; la vista previa usa el mismo origen que el PDF.
+
+| Sección | Campos |
+| Documento | Empresa, logo, RUC, dirección, guía interna, fecha, estado y referencias a pedido, programación y carga |
+| Destino | Cliente, documento, dirección fiscal separada de obra, dirección de entrega, distrito, provincia, departamento, referencia, contacto y elemento vaciado |
+| Concreto | Resistencia y unidad, edad, diseño y versión, volumen cargado, unidad m³, asentamiento solicitado y tipo de descarga |
+| Vehículo y personal | Código de mixer, placa, conductor, licencia cuando corresponda, operador de planta, bomba y operador |
+| Preparación y controles | Hora de preparación, temperatura del concreto en salida y llegada en grados Celsius, temperatura ambiente cuando aplique, asentamiento en planta y obra, agua de diseño y agua ingresada, aditivos con cantidades y unidades |
+| Tiempos del viaje | Salida de planta, llegada a obra, inicio y fin de descarga, salida de obra y retorno a planta |
+| Recepción | Cantidad descargada, cantidad aceptada, cantidad observada, retorno, disposición y motivos |
+| Evidencia | Nombre del receptor, identificación o cargo cuando corresponda, firma o constancia, fotografías y observaciones |
+| Documentos relacionados | Número y estado de GRE si aplica, comprobantes y liquidación |
+
+La firma del receptor se vincula al documento y versión que recibió, con fecha, método y huella del archivo. La firma dibujada en pantalla se presenta como evidencia de recepción y no se describe automáticamente como firma digital certificada. Si el receptor no firma, registra el motivo y un circuito de revisión.
+
+Conserva un formato de impresión reconocible con dos ejemplares, como la hoja Impresion del archivo, y una opción de una copia. El origen tiene área A1:F42 y configuración A4 horizontal; úsala como punto de partida para la guía, ajustando a la impresora validada. Conserva los espacios de administración de planta, responsable de obra y conductor. Los ejemplares cliente y empresa deben mostrar los mismos datos operativos y firmas. Separa la orden interna de dosificación cuando el detalle completo de receta y costos no deba aparecer en la copia del cliente. Mantén el título operativo NOTA DE PEDIDO si la empresa desea conservarlo, con la identificación de carga y sin confundirlo con el pedido comercial del ERP.
+
+Incluye QR interno de consulta con un identificador no predecible y permisos adecuados. Debe mostrar estado del documento y datos permitidos, sin publicar costos ni datos personales innecesarios. El QR interno no se presenta como QR tributario de SUNAT. El PDF de la guía conserva versión, fecha de generación e identidad del documento. Reimprimir no crea otro despacho ni consume materiales.
+
+Antes de la salida faltarán legítimamente horas de llegada y firma. El documento debe representar ese estado. Al recibir la conformidad, crea el registro o versión de cierre vinculada sin modificar retroactivamente un documento tributario. Toda anulación conserva número, motivo, usuario y relación a la sustitución cuando exista.
+
+### Mapeo del formulario heredado
+
+La macro GUARDAR transpone Registro B2:B32 a BD A:AE. Este mapa reconstruye el significado del formulario actual; el histórico puede contener otros usos y se valida por fila. Las columnas que solo representaban separadores de sección no generan entidades de negocio.
+
+| Campo | Registro | BD | Destino y tratamiento |
+| Número operativo | B2 | A | Número histórico como texto y nueva identidad interna |
+| Fecha | B3 | B | Fecha del documento validada |
+| Documento cliente | B5 | D | Tipo y número de documento, sin inventar faltantes |
+| Razón social | B6 | E | Relación con cliente validado y texto original |
+| Dirección cliente | B7 | F | Dirección fiscal o comercial según revisión |
+| Dirección obra | B8 | G | Obra y dirección de entrega |
+| Distrito | B9 | H | Distrito y ubigeo validado |
+| Provincia | B10 | I | Provincia de la obra |
+| Departamento | B11 | J | Departamento de la obra |
+| Conductor | B13 | L | Persona y nombre histórico |
+| Tipo transporte | B14 | M | Clasificación de transporte validada |
+| Placa o unidad | B15 | N | Vehículo y código normalizado |
+| Cantidad | B17 | P | Volumen registrado con procedencia |
+| Unidad | B18 | Q | Unidad explícita m³ |
+| Descripción | B19 | R | Producto y modalidad de colocación |
+| Resistencia | B20 | S | Valor y unidad f'c |
+| Otros u operador bomba | B21 | T | Revisar texto y excluir fórmulas auxiliares |
+| Slump histórico | B22 | U | No interpretar como temperatura por el encabezado antiguo |
+| Temperatura salida | B23 | V | Temperatura numérica con unidad y origen |
+| Temperatura llegada | B24 | W | Excluir sumatorias auxiliares incrustadas |
+| Agregado fino | B25 | X | Conservar original; resolver cantidad y unidad si existe |
+| Agua de diseño | B26 | Y | Encabezado antiguo dice agregado grueso; revisar semántica |
+| Agua al mixer | B27 | Z | Agua ingresada con unidad; encabezado histórico distinto |
+| H2O Ret | B28 | AA | Significado pendiente; no importar como cemento |
+| Aditivo genérico | B29 | AB | No repartir arbitrariamente entre dos aditivos nuevos |
+| Observaciones | B30 | AC | Texto y evidencias |
+| Hora salida | B31 | AD | Fecha y hora combinadas con regla de calendario |
+| Hora llegada | B32 | AE | Vacío se conserva como dato faltante |
+
+Los dos valores nuevos de slump planta y obra, agua por fuente, aditivos separados, inicio y fin de vaciado y firmas requieren almacenamiento explícito. El histórico no contiene toda esa información. H2O Ret debe mantener su denominación original hasta que la planta aclare su significado; no expandas la abreviatura por suposición.
+
+## 9 Estados y cantidades que deben cuadrar
+
+Mantén estados distintos por documento y agrega indicadores al tablero. Proforma: borrador, emitida, aceptada, vencida, rechazada o sustituida. Pedido: abierto, parcial, completado o cancelado. Carga: planificada, preparada parcialmente, preparada, liberada, en tránsito, en obra, cerrada o con incidencia. Tanda: pendiente, iniciada, confirmada, interrumpida o descartada. Los estados técnicos, de pago y de GRE son independientes.
+
+| Cantidad | Significado y regla |
+| Contratada vigente | Cantidad aceptada y sus modificaciones autorizadas por partida |
+| Comprometida sin entregar | Reserva de volumen de programaciones y cargas activas que aún no cumplen el pedido |
+| Preparada | Volumen de producción confirmado, con método de determinación |
+| Cargada o salida | Volumen asignado al mixer y documentado al salir |
+| Descargada en obra | Hecho físico registrado en el destino |
+| Aceptada | Parte de la entrega con conformidad comercial, con fecha y evidencia |
+| Retornada | Concreto que físicamente vuelve a planta |
+| Rechazada | Clasificación de calidad o comercial, que puede coincidir con un retorno físico |
+| Facturable | Cantidad y servicios autorizados conforme a la política comercial y tributaria |
+| Facturada | Cantidad vinculada a comprobantes válidos, con ajustes documentados |
+
+El volumen aceptado más la reserva activa no debe exceder la cantidad autorizada salvo ampliación registrada. La reserva activa incluye la cantidad en preparación y en tránsito; no vuelvas a descontarla por ser hija de una programación. Los sobrepedidos requieren ampliación o autorización documentada. El saldo de atención se calcula desde cantidades aceptadas y modificaciones, sin usar el monto pagado como equivalente a m³.
+
+Para un viaje cerrado, una conciliación física propuesta es: volumen de salida igual a volumen descargado en obra más volumen retornado a planta más disposición fuera de planta más pérdida documentada, considerando diferencias de medición explícitas. Los destinos físicos son excluyentes. Rechazado es una clasificación superpuesta: los mismos dos m³ pueden ser rechazados y retornados, y no deben contarse dos veces en ese balance. Si un volumen ya descargado en obra se descarta después allí, vincula la disposición a esa cantidad existente y no la sumes como otro destino desde el mixer.
+
+Registra cantidad, base y método de determinación en salida, descarga y retorno. Las tolerancias son aprobadas y explícitas. No ajustes cantidades para que la suma coincida. Una diferencia no explicada mantiene el viaje pendiente de conciliación. Una nota de crédito monetaria no cambia automáticamente m³ entregados; una corrección física tiene su propio documento.
+
+## 10 Almacén y consumo de materiales
+
+Usa el kardex existente para materiales por empresa, planta, almacén, ubicación o silo, producto, unidad base y lote cuando aplique. El saldo procede de movimientos confirmados. Distingue saldo físico registrado, cantidad reservada y disponible para nuevas órdenes. El consumo confirmado libera o aplica su reserva sin descontar dos veces la disponibilidad. Define la base de masa del inventario de cada agregado: húmeda medida, seca equivalente u otra base aprobada. Recepciones, consumos y conteos se concilian sobre bases compatibles, conservando la condición y los factores empleados.
+
+Tipos de movimiento: apertura, recepción, traslado, consumo de tanda, devolución física verificable, merma y ajuste autorizado. Una recepción de bombona distribuida entre silos sigue siendo una sola recepción con varios destinos. Un traslado tiene salida y entrada relacionadas. La factura de compra valoriza o referencia la recepción; no crea otra entrada si el ERP ya la registró.
+
+Al confirmar una tanda registra los insumos usados y, conforme al modelo de inventario del ERP, el concreto producido como lote o producción en proceso identificada para la carga. Si el ERP controla existencias de producto terminado, su salida al despacho y su costo se contabilizan por ese lote. Si usa consumo por orden y producción contra pedido, conserva la conciliación de cantidades y costos. Elige una sola política documentada para evitar registrar dos veces el costo de producción.
+
+Los retornos de concreto fresco se registran como material retornado con evaluación y disposición técnica. No se reconstruyen cemento, arena y aditivos disponibles a partir del volumen devuelto. Un reproceso, reutilización o descarte requiere decisión técnica y movimiento específico. La cancelación previa al inicio libera reservas; la cancelación después de mezclar conserva consumos y disposición.
+
+Los movimientos confirmados conservan identidad y contenido original. Una corrección genera ajuste o reverso relacionado, con motivo, evidencia y autorización según los permisos del ERP. Un reverso corrige un movimiento erróneo o refleja una reversión física o económica comprobada. La cancelación comercial de concreto ya producido no autoriza a devolver materias primas mediante reverso de receta. Respeta períodos cerrados y el procedimiento de regularización aplicable.
+
+Las mediciones de silos o conteos de agregados se almacenan como conteos físicos independientes. Una diferencia contra kardex genera propuesta de ajuste, evidencia y aprobación. No se contabiliza como utilidad. En materiales comprados por volumen y dosificados por masa conserva el volumen recibido, la masa medida si existe, el factor aprobado y su condición. Si no existe conversión confiable, muestra conciliación pendiente y no inventes stock exacto en kg.
+
+## 11 Recepción en obra y control de calidad
+
+La recepción registra viaje, obra, receptor, tiempos, ubicación cuando esté disponible, volumen descargado, observaciones y conformidad. La interfaz móvil permite registrar llegada, inicio y fin de descarga, evidencia y cierre. Si hay conectividad intermitente, conserva borradores locales y una cola con identificadores idempotentes; la numeración oficial y los movimientos confirmados los decide el servidor.
+
+El laboratorio gestiona muestras, probetas individuales, lote o carga representados, lugar de muestreo, técnico, fecha y hora, identificación, curado, edad programada y efectiva, laboratorio, ensayo, resultado, unidad y certificado. Una muestra puede representar varias tandas solo si se registra la relación y el plan aprobado lo permite. No unas probetas por cliente y fecha sin trazabilidad.
+
+Configura planes de ensayo por obra y contrato. Las edades siete, catorce y veintiocho días observadas en las proformas pueden usarse como condiciones iniciales de esas propuestas. El criterio de aceptación debe definirse por norma, especificación contractual y revisión técnica con su versión. No declares automáticamente incumplimiento porque una probeta a siete días no alcance el objetivo a veintiocho, ni apruebes toda una obra por una única probeta.
+
+Gestiona no conformidades con carga, hechos, evidencias, responsable, evaluación, disposición, acción correctiva y cierre. Un resultado posterior puede abrir seguimiento aun cuando la recepción física esté cerrada. El reporte distingue entrega, aceptación comercial y evaluación técnica. La emisión tributaria no debe depender de esperar el ensayo a veintiocho días.
+
+## 12 Flota combustible y gastos de operación
+
+Reutiliza activos y empleados si existen. Cada equipo tiene código, tipo, placa si aplica, capacidad útil, medidores y su unidad. Configura odómetro en km y horómetro en horas por separado, incluso si un mismo equipo tiene ambos. No deduzcas el tipo de lectura por la magnitud del número. Registra lecturas con fecha, origen y evidencias; los cambios o reinicios de medidor requieren evento específico. Conserva equipo y operador efectivos de cada viaje; cambiar el conductor habitual del maestro no altera viajes anteriores.
+
+El mantenimiento define tareas, frecuencia por fecha, km u horas, próxima atención, orden de trabajo, repuestos, mano de obra, proveedor, costo y período de indisponibilidad. La programación consulta esa indisponibilidad. Una lectura nueva o una nota solicitando información no acredita servicio ejecutado ni reinicia contadores. Solo completar la tarea autorizada actualiza el último servicio de su plan; tareas pendientes conservan su vencimiento. Una falla durante el viaje crea incidencia y eventual transferencia autorizada; conserva el viaje y equipo originales.
+
+Los vales de combustible incluyen proveedor, serie y número, fecha, producto, cantidad, unidad, precio, moneda, importe, equipo, conductor, odómetro, horómetro y comprobante. Si se usa galón, identifica el tipo de galón antes de convertir a litros. Separa carga de combustible, consumo estimado y consumo medido: abastecer un tanque no demuestra consumo completo del viaje siguiente. El libro de petróleo tiene hojas con dos denominaciones empresariales; resuelve su correspondencia con RUC y empresa del ERP antes de consolidar.
+
+Registra el servicio de bombeo por obra, bomba, operador y ventana de trabajo, vinculado a las cargas que atiende. Una bomba puede atender varias guías. Los m³ bombeados son volumen del servicio sobre el concreto ya transportado; no se suman de nuevo como concreto producido, entregado o vendido. Los trabajos del cargador y los transportes del remolcador usan sus propios registros y unidades.
+
+Cruza referencias de vales entre control de viajes y liquidación de petróleo. Una referencia no crea otra compra, otro pago o un costo adicional. Detecta coincidencias y diferencias de precio o cantidad para conciliación. La liquidación de proveedor agrupa comprobantes o vales pendientes y su pago se registra una sola vez en tesorería. Un abastecimiento puede atender varios viajes y un viaje puede relacionarse con varios abastecimientos; guarda cantidades y costos asignados, método y saldo pendiente. Si existe tanque propio, la compra ingresa al tanque y la entrega al equipo es una salida relacionada, sin duplicar el costo del mismo combustible.
+
+Los gastos de desayuno, almuerzo y cena usan trabajador, fecha, servicio, cantidad, proveedor, tarifa, centro de costo, obra o turno si corresponde y liquidación. El archivo de almuerzos contiene también cenas. Controla duplicados por evento y autorizaciones. Una marca de asistencia no equivale necesariamente a comida consumida. Separa anticipo al proveedor, gasto devengado y pago.
+
+Asigna costos a carga, viaje, equipo, obra o planta según evidencia. Si un gasto cubre varios viajes, usa una distribución explícita por horas, km, m³ u otra base aprobada. La suma de asignaciones más el saldo sin asignar debe coincidir con el monto distribuible, con ajuste explícito por redondeo. Si falta base, conserva el costo pendiente de asignación. No puede coexistir una asignación directa del 100 por ciento con otra distribución del mismo costo. Una tarifa integral que ya incluya combustible o mantenimiento no se suma nuevamente con esos mismos costos en una única vista de resultado.
+
+## 13 Liquidación facturación y rentabilidad
+
+La liquidación de obra reúne entregas y servicios elegibles, tarifa de la versión aceptada, descuentos autorizados, adelantos aplicables y comprobantes emitidos. Permite facturación por entrega o consolidada conforme a las reglas del negocio y emisión tributaria del ERP. Cada partida facturada se vincula con las cantidades de las entregas; admitir facturación parcial sin repetir la cantidad ya aplicada.
+
+El saldo facturable se calcula por partida y unidad, restando aplicaciones vigentes a comprobantes. Una carga parcialmente facturada puede aparecer en otra factura solo por el remanente. Usa bloqueo o control transaccional al asignar cantidades para que dos usuarios no facturen el mismo saldo. Reintentos de un envío recuperan su estado antes de crear otro comprobante.
+
+La emisión de GRE requiere un adaptador específico o integración con el módulo existente que realmente soporte ese documento. No supongas que el proveedor de facturación electrónica ya soporta GRE. Conserva XML, identificación, ticket de envío cuando proceda, CDR, errores, estado y versión de integración. Para una operación sujeta a GRE en el sistema del contribuyente, verifica el estado requerido antes de autorizar el inicio del traslado y trata las contingencias mediante el procedimiento aplicable.
+
+La página de SUNAT sobre sistemas de emisión indica envío y CDR aceptada antes del traslado. La guía operativa impresa de Wuanuko Mix debe vincularse al documento tributario cuando corresponda. Su apariencia de guía y su QR interno no acreditan esa condición. Valida catálogos y reglas vigentes de SUNAT durante la implementación; no copies endpoints antiguos del Excel o de ejemplos no verificados.
+
+Separa costo estándar previsto, costo real directo y costo completo con indirectos. Usa las recepciones valorizadas y el método del ERP para materiales. Agrega únicamente costos propios de producción y despacho que no estén ya incluidos: combustible asignado, operación de equipos, personal, bombeo contratado y otros gastos atribuibles. Distribuye costos de planta, mantenimiento y depreciación según política aprobada, identificando costos pendientes o capacidad no absorbida.
+
+```text
+costo_materiales = suma(cantidad_real_consumida * costo_unitario_valorizado)
+costo_directo = costo_materiales + costos_directos_no_duplicados
+costo_completo = costo_directo + indirectos_asignados
+margen_sobre_costos_directos = venta_neta - costo_directo
+resultado_con_costos_asignados = venta_neta - costo_completo
+margen_pct = 100 * resultado_con_costos_asignados / venta_neta
+```
+
+La venta neta excluye impuestos trasladados y descuenta las correcciones comerciales correspondientes. El tratamiento de impuestos recuperables en compras utiliza la política tributaria aplicable. Si venta neta es cero, el porcentaje no se calcula. Si falta un costo, el resultado se identifica como provisional o incompleto y no se reemplaza por cero. Mantén costo por m³ producido y costo por m³ aceptado como indicadores distintos con denominadores identificados. Un margen de contribución solo se calcula si los costos están clasificados en variables y fijos, usando venta neta menos costos variables; costo directo no equivale automáticamente a costo variable.
+
+Una factura tardía o corrección de costo genera ajustes de valorización según el método del ERP, con origen, importe y período. Distribuye el efecto entre existencias y costos afectados conforme al método elegido, conservando el valor originalmente aplicado y sus ajustes. No reescribe cantidades físicas ni resultados de un cierre aprobado sin el procedimiento de reapertura o ajuste correspondiente. El costo mostrado identifica su fecha de cálculo y si conserva importes provisionales.
+
+Cada margen compara ingresos y costos de las mismas cargas, cantidades y servicios. Muestra por separado concreto preparado pendiente de salida, entregas sin liquidar y costos sin asignar. No restes automáticamente toda la producción del mes a las facturas emitidas en ese mes. Identifica qué costo pasa de producción a existencias, entrega o resultado según el ERP y evita reconocerlo en dos etapas. El resultado por obra con costos asignados no se etiqueta como utilidad definitiva de toda la empresa.
+
+Ejemplo aritmético de aceptación comercial, sin afirmar una venta real: veinticuatro m³ por S/ 410 da S/ 9 840 de concreto. Si se contrata adicionalmente bombeo de veinticuatro m³ por S/ 60, añade S/ 1 440 y la base resulta S/ 11 280. Si la operación está gravada a la tasa total del 18 por ciento, el impuesto es S/ 2 030,40 y el total S/ 13 310,40. La condición tributaria se configura, no se deduce del nombre del producto. SUNAT informa 18 por ciento como tasa aplicable para operaciones gravadas en 2026.
+
+La misma carga puede tener rechazo, descuento, retorno y costo de disposición. Mantén esos conceptos separados. Cerrar una cobranza no elimina un ensayo pendiente ni una no conformidad. Cerrar producción no reconoce por sí mismo un ingreso.
+
+## 14 Datos y relaciones para la implementación
+
+Extiende primero las entidades existentes. No copies esta lista como migraciones sin revisar el repositorio. Todas las nuevas entidades deben respetar empresa, sucursal o planta cuando correspondan, claves foráneas, auditoría, permisos e índices usados por las consultas.
+
+| Dominio lógico | Entidades o extensiones sugeridas |
+| Configuración | Configuración concretera por empresa, plantas y capacidades, ubicaciones y silos, unidades y conversiones versionadas |
+| Comercial | Obra, especificación comercial de concreto, extensión de proforma y partidas, condiciones y aceptación, pedido y modificaciones |
+| Programación | Vaciado, partidas programadas, reservas de volumen, asignaciones de recursos y cargas |
+| Técnico | Diseño, versión, componentes, compatibilidad, documentos y aprobaciones, propiedades de materiales y mediciones de humedad |
+| Producción | Tanda, componentes objetivo y reales, asignaciones por silo y lote, controles, liberación y disposición |
+| Despacho | Carga, viaje, eventos, guía interna y versiones, recepción y destinos físicos |
+| Calidad | Plan, muestra, probeta, ensayo, certificado, no conformidad y acción correctiva |
+| Operación | Equipos y medidores, lecturas, mantenimiento, servicio de bombeo con cargas vinculadas, vales de combustible y asignaciones, gastos y liquidaciones |
+| Documentos y costos | Vínculos de GRE, aplicaciones a factura, aplicaciones de adelantos, costos por origen y distribuciones |
+| Migración | Lote de importación, fila original, mapeo, incidencias, propuesta y vínculo a registro confirmado |
+
+Usa identificadores internos estables además de códigos visibles. Un correlativo histórico como 874A o 2460 A se conserva como texto; no lo fuerces a entero. La serie y numeración de documentos nuevos pertenecen a un ámbito definido de empresa, establecimiento y tipo. La clave tributaria respeta además emisor y tipo de documento según integración. Un número suelto del Excel no identifica de forma universal una guía.
+
+Define fechas y horas completas con zona America/Lima para mostrar y almacenar consistentemente con el ERP. Evita guardar solo la hora en viajes que cruzan medianoche. Conserva fechas sin hora como fechas. Documenta cómo convertir el calendario de Excel y las fechas escritas como texto. Los documentos, placas, RUC, DNI, series y códigos se almacenan como texto.
+
+Usa tipos decimales adecuados para cantidades, dosis y moneda. Ejemplo orientativo: seis decimales para cálculo de dosis y factores, tres o cuatro para cantidades físicas según equipo y dos para importes finales. Ajusta precisión y escala al motor real y a la resolución de instrumentos. No uses coma flotante binaria para importes ni conversiones que determinen inventario.
+
+Un registro de componente de tanda debe guardar material, objetivo base, objetivo corregido, cantidad real, unidad, lote o silo, origen del dato, costo aplicado y referencias a receta y medición. Un registro de guía debe apuntar a la carga; no contener una copia independiente editable de todos los cálculos de producción. Los documentos conservan la instantánea que corresponde a su emisión.
+
+## 15 Transacciones permisos y concurrencia
+
+Implementa servicios de dominio para aceptar proforma, modificar pedido, programar carga, reservar materiales, confirmar tanda, liberar carga, emitir guía, registrar recepción, disponer retorno y aplicar cantidades a factura. Las validaciones decisivas deben ejecutarse en servidor, aunque existan también en la interfaz.
+
+Confirmar una tanda requiere una operación transaccional: comprobar identidad y estado, verificar versión, registrar cantidades reales, aplicar movimientos de material y producción según política, liberar reserva, calcular costos disponibles y registrar auditoría. Repetir la solicitud con el mismo identificador devuelve el mismo resultado. Si la misma clave llega con datos diferentes, informa conflicto. Usa restricciones únicas en base de datos además de controles en pantalla.
+
+Define límites transaccionales para series, inventario, reservas, saldo facturable y saldo de adelantos. Usa bloqueo de filas o control de versión compatible con el motor y orden estable de bloqueo para disminuir interbloqueos. Si dos usuarios intentan consumir el mismo saldo, la validación se hace sobre el estado confirmado, no sobre una lectura antigua. Las series nunca se obtienen con un MAX más uno sin protección de concurrencia. Las aplicaciones y devoluciones de adelantos comprueban el saldo dentro de la transacción; dos usuarios no pueden aplicar o devolver el mismo dinero. Cada reintento conserva el vínculo al cobro original y una única aplicación efectiva.
+
+Los envíos a SUNAT, generación de archivos y notificaciones se procesan con cola y reintentos controlados después de confirmar el hecho de negocio. Usa un patrón de eventos pendientes o equivalente del ERP para conservar envíos cuando una conexión falle. Un error al imprimir o enviar un PDF no debe repetir producción, consumo ni facturación.
+
+| Función | Permisos principales |
+| Ventas | Proformas y seguimiento de pedidos; descuentos dentro de su autorización |
+| Responsable comercial | Tarifas, excepciones, crédito y cambios de pedido |
+| Programación | Asignar planta, equipo y horarios según disponibilidad |
+| Responsable técnico | Aprobar diseños, tolerancias, correcciones y disposición técnica |
+| Plantista | Ejecutar tandas autorizadas y registrar cantidades y controles |
+| Almacén | Recepciones, traslados, conteos y propuestas de ajuste |
+| Despacho y conductor | Salida, eventos del viaje y evidencia de entrega según asignación |
+| Calidad | Muestras, ensayos, certificados y no conformidades |
+| Administración | Liquidaciones, costos y reportes según alcance |
+| Caja y facturación | Cobros, aplicaciones, comprobantes y conciliación |
+
+Los usuarios son individuales y reutilizan la autenticación existente. Un conductor ve sus viajes asignados; ventas no modifica diseños aprobados y la pantalla del cliente no expone costos internos. Registra autor, hora, entidad, acción, cambios, motivo y autorización en ajustes o excepciones. Los datos de una empresa no deben filtrarse por consultas, PDF, adjuntos, exportaciones ni QR de otra.
+
+## 16 Importación de los Excel
+
+Desarrolla un importador con previsualización que separe lectura, normalización, propuesta, revisión y confirmación. Conserva archivo original, hash, hoja, fila o celda, valor original, fórmula y caché cuando exista, fecha propuesta, unidad, mapeo y resultado. No ejecutes macros. Registra la versión del importador y el usuario responsable de cada confirmación.
+
+La base BD de la guía es fuente principal para candidatos a despachos. Registro, Impresion, Busqueda y Copia son formularios o vistas; no se importan como nuevos viajes. Los demás libros pueden complementar insumos, costos o evidencias, pero no representan automáticamente otros despachos. La ausencia de un número no autoriza a unir filas por semejanza de nombre sin revisión.
+
+Clasifica filas, celdas y bloques antes de importarlos: detalle, encabezado, subtotal, resumen, arrastre, conteo físico, recepción, fórmula auxiliar o texto. Una fila de guía válida puede contener un cálculo auxiliar en otra columna: excluye o marca esa celda sin descartar la guía completa. La estructura del control de cemento cambia en setiembre: detecta por encabezados y versión de formato. Conserva el significado de celdas combinadas y hereda fechas solo dentro de un bloque válido. Diferencia vacío, cero, error y no aplicable.
+
+Usa una tabla de equivalencias para clientes, obras, placas, equipos, trabajadores, materiales y diseños. Presenta coincidencias dudosas a revisión. No inventes RUC o DNI faltantes. Un cliente histórico incompleto puede conservarse como dato histórico con restricción para nuevas emisiones que requieran esa información. Mantén el texto original y el dato normalizado.
+
+La idempotencia tiene dos niveles: archivo y fila para reimportar la misma fuente, e identidad de negocio validada para reconocer el mismo hecho en libros diferentes. Repetir una carga no crea otro despacho, movimiento, vale o pago. Los archivos agregados por viajes se conservan como registros históricos agregados cuando no existe detalle individual.
+
+Define una fecha y hora de corte. El histórico anterior al corte se importa para consulta y conciliación sin afectar existencias ni cuentas actuales. Las aperturas de inventario y cuentas por cobrar o pagar se registran una sola vez con cantidades y valores aprobados al corte. Los movimientos posteriores empiezan desde esa apertura. Una reconstrucción retrospectiva completa solo se utiliza si se elige expresamente esa estrategia y existe información suficiente; no combines apertura al corte y reproducción de todos los consumos anteriores.
+
+Migra además el estado de las operaciones abiertas: pedido contratado, atendido y pendiente; reservas activas; concreto preparado sin despachar o en tránsito; retornos pendientes; adelantos disponibles y entregas pendientes de facturación. Vincula esas aperturas a sus documentos para continuar sin repetir hechos. Una carga preparada antes del corte no vuelve a consumir materias primas al despacharse después. Un comprobante histórico vinculado a una apertura de cuenta por cobrar no genera otra deuda. Define expresamente qué lado del corte incluye el instante exacto seleccionado.
+
+Entrega un resumen por lote: registros leídos, candidatos, confirmados, omitidos por repetición, en revisión y rechazados, con su motivo y procedencia. Un total guardado en Excel sirve como referencia de conciliación y no como prueba de exactitud. La confirmación muestra qué documentos y saldos cambiarán.
+
+## 17 Incidencias concretas que deben guiar el importador
+
+| Referencia comprobada | Tratamiento requerido |
+| Guía Impresion B31 consulta la columna 27 de BD, cuyo AA10 dice Cemento, aunque B31 se usa para H2O Ret | Mapear por significado y revisión de datos, conservar original ambiguo |
+| Guía Impresion F36 toma B33, correspondiente a aditivo, para una hora de llegada | Renderizar ambos ejemplares desde el mismo campo de llegada |
+| Guía Busqueda contiene referencias BD con REF inválido ocultadas por IFERROR | No usar esa pantalla como base de importación |
+| Guía BD T1000 contiene una sumatoria 2522 y W786 contiene una sumatoria 283 en columnas de operador y temperatura | Conservar las guías de esas filas y excluir los valores auxiliares de esos campos |
+| Diseños activos O27 multiplica H27 por F5, pero Q27 muestra g aunque el cálculo base es kg | Exigir validación de unidad antes de activar receta |
+| Cemento 21-09-26 E12 vale 7, F12 vale 260 y G12 está escrito 1910 | Conservar declarado y teórico 1820 separados; revisar diferencia de 90 |
+| Cemento 21-09-26 I9 vale menos 1247 y J9 dice SOBRO 1247 | Conciliar lectura y signo; no corregirlos por intuición |
+| Cemento 22-09-26 K11 y L11 excluyen del total el despacho de la fila 6 | Recalcular reportes desde movimientos validados |
+| Cemento hoja 23-09-26 A1 guarda 22-09-2026 | Registrar conflicto de fecha para revisión |
+| Aditivos ING.ADITIVOS C10 vale 2 y E10 contiene 2200 KG | Confirmar si el peso corresponde al total o a cada envase |
+| Arena Hoja2 F90 muestra 16 bajo TOTAL A PAGAR | Conservar conteo de viajes; no importarlo como dinero |
+| Piedra fila 11 registra 15 m³ por 20 viajes y total 300 m³ | Conservar recepción agregada, sin inventar veinte tickets |
+| Viajes CJI-945 H19 suma H5:I18 e incluye la columna ESTRUCTURA | Calcular volúmenes solo desde campos normalizados de volumen |
+| Petróleo WUANUKO MIX EIRL H16 suma H9 y H11, omitiendo otras filas del bloque | Conciliar detalle de vales antes de liquidar |
+| Vale 009210 tiene referencias con misma cantidad y distinto precio entre libros | Un solo hecho candidato con conflicto, no dos compras |
+| Mantenimiento MIXER-CAX-907 C16 identifica BEE-715 y otras fichas contradicen placa o intervalo entre cabecera y detalle | Resolver equipo y plan antes de unir historiales o generar tareas |
+
+Estas incidencias describen los archivos aportados. No constituyen autorización para cambiar saldos de la empresa ni para corregir retrospectivamente entregas. La revisión conserva tanto el original como la resolución aprobada.
+
+## 18 Reportes y tablero de gestión
+
+El tablero muestra programado, preparado, en tránsito, descargado, aceptado, retornado y pendiente, con fecha y unidad. Permite ir del indicador al documento que lo compone. Incluye existencias y reservas por silo, cargas con datos incompletos, entregas pendientes de conformidad, ensayos próximos, equipo no disponible y pedidos pendientes de pago o atención.
+
+| Reporte | Corte y contenido |
+| Producción diaria | Planta, turno, diseño, carga y tanda; m³ y consumos objetivo y reales |
+| Cemento y aditivos | Apertura, ingresos, consumos, traslados, ajustes y cierre por material y ubicación |
+| Agregados | Proveedor, cantera, recepción, volumen, masa cuando exista y pendientes de conversión |
+| Guías y viajes | Cliente, obra, mixer, conductor, tiempos, cantidades y estado |
+| Atención de pedido | Contratado, reservado sin entregar, aceptado y saldo por partida |
+| Calidad | Muestras, ensayos por edad, certificados, resultados y no conformidades |
+| Flota y combustible | Disponibilidad, km, horas, abastecimiento, consumo estimado o medido y costos |
+| Rentabilidad | Venta neta, costos completos o pendientes, margen por obra, producto, carga y período |
+| Liquidaciones | Proveedores, trabajadores, alimentación, combustible, montos devengados y pagos |
+| Facturación y cobranza | Entregas por facturar, cantidades aplicadas, anticipos, vencimientos y saldos |
+
+Identifica el denominador de cada indicador: minutos por viaje, litros por hora, litros por km o por m³. No presentes litros abastecidos por viaje como consumo medido sin evidencia. No mezcles fechas de preparación, entrega, factura y cobro en un mismo total sin señalar el criterio. Las exportaciones PDF y Excel usan la misma consulta y filtros que la pantalla.
+
+## 19 Etapas de construcción y entrega
+
+| Etapa | Entrega concreta | Condición para avanzar |
+| 0 Diagnóstico | Mapa del repositorio, reutilización, migraciones propuestas y plan de implementación | Arquitectura identificada y datos de prueba separados |
+| 1 Base comercial | Activación por empresa, obras, especificaciones, proforma y pedido | Aceptar tarifario y presupuesto sin perder precio ni condiciones |
+| 2 Técnica y programación | Diseños versionados, aprobación, plantas, capacidades, calendario y cargas | Programación sin sobreasignación y receta compatible |
+| 3 Producción e inventario | Reservas, tandas, objetivo y real, consumos, trazabilidad y costo disponible | Preparación completa con un único movimiento por hecho |
+| 4 Despacho y recepción | Guía Wuanuko Mix, PDF, dos ejemplares, viaje, recepción y retorno | Carga trazable y cantidades conciliadas |
+| 5 Comercial completo | Liquidación, facturación y adelantos del ERP, vínculo o integración GRE | Sin duplicar cantidades, ventas, cobros ni emisiones |
+| 6 Operación ampliada | Calidad, flota, combustible, mantenimiento, alimentación y reportes | Costos y controles con fuente identificable |
+| 7 Importación y piloto | Previsualización, conciliación, corte, capacitación y pruebas integrales | Caso piloto aprobado con responsables comercial, planta y administración |
+
+La integración GRE necesaria para una salida real debe estar operativa o cubierta por el procedimiento vigente utilizado por la empresa antes del piloto de despacho en producción. La etapa 4 puede verificarse con datos de prueba. Las integraciones con balanzas o controladores físicos se incorporan mediante adaptadores después de confirmar modelo, protocolo, unidades y responsabilidad de control. La primera versión puede registrar lecturas manuales con trazabilidad; no debe presentar esos datos como captura automática.
+
+Cada entrega incluye código funcional, migraciones, permisos, datos de prueba identificados, documentos generados, instrucciones de instalación y evidencia de los escenarios ejecutados. Mantén una lista breve de decisiones pendientes. No declares operativa una conexión externa por tener un botón que simula su respuesta.
+
+## 20 Escenarios de aceptación para Codex
+
+Estos son criterios a implementar y verificar en el repositorio; no se afirma que ya estén ejecutados.
+
+1. Aceptar un tarifario con seis alternativas y elegir solo f'c 210 por veinticuatro m³. Crear una partida contratada sin sumar el resto de resistencias.
+2. Mantener S/ 410 para una versión aceptada y S/ 430 para otra. Cambiar la tarifa general no altera pedidos anteriores.
+3. Crear dos diseños aprobados de la misma resistencia. La carga conserva el diseño elegido y su versión. Un cambio de versión no modifica producción histórica.
+4. Intentar producir con receta importada cuya unidad de aditivo está en revisión. La liberación indica la incidencia y requiere su resolución técnica.
+5. Con capacidad de mixer configurada en ocho m³, repartir veinticuatro en tres cargas. Con otra capacidad, recalcular las cargas futuras sin modificar las realizadas.
+6. Confirmar dos tandas de cuatro m³ dentro de una carga de ocho. Verificar suma de cantidades y consumos por silo.
+7. Verificar receta de prueba con agregado SSS de 1 000 kg, absorción 2 por ciento y humedad total 5 por ciento sobre masa seca: masa seca 980,392157 kg, masa húmeda 1 029,411765 kg y agua libre 29,411765 kg antes de redondeo. Es un caso de software, no una receta para obra.
+8. Repetir la confirmación de una tanda con el mismo identificador. Mantener una tanda, un juego de movimientos y el mismo resultado. Reusar la clave con datos diferentes devuelve conflicto.
+9. Ejecutar dos reservas o consumos concurrentes contra un saldo insuficiente para ambos. Impedir doble asignación y conservar consistencia.
+10. Cancelar una programación sin iniciar y liberar reservas. Cancelar después de mezclar y conservar consumo, concreto producido e incidencia de disposición.
+11. Imprimir dos veces la guía y sus dos ejemplares. Mantener identidad y datos iguales, sin crear viajes ni movimientos adicionales. La hora de llegada proviene del campo de llegada.
+12. Despachar ocho m³, descargar seis aceptados y retornar dos rechazados. El balance físico es ocho igual a seis más dos; no sumar otra vez los dos por la condición de rechazo. El pedido conserva la obligación pendiente según resolución comercial.
+13. Cerrar un viaje que cruza medianoche. Calcular tiempos positivos usando fechas y horas completas y la zona configurada.
+14. Aplicar parcialmente una entrega a factura y luego facturar su remanente. Dos sesiones no pueden exceder el volumen elegible. Un reintento tributario no crea un comprobante nuevo sin resolver el estado anterior.
+15. Registrar un adelanto y aplicarlo a liquidaciones. No duplicar venta ni ingreso de caja y mostrar saldo disponible del adelanto.
+16. Importar dos veces el mismo libro y cruzar una guía presente también en cemento. Conservar un despacho y sus vínculos, sin duplicar consumo ni saldos.
+17. Importar la referencia de un vale desde viajes y petróleo con distinto precio. Abrir un conflicto y evitar crear dos compras o pagos.
+18. Importar histórico anterior al corte y una apertura al corte. Demostrar que el histórico de consulta no vuelve a descontar la apertura.
+19. Registrar tres lecturas de un equipo en km y horas. Programar mantenimiento con su medidor correcto y bloquear su intervalo de indisponibilidad.
+20. Registrar un ensayo a siete días y otro a veintiocho. Aplicar el plan técnico correcto sin inventar un umbral universal ni impedir la emisión tributaria por esperar el ensayo final.
+21. Simular GRE rechazada o respuesta desconocida. Mostrar el estado real, permitir tratamiento del error y evitar una falsa salida autorizada como si estuviera aceptada.
+22. Consultar registros y QR con usuarios de otra empresa. Impedir acceso en pantalla, API, PDF, adjuntos y exportaciones.
+23. Omitir un precio de compra o un costo de transporte. Mostrar costo incompleto y no calcular una utilidad definitiva con ceros inventados.
+24. Verificar que una falla de PDF o de conexión después de confirmar producción no revierta el hecho físico ni lo vuelva a registrar al reintentar.
+25. Transportar ocho m³ y bombear esos mismos ocho m³. El reporte de concreto entrega ocho m³ y el reporte del servicio muestra ocho m³ bombeados; no aparecen dieciséis m³ de producción.
+26. Recibir 1 000 kg, consumir 400 y registrar después la factura con ajuste de precio. Mantener 600 kg físicos y aplicar solo la valorización pendiente según el método del ERP.
+27. Importar las filas de BD que contienen T1000 o W786 con cálculos auxiliares. Conservar sus guías y cantidades válidas, sin convertir 2522 en operador ni 283 en temperatura.
+28. Migrar una carga de cuatro m³ preparada antes del corte y despacharla después. Registrar una sola salida de concreto y no repetir consumos de materias primas.
+29. Tener dos m³ retornados. Impedir su uso sin autorización técnica y la asignación concurrente de la misma cantidad a dos destinos autorizados.
+30. Cobrar S/ 2 000 de adelanto y aplicar S/ 1 500 a una factura de S/ 5 000. Quedan S/ 3 500 por cobrar y S/ 500 de adelanto disponible. Reintentos y aplicaciones concurrentes no exceden esos saldos.
+31. Dos programadores intentan comprometer veinte m³ cada uno sobre un pedido de treinta m³. La segunda transacción debe resolver el saldo o conflicto, aunque exista suficiente material en almacén.
+32. En un plan de mantenimiento de quinientas horas, registrar quinientas setenta y dos desde el servicio. Mostrar atraso de setenta y dos; otra lectura sin servicio no reinicia el plan.
+33. Registrar gasto S/ 100, asignar S/ 60 y dejar S/ 40 pendientes. Impedir otra asignación de S/ 50 que exceda la fuente. Una prestación de alimentación tampoco puede entrar en dos liquidaciones activas.
+
+## 21 Datos que se deben confirmar durante la configuración
+
+Estas decisiones pueden quedar como parámetros pendientes mientras se desarrolla y prueba con datos identificados. Deben resolverse antes de habilitar la operación correspondiente.
+
+Se necesitan las capacidades reales de planta, tandas y mixers; lista y capacidad de silos; catálogo vigente de materiales; unidades de aditivos, presentación y densidad; diseños aprobados con base seca o SSS; forma de medir humedad y vigencia; tolerancias y criterios de liberación; reglas de precios y mínimos de bombeo; método de valorización y reparto de costos; condición de pago que autoriza producción; procedimiento GRE vigente; modelo de balanzas o controlador si se integrará; política de rechazo, retorno y cobro; y fecha de corte con saldos conciliados.
+
+Para importar los archivos, también hay que resolver encabezados ambiguos de agua y cemento, referencias incompletas de clientes, discrepancias entre guías y controles, peso total frente a peso por envase, fechas copiadas y costos faltantes. Mantén estas decisiones en configuración o en un registro de conciliación; no las sustituyas por constantes silenciosas en código.
+
+## 22 Referencias para localizar la evidencia
+
+Los archivos aportados por el usuario son las fuentes de operación y formatos. Las referencias técnicas explican correcciones e integración; no certifican las recetas históricas ni sustituyen la aprobación de la empresa.
+
+F01. GUIA WUANUKO MIX ACTUAL 2026 - JULIO..xlsm. Hojas Registro, Impresion, BD, Busqueda, Copia y Hoja1. Base de candidatos BD A11 a AE1352. Revisar especialmente BD AA10, Impresion B31, F36 y las fórmulas de Busqueda. Los registros incluyen códigos alfanuméricos; el nombre del archivo no define por sí mismo el período real del contenido.
+
+F02. DISEÑOS SETIEMBRE.xlsx. Diseños por resistencia y aplicación. Revisar variantes de f'c 210, base por m³, volumen F5, aditivos H27 y O27 y unidad Q27. Conservar nombres de hoja y contenido original durante la importación.
+
+F03. CONTROL DE CEMENTO SETIEMBRE (Autoguardado).xlsx. Encabezados A3 a R3 de 01,09,2026 y cambios de formato desde 17-09-2026. Ejemplo E10 a L10 de 01,09,2026. Incidencias E12 a G12 e I9 a J9 de 21-09-26, K11 y L11 de 22-09-26 y A1 de 23-09-26.
+
+F04. INFORME MES DE MAYO.xlsx. Veinticuatro hojas diarias. Hoja 01-05-26  (33), F5 a I5, distingue cantidad calculada de lectura independiente; cuadros de silos y aditivos. Los cálculos repetidos en columnas de utilizado no acreditan medición real.
+
+F05. ADICTIVO DEL MES DE SETIEMBRE.xlsx. ING.ADITIVOS A9 a E13. Cantidades de envases, productos y pesos textuales.
+
+F06. CONTROL DE ARENA GRUESA DEl  SEÑOR LUCERO  16.09.xlsx. Hoja2 A3 a I3, bloques A5 y A20, F88 a F90 y hora B10.
+
+F07. CONTROL DE PIEDRA CHANCADA Y POLVILLO   SETEIMBRE.xlsx. Hoja PIEDRA CHANCADA Y  CONFITILLO, A10 a J15. Cantidad por viaje, número de viajes y total.
+
+F08. LIQUIDACION DE PETROLIO DEL 14 AL 19  DE SETIEMBRE  2026 ACTUALIZADO.xlsx. Hoja WUANUKO MIX EIRL, detalle de vales y H16; referencias para conciliación de combustible.
+
+F09. nuev control de  viajes.xlsx. Hojas por equipo. Hoja CJI-945 H5 a I19 y referencias de vales. La columna ESTRUCTURA requiere revisión semántica antes de importación.
+
+F10. CONTROL DE MANTENIMEINTO DE  LAS  MAQUINAS.xlsx. Hojas por equipo, lecturas y servicios. Identificación de medidor y unidad según cada ficha.
+
+F11. LIQUIDEZ DE DESAYUNO  AGOSTO.xlsx. Hoja MARZO, cuyo título A9 indica agosto de 2026, y total G66. Conservar fecha, trabajador, cargos originales, tarifas y evidencias.
+
+F12. LIQUIDACION DE ALMUERZO SETIEMBRE DEL 01 AL 15.xlsx. Hoja Hoja5, detalle A3:F199 y resumen B202:D217; incluye almuerzos y cenas. Separar registros individuales, totales y pagos.
+
+F13. WhatsApp Image 2026-10-08 at 1.00.24 PM (1).jpeg. Cotización 077-2026 del 10 de setiembre de 2026. La imagen WhatsApp Image 2026-10-18 at 11.11.46 PM.jpeg es idéntica a esta fuente.
+
+F14. WhatsApp Image 2026-10-08 at 1.00.24 PM.jpeg. Cotización 084-2026 del 22 de setiembre de 2026. Precios y condiciones de otra obra.
+
+T01. SUNAT, Sistemas de emisión de guías. https://cpe.sunat.gob.pe/node/116 . Consulta del 19 de octubre de 2026 UTC. Referencia para emisión, CDR y validaciones vigentes de GRE.
+
+T02. SUNAT, Impuesto General a las Ventas. https://emprender.sunat.gob.pe/principales-impuestos/impuesto-general-las-ventas-igv/impuesto-general-las-ventas . Consulta del 19 de octubre de 2026 UTC. Tasa total aplicable a operaciones gravadas en el ejemplo.
+
+T03. American Concrete Institute, Aggregates for Concrete, ACI E1-16, secciones 3.3.2 a 3.3.6. https://www.concrete.org/Portals/0/Files/PDF/E1-16v3.pdf . Referencia de las bases de humedad, absorción y corrección de cantidades. No se afirma que sea la edición contractual aplicable a una obra específica.
+
+T04. American Concrete Institute, corrección del agua absorbida y superficial de agregados. https://www.concrete.org/frequentlyaskedquestions.aspx?faqid=757 . Referencia conceptual sobre conservación de la relación agua y cementantes.
+
+T05. NRMCA, TIP 6 Aggregate Moisture and Making Adjustments to Concrete Mixtures, vista pública. https://www.nrmca.org/wp-content/uploads/2020/04/Tip6w.pdf . Referencia sobre fuentes de agua de mezcla y necesidad de considerar humedad de agregados.
+
+## 23 Orden de inicio
+
+Codex, inspecciona el repositorio actual, aplica las instrucciones de este documento y comienza por las etapas 0 y 1. Presenta el mapa de reutilización y ejecuta la implementación con migraciones aditivas. Continúa con el primer recorrido completo de proforma a guía y liquidación, incorporando desde producción los movimientos de materiales y la trazabilidad. Conserva el formato de guía Wuanuko Mix y resuelve los errores de mapeo documentados con campos definidos.
+
+Para cada etapa, muestra qué funciona, qué escenarios ejecutaste y qué depende de una configuración o integración pendiente. Haz las preguntas operativas cuando afecten una decisión real de habilitación, continuando mientras tanto con los componentes independientes. El resultado esperado es un módulo integrado y comprobable dentro de NEUROSOFT, con datos persistidos y documentos generados desde esos datos.

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "fuente": "Cotización física Wuanuko Mix 077-2026, fotografía aportada por el usuario",
+  "confirmacionCuentasCompartidas": "2026-10-19: trabajar las cuentas en ambos por el momento",
+  "servicios": "Concreto premezclado en diversas resistencias, aditivos y plastificantes. Alquiler de camión mixer y servicio de bomba de concreto.",
+  "direccionComercial": "Av. Túpac Amaru N° 1002 - Urb. Paucarbamba - Amarilis - Huánuco",
+  "correoComercial": "concretera.wuanuko.mix@hotmail.com",
+  "contactos": [
+    {
+      "nombre": "Rhonald Figueroa Cruz",
+      "telefonos": "980 651 293"
+    },
+    {
+      "nombre": "Sergio Raul Laveriano Ghio",
+      "telefonos": "990 908 690 / 941 537 558"
+    }
+  ],
+  "cuentas": [
+    {
+      "banco": "BCP - Banco de Crédito",
+      "cuenta": "365-2332168-0-19",
+      "cci": "002-365-002332168019-53"
+    },
+    {
+      "banco": "BBVA - Banco Continental",
+      "cuenta": "0011-0210-29-0100057524",
+      "cci": "011-210-000100057524-29"
+    }
+  ],
+  "condicionesTecnicas": [
+    "Preparación con cemento Andino Tipo I, piedra chancada, arena gruesa y aditivos, conforme a la receta técnica que se apruebe para el suministro.",
+    "La resistencia requerida se verifica a los 28 días. Los testigos se elaboran en planta y en obra; la rotura se realiza en laboratorio según las edades de ensayo indicadas.",
+    "Se permite la supervisión en planta por parte del contratista.",
+    "Los operadores y trabajadores de la concretera cuentan con SCTR."
+  ],
+  "cierre": "Gracias por considerar a Wuanuko Mix. Estamos a su disposición para coordinar el suministro de concreto de su proyecto.",
+  "fuenteSha256": "767b5cc19b03d1c92c444608d9ac51b2456f7077b3f452c6f6725f222030266b"
+}
