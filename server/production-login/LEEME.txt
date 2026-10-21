@@ -1,0 +1,49 @@
+NSTARAPACA - CORRECCION DE CONEXION Y LOGIN EN PRODUCCION
+
+CAUSA EN EL CODIGO
+El login heredado y la API usaban conexiones escritas en sus propios archivos.
+Por eso cambiar config/database.local.php no corregia esas conexiones.
+La pantalla intentaba interpretar como JSON el texto de un error SQL y quedaba
+en "Validando acceso".
+
+ESTE PARCHE
+- Login y API consultan la configuracion comun de config/database.php.
+- La configuracion privada database.local.php tiene prioridad.
+- El adaptador mysqli heredado tambien usa esa configuracion.
+- El login reconoce el caso real de las tablas, mantiene permisos y el perfil
+  PROGRAMADOR, y usa consultas parametrizadas.
+- Los errores del servidor regresan JSON sin consultas ni contrasenas.
+- El boton vuelve a habilitarse ante errores o tras 15 segundos sin respuesta.
+- No modifica tablas, usuarios, contrasenas ni datos comerciales.
+
+El paquete NO incluye database.local.php ni contrasenas del servidor.
+Conservar el archivo privado que ya apunta a fact_nstarapaca.
+
+INSTALAR EN EL SERVIDOR REAL
+Copiar este paquete a una carpeta privada del servidor mediante MobaXterm/SFTP.
+No basta con instalarlo en localhost ni con recompilar boticav1/nuevo: es PHP.
+Cambiar las rutas del ejemplo por la carpeta REAL que atiende nstarapaca.factura.vip:
+
+  mkdir -p /home/USUARIO/respaldos
+  php install.php --root=/home/USUARIO/public_html --backup=/home/USUARIO/respaldos/nstarapaca-login-NUEVO
+
+La carpeta de respaldo debe ser nueva y estar fuera del directorio publico.
+El instalador comprueba los puntos de integracion y la sintaxis PHP antes de
+escribir. Respalda cada archivo original y conserva database.local.php.
+
+Comprobar despues con el mismo PHP utilizado por el servidor web:
+  php check.php --root=/home/USUARIO/public_html
+
+Debe mostrar fact_nstarapaca tanto para PDO como para mysqli y las cuatro tablas
+de usuarios/permisos. Este chequeo solo lee, y nunca imprime la contrasena.
+Despues recargar la pagina con Ctrl+F5 y probar el ingreso normal.
+GET /controllers/validarLogin.php debe devolver 405 y JSON, sin ejecutar login.
+
+Si el chequeo falla, revisar la base importada, los permisos del usuario MySQL,
+las extensiones pdo_mysql/mysqli y la lectura de config/database.local.php por PHP.
+No cambiar la base local nst con las credenciales del servidor de produccion.
+
+RECUPERACION
+Los originales quedan en respaldo/original y los nuevos en respaldo/staged.
+manifest.json registra los hashes. Para revertir, restaurar solo los archivos
+originales del respaldo; database.local.php y los datos no se han modificado.
