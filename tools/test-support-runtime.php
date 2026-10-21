@@ -2,6 +2,7 @@
 require 'C:/xampp/htdocs/boticav1/config/database.php';
 require __DIR__.'/../integration/helpdesk/support-runtime.php';
 require __DIR__.'/../integration/helpdesk/support-service.php';
+require __DIR__.'/../integration/helpdesk/runtime/config-files.php';
 function runtimeAssert($ok, $message) { if (!$ok) throw new RuntimeException($message); }
 function runtimeCommand(array $args) {
     $process=proc_open(array_merge([PHP_BINARY],$args),[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,null,null,['bypass_shell'=>true]);
@@ -14,6 +15,7 @@ $fixture=sys_get_temp_dir().'/nst-support-'.$suffix;
 $oldEnv=getenv('SUPPORT_RUNTIME_CONFIG');
 mkdir($fixture,0700,true);
 try {
+    foreach ([0600=>0600,0640=>0640,0644=>0644,0777=>0644,0660=>0640] as $reference=>$expected) runtimeAssert(supportConfigAccessMode($reference)===$expected,'Unsafe config permission policy');
     $pdo->exec('CREATE DATABASE `'.$erp.'`');$pdo->exec('USE `'.$erp.'`');
     $pdo->exec("CREATE TABLE GEN_EMPRESA(IDEMPRESA INT PRIMARY KEY); INSERT INTO GEN_EMPRESA VALUES(1);
 CREATE TABLE Seg_UsuarioPerfil(IdUsuarioPerfil INT PRIMARY KEY,UsuarioPerfil VARCHAR(80)); INSERT INTO Seg_UsuarioPerfil VALUES(1,'ADMIN'),(2,'VENTAS');
@@ -25,6 +27,7 @@ CREATE TABLE Seg_Usuario(Usuario VARCHAR(100) PRIMARY KEY,NombreUsuario VARCHAR(
     file_put_contents($fixture.'/config/database.local.php','<?php return '.var_export($connection,true).';');chmod($fixture.'/config/database.local.php',0600);
     foreach(['support-runtime.php','support-api.php','support-service.php','support-activity.php'] as $file)copy(__DIR__.'/../integration/helpdesk/'.$file,$fixture.'/api/'.$file);
     copy(__DIR__.'/../integration/helpdesk/runtime/setup.php',$fixture.'/tools/support/setup.php');
+    copy(__DIR__.'/../integration/helpdesk/runtime/config-files.php',$fixture.'/tools/support/config-files.php');
     foreach(glob(__DIR__.'/../integration/helpdesk/migrations/*.up.sql') as $file)copy($file,$fixture.'/tools/support/migrations/'.basename($file));
     // Explicit missing config must not silently fall back to the Windows runtime.
     $private=$fixture.'/config/support.local.php';putenv('SUPPORT_RUNTIME_CONFIG='.$private);
@@ -48,6 +51,10 @@ CREATE TABLE Seg_Usuario(Usuario VARCHAR(100) PRIMARY KEY,NombreUsuario VARCHAR(
     $before=(int)$pdo->query('SELECT COUNT(*) FROM support_audit_logs')->fetchColumn();
     [$code,$output]=runtimeCommand([$script,'--check']);runtimeAssert($code===0,'Read-only check failed: '.$output);
     runtimeAssert((int)$pdo->query('SELECT COUNT(*) FROM support_audit_logs')->fetchColumn()===$before,'Check modified audit');
+    $beforeConfig=hash_file('sha256',$private);
+    [$code,$output]=runtimeCommand([$script,'--repair-config-access']);runtimeAssert($code===0,'Repair access failed: '.$output);
+    runtimeAssert(hash_file('sha256',$private)===$beforeConfig,'Permission repair changed configuration contents');
+    runtimeAssert((int)$pdo->query('SELECT COUNT(*) FROM support_audit_logs')->fetchColumn()===$before,'Permission repair changed database');
     [$code]=runtimeCommand([$script,'--apply','--database='.$schema,'--origin=https://support-fixture.invalid','--company=1','--admin=fixture-client']);runtimeAssert($code!==0,'Non-admin bootstrap accepted');
     $original=file_get_contents($private);$cfg['connection']=$connection;$cfg['database']=$erp;file_put_contents($private,'<?php return '.var_export($cfg,true).';');
     [$code,$output]=runtimeCommand([$script,'--check']);runtimeAssert($code!==0&&strpos($output,'SUPPORT_DATABASE_NOT_SEPARATE')!==false,'Main ERP DB must not be used for support');

@@ -1,7 +1,7 @@
 <?php
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
-$options = getopt('', ['root:', 'check', 'apply', 'database:', 'origin:', 'company:', 'admin:', 'create-database', 'config:']);
-if (!isset($options['check']) && !isset($options['apply'])) {
+$options = getopt('', ['root:', 'check', 'apply', 'database:', 'origin:', 'company:', 'admin:', 'create-database', 'config:', 'repair-config-access']);
+if (!isset($options['check']) && !isset($options['apply']) && !isset($options['repair-config-access'])) {
     echo "Diagnóstico: php tools/support/setup.php --check\n";
     echo "Instalar: php tools/support/setup.php --apply --database=BASE_SOPORTE --origin=https://su-dominio --company=1 --admin=superadmin [--create-database]\n";
     exit;
@@ -11,10 +11,18 @@ if (!$root || !is_file($root . '/config/database.php') || !is_file($root . '/api
 require_once $root . '/config/database.php';
 require_once $root . '/api/support-runtime.php';
 require_once $root . '/api/support-service.php';
+require_once __DIR__ . '/config-files.php';
 appLoadEnvironment();
 if (isset($options['config'])) putenv('SUPPORT_RUNTIME_CONFIG=' . $options['config']);
 $db = null;
 try {
+    if (isset($options['repair-config-access'])) {
+        $file = supportRuntimeConfigPath($root);
+        if (!is_file($file)) throw new SupportRuntimeException('SUPPORT_CONFIG_MISSING', 'El archivo de soporte no existe. Ejecuta la primera instalación con --apply.');
+        supportConfigApplyAccess($file, $root);
+        echo "OK: permisos de soporte alineados con la configuración privada del ERP. No se modificaron bases ni credenciales.\n";
+        exit;
+    }
     if (isset($options['check'])) {
         $cfg = supportRuntimeConfig($root);
         $db = supportRuntimeConnect($cfg);
@@ -101,8 +109,14 @@ try {
             chmod($temp, 0600);
             $written = fwrite($handle, $contents);
             fclose($handle);
-            if ($written !== strlen($contents) || !rename($temp, $file)) { @unlink($temp); throw new RuntimeException('No se pudo publicar la configuración privada.'); }
+            try {
+                if ($written !== strlen($contents)) throw new RuntimeException('No se pudo escribir toda la configuración privada.');
+                supportConfigApplyAccess($temp, $root);
+                if (!rename($temp, $file)) throw new RuntimeException('No se pudo publicar la configuración privada.');
+            } finally { if (is_file($temp)) unlink($temp); }
         }
+        // Repair older root-owned 0600 files even when their contents did not change.
+        supportConfigApplyAccess($file, $root);
         supportRuntimeVerify($db, $cfg);
         echo "OK: centro instalado. Conserva tickets y permisos existentes. El administrador indicado puede gestionar técnicos y clientes.\n";
     } finally { supportQuery($db, 'SELECT RELEASE_LOCK(?)', [$lock]); }

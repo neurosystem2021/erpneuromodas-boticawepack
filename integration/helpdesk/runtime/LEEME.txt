@@ -6,6 +6,18 @@ POR QUE APARECIA 'CENTRO DE SOPORTE NO DISPONIBLE'
 La API buscaba C:/xampp/support-private/runtime.php incluso en Linux.
 La base independiente de soporte no forma parte de la exportacion del ERP.
 El acceso al ERP y el acceso a soporte son conexiones distintas.
+Si ahora aparece 'Falta configurar la conexion del centro de soporte', la
+actualizacion ya llego, pero falta crear config/support.local.php con el comando
+de PRIMERA INSTALACION que aparece abajo. Git no copia archivos privados.
+
+SI YA SE INSTALO Y EN LA WEB SIGUE FALLANDO
+Un instalador anterior podia dejar el archivo accesible solo para root.
+Tras git pull ejecutar:
+ php tools/support/setup.php --repair-config-access
+ php tools/support/setup.php --check
+La reparacion conserva el contenido y usa propietario/grupo y permisos de
+lectura de la configuracion privada del ERP. No usar chmod 777.
+Si indica SUPPORT_CONFIG_MISSING, ejecutar la primera instalacion completa.
 
 ACTUALIZACION EN PRODUCCION (desde la carpeta del repositorio PHP boticav1)
  git switch nstarapaca
@@ -48,6 +60,7 @@ Abrir diario.php de nuevo. El superadmin podra registrar clientes y dar permisos
 El diagnostico no modifica datos ni imprime claves ni passwords.
 Codigos: SUPPORT_CONFIG_MISSING (configuracion ausente), SUPPORT_DATABASE_MISSING
 (base ausente), SUPPORT_DATABASE_ACCESS (permisos/credenciales),
+SUPPORT_CONFIG_UNREADABLE (PHP no puede leer el archivo privado),
 SUPPORT_DATABASE_UNREACHABLE (servidor no accesible), SUPPORT_MIGRATIONS_REQUIRED
 (tablas pendientes), SUPPORT_REGISTRATION_INACTIVE (empresa/instalacion inactiva).
 El entorno local anterior de Windows sigue reconociendo su runtime privado.

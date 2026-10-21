@@ -22,7 +22,8 @@ function supportRuntimeConfigPath($root = null)
 function supportRuntimeConfig($root = null, $registration = true)
 {
     $file = supportRuntimeConfigPath($root);
-    if (!is_readable($file)) throw new SupportRuntimeException('SUPPORT_CONFIG_MISSING', 'Falta configurar la conexión del centro de soporte.');
+    if (!is_file($file)) throw new SupportRuntimeException('SUPPORT_CONFIG_MISSING', 'Falta configurar la conexión del centro de soporte.');
+    if (!is_readable($file)) throw new SupportRuntimeException('SUPPORT_CONFIG_UNREADABLE', 'PHP no tiene permiso para leer la configuración del centro de soporte.');
     $cfg = require $file;
     if (!is_array($cfg)) throw new SupportRuntimeException('SUPPORT_CONFIG_INVALID', 'La configuración del centro de soporte no es válida.');
     supportRuntimeValidate($cfg, $registration);
