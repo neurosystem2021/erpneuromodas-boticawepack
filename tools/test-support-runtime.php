@@ -16,6 +16,11 @@ $oldEnv=getenv('SUPPORT_RUNTIME_CONFIG');
 mkdir($fixture,0700,true);
 try {
     foreach ([0600=>0600,0640=>0640,0644=>0644,0777=>0644,0660=>0640] as $reference=>$expected) runtimeAssert(supportConfigAccessMode($reference)===$expected,'Unsafe config permission policy');
+    foreach ([1044=>'SUPPORT_DATABASE_CREATE_DENIED',1142=>'SUPPORT_DATABASE_CREATE_DENIED',1227=>'SUPPORT_DATABASE_CREATE_DENIED',1045=>'SUPPORT_DATABASE_AUTH_FAILED',1049=>'SUPPORT_DATABASE_MISSING',2002=>'SUPPORT_DATABASE_UNREACHABLE',1064=>'SUPPORT_DATABASE_OPERATION_FAILED'] as $number=>$expected) {
+        $failureError=new PDOException('PRIVATE_FIXTURE_PASSWORD private SQL');$failureError->errorInfo=['HY000',$number,'PRIVATE_FIXTURE_PASSWORD'];$failure=supportSetupDatabaseFailure($failureError,'database_create');
+        runtimeAssert($failure['code']===$expected&&strpos($failure['error'],'MySQL='.$number)!==false&&strpos(json_encode($failure),'PRIVATE_FIXTURE_PASSWORD')===false,'Safe actionable installation failure');
+    }
+    $failureError->errorInfo=['42000',1142,'PRIVATE_FIXTURE_PASSWORD'];runtimeAssert(supportSetupDatabaseFailure($failureError,'migrations')['code']==='SUPPORT_DATABASE_PERMISSION_DENIED','Migration permission failure misclassified as creation');
     $pdo->exec('CREATE DATABASE `'.$erp.'`');$pdo->exec('USE `'.$erp.'`');
     $pdo->exec("CREATE TABLE GEN_EMPRESA(IDEMPRESA INT PRIMARY KEY); INSERT INTO GEN_EMPRESA VALUES(1);
 CREATE TABLE Seg_UsuarioPerfil(IdUsuarioPerfil INT PRIMARY KEY,UsuarioPerfil VARCHAR(80)); INSERT INTO Seg_UsuarioPerfil VALUES(1,'ADMIN'),(2,'VENTAS');
@@ -34,6 +39,8 @@ CREATE TABLE Seg_Usuario(Usuario VARCHAR(100) PRIMARY KEY,NombreUsuario VARCHAR(
     try { supportRuntimeConfig($fixture); throw new LogicException('Missing configuration accepted'); }
     catch (SupportRuntimeException $e) { runtimeAssert($e->reason==='SUPPORT_CONFIG_MISSING','Missing config diagnostic'); }
     $script=$fixture.'/tools/support/setup.php';
+    $denied=$fixture.'/config/denied.local.php';file_put_contents($denied,'<?php return '.var_export(['database'=>$schema,'connection'=>['user'=>'missing_'.bin2hex(random_bytes(4)),'pass'=>'PRIVATE_FIXTURE_PASSWORD']],true).';');chmod($denied,0600);
+    [$code,$output]=runtimeCommand([$script,'--config='.$denied,'--apply','--database='.$schema,'--origin=https://support-fixture.invalid','--company=1','--admin=fixture-admin','--create-database']);runtimeAssert($code!==0&&strpos($output,'SUPPORT_DATABASE_AUTH_FAILED')!==false&&strpos($output,'etapa=database_create')!==false&&strpos($output,'PRIVATE_FIXTURE_PASSWORD')===false,'CLI must distinguish authentication failure without leaking secrets');runtimeAssert(!is_file($private),'Failed installation published an incomplete config');
     $args=[$script,'--apply','--database='.$schema,'--origin=https://support-fixture.invalid','--company=1','--admin=fixture-admin','--create-database'];
     [$code,$output]=runtimeCommand($args);runtimeAssert($code===0,'Setup failed: '.$output);
     $cfg=require $private;$pdo->exec('USE `'.$schema.'`');

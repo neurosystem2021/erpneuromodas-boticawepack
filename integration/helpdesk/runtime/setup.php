@@ -15,6 +15,7 @@ require_once __DIR__ . '/config-files.php';
 appLoadEnvironment();
 if (isset($options['config'])) putenv('SUPPORT_RUNTIME_CONFIG=' . $options['config']);
 $db = null;
+$stage = 'configuration';
 try {
     if (isset($options['repair-config-access'])) {
         $file = supportRuntimeConfigPath($root);
@@ -42,6 +43,7 @@ try {
     if (!$url || ($url['scheme'] ?? '') !== 'https' || empty($url['host']) || isset($url['user']) || isset($url['pass']) || isset($url['query']) || isset($url['fragment']) || !empty($url['path'])) throw new RuntimeException('Indica --origin=https://dominio-del-centro (sin ruta).');
     if ($company === '' || $admin === '') throw new RuntimeException('Indica --company=ID_EMPRESA y --admin=USUARIO_ADMIN_ERP.');
     // Validate identities before creating or migrating anything.
+    $stage = 'erp_identity';
     $erp = appPdoConnection();
     $companies = supportErpTable($erp, 'Gen_Empresa');
     if (!supportQuery($erp, 'SELECT IDEMPRESA FROM ' . $companies . ' WHERE IDEMPRESA=?', [$company])->fetchColumn()) throw new RuntimeException('La empresa indicada no existe en el ERP.');
@@ -50,15 +52,18 @@ try {
     $user = supportQuery($erp, 'SELECT u.Usuario,u.NombreUsuario,u.IdUsuarioPerfil,p.UsuarioPerfil FROM ' . $users . ' u JOIN ' . $profiles . ' p ON p.IdUsuarioPerfil=u.IdUsuarioPerfil WHERE u.Usuario=? AND IFNULL(u.Anulado,0)=0', [$admin])->fetch(PDO::FETCH_ASSOC);
     if (!$user || ((int)$user['IdUsuarioPerfil'] !== 1 && strcasecmp(trim($user['UsuarioPerfil']), 'PROGRAMADOR') !== 0)) throw new RuntimeException('El administrador inicial debe ser un usuario activo con perfil administrador o PROGRAMADOR del ERP.');
     if (isset($options['create-database'])) {
+        $stage = 'database_create';
         $serverDsn = 'mysql:host=' . $connection['host'] . ';port=' . $connection['port'] . ';charset=' . $connection['charset'];
         $server = new PDO($serverDsn, $connection['user'], $connection['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
         $server->exec('CREATE DATABASE IF NOT EXISTS `' . $cfg['database'] . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         $server = null;
     }
+    $stage = 'support_connection';
     $db = supportRuntimeConnect($cfg);
     $lock = 'support_setup_' . substr(hash('sha256', $cfg['database']), 0, 40);
     if ((int)supportQuery($db, 'SELECT GET_LOCK(?,10)', [$lock])->fetchColumn() !== 1) throw new RuntimeException('Otro proceso está instalando soporte. Intenta nuevamente.');
     try {
+        $stage = 'schema_check';
         $tracked = supportQuery($db, "SELECT COUNT(*) FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA=BINARY DATABASE() AND TABLE_NAME='support_schema_versions'")->fetchColumn();
         $existing = supportQuery($db, "SELECT COUNT(*) FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA=BINARY DATABASE() AND TABLE_NAME LIKE 'support\\_%'")->fetchColumn();
         if (!$tracked && $existing) throw new RuntimeException('Hay tablas de soporte sin historial de migraciones. Deben revisarse antes de continuar; no se reemplazarán.');
@@ -66,6 +71,7 @@ try {
         $migrations = glob(__DIR__ . '/migrations/*.up.sql');
         if (count($migrations) !== 8) throw new RuntimeException('Faltan archivos de migración. Actualiza el repositorio completo.');
         sort($migrations);
+        $stage = 'migrations';
         // Detect any changed historical migration before applying subsequent ones.
         foreach ($migrations as $migration) {
             $old = supportQuery($db, 'SELECT checksum FROM support_schema_versions WHERE version=?', [basename($migration)])->fetchColumn();
@@ -77,6 +83,7 @@ try {
             supportQuery($db, 'INSERT INTO support_schema_versions VALUES(?,?,?)', [basename($migration), hash_file('sha256', $migration), supportNow()]);
             echo 'Aplicada: ' . basename($migration) . "\n";
         }
+        $stage = 'registration';
         $db->beginTransaction();
         if (!empty($cfg['local_installation'])) {
             $installation = supportQuery($db, 'SELECT id,origin_https,active FROM support_installations WHERE id=? FOR UPDATE', [$cfg['local_installation']])->fetch(PDO::FETCH_ASSOC);
@@ -100,6 +107,7 @@ try {
         supportAudit($db, $identity, 'central_setup', null, ['origin' => $origin, 'company' => $company]);
         $db->commit();
         // Publish config only after successful migrations/registration. Passwords stay private.
+        $stage = 'configuration_write';
         $contents = '<?php' . "\nreturn " . var_export($cfg, true) . ";\n";
         if (!is_file($file) || file_get_contents($file) !== $contents) {
             if (!is_dir(dirname($file))) throw new RuntimeException('No existe el directorio privado de configuración.');
@@ -123,7 +131,7 @@ try {
 } catch (Throwable $e) {
     if ($db && $db->inTransaction()) $db->rollBack();
     $failure = supportRuntimeFailure($e);
-    if ($e instanceof PDOException) $message = 'No se pudo crear/actualizar la base de soporte. Revisa permisos del usuario MySQL y la conexión privada; no se muestran credenciales.';
+    if ($e instanceof PDOException) { $failure = supportSetupDatabaseFailure($e, $stage); $message = $failure['error']; }
     else $message = $e instanceof SupportRuntimeException ? $failure['error'] : $e->getMessage();
     fwrite(STDERR, $failure['code'] . ': ' . $message . "\n");
     exit(1);

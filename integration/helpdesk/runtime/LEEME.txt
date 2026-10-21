@@ -45,6 +45,20 @@ Nunca versionar archivos *.local.php. El directorio config esta protegido por
 Se puede ubicar la configuracion fuera del webroot definiendo
 SUPPORT_RUNTIME_CONFIG=/ruta/privada/runtime.php en PHP-FPM/Apache y en la CLI.
 
+SI FALLA LA CREACION DE LA BASE EN CYBERPANEL
+El usuario root de MobaXterm es de Linux; el instalador usa el usuario MySQL del
+ERP y este puede tener acceso solo a fact_nstarapaca. La actualizacion del codigo
+no le concede permisos sobre otra base. El instalador muestra el codigo MySQL,
+SQLSTATE y etapa sin revelar contrasenas, consultas ni datos de conexion.
+Si indica SUPPORT_DATABASE_CREATE_DENIED (MySQL 1044/1142/1227):
+1. En CyberPanel crear la base independiente fact_nstarapaca_soporte. Usar el
+   nombre completo real que asigne el panel si agrega un prefijo.
+2. Autorizar al usuario MySQL del ERP sobre esa base. Si el panel exige otro
+   usuario, completar config/support.local.php con el ejemplo privado indicado.
+3. Repetir --apply con el nombre real y SIN --create-database; despues --check.
+Si el fallo ocurre en migrations, revisar primero las migraciones aplicadas;
+no borrar tablas ni importar una base vacia sobre tickets existentes.
+
 El instalador aplica 8 migraciones con historial/checksum y bloqueo. No borra
 tickets, no cambia permisos existentes ni reactiva empresas dadas de baja.
 Solo asigna superadmin de soporte al usuario explicitamente indicado y validado
