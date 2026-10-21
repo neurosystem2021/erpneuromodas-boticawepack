@@ -1,0 +1,81 @@
+CENTRO DE SOPORTE NSTARAPACA
+Central: https://nstarapaca.factura.vip/views/diario.php
+API para los clientes: https://nstarapaca.factura.vip/api/index.php
+
+POR QUE APARECIA 'CENTRO DE SOPORTE NO DISPONIBLE'
+La API buscaba C:/xampp/support-private/runtime.php incluso en Linux.
+La base independiente de soporte no forma parte de la exportacion del ERP.
+El acceso al ERP y el acceso a soporte son conexiones distintas.
+
+ACTUALIZACION EN PRODUCCION (desde la carpeta del repositorio PHP boticav1)
+ git switch nstarapaca
+ git pull --ff-only origin nstarapaca
+ php tools/support/setup.php --check
+
+PRIMERA INSTALACION DE LA CENTRAL
+Respaldar primero cualquier base de soporte existente. No importar datos de
+prueba ni reemplazar una central que ya tiene tickets. Si existe la central,
+configurar su conexion e identificadores reales en config/support.local.php.
+Una instalacion nueva necesita una base MySQL independiente, por ejemplo
+fact_nstarapaca_soporte. Si el usuario actual del ERP tiene permiso para crearla:
+
+ php tools/support/setup.php --apply --database=fact_nstarapaca_soporte --origin=https://nstarapaca.factura.vip --company=1 --admin=superadmin --create-database
+
+Usar el IDEMPRESA y usuario administrador reales si no son 1 y superadmin.
+El comando toma host/puerto/usuario/password de config/database.local.php cuando
+no se indica otra conexion. No cambia esa configuracion ni las tablas del ERP.
+Si MySQL deniega crear/acceder a esa base, crearla y otorgar permisos desde la
+administracion del hosting. Para usar un usuario distinto, copiar
+tools/support/support.local.example.php a config/support.local.php y completar
+SOLO en el servidor. Luego ejecutar el mismo comando sin --create-database.
+Nunca versionar archivos *.local.php. El directorio config esta protegido por
+.htaccess; en Nginx debe bloquearse /config/ y /tools/ en el virtual host.
+Se puede ubicar la configuracion fuera del webroot definiendo
+SUPPORT_RUNTIME_CONFIG=/ruta/privada/runtime.php en PHP-FPM/Apache y en la CLI.
+
+El instalador aplica 8 migraciones con historial/checksum y bloqueo. No borra
+tickets, no cambia permisos existentes ni reactiva empresas dadas de baja.
+Solo asigna superadmin de soporte al usuario explicitamente indicado y validado
+como administrador o PROGRAMADOR activo. El resto de usuarios entra como
+solicitante hasta que el superadmin conceda acceso. Los perfiles del ERP no cambian.
+Repetir --apply conserva los datos. Si una migracion DDL falla, revisar su estado
+antes de repetir; no existe reparacion destructiva ni borrado automatico.
+
+VERIFICACION
+ php tools/support/setup.php --check
+Debe indicar soporte conectado, migraciones y empresa habilitadas.
+Abrir diario.php de nuevo. El superadmin podra registrar clientes y dar permisos.
+El diagnostico no modifica datos ni imprime claves ni passwords.
+Codigos: SUPPORT_CONFIG_MISSING (configuracion ausente), SUPPORT_DATABASE_MISSING
+(base ausente), SUPPORT_DATABASE_ACCESS (permisos/credenciales),
+SUPPORT_DATABASE_UNREACHABLE (servidor no accesible), SUPPORT_MIGRATIONS_REQUIRED
+(tablas pendientes), SUPPORT_REGISTRATION_INACTIVE (empresa/instalacion inactiva).
+El entorno local anterior de Windows sigue reconociendo su runtime privado.
+
+CENTRALIZAR LOS DEMAS SISTEMAS
+Usar el paquete support-clientes-nstarapaca.zip. No ejecutar su instalador de
+cliente en esta central. Cada sistema conserva su base y sus usuarios del ERP.
+El cliente genera una clave propia; compartir solo public-registration.json.
+En la central: Empresas y accesos -> Registrar otra instalacion. Completar UUID,
+origen HTTPS del cliente, IdEmpresa, key_id y clave PUBLICA de ese manifiesto.
+Conceder acceso a los programadores de soporte para esa empresa.
+Cliente: Soporte -> Nuevo ticket -> categoria, modulo, asunto y descripcion ->
+Enviar. Recibe numero SOP, puede conversar y confirmar/calificar la solucion.
+Programador: cola central -> asignar/tomar -> responder -> resolver. El cliente
+solo ve sus tickets; las notas internas quedan para el equipo autorizado.
+Los avisos funcionan en la bandeja con el navegador abierto. Correo, WhatsApp y
+adjuntos remotos no estan integrados en este paquete. No se envia nada por ellos.
+
+VERIFICACION LOCAL 21/10/2026
+- test-support-runtime.php: instalacion con las 8 migraciones en bases temporales,
+  ticket creado por el puente HTTP firmado y numero SOP, visible en la central,
+  separacion de empresas y rechazo de firma repetida; actualizacion sin borrado.
+- test-support-service.php: roles, notas internas, asignacion, respuestas,
+  resolucion, cierre, reapertura, encuesta y metricas por tecnico.
+- test-support-connector-package.php y test-support-connector-case.php: claves,
+  manifiesto publico, instalacion aislada, respaldos privados y caso de tablas.
+- Prueba del navegador: formulario, ticket, conversacion, indicadores y movil.
+  HTTP simulado; no se enviaron tickets ni mensajes a clientes reales.
+- setup.php --check y test-support-installed.php: conexion local y endpoints OK.
+Pendiente en produccion: pull, conexion/base privada, instalacion y registro de
+claves publicas de cada cliente. La conexion remota autenticada no se verifico.

@@ -1,9 +1,9 @@
 <?php
 if(!function_exists('appPdoConnection'))require_once __DIR__.'/../config/database.php';
 require_once __DIR__.'/support-service.php';
+require_once __DIR__.'/support-runtime.php';
 function supportDatabase(){
- if(!is_file('C:/xampp/support-private/runtime.php'))throw new RuntimeException('Support not configured');$cfg=require 'C:/xampp/support-private/runtime.php';
- if(!preg_match('/^[a-z0-9_]+$/',$cfg['database']))throw new RuntimeException('Invalid schema');$db=appPdoConnection();$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);$db->exec('USE `'.$cfg['database'].'`');return [$db,$cfg];
+ $cfg=supportRuntimeConfig();$db=supportRuntimeConnect($cfg);supportRuntimeVerify($db,$cfg);return [$db,$cfg];
 }
 function supportVerifyBridge($db,$raw,$headers){
  if(strlen($raw)>128000||!function_exists('openssl_verify'))throw new InvalidArgumentException('Solicitud no válida.');$envelope=json_decode($raw,true);if(!is_array($envelope))throw new InvalidArgumentException('Solicitud no válida.');
@@ -21,10 +21,10 @@ return function($app){
  $auth=function($q,$r,$next){$db=null;try{
   if(session_status()!==PHP_SESSION_ACTIVE)session_start();$user=$_SESSION['user']??'';if(!$user||(isset($_SESSION['expire'])&&$_SESSION['expire']<time())){session_write_close();return $r->withJson(['error'=>'Inicia sesión.'],401);}
   $_SESSION['support_csrf']=$_SESSION['support_csrf']??bin2hex(random_bytes(24));$csrf=$_SESSION['support_csrf'];$branch=(string)($_SESSION['idAlmacen']??'');session_write_close();if($q->getMethod()!=='GET'&&!hash_equals($csrf,$q->getHeaderLine('X-Support-CSRF')))return $r->withJson(['error'=>'Actualiza la página antes de guardar.'],403);
-  $erp=appPdoConnection();$u=supportQuery($erp,'SELECT Usuario,NombreUsuario FROM Seg_Usuario WHERE Usuario=? AND IFNULL(Anulado,0)=0',[$user])->fetch(PDO::FETCH_ASSOC);if(!$u)return $r->withJson(['error'=>'Usuario deshabilitado.'],403);
+  $erp=appPdoConnection();$users=supportErpTable($erp,'Seg_Usuario');$u=supportQuery($erp,'SELECT Usuario,NombreUsuario FROM '.$users.' WHERE Usuario=? AND IFNULL(Anulado,0)=0',[$user])->fetch(PDO::FETCH_ASSOC);if(!$u)return $r->withJson(['error'=>'Usuario deshabilitado.'],403);
   [$db,$cfg]=supportDatabase();$i=supportIdentity($db,$cfg['local_installation'],$u['Usuario'],$cfg['local_company'],$u['NombreUsuario']?:$u['Usuario']);$i['csrf']=$csrf;$i['branch']=$branch;
   return $next($q->withAttribute('support_db',$db)->withAttribute('support_identity',$i),$r)->withHeader('Cache-Control','no-store');
- }catch(InvalidArgumentException $e){if($db&&$db->inTransaction())$db->rollBack();return $r->withJson(['error'=>$e->getMessage()],422);}catch(Throwable $e){if($db&&$db->inTransaction())$db->rollBack();error_log('[SUPPORT] '.get_class($e));return $r->withJson(['error'=>'Centro de soporte no disponible.'],503);}};
+ }catch(InvalidArgumentException $e){if($db&&$db->inTransaction())$db->rollBack();return $r->withJson(['error'=>$e->getMessage()],422);}catch(Throwable $e){if($db&&$db->inTransaction())$db->rollBack();$failure=supportRuntimeFailure($e);error_log('[SUPPORT] '.$failure['code']);return $r->withJson($failure,503);}};
  $run=function($q,$r,$action,$p){$db=$q->getAttribute('support_db');try{return $r->withJson(supportDispatch($db,$q->getAttribute('support_identity'),$action,$p));}catch(InvalidArgumentException $e){if($db->inTransaction())$db->rollBack();return $r->withJson(['error'=>$e->getMessage()],422);}catch(Throwable $e){if($db->inTransaction())$db->rollBack();error_log('[SUPPORT] action '.get_class($e));return $r->withJson(['error'=>'No se pudo guardar. Actualiza y revisa los datos.'],500);}};
  foreach(['context','tickets','members','notifications','activity'] as $action)$app->get('/support/'.$action,function($q,$r)use($run,$action){return $run($q,$r,$action,$q->getQueryParams());})->add($auth);
  $app->get('/support/tickets/{id:[0-9]+}',function($q,$r,$args)use($run){return $run($q,$r,'detail',$args);})->add($auth);

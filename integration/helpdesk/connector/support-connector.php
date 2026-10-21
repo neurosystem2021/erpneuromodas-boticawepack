@@ -1,5 +1,14 @@
 <?php
 if(!function_exists('appPdoConnection'))require_once __DIR__.'/../config/database.php';
+// Windows can hide table-name case mismatches that fail on Linux.
+function supportConnectorTable($db,$expected){
+ if(!in_array($expected,['Seg_Usuario','Gen_Empresa'],true))throw new RuntimeException('Unsupported identity table');
+ $s=$db->prepare('SELECT TABLE_NAME FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA=BINARY DATABASE() AND LOWER(TABLE_NAME)=LOWER(?)');$s->execute([$expected]);$matches=$s->fetchAll(PDO::FETCH_COLUMN);
+ if(in_array($expected,$matches,true))$name=$expected;
+ elseif(count($matches)===1)$name=$matches[0];
+ else throw new RuntimeException('Identity table unavailable or ambiguous');
+ return '`'.str_replace('`','``',$name).'`';
+}
 // Installed in a client ERP. Private key never leaves its server.
 function supportConnectorSend($config,$identity,$action,$payload){
  $url=rtrim($config['central_api'],'/').'/support/bridge';if(parse_url($url,PHP_URL_SCHEME)!=='https')throw new RuntimeException('Central support requires HTTPS');
@@ -10,9 +19,9 @@ return function($app){
  $proxy=function($q,$r,$action,$payload){try{
   if(session_status()!==PHP_SESSION_ACTIVE)session_start();$user=$_SESSION['user']??'';if(!$user||(isset($_SESSION['expire'])&&$_SESSION['expire']<time())){session_write_close();return $r->withJson(['error'=>'Inicia sesión.'],401);}
   $_SESSION['support_csrf']=$_SESSION['support_csrf']??bin2hex(random_bytes(24));$csrf=$_SESSION['support_csrf'];$branch=$_SESSION['idAlmacen']??'';session_write_close();if($q->getMethod()!=='GET'&&!hash_equals($csrf,$q->getHeaderLine('X-Support-CSRF')))return $r->withJson(['error'=>'Actualiza la página antes de guardar.'],403);
-  $file=getenv('SUPPORT_CONNECTOR_CONFIG');if(!$file&&is_file(__DIR__.'/support-connector-location.php'))$file=require __DIR__.'/support-connector-location.php';if(!$file||!is_file($file))throw new RuntimeException('Private connector config unavailable');$cfg=require $file;$db=appPdoConnection();$s=$db->prepare('SELECT Usuario,NombreUsuario FROM Seg_Usuario WHERE Usuario=? AND IFNULL(Anulado,0)=0');$s->execute([$user]);$u=$s->fetch(PDO::FETCH_ASSOC);if(!$u)return $r->withJson(['error'=>'Usuario deshabilitado.'],403);
+  $file=getenv('SUPPORT_CONNECTOR_CONFIG');if(!$file&&is_file(__DIR__.'/support-connector-location.php'))$file=require __DIR__.'/support-connector-location.php';if(!$file||!is_file($file))throw new RuntimeException('Private connector config unavailable');$cfg=require $file;$db=appPdoConnection();$usersTable=supportConnectorTable($db,'Seg_Usuario');$companyTable=supportConnectorTable($db,'Gen_Empresa');$s=$db->prepare('SELECT Usuario,NombreUsuario FROM '.$usersTable.' WHERE Usuario=? AND IFNULL(Anulado,0)=0');$s->execute([$user]);$u=$s->fetch(PDO::FETCH_ASSOC);if(!$u)return $r->withJson(['error'=>'Usuario deshabilitado.'],403);
   // Company is provisioned from this ERP, never from submitted form data.
-  $s=$db->prepare('SELECT IDEMPRESA FROM Gen_Empresa WHERE IDEMPRESA=?');$s->execute([$cfg['company']]);if(!$s->fetchColumn())throw new RuntimeException('Configured company not found');
+  $s=$db->prepare('SELECT IDEMPRESA FROM '.$companyTable.' WHERE IDEMPRESA=?');$s->execute([$cfg['company']]);if(!$s->fetchColumn())throw new RuntimeException('Configured company not found');
   unset($payload['tenant_id']);if($action==='create')$payload['branch']=(string)$branch;
   [$status,$data]=supportConnectorSend($cfg,['user'=>$u['Usuario'],'name'=>$u['NombreUsuario']?:$u['Usuario'],'company'=>(string)$cfg['company']],$action,$payload);if($action==='context'&&$status===200){$data['csrf']=$csrf;$data['remote']=true;}return $r->withJson($data,$status)->withHeader('Cache-Control','no-store');
  }catch(Throwable $e){error_log('[SUPPORT CONNECTOR] '.get_class($e));return $r->withJson(['error'=>'No se pudo conectar con el centro de soporte. Intenta nuevamente.'],503);}};

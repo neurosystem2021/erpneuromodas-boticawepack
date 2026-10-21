@@ -1,17 +1,24 @@
-CONECTOR FACTURA.VIP - NST
+CONECTOR PARA CLIENTES - CENTRAL NSTARAPACA
+Central: https://nstarapaca.factura.vip/views/diario.php
+API central: https://nstarapaca.factura.vip/api/index.php
+Primero instalar/configurar la base de la central segun tools/support/LEEME.txt.
+Esta descarga instala el lado CLIENTE para generar tickets; no configura la central.
 Este paquete NO contiene claves privadas, contrasenas ni datos de clientes.
 No instala una central por cliente. Solo conecta la sesion de su ERP a la central.
 
 REQUISITOS
 ERP compatible con NST: PHP 7.4, Slim 3, appPdoConnection en config/database.php,
 Gen_Empresa, Seg_Usuario y sesion user. PHP OpenSSL y cURL habilitados.
+El conector reconoce el nombre real de las tablas de identidad, incluyendo
+GEN_EMPRESA y Gen_Empresa, para respetar el caso de cada instalacion en Linux.
+Las rutas del paquete asumen que el ERP esta en la raiz de su dominio.
 Central accesible por HTTPS desde ese servidor. Localhost solo sirve para probar NST;
 ningun servidor remoto puede conectarse al localhost de esta computadora.
 Mantener reloj del servidor sincronizado. La firma vence a los 120 segundos.
 
 1. Definir la direccion HTTPS definitiva de la API central (termina en /api/index.php).
 2. En el servidor CLIENTE, generar sus claves:
- php setup-connector.php --central=https://central.example/api/index.php --company=1 --private-dir=/private/support --webroot=/var/www/erp
+ php setup-connector.php --central=https://nstarapaca.factura.vip/api/index.php --company=1 --private-dir=/private/support --webroot=/var/www/erp
  En Windows usar rutas fuera de C:/xampp/htdocs para private-dir.
  No copiar la clave privada fuera de ese servidor. La generacion no reemplaza
  configuraciones existentes ni rota claves silenciosamente.
@@ -21,6 +28,8 @@ Mantener reloj del servidor sincronizado. La firma vence a los 120 segundos.
 4. Instalar el adaptador y UI aislada, despues de respaldo y prueba del cliente:
  php install-connector.php --erp-root=/var/www/erp --private-config=/private/support/support-client.php
  El instalador agrega rutas /support, un icono flotante y /support-ui; no reemplaza /nuevo.
+ Guarda el respaldo de los archivos modificados junto a la configuracion privada,
+ fuera del directorio publico del ERP.
  Si no coinciden los puntos de integracion del ERP, se detiene para revision.
 5. Abrir Centro de soporte con un usuario cliente y verificar su empresa.
 6. Desde NST conceder a los tecnicos centrales acceso a esa empresa y asignar tickets.
@@ -47,3 +56,27 @@ modulos de ventas ni recursos de otros clientes. /support-ui usa solo la ruta
 /soporte y no sustituye el frontend operativo del cliente.
 Para conectar sistemas que no sean NST, adaptar solo resolucion de identidad,
 registro de rutas/menu y carga de configuracion; mantener el protocolo de firma.
+
+COMO TRABAJA CADA PERSONA
+Cliente: entra con su usuario habitual, pulsa Soporte, describe el problema,
+elige modulo/categoria/prioridad y envia. Recibe su numero SOP y puede consultar
+respuestas, confirmar la solucion o reabrir. No necesita acceso a la base central.
+Supervisor: en la central registra la instalacion, concede acceso a la empresa
+y distribuye los tickets al equipo de programadores.
+Programador: entra a la central con acceso de tecnico a esa empresa, ve la cola,
+toma o recibe el ticket, conversa con el cliente y registra su solucion.
+Los avisos son de la bandeja de soporte con el navegador abierto; no son correos
+ni mensajes de WhatsApp. Para recibirlos, el tecnico debe tener acceso habilitado
+a la empresa. Los otros clientes no pueden ver ese ticket ni las notas internas.
+
+EJEMPLO WINDOWS, UNA VEZ EN CADA ERP CLIENTE
+Cambiar la ruta del ERP, el IdEmpresa real y la carpeta privada:
+ C:/xampp/php/php.exe setup-connector.php --central=https://nstarapaca.factura.vip/api/index.php --company=1 --private-dir=C:/xampp/soporte-privado/cliente1 --webroot=C:/xampp/htdocs/cliente1
+ C:/xampp/php/php.exe install-connector.php --erp-root=C:/xampp/htdocs/cliente1 --private-config=C:/xampp/soporte-privado/cliente1/support-client.php
+
+El instalador agrega al encabezado este codigo (no duplicarlo manualmente):
+ <script defer src="/support-ui/widget.js"></script>
+
+Cada instalacion genera su UUID y sus propias claves. No reutilizar la clave
+privada de un cliente en otro sistema. La URL apunta a Nstarapaca; debe estar
+habilitada la central y registrada la clave publica antes de enviar tickets.

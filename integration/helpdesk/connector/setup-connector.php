@@ -1,4 +1,5 @@
 <?php
+if(PHP_SAPI!=='cli'){http_response_code(404);exit;}
 // Run on EACH client server. Creates private configuration and public manifest only.
 $options=getopt('',['central:','company:','private-dir:','webroot:']);
 if(empty($options['central'])||empty($options['company'])||empty($options['private-dir'])||empty($options['webroot'])){echo "Usage: php setup-connector.php --central=https://central.example/api --company=1 --private-dir=/private/support --webroot=/path/to/erp\n";exit(1);}
